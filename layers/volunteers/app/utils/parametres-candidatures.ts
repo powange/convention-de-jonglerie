@@ -82,6 +82,7 @@ export function parametresDeFiltre(
     source: filtres.source && filtres.source !== 'ALL' ? filtres.source : undefined,
     teams: liste(filtres.equipesSouhaitees),
     presence: liste(filtres.presence),
+    ticket: liste(filtres.billet),
     assignedTeams: liste(filtres.equipesAssignees),
     search: filtres.recherche || undefined,
   }

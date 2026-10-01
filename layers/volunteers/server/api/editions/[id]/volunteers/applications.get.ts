@@ -69,6 +69,8 @@ export default wrapApiHandler(
     const statusFilter = query.status as string | undefined
     const teamsFilter = query.teams as string | undefined
     const presenceFilter = query.presence as string | undefined
+    /** `validated`, `not_validated`, `no_ticket` — séparés par des virgules. */
+    const ticketFilter = query.ticket as string | undefined
     const assignedTeamsFilter = query.assignedTeams as string | undefined
     const sourceFilter = query.source as string | undefined
     const isExport = query.export === 'true'
@@ -140,6 +142,55 @@ export default wrapApiHandler(
         if (presenceConditions.length > 0) {
           conditions.push({ OR: presenceConditions })
         }
+      }
+    }
+
+    /*
+     * Filtre par statut du billet au contrôle d'accès.
+     *
+     * ⚠️ TROIS VALEURS ET NON DEUX. « validé » et « non validé » ne couvrent pas tout : une
+     * candidature acceptée qui n'est présente à AUCUNE phase n'a pas de billet du tout — elle n'est
+     * pas « non validée », elle n'a rien à valider. Les ranger ensemble ferait chercher un oubli
+     * là où il n'y en a pas. La règle est celle du guichet, `benevolePresentSurPlace`, pour que
+     * les deux écrans ne se contredisent pas.
+     */
+    if (ticketFilter) {
+      const statuts = ticketFilter
+        .split(',')
+        .map((valeur) => valeur.trim())
+        .filter(Boolean)
+
+      const presenceSurPlace = {
+        OR: [
+          { eventAvailability: true },
+          { eventAvailability: null },
+          { setupAvailability: true },
+          { teardownAvailability: true },
+        ],
+      }
+      const sansBillet = {
+        eventAvailability: false,
+        setupAvailability: { not: true },
+        teardownAvailability: { not: true },
+      }
+
+      const conditionsBillet = statuts
+        .map((statut) => {
+          switch (statut) {
+            case 'validated':
+              return { AND: [presenceSurPlace, { entryValidated: true }] }
+            case 'not_validated':
+              return { AND: [presenceSurPlace, { entryValidated: false }] }
+            case 'no_ticket':
+              return sansBillet
+            default:
+              return null
+          }
+        })
+        .filter(Boolean)
+
+      if (conditionsBillet.length > 0) {
+        conditions.push({ OR: conditionsBillet })
       }
     }
 
@@ -239,6 +290,10 @@ export default wrapApiHandler(
       setupAvailability: true,
       teardownAvailability: true,
       eventAvailability: true,
+      // Statut du billet au contrôle d'accès : la colonne de la liste s'en sert, et le filtre
+      // ci-dessus porte sur le même champ — l'un sans l'autre laisserait filtrer sans voir.
+      entryValidated: true,
+      entryValidatedAt: true,
       arrivalDateTime: true,
       departureDateTime: true,
       source: true,

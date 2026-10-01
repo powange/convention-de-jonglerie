@@ -116,7 +116,7 @@ model User {
   volunteerComments                  VolunteerComment[]
   conversationParticipants           ConversationParticipant[]
   /// Les fils « bénévole ↔ organisateurs » dont cette personne est LE bénévole.
-  volunteerConversations             Conversation[]            @relation("Conversation_volunteer")
+  volunteerConversations             Conversation[]                      @relation("Conversation_volunteer")
   showApplications                   ShowApplication[]
   decidedShowApplications            ShowApplication[]                   @relation("ShowApplicationDecider")
   showPresets                        ShowPreset[]

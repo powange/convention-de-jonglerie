@@ -28,17 +28,48 @@ describe('handoutItemSelectionSchema', () => {
   })
 })
 
+describe('les PHASES, quand elles sont fournies', () => {
+  it('🔬 normalise les phases, et rend un tableau vide à défaut', () => {
+    /*
+     * ⚠️ VIDE = TOUTES LES PHASES, c'est la convention de `phases-edition.ts` et c'est ce qui rend
+     * l'ajout de la colonne sans effet sur l'existant. L'identifiant nu — la forme documentée
+     * avant les quantités — doit donc rendre la MÊME structure que la forme objet, sans quoi
+     * l'appelant devrait savoir laquelle il a reçue.
+     */
+    expect(normalizeHandoutItemSelections([4])).toEqual([
+      { handoutItemId: 4, quantity: 1, phases: [] },
+    ])
+    expect(
+      normalizeHandoutItemSelections([{ handoutItemId: 4, phases: ['TEARDOWN', 'SETUP'] }])
+    ).toEqual([{ handoutItemId: 4, quantity: 1, phases: ['SETUP', 'TEARDOWN'] }])
+  })
+
+  it('les autres porteurs d’articles ignorent ce champ sans se casser', () => {
+    /*
+     * 📍 Tarifs, options, spectacles et repas passent par cette même normalisation et leurs tables
+     * n'ont PAS de colonne `phases` : ils déstructurent `{ handoutItemId, quantity }`. Ce test
+     * fixe le contrat — un champ en plus ne doit jamais devenir un champ obligatoire pour eux.
+     */
+    const [selection] = normalizeHandoutItemSelections([{ handoutItemId: 8, quantity: 2 }])
+    const { handoutItemId, quantity } = selection!
+
+    expect({ handoutItemId, quantity }).toEqual({ handoutItemId: 8, quantity: 2 })
+  })
+})
+
 describe('normalizeHandoutItemSelections', () => {
   it('ramène les deux formes à un couple article / quantité', () => {
-    expect(normalizeHandoutItemSelections([7, { handoutItemId: 8, quantity: 4 }])).toEqual([
-      { handoutItemId: 7, quantity: 1 },
-      { handoutItemId: 8, quantity: 4 },
+    expect(
+      normalizeHandoutItemSelections([7, { handoutItemId: 8, quantity: 4, phases: [] }])
+    ).toEqual([
+      { handoutItemId: 7, quantity: 1, phases: [] },
+      { handoutItemId: 8, quantity: 4, phases: [] },
     ])
   })
 
   it('donne un exemplaire par défaut quand la quantité est absente', () => {
     expect(normalizeHandoutItemSelections([{ handoutItemId: 9 }])).toEqual([
-      { handoutItemId: 9, quantity: 1 },
+      { handoutItemId: 9, quantity: 1, phases: [] },
     ])
   })
 
@@ -47,10 +78,10 @@ describe('normalizeHandoutItemSelections', () => {
     // le createMany. La dernière quantité l'emporte.
     expect(
       normalizeHandoutItemSelections([
-        { handoutItemId: 3, quantity: 1 },
-        { handoutItemId: 3, quantity: 5 },
+        { handoutItemId: 3, quantity: 1, phases: [] },
+        { handoutItemId: 3, quantity: 5, phases: [] },
       ])
-    ).toEqual([{ handoutItemId: 3, quantity: 5 }])
+    ).toEqual([{ handoutItemId: 3, quantity: 5, phases: [] }])
   })
 
   it('rend une liste vide pour une sélection vide', () => {
@@ -73,14 +104,14 @@ describe('normalizeHandoutItemSelections', () => {
 
   it('BORNE une quantité nulle, négative ou fractionnaire à un exemplaire', () => {
     // On ne remet pas « zéro bracelet », et une demi-unité n'a pas de sens non plus.
-    expect(normalizeHandoutItemSelections([{ handoutItemId: 1, quantity: 0 }])).toEqual([
-      { handoutItemId: 1, quantity: 1 },
-    ])
+    expect(normalizeHandoutItemSelections([{ handoutItemId: 1, quantity: 0, phases: [] }])).toEqual(
+      [{ handoutItemId: 1, quantity: 1, phases: [] }]
+    )
     expect(normalizeHandoutItemSelections([{ handoutItemId: 2, quantity: -3 }])).toEqual([
-      { handoutItemId: 2, quantity: 1 },
+      { handoutItemId: 2, quantity: 1, phases: [] },
     ])
     expect(normalizeHandoutItemSelections([{ handoutItemId: 3, quantity: 2.7 }])).toEqual([
-      { handoutItemId: 3, quantity: 2 },
+      { handoutItemId: 3, quantity: 2, phases: [] },
     ])
   })
 })

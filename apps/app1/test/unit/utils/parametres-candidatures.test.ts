@@ -57,6 +57,7 @@ describe('parametresDeFiltre', () => {
         statut: 'PENDING',
         equipesSouhaitees: ['a', 'b'],
         presence: ['montage'],
+        billet: [],
         equipesAssignees: ['c'],
         recherche: 'dupont',
       })
@@ -77,7 +78,12 @@ describe('parametresDeFiltre', () => {
 
   it('efface une liste vide plutôt que d’envoyer une chaîne vide', () => {
     // Une chaîne vide se lirait « filtre sur rien » et ne rendrait aucune candidature.
-    const p = parametresDeFiltre({ equipesSouhaitees: [], presence: [], equipesAssignees: [] })
+    const p = parametresDeFiltre({
+      equipesSouhaitees: [],
+      presence: [],
+      billet: [],
+      equipesAssignees: [],
+    })
 
     expect(p.teams).toBeUndefined()
     expect(p.presence).toBeUndefined()
@@ -98,6 +104,9 @@ describe('parametresDeFiltre', () => {
       'source',
       'status',
       'teams',
+      // Le statut du billet au contrôle d'accès. Ce test existe pour qu'une clé n'y entre pas par
+      // inadvertance : elle partirait dans la requête et serait ignorée en silence.
+      'ticket',
     ])
   })
 })
@@ -110,6 +119,7 @@ describe('parametresDesCandidatures', () => {
     statut: 'ACCEPTED',
     equipesSouhaitees: ['bar', 'accueil'],
     presence: ['montage'],
+    billet: [],
     equipesAssignees: ['cuisine'],
     recherche: 'marie',
   }

@@ -107,10 +107,10 @@ describe('l’onglet des articles des bénévoles', () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     const vm = composant.vm as unknown as {
-      selection: Array<{ handoutItemId: number; quantity: number }>
+      selection: Array<{ handoutItemId: number; quantity: number; phases: string[] }>
       modaleOuverte: boolean
     }
-    vm.selection = [{ handoutItemId: 63, quantity: 9 }]
+    vm.selection = [{ handoutItemId: 63, quantity: 9, phases: [] }]
     vm.modaleOuverte = false
     await new Promise((resolve) => setTimeout(resolve, 0))
 
@@ -118,8 +118,11 @@ describe('l’onglet des articles des bénévoles', () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     expect(vm.selection).toEqual([
-      { handoutItemId: 52, quantity: 3 },
-      { handoutItemId: 58, quantity: 1 },
+      // ⚠️ `phases` s'ajoute à la forme : vide = toutes les périodes, donc une association
+      // existante se comporte exactement comme avant ce réglage. C'est cette équivalence que le
+      // cas vérifie, pas seulement la présence du champ.
+      { handoutItemId: 52, quantity: 3, phases: [] },
+      { handoutItemId: 58, quantity: 1, phases: [] },
     ])
   })
 })
