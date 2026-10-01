@@ -1,20 +1,44 @@
-# Docker Compose pour Convention de Jonglerie
-name: convention-de-jonglerie
+# Docker Compose pour les TESTS de Convention de Jonglerie.
+#
+# ⚠️⚠️ CE FICHIER A LONGTEMPS PARTAGÉ SON IDENTITÉ AVEC CELUI DE DÉVELOPPEMENT, et c'est ainsi qu'il
+# détruisait la base de travail. Il portait le même `name:` (`convention-de-jonglerie`), le même
+# service `database`, le même `container_name` (`convention-db`) et le même volume (`mysql_data`).
+# Compose résolvait donc `convention-de-jonglerie_mysql_data` — LE VOLUME DU DÉVELOPPEMENT —, puis
+# recréait le conteneur de dev avec la configuration de test. `npm run test:setup` et
+# `npm run test:db:run`, deux commandes documentées, suffisaient : `cleanDatabase()` de
+# `test/setup-db.ts` vidait ensuite utilisateurs, conventions, éditions, covoiturage, publications
+# et bénévoles.
+#
+# Quatre séparations, et chacune est nécessaire :
+#  • `name:` distinct — c'est lui qui préfixe les volumes, donc lui qui décidait de la destruction ;
+#  • `container_name:` distincts — sans quoi Compose RECRÉE le conteneur de dev, port compris ;
+#  • base en `tmpfs` plutôt qu'un volume nommé — elle est jetable, et rien de persistant ne peut
+#    alors être confondu avec le développement ;
+#  • port 3310 — 3306 est pris par la base de dev, 3308 par sa base miroir, et 3307 par un autre
+#    projet de cette machine (voir le commentaire de `shadow-db` dans docker-compose.dev.yml).
+#
+# Le nom de base par défaut contient « test », et ce n'est pas cosmétique : `test/setup-db.ts`
+# REFUSE de nettoyer une base dont le nom ne le contient pas. C'est la seconde barrière, celle qui
+# tient même si quelqu'un pointe ces tests ailleurs à la main.
+name: convention-de-jonglerie-test
 services:
-  # Base de données MySQL
+  # Base de données MySQL, jetable
   database:
     image: mysql:8.0
-    container_name: convention-db
+    container_name: convention-db-test
     restart: unless-stopped
+    # Durabilité relâchée : la base ne survit pas à l'arrêt, et rejouer une centaine de migrations
+    # en RAM prend quelques secondes au lieu de quelques minutes. Même raison que `shadow-db`.
+    command: --innodb-flush-log-at-trx-commit=2 --skip-log-bin --innodb-doublewrite=0
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-convention_db}
+      MYSQL_DATABASE: ${MYSQL_TEST_DATABASE:-convention_db_test}
       MYSQL_USER: ${MYSQL_USER:-convention_user}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-convention_password}
     ports:
-      - '3308:3306'
-    volumes:
-      - mysql_data:/var/lib/mysql
+      - '3310:3306'
+    tmpfs:
+      - /var/lib/mysql
     healthcheck:
       test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       timeout: 20s
@@ -25,10 +49,10 @@ services:
     build:
       context: ../..
       dockerfile: apps/app1/Dockerfile.test
-    container_name: convention-app
+    container_name: convention-app-test
     restart: unless-stopped
     environment:
-      DATABASE_URL: 'mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_DATABASE:-convention_db}'
+      DATABASE_URL: 'mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_TEST_DATABASE:-convention_db_test}'
       NUXT_HOST: '0.0.0.0'
       NUXT_PORT: '3000'
       NODE_ENV: 'production'
@@ -36,15 +60,14 @@ services:
       SMTP_USER: '${SMTP_USER:-}'
       SMTP_PASS: '${SMTP_PASS:-}'
     volumes:
-      - uploads_data:/app/apps/app1/public/uploads
+      - uploads_data_test:/app/apps/app1/public/uploads
     depends_on:
       database:
         condition: service_healthy
 
 volumes:
-  mysql_data:
-    driver: local
-  uploads_data:
+  # Renommé lui aussi : `uploads_data` désignait le volume des envois du développement.
+  uploads_data_test:
     driver: local
 
 networks:

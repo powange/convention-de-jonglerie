@@ -1,4 +1,10 @@
-name: convention-de-jonglerie
+# ⚠️ `name:` DISTINCT DE CELUI DU DÉVELOPPEMENT, et c'est la correction la plus importante de ce
+# fichier. Le nom de projet PRÉFIXE les volumes : avec `convention-de-jonglerie`, le volume
+# `node_modules` déclaré plus bas résolvait `convention-de-jonglerie_node_modules`, c'est-à-dire
+# CELUI DU CONTENEUR DE DÉVELOPPEMENT. Les tests montaient donc son installation, et les scripts
+# `*:clean` (`down -v`) l'auraient SUPPRIMÉE. Même cause que la destruction de la base de dev par
+# docker-compose.test.yml : un nom de projet partagé.
+name: convention-de-jonglerie-test
 services:
   # Container pour les tests unitaires uniquement (sans DB)
   test-unit:
