@@ -99,6 +99,90 @@ describe('GET /api/editions/[id]/stock-responsables', () => {
     })
   })
 
+  it('🔬 cherche sur le PSEUDO, le PRÉNOM et le NOM', async () => {
+    /*
+     * ⚠️ ELLE NE REGARDAIT QUE LE PSEUDO, et il fallait donc le connaître — alors qu'on cherche
+     * quelqu'un par son nom. C'était la demande de l'utilisateur.
+     *
+     * On mesure la FORME de la requête, et c'est la seule assertion qui compte ici : le mock de
+     * Prisma ignore le `where`, donc compter les personnes rendues resterait vert avec un filtre
+     * revenu au seul pseudo.
+     */
+    ;(globalThis as any).getQuery = vi.fn(() => ({ q: 'dupont' }))
+
+    await handler(evenement() as any)
+
+    const where = prismaMock.user.findMany.mock.calls[0][0].where
+    expect(where.AND).toEqual([
+      {
+        OR: [
+          { pseudo: { contains: 'dupont' } },
+          { prenom: { contains: 'dupont' } },
+          { nom: { contains: 'dupont' } },
+        ],
+      },
+    ])
+    // Et plus de filtre `pseudo` à la racine : il écraserait le groupe ci-dessus.
+    expect(where.pseudo).toBeUndefined()
+  })
+
+  it('🔬 accepte « Nom prénom » comme « prénom nom »', async () => {
+    /*
+     * L'assertion qui porte la demande. Un groupe par mot, tous exigés : l'ordre n'a aucune
+     * importance puisque chaque groupe accepte les trois champs. Chercher la saisie ENTIÈRE dans
+     * chaque champ échouerait sur les deux formes — aucun champ ne contient « Jean Dupont ».
+     */
+    const formeDe = async (saisie: string) => {
+      prismaMock.user.findMany.mockClear()
+      ;(globalThis as any).getQuery = vi.fn(() => ({ q: saisie }))
+      await handler(evenement() as any)
+      return prismaMock.user.findMany.mock.calls[0][0].where.AND
+    }
+
+    const prenomNom = await formeDe('Jean Dupont')
+    const nomPrenom = await formeDe('Dupont Jean')
+
+    expect(prenomNom).toHaveLength(2)
+    expect(prenomNom).toEqual(expect.arrayContaining(nomPrenom))
+    expect(nomPrenom).toEqual(expect.arrayContaining(prenomNom))
+  })
+
+  it('🔬 propose aussi les ARTISTES de l’édition', async () => {
+    /*
+     * Ajoutés à la demande : ils font l'édition autant que les autres, et c'est souvent à eux
+     * qu'on confie leur propre matériel. Le périmètre est partagé avec la garde d'écriture
+     * (`assertResponsablesDeLEdition`) : sans cet ajout, un artiste trouvé ici serait refusé à
+     * l'enregistrement.
+     */
+    await handler(evenement() as any)
+
+    const where = prismaMock.user.findMany.mock.calls[0][0].where
+    expect(where.OR).toContainEqual({ artistProfiles: { some: { editionId: 1 } } })
+  })
+
+  it('accepte encore l’ancien paramètre `pseudo`', async () => {
+    /*
+     * ⚠️ Un contrat d'API qu'on durcit casse les clients déjà ouverts : une page restée dans un
+     * onglet continue d'envoyer `pseudo`, et ce dépôt a déjà payé ce cas deux fois. Les deux formes
+     * sont donc acceptées, et elles doivent produire la MÊME requête.
+     */
+    ;(globalThis as any).getQuery = vi.fn(() => ({ pseudo: 'dupont' }))
+
+    await handler(evenement() as any)
+
+    const where = prismaMock.user.findMany.mock.calls[0][0].where
+    expect(where.AND[0].OR[0]).toEqual({ pseudo: { contains: 'dupont' } })
+  })
+
+  it('refuse une recherche sans terme', async () => {
+    // Sans mot, le `AND` serait vide et la liste rendrait toutes les personnes de l'édition d'un
+    // coup — ce que le périmètre borne, mais que la saisie ne doit pas pouvoir déclencher.
+    ;(globalThis as any).getQuery = vi.fn(() => ({}))
+
+    await expect(handler(evenement() as any)).rejects.toThrow()
+    expect(prismaMock.user.findMany).not.toHaveBeenCalled()
+  })
+
   it("ne rend pas l'adresse e-mail", async () => {
     // Gérer un stock ne donne pas droit aux adresses des bénévoles : le pseudo et l'état civil
     // suffisent à reconnaître quelqu'un de son équipe.

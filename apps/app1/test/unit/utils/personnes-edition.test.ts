@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   assertResponsablesDeLEdition,
   attachesALEdition,
+  filtreRecherchePersonne,
   LIMITE_RESULTATS,
 } from '../../../server/utils/personnes-edition'
 
@@ -20,10 +21,23 @@ const CONVENTION = 7
 const attaches = () => attachesALEdition(EDITION, CONVENTION) ?? []
 
 describe('attachesALEdition', () => {
-  it('retient les quatre façons d’être de l’édition', () => {
+  it('retient les cinq façons d’être de l’édition', () => {
     // Aucune ne suffit seule : l'auteur de la convention et le créateur de l'édition ne figurent
-    // pas toujours parmi les organisateurs, et un bénévole n'y figure jamais.
-    expect(attaches()).toHaveLength(4)
+    // pas toujours parmi les organisateurs, et ni un bénévole ni un artiste n'y figurent jamais.
+    expect(attaches()).toHaveLength(5)
+  })
+
+  it('🔬 retient les ARTISTES de l’édition', () => {
+    /*
+     * Ajoutés à la demande de l'utilisateur : ils font l'édition autant que les autres, et c'est
+     * souvent à eux qu'on confie leur propre matériel. `EditionArtist` est le rattachement d'un
+     * compte à une édition — y figurer, c'est être de l'édition, sans statut à filtrer.
+     *
+     * ⚠️ Cette liste sert DEUX FOIS : elle décide qui la recherche propose, et
+     * `assertResponsablesDeLEdition` l'emploie pour refuser toute écriture visant quelqu'un
+     * d'autre. Sans cet ajout des deux côtés, un artiste trouvé serait refusé à l'enregistrement.
+     */
+    expect(attaches()).toContainEqual({ artistProfiles: { some: { editionId: EDITION } } })
   })
 
   it('retient les organisateurs de la convention', () => {
@@ -131,5 +145,51 @@ describe('assertResponsablesDeLEdition', () => {
     await expect(
       assertResponsablesDeLEdition(EDITION, CONVENTION, [12, 12])
     ).resolves.toBeUndefined()
+  })
+})
+
+/**
+ * La recherche d'une personne par mots-clés.
+ *
+ * ⚠️ ELLE NE REGARDAIT QUE LE PSEUDO, et il fallait donc le connaître — alors qu'on cherche
+ * quelqu'un par son nom. Demande de l'utilisateur : chercher aussi sur le prénom et le nom, et
+ * accepter « Nom prénom » comme « prénom nom ».
+ */
+describe('filtreRecherchePersonne', () => {
+  it('🔬 confronte chaque mot aux TROIS champs', () => {
+    // Un seul mot : il doit pouvoir être un pseudo, un prénom ou un nom. Chercher « Dupont » dans
+    // le seul pseudo ne trouvait personne qui ne se soit pas nommé ainsi.
+    expect(filtreRecherchePersonne(['Dupont'])).toEqual([
+      {
+        OR: [
+          { pseudo: { contains: 'Dupont' } },
+          { prenom: { contains: 'Dupont' } },
+          { nom: { contains: 'Dupont' } },
+        ],
+      },
+    ])
+  })
+
+  it('🔬 exige que TOUS les mots trouvent preneur, dans n’importe quel ordre', () => {
+    /*
+     * L'assertion qui porte la demande. Un groupe par mot, combinés en `AND` : « Jean Dupont » et
+     * « Dupont Jean » produisent les mêmes deux groupes, dans un ordre qui n'a aucune importance
+     * puisque chacun accepte les trois champs.
+     *
+     * Chercher la saisie ENTIÈRE dans chaque champ échouerait sur les deux formes : aucun champ ne
+     * contient « Jean Dupont » à lui seul.
+     */
+    const ordreA = filtreRecherchePersonne(['Jean', 'Dupont'])
+    const ordreB = filtreRecherchePersonne(['Dupont', 'Jean'])
+
+    expect(ordreA).toHaveLength(2)
+    expect(ordreA).toEqual(expect.arrayContaining(ordreB))
+    expect(ordreB).toEqual(expect.arrayContaining(ordreA))
+  })
+
+  it('ne filtre rien sans mot', () => {
+    // Un `AND` vide laisse passer tout le monde — c'est le rôle du `OR` des attaches de borner, et
+    // du schéma zod de refuser une saisie trop courte avant d'arriver ici.
+    expect(filtreRecherchePersonne([])).toEqual([])
   })
 })

@@ -35,8 +35,8 @@ export function useRechercheResponsable(editionId: number): RechercheResponsable
   const resultats = ref<UserSelectItem[]>([])
   const enCours = ref(false)
 
-  // Une frappe ne vaut pas une requête : la recherche par pseudo part dès deux caractères, là où
-  // l'adresse exacte n'aboutissait qu'une fois l'adresse entière écrite.
+  // Une frappe ne vaut pas une requête : la recherche par mots-clés part dès deux caractères, là
+  // où l'adresse exacte n'aboutissait qu'une fois l'adresse entière écrite.
   const termeDiffere = refDebounced(terme, 300)
 
   async function chercher(saisie: string): Promise<UserSelectItem[]> {
@@ -60,7 +60,9 @@ export function useRechercheResponsable(editionId: number): RechercheResponsable
 
       const reponse = await $fetch<{ data: { users: any[] } }>(
         `/api/editions/${editionId}/stock-responsables`,
-        { params: { pseudo: recherche.valeur } }
+        // `q` : la recherche ne porte plus sur le seul pseudo. Le serveur accepte encore
+        // `pseudo`, pour les pages restées ouvertes avant ce changement.
+        { params: { q: recherche.valeur } }
       )
       return (reponse.data.users || []).map((u) => ({
         id: u.id,
