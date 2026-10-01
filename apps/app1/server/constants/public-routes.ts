@@ -127,6 +127,43 @@ export const publicRoutes: PublicRoute[] = [
 
   // ====== Appels à spectacles ======
   { pattern: /^\/api\/editions\/\d+\/shows-call\/public$/, methods: ['GET'], hydrateSession: true },
+  /*
+   * La liste des appels OUVERTS, toutes éditions confondues — la page que vise la notification
+   * « nouvel appel à spectacles ».
+   *
+   * ⚠️ SON PROPRE COMMENTAIRE ANNONÇAIT « accessible par tout le monde », et la page ne pose aucun
+   * middleware — mais la route n'était pas inscrite ici, donc le middleware rendait 401. Un
+   * visiteur anonyme, ou un artiste dont la session avait expiré, tombait sur l'erreur générique
+   * de chargement au lieu de la liste. Le lien de la notification menait à un écran cassé.
+   */
+  { path: '/api/shows-call/open', methods: ['GET'], hydrateSession: true },
+  /*
+   * Les représentations publiques d'une édition : ce que les popups de la carte annoncent.
+   *
+   * ⚠️ Un visiteur anonyme de la carte recevait 401. Et même connecté, il ne voyait rien — voir le
+   * `transform` de `map.vue`, qui lisait une clé que la réponse ne porte plus.
+   */
+  {
+    pattern: /^\/api\/editions\/\d+\/shows\/public$/,
+    methods: ['GET'],
+    hydrateSession: true,
+  },
+  /*
+   * Les ateliers d'une édition : l'AUTRE moitié de ce que les popups de la carte annoncent.
+   *
+   * 📍 CELLE-CI N'ÉTAIT PAS DANS LE RAPPORT — trouvée en sondant la carte publique dans un
+   * navigateur, qui a montré un `401 /editions/17/workshops` au milieu des autres appels. Son
+   * handler traite pourtant la session comme OPTIONNELLE (`session?.user?.id`) : il est écrit pour
+   * le public, exactement comme les deux précédents.
+   *
+   * La corriger fait partie du même point : réparer les spectacles sans les ateliers aurait laissé
+   * les popups à moitié vides pour un visiteur, soit le symptôme même qu'on venait traiter.
+   */
+  {
+    pattern: /^\/api\/editions\/\d+\/workshops$/,
+    methods: ['GET'],
+    hydrateSession: true,
+  },
   {
     pattern: /^\/api\/editions\/\d+\/shows-call\/\d+\/public$/,
     methods: ['GET'],

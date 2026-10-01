@@ -218,8 +218,18 @@ const { getImageUrl } = useImageUrl()
 // Récupération des appels ouverts
 const { data: openCallsData, pending, error } = await useFetch('/api/shows-call/open')
 
-// Récupération des candidatures de l'utilisateur (pour savoir s'il a déjà candidaté)
-const { data: applications } = await useFetch('/api/user/show-applications')
+/*
+ * Les candidatures de l'utilisateur, pour marquer les appels où il a déjà postulé.
+ *
+ * ⚠️ CETTE ROUTE EXIGE UNE SESSION, et cette page est publique : l'appel partait donc à chaque
+ * visite anonyme et rendait 401. Sans conséquence visible — les badges « déjà candidaté » n'ont
+ * pas de sens pour un visiteur — mais un 401 par visite dans les journaux d'erreurs, qui noie
+ * ceux qui comptent.
+ */
+const authStore = useAuthStore()
+const { data: applications } = await useFetch('/api/user/show-applications', {
+  immediate: authStore.isAuthenticated,
+})
 
 // Appels ouverts
 const openCalls = computed(() => openCallsData.value?.showCalls || [])

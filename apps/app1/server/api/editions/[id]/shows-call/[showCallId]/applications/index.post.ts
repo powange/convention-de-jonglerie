@@ -75,6 +75,36 @@ export default wrapApiHandler(
       })
     }
 
+    /*
+     * ⚠️ ET QUE L'ÉDITION ELLE-MÊME EST ENCORE DE CE MONDE. Seule la visibilité de l'APPEL était
+     * contrôlée : une édition `OFFLINE` ou `CANCELLED` dont un appel restait `PUBLIC` continuait
+     * de recevoir des candidatures et d'envoyer des notifications aux organisateurs — pour un
+     * événement retiré ou annulé. L'artiste préparait un dossier, remplissait ses besoins
+     * techniques, et postulait dans le vide.
+     *
+     * ⚠️⚠️ `editionVisiblePubliquement` NE CONVIENT PAS ICI, et le découvrir a coûté un test rouge :
+     * elle compte `CANCELLED` comme PUBLIQUE, à raison — une annulation doit rester lisible par
+     * ceux qui avaient prévu de venir. Mais « lisible » n'est pas « accepte des candidatures » :
+     * ce sont deux questions distinctes, et emprunter le prédicat de la première aurait laissé
+     * une édition annulée recevoir des dossiers.
+     *
+     * La liste est donc écrite en clair, comme celle de `visibilite-edition.ts` et pour la même
+     * raison : un statut ajouté demain doit REFUSER par défaut, plutôt que devenir ouvert sans que
+     * personne l'ait décidé.
+     *
+     * Le même message que la garde du dessus, à dessein : du point de vue du candidat, l'appel
+     * n'est pas ouvert. Dire « l'édition est annulée » serait plus précis, mais c'est une
+     * information que la fiche de l'édition donne déjà, et ce point d'API n'a pas à l'annoncer à
+     * qui devine un identifiant.
+     */
+    const STATUTS_QUI_ACCEPTENT = ['PUBLISHED', 'PLANNED']
+    if (!STATUTS_QUI_ACCEPTENT.includes(edition.status)) {
+      throw createError({
+        status: 400,
+        message: "L'appel à spectacles n'est pas ouvert",
+      })
+    }
+
     // Vérifier le mode
     if (showCall.mode === 'EXTERNAL') {
       throw createError({
