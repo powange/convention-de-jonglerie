@@ -777,7 +777,9 @@
       "stage_setup_max_length": "De opstelling op het podium mag niet langer zijn dan 3000 tekens",
       "technical_needs_max_length": "De technische vereisten mogen niet meer dan 3000 tekens bevatten",
       "url_invalid": "De URL moet beginnen met http:// of https://"
-    }
+    },
+    "unavailable": "Aanmelden niet beschikbaar",
+    "unavailable_desc": "De organisatoren hebben nog niet aangegeven waar je je voor deze oproep kunt aanmelden."
   },
   "validation": {
     "allergy_severity_required": "Ernst niveau is vereist wanneer allergieën worden opgegeven",
@@ -804,7 +806,8 @@
     "url_max_191": "De URL mag niet langer zijn dan 191 tekens",
     "emergency_contact_phone_invalid": "Het nummer van de noodcontactpersoon is niet geldig",
     "phone_invalid": "Dit telefoonnummer is niet geldig",
-    "external_url_invalid": "Deze link is niet geldig — alleen links die beginnen met http:// of https:// worden geaccepteerd"
+    "external_url_invalid": "Deze link is niet geldig — alleen links die beginnen met http:// of https:// worden geaccepteerd",
+    "deadline_timezone_invalid": "De tijdzone van de editie is onbekend: de deadline kan niet worden opgeslagen."
   },
   "guide": {
     "menu": "Menu van de gids",

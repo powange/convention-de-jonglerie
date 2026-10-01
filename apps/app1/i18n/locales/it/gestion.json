@@ -422,7 +422,7 @@
       "company_name": "Compagnia / nome d'arte",
       "company_name_hint": "Nome della compagnia o nome d'arte dell'artista che porta in scena lo spettacolo",
       "company_name_placeholder": "Es.: Compagnia delle Clave",
-      "delete_confirm": "Sei sicuro di voler eliminare questo spettacolo?",
+      "delete_confirm": "Eliminare questo spettacolo? Le sue rappresentazioni, i suoi numeri, i suoi articoli da consegnare e il collegamento con i suoi artisti saranno eliminati con esso. Le candidature già ricevute vengono conservate.",
       "delete_show": "Elimina spettacolo",
       "description": "Descrizione",
       "duration": "Durata",

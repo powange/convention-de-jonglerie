@@ -777,7 +777,9 @@
       "stage_setup_max_length": "L'allestimento del palco non può superare i 3000 caratteri",
       "technical_needs_max_length": "I requisiti tecnici non possono superare i 3000 caratteri",
       "url_invalid": "L'URL deve iniziare con http:// o https://"
-    }
+    },
+    "unavailable": "Candidatura non disponibile",
+    "unavailable_desc": "Gli organizzatori non hanno ancora indicato dove candidarsi per questo bando."
   },
   "validation": {
     "allergy_severity_required": "Il livello di gravità è richiesto quando vengono fornite allergie",
@@ -804,7 +806,8 @@
     "url_max_191": "L'URL non può superare i 191 caratteri",
     "emergency_contact_phone_invalid": "Il numero del contatto di emergenza non è valido",
     "phone_invalid": "Questo numero di telefono non è valido",
-    "external_url_invalid": "Questo link non è valido: sono accettati solo i link che iniziano con http:// o https://"
+    "external_url_invalid": "Questo link non è valido: sono accettati solo i link che iniziano con http:// o https://",
+    "deadline_timezone_invalid": "Il fuso orario dell'edizione è sconosciuto: la scadenza non può essere salvata."
   },
   "guide": {
     "menu": "Menu della guida",

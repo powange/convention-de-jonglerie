@@ -777,7 +777,9 @@
       "stage_setup_max_length": "Ustawienie na scenie nie może przekraczać 3000 znaków",
       "technical_needs_max_length": "Wymagania techniczne nie mogą przekraczać 3000 znaków",
       "url_invalid": "Adres URL musi zaczynać się od http:// lub https://"
-    }
+    },
+    "unavailable": "Zgłoszenie niedostępne",
+    "unavailable_desc": "Organizatorzy nie wskazali jeszcze, gdzie można zgłosić się do tego naboru."
   },
   "validation": {
     "allergy_severity_required": "Poziom ciężkości jest wymagany przy podaniu alergii",
@@ -804,7 +806,8 @@
     "url_max_191": "Adres URL nie może przekraczać 191 znaków",
     "emergency_contact_phone_invalid": "Numer kontaktu alarmowego jest nieprawidłowy",
     "phone_invalid": "Ten numer telefonu jest nieprawidłowy",
-    "external_url_invalid": "Ten link jest nieprawidłowy — akceptowane są tylko linki zaczynające się od http:// lub https://"
+    "external_url_invalid": "Ten link jest nieprawidłowy — akceptowane są tylko linki zaczynające się od http:// lub https://",
+    "deadline_timezone_invalid": "Strefa czasowa edycji jest nieznana: nie można zapisać terminu."
   },
   "guide": {
     "menu": "Menu przewodnika",

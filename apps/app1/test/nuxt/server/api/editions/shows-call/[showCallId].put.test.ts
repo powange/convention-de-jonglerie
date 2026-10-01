@@ -395,6 +395,90 @@ describe('/api/editions/[id]/shows-call/[showCallId] PUT', () => {
       await expect(handler(mockEvent as any)).rejects.toThrow(/URL externe.*requise/i)
     })
 
+    it('🔬 devrait rejeter le VIDAGE de l’URL externe d’un appel EXTERNAL ouvert', async () => {
+      /*
+       * ⚠️ LE CAS QUI PASSAIT, et le test voisin ne pouvait pas l'attraper : sa fixture part d'un
+       * appel dont `externalUrl` est DÉJÀ nulle, si bien que le repli `??` tombait de toute façon
+       * sur `null` et la garde se déclenchait. Ici l'appel a une adresse, et l'organisateur efface
+       * le champ — le formulaire envoie `externalUrl: null`.
+       *
+       * `??` traitait ce `null` comme « non fourni » et retombait sur l'ANCIENNE adresse : la
+       * garde passait avec elle, puis l'écriture — conditionnée à `!== undefined`, elle —
+       * enregistrait bien `null`. On obtenait un appel EXTERNAL et PUBLIC sans adresse, c'est-à-dire
+       * une fiche publique sans aucun bouton : l'artiste ne pouvait ni candidater, ni comprendre
+       * pourquoi.
+       */
+      prismaMock.editionShowCall.findFirst.mockResolvedValue({
+        ...mockShowCall,
+        mode: 'EXTERNAL',
+        visibility: 'PUBLIC',
+        externalUrl: 'https://ancien-formulaire.example',
+      })
+
+      global.readBody.mockResolvedValue({ externalUrl: null })
+
+      const mockEvent = { context: { user: mockUser } }
+
+      await expect(handler(mockEvent as any)).rejects.toThrow(/URL externe.*requise/i)
+      // Et rien n'est écrit : un refus qui enregistrerait quand même serait pire que l'absence de
+      // refus, puisqu'il laisserait l'appel dans l'état qu'on vient d'interdire.
+      expect(prismaMock.editionShowCall.update).not.toHaveBeenCalled()
+    })
+
+    it('CONSERVE l’URL externe quand le corps ne la mentionne pas', async () => {
+      /*
+       * 🔬 Le pendant positif, et il est nécessaire : remplacer `??` par un test d'`undefined`
+       * sans distinguer les deux cas refuserait aussi une requête PARTIELLE — modifier le seul
+       * nom d'un appel externe, par exemple, où le formulaire n'envoie pas `externalUrl`.
+       * « Non fourni » et « vidé » sont deux choses différentes, et c'est le schéma qui le dit :
+       * seul ce champ est `.nullable()`.
+       */
+      prismaMock.editionShowCall.findFirst.mockResolvedValue({
+        ...mockShowCall,
+        mode: 'EXTERNAL',
+        visibility: 'PUBLIC',
+        externalUrl: 'https://formulaire.example',
+      })
+      prismaMock.editionShowCall.findUnique.mockResolvedValue(null)
+      prismaMock.editionShowCall.update.mockResolvedValue({
+        ...mockShowCall,
+        name: 'Nouveau nom',
+      })
+
+      global.readBody.mockResolvedValue({ name: 'Nouveau nom' })
+
+      const mockEvent = { context: { user: mockUser } }
+
+      await expect(handler(mockEvent as any)).resolves.toMatchObject({ success: true })
+      // L'adresse n'est pas réécrite non plus : ce qui n'est pas envoyé n'est pas touché.
+      expect(prismaMock.editionShowCall.update.mock.calls[0][0].data).not.toHaveProperty(
+        'externalUrl'
+      )
+    })
+
+    it('ACCEPTE de vider l’URL externe d’un appel FERMÉ', async () => {
+      // La garde ne porte que sur un appel ouvert : un appel `CLOSED` ou `OFFLINE` sans adresse
+      // n'est pas incohérent, il n'invite personne à candidater.
+      prismaMock.editionShowCall.findFirst.mockResolvedValue({
+        ...mockShowCall,
+        mode: 'EXTERNAL',
+        visibility: 'CLOSED',
+        externalUrl: 'https://formulaire.example',
+      })
+      prismaMock.editionShowCall.findUnique.mockResolvedValue(null)
+      prismaMock.editionShowCall.update.mockResolvedValue({
+        ...mockShowCall,
+        externalUrl: null,
+      })
+
+      global.readBody.mockResolvedValue({ externalUrl: null })
+
+      const mockEvent = { context: { user: mockUser } }
+
+      await expect(handler(mockEvent as any)).resolves.toMatchObject({ success: true })
+      expect(prismaMock.editionShowCall.update.mock.calls[0][0].data.externalUrl).toBeNull()
+    })
+
     it('devrait rejeter un nom trop long', async () => {
       global.readBody.mockResolvedValue({
         name: 'a'.repeat(101),

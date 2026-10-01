@@ -422,7 +422,7 @@
       "company_name": "Gezelschap / artiestennaam",
       "company_name_hint": "Naam van het gezelschap of artiestennaam van de artiest die de voorstelling brengt",
       "company_name_placeholder": "Bijv. Jongleergezelschap",
-      "delete_confirm": "Weet je zeker dat je deze voorstelling wilt verwijderen?",
+      "delete_confirm": "Deze voorstelling verwijderen? De uitvoeringen, de nummers, de uit te reiken artikelen en de koppeling met de artiesten worden samen met de voorstelling verwijderd. Al ontvangen aanmeldingen blijven bewaard.",
       "delete_show": "Verwijder voorstelling",
       "description": "Beschrijving",
       "duration": "Duur",

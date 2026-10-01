@@ -422,7 +422,7 @@
       "company_name": "Kompanie / Künstlername",
       "company_name_hint": "Name der Kompanie oder Künstlername des Artisten, der die Show trägt",
       "company_name_placeholder": "Z. B. Jonglier-Kompanie",
-      "delete_confirm": "Sind Sie sicher, dass Sie diese Vorstellung löschen möchten?",
+      "delete_confirm": "Diese Vorstellung löschen? Ihre Aufführungen, ihre Nummern, ihre auszugebenden Artikel und die Verknüpfung mit ihren Künstlern werden mit ihr gelöscht. Bereits eingegangene Bewerbungen bleiben erhalten.",
       "delete_show": "Vorstellung löschen",
       "description": "Beschreibung",
       "duration": "Dauer",

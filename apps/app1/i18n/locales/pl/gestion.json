@@ -422,7 +422,7 @@
       "company_name": "Zespół / pseudonim sceniczny",
       "company_name_hint": "Nazwa zespołu lub pseudonim sceniczny artysty prowadzącego spektakl",
       "company_name_placeholder": "Np. Grupa Żonglerska",
-      "delete_confirm": "Czy na pewno chcesz usunąć to przedstawienie?",
+      "delete_confirm": "Usunąć to przedstawienie? Jego występy, jego numery, jego artykuły do wydania oraz powiązanie z artystami zostaną usunięte razem z nim. Otrzymane zgłoszenia zostają zachowane.",
       "delete_show": "Usuń przedstawienie",
       "description": "Opis",
       "duration": "Czas trwania",

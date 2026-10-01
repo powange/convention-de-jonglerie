@@ -624,7 +624,7 @@
     <UiConfirmModal
       v-model="showDeleteConfirm"
       :title="$t('artists.delete_artist')"
-      :message="$t('artists.delete_confirm')"
+      :description="$t('artists.delete_confirm')"
       confirm-color="error"
       :loading="deletingArtist"
       @confirm="deleteArtist"

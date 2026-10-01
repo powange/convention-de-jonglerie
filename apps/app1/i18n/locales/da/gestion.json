@@ -422,7 +422,7 @@
       "company_name": "Kompagni / kunstnernavn",
       "company_name_hint": "Navnet på kompagniet eller kunstnernavnet på den artist, der står bag forestillingen",
       "company_name_placeholder": "F.eks. Jonglørkompagniet",
-      "delete_confirm": "Er du sikker på, at du vil slette denne forestilling?",
+      "delete_confirm": "Slet denne forestilling? Dens opførelser, dens numre, dens genstande til udlevering og forbindelsen til dens artister bliver slettet sammen med den. Allerede modtagne ansøgninger bevares.",
       "delete_show": "Slet forestilling",
       "description": "Beskrivelse",
       "duration": "Varighed",

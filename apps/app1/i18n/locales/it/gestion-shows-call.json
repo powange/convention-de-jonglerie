@@ -107,7 +107,8 @@
       "visibility_public_desc": "Visibile a tutti e presente sulla piattaforma",
       "confirm_reapply_performer_desc": "Riapplicare le info della candidatura per {name}? Verranno compilati solo i campi ancora vuoti del numero — niente verrà sovrascritto.",
       "confirm_reapply_performer_title": "Riapplica le info",
-      "reapply_performer_info": "Riapplica le info"
+      "reapply_performer_info": "Riapplica le info",
+      "deadline_timezone": "Ora dell'edizione ({timezone})"
     }
   }
 }

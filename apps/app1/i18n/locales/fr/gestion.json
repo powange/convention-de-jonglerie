@@ -432,7 +432,7 @@
       "company_name": "Compagnie / nom de scène",
       "company_name_hint": "Nom de la compagnie ou nom de scène de l'artiste qui porte le spectacle",
       "company_name_placeholder": "Ex : Cie des Massues",
-      "delete_confirm": "Êtes-vous sûr de vouloir supprimer ce spectacle ?",
+      "delete_confirm": "Supprimer ce spectacle ? Ses représentations, ses numéros, ses articles à remettre et le lien avec ses artistes seront supprimés avec lui. Les candidatures reçues, elles, sont conservées.",
       "delete_show": "Supprimer le spectacle",
       "description": "Description",
       "duration": "Durée",

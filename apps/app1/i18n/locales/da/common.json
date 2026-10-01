@@ -777,7 +777,9 @@
       "stage_setup_max_length": "Opstillingen på scenen må ikke overstige 3000 tegn",
       "technical_needs_max_length": "Tekniske krav må ikke overstige 3000 tegn",
       "url_invalid": "URL'en skal starte med http:// eller https://"
-    }
+    },
+    "unavailable": "Ansøgning ikke tilgængelig",
+    "unavailable_desc": "Arrangørerne har endnu ikke oplyst, hvor man søger til dette opslag."
   },
   "validation": {
     "allergy_severity_required": "Sværhedsgrad er påkrævet, når allergier er angivet",
@@ -804,7 +806,8 @@
     "url_max_191": "URL'en må ikke overstige 191 tegn",
     "emergency_contact_phone_invalid": "Nødkontaktens telefonnummer er ikke gyldigt",
     "phone_invalid": "Dette telefonnummer er ikke gyldigt",
-    "external_url_invalid": "Dette link er ikke gyldigt — kun links, der starter med http:// eller https://, accepteres"
+    "external_url_invalid": "Dette link er ikke gyldigt — kun links, der starter med http:// eller https://, accepteres",
+    "deadline_timezone_invalid": "Udgavens tidszone er ukendt: fristen kan ikke gemmes."
   },
   "guide": {
     "menu": "Guidemenu",

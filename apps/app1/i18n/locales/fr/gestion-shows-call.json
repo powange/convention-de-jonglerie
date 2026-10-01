@@ -34,6 +34,7 @@
       "deadline_description": "Date limite pour soumettre une candidature",
       "deadline_label": "Date limite de candidature",
       "deadline_time": "Heure limite",
+      "deadline_timezone": "Heure de l'édition ({timezone})",
       "decided_info": "Décision prise le",
       "delete_confirm_message": "Cette action supprimera définitivement l'appel \"{name}\" ainsi que toutes les candidatures associées.",
       "delete_confirm_title": "Supprimer l'appel à spectacles",

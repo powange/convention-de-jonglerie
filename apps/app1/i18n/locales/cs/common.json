@@ -777,7 +777,9 @@
       "stage_setup_max_length": "Příprava na jevišti nesmí překročit 3000 znaků",
       "technical_needs_max_length": "Technické požadavky nemohou překročit 3000 znaků",
       "url_invalid": "URL musí začínat http:// nebo https://"
-    }
+    },
+    "unavailable": "Přihlášení není dostupné",
+    "unavailable_desc": "Organizátoři dosud neuvedli, kde se lze do této výzvy přihlásit."
   },
   "validation": {
     "allergy_severity_required": "Stupeň závažnosti je vyžadován, pokud jsou uvedeny alergie.",
@@ -804,7 +806,8 @@
     "url_max_191": "Adresa URL nesmí překročit 191 znaků",
     "emergency_contact_phone_invalid": "Číslo nouzového kontaktu není platné",
     "phone_invalid": "Toto telefonní číslo není platné",
-    "external_url_invalid": "Tento odkaz není platný – přijímány jsou pouze odkazy začínající http:// nebo https://"
+    "external_url_invalid": "Tento odkaz není platný – přijímány jsou pouze odkazy začínající http:// nebo https://",
+    "deadline_timezone_invalid": "Časové pásmo ročníku není známé: termín nelze uložit."
   },
   "guide": {
     "menu": "Nabídka průvodce",
