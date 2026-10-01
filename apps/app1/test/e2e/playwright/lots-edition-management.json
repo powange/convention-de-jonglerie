@@ -22,6 +22,7 @@
     "candidatures-entete-mobile.spec.ts",
     "carpool.spec.ts",
     "carte-menu-empilement.spec.ts",
+    "entete-gestion-mobile.spec.ts",
     "features-toggle.spec.ts",
     "import-nom-de-compagnie.spec.ts",
     "manual-artist-invitation.spec.ts",

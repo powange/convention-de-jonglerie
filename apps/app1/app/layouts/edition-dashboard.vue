@@ -82,12 +82,17 @@
 
               <template #left>
                 <!-- Nom de la convention + édition -->
-                <div v-if="edition" class="flex items-center gap-3">
+                <div v-if="edition" data-entete-gestion class="flex items-center gap-3">
+                  <!-- La vignette disparaît sous `sm` : sur un écran étroit, elle prenait de la
+                       largeur au seul contenu qui en a besoin — le nom de l'édition et ses dates.
+                       Même seuil que le nom de la convention juste en dessous et que le sélecteur
+                       de langue, pour que la barre change d'allure d'un seul coup. -->
                   <img
                     v-if="edition.imageUrl"
                     :src="getImageUrl(edition.imageUrl, 'edition', edition.id) ?? undefined"
                     :alt="getEditionDisplayName(edition)"
-                    class="h-10 w-auto rounded object-contain"
+                    data-vignette-edition
+                    class="hidden sm:block h-10 w-auto rounded object-contain"
                   />
                   <img
                     v-else-if="edition.convention?.logo"
@@ -96,7 +101,8 @@
                       undefined
                     "
                     :alt="edition.convention.name"
-                    class="h-8 w-8 rounded object-cover"
+                    data-vignette-edition
+                    class="hidden sm:block h-8 w-8 rounded object-cover"
                   />
                   <!-- Les dates sur leur propre ligne : accolées au nom de l'édition, elles
                        allongeaient la barre au point de pousser le reste hors de l'écran. -->
@@ -107,7 +113,14 @@
                     <span class="hidden sm:block text-sm font-semibold">
                       {{ edition.convention?.name }}
                     </span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                    <!-- En gras sous `sm` seulement, et c'est une question de hiérarchie :
+                         le nom de la convention au-dessus est masqué sur mobile, donc le nom de
+                         l'édition devient LE titre de la barre. Au-delà de `sm`, la convention
+                         reprend ce rôle et l'édition redevient son sous-titre. -->
+                    <span
+                      data-nom-edition
+                      class="text-xs font-semibold sm:font-normal text-gray-500 dark:text-gray-400"
+                    >
                       {{ getEditionDisplayName(edition) }}
                     </span>
                     <span
@@ -126,6 +139,14 @@
                 <ClientOnly>
                   <!-- Sélecteur de langue (masqué sur mobile, déjà dans le menu) -->
                   <UiSelectLanguage class="hidden sm:block" />
+
+                  <!-- Messagerie puis notifications, dans cet ordre : le même qu'en-tête du site
+                       (`AppHeader.vue`), pour qu'un organisateur retrouve ses deux icônes à la
+                       même place en passant du site à la gestion.
+                       Le raisonnement écrit plus bas pour les notifications vaut tel quel ici :
+                       un organisateur passe l'essentiel de son temps dans la gestion, et sans ce
+                       bouton il n'a aucun accès à ses messages depuis cette barre. -->
+                  <MessengerHeaderButton v-if="authStore.isAuthenticated" />
 
                   <!-- Même centre de notifications que l'en-tête du site : la gestion d'une
                        édition a sa propre barre, et un organisateur y passe l'essentiel de son
@@ -408,9 +429,19 @@ watch(editionId, (nouvelle) => {
 const navigationItems = computed<NavigationMenuItem[][]>(() => {
   const items: NavigationMenuItem[][] = []
 
-  // Retour à l'édition, dans sa propre section : c'est la sortie de la gestion, pas une
-  // destination de gestion. Le tableau de sections fait apparaître le trait qui l'en sépare.
+  // Les deux sorties de la gestion, dans leur propre section : ce ne sont pas des destinations de
+  // gestion, et le tableau de sections fait apparaître le trait qui les en sépare.
+  //
+  // L'accueil du site AVANT la fiche de l'édition : du plus loin au plus proche, comme on remonte
+  // un chemin de fer. Un organisateur qui veut quitter la gestion n'avait jusqu'ici que la sortie
+  // vers l'édition, et devait passer par elle — ou par le logo — pour revenir au site.
   items.push([
+    {
+      label: t('gestion.back_to_home'),
+      icon: 'i-heroicons-home-modern',
+      to: '/',
+      tooltip: { text: t('gestion.back_to_home') },
+    },
     {
       label: t('gestion.view_edition'),
       icon: 'i-heroicons-arrow-left',

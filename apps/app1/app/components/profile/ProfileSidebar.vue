@@ -11,6 +11,14 @@
 
     <!-- Le menu dépend des rôles (isVolunteer/isArtist) du store d'auth, peuplé
          uniquement côté client → ClientOnly évite un mismatch d'hydratation. -->
+
+    <!-- Cibles tactiles : ces valeurs sont CELLES DU PANNEAU DE GESTION
+         (`layouts/edition-dashboard.vue`), reprises à l'identique. Les entrées y faisaient 36 px
+         de haut dans le tiroir mobile — sous le seuil confortable, et deux fois moins que celles
+         de la gestion, mesurées côte à côte.
+         Le seuil `lg` est le même des deux côtés, et c'est ce qui rend la reprise exacte : c'est
+         précisément là que `layouts/profile.vue` passe du tiroir à la colonne permanente, où l'on
+         préfère la compacité. -->
     <ClientOnly>
       <UNavigationMenu
         :items="items"
@@ -20,11 +28,11 @@
         highlight
         :collapsible="true"
         :ui="{
-          link: 'text-base items-start',
-          linkLeadingIcon: 'size-5',
+          link: 'text-base items-start gap-3 py-4 lg:gap-1.5 lg:py-1.5',
+          linkLeadingIcon: 'size-6 lg:size-5',
           linkLabel: 'whitespace-normal',
-          childLink: 'text-base items-start',
-          childLinkIcon: 'size-5',
+          childLink: 'text-base items-start gap-3 py-4 lg:gap-1.5 lg:py-1.5',
+          childLinkIcon: 'size-6 lg:size-5',
           childLinkLabel: 'whitespace-normal',
         }"
       />

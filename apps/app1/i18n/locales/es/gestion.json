@@ -1179,6 +1179,7 @@
       "submit": "Guardar la convención",
       "title": "Convención"
     },
-    "back_to_categories": "Todas las categorías"
+    "back_to_categories": "Todas las categorías",
+    "back_to_home": "Inicio del sitio"
   }
 }
