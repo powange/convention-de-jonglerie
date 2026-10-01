@@ -62,19 +62,39 @@ export default wrapApiHandler(
       status: 'ACCEPTED',
     }
 
-    // Si on ciblait des équipes spécifiques
+    /*
+     * Si on ciblait des équipes spécifiques.
+     *
+     * ⚠️ CE QUI N'ALLAIT PAS : ce filtre portait sur `assignedTeams`, un champ JSON qui N'EXISTE
+     * PLUS sur `EditionVolunteerApplication` — les équipes vivent dans la relation
+     * `teamAssignments` depuis le passage aux `VolunteerTeam`. Prisma rejetait donc la requête
+     * ENTIÈRE (`Unknown argument 'assignedTeams'`), et l'écran de suivi d'une notification
+     * répondait 500 : l'organisateur ne pouvait pas savoir qui avait confirmé. Relevé 12 fois en
+     * production le 30/09/2026 sur une seule édition — il a réessayé.
+     *
+     * 📍 LA SÉLECTION EST CELLE DE L'ENVOI, à l'identique (`notifications.post.ts`), et ce n'est
+     * pas une commodité : cet écran compare les destinataires aux confirmations. Deux façons de
+     * répondre à « qui était visé ? » donneraient un taux de confirmation faux — un défaut
+     * silencieux, là où celui-ci au moins criait.
+     *
+     * 📍 Ce point d'API avait été OUBLIÉ par la migration : son voisin porte depuis le début le
+     * commentaire « utiliser la relation teamAssignments au lieu du champ JSON assignedTeams ».
+     */
     if (
       notificationGroup.targetType === 'teams' &&
       notificationGroup.selectedTeams &&
       Array.isArray(notificationGroup.selectedTeams) &&
       notificationGroup.selectedTeams.length > 0
     ) {
-      // Pour les champs JSON avec arrays, utiliser OR avec array_contains pour chaque équipe
-      whereClause.OR = (notificationGroup.selectedTeams as string[]).map((team: string) => ({
-        assignedTeams: {
-          array_contains: team,
+      whereClause.teamAssignments = {
+        some: {
+          team: {
+            name: {
+              in: notificationGroup.selectedTeams as string[],
+            },
+          },
         },
-      }))
+      }
     }
 
     const allRecipients = await prisma.editionVolunteerApplication.findMany({
