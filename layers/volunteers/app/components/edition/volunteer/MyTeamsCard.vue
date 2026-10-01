@@ -11,8 +11,11 @@
         :key="team.id"
         class="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
       >
-        <!-- En-tête de l'équipe -->
-        <div class="flex items-center justify-between mb-3">
+        <!-- En-tête de l'équipe.
+             ⚠️ EN COLONNE SUR MOBILE : sur une seule ligne, le bouton « Envoyer un message » et la
+             pastille « Responsable » débordaient hors de la carte — la pastille était coupée net.
+             Les points de rupture font le travail, on ne mesure aucune largeur. -->
+        <div class="flex flex-col gap-2 mb-3 sm:flex-row sm:items-center sm:justify-between">
           <div class="flex items-center gap-2">
             <div
               class="w-3 h-3 rounded-full"
@@ -20,16 +23,17 @@
             />
             <h4 class="font-semibold text-sm">{{ team.name }}</h4>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
             <UButton
               icon="i-heroicons-chat-bubble-left-right"
               color="primary"
               variant="soft"
               size="sm"
+              class="w-full justify-center sm:w-auto"
               :label="t('common.edition.volunteers.send_message_to_team')"
               @click="sendMessageToTeam(team.id)"
             />
-            <UBadge color="warning" size="sm">
+            <UBadge color="warning" size="sm" class="w-full justify-center sm:w-auto">
               <UIcon name="i-heroicons-star-solid" size="12" />
               {{ t('pages.volunteers.team_distribution.leader_badge') }}
             </UBadge>
@@ -65,10 +69,13 @@
             v-else
             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2"
           >
-            <div
+            <button
               v-for="member in teamMembers[team.id]"
               :key="member.id"
-              class="p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+              type="button"
+              class="w-full text-left p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+              :title="t('volunteers.see_slots')"
+              @click="emit('volunteer-click', member)"
             >
               <UiUserDisplayForAdmin
                 :user="{
@@ -94,7 +101,7 @@
                   </UBadge>
                 </template>
               </UiUserDisplayForAdmin>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -148,6 +155,16 @@ const props = withDefaults(
   }>(),
   { repliableSurMobile: false }
 )
+
+/**
+ * Un membre cliqué : la page ouvre alors la carte de ses créneaux.
+ *
+ * 📍 LA MODALE RESTE À LA PAGE, comme dans la gestion où `VolunteersSummary` émet le même
+ * événement et où c'est `planning.vue` qui ouvre `VolunteerSlotsModal`. C'est la page qui tient
+ * les créneaux, les formateurs de date et le fuseau de l'édition ; les redemander ici les
+ * dédoublerait.
+ */
+const emit = defineEmits<{ 'volunteer-click': [membre: { id: number; pseudo: string }] }>()
 
 const { t } = useI18n()
 
