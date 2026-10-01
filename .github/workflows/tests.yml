@@ -747,13 +747,48 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('apps/app1/package-lock.json') }}
 
-      # `--with-deps` inconditionnel, et c'est volontaire : sur cache chaud, Playwright saute de
-      # lui-même le téléchargement (il teste `INSTALLATION_COMPLETE` dans le dossier du
-      # navigateur), si bien que scinder ce step selon le cache ne gagnerait rien — tout son temps
-      # part dans l'`apt-get` des dépendances système, que `install-deps` referait à l'identique —
-      # tout en perdant la réparation automatique d'un cache restauré mais incomplet.
+      # PAS de `--with-deps`, et c'est MESURÉ, pas supposé. Le commentaire précédent avait raison
+      # sur le diagnostic — « tout son temps part dans l'apt-get » — mais en concluait qu'il n'y
+      # avait rien à gagner. Il restait à ouvrir le journal de cet apt-get :
+      #
+      #   « 0 upgraded, 9 newly installed » — et les neuf sont des POLICES : fonts-wqy-zenhei,
+      #   fonts-ipafont-gothic, fonts-unifont, xfonts-cyrillic, xfonts-scalable, fonts-freefont-ttf,
+      #   fonts-tlwg-loma-otf, xfonts-encodings, xfonts-utils. 18,4 Mo.
+      #
+      # Toutes les bibliothèques dont Chromium a réellement besoin répondent déjà « already the
+      # newest version » : l'image du runner les porte, parce qu'elle embarque Chrome et Edge. Et
+      # le navigateur lui-même ne se télécharge pas non plus — le cache ci-dessus le restaure en
+      # quatre secondes.
+      #
+      # Ce que ces 18,4 Mo coûtaient, relevé sur les sept lots d'un même run : 19 s, 21 s, 91 s,
+      # 136 s, 150 s, 154 s et 280 s. La dispersion vient du miroir Debian, pas de nous. Sur les
+      # lots rapides l'étape disparaissait derrière l'attente du job `build` ; sur les lents, cette
+      # attente tombait à une seconde — c'était donc l'apt-get qui tenait le lot, et `publics` y
+      # passait 280 s de ses 577 s.
+      #
+      # Ce qu'on perd : les glyphes CJK, cyrilliques et thaï dans les captures d'écran d'échec. Rien
+      # d'autre. Le dépôt ne contient AUCUNE comparaison d'image (`toHaveScreenshot`,
+      # `toMatchSnapshot` : zéro occurrence), et les assertions de langue portent sur le texte du
+      # DOM, que le navigateur compare sans avoir à le dessiner.
+      #
+      # ⚠️ Si une version future de l'image du runner retirait une de ces bibliothèques, le
+      # contrôle de démarrage juste en dessous le dirait par son nom — et c'est `--with-deps` qu'il
+      # faudrait alors remettre, pas ce commentaire qu'il faudrait croire.
       - name: Install Playwright browsers
-        run: npx playwright install chromium --with-deps
+        run: npx playwright install chromium
+
+      # Deux secondes pour transformer une bibliothèque manquante en une étape qui la nomme, au
+      # lieu d'un échec obscur au milieu du premier test. Playwright cite le paquet absent et la
+      # commande qui le pose.
+      - name: Vérifier que Chromium démarre
+        run: |
+          node -e "
+            const { chromium } = require('@playwright/test')
+            chromium.launch()
+              .then((n) => n.close())
+              .then(() => console.log('✅ Chromium démarre sans --with-deps'))
+              .catch((e) => { console.error('::error::Chromium ne démarre pas : ' + e.message); process.exit(1) })
+          "
 
       # Tout ce qui précède — conteneur MySQL, base restaurée, navigateurs — s'est fait pendant que
       # le job `build` tournait. C'est ici seulement qu'on a besoin de son résultat, donc ici
