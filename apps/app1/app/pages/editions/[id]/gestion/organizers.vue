@@ -864,10 +864,23 @@ const editionOrganizersColumns = computed((): TableColumn<any>[] => [
  * même endroit : en dupliquer le calcul ferait diverger le CSV du PDF sur une édition
  * particulière, et personne ne s'en apercevrait avant d'ouvrir les deux.
  */
+/**
+ * Ce que l'export emporte : ce que les DROITS autorisent, croisé avec ce que l'écran MONTRE.
+ *
+ * ⚠️ Les deux conditions sont distinctes et toutes deux nécessaires. Les droits disent ce qu'on a
+ * le droit de lire — un organisateur sans la gestion des repas ne doit pas les emporter —, la
+ * sélection de colonnes dit ce qu'on a demandé à voir. Masquer une colonne à l'écran et la
+ * retrouver dans le fichier était le défaut ; l'inverse serait une fuite.
+ */
 const colonnesExportees = () => ({
   contact: editionOrganizers.value.some((o: any) => o?.user?.email !== undefined),
-  statut: Boolean(edition.value?.ticketingEnabled),
-  repas: Boolean(edition.value?.mealsEnabled) && canManageMeals.value,
+  courriel: colonnesVisibles.value?.email !== false,
+  telephone: colonnesVisibles.value?.phone !== false,
+  statut: Boolean(edition.value?.ticketingEnabled) && colonnesVisibles.value?.status !== false,
+  repas:
+    Boolean(edition.value?.mealsEnabled) &&
+    canManageMeals.value &&
+    colonnesVisibles.value?.meals !== false,
 })
 
 const exporterLesOrganisateurs = () => {

@@ -2,9 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import { BOM_UTF8 } from '../../../shared/utils/csv'
 import {
-  candidaturesEnCsv,
   COLONNES_A_IMPRIMER,
   COLONNES_CANDIDATURES,
+  candidaturesEnCsv,
+  colonnesCandidaturesVisibles,
   entetesDesCandidatures,
   ligneDUneCandidature,
   momentLisible,
@@ -249,5 +250,63 @@ describe('la sélection de colonnes pour le papier', () => {
     expect(COLONNES_A_IMPRIMER).toContain('phone')
     expect(COLONNES_A_IMPRIMER).toContain('allergies')
     expect(COLONNES_A_IMPRIMER).toContain('diet')
+  })
+})
+
+describe('colonnesCandidaturesVisibles', () => {
+  it('🔬 retire les colonnes que l’écran masque', () => {
+    /*
+     * ⚠️ DEMANDÉ PAR L'UTILISATEUR : « il faut que ça n'exporte que les colonnes du tableau
+     * sélectionné ». Masquer une colonne à l'écran et la retrouver dans le fichier était le défaut.
+     */
+    const retenues = colonnesCandidaturesVisibles({ dietaryPreference: false })
+
+    expect(retenues).not.toContain('diet')
+    expect(retenues).toContain('allergies')
+  })
+
+  it('🔬 une seule colonne du tableau peut en retirer TROIS du fichier', () => {
+    /*
+     * ⚠️ LE PIÈGE DE CE RAPPROCHEMENT. Le tableau réunit sous « Présence » les trois périodes que
+     * l'export détaille en colonnes séparées. Sans la table de correspondance, masquer « Présence »
+     * n'aurait rien retiré du fichier — et rien ne l'aurait signalé.
+     */
+    const retenues = colonnesCandidaturesVisibles({ presence: false })
+
+    expect(retenues).not.toContain('setup')
+    expect(retenues).not.toContain('event')
+    expect(retenues).not.toContain('teardown')
+  })
+
+  it('🔬 garde ce qui n’a AUCUNE colonne dans le tableau', () => {
+    /*
+     * 📍 L'adresse, le téléphone et la motivation ne sont pas des colonnes de cet écran : on ne
+     * peut pas les y masquer, donc rien ne justifie de les retirer du fichier. Le défaut le moins
+     * grave des deux — emporter une colonne qu'on n'a jamais pu cacher, plutôt que perdre une
+     * donnée qu'on croyait avoir.
+     */
+    const retenues = colonnesCandidaturesVisibles({ presence: false, dietaryPreference: false })
+
+    expect(retenues).toContain('email')
+    expect(retenues).toContain('phone')
+    expect(retenues).toContain('motivation')
+  })
+
+  it('🔬 sans rien de masqué, toutes les colonnes partent', () => {
+    // La sélection ne contient QUE les colonnes masquées : tant qu'on n'a rien touché, elle est
+    // vide. Un test d'égalité à `true` aurait donc vidé tous les exports.
+    expect(colonnesCandidaturesVisibles({})).toHaveLength(COLONNES_CANDIDATURES.length)
+    expect(colonnesCandidaturesVisibles(undefined)).toHaveLength(COLONNES_CANDIDATURES.length)
+  })
+
+  it('croise avec un sous-ensemble, pour le papier', () => {
+    // L'impression part d'une liste restreinte : masquer à l'écran la réduit encore, révéler ne
+    // l'élargit pas — la contrainte de place n'a pas changé.
+    const retenues = colonnesCandidaturesVisibles({ status: false }, COLONNES_A_IMPRIMER)
+
+    expect(retenues).not.toContain('status')
+    expect(retenues.every((id) => (COLONNES_A_IMPRIMER as readonly string[]).includes(id))).toBe(
+      true
+    )
   })
 })

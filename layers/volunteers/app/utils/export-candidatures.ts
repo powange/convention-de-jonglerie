@@ -137,6 +137,61 @@ export const COLONNES_A_IMPRIMER = [
   'departure',
 ] as const satisfies readonly IdColonneCandidature[]
 
+/**
+ * Le rapprochement entre une colonne d'EXPORT et la colonne du TABLEAU qui la montre.
+ *
+ * ⚠️ LES DEUX JEUX D'IDENTIFIANTS NE COÏNCIDENT PAS, et c'est la raison de cette table. Le tableau
+ * nomme `dietaryPreference` ce que l'export appelle `diet`, et il réunit sous une seule colonne
+ * `presence` les trois périodes que l'export détaille. Masquer « Présence » à l'écran doit donc
+ * retirer TROIS colonnes du fichier.
+ *
+ * 📍 CE QUI N'EST PAS LISTÉ RESTE TOUJOURS EXPORTÉ : l'adresse, le téléphone, la motivation n'ont
+ * pas de colonne dans ce tableau — on ne peut pas les y masquer, donc rien ne justifie de les
+ * retirer du fichier. C'est le défaut le moins grave des deux : emporter une colonne qu'on n'a
+ * jamais pu cacher, plutôt que perdre une donnée qu'on croyait avoir.
+ */
+const COLONNE_DU_TABLEAU: Partial<Record<IdColonneCandidature, string>> = {
+  createdAt: 'createdAt',
+  status: 'status',
+  pseudo: 'pseudo',
+  prenom: 'prenom',
+  nom: 'nom',
+  diet: 'dietaryPreference',
+  allergies: 'allergies',
+  emergencyName: 'emergencyContact',
+  emergencyPhone: 'emergencyContact',
+  timePreferences: 'timePreferences',
+  teamPreferences: 'teamPreferences',
+  pets: 'hasPets',
+  minors: 'hasMinors',
+  vehicle: 'hasVehicle',
+  companion: 'companionName',
+  avoidList: 'avoidList',
+  skills: 'skills',
+  experience: 'hasExperience',
+  setup: 'presence',
+  teardown: 'presence',
+  event: 'presence',
+  arrival: 'arrivalDateTime',
+  departure: 'departureDateTime',
+}
+
+/**
+ * Les colonnes d'export que la sélection de l'écran laisse passer.
+ *
+ * `visibilite` ne liste que les colonnes MASQUÉES — une absente est visible. Voir
+ * `colonnes-a-exporter.ts`, qui porte la règle et la raison.
+ */
+export function colonnesCandidaturesVisibles(
+  visibilite: Record<string, boolean> | null | undefined,
+  parmi: readonly IdColonneCandidature[] = COLONNES_CANDIDATURES.map((c) => c.id)
+): IdColonneCandidature[] {
+  return parmi.filter((id) => {
+    const colonne = COLONNE_DU_TABLEAU[id]
+    return !colonne || visibilite?.[colonne] !== false
+  })
+}
+
 /** Les colonnes retenues, dans l'ordre déclaré. Sans choix, toutes. */
 function colonnesRetenues(
   choisies?: readonly IdColonneCandidature[]
@@ -307,13 +362,22 @@ export function ligneDUneCandidature(
 }
 
 /** Le fichier entier, prêt à être téléchargé. */
+/**
+ * @param colonnes les colonnes à emporter. Omis, toutes — c'est ce que faisaient les appelants
+ *                 avant que la sélection de l'écran ne soit respectée, et le défaut reste le même
+ *                 pour qui n'a pas de menu de colonnes.
+ */
 export function candidaturesEnCsv(
   candidatures: CandidatureExportable[],
   t: Traducteur,
-  format: FormatDesDates
+  format: FormatDesDates,
+  colonnes?: readonly IdColonneCandidature[]
 ): string {
   return versCsv(
-    entetesDesCandidatures(t),
-    candidatures.map((candidature) => ligneDUneCandidature(candidature, t, format))
+    entetesDesCandidatures(t, colonnes),
+    // ⚠️ LES MÊMES COLONNES DES DEUX CÔTÉS. Les en-têtes et les valeurs se construisent par deux
+    // appels distincts : leur passer des listes différentes décalerait tout le fichier d'un cran,
+    // ce qui ne se voit qu'à l'ouverture et s'impute alors aux données.
+    candidatures.map((candidature) => ligneDUneCandidature(candidature, t, format, colonnes))
   )
 }

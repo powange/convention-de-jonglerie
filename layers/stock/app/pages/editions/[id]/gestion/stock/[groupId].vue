@@ -709,6 +709,11 @@
 </template>
 
 <script setup lang="ts">
+import {
+  colonnesExportablesVisibles,
+  tableauAExporter,
+  type ColonneExportable,
+} from '~/utils/colonnes-a-exporter'
 import { dessinerCaseACocher, ENTETE_COCHE, styleColonneCoche } from '~/utils/pdf-case-a-cocher'
 import { telechargerFichier } from '~/utils/telechargement'
 
@@ -1711,27 +1716,41 @@ function lignesAExporter() {
 }
 
 /** Les en-têtes de l'inventaire, dans l'ordre des lignes. */
-function entetesInventaire() {
+type LigneInventaire = ReturnType<typeof preparerInventairePourExport>[number]
+
+/**
+ * Les colonnes de l'inventaire : leur identifiant DANS LE TABLEAU, leur titre, leur valeur.
+ *
+ * ⚠️ DÉCRITES ENSEMBLE, et c'est le correctif. En-têtes et cellules vivaient dans deux fonctions
+ * parallèles qu'il fallait penser à modifier de concert ; filtrer l'une sans l'autre aurait décalé
+ * tout le fichier d'un cran — un défaut qui ne se voit qu'à l'ouverture et qu'on impute alors aux
+ * données. `tableauAExporter` les rend désormais ensemble.
+ *
+ * L'identifiant est celui de la colonne du tableau : c'est lui qui fait le lien avec la sélection
+ * de colonnes de l'écran.
+ */
+function colonnesInventaire(): ColonneExportable<LigneInventaire>[] {
   return [
-    t('gestion.stock.item_name'),
-    t('gestion.stock.count_expected'),
-    t('gestion.stock.count_counted'),
-    t('gestion.stock.item_storage_location'),
-    t('gestion.stock.tags.field_label'),
-    t('gestion.stock.loan_state'),
+    { id: 'name', entete: t('gestion.stock.item_name'), valeur: (l) => l.nom },
+    { id: 'quantity', entete: t('gestion.stock.count_expected'), valeur: (l) => l.quantite },
+    { id: 'compte', entete: t('gestion.stock.count_counted'), valeur: (l) => l.compte },
+    {
+      id: 'storage',
+      entete: t('gestion.stock.item_storage_location'),
+      valeur: (l) => l.emplacement,
+    },
+    { id: 'tags', entete: t('gestion.stock.tags.field_label'), valeur: (l) => l.tags },
+    {
+      id: 'loan',
+      entete: t('gestion.stock.loan_state'),
+      valeur: (l) => (l.etatEmprunt ? t(l.etatEmprunt) : ''),
+    },
   ]
 }
 
-/** Une ligne d'inventaire, dans l'ordre des en-têtes. */
-function celluleDeLigne(ligne: ReturnType<typeof preparerInventairePourExport>[number]) {
-  return [
-    ligne.nom,
-    ligne.quantite,
-    ligne.compte,
-    ligne.emplacement,
-    ligne.tags,
-    ligne.etatEmprunt ? t(ligne.etatEmprunt) : '',
-  ]
+/** Les colonnes que l'écran montre, et elles seules. */
+function colonnesInventaireVisibles() {
+  return colonnesExportablesVisibles(colonnesInventaire(), colonnesVisibles.value)
 }
 
 /**
@@ -1750,7 +1769,14 @@ function exporterInventaireCsv() {
 
   telechargerFichier(
     nomFichierInventaire(group.value?.name, edition.value?.name, 'csv'),
-    versCsv(entetesInventaire(), lignes.map(celluleDeLigne)),
+    (() => {
+      const { entetes, lignes: rangees } = tableauAExporter(
+        colonnesInventaire(),
+        colonnesVisibles.value,
+        lignes
+      )
+      return versCsv(entetes, rangees)
+    })(),
     'text/csv;charset=utf-8'
   )
 
@@ -1774,6 +1800,11 @@ function exporterInventaireCsv() {
 async function exporterInventaire() {
   const lignes = lignesAExporter()
   if (lignes.length === 0) return
+
+  // La feuille porte les mêmes colonnes que l'écran : masquer une colonne doit la retirer du
+  // papier comme du fichier, sans quoi les deux exports se contrediraient.
+  const colonnesRetenues = colonnesInventaireVisibles()
+  if (colonnesRetenues.length === 0) return
 
   exportEnCours.value = true
   try {
@@ -1828,17 +1859,33 @@ async function exporterInventaire() {
       headStyles: { fillColor: [27, 77, 92] },
       // La case à cocher en tête, et la colonne « Compté » qui reste : ce ne sont pas les mêmes
       // gestes. On coche « cette caisse est faite », on écrit « j'en ai trouvé sept ».
-      head: [[ENTETE_COCHE, ...entetesInventaire()]],
-      body: lignes.map((ligne) => ['', ...celluleDeLigne(ligne)]),
+      head: [[ENTETE_COCHE, ...colonnesRetenues.map((colonne) => colonne.entete)]],
+      body: lignes.map((ligne) => [
+        '',
+        ...colonnesRetenues.map((colonne) => colonne.valeur(ligne)),
+      ]),
       // La colonne « Compté » reste large et vide : c'est là qu'on écrit au crayon.
       //
-      // ⚠️ Les index sont décalés d'un cran depuis l'ajout de la colonne à cocher en tête : 2 est
-      // la quantité et 3 le compte, là où c'étaient 1 et 2. Un style d'autoTable désigne un rang,
-      // pas un nom — se tromper ne lève rien, cela élargit simplement la mauvaise colonne.
+      /*
+       * ⚠️ LES INDEX SE CALCULENT, ILS NE S'ÉCRIVENT PLUS. Un style d'autoTable désigne un RANG,
+       * pas un nom : se tromper ne lève rien, cela élargit simplement la mauvaise colonne. Ils
+       * étaient déjà décalés d'un cran par la colonne à cocher ; depuis que l'utilisateur peut
+       * masquer des colonnes, ils dépendent en plus de sa sélection. Les laisser en dur aurait
+       * mis la largeur du « Compté » sur les tags.
+       */
       columnStyles: {
         ...styleColonneCoche(),
-        2: { cellWidth: 22, halign: 'center' },
-        3: { cellWidth: 26, halign: 'center' },
+        ...Object.fromEntries(
+          colonnesRetenues
+            .map((colonne, rang) => [colonne.id, rang + 1] as const)
+            .filter(([id]) => id === 'quantity' || id === 'compte')
+            .map(([id, rang]) => [
+              rang,
+              id === 'quantity'
+                ? { cellWidth: 22, halign: 'center' as const }
+                : { cellWidth: 26, halign: 'center' as const },
+            ])
+        ),
       },
       didDrawCell: (cellule: unknown) => dessinerCaseACocher(doc, cellule as never),
     })

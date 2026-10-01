@@ -471,7 +471,7 @@ import {
   type GroupeDeCode,
   type TotalDeNature,
 } from '~/utils/export-tresorerie'
-import { tresorerieVersCsv } from '~/utils/export-tresorerie-csv'
+import { colonnesTresorerieVisibles, tresorerieVersCsv } from '~/utils/export-tresorerie-csv'
 
 import type { TableColumn } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
@@ -1176,7 +1176,15 @@ function exporterCsv() {
   const lignes = lignesFiltrees.value as TreasuryLine[]
   if (lignes.length === 0) return
 
-  const contenu = tresorerieVersCsv(lignes, t, lineTitle as (l: TreasuryLine) => string)
+  // Le fichier n'emporte que les colonnes AFFICHÉES. Attention : masquer « Montant » retire les
+  // trois colonnes chiffrées — engagé, réglé, prévisionnel —, ce qui est bien ce que demande
+  // « n'exporter que les colonnes sélectionnées », mais mérite d'être su.
+  const contenu = tresorerieVersCsv(
+    lignes,
+    t,
+    lineTitle as (l: TreasuryLine) => string,
+    colonnesTresorerieVisibles(visibiliteDesColonnes.value)
+  )
 
   /*
    * La mention du filtre passe par le NOM du fichier, pas par son contenu.
