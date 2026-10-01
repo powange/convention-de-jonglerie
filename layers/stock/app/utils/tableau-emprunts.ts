@@ -210,10 +210,10 @@ export function ongletDepuisUrl(valeur: unknown): OngletEmprunts | null {
 /** Ce dont on connaît la forme pour lire l'étape en cours d'un emprunt. */
 type EmpruntAvecEtape = EmpruntObservable & {
   pickupLocation?: string | null
-  pickupResponsible?: { pseudo: string } | null
+  pickupResponsible?: ResponsableEmprunt | null
   pickupContact?: string | null
   returnLocation?: string | null
-  returnResponsible?: { pseudo: string } | null
+  returnResponsible?: ResponsableEmprunt | null
   returnContact?: string | null
 }
 

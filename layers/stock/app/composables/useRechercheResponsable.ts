@@ -2,6 +2,8 @@ import { refDebounced } from '@vueuse/core'
 
 import type { UserSelectItem } from '~/components/UserSelector.vue'
 
+import { libelleResponsable } from '../utils/nom-responsable'
+
 import type { Ref } from 'vue'
 
 import { rechercheResponsable } from '~~/shared/utils/recherche-responsable'
@@ -23,11 +25,6 @@ export interface RechercheResponsable {
   resultats: Ref<UserSelectItem[]>
   /** Liée à `:searching-users`. */
   enCours: Ref<boolean>
-}
-
-/** Prénom et nom quand ils sont renseignés — deux pseudos proches se distinguent ainsi. */
-function nomComplet(u: { prenom?: string | null; nom?: string | null }): string {
-  return [u.prenom, u.nom].filter(Boolean).join(' ').trim()
 }
 
 export function useRechercheResponsable(editionId: number): RechercheResponsable {
@@ -68,7 +65,9 @@ export function useRechercheResponsable(editionId: number): RechercheResponsable
         id: u.id,
         // L'adresse n'est volontairement pas rendue par cette recherche-là : le pseudo et l'état
         // civil suffisent à reconnaître quelqu'un de sa propre équipe.
-        label: nomComplet(u) ? `${u.pseudo} (${nomComplet(u)})` : u.pseudo,
+        // Le MÊME libellé que partout ailleurs dans le module : on cherchait jusqu'ici quelqu'un
+        // sous un nom qui ne s'affichait ensuite nulle part.
+        label: libelleResponsable(u),
         pseudo: u.pseudo,
         email: '',
         emailHash: u.emailHash || '',

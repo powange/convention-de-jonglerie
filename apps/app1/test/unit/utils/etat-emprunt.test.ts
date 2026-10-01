@@ -106,6 +106,31 @@ describe('prochaineEtapeEmprunt', () => {
     expect(etape?.compte).toEqual(THOMAS)
   })
 
+  it('🔬 nomme le compte par son pseudo ET son état civil', () => {
+    /*
+     * ⚠️ IL N'AFFICHAIT QUE LE PSEUDO, et c'est la demande de l'utilisateur : « difficile de
+     * différencier qui est qui quand on ne connaît pas tout le monde sur l'événement ». Un pseudo
+     * ne ressemble pas forcément au nom de son porteur.
+     *
+     * 📍 C'est aussi ce sur quoi la colonne TRIE et ce que les listes de filtres proposent — les
+     * trois passent par `qui`, donc elles restent d'accord entre elles.
+     */
+    const etape = prochaineEtapeEmprunt({
+      ...EMPRUNT,
+      pickupResponsible: { ...THOMAS, prenom: 'Thomas', nom: 'Martin' },
+    })
+
+    expect(etape?.qui).toBe('thomas (Thomas Martin)')
+  })
+
+  it('se contente du pseudo quand le compte n’a pas d’état civil', () => {
+    /*
+     * Le cas majoritaire, et celui qui interdit de faire du nom le libellé principal : prénom et
+     * nom sont facultatifs sur un compte. Une parenthèse vide derrière le pseudo serait du bruit.
+     */
+    expect(prochaineEtapeEmprunt({ ...EMPRUNT })?.qui).toBe('thomas')
+  })
+
   it('sépare le compte du texte libre, pour que l’écran sache lequel il tient', () => {
     // On ne met pas d'avatar devant « Marc, le voisin » : la liste doit pouvoir distinguer une
     // personne inscrite d'un nom écrit à la main.

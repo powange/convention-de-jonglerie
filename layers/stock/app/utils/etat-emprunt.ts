@@ -6,6 +6,8 @@
  * chacun la réécrivait : le retard ne concerne que la période où le matériel est chez nous.
  */
 
+import { libelleResponsable } from './nom-responsable'
+
 /** Un matériel, réduit à ce qui détermine l'état de son emprunt. */
 export interface EmpruntObservable {
   isExternalLoan?: boolean | null
@@ -56,6 +58,9 @@ export function etatEmprunt(
 export interface ResponsableEmprunt {
   id?: number
   pseudo: string
+  /** Prénom et nom, facultatifs sur un compte — voir `libelleResponsable`. */
+  prenom?: string | null
+  nom?: string | null
   profilePicture?: string | null
   emailHash?: string | null
   updatedAt?: string
@@ -105,7 +110,16 @@ export function prochaineEtapeEmprunt(
 
   // Le compte d'abord, le texte libre en repli : c'est la même règle qu'à la saisie.
   const compte = responsable?.pseudo ? responsable : null
-  const qui = compte?.pseudo || contact || null
+  /*
+   * ⚠️ LE PSEUDO SEUL NE SUFFIT PAS À RECONNAÎTRE QUELQU'UN quand on ne connaît pas tout le monde
+   * sur l'événement — demande de l'utilisateur. `libelleResponsable` y ajoute le prénom et le nom
+   * quand ils existent, et c'est le MÊME libellé que la liste déroulante de recherche : on cherchait
+   * jusqu'ici quelqu'un sous un nom qui ne s'affichait ensuite nulle part.
+   *
+   * 📍 C'est aussi ce sur quoi la colonne trie et ce que les listes de filtres proposent : les
+   * trois passent par ici, donc elles restent d'accord entre elles.
+   */
+  const qui = (compte ? libelleResponsable(compte) : '') || contact || null
 
   if (!lieu && !qui) return null
   return { lieu: lieu || null, qui, compte }

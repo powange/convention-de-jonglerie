@@ -63,6 +63,33 @@ describe('GET /api/editions/[id]/stock-groups', () => {
     await expect(handler(baseEvent as any)).rejects.toThrow('Droits insuffisants')
   })
 
+  it('🔬 demande le PRÉNOM et le NOM du responsable, pas seulement son pseudo', async () => {
+    /*
+     * ⚠️ IL NE DEMANDAIT QUE LE PSEUDO (`userWithProfileAndGravatarSelect`), et l'écran ne pouvait
+     * donc afficher que lui — « difficile de différencier qui est qui quand on ne connaît pas tout
+     * le monde sur l'événement », demande de l'utilisateur.
+     *
+     * 🔬 ON MESURE LA FORME DU `select`, et c'est la SEULE assertion qui mord ici : le mock de
+     * Prisma l'ignore, donc un test qui lirait les personnes rendues resterait vert avec l'ancien
+     * helper — c'est le mock qui décide des champs présents, pas la requête.
+     *
+     * 📍 Et un helper DÉDIÉ, pas l'ancien enrichi : `userWithProfileAndGravatarSelect` est employé
+     * par une vingtaine de fichiers, le covoiturage surtout. Y ajouter prénom et nom aurait exposé
+     * l'état civil sur des écrans où personne ne l'a demandé.
+     */
+    await handler(baseEvent as any)
+
+    const call = prismaMock.stockGroup.findMany.mock.calls[0][0]
+    for (const champ of ['pickupResponsible', 'returnResponsible'] as const) {
+      const select = call.include.items.include[champ].select
+      expect(select.prenom, `${champ}.prenom`).toBe(true)
+      expect(select.nom, `${champ}.nom`).toBe(true)
+      // L'avatar reste demandé : la liste montre le visage devant le nom.
+      expect(select.pseudo, `${champ}.pseudo`).toBe(true)
+      expect(select.profilePicture, `${champ}.profilePicture`).toBe(true)
+    }
+  })
+
   it('inclut les RESERVED non terminées ET les PICKED_UP avec leur emplacement', async () => {
     await handler(baseEvent as any)
     const call = prismaMock.stockGroup.findMany.mock.calls[0][0]

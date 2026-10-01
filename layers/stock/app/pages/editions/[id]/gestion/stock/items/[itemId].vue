@@ -193,7 +193,7 @@
               <dd class="flex items-center gap-2 flex-wrap">
                 <template v-if="item.pickupResponsible">
                   <UiUserAvatar :user="item.pickupResponsible" size="xs" />
-                  {{ item.pickupResponsible.pseudo }}
+                  {{ libelleResponsable(item.pickupResponsible) }}
                 </template>
                 <span v-if="item.pickupContact" class="text-gray-600 dark:text-gray-400">
                   {{ item.pickupContact }}
@@ -212,7 +212,7 @@
               <dd class="flex items-center gap-2 flex-wrap">
                 <template v-if="item.returnResponsible">
                   <UiUserAvatar :user="item.returnResponsible" size="xs" />
-                  {{ item.returnResponsible.pseudo }}
+                  {{ libelleResponsable(item.returnResponsible) }}
                 </template>
                 <span v-if="item.returnContact" class="text-gray-600 dark:text-gray-400">
                   {{ item.returnContact }}
@@ -387,6 +387,9 @@ import { useAuthStore, useEditionStore } from '#imports'
 
 import { apparenceEmplacement } from '../../../../../../utils/apparence-emplacement'
 import { peutGererLeStock } from '../../../../../../utils/droits-stock'
+import { libelleResponsable } from '../../../../../../utils/nom-responsable'
+
+import type { ResponsableEmprunt } from '../../../../../../utils/etat-emprunt'
 
 definePageMeta({
   layout: 'edition-dashboard',
@@ -439,10 +442,10 @@ interface StockItemFull {
   pickedUpAt: string | null
   returnedAt: string | null
   pickupLocation: string | null
-  pickupResponsible: { id: number; pseudo: string; profilePicture?: string | null } | null
+  pickupResponsible: ResponsableEmprunt | null
   pickupContact: string | null
   returnLocation: string | null
-  returnResponsible: { id: number; pseudo: string; profilePicture?: string | null } | null
+  returnResponsible: ResponsableEmprunt | null
   returnContact: string | null
   group: { id: number; name: string; reservationsEnabled?: boolean | null }
   location: string | null

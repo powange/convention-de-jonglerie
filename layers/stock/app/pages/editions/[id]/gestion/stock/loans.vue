@@ -311,7 +311,7 @@
 </template>
 
 <script setup lang="ts">
-import { prochaineEtapeEmprunt } from '../../../../../utils/etat-emprunt'
+import { prochaineEtapeEmprunt, type ResponsableEmprunt } from '../../../../../utils/etat-emprunt'
 // Le filtre par tags est celui du reste du module — le même sur la liste d'un groupe et sur la
 // liste de courses. En réécrire un ici aurait créé une seconde définition du même mot, et Nuxt
 // aurait choisi laquelle des deux auto-importer.
@@ -363,8 +363,10 @@ interface EmpruntTableau {
   pickupContact: string | null
   returnLocation: string | null
   returnContact: string | null
-  pickupResponsible: { id: number; pseudo: string; profilePicture?: string | null } | null
-  returnResponsible: { id: number; pseudo: string; profilePicture?: string | null } | null
+  // `ResponsableEmprunt` plutôt qu'une forme recopiée : le prénom et le nom viennent de s'y
+  // ajouter, et une copie locale les aurait silencieusement omis du typage.
+  pickupResponsible: ResponsableEmprunt | null
+  returnResponsible: ResponsableEmprunt | null
   group: { id: number; name: string }
   // La couleur voyage avec le nom : la pastille et le sélecteur en ont besoin. Facultatif, comme
   // dans `EmpruntRangeable` — une réponse mise en cache avant que le point d'API ne rende les
