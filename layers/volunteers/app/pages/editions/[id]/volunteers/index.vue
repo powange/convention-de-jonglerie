@@ -153,6 +153,7 @@
           :edition-id="editionId"
           :equipes="mesEquipesResponsable"
           repliable-sur-mobile
+          @volunteer-click="ouvrirCreneauxDuBenevole"
         />
 
         <!-- Carte "Mes repas" - Visible pour les bénévoles acceptés -->
@@ -432,6 +433,19 @@
         :server-errors="erreursServeur"
         @close="closeEditApplicationModal"
         @update="updateVolunteerApplication"
+      />
+
+      <!-- Les créneaux d'un bénévole, ouverts depuis la carte « Mes équipes ».
+           Même composant que dans la gestion du planning : c'est la page qui le porte, parce que
+           c'est elle qui tient les créneaux, le formateur de date et le fuseau. -->
+      <EditionVolunteerPlanningVolunteerSlotsModal
+        v-model="creneauxBenevoleModalOpen"
+        :user="benevoleObserve"
+        :time-slots="(creneauxDuPlanning as any) ?? []"
+        :teams="(equipesDesCreneaux as any) ?? []"
+        :format-date="formatDate"
+        :fuseau="(edition as any)?.timezone ?? null"
+        @slot-click="openSlotDetailsModal"
       />
 
       <!-- Modal détails de créneau (lecture seule) -->
@@ -783,6 +797,32 @@ const editionIdSiDroitAuPlanning = computed(() =>
   peutConsommerLePlanning.value ? editionId : undefined
 )
 const { timeSlots: creneauxDuPlanning } = useVolunteerTimeSlots(editionIdSiDroitAuPlanning)
+
+/**
+ * Les créneaux d'un bénévole, ouverts en cliquant son nom dans « Mes équipes ».
+ *
+ * ⚠️ CE QUE LE RESPONSABLE Y VERRA, et c'est le serveur qui le décide, pas cet écran : le point
+ * d'API des créneaux rend en détail les équipes dont on est responsable et anonymise le reste. Un
+ * responsable voit donc les créneaux de son bénévole DANS SES ÉQUIPES — pas son emploi du temps
+ * entier sur l'édition. C'est voulu : ce qu'il organise, et rien de plus.
+ */
+const creneauxBenevoleModalOpen = ref(false)
+const benevoleObserve = ref<{ id: number; pseudo: string } | null>(null)
+
+const ouvrirCreneauxDuBenevole = (membre: { id: number; pseudo: string }) => {
+  benevoleObserve.value = membre
+  creneauxBenevoleModalOpen.value = true
+}
+
+/**
+ * Les équipes qui nomment et colorent les créneaux de cette modale.
+ *
+ * Complétées depuis les créneaux eux-mêmes : une équipe masquée au formulaire de candidature
+ * n'est pas rendue par `/volunteer-teams`, et ses créneaux sortiraient sans nom ni couleur.
+ */
+const equipesDesCreneaux = computed(() =>
+  completerEquipesDepuisCreneaux(mesEquipesResponsable.value, creneauxDuPlanning.value ?? [])
+)
 // Références de gestion (édition supprimée sur page publique)
 // const volunteersLoadingAction = ref(false) // supprimé
 // const volunteersSaving = ref(false) // supprimé
