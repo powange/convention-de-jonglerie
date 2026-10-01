@@ -189,6 +189,98 @@ describe('date utils', () => {
     })
   })
 
+  /**
+   * Le fuseau dans lequel ces dates se lisent.
+   *
+   * ⚠️ `Europe/Paris` était CODÉ EN DUR : une édition australienne affichait ses dates à l'heure de
+   * Paris, c'est-à-dire autre chose que ce que son organisateur avait saisi. Et les comparaisons
+   * « même jour ? » / « même mois ? » passaient par `getDate()`, `getMonth()` et `getFullYear()`,
+   * qui lisent dans le fuseau de la MACHINE — un troisième fuseau, différent des deux autres.
+   */
+  describe('le fuseau de lecture', () => {
+    it('🔬 lit les dates dans le fuseau DEMANDÉ', () => {
+      /*
+       * L'assertion qui porte le point. Cet instant est le 15 juin à 23 h UTC : le 16 à Sydney
+       * (UTC+10), encore le 15 à Paris. Avant, les deux rendaient « 15 juin ».
+       */
+      expect(formatDate('2024-06-15T23:00:00Z', { fuseau: 'Australia/Sydney' })).toBe(
+        '16 juin 2024'
+      )
+      expect(formatDate('2024-06-15T23:00:00Z', { fuseau: 'Europe/Paris' })).toBe('16 juin 2024')
+      expect(formatDate('2024-06-15T23:00:00Z', { fuseau: 'America/Montreal' })).toBe(
+        '15 juin 2024'
+      )
+    })
+
+    it('🔬 retombe sur Europe/Paris quand AUCUN fuseau n’est fourni', () => {
+      /*
+       * ⚠️⚠️ CE REPLI EST UNE DÉCISION, pas un reste de l'ancien code. `fuseauUtilisable(null)` rend
+       * `undefined`, ce qui ferait lire la date au fuseau de la MACHINE du lecteur. Or 38 des 69
+       * éditions de la base de développement ne déclarent aucun fuseau, et des dizaines d'appels
+       * affichent autre chose qu'une date d'édition. Prendre la machine par défaut aurait donc
+       * changé en silence ce que voient tous les lecteurs hors de France, sans qu'aucune donnée ait
+       * bougé.
+       *
+       * Conséquence voulue, et que ce test fige : seules les éditions qui DÉCLARENT un fuseau
+       * changent d'affichage. Le reste est strictement inchangé.
+       */
+      expect(formatDate('2024-06-15T23:00:00Z')).toBe('16 juin 2024')
+      expect(formatDate('2024-06-15T23:00:00Z', { fuseau: null })).toBe('16 juin 2024')
+      expect(formatDate('2024-06-15T23:00:00Z', { fuseau: 'Pas/Un_Fuseau' })).toBe('16 juin 2024')
+    })
+
+    it('🔬 décide « même jour » SUR PLACE, et non au fuseau du lecteur', () => {
+      /*
+       * Du 15 à 23 h au 16 à 1 h UTC : à Montréal (UTC-4) les deux instants tombent le 15, à
+       * Sydney (UTC+10) tous deux le 16, et à Paris ils encadrent minuit. La plage doit donc être
+       * d'un seul jour dans les deux premiers cas et de deux jours dans le troisième.
+       *
+       * L'ancien code comparait avec `getDate()`, c'est-à-dire au fuseau de la machine de test :
+       * la réponse dépendait de l'endroit où la suite tournait.
+       */
+      expect(
+        formatDateRange('2024-06-15T23:00:00Z', '2024-06-16T01:00:00Z', {
+          fuseau: 'America/Montreal',
+        })
+      ).toBe('15 juin 2024')
+      expect(
+        formatDateRange('2024-06-15T23:00:00Z', '2024-06-16T01:00:00Z', {
+          fuseau: 'Australia/Sydney',
+        })
+      ).toBe('16 juin 2024')
+      // À Paris les deux instants tombent le 16 (01 h et 03 h) : c'est donc AUSSI un seul jour,
+      // mais le 16 et non le 15 — ce qui distingue bien ce fuseau de celui de Montréal ci-dessus.
+      expect(
+        formatDateRange('2024-06-15T23:00:00Z', '2024-06-16T01:00:00Z', { fuseau: 'Europe/Paris' })
+      ).toBe('16 juin 2024')
+    })
+
+    it('décide « même mois » sur place', () => {
+      /*
+       * 🔬 Le 30 juin à 23 h UTC est déjà le 1er juillet à Paris : la plage CHANGE DE FORME, et
+       * passe de la forme compacte à deux dates complètes. Une heure près, et la même édition
+       * s'annonce autrement — c'est la preuve que le découpage se fait bien dans le fuseau donné.
+       */
+      expect(
+        formatDateRange('2024-06-28T12:00:00Z', '2024-06-30T23:00:00Z', { fuseau: 'Europe/Paris' })
+      ).toBe('28 juin 2024 - 1 juillet 2024')
+      expect(
+        formatDateRange('2024-06-28T12:00:00Z', '2024-06-30T12:00:00Z', { fuseau: 'Europe/Paris' })
+      ).toBe('28 - 30 juin 2024')
+    })
+
+    it('le mois nommé dans la plage compacte vient aussi du fuseau', () => {
+      /*
+       * 📍 Le nom du mois était pris sur `startObj` sans `timeZone` : une édition commencée le
+       * 1er du mois à 23 h UTC pouvait annoncer le mois PRÉCÉDENT, alors que ses deux jours
+       * appartenaient au suivant.
+       */
+      expect(
+        formatDateRange('2024-06-30T23:00:00Z', '2024-07-03T12:00:00Z', { fuseau: 'Europe/Paris' })
+      ).toBe('1 - 3 juillet 2024')
+    })
+  })
+
   describe('parseDateTimeLocal', () => {
     it('convertit une chaîne datetime-local en Date locale', () => {
       const date = parseDateTimeLocal('2024-06-15T14:30')

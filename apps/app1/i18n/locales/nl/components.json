@@ -143,7 +143,8 @@
       "currency_description": "Geldt voor alle bedragen van de editie: artiesten, ticketing en financiën.",
       "program_link": "Link naar het programma",
       "program_section_title": "Programma",
-      "program_section_description": "Houdt u uw programma elders bij, geef dan de pagina op die het beschrijft"
+      "program_section_description": "Houdt u uw programma elders bij, geef dan de pagina op die het beschrijft",
+      "dates_timezone": "Tijden in de plaatselijke tijd van de locatie ({timezone})"
     },
     "favorites_map": {
       "all_favorites": "Alle zijn favorieten",

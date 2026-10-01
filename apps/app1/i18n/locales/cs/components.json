@@ -143,7 +143,8 @@
       "currency_description": "Platí pro všechny částky ročníku: umělci, vstupenky a pokladna.",
       "program_link": "Odkaz na program",
       "program_section_title": "Program",
-      "program_section_description": "Pokud svůj program vedete jinde, uveďte stránku, která jej popisuje"
+      "program_section_description": "Pokud svůj program vedete jinde, uveďte stránku, která jej popisuje",
+      "dates_timezone": "Časy v místním čase místa konání ({timezone})"
     },
     "favorites_map": {
       "all_favorites": "Všichni jsou oblíbení",

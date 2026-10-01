@@ -320,7 +320,9 @@
                       <div class="space-y-1 text-sm text-gray-600 dark:text-gray-400">
                         <p class="flex items-center gap-1">
                           <UIcon name="i-heroicons-calendar-days" class="w-4 h-4 shrink-0" />
-                          {{ formatDateRange(edition.startDate, edition.endDate) }}
+                          {{
+                            formatDateRange(edition.startDate, edition.endDate, edition.timezone)
+                          }}
                         </p>
                         <p class="flex items-center gap-1">
                           <UIcon name="i-heroicons-map-pin" class="w-4 h-4 shrink-0" />
@@ -486,6 +488,8 @@
 <script setup lang="ts">
 import { useDebounce } from '~/composables/useDebounce'
 import type { Convention } from '~/types'
+
+import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
 
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()
@@ -672,19 +676,27 @@ const formatDate = (date: string | Date) => {
   })
 }
 
-const formatDateRange = (startDate: string | Date, endDate: string | Date) => {
+const formatDateRange = (
+  startDate: string | Date,
+  endDate: string | Date,
+  fuseau?: string | null
+) => {
   const start = new Date(startDate)
   const end = new Date(endDate)
+  // Le fuseau de l'édition : sans lui, ces dates se lisaient à l'heure de l'administrateur.
+  const zone = fuseauUtilisable(fuseau)
 
   const startStr = start.toLocaleDateString('fr-FR', {
     day: 'numeric',
     month: 'short',
+    timeZone: zone,
   })
 
   const endStr = end.toLocaleDateString('fr-FR', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
+    timeZone: zone,
   })
 
   return `${startStr} - ${endStr}`

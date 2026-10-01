@@ -118,6 +118,8 @@
       "convention_description_placeholder": "Description de la convention",
       "convention_poster_optional": "Affiche de l'édition (Optionnel)",
       "country_placeholder": "Nom du pays",
+      "currency_description": "S'applique à tous les montants de l'édition : artistes, billetterie et trésorerie.",
+      "dates_timezone": "Heures à l'heure du lieu ({timezone})",
       "end_date_time": "Date et heure de fin",
       "facebook_page": "Page Facebook",
       "instagram_account": "Compte Instagram",
@@ -126,6 +128,9 @@
       "poster_alt": "Poster de l'édition",
       "poster_placeholder": "Cliquez pour sélectionner le poster de l'édition",
       "previous": "Précédent",
+      "program_link": "Lien du programme",
+      "program_section_description": "Si vous tenez votre programme ailleurs, indiquez la page qui le décrit",
+      "program_section_title": "Programme",
       "social_networks_description": "Partagez vos pages pour augmenter la visibilité",
       "social_networks_title": "Réseaux sociaux",
       "start_date_time": "Date et heure de début",
@@ -137,13 +142,9 @@
       "step_general_title": "Informations Générales",
       "step_services_title": "Services Proposés",
       "ticketing_link": "Lien de la billetterie",
-      "program_link": "Lien du programme",
-      "program_section_title": "Programme",
-      "program_section_description": "Si vous tenez votre programme ailleurs, indiquez la page qui le décrit",
       "ticketing_section_description": "Informations pour l'achat de billets",
       "ticketing_section_title": "Billetterie",
-      "timezone_description": "Les dates et heures seront affichées dans ce fuseau horaire",
-      "currency_description": "S'applique à tous les montants de l'édition : artistes, billetterie et trésorerie."
+      "timezone_description": "Les dates et heures seront affichées dans ce fuseau horaire"
     },
     "favorites_map": {
       "all_favorites": "Toutes sont favorites",

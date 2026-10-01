@@ -545,6 +545,7 @@ import { useDatetime } from '~/composables/useDatetime'
 import { useTimezones } from '~/composables/useTimezones'
 import type { Edition, Convention } from '~/types'
 import { countrySelectOptions } from '~/utils/countries'
+import { ancrerHorloge, horlogeMurale, relireHorloge } from '~/utils/horloge-edition'
 import { estUnLienHttp } from '~/utils/lien-externe'
 
 import type { StepperItem } from '@nuxt/ui'
@@ -723,6 +724,7 @@ const calendarEndDate = shallowRef<CalendarDate | null>(null)
 // Heures séparées pour les selects
 const startTime = ref('09:00')
 const endTime = ref('18:00')
+const initialisationTerminee = ref(false)
 
 // Options d'heures (de 00:00 à 23:30 par intervalles de 30 min)
 const timeOptions = computed(() => {
@@ -1092,80 +1094,85 @@ watch(
   }
 )
 
+/**
+ * Les dates d'une édition sont des heures de LIEU, ancrées sur `state.timezone`.
+ *
+ * Le détail du défaut et la raison de l'extraction vivent dans `~/utils/horloge-edition` : les deux
+ * écrans de saisie avaient les mêmes quatre fonctions recopiées, et c'est ce qui a rendu le défaut
+ * identique des deux côtés.
+ */
+const ancrerSurLEdition = (mur: string | null) => ancrerHorloge(mur, state.timezone)
+
+const reporterHorloge = (
+  instant: Date | null,
+  calendrier: typeof calendarStartDate,
+  heure: typeof startTime
+) => {
+  const relu = relireHorloge(instant, state.timezone)
+  if (!relu) return
+  calendrier.value = new CalendarDate(relu.jour.year, relu.jour.month, relu.jour.day)
+  heure.value = relu.heure
+}
+
 // Charger les conventions au montage du composant
 onMounted(() => {
   fetchUserConventions()
 
-  // Initialiser les dates et heures si elles existent (nouveau système)
-  if (state.startDate) {
-    const year = state.startDate.getFullYear()
-    const month = state.startDate.getMonth() + 1
-    const day = state.startDate.getDate()
-    calendarStartDate.value = new CalendarDate(year, month, day)
-    startTime.value = `${state.startDate.getHours().toString().padStart(2, '0')}:${state.startDate.getMinutes().toString().padStart(2, '0')}`
-  }
+  // Initialiser le calendrier et l'heure depuis l'instant reçu, lu dans le fuseau de l'édition
+  reporterHorloge(state.startDate, calendarStartDate, startTime)
+  reporterHorloge(state.endDate, calendarEndDate, endTime)
 
-  if (state.endDate) {
-    const year = state.endDate.getFullYear()
-    const month = state.endDate.getMonth() + 1
-    const day = state.endDate.getDate()
-    calendarEndDate.value = new CalendarDate(year, month, day)
-    endTime.value = `${state.endDate.getHours().toString().padStart(2, '0')}:${state.endDate.getMinutes().toString().padStart(2, '0')}`
-  }
+  // Le réancrage ne doit pas jouer pendant la mise en place : le fuseau arrive AVEC les dates
+  // qu'il a servi à écrire, et les recalculer à cet instant ne ferait que reproduire la même
+  // valeur — ou la fausser si l'horloge murale n'est pas encore posée.
+  initialisationTerminee.value = true
 })
 
 // Fonctions pour mettre à jour les dates avec le nouveau système
 const updateStartDate = (date: CalendarDate | null) => {
   if (date) {
-    const [hours, minutes] = (startTime.value || '09:00').split(':').map(Number)
-    // Créer un nouvel objet Date
-    const newDate = new Date(date.year, date.month - 1, date.day, hours, minutes)
-    state.startDate = newDate
+    state.startDate = ancrerSurLEdition(horlogeMurale(date, startTime.value || '09:00'))
     touchedFields.startDate = true
   }
 }
 
 const updateEndDate = (date: CalendarDate | null) => {
   if (date) {
-    const [hours, minutes] = (endTime.value || '18:00').split(':').map(Number)
-    // Créer un nouvel objet Date
-    const newDate = new Date(date.year, date.month - 1, date.day, hours, minutes)
-    state.endDate = newDate
+    state.endDate = ancrerSurLEdition(horlogeMurale(date, endTime.value || '18:00'))
     touchedFields.endDate = true
   }
 }
 
 const updateStartDateTime = () => {
   if (calendarStartDate.value && startTime.value) {
-    const [hours, minutes] = startTime.value.split(':').map(Number)
-    // Créer un nouvel objet Date
-    const newDate = new Date(
-      calendarStartDate.value.year,
-      calendarStartDate.value.month - 1,
-      calendarStartDate.value.day,
-      hours,
-      minutes
-    )
-    state.startDate = newDate
+    state.startDate = ancrerSurLEdition(horlogeMurale(calendarStartDate.value, startTime.value))
     touchedFields.startDate = true
   }
 }
 
 const updateEndDateTime = () => {
   if (calendarEndDate.value && endTime.value) {
-    const [hours, minutes] = endTime.value.split(':').map(Number)
-    // Créer un nouvel objet Date
-    const newDate = new Date(
-      calendarEndDate.value.year,
-      calendarEndDate.value.month - 1,
-      calendarEndDate.value.day,
-      hours,
-      minutes
-    )
-    state.endDate = newDate
+    state.endDate = ancrerSurLEdition(horlogeMurale(calendarEndDate.value, endTime.value))
     touchedFields.endDate = true
   }
 }
+
+/*
+ * Changer le fuseau RÉANCRE l'heure saisie, il ne la déplace pas.
+ *
+ * L'organisateur qui corrige « Europe/Paris » en « America/Montreal » après avoir tapé 9 h veut
+ * dire « 9 h à Montréal » : c'est l'instant qui doit bouger, pas le chiffre affiché. Sans ce
+ * rattrapage, l'instant resterait celui de l'ancien fuseau et rien ne le dirait — le formulaire
+ * afficherait 9 h et la base porterait 15 h.
+ */
+watch(
+  () => state.timezone,
+  () => {
+    if (!initialisationTerminee.value) return
+    if (calendarStartDate.value) updateStartDateTime()
+    if (calendarEndDate.value) updateEndDateTime()
+  }
+)
 
 // Mise à jour d'un service booléen (évite syntaxe TS dans template)
 function setServiceValue(key: string, value: boolean) {

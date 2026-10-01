@@ -282,7 +282,7 @@
                   </p>
                   <p class="text-sm text-gray-600">
                     <UIcon name="i-heroicons-calendar" class="inline mr-1" />
-                    {{ formatDateTimeRange(edition.startDate, edition.endDate) }}
+                    {{ formatDateTimeRange(edition.startDate, edition.endDate, edition.timezone) }}
                   </p>
 
                   <!-- Email de contact de la convention -->
@@ -352,7 +352,7 @@
               </p>
               <p class="text-sm text-gray-600">
                 <UIcon name="i-heroicons-calendar" class="inline mr-1" />
-                {{ formatDateTimeRange(edition.startDate, edition.endDate) }}
+                {{ formatDateTimeRange(edition.startDate, edition.endDate, edition.timezone) }}
               </p>
 
               <!-- Email de contact de la convention -->
@@ -707,7 +707,9 @@ const editionImageUrl = computed(() =>
     : undefined
 )
 const editionDateRange = computed(() =>
-  edition.value ? formatDateTimeRange(edition.value.startDate, edition.value.endDate) : ''
+  edition.value
+    ? formatDateTimeRange(edition.value.startDate, edition.value.endDate, edition.value.timezone)
+    : ''
 )
 
 // Computed properties pour l'alerte de statut

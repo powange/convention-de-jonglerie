@@ -143,7 +143,8 @@
       "currency_description": "Gilt für alle Beträge der Ausgabe: Künstler, Ticketing und Buchhaltung.",
       "program_link": "Programm-Link",
       "program_section_title": "Programm",
-      "program_section_description": "Wenn Sie Ihr Programm anderswo pflegen, geben Sie die Seite an, die es beschreibt"
+      "program_section_description": "Wenn Sie Ihr Programm anderswo pflegen, geben Sie die Seite an, die es beschreibt",
+      "dates_timezone": "Zeiten in der Ortszeit des Veranstaltungsorts ({timezone})"
     },
     "favorites_map": {
       "all_favorites": "Alle sind Favoriten",

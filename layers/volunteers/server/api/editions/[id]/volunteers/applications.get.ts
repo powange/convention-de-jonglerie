@@ -267,6 +267,16 @@ export default wrapApiHandler(
                   name: true,
                   startDate: true,
                   endDate: true,
+                  /**
+                   * Le fuseau accompagne ces dates, sans quoi elles s'affichent à l'heure du
+                   * navigateur de l'organisateur et non à celle du lieu.
+                   *
+                   * ⚠️ Il vit sur l'ÉDITION, pas sur l'événement — une seule traversée, pour un
+                   * seul scalaire, et c'est la seule façon de l'obtenir. Le demander directement
+                   * sur `Event` fait rejeter la requête ENTIÈRE par Prisma : un 500, pas un champ
+                   * manquant, et ce dépôt l'a déjà payé une fois sur la page des candidatures.
+                   */
+                  edition: { select: { timezone: true } },
                 },
               },
             },

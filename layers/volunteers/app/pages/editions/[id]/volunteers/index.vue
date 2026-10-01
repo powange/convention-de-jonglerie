@@ -625,7 +625,9 @@ const planningPublie = computed(() => volunteersInfo.value?.planningPublished ==
 const editionName = computed(() => (edition.value ? getEditionDisplayName(edition.value) : ''))
 
 const editionDateRange = computed(() =>
-  edition.value ? formatDateTimeRange(edition.value.startDate, edition.value.endDate) : ''
+  edition.value
+    ? formatDateTimeRange(edition.value.startDate, edition.value.endDate, edition.value.timezone)
+    : ''
 )
 
 const seoTitle = computed(() => {

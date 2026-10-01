@@ -37,7 +37,7 @@
               {{ edition.name }}
             </p>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-              {{ formatDateRange(edition.startDate, edition.endDate) }}
+              {{ formatDateRange(edition.startDate, edition.endDate, edition.timezone) }}
             </p>
             <p class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
               <UIcon name="i-heroicons-map-pin" size="14" />

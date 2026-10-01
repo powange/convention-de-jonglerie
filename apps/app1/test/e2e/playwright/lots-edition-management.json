@@ -8,6 +8,7 @@
     "assignation-auto.spec.ts",
     "config-benevolat-dates.spec.ts",
     "faq.spec.ts",
+    "general-info-fuseau.spec.ts",
     "general-info.spec.ts",
     "lost-found.spec.ts",
     "manual-artist-claim.spec.ts",

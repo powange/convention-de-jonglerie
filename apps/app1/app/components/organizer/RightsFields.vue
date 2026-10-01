@@ -241,7 +241,7 @@
                 <td class="px-3 py-2 align-middle max-w-[160px] break-words">
                   <div>{{ getEditionDisplayNameWithFallback(ed) }}</div>
                   <div class="text-xs text-gray-500 mt-1">
-                    {{ formatDateRange(ed.startDate, ed.endDate) }}
+                    {{ formatDateRange(ed.startDate, ed.endDate, ed.timezone) }}
                   </div>
                 </td>
                 <td class="px-3 py-2 align-middle">
@@ -388,6 +388,7 @@
 </template>
 
 <script setup lang="ts">
+import { fuseauUtilisable, journeeDans } from '~~/shared/utils/fuseau-edition'
 import { CONVENTION_RIGHTS, rightLabelKey } from '~~/shared/utils/organizer-rights'
 
 interface EditionLite {
@@ -395,6 +396,8 @@ interface EditionLite {
   name: string | null
   startDate: string | Date
   endDate: string | Date
+  /** Le fuseau accompagne les dates : voir `formatDateRange` plus bas. Facultatif, et souvent absent. */
+  timezone?: string | null
   convention?: { name: string }
 }
 interface PerEditionRight {
@@ -507,8 +510,22 @@ function getEditionDisplayNameWithFallback(edition: EditionLite): string {
   return `#${edition.id}`
 }
 
-// Helper pour formater la plage de dates
-function formatDateRange(startDate: string | Date, endDate: string | Date): string {
+/**
+ * La plage de dates d'une édition, dans SON fuseau.
+ *
+ * ⚠️ `toLocaleDateString` sans `timeZone` et `toDateString()` lisaient tous deux dans le fuseau du
+ * NAVIGATEUR : une édition du 1er au 2 août, heure locale, passait pour tenir en un seul jour vue
+ * d'un fuseau plus à l'ouest, et la plage perdait sa date de fin.
+ *
+ * 📍 Le repli reste la MACHINE, et non `Europe/Paris` : cette fonction n'a jamais posé de fuseau,
+ * donc lui en imposer un changerait l'affichage des éditions qui n'en déclarent pas. Chaque
+ * surface garde son repli d'origine ; seules les éditions qui DÉCLARENT un fuseau changent.
+ */
+function formatDateRange(
+  startDate: string | Date,
+  endDate: string | Date,
+  fuseau?: string | null
+): string {
   try {
     const start = new Date(startDate)
     const end = new Date(endDate)
@@ -521,13 +538,14 @@ function formatDateRange(startDate: string | Date, endDate: string | Date): stri
       day: 'numeric',
       month: 'short',
       year: 'numeric',
+      timeZone: fuseauUtilisable(fuseau),
     }
 
     const startFormatted = start.toLocaleDateString('fr-FR', formatOptions)
     const endFormatted = end.toLocaleDateString('fr-FR', formatOptions)
 
-    // Si même jour, afficher seulement une date
-    if (start.toDateString() === end.toDateString()) {
+    // Si même jour, afficher seulement une date — journée découpée sur le lieu de l'édition.
+    if (journeeDans(start, fuseau) === journeeDans(end, fuseau)) {
       return startFormatted
     }
 

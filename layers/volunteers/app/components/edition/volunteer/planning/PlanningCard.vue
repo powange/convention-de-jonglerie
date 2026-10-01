@@ -116,7 +116,7 @@ interface Props {
   volunteersStatsByDay?: DayStats[]
   volunteersStatsIndividual?: VolunteerStatsIndividual[]
   formatDate: (date: string) => string
-  formatDateTimeRange: (start: string, end: string) => string
+  formatDateTimeRange: (start: string, end: string, fuseau?: string | null) => string
   currentUserId?: number // Pour filtrer les stats si c'est un bénévole
   /** Repli proposé sur mobile — la page bénévole s'en sert, pas celle de gestion. */
   repliableSurMobile?: boolean
@@ -459,7 +459,11 @@ const exportToPdf = async () => {
     doc.setFontSize(10)
     doc.setFont('helvetica', 'normal')
     doc.setTextColor(107, 114, 128) // Gris
-    const subtitle = `${props.edition?.convention?.name || ''} - ${props.formatDateTimeRange(props.edition?.startDate || '', props.edition?.endDate || '')}`
+    const subtitle = `${props.edition?.convention?.name || ''} - ${props.formatDateTimeRange(
+      props.edition?.startDate || '',
+      props.edition?.endDate || '',
+      props.edition?.timezone
+    )}`
     doc.text(subtitle, margin, currentY)
 
     // Une feuille filtrée doit le dire. Celui qui la relit le lendemain n'a aucun moyen de savoir

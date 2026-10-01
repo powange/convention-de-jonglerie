@@ -56,8 +56,8 @@
                 <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
                   {{
                     $t('admin.import.duplicate_edition_dates', {
-                      startDate: formatDate(edition.startDate),
-                      endDate: formatDate(edition.endDate),
+                      startDate: formatDate(edition.startDate, edition.timezone),
+                      endDate: formatDate(edition.endDate, edition.timezone),
                     })
                   }}
                 </p>
@@ -94,6 +94,8 @@
 </template>
 
 <script setup lang="ts">
+import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
+
 interface DuplicateEdition {
   id: string
   name?: string
@@ -124,8 +126,15 @@ defineEmits<{
 /**
  * Formate une date pour l'affichage
  */
-const formatDate = (date: string | Date): string => {
+const formatDate = (date: string | Date, fuseau?: string | null): string => {
   const d = new Date(date)
-  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  // Le fuseau de l'édition comparée : sans lui, la date se lit à l'heure de l'administrateur, et
+  // deux éditions voisines d'un jour peuvent paraître identiques.
+  return d.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: fuseauUtilisable(fuseau),
+  })
 }
 </script>

@@ -91,6 +91,12 @@
                 />
               </UFormField>
             </div>
+            <!-- Le fuseau dans lequel ces heures sont lues ET enregistrées. L'ambiguïté faisait
+                 autant de dégâts que la conversion : rien ne disait à l'organisateur si « 9 h »
+                 désignait son heure ou celle du lieu. -->
+            <p v-if="timezone" class="text-xs text-gray-500 dark:text-gray-400">
+              {{ $t('components.edition_form.dates_timezone', { timezone }) }}
+            </p>
           </div>
 
           <!-- Date de fin -->
@@ -326,6 +332,7 @@ import { useTimezones } from '~/composables/useTimezones'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { countrySelectOptions } from '~/utils/countries'
+import { ancrerHorloge, horlogeMurale, relireHorloge } from '~/utils/horloge-edition'
 
 import { DEFAULT_CURRENCY, SUPPORTED_CURRENCIES } from '~~/shared/utils/money'
 import { premierJourDeSemaine } from '~~/shared/utils/semaine'
@@ -436,6 +443,31 @@ const selectedCountry = computed({
 })
 
 // Synchroniser les valeurs avec l'édition chargée
+/**
+ * Les dates de l'édition sont des heures de LIEU : voir `~/utils/horloge-edition` pour le défaut
+ * qu'elles portaient et la raison de l'extraction.
+ *
+ * ⚠️ DÉFINI AVANT LE WATCHER CI-DESSOUS, et ce n'est pas une question de style : ce watcher porte
+ * `{ immediate: true }`, donc son rappel s'exécute PENDANT le `setup`, à la ligne du `watch`
+ * lui-même. Une `const` déclarée plus bas serait dans sa zone morte : le `setup` lèverait, et
+ * l'écran serait BLANC sans qu'aucun test ni le typage le voient. Ce dépôt a déjà payé exactement
+ * cela sur un computed.
+ */
+const ancrerSurLEdition = (mur: string | null) => ancrerHorloge(mur, timezone.value)
+
+const reporterHorloge = (
+  instant: Date | null,
+  calendrier: typeof calendarStartDate,
+  heure: typeof startTime
+) => {
+  const relu = relireHorloge(instant, timezone.value)
+  if (!relu) return
+  calendrier.value = new CalendarDate(relu.jour.year, relu.jour.month, relu.jour.day)
+  heure.value = relu.heure
+}
+
+const initialisationTerminee = ref(false)
+
 watch(
   edition,
   (newEdition) => {
@@ -462,21 +494,13 @@ watch(
       startDate.value = parsedStart
       endDate.value = parsedEnd
 
-      if (parsedStart) {
-        const year = parsedStart.getFullYear()
-        const month = parsedStart.getMonth() + 1
-        const day = parsedStart.getDate()
-        calendarStartDate.value = new CalendarDate(year, month, day)
-        startTime.value = `${parsedStart.getHours().toString().padStart(2, '0')}:${parsedStart.getMinutes().toString().padStart(2, '0')}`
-      }
-
-      if (parsedEnd) {
-        const year = parsedEnd.getFullYear()
-        const month = parsedEnd.getMonth() + 1
-        const day = parsedEnd.getDate()
-        calendarEndDate.value = new CalendarDate(year, month, day)
-        endTime.value = `${parsedEnd.getHours().toString().padStart(2, '0')}:${parsedEnd.getMinutes().toString().padStart(2, '0')}`
-      }
+      // `timezone.value` est posé plus haut dans ce même bloc : les deux reports lisent donc
+      // l'instant dans le fuseau de l'édition, et non dans celui du navigateur. Avec `getHours()`,
+      // ouvrir cet écran depuis un autre pays affichait une autre heure que celle saisie — et un
+      // simple enregistrement la gravait.
+      reporterHorloge(parsedStart, calendarStartDate, startTime)
+      reporterHorloge(parsedEnd, calendarEndDate, endTime)
+      initialisationTerminee.value = true
     }
   },
   { immediate: true }
@@ -485,43 +509,38 @@ watch(
 // Fonctions de mise à jour des dates
 const updateStartDate = (date: CalendarDate | null) => {
   if (date) {
-    const [hours, minutes] = (startTime.value || '09:00').split(':').map(Number)
-    startDate.value = new Date(date.year, date.month - 1, date.day, hours, minutes)
+    startDate.value = ancrerSurLEdition(horlogeMurale(date, startTime.value || '09:00'))
   }
 }
 
 const updateEndDate = (date: CalendarDate | null) => {
   if (date) {
-    const [hours, minutes] = (endTime.value || '18:00').split(':').map(Number)
-    endDate.value = new Date(date.year, date.month - 1, date.day, hours, minutes)
+    endDate.value = ancrerSurLEdition(horlogeMurale(date, endTime.value || '18:00'))
   }
 }
 
 const updateStartDateTime = () => {
   if (calendarStartDate.value && startTime.value) {
-    const [hours, minutes] = startTime.value.split(':').map(Number)
-    startDate.value = new Date(
-      calendarStartDate.value.year,
-      calendarStartDate.value.month - 1,
-      calendarStartDate.value.day,
-      hours,
-      minutes
-    )
+    startDate.value = ancrerSurLEdition(horlogeMurale(calendarStartDate.value, startTime.value))
   }
 }
 
 const updateEndDateTime = () => {
   if (calendarEndDate.value && endTime.value) {
-    const [hours, minutes] = endTime.value.split(':').map(Number)
-    endDate.value = new Date(
-      calendarEndDate.value.year,
-      calendarEndDate.value.month - 1,
-      calendarEndDate.value.day,
-      hours,
-      minutes
-    )
+    endDate.value = ancrerSurLEdition(horlogeMurale(calendarEndDate.value, endTime.value))
   }
 }
+
+/*
+ * Changer le fuseau RÉANCRE l'heure saisie, il ne la déplace pas — même raison que dans le
+ * formulaire de création : « 9 h » corrigé de Paris à Montréal veut dire 9 h à Montréal, donc
+ * c'est l'instant qui bouge, pas le chiffre affiché.
+ */
+watch(timezone, () => {
+  if (!initialisationTerminee.value) return
+  if (calendarStartDate.value) updateStartDateTime()
+  if (calendarEndDate.value) updateEndDateTime()
+})
 
 const prepareEndCalendar = () => {
   if (calendarStartDate.value && !calendarEndDate.value) {
