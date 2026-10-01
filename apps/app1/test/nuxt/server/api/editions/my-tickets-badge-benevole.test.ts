@@ -47,11 +47,18 @@ describe('GET /api/editions/[id]/my-tickets — badge de bénévole', () => {
     prismaMock.editionOrganizer.findFirst.mockResolvedValue(null)
   })
 
-  it('exige la PRÉSENCE à l’événement dans la requête', async () => {
+  it('exige la PRÉSENCE SUR PLACE dans la requête', async () => {
     /*
-     * L'assertion centrale. Le `where` doit porter le `OR` sur `eventAvailability` : `true` (a dit
-     * oui) ou `null` (la colonne a été ajoutée après coup, personne ne lui a posé la question).
-     * `false` — « il a répondu non » — est le seul cas exclu.
+     * L'assertion centrale. Le `where` doit porter le `OR` de `benevolePresentSurPlace` :
+     * `eventAvailability` à `true` (a dit oui) ou `null` (la colonne a été ajoutée après coup,
+     * personne ne lui a posé la question), ou une présence au montage ou au démontage.
+     *
+     * ⚠️ LE MONTAGE ET LE DÉMONTAGE ONT ÉTÉ AJOUTÉS, et c'est le même élargissement que pour le
+     * contrôle d'accès : un bénévole qui n'est là qu'au montage est sur place, il lui faut donc un
+     * badge. Le laisser hors de cette requête recréerait la contradiction que ce fichier existe
+     * pour interdire — un badge refusé au guichet, ou un guichet qui accepte quelqu'un sans badge.
+     *
+     * `false` partout reste le seul cas exclu.
      */
     await handler(evenement)
 
@@ -59,7 +66,12 @@ describe('GET /api/editions/[id]/my-tickets — badge de bénévole', () => {
 
     expect(où.eventId).toBe(EDITION)
     expect(où.status).toBe('ACCEPTED')
-    expect(où.OR).toEqual([{ eventAvailability: true }, { eventAvailability: null }])
+    expect(où.OR).toEqual([
+      { eventAvailability: true },
+      { eventAvailability: null },
+      { setupAvailability: true },
+      { teardownAvailability: true },
+    ])
   })
 
   it('n’émet AUCUN badge quand la candidature ne correspond pas', async () => {

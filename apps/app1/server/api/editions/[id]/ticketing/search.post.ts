@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
 import { conditionsMotsCles, motsClesDeLaRequete } from '#server/utils/recherche-mots-cles'
-import { benevolePresentAEvenement } from '#server/utils/ticketing/benevoles-presents'
+import { benevolePresentSurPlace } from '#server/utils/ticketing/benevoles-presents'
 import { lignesQuiDonnentAcces } from '#server/utils/ticketing/billets-qui-comptent'
 import {
   aggregateHandoutItems,
@@ -205,7 +205,7 @@ export default wrapApiHandler(
         where: {
           eventId: editionId,
           status: 'ACCEPTED',
-          ...benevolePresentAEvenement(),
+          ...benevolePresentSurPlace(),
           AND: [...conditionsMotsCles(mots, ['user.prenom', 'user.nom', 'user.email'])],
         },
         select: {
@@ -214,6 +214,11 @@ export default wrapApiHandler(
           entryValidatedAt: true,
           entryValidatedBy: true,
           userSnapshotPhone: true,
+          // Les trois phases : le guichet signale celui qui n'est pas attendu PENDANT
+          // l'événement, pour ne pas le confondre avec un bénévole ordinaire.
+          eventAvailability: true,
+          setupAvailability: true,
+          teardownAvailability: true,
           user: {
             select: {
               id: true,
@@ -692,6 +697,9 @@ export default wrapApiHandler(
                 entryValidated: application.entryValidated,
                 entryValidatedAt: application.entryValidatedAt,
                 entryValidatedBy: nomDuValidateur(application.entryValidatedBy),
+                eventAvailability: application.eventAvailability,
+                setupAvailability: application.setupAvailability,
+                teardownAvailability: application.teardownAvailability,
               },
             },
           }

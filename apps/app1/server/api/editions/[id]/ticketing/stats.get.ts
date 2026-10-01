@@ -1,6 +1,6 @@
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
-import { benevolePresentAEvenement } from '#server/utils/ticketing/benevoles-presents'
+import { benevolePresentSurPlace } from '#server/utils/ticketing/benevoles-presents'
 import { billetsQuiComptent, estUnParticipant } from '#server/utils/ticketing/billets-qui-comptent'
 import { compterLesParticipants } from '~~/shared/utils/participants-par-personne'
 
@@ -59,7 +59,7 @@ export default wrapApiHandler(
           entryValidatedAt: {
             gte: today,
           },
-          ...benevolePresentAEvenement(),
+          ...benevolePresentSurPlace(),
         },
       })
 
@@ -68,7 +68,7 @@ export default wrapApiHandler(
           eventId: editionId,
           status: 'ACCEPTED',
           entryValidated: true,
-          ...benevolePresentAEvenement(),
+          ...benevolePresentSurPlace(),
         },
       })
 
@@ -115,7 +115,7 @@ export default wrapApiHandler(
         where: {
           eventId: editionId,
           status: 'ACCEPTED',
-          ...benevolePresentAEvenement(),
+          ...benevolePresentSurPlace(),
         },
       })
 
