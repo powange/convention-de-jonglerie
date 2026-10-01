@@ -1,4 +1,5 @@
 import { expect, test } from '@nuxt/test-utils/playwright'
+import type { Page } from '@playwright/test'
 
 const BASE = 'http://localhost:3000'
 
@@ -14,29 +15,23 @@ const BASE = 'http://localhost:3000'
  * encore là où il l'a gardée, pas ailleurs : d'où des visiteurs touchés et d'autres non, sans
  * logique apparente. S'y ajoutent les coupures réseau et les extensions qui bloquent des requêtes.
  *
- * LE DÉFAUT : `emitRouteChunkError` valait `'automatic'`, dont le greffon n'agit que depuis
- * `router.onError`. Une bribe qui échoue AILLEURS — au chargement initial, sur un composant
- * paresseux, sur un `import()` d'une page déjà ouverte — n'était rattrapée par personne, et
- * l'erreur remontait jusqu'à la page d'erreur. `'automatic-immediate'` recharge la route courante
- * dès qu'une bribe échoue, quelle qu'en soit l'origine.
- *
- * 📍 UN SEUL RECHARGEMENT, PAS UNE BOUCLE : `reloadNuxtApp` pose un marqueur `nuxt:reload` en
- * `sessionStorage` et refuse de recharger deux fois le même chemin en moins de dix secondes.
- * C'est ce qui rend ce réglage sûr même quand la bribe est durablement inaccessible, et c'est
- * vérifié ici.
+ * LE DÉFAUT : `emitRouteChunkError` valait `'automatic'`, dont le greffon ne recharge que depuis
+ * `router.onError` — vérifié dans `nuxt/dist/app/plugins/chunk-reload.client.js`. Une bribe qui
+ * échoue HORS navigation de route n'était donc rattrapée par personne : l'erreur était relancée
+ * par `__vitePreload`, remontait jusqu'au gestionnaire d'erreur de Vue, et donnait la page 500 de
+ * la capture. `'automatic-immediate'` branche `app:chunkError` directement et recharge la route
+ * courante, quelle que soit l'origine de l'échec.
  */
 test.describe('Une bribe manquante ne doit pas afficher de 500', () => {
   /*
    * ⚠️ CE LOT N'A DE SENS QUE SUR UNE APPLICATION CONSTRUITE, et il le dit plutôt que de passer à
-   * vide. En développement, Vite sert des modules ESM natifs : un `import()` qui échoue ne passe
-   * PAS par `vite:preloadError`, donc Nuxt n'émet aucun `app:chunkError` et aucun rechargement
-   * n'a lieu. Mesuré : sur le serveur de développement, le cas du rechargement échoue tandis que
-   * les deux autres passent — dont l'un pour une mauvaise raison, une page blanche ne contenant
-   * pas davantage « Internal Server Error ».
+   * vide. En développement, Vite sert des modules ESM natifs : les `import()` ne sont pas
+   * enveloppés dans `__vitePreload`, donc aucun `vite:preloadError` n'est émis, donc Nuxt n'émet
+   * aucun `app:chunkError` et aucun rechargement n'a lieu.
    *
    * En CI, l'application est pré-construite (voir le commentaire du projet `setup` dans
    * `playwright.config.ts`) : les bribes y sont hachées et le chemin de préchargement est celui de
-   * la production. C'est là que ces trois cas mordent.
+   * la production. C'est là que ces cas mordent.
    */
   test.skip(
     !process.env.CI,
@@ -44,90 +39,136 @@ test.describe('Une bribe manquante ne doit pas afficher de 500', () => {
   )
 
   /**
-   * Coupe la PREMIÈRE bribe demandée après le document, puis laisse tout passer.
+   * Arme une coupure des bribes `/_nuxt/*.js`, à déclencher au moment voulu.
    *
-   * On ne coupe qu'une fois : le rechargement qui suit doit pouvoir aboutir, sinon on éprouverait
-   * la garde anti-boucle au lieu du rechargement lui-même.
+   * ⚠️⚠️ POURQUOI PAS « LA PREMIÈRE BRIBE DEMANDÉE », comme le faisait la version précédente de ce
+   * fichier : la première est le script d'ENTRÉE. La couper empêche l'application de démarrer —
+   * aucun greffon ne tourne, aucun `app:chunkError` n'est émis, et le HTML rendu par le serveur
+   * reste affiché. La page paraît alors parfaitement saine : le cas « pas de 500 » passait au vert
+   * sans rien éprouver, et seul le témoin de rechargement a révélé qu'il ne se passait rien.
+   *
+   * 📍 ON COUPE DONC APRÈS LE DÉMARRAGE, sur un `import()` qui n'est pas une navigation de route :
+   * c'est précisément ce que `'automatic'` laissait passer, et c'est le cas de la production.
+   *
+   * 📍 ET ON REND LA MAIN DÈS QUE LE NAVIGATEUR REDEMANDE LE DOCUMENT : c'est le rechargement, et
+   * il lui faut ses bribes pour aboutir. Ce signal-là, et pas `framenavigated`, parce qu'un
+   * `router.replace` — ce que fait le changement de `?view=` — est une navigation sans requête de
+   * document : elle ne doit pas désarmer la coupure.
    */
-  const couperUneBribe = async (page: import('@playwright/test').Page) => {
-    let coupees = 0
+  const armerLaCoupure = async (page: Page, { durable = false } = {}) => {
+    let couper = false
+    const coupees = new Set<string>()
+    page.on('request', (requete) => {
+      if (requete.resourceType() === 'document') couper = false
+    })
     await page.route(/\/_nuxt\/.*\.js(\?.*)?$/, async (route) => {
-      if (coupees === 0) {
-        coupees++
+      const url = route.request().url()
+      // `durable` garde la MÊME bribe inaccessible d'un chargement à l'autre : c'est ce qu'il faut
+      // pour éprouver la garde anti-boucle, et il ne faut surtout pas de cela ailleurs.
+      if (couper || (durable && coupees.has(url))) {
+        coupees.add(url)
         await route.abort('failed')
         return
       }
       await route.continue()
     })
-    return () => coupees
+    return { armer: () => (couper = true), coupees }
   }
 
-  test('🔬 recharge au lieu de montrer « Internal Server Error »', async ({ page }) => {
-    const compteur = await couperUneBribe(page)
-
-    await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' })
-    // Laisser au greffon le temps de voir l'échec et de relancer la page.
-    await page.waitForTimeout(6000)
-
-    expect(compteur(), 'une bribe doit bien avoir été coupée').toBeGreaterThan(0)
-
+  /** Ouvre l'accueil et attend que l'application ait réellement démarré côté client. */
+  const ouvrirLAccueilHydrate = async (page: Page) => {
+    await page.goto(`${BASE}/`)
+    // Nuxt pose `window.useNuxtApp` au démarrage du client (`nuxt/dist/app/nuxt.js`) : c'est le
+    // témoin d'hydratation le moins coûteux, et le seul qui distingue la page rendue par le
+    // serveur de l'application vivante.
+    await page.waitForFunction(() => 'useNuxtApp' in window, null, { timeout: 60000 })
     /*
-     * L'assertion qui porte le point. Avant le correctif, cette page portait le 500 de la capture ;
-     * après, le rechargement l'a remplacée par la page d'accueil.
+     * Les préchargements de route de `NuxtLink` partent juste après l'hydratation. Les laisser
+     * finir évite que la coupure ne tombe sur l'un d'eux plutôt que sur la bribe de la carte.
+     * Ce n'est que de l'hygiène : un préchargement coupé produirait lui aussi un `app:chunkError`
+     * hors navigation, donc le même point. D'où le `catch` plutôt qu'un échec.
      */
-    const texte = (await page.textContent('body')) ?? ''
-    expect(texte).not.toContain('Internal Server Error')
-    expect(texte).not.toContain('Failed to fetch dynamically imported module')
-  })
+    await page.waitForLoadState('networkidle', { timeout: 20000 }).catch(() => {})
+  }
 
-  test('🔬 le rechargement a bien eu lieu, et la page est utilisable', async ({ page }) => {
-    /*
-     * Le pendant positif, et il est nécessaire : une page BLANCHE ne contient pas non plus
-     * « Internal Server Error ». On vérifie donc qu'un rechargement a eu lieu — le témoin posé
-     * dans la fenêtre ne survit pas à une navigation — et que le contenu est revenu.
-     */
-    const compteur = await couperUneBribe(page)
+  test('🔬 recharge la page au lieu d’afficher « Internal Server Error »', async ({ page }) => {
+    const { armer, coupees } = await armerLaCoupure(page)
+    await ouvrirLAccueilHydrate(page)
 
-    await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' })
     await page.evaluate(() => {
       ;(window as unknown as { __temoinAvantRechargement?: boolean }).__temoinAvantRechargement =
         true
     })
 
-    await page.waitForTimeout(6000)
+    /*
+     * La vue « carte » de l'accueil est un `defineAsyncComponent(() => import('~/components/
+     * HomeMap.vue'))` : le clic déclenche un `import()` qui n'est PAS une navigation de route.
+     * C'est le cas que `'automatic'` ne rattrapait pas, et donc le seul qui discrimine ce lot.
+     */
+    armer()
+    await page.locator('[data-vue-carte]').click()
 
-    const temoin = await page.evaluate(
-      () => (window as unknown as { __temoinAvantRechargement?: boolean }).__temoinAvantRechargement
+    /*
+     * 🔬 L'ASSERTION QUI PORTE LE POINT, et elle est en attente plutôt qu'après une temporisation :
+     * le témoin posé dans la fenêtre ne survit pas à un nouveau document. S'il est encore là au
+     * bout de vingt secondes, c'est qu'aucun rechargement n'a eu lieu — ce que disait la CI avant
+     * cette réécriture.
+     */
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __temoinAvantRechargement?: boolean }).__temoinAvantRechargement ===
+        undefined,
+      null,
+      { timeout: 20000 }
     )
-    expect(compteur(), 'une bribe doit bien avoir été coupée').toBeGreaterThan(0)
-    expect(
-      temoin,
-      'le témoin doit avoir disparu, signe que la page a été rechargée'
-    ).toBeUndefined()
 
-    // Et la page rend quelque chose : l'en-tête du site suffit à le dire.
-    await expect(page.locator('body')).toContainText(/\p{L}/u, { timeout: 15000 })
+    expect(coupees.size, `bribes coupées : ${[...coupees].join(', ')}`).toBeGreaterThan(0)
+
+    /*
+     * Le pendant négatif : avant le correctif, c'est ici que se trouvait le 500 de la capture.
+     * Il ne suffit pas à lui seul — une page blanche ne le contient pas davantage —, d'où
+     * l'assertion de contenu qui suit.
+     */
+    const texte = (await page.textContent('body')) ?? ''
+    expect(texte).not.toContain('Internal Server Error')
+    expect(texte).not.toContain('Failed to fetch dynamically imported module')
+
+    // Et la page est de nouveau utilisable : la coupure a été rendue avant le rechargement, donc
+    // la bribe de la carte est arrivée cette fois.
+    await expect(page.locator('[data-vue-carte]')).toBeVisible({ timeout: 20000 })
   })
 
   test('ne recharge pas en BOUCLE quand la bribe reste inaccessible', async ({ page }) => {
     /*
      * ⚠️ LA SEULE OBJECTION SÉRIEUSE à ce réglage, et la raison pour laquelle il est sûr : si une
      * bribe est bloquée durablement — une extension de navigateur, par exemple —, le rechargement
-     * ne doit pas se répéter sans fin. `reloadNuxtApp` pose un marqueur en `sessionStorage` valable
-     * dix secondes par chemin.
+     * ne doit pas se répéter sans fin. `reloadNuxtApp` pose `nuxt:reload` en `sessionStorage` et
+     * refuse de recharger deux fois le même chemin en moins de dix secondes.
      *
-     * On coupe donc TOUTES les bribes, et l'on compte les chargements du document.
+     * 📍 CE CAS A BESOIN QUE L'APPLICATION REDÉMARRE pour éprouver la garde : on bloque donc la
+     * seule bribe de la carte, durablement, et l'on laisse passer tout le reste. Couper tout
+     * laisserait l'application morte au deuxième chargement, et le compteur resterait bas sans que
+     * la garde y soit pour rien.
+     *
+     * 📍 CE QUE CELA CONCÈDE : au second échec, l'erreur n'est plus rattrapée et la page d'erreur
+     * peut apparaître. C'est le comportement voulu — mieux vaut une erreur visible qu'une boucle —,
+     * et c'est pourquoi ce cas ne vérifie PAS l'absence du 500, contrairement au précédent.
      */
     let documents = 0
-    page.on('framenavigated', (frame) => {
-      if (frame === page.mainFrame()) documents++
+    page.on('request', (requete) => {
+      if (requete.resourceType() === 'document') documents++
     })
-    await page.route(/\/_nuxt\/.*\.js(\?.*)?$/, (route) => route.abort('failed'))
 
-    await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' })
-    await page.waitForTimeout(8000)
+    const { armer, coupees } = await armerLaCoupure(page, { durable: true })
+    await ouvrirLAccueilHydrate(page)
 
-    // Le chargement initial, plus UN rechargement au plus. Sans la garde, ce compteur s'emballerait.
-    expect(documents, `navigations observées : ${documents}`).toBeLessThanOrEqual(3)
+    armer()
+    await page.locator('[data-vue-carte]').click()
+    await page.waitForTimeout(12000)
+
+    expect(coupees.size, 'une bribe doit bien avoir été coupée').toBeGreaterThan(0)
+    // Le chargement initial, plus UN rechargement. La marge laisse passer une requête de document
+    // supplémentaire sans laisser passer une boucle, qui en produirait des dizaines.
+    expect(documents, `requêtes de document observées : ${documents}`).toBeLessThanOrEqual(3)
   })
 })

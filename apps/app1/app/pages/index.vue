@@ -65,6 +65,7 @@
             :variant="viewMode === 'map' ? 'solid' : 'ghost'"
             icon="i-heroicons-map"
             size="sm"
+            data-vue-carte
             @click="changeViewMode('map')"
           >
             {{ $t('homepage.map') }}
