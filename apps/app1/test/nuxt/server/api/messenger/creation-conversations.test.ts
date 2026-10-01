@@ -4,12 +4,17 @@ const assurerConversationsEquipe = vi.hoisted(() => vi.fn(async () => undefined)
 const assurerConversationsEquipeEnLot = vi.hoisted(() => vi.fn(async () => undefined))
 const assurerBenevoleVersOrganisateurs = vi.hoisted(() => vi.fn(async () => 'conv-vo'))
 const assurerGroupeOrganisateurs = vi.hoisted(() => vi.fn(async () => 'conv-og'))
+const equipesDontIlEstResponsable = vi.hoisted(() => vi.fn(async () => [] as string[]))
 
 vi.mock('../../../../../server/utils/messenger-helpers', () => ({
   ensureVolunteerConversations: assurerConversationsEquipe,
   assurerConversationsEquipeDesMembres: assurerConversationsEquipeEnLot,
   ensureVolunteerToOrganizersConversation: assurerBenevoleVersOrganisateurs,
   ensureOrganizersGroupConversation: assurerGroupeOrganisateurs,
+}))
+
+vi.mock('../../../../../server/utils/editions/volunteers/responsables-equipe', () => ({
+  equipesDontIlEstResponsable,
 }))
 
 vi.mock('../../../../../server/utils/auth-utils', () => ({
@@ -62,6 +67,8 @@ describe('POST /api/messenger/team-conversation', () => {
       { application: { userId: 8 } },
     ])
     prismaMock.conversation.findFirst.mockResolvedValue({ id: 'conv-equipe' })
+    // Par défaut : ne dirige aucune équipe. Les cas qui éprouvent le responsable le disent.
+    equipesDontIlEstResponsable.mockResolvedValue([])
   })
 
   it('ouvre la conversation pour un membre accepté de l’équipe', async () => {
@@ -74,6 +81,55 @@ describe('POST /api/messenger/team-conversation', () => {
     // Le cœur de ce point d'API. Sans ce refus, n'importe qui ouvrirait la conversation de
     // n'importe quelle équipe et lirait ce qui s'y dit.
     prismaMock.applicationTeamAssignment.findFirst.mockResolvedValue(null)
+
+    await expect(equipe(evenement as any)).rejects.toThrow(/pas membre de cette équipe/)
+    expect(assurerConversationsEquipeEnLot).not.toHaveBeenCalled()
+  })
+
+  it('🔬 ouvre la conversation pour un responsable ORGANISATEUR, sans candidature', async () => {
+    /*
+     * ⚠️ SIGNALÉ PAR L'UTILISATEUR : les responsables d'équipe n'avaient pas, sur leur page
+     * bénévole publique, « le bouton qui permet d'envoyer un message dans la messagerie privée
+     * groupée de leur équipe ».
+     *
+     * ⚠️⚠️ ET C'ÉTAIT L'ANGLE MORT QUE CE DÉPÔT S'ÉTAIT DÉJÀ INTERDIT. La garde n'interrogeait que
+     * `applicationTeamAssignment`, c'est-à-dire les candidatures de bénévoles. Un responsable qui
+     * tient ce rôle comme ORGANISATEUR n'a pas de candidature : 403. Or `responsables-equipe.ts`
+     * dit mot pour mot qu'interroger cette table seule « rouvrirait l'angle mort sans que rien ne
+     * le signale ».
+     */
+    prismaMock.applicationTeamAssignment.findFirst.mockResolvedValue(null)
+    equipesDontIlEstResponsable.mockResolvedValue([EQUIPE])
+
+    const reponse: any = await equipe(evenement as any)
+
+    expect(reponse.data.conversationId).toBe('conv-equipe')
+  })
+
+  it('🔬 inscrit ce responsable dans la conversation qu’il ouvre', async () => {
+    /*
+     * 📍 CE N'EST PLUS UNE CEINTURE. Tant que la garde exigeait une candidature acceptée, le
+     * demandeur figurait forcément parmi les membres que la base rend, et son ajout explicite
+     * n'était qu'une précaution. Un responsable organisateur, lui, n'y figure pas : le retirer le
+     * laisserait hors de la conversation qu'il vient d'ouvrir.
+     */
+    prismaMock.applicationTeamAssignment.findFirst.mockResolvedValue(null)
+    prismaMock.applicationTeamAssignment.findMany.mockResolvedValue([
+      { application: { userId: 8 } },
+    ])
+    equipesDontIlEstResponsable.mockResolvedValue([EQUIPE])
+
+    await equipe(evenement as any)
+
+    const destinataires = assurerConversationsEquipeEnLot.mock.calls[0][2] as number[]
+    expect(destinataires).toContain(UTILISATEUR)
+    expect(destinataires).toContain(8)
+  })
+
+  it('REFUSE le responsable d’une AUTRE équipe', async () => {
+    // Le pendant du cas précédent : élargir la garde ne doit pas l'ouvrir à toutes les équipes.
+    prismaMock.applicationTeamAssignment.findFirst.mockResolvedValue(null)
+    equipesDontIlEstResponsable.mockResolvedValue(['une-autre-equipe'])
 
     await expect(equipe(evenement as any)).rejects.toThrow(/pas membre de cette équipe/)
     expect(assurerConversationsEquipeEnLot).not.toHaveBeenCalled()
