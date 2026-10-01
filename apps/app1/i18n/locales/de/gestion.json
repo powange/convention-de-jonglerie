@@ -1179,6 +1179,7 @@
       "submit": "Convention speichern",
       "title": "Convention"
     },
-    "back_to_categories": "Alle Kategorien"
+    "back_to_categories": "Alle Kategorien",
+    "back_to_home": "Startseite"
   }
 }
