@@ -630,7 +630,11 @@ import {
   assignVolunteerTeams,
 } from '~/utils/volunteer-application-api'
 
-import { candidaturesEnCsv, type CandidatureExportable } from '../../../utils/export-candidatures'
+import {
+  candidaturesEnCsv,
+  colonnesCandidaturesVisibles,
+  type CandidatureExportable,
+} from '../../../utils/export-candidatures'
 import {
   filtresDepuisUrl,
   pageDepuisUrl,
@@ -1305,13 +1309,30 @@ const exportApplications = async (format: 'csv' | 'pdf') => {
     if (format === 'csv') {
       telechargerFichier(
         nomDeFichierCsv(nomDeBase),
-        candidaturesEnCsv(candidatures, t, formatDesDates),
+        // Le fichier tableur emporte les colonnes AFFICHÉES, et elles seules : masquer une
+        // colonne à l'écran et la retrouver dans le fichier est ce que ce lot corrige.
+        candidaturesEnCsv(
+          candidatures,
+          t,
+          formatDesDates,
+          colonnesCandidaturesVisibles(columnVisibility.value)
+        ),
         'text/csv;charset=utf-8'
       )
     } else {
-      // Vingt-six colonnes : le paysage ne suffit pas, et rétrécir la police rendrait la feuille
-      // illisible. On imprime donc les colonnes qu'on EMPORTE — de quoi appeler quelqu'un et
-      // savoir ce qu'il a annoncé — le fichier tableur restant là pour tout le reste.
+      /*
+       * Vingt-six colonnes : le paysage ne suffit pas, et rétrécir la police rendrait la feuille
+       * illisible. On imprime donc une sélection — de quoi appeler quelqu'un et savoir ce qu'il a
+       * annoncé — le fichier tableur restant là pour tout le reste.
+       *
+       * ⚠️ ET ON LA CROISE AVEC CE QUI EST AFFICHÉ : masquer une colonne à l'écran doit la retirer
+       * du papier aussi. L'inverse n'est PAS vrai — révéler une colonne à l'écran ne la fait pas
+       * apparaître sur la feuille, parce que la contrainte de place, elle, n'a pas changé.
+       */
+      const colonnesImprimables = colonnesCandidaturesVisibles(
+        columnVisibility.value,
+        COLONNES_A_IMPRIMER
+      )
       await exporterTableauEnPdf({
         titre: t('volunteers.export_applications_title'),
         sousTitre: [props.edition?.convention?.name, props.edition?.name]
@@ -1320,9 +1341,9 @@ const exportApplications = async (format: 'csv' | 'pdf') => {
         mention: `${new Date().toLocaleDateString(locale.value)} — ${t('volunteers.export_count', {
           count: candidatures.length,
         })}`,
-        entetes: entetesDesCandidatures(t, COLONNES_A_IMPRIMER),
+        entetes: entetesDesCandidatures(t, colonnesImprimables),
         lignes: candidatures.map((candidature) =>
-          ligneDUneCandidature(candidature, t, formatDesDates, COLONNES_A_IMPRIMER)
+          ligneDUneCandidature(candidature, t, formatDesDates, colonnesImprimables)
         ),
         nomFichier: nomDeBase,
       })

@@ -21,8 +21,18 @@ import { versCsv } from '~~/shared/utils/csv'
 
 /** Ce que le tableau affiche réellement, et donc ce que le fichier doit porter. */
 export interface ColonnesOrganisateurs {
-  /** Courriel et téléphone : réservés aux gestionnaires d'organisateurs, masqués sinon. */
+  /**
+   * Courriel et téléphone ensemble : réservés aux gestionnaires d'organisateurs.
+   *
+   * ⚠️ CONSERVÉ POUR LE DROIT, pas pour l'affichage. Le tableau a DEUX colonnes distinctes, qu'on
+   * peut masquer séparément ; `courriel` et `telephone` ci-dessous portent ce réglage-là. Les
+   * confondre ferait qu'en masquant le seul courriel on continuerait de l'emporter.
+   */
   contact: boolean
+  /** Le courriel est-il affiché ? Par défaut oui, tant que `contact` l'autorise. */
+  courriel?: boolean
+  /** Le téléphone est-il affiché ? */
+  telephone?: boolean
   /** Statut d'entrée : seulement quand la billetterie est active. */
   statut: boolean
   /** Repas : seulement quand le module est actif ET qu'on peut le gérer. */
@@ -50,7 +60,8 @@ export function entetesDesOrganisateurs(colonnes: ColonnesOrganisateurs, t: Trad
   return [
     t('gestion.organizers.organizer'),
     t('gestion.organizers.title_column'),
-    ...(colonnes.contact ? [t('common.email'), t('common.phone')] : []),
+    ...(colonnes.contact && colonnes.courriel !== false ? [t('common.email')] : []),
+    ...(colonnes.contact && colonnes.telephone !== false ? [t('common.phone')] : []),
     ...(colonnes.statut ? [t('gestion.organizers.status')] : []),
     t('gestion.organizers.roles_column'),
     ...(colonnes.repas ? [t('common.meals_short')] : []),
@@ -69,7 +80,8 @@ export function ligneDUnOrganisateur(
     // produit se rattrapent mal une fois le fichier ouvert ailleurs.
     formatUserFullName(organisateur.user ?? null, t),
     organisateur.title ?? '',
-    ...(colonnes.contact ? [organisateur.user?.email ?? '', organisateur.user?.phone ?? ''] : []),
+    ...(colonnes.contact && colonnes.courriel !== false ? [organisateur.user?.email ?? ''] : []),
+    ...(colonnes.contact && colonnes.telephone !== false ? [organisateur.user?.phone ?? ''] : []),
     ...(colonnes.statut
       ? [
           t(
