@@ -114,7 +114,9 @@
                       v-if="edition.startDate && edition.endDate"
                       class="text-xs text-gray-500 dark:text-gray-400"
                     >
-                      {{ formatDateRangeCompact(edition.startDate, edition.endDate) }}
+                      {{
+                        formatDateRangeCompact(edition.startDate, edition.endDate, edition.timezone)
+                      }}
                     </span>
                   </div>
                 </div>

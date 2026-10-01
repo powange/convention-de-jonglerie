@@ -160,7 +160,11 @@
                   <p class="text-gray-600 dark:text-gray-400 flex items-center gap-2 mt-1">
                     <UIcon name="i-heroicons-calendar-days" class="w-4 h-4" />
                     {{
-                      formatDateRange(application.edition.startDate, application.edition.endDate)
+                      formatDateRange(
+                        application.edition.startDate,
+                        application.edition.endDate,
+                        application.edition.timezone
+                      )
                     }}
                   </p>
                 </div>
@@ -367,10 +371,22 @@
                 {{ application.edition.city }}, {{ application.edition.country }}
               </p>
               <p class="text-xs text-gray-500 truncate sm:hidden">
-                {{ formatDateRange(application.edition.startDate, application.edition.endDate) }}
+                {{
+                  formatDateRange(
+                    application.edition.startDate,
+                    application.edition.endDate,
+                    application.edition.timezone
+                  )
+                }}
               </p>
               <p class="text-xs sm:text-sm text-gray-500 truncate hidden sm:block">
-                {{ formatDateRange(application.edition.startDate, application.edition.endDate) }}
+                {{
+                  formatDateRange(
+                    application.edition.startDate,
+                    application.edition.endDate,
+                    application.edition.timezone
+                  )
+                }}
               </p>
             </div>
           </div>
@@ -469,6 +485,8 @@
 
 <script setup lang="ts">
 import { withdrawVolunteerApplication } from '~/utils/volunteer-application-api'
+
+import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
 
 // Données « édition » à plat renvoyées par /api/user/volunteer-applications.
 // Métadonnées génériques (id/name/dates) issues d'`Event`, données d'affichage propres au domaine
@@ -691,19 +709,30 @@ const formatDate = (date: string) => {
   })
 }
 
-const formatDateRange = (startDate: string, endDate: string) => {
+/**
+ * La plage de dates d'une édition, dans SON fuseau — comme les créneaux affichés plus bas sur
+ * cette même page, qui le reçoivent déjà. Sans `timeZone`, ces deux dates se lisaient à l'heure du
+ * téléphone de qui consulte, alors que la ligne voisine annonçait l'heure du lieu.
+ *
+ * 📍 Repli sur la machine, et non `Europe/Paris` : cette fonction n'a jamais posé de fuseau, donc
+ * seules les éditions qui en DÉCLARENT un changent d'affichage.
+ */
+const formatDateRange = (startDate: string, endDate: string, fuseau?: string | null) => {
   const start = new Date(startDate)
   const end = new Date(endDate)
+  const zone = fuseauUtilisable(fuseau)
 
   const startStr = start.toLocaleDateString('fr-FR', {
     day: 'numeric',
     month: 'short',
+    timeZone: zone,
   })
 
   const endStr = end.toLocaleDateString('fr-FR', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
+    timeZone: zone,
   })
 
   return `${startStr} - ${endStr}`

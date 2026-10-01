@@ -1,10 +1,25 @@
-import { versInstant } from '~~/shared/utils/fuseau-edition'
+import { fuseauUtilisable, journeeDans, versInstant } from '~~/shared/utils/fuseau-edition'
 
 export interface DateFormatOptions {
   locale?: string
   includeTime?: boolean
   format?: 'short' | 'medium' | 'long'
+  /**
+   * Le fuseau dans lequel lire l'instant — celui de l'édition pour une date d'édition.
+   *
+   * ⚠️ `Europe/Paris` était codé en dur : une édition australienne affichait ses dates à l'heure
+   * de Paris, c'est-à-dire autre chose que ce que son organisateur avait saisi.
+   *
+   * Le repli RESTE `Europe/Paris` quand rien n'est fourni, délibérément : 38 des 69 éditions de la
+   * base de développement ne déclarent aucun fuseau, et retomber sur la machine du lecteur aurait
+   * changé en silence ce que voient tous les lecteurs hors de France. Seules les éditions qui
+   * DÉCLARENT un fuseau changent d'affichage, et elles changent vers le bon.
+   */
+  fuseau?: string | null
 }
+
+/** Le fuseau effectif d'un formatage. Voir `DateFormatOptions.fuseau`. */
+const zoneDeLecture = (fuseau?: string | null) => fuseauUtilisable(fuseau) ?? 'Europe/Paris'
 
 /**
  * Formate une date selon les options spécifiées
@@ -23,7 +38,7 @@ export const formatDate = (date: string | Date, options: DateFormatOptions = {})
   }
 
   const formatOptions: Intl.DateTimeFormatOptions = {
-    timeZone: 'Europe/Paris',
+    timeZone: zoneDeLecture(options.fuseau),
   }
 
   // Configuration selon le format
@@ -104,28 +119,31 @@ export const formatDateRange = (
   const start = formatDate(startDate, options)
   const end = formatDate(endDate, options)
 
-  const startObj = typeof startDate === 'string' ? new Date(startDate) : startDate
-  const endObj = typeof endDate === 'string' ? new Date(endDate) : endDate
+  /*
+   * ⚠️ LES JOURNÉES SE DÉCOUPENT SUR PLACE, pas au fuseau du lecteur. `getDate()`, `getMonth()` et
+   * `getFullYear()` lisent dans le fuseau de la MACHINE : une édition du 1er au 2 août, heure
+   * locale, passait pour tenir en un seul jour vue d'un fuseau plus à l'ouest — et la plage rendue
+   * perdait alors sa date de fin. C'est le même défaut que celui qu'on répare, un cran plus loin.
+   *
+   * `journeeDans` rend `AAAA-MM-JJ` dans le fuseau demandé : comparer ces chaînes compare bien des
+   * journées vécues sur le lieu de l'édition.
+   */
+  const zone = zoneDeLecture(options.fuseau)
+  const [anneeDebut, moisDebut, jourDebut] = journeeDans(startDate, zone).split('-')
+  const [anneeFin, moisFin, jourFin] = journeeDans(endDate, zone).split('-')
 
   // Si même jour, afficher une seule date
-  if (
-    startObj.getDate() === endObj.getDate() &&
-    startObj.getMonth() === endObj.getMonth() &&
-    startObj.getFullYear() === endObj.getFullYear()
-  ) {
+  if (anneeDebut === anneeFin && moisDebut === moisFin && jourDebut === jourFin) {
     return start
   }
 
   // Si même mois et année
-  if (
-    startObj.getMonth() === endObj.getMonth() &&
-    startObj.getFullYear() === endObj.getFullYear()
-  ) {
-    const dayStart = startObj.getDate()
-    const dayEnd = endObj.getDate()
-    const month = startObj.toLocaleDateString(options.locale || 'fr-FR', { month: 'long' })
-    const year = startObj.getFullYear()
-    return `${dayStart} - ${dayEnd} ${month} ${year}`
+  if (anneeDebut === anneeFin && moisDebut === moisFin) {
+    const month = new Date(startDate).toLocaleDateString(options.locale || 'fr-FR', {
+      month: 'long',
+      timeZone: zone,
+    })
+    return `${Number(jourDebut)} - ${Number(jourFin)} ${month} ${anneeDebut}`
   }
 
   return `${start} - ${end}`

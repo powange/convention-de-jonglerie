@@ -143,7 +143,8 @@
       "currency_description": "Применяется ко всем суммам выпуска: артисты, билеты и касса.",
       "program_link": "Ссылка на программу",
       "program_section_title": "Программа",
-      "program_section_description": "Если программа размещена в другом месте, укажите страницу с её описанием"
+      "program_section_description": "Если программа размещена в другом месте, укажите страницу с её описанием",
+      "dates_timezone": "Время по местному времени площадки ({timezone})"
     },
     "favorites_map": {
       "all_favorites": "Все избранные",

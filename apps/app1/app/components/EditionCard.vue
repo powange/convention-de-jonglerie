@@ -47,7 +47,7 @@
       <!-- Informations principales -->
       <div class="space-y-2">
         <p class="text-sm font-semibold">
-          {{ formatDateTimeRange(edition.startDate, edition.endDate) }}
+          {{ formatDateTimeRange(edition.startDate, edition.endDate, edition.timezone) }}
         </p>
         <p class="text-sm font-semibold flex items-center gap-1">
           <UIcon name="i-heroicons-map-pin" class="text-gray-400" size="16" />

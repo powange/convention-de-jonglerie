@@ -143,7 +143,8 @@
       "currency_description": "Dotyczy wszystkich kwot edycji: artystów, biletów i finansów.",
       "program_link": "Link do programu",
       "program_section_title": "Program",
-      "program_section_description": "Jeśli prowadzisz program gdzie indziej, podaj stronę, która go opisuje"
+      "program_section_description": "Jeśli prowadzisz program gdzie indziej, podaj stronę, która go opisuje",
+      "dates_timezone": "Godziny w czasie lokalnym miejsca ({timezone})"
     },
     "favorites_map": {
       "all_favorites": "Wszystkie są ulubione",

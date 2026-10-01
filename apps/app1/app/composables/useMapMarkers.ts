@@ -3,6 +3,8 @@ import type { Edition } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { createCustomMarkerIcon, escapeHtml, getEditionStatus } from '~/utils/mapMarkers'
 
+import { fuseauUtilisable, journeeDans } from '~~/shared/utils/fuseau-edition'
+
 /**
  * Contexte pré-calculé et échappé fourni au callback de construction de popup.
  */
@@ -37,17 +39,49 @@ export const useMapMarkers = (options: UseMapMarkersOptions) => {
   const { getImageUrl } = useImageUrl()
   const { translateCountryName } = useCountryTranslation()
 
-  const formatDateRangeLocal = (startDate: string, endDate: string): string => {
+  /**
+   * La plage de dates d'une édition, dans SON fuseau.
+   *
+   * ⚠️ `getMonth()`, `getFullYear()` et `getDate()` lisaient dans le fuseau du NAVIGATEUR : une
+   * édition du 1er au 3 août, heure locale, pouvait s'annoncer « 31 juillet - 2 août » à un
+   * lecteur situé plus à l'ouest. Les trois comparaisons passent donc par `journeeDans`, qui
+   * découpe la journée sur le lieu de l'événement.
+   *
+   * 📍 LE REPLI EST VOLONTAIREMENT LA MACHINE, et non `Europe/Paris` comme dans `useDateFormat` :
+   * cette fonction n'a jamais posé de fuseau, donc elle a toujours lu celui du lecteur. Lui en
+   * imposer un autre aujourd'hui changerait l'affichage des éditions sans fuseau — plus de la
+   * moitié d'entre elles — sans que personne l'ait demandé. Chaque surface garde son repli
+   * d'origine ; seules les éditions qui DÉCLARENT un fuseau changent, et vers le bon.
+   */
+  const formatDateRangeLocal = (
+    startDate: string,
+    endDate: string,
+    fuseau?: string | null
+  ): string => {
     const start = new Date(startDate)
     const end = new Date(endDate)
     const loc = locale.value
-    const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' }
-    if (start.getTime() === end.getTime()) return start.toLocaleDateString(loc, opts)
-    if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
-      return `${start.getDate()} - ${end.toLocaleDateString(loc, opts)}`
+    const zone = fuseauUtilisable(fuseau)
+    const opts: Intl.DateTimeFormatOptions = {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: zone,
     }
-    if (start.getFullYear() === end.getFullYear()) {
-      const startOpts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long' }
+    if (start.getTime() === end.getTime()) return start.toLocaleDateString(loc, opts)
+
+    const [anneeDebut, moisDebut, jourDebut] = journeeDans(start, fuseau).split('-')
+    const [anneeFin, moisFin] = journeeDans(end, fuseau).split('-')
+
+    if (moisDebut === moisFin && anneeDebut === anneeFin) {
+      return `${Number(jourDebut)} - ${end.toLocaleDateString(loc, opts)}`
+    }
+    if (anneeDebut === anneeFin) {
+      const startOpts: Intl.DateTimeFormatOptions = {
+        day: 'numeric',
+        month: 'long',
+        timeZone: zone,
+      }
       return `${start.toLocaleDateString(loc, startOpts)} - ${end.toLocaleDateString(loc, opts)}`
     }
     return `${start.toLocaleDateString(loc, opts)} - ${end.toLocaleDateString(loc, opts)}`
@@ -76,7 +110,7 @@ export const useMapMarkers = (options: UseMapMarkersOptions) => {
         city: escapeHtml(edition.city || ''),
         country: escapeHtml(translateCountryName(edition.country)),
         imageUrl: getEditionImageUrl(edition),
-        dateRange: formatDateRangeLocal(edition.startDate, edition.endDate),
+        dateRange: formatDateRangeLocal(edition.startDate, edition.endDate, edition.timezone),
         description: edition.description ? escapeHtml(edition.description) : null,
         detailUrl: `/editions/${edition.id}`,
         t,

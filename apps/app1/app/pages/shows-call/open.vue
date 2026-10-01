@@ -92,7 +92,13 @@
                   </p>
                   <p class="flex items-center gap-1 text-sm text-gray-500">
                     <UIcon name="i-heroicons-calendar-days" class="h-3 w-3" />
-                    {{ formatDateRange(call.edition.startDate, call.edition.endDate) }}
+                    {{
+                      formatDateRange(
+                        call.edition.startDate,
+                        call.edition.endDate,
+                        call.edition.timezone
+                      )
+                    }}
                   </p>
                 </div>
               </div>
@@ -212,7 +218,7 @@
 </template>
 
 <script setup lang="ts">
-import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+import { formaterDateHeure, fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
 
 const { t, locale } = useI18n()
 const { getImageUrl } = useImageUrl()
@@ -262,19 +268,29 @@ const dateLimiteAffichee = (call: {
   edition: { timezone?: string | null }
 }) => (call.deadline ? formaterDateHeure(call.deadline, call.edition.timezone, locale.value) : '')
 
-const formatDateRange = (startDate: string, endDate: string) => {
+/**
+ * Les dates de l'édition, dans SON fuseau.
+ *
+ * Cette page rassemble les appels de toutes les conventions : lues au fuseau du visiteur, les
+ * dates des plus lointaines pouvaient reculer d'un jour. Repli sur la machine, comme avant — seules
+ * les éditions qui DÉCLARENT un fuseau changent d'affichage.
+ */
+const formatDateRange = (startDate: string, endDate: string, fuseau?: string | null) => {
   const start = new Date(startDate)
   const end = new Date(endDate)
+  const zone = fuseauUtilisable(fuseau)
 
   const startStr = start.toLocaleDateString(locale.value, {
     day: 'numeric',
     month: 'short',
+    timeZone: zone,
   })
 
   const endStr = end.toLocaleDateString(locale.value, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
+    timeZone: zone,
   })
 
   return `${startStr} - ${endStr}`

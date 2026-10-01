@@ -143,7 +143,8 @@
       "currency_description": "Vale per tutti gli importi dell'edizione: artisti, biglietteria e tesoreria.",
       "program_link": "Link del programma",
       "program_section_title": "Programma",
-      "program_section_description": "Se tieni il tuo programma altrove, indica la pagina che lo descrive"
+      "program_section_description": "Se tieni il tuo programma altrove, indica la pagina che lo descrive",
+      "dates_timezone": "Orari nell'ora locale della sede ({timezone})"
     },
     "favorites_map": {
       "all_favorites": "Tutte sono preferite",

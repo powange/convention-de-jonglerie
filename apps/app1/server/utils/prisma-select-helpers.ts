@@ -218,6 +218,16 @@ export const editionListSelect = {
   longitude: true,
   startDate: true,
   endDate: true,
+  /**
+   * Le fuseau de l'édition accompagne SES DATES, et ne s'en sépare pas.
+   *
+   * Sans lui, un écran qui reçoit `startDate` ne peut que l'afficher dans un fuseau deviné — ce
+   * qui a longtemps voulu dire `Europe/Paris` codé en dur, donc une heure fausse pour toute
+   * convention hors de France. Les composables d'affichage l'acceptent désormais en paramètre, et
+   * cette ligne est ce qui le rend disponible aux listes : l'accueil, les cartes d'édition, les
+   * marqueurs de la carte.
+   */
+  timezone: true,
   imageUrl: true,
   status: true,
 

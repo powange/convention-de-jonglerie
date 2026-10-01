@@ -143,7 +143,8 @@
       "currency_description": "Applies to every amount of the edition: artists, ticketing and treasury.",
       "program_link": "Programme link",
       "program_section_title": "Programme",
-      "program_section_description": "If you keep your programme elsewhere, give the page that describes it"
+      "program_section_description": "If you keep your programme elsewhere, give the page that describes it",
+      "dates_timezone": "Times in the venue's local time ({timezone})"
     },
     "favorites_map": {
       "all_favorites": "All are favorites",

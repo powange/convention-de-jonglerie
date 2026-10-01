@@ -291,7 +291,11 @@
                             v-if="comment.event?.startDate && comment.event?.endDate"
                             class="text-xs text-gray-500 dark:text-gray-400"
                           >
-                            {{ formatDateRange(comment.event.startDate, comment.event.endDate) }}
+                            {{
+                              formatDateRange(comment.event.startDate, comment.event.endDate, {
+                                fuseau: comment.event.edition?.timezone,
+                              })
+                            }}
                           </span>
                         </div>
                       </div>

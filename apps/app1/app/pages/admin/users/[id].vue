@@ -358,7 +358,8 @@
                 }}<template v-if="edition.name"> — {{ edition.name }}</template>
               </ULink>
               <div class="text-xs text-gray-500 dark:text-gray-400">
-                {{ formatDate(edition.startDate) }} – {{ formatDate(edition.endDate) }} ·
+                {{ formatDate(edition.startDate, { fuseau: edition.timezone }) }} –
+                {{ formatDate(edition.endDate, { fuseau: edition.timezone }) }} ·
                 {{ edition.city }}
               </div>
             </div>
