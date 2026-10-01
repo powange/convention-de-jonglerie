@@ -792,8 +792,16 @@ export default defineNuxtConfig({
      * `defineAsyncComponent`, trois `<Lazy…>`, dont plusieurs SANS `try` autour. Sur un téléphone,
      * une coupure réseau d'une seconde suffit.
      *
-     * 📍 `useLazyI18n` n'en fait PAS partie, vérifié : il attrape ses propres erreurs et se
-     * contente de journaliser. Le citer ici serait faux.
+     * ⚠️ UN `try` AUTOUR DE L'IMPORT NE MET PAS À L'ABRI, contrairement à ce qu'affirmait la
+     * première version de ce commentaire au sujet de `useLazyI18n`. Lu dans le helper de Vite :
+     * `handlePreloadError` ÉMET `vite:preloadError` puis ne relance l'erreur que si personne n'a
+     * appelé `preventDefault`. L'événement part donc avant le `catch` de l'appelant, et Nuxt émet
+     * `app:chunkError` quoi qu'il arrive. Conséquence assumée de ce réglage : un import que
+     * l'application rattrapait proprement — les traductions d'un domaine, les greffons de
+     * FullCalendar — provoque désormais un rechargement au lieu d'une page dégradée. C'est le bon
+     * arbitrage dans le cas courant, celui de la bribe retirée par un déploiement : le
+     * rechargement RÉPARE, là où la page dégradée reste dégradée. Et la garde ci-dessous borne le
+     * cas contraire à un seul rechargement.
      *
      * S'y ajoute la cause de fond : un déploiement retire les anciennes bribes du serveur. Un
      * onglet resté ouvert — cas courant sur mobile — en demande une qui n'existe plus. Le cache de
