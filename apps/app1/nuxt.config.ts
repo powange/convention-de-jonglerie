@@ -774,8 +774,45 @@ export default defineNuxtConfig({
   experimental: {
     // Améliorer les performances avec la lazy hydration
     lazyHydration: true,
-    // Optimiser la gestion d'erreur des chunks
-    emitRouteChunkError: 'automatic',
+    /*
+     * Rechargement sur échec de chargement d'une bribe JavaScript.
+     *
+     * ⚠️ `'automatic'` NE COUVRAIT QUE LA NAVIGATION, et c'est ce qui a mis des visiteurs devant un
+     * « 500 — Failed to fetch dynamically imported module » en pleine page. Le greffon de Nuxt
+     * n'agit que depuis `router.onError` : une bribe qui échoue AILLEURS — un composant paresseux,
+     * un `import()` dans une page déjà chargée — n'est jamais rattrapée, et l'erreur remonte
+     * jusqu'à la page d'erreur.
+     *
+     * ⚠️⚠️ ET LE CAS LE PLUS COURANT EST LE CHARGEMENT INITIAL. Le greffon `automatic` s'abonne à
+     * `router.onError` et vide sa liste d'erreurs à chaque `beforeEach` : une bribe qui échoue en
+     * ouvrant la page — avant toute navigation — n'est rattrapée par personne. C'est exactement ce
+     * que décrit la capture reçue : l'erreur en pleine page, dès l'arrivée sur le site.
+     *
+     * 📊 Et le dépôt multiplie les occasions : 22 `await import()` côté client, trois
+     * `defineAsyncComponent`, trois `<Lazy…>`, dont plusieurs SANS `try` autour. Sur un téléphone,
+     * une coupure réseau d'une seconde suffit.
+     *
+     * 📍 `useLazyI18n` n'en fait PAS partie, vérifié : il attrape ses propres erreurs et se
+     * contente de journaliser. Le citer ici serait faux.
+     *
+     * S'y ajoute la cause de fond : un déploiement retire les anciennes bribes du serveur. Un
+     * onglet resté ouvert — cas courant sur mobile — en demande une qui n'existe plus. Le cache de
+     * Cloudflare la sert encore là où il l'a gardée, pas ailleurs : d'où des visiteurs touchés et
+     * d'autres non, sans logique apparente.
+     *
+     * `'automatic-immediate'` recharge la route COURANTE dès qu'une bribe échoue, quelle qu'en soit
+     * l'origine. Le rechargement récupère un HTML neuf, donc les noms de bribes actuels.
+     *
+     * 📍 PAS DE BOUCLE À CRAINDRE, vérifié dans `reloadNuxtApp` : un marqueur `nuxt:reload` en
+     * `sessionStorage` interdit de recharger deux fois le même chemin en moins de dix secondes.
+     * Une bribe durablement inaccessible — bloquée par une extension, par exemple — donne donc UN
+     * rechargement, puis la page d'erreur. C'était la seule objection sérieuse à ce réglage.
+     *
+     * 📍 `restoreState` reste DÉSACTIVÉ : la documentation de Nuxt met en garde contre ses effets
+     * de bord, et il exige des clés explicites sur chaque `useState`. Un rechargement perd donc
+     * l'état de la page — ce qui reste très au-dessus d'une page d'erreur.
+     */
+    emitRouteChunkError: 'automatic-immediate',
     // Cache des artefacts de build (accélère les rebuilds)
     buildCache: true,
     // Transitions natives du navigateur entre pages (respecte prefers-reduced-motion)
