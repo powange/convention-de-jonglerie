@@ -534,6 +534,11 @@ function extractI18nKeysFromFile(filePath) {
       continue // Ignorer les strings dans includes()
     }
 
+    // Un nom pointé CITÉ DANS UN COMMENTAIRE n'est pas une clé — voir estDansUnCommentaire.
+    if (estDansUnCommentaire(content, matchStart)) {
+      continue
+    }
+
     // Filtrer les faux positifs
     // - Exclure les propriétés d'objets JavaScript communes
     // - Exclure les noms de domaine utilisés dans les scrapers
@@ -674,6 +679,30 @@ function extractHardcodedTexts(filePath) {
   }
 
   return hardcodedTexts
+}
+
+/**
+ * Cette position est-elle dans un COMMENTAIRE ?
+ *
+ * `stringKeyRegex` ramasse n'importe quel nom pointé entre guillemets ou accents graves, ce qui est
+ * voulu — il attrape les clés passées comme valeurs, `{ label: 'feedback.types.bug' }`. Mais il
+ * attrape aussi ce qu'on CITE dans un commentaire : un nom de fichier (`public.get.ts`), un chemin
+ * de propriété (`show.title`), une relation Prisma. Signalés comme « clés manquantes », ils
+ * n'existent nulle part et n'ont pas à exister.
+ *
+ * ⚠️ CE DÉPÔT A PAYÉ CE FAUX POSITIF CINQ FOIS, dont deux en recopiant un commentaire voisin — et
+ * chaque fois le remède a été de reformuler la phrase. Un contrôle qui crie au loup finit par être
+ * ignoré, ce qui coûte plus cher que les quelques lignes ci-dessous.
+ *
+ * La reconnaissance est volontairement grossière — début de ligne en `//`, `*` ou `/*` — donc elle
+ * ne couvre QUE les commentaires de ligne et les blocs JSDoc, là où vivaient les cinq occurrences.
+ * Un commentaire en fin de ligne de code n'est pas reconnu : mieux vaut un faux positif résiduel
+ * qu'une vraie clé passée sous silence.
+ */
+function estDansUnCommentaire(content, matchIndex) {
+  const debutDeLigne = content.lastIndexOf('\n', matchIndex) + 1
+  const avant = content.substring(debutDeLigne, matchIndex).trimStart()
+  return avant.startsWith('//') || avant.startsWith('*') || avant.startsWith('/*')
 }
 
 /**

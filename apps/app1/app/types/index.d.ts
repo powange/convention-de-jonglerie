@@ -539,6 +539,14 @@ export interface EditionShowCallPublic extends EditionShowCallBasic {
 // Candidature avec le nom de l'appel (pour "Mes candidatures")
 export interface ShowApplicationWithShowCallName extends ShowApplication {
   showCallName: string
+  /**
+   * La visibilité et la date limite de l'appel, que `my-applications.get.ts` renvoie depuis
+   * toujours mais que ce type ne déclarait pas. Elles sont ce qui permet de décider si la
+   * candidature est encore modifiable SANS aller chercher l'appel dans la liste publique, qui
+   * exclut les appels privés — voir `shared/utils/candidature-spectacle.ts`.
+   */
+  showCallVisibility: ShowCallVisibility
+  showCallDeadline?: string | null
 }
 
 // Exports des types organisateurs

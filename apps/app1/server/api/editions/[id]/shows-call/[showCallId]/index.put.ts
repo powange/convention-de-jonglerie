@@ -123,10 +123,26 @@ export default wrapApiHandler(
     const body = await readBody(event)
     const validatedData = updateShowCallSchema.parse(body)
 
-    // Déterminer les valeurs finales pour la vérification de cohérence
+    /*
+     * Les valeurs finales, pour la vérification de cohérence juste en dessous.
+     *
+     * ⚠️ `externalUrl` SE DISTINGUE DES DEUX AUTRES, et c'est le schéma qui le dit : seul ce champ
+     * est `.nullable()`, donc pour lui le vide est une VALEUR et non une absence. Le formulaire
+     * envoie `externalUrl: null` quand l'organisateur efface le champ ; `??` retombait alors sur
+     * l'ancienne adresse, la garde passait avec elle, et l'écriture quelques lignes plus bas —
+     * conditionnée à `!== undefined`, elle — enregistrait bien `null`. On obtenait un appel
+     * EXTERNAL et PUBLIC sans adresse, c'est-à-dire sans aucun moyen de candidater.
+     *
+     * `mode` et `visibility` sont `.optional()` sans `.nullable()` : `undefined` est leur seule
+     * absence possible, `??` y est donc exactement équivalent et reste tel quel. Les aligner
+     * « par symétrie » ne changerait rien et laisserait croire qu'on peut les vider.
+     */
     const finalMode = validatedData.mode ?? existingShowCall.mode
     const finalVisibility = validatedData.visibility ?? existingShowCall.visibility
-    const finalExternalUrl = validatedData.externalUrl ?? existingShowCall.externalUrl
+    const finalExternalUrl =
+      validatedData.externalUrl !== undefined
+        ? validatedData.externalUrl
+        : existingShowCall.externalUrl
 
     if (
       finalMode === 'EXTERNAL' &&

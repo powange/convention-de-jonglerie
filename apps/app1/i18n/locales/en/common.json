@@ -777,7 +777,9 @@
       "stage_setup_max_length": "The stage setup cannot exceed 3000 characters",
       "technical_needs_max_length": "Technical requirements cannot exceed 3000 characters",
       "url_invalid": "URL must start with http:// or https://"
-    }
+    },
+    "unavailable": "Applications unavailable",
+    "unavailable_desc": "The organisers have not yet said where to apply for this call."
   },
   "validation": {
     "allergy_severity_required": "Severity level is required when allergies are provided",
@@ -804,7 +806,8 @@
     "url_max_191": "The URL cannot exceed 191 characters",
     "emergency_contact_phone_invalid": "The emergency contact's phone number is not valid",
     "phone_invalid": "This phone number is not valid",
-    "external_url_invalid": "This link is not valid — only links starting with http:// or https:// are accepted"
+    "external_url_invalid": "This link is not valid — only links starting with http:// or https:// are accepted",
+    "deadline_timezone_invalid": "The edition's time zone is unknown: the deadline cannot be saved."
   },
   "guide": {
     "menu": "Guide menu",

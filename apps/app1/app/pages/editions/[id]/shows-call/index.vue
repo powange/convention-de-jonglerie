@@ -114,7 +114,7 @@
                     <span class="text-gray-600 dark:text-gray-400">
                       {{ t('shows_call.deadline') }} :
                       <strong :class="isDeadlinePassed(call.deadline) ? 'text-red-500' : ''">
-                        {{ formatDate(call.deadline) }}
+                        {{ dateLimiteAffichee(call.deadline) }}
                       </strong>
                     </span>
                   </div>
@@ -181,7 +181,7 @@
               </div>
               <!-- Bouton modifier si candidature en attente -->
               <UButton
-                v-if="app.status === 'PENDING' && canEditApplication(app.showCallId)"
+                v-if="canEditApplication(app)"
                 :to="`/editions/${editionId}/shows-call/${app.showCallId}/apply`"
                 color="primary"
                 variant="soft"
@@ -209,13 +209,16 @@ import type {
 } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
 
+import { candidatureModifiable } from '~~/shared/utils/candidature-spectacle'
+import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+
 const route = useRoute()
 // `buildLoginUrl` nettoie l'URL, refuse de boucler sur une page d'authentification et
 // encode le paramètre que la page de connexion lit réellement — `returnTo`, et non `redirect`.
 const { buildLoginUrl } = useReturnTo()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { formatDate } = useDateFormat()
 
 const editionId = parseInt(route.params.id as string)
@@ -269,12 +272,32 @@ async function loadMyApplications() {
   }
 }
 
-function canEditApplication(showCallId: number): boolean {
-  const call = showCalls.value.find((c) => c.id === showCallId)
-  if (!call) return false
-  if (call.visibility === 'CLOSED' || call.visibility === 'OFFLINE') return false
-  if (call.deadline && new Date() > new Date(call.deadline)) return false
-  return true
+/**
+ * La date limite d'un appel, dans le fuseau de la convention et avec son heure.
+ *
+ * `useDateFormat().formatDate` est figé sur Europe/Paris et ne rend que le jour : pour une
+ * convention située ailleurs, la veille s'affichait, et « 23 h 59 » ne se distinguait pas de
+ * « 00 h 01 » — ce qui est pourtant ce que l'artiste doit savoir avant d'envoyer son dossier.
+ */
+function dateLimiteAffichee(limite: string | Date): string {
+  return formaterDateHeure(limite, edition.value?.timezone, locale.value)
+}
+
+/**
+ * ⚠️ CE QUI N'ALLAIT PAS : la version précédente cherchait l'appel dans `showCalls`, c'est-à-dire
+ * dans la liste PUBLIQUE, qui exclut volontairement les appels `PRIVATE`. Pour
+ * une candidature en attente à un appel privé encore ouvert, la recherche échouait et la fonction
+ * rendait `false` : le bouton « Modifier » ne s'affichait jamais, alors que le serveur acceptait
+ * la modification. Or le point d'API « mes candidatures » fournit déjà `showCallVisibility` et
+ * `showCallDeadline` —
+ * la candidature portait la réponse, il suffisait de la lui demander.
+ */
+function canEditApplication(app: ShowApplicationWithShowCallName): boolean {
+  return candidatureModifiable({
+    statut: app.status,
+    visibiliteAppel: app.showCallVisibility,
+    dateLimiteAppel: app.showCallDeadline,
+  })
 }
 
 function isDeadlinePassed(deadline: string | null): boolean {

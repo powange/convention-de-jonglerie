@@ -422,7 +422,7 @@
       "company_name": "Companhia / nome artístico",
       "company_name_hint": "Nome da companhia ou nome artístico do artista que apresenta o espetáculo",
       "company_name_placeholder": "Ex.: Cia. das Maças",
-      "delete_confirm": "Tem certeza de que deseja excluir este espetáculo?",
+      "delete_confirm": "Eliminar este espetáculo? As suas apresentações, os seus números, os seus artigos a entregar e a ligação aos seus artistas serão eliminados com ele. As candidaturas já recebidas são conservadas.",
       "delete_show": "Excluir espetáculo",
       "description": "Descrição",
       "duration": "Duração",

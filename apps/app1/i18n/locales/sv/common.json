@@ -777,7 +777,9 @@
       "stage_setup_max_length": "Scenuppställningen får inte överstiga 3000 tecken",
       "technical_needs_max_length": "Tekniska krav får inte överstiga 3000 tecken",
       "url_invalid": "URL:en måste börja med http:// eller https://"
-    }
+    },
+    "unavailable": "Ansökan inte tillgänglig",
+    "unavailable_desc": "Arrangörerna har ännu inte angett var man ansöker till denna utlysning."
   },
   "validation": {
     "allergy_severity_required": "Allvarlighetsgraden krävs när allergier indikeras.",
@@ -804,7 +806,8 @@
     "url_max_191": "URL:en får inte överstiga 191 tecken",
     "emergency_contact_phone_invalid": "Nödkontaktens telefonnummer är inte giltigt",
     "phone_invalid": "Detta telefonnummer är inte giltigt",
-    "external_url_invalid": "Den här länken är inte giltig — endast länkar som börjar med http:// eller https:// accepteras"
+    "external_url_invalid": "Den här länken är inte giltig — endast länkar som börjar med http:// eller https:// accepteras",
+    "deadline_timezone_invalid": "Upplagans tidszon är okänd: sista datum kan inte sparas."
   },
   "guide": {
     "menu": "Guidemeny",

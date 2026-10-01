@@ -422,7 +422,7 @@
       "company_name": "Compañía / nombre artístico",
       "company_name_hint": "Nombre de la compañía o nombre artístico del artista que presenta el espectáculo",
       "company_name_placeholder": "Ej.: Cía. de Malabares",
-      "delete_confirm": "¿Está seguro de que desea eliminar este espectáculo?",
+      "delete_confirm": "¿Eliminar este espectáculo? Sus representaciones, sus números, sus artículos a entregar y el vínculo con sus artistas se eliminarán con él. Las candidaturas ya recibidas se conservan.",
       "delete_show": "Eliminar espectáculo",
       "description": "Descripción",
       "duration": "Duración",

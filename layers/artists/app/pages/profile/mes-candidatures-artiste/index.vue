@@ -303,11 +303,7 @@
                   </UButton>
 
                   <UButton
-                    v-if="
-                      (application.status === 'PENDING' &&
-                        application.showCall.visibility === 'PUBLIC') ||
-                      application.showCall.visibility === 'PRIVATE'
-                    "
+                    v-if="peutModifier(application)"
                     :to="`/editions/${application.showCall.edition.id}/shows-call/${application.showCall.id}/apply`"
                     size="sm"
                     color="info"
@@ -414,11 +410,7 @@
                   square
                 />
                 <UButton
-                  v-if="
-                    (application.status === 'PENDING' &&
-                      application.showCall.visibility === 'PUBLIC') ||
-                    application.showCall.visibility === 'PRIVATE'
-                  "
+                  v-if="peutModifier(application)"
                   :to="`/editions/${application.showCall.edition.id}/shows-call/${application.showCall.id}/apply`"
                   size="xs"
                   color="info"
@@ -473,6 +465,8 @@
 </template>
 
 <script setup lang="ts">
+import { candidatureModifiable } from '~~/shared/utils/candidature-spectacle'
+
 definePageMeta({
   layout: 'profile',
   middleware: 'auth-protected',
@@ -480,6 +474,29 @@ definePageMeta({
 
 const { t, locale } = useI18n()
 const { getImageUrl } = useImageUrl()
+
+/**
+ * Le bouton « Modifier » suit exactement la règle du serveur
+ * (`shows-call/[showCallId]/my-application.put.ts`), posée une seule fois dans
+ * `shared/utils/candidature-spectacle.ts`.
+ *
+ * ⚠️ CE QUI N'ALLAIT PAS : la condition était
+ * `(status === 'PENDING' && visibility === 'PUBLIC') || visibility === 'PRIVATE'`. La parenthèse
+ * laisse `PRIVATE` SEUL, sans aucune exigence de statut : une candidature acceptée ou refusée sur
+ * un appel privé affichait « Modifier », et le clic menait sur la page de candidature qui répond
+ * « vous avez déjà candidaté ». Et la date limite n'était vérifiée dans aucun des deux cas, alors
+ * que le serveur la refuse. Les deux vues, détaillée et compacte, portaient la même faute copiée.
+ */
+function peutModifier(application: {
+  status: string
+  showCall: { visibility: string; deadline?: string | null }
+}): boolean {
+  return candidatureModifiable({
+    statut: application.status,
+    visibiliteAppel: application.showCall.visibility,
+    dateLimiteAppel: application.showCall.deadline,
+  })
+}
 
 // États de la vue
 const viewMode = ref<'detailed' | 'compact'>('detailed')

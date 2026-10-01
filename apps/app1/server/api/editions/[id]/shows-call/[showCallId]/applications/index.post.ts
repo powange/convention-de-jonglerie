@@ -8,6 +8,7 @@ import {
   createShowApplicationSchema,
   handleValidationError,
 } from '#server/utils/validation-schemas'
+import { editionAccueilleDesCandidatures } from '~~/shared/utils/candidature-spectacle'
 
 /**
  * Soumettre une candidature à un appel à spectacles
@@ -94,11 +95,12 @@ export default wrapApiHandler(
      * La vraie barrière de l'organisateur est la VISIBILITÉ DE L'APPEL, vérifiée juste au-dessus :
      * c'est le drapeau qu'il pose délibérément.
      *
-     * La liste est écrite en négatif et en clair, comme celle de `visibilite-edition.ts` : un
-     * statut ajouté demain sera ACCEPTÉ par défaut, ce qui est le bon sens ici — seule l'annulation
-     * ferme la porte, et on la nommera.
+     * La liste vit dans `shared/utils/candidature-spectacle.ts`, avec le reste de la règle : la
+     * liste publique des appels ouverts pose la MÊME question, et elle y répondait autrement
+     * (`status: 'PUBLISHED'` en dur, donc sans les éditions `PLANNED`). Deux réponses à une même
+     * question sont la cause de la moitié des défauts de ce module.
      */
-    if (edition.status === 'CANCELLED') {
+    if (!editionAccueilleDesCandidatures(edition.status)) {
       throw createError({
         status: 400,
         message: "L'appel à spectacles n'est pas ouvert",

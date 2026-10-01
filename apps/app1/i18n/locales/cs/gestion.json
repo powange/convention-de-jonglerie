@@ -422,7 +422,7 @@
       "company_name": "Soubor / umělecké jméno",
       "company_name_hint": "Název souboru nebo umělecké jméno umělce, který představení uvádí",
       "company_name_placeholder": "Např. Žonglérský soubor",
-      "delete_confirm": "Opravdu chcete smazat toto představení?",
+      "delete_confirm": "Smazat toto představení? Jeho reprízy, jeho čísla, jeho předměty k předání a propojení s jeho umělci budou smazány společně s ním. Již přijaté přihlášky zůstanou zachovány.",
       "delete_show": "Smazat představení",
       "description": "Popis",
       "duration": "Trvání",

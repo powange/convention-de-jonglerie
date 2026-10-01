@@ -189,7 +189,14 @@
                 </p>
               </div>
 
-              <UFormField :error="fieldErrors.deadline">
+              <UFormField
+                :error="fieldErrors.deadline"
+                :help="
+                  fuseau
+                    ? $t('gestion.shows_call.deadline_timezone', { timezone: fuseau })
+                    : undefined
+                "
+              >
                 <UiDateTimePicker
                   v-model="deadlineLocal"
                   :date-label="$t('gestion.shows_call.deadline_date')"
@@ -387,8 +394,8 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { EditionShowCall, ShowCallVisibility } from '~/types'
-import { formatDateTimeLocal } from '~/utils/date'
 
+import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
 import { estUrlExterne } from '~~/shared/utils/url-externe'
 
 definePageMeta({
@@ -408,6 +415,18 @@ const showCallId = Number(route.params.showCallId)
 const { data: edition, pending: loading } = await useFetch(`/api/editions/${editionId}`, {
   key: `edition-${editionId}`,
 })
+
+/**
+ * Le fuseau de la convention, celui dans lequel la date limite doit être lue ET écrite.
+ *
+ * ⚠️ CE QUI N'ALLAIT PAS. Le champ était rempli par `formatDateTimeLocal(new Date(...))` et
+ * renvoyé par `new Date(saisie).toISOString()` : les deux conversions prenaient le fuseau de la
+ * MACHINE de l'organisateur. Un organisateur en déplacement qui règle « 30 juin 23 h 59 »
+ * enregistrait un autre instant que son collègue sur place, et la date se décalait un peu plus à
+ * chaque ouverture-enregistrement de la page. Le formulaire des spectacles, lui, ancre déjà ses
+ * horaires ainsi (`ShowForm.vue`) : c'est la même règle, pas une nouvelle.
+ */
+const fuseau = computed(() => edition.value?.timezone ?? null)
 
 // Variables locales
 const showCall = ref<EditionShowCall | null>(null)
@@ -582,13 +601,8 @@ const fetchSettings = async () => {
     askSocialLinksLocal.value = response.askSocialLinks ?? false
     requirePhoneLocal.value = response.requirePhone ?? true
 
-    // Formater la date pour le DateTimePicker
-    if (response.deadline) {
-      const date = new Date(response.deadline)
-      deadlineLocal.value = formatDateTimeLocal(date)
-    } else {
-      deadlineLocal.value = ''
-    }
+    // Formater la date pour le DateTimePicker, dans le fuseau de l'édition
+    deadlineLocal.value = response.deadline ? versChampLocal(response.deadline, fuseau.value) : ''
 
     // Sauvegarder l'état initial pour détecter les changements
     updateInitialState()
@@ -629,7 +643,7 @@ const buildSettingsBody = () => {
     visibility: visibilityLocal.value,
     mode: modeLocal.value,
     description: descriptionLocal.value || null,
-    deadline: deadlineLocal.value ? new Date(deadlineLocal.value).toISOString() : null,
+    deadline: deadlineLocal.value ? versInstant(deadlineLocal.value, fuseau.value) : null,
     askPortfolioUrl: askPortfolioUrlLocal.value,
     askVideoUrl: askVideoUrlLocal.value,
     askTechnicalNeeds: askTechnicalNeedsLocal.value,
@@ -686,6 +700,18 @@ const persistSettings = () => {
   const lien = externalUrlLocal.value.trim()
   if (lien && !estUrlExterne(lien)) {
     fieldErrors.value.externalUrl = t('validation.external_url_invalid')
+    return
+  }
+
+  /*
+   * ⚠️ Une date limite saisie qui ne s'ancre pas est REFUSÉE, et non silencieusement effacée.
+   * `versInstant` rend une chaîne vide plutôt qu'un instant inventé quand l'édition annonce un
+   * fuseau que le navigateur ne connaît pas — un cas réel, les fuseaux venant parfois d'un
+   * import. Envoyer `null` dans ce cas supprimerait la date limite de l'appel sans que personne
+   * l'ait demandé, et l'organisateur ne verrait qu'un enregistrement réussi.
+   */
+  if (deadlineLocal.value && !versInstant(deadlineLocal.value, fuseau.value)) {
+    fieldErrors.value.deadline = t('validation.deadline_timezone_invalid')
     return
   }
 

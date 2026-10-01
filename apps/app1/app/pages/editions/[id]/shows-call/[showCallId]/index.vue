@@ -76,7 +76,7 @@
               <span class="text-gray-600 dark:text-gray-400">
                 {{ t('shows_call.deadline') }} :
                 <strong :class="isDeadlinePassed ? 'text-red-500' : ''">
-                  {{ formatDate(showCall.deadline) }}
+                  {{ dateLimiteAffichee }}
                 </strong>
               </span>
             </div>
@@ -183,6 +183,27 @@
           >
             {{ t('shows_call.closed') }}
           </UButton>
+
+          <!-- Appel externe ouvert, mais sans adresse où candidater.
+               Dernier recours, et il ne doit JAMAIS rester vide : les trois branches ci-dessus
+               ne couvrent pas cet état, et la carte n'affichait alors aucun bouton — l'artiste
+               ne pouvait ni candidater, ni comprendre pourquoi. Le serveur refuse désormais
+               d'enregistrer un appel dans cet état, mais ceux qui y sont déjà doivent se lire. -->
+          <div v-else class="space-y-2">
+            <UButton
+              color="neutral"
+              variant="soft"
+              icon="i-heroicons-link-slash"
+              block
+              size="lg"
+              disabled
+            >
+              {{ t('shows_call.unavailable') }}
+            </UButton>
+            <p class="text-sm text-gray-500 dark:text-gray-400 text-center">
+              {{ t('shows_call.unavailable_desc') }}
+            </p>
+          </div>
         </div>
       </template>
     </div>
@@ -196,14 +217,15 @@ import type { Edition, EditionShowCallPublic } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { convertirRaccourcisEmoji, markdownToHtml } from '~/utils/markdown'
 
+import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+
 const route = useRoute()
 // `buildLoginUrl` nettoie l'URL, refuse de boucler sur une page d'authentification et
 // encode le paramètre que la page de connexion lit réellement — `returnTo`, et non `redirect`.
 const { buildLoginUrl } = useReturnTo()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
-const { t } = useI18n()
-const { formatDate } = useDateFormat()
+const { t, locale } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
 const showCallId = parseInt(route.params.showCallId as string)
@@ -248,6 +270,21 @@ const isDeadlinePassed = computed(() => {
   if (!showCall.value?.deadline) return false
   return new Date() > new Date(showCall.value.deadline)
 })
+
+/**
+ * La date limite, lue dans le fuseau de la convention et AVEC SON HEURE.
+ *
+ * `formatDate` d'`useDateFormat` est figé sur Europe/Paris et ne rend que le jour : pour une
+ * convention australienne la veille s'affichait, et « 23 h 59 » ne se distinguait pas de
+ * « 00 h 01 » — soit exactement ce que l'artiste doit savoir avant d'envoyer son dossier.
+ * L'écriture de ce champ vient d'être ancrée au même fuseau côté gestion : l'afficher autrement
+ * déplacerait l'écart au lieu de le fermer.
+ */
+const dateLimiteAffichee = computed(() =>
+  showCall.value?.deadline
+    ? formaterDateHeure(showCall.value.deadline, edition.value?.timezone, locale.value)
+    : ''
+)
 
 // Vérifier si l'utilisateur a déjà candidaté
 const hasExistingApplication = ref(false)

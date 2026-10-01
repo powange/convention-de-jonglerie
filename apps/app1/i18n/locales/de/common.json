@@ -777,7 +777,9 @@
       "stage_setup_max_length": "Der Bühnenaufbau darf 3000 Zeichen nicht überschreiten",
       "technical_needs_max_length": "Die technischen Anforderungen dürfen 3000 Zeichen nicht überschreiten",
       "url_invalid": "Die URL muss mit http:// oder https:// beginnen"
-    }
+    },
+    "unavailable": "Bewerbung nicht verfügbar",
+    "unavailable_desc": "Die Organisatoren haben noch nicht angegeben, wo man sich für diesen Aufruf bewerben kann."
   },
   "validation": {
     "allergy_severity_required": "Schweregrad ist erforderlich, wenn Allergien angegeben sind",
@@ -804,7 +806,8 @@
     "url_max_191": "Die URL darf 191 Zeichen nicht überschreiten",
     "emergency_contact_phone_invalid": "Die Nummer des Notfallkontakts ist ungültig",
     "phone_invalid": "Diese Telefonnummer ist ungültig",
-    "external_url_invalid": "Dieser Link ist ungültig – nur Links, die mit http:// oder https:// beginnen, werden akzeptiert"
+    "external_url_invalid": "Dieser Link ist ungültig – nur Links, die mit http:// oder https:// beginnen, werden akzeptiert",
+    "deadline_timezone_invalid": "Die Zeitzone der Ausgabe ist unbekannt: Die Frist kann nicht gespeichert werden."
   },
   "guide": {
     "menu": "Handbuch-Menü",

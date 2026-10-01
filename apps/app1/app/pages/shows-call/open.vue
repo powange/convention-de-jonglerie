@@ -125,7 +125,7 @@
                   class="flex items-center gap-1"
                 >
                   <UIcon name="i-heroicons-clock" class="h-3 w-3" />
-                  {{ $t('pages.artists.deadline') }}: {{ formatDate(call.deadline) }}
+                  {{ $t('pages.artists.deadline') }}: {{ dateLimiteAffichee(call) }}
                 </UBadge>
                 <UBadge
                   v-if="
@@ -212,6 +212,8 @@
 </template>
 
 <script setup lang="ts">
+import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+
 const { t, locale } = useI18n()
 const { getImageUrl } = useImageUrl()
 
@@ -248,13 +250,17 @@ const getEditionDisplayName = (edition: any) => {
   return edition.name || edition.convention.name
 }
 
-const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString(locale.value, {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  })
-}
+/**
+ * La date limite, dans le fuseau de la convention et avec son heure.
+ *
+ * Cette page rassemble les appels de toutes les conventions : lire leurs échéances dans le fuseau
+ * du visiteur affichait la veille pour les plus lointaines, et « 23 h 59 » ne se distinguait pas
+ * de « 00 h 01 » — ce qui est pourtant ce qu'un artiste vient vérifier ici.
+ */
+const dateLimiteAffichee = (call: {
+  deadline: string | null
+  edition: { timezone?: string | null }
+}) => (call.deadline ? formaterDateHeure(call.deadline, call.edition.timezone, locale.value) : '')
 
 const formatDateRange = (startDate: string, endDate: string) => {
   const start = new Date(startDate)

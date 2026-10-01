@@ -371,7 +371,7 @@
     <UiConfirmModal
       v-model="showDeleteConfirm"
       :title="$t('gestion.shows.delete_show')"
-      :message="$t('gestion.shows.delete_confirm')"
+      :description="$t('gestion.shows.delete_confirm')"
       confirm-color="error"
       :loading="deletingShow"
       @confirm="deleteShow"

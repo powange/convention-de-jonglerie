@@ -107,7 +107,8 @@
       "visibility_public_desc": "Видимий для всіх і відображений на платформі",
       "confirm_reapply_performer_desc": "Застосувати дані заявки для {name} повторно? Буде заповнено лише ще порожні поля номера — нічого не буде перезаписано.",
       "confirm_reapply_performer_title": "Застосувати дані повторно",
-      "reapply_performer_info": "Застосувати дані повторно"
+      "reapply_performer_info": "Застосувати дані повторно",
+      "deadline_timezone": "Час випуску ({timezone})"
     }
   }
 }

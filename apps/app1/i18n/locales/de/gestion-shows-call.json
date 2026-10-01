@@ -107,7 +107,8 @@
       "visibility_public_desc": "Für alle sichtbar und auf der Plattform gelistet",
       "confirm_reapply_performer_desc": "Infos der Bewerbung für {name} erneut anwenden? Nur die noch leeren Felder der Nummer werden ausgefüllt – nichts wird überschrieben.",
       "confirm_reapply_performer_title": "Infos erneut anwenden",
-      "reapply_performer_info": "Infos erneut anwenden"
+      "reapply_performer_info": "Infos erneut anwenden",
+      "deadline_timezone": "Zeit der Ausgabe ({timezone})"
     }
   }
 }

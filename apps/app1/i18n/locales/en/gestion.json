@@ -422,7 +422,7 @@
       "company_name": "Company / stage name",
       "company_name_hint": "Name of the company or stage name of the artist behind the show",
       "company_name_placeholder": "E.g. The Juggling Club",
-      "delete_confirm": "Are you sure you want to delete this show?",
+      "delete_confirm": "Delete this show? Its performances, its acts, its handout items and the link to its artists will be deleted with it. Applications already received are kept.",
       "delete_show": "Delete show",
       "description": "Description",
       "duration": "Duration",

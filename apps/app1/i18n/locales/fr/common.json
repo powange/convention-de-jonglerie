@@ -747,6 +747,8 @@
     "submit_error": "Une erreur est survenue lors de l'envoi de votre candidature.",
     "submitted_at": "Soumis le",
     "title": "Appels à spectacles",
+    "unavailable": "Candidature indisponible",
+    "unavailable_desc": "Les organisateurs n'ont pas encore indiqué où candidater pour cet appel.",
     "update_application": "Modifier ma candidature",
     "update_profile": "Modifier mon profil",
     "validation": {
@@ -785,6 +787,7 @@
     "at_least_one_availability_required": "Au moins une disponibilité doit être sélectionnée",
     "date_end_after_start": "La date de fin doit être strictement supérieure à la date de début",
     "date_start_required": "La date de début est requise",
+    "deadline_timezone_invalid": "Le fuseau horaire de l'édition est inconnu : la date limite ne peut pas être enregistrée.",
     "departure_date_required": "La date de départ est requise",
     "description_max_1000": "La description ne peut pas dépasser 1000 caractères",
     "description_max_5000": "La description ne peut pas dépasser 5000 caractères",
