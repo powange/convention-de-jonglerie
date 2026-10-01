@@ -198,6 +198,9 @@
         "name_placeholder": "Nom de l'article",
         "name_required": "Le nom est obligatoire"
       },
+      "periodes": "Périodes",
+      "periodes_et_quantite": "Périodes et quantité",
+      "phases_toutes": "Toutes les périodes",
       "volunteer": {
         "all_volunteers": "Tous les bénévoles",
         "edit_title": "Modifier les articles remis aux bénévoles",

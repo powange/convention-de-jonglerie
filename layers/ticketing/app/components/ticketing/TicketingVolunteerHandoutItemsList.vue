@@ -55,6 +55,15 @@
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {{ $t('ticketing.handout_items.volunteer.scope_global_hint') }}
             </p>
+            <!-- Rien à afficher quand l'article vaut pour toutes les périodes : c'est le cas
+                 courant, et une mention sur chaque ligne cesserait d'être lue. -->
+            <p
+              v-if="libellePhases(item.phases)"
+              class="text-xs text-amber-600 dark:text-amber-400 mt-1"
+            >
+              <UIcon name="i-heroicons-wrench-screwdriver" class="w-3 h-3 mr-1" />
+              {{ libellePhases(item.phases) }}
+            </p>
           </div>
         </div>
       </div>
@@ -98,6 +107,15 @@
             </p>
             <p class="text-xs text-orange-600 dark:text-orange-400 mt-1 font-medium">
               {{ $t('ticketing.handout_items.volunteer.team_only') }}
+            </p>
+            <!-- Même repère que pour les articles globaux : rien quand l'article vaut pour toutes
+                 les périodes, c'est le cas courant. -->
+            <p
+              v-if="libellePhases(item.phases)"
+              class="text-xs text-amber-600 dark:text-amber-400 mt-1"
+            >
+              <UIcon name="i-heroicons-wrench-screwdriver" class="w-3 h-3 mr-1" />
+              {{ libellePhases(item.phases) }}
             </p>
           </div>
         </div>
@@ -157,7 +175,11 @@
           />
 
           <UFormField :label="$t('ticketing.handout_items.volunteer.items_label')">
-            <TicketingHandoutItemsQuantityPicker v-model="selection" :items="allHandoutItems" />
+            <TicketingHandoutItemsQuantityPicker
+              v-model="selection"
+              :items="allHandoutItems"
+              avec-phases
+            />
           </UFormField>
 
           <!-- Aperçu de ce que recevra réellement un bénévole de cette portée -->
@@ -187,6 +209,8 @@
 </template>
 
 <script setup lang="ts">
+import { normaliserPhases, type PhaseEdition } from '~~/shared/utils/phases-edition'
+
 interface VolunteerHandoutItem {
   id: number
   handoutItemId: number
@@ -194,6 +218,8 @@ interface VolunteerHandoutItem {
   name: string
   /** Nombre d'exemplaires remis pour cette association. */
   quantity: number
+  /** Les périodes où l'article est remis. Vide = toutes. */
+  phases?: PhaseEdition[]
   team?: {
     id: string
     name: string
@@ -225,7 +251,22 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const selectedTeamId = ref<string | null>(null) // null = global, string = équipe spécifique
 // Articles de la portée sélectionnée, avec leur quantité : la forme qu'attend le PUT.
-const selection = ref<Array<{ handoutItemId: number; quantity: number }>>([])
+const selection = ref<Array<{ handoutItemId: number; quantity: number; phases: PhaseEdition[] }>>(
+  []
+)
+
+const CLES_DE_PHASE: Record<PhaseEdition, string> = {
+  SETUP: 'common.setup',
+  EVENT: 'common.event',
+  TEARDOWN: 'common.teardown',
+}
+
+/** Ce qu'on affiche à côté d'un article déjà associé. Rien quand il vaut pour toutes les phases. */
+const libellePhases = (phases: PhaseEdition[] | undefined) => {
+  const retenues = normaliserPhases(phases)
+  if (retenues.length === 0) return ''
+  return retenues.map((phase) => t(CLES_DE_PHASE[phase])).join(', ')
+}
 const allHandoutItems = ref<TicketingHandoutItem[]>([])
 const teams = ref<VolunteerTeam[]>([])
 const modaleOuverte = ref(false)
@@ -284,7 +325,11 @@ onMounted(() => {
 function resynchroniserLaSelection() {
   selection.value = props.items
     .filter((item) => (item.teamId ?? null) === selectedTeamId.value)
-    .map((item) => ({ handoutItemId: item.handoutItemId, quantity: item.quantity ?? 1 }))
+    .map((item) => ({
+      handoutItemId: item.handoutItemId,
+      quantity: item.quantity ?? 1,
+      phases: normaliserPhases(item.phases),
+    }))
 }
 
 watch(

@@ -14,6 +14,11 @@ import {
 import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
 import { resoudreLesValidateurs } from '#server/utils/ticketing/nom-du-validateur'
 import { montantARembourser } from '#server/utils/ticketing/remboursement-du'
+import {
+  normaliserPhases,
+  phasesDuBenevole,
+  phasesSeRencontrent,
+} from '~~/shared/utils/phases-edition'
 
 /**
  * Deux demandes distinctes, et c'est volontaire : un QR code présenté au scan doit porter son
@@ -74,6 +79,14 @@ export default wrapApiHandler(
             entryValidatedAt: true,
             entryValidatedBy: true,
             userSnapshotPhone: true,
+            // ⚠️ INDISPENSABLES AU FILTRE DES PHASES juste en dessous : sans elles,
+            // `phasesDuBenevole` ne verrait que des `undefined` et conclurait « présent à
+            // l'événement » pour tout le monde — y compris pour qui ne vient qu'au montage. Le
+            // scan remettrait alors les articles de l'événement à un bénévole de montage, en
+            // silence.
+            eventAvailability: true,
+            setupAvailability: true,
+            teardownAvailability: true,
             user: {
               select: {
                 prenom: true,
@@ -154,8 +167,25 @@ export default wrapApiHandler(
             })
           }
 
+          /*
+           * Puis les PHASES : un article réservé au montage ne va pas à qui ne vient que pendant
+           * l'événement, et réciproquement.
+           *
+           * ⚠️ MÊME RÈGLE ET MÊME ORDRE QUE DANS `search.post.ts`, et ce n'est pas une coquetterie :
+           * ces deux surfaces répondent à la même question — ce qu'on remet à cette personne — et
+           * l'écran de recherche sert à préparer ce que le scan va confirmer. Les laisser diverger
+           * donnerait une liste au guichet et une autre au scan, pour le même bénévole.
+           *
+           * Le filtre vient APRÈS la surcharge : la surcharge dit quelle liste s'applique, les
+           * phases disent qui est concerné. Une liste de phases vide ne restreint rien.
+           */
+          const phasesDuBeneficiaire = phasesDuBenevole(application)
+          const articlesDeLaPhase = volunteerHandoutItems.filter((association) =>
+            phasesSeRencontrent(normaliserPhases(association.phases), phasesDuBeneficiaire)
+          )
+
           // Collecter les articles (équipes) ; l'agrégation a lieu après les repas.
-          const volunteerItemEntries: any[] = [...volunteerHandoutItems]
+          const volunteerItemEntries: any[] = [...articlesDeLaPhase]
 
           // Récupérer les repas associés au bénévole
           const volunteerMeals = await prisma.volunteerMealSelection.findMany({

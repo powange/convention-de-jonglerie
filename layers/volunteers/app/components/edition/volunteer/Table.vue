@@ -94,6 +94,19 @@
                   multiple
                   @change="onPresenceFilterChange"
                 />
+
+                <USelect
+                  v-model="applicationsFilterBillet"
+                  :items="volunteerBilletItems"
+                  :placeholder="t('volunteers.ticket_all')"
+                  icon="i-heroicons-ticket"
+                  size="md"
+                  variant="soft"
+                  class="w-full"
+                  :ui="{ content: 'min-w-fit' }"
+                  multiple
+                  @change="onBilletFilterChange"
+                />
               </UFormField>
 
               <UFormField
@@ -179,6 +192,19 @@
             :ui="{ content: 'min-w-fit' }"
             multiple
             @change="onPresenceFilterChange"
+          />
+
+          <USelect
+            v-model="applicationsFilterBillet"
+            :items="volunteerBilletItems"
+            :placeholder="t('volunteers.ticket_all')"
+            icon="i-heroicons-ticket"
+            size="md"
+            variant="soft"
+            class="w-40"
+            :ui="{ content: 'min-w-fit' }"
+            multiple
+            @change="onBilletFilterChange"
           />
 
           <USelect
@@ -660,6 +686,7 @@ const applicationsFilterStatus = ref<string>(filtresInitiaux.statut)
 const applicationsFilterSource = ref<string>(filtresInitiaux.source)
 const applicationsFilterTeams = ref<string[]>(filtresInitiaux.equipesSouhaitees)
 const applicationsFilterPresence = ref<string[]>(filtresInitiaux.presence)
+const applicationsFilterBillet = ref<string[]>(filtresInitiaux.billet)
 const applicationsFilterAssignedTeams = ref<string[]>(filtresInitiaux.equipesAssignees)
 const globalFilter = ref(filtresInitiaux.recherche)
 
@@ -670,6 +697,7 @@ watch(
     applicationsFilterSource,
     applicationsFilterTeams,
     applicationsFilterPresence,
+    applicationsFilterBillet,
     applicationsFilterAssignedTeams,
     globalFilter,
     // La page suit les filtres : un lien filtré qui ramène à la première page ne règle que la
@@ -685,6 +713,7 @@ watch(
           source: applicationsFilterSource.value,
           equipesSouhaitees: applicationsFilterTeams.value,
           presence: applicationsFilterPresence.value,
+          billet: applicationsFilterBillet.value,
           equipesAssignees: applicationsFilterAssignedTeams.value,
           recherche: globalFilter.value,
         },
@@ -796,6 +825,19 @@ const volunteerPresenceItems = computed(() => [
   { label: t('volunteers.presence_teardown'), value: 'teardown' },
 ])
 
+/**
+ * Les trois états possibles du billet.
+ *
+ * ⚠️ TROIS ET NON DEUX. « validé » et « non validé » ne couvrent pas tout : un bénévole présent à
+ * aucune des trois périodes n'a pas de billet du tout — il n'est pas « non validé », il n'a rien à
+ * valider. Les confondre ferait chercher un oubli là où il n'y en a pas.
+ */
+const volunteerBilletItems = computed(() => [
+  { label: t('volunteers.ticket_validated'), value: 'validated' },
+  { label: t('volunteers.ticket_not_validated'), value: 'not_validated' },
+  { label: t('volunteers.ticket_none'), value: 'no_ticket' },
+])
+
 const assignedTeamItems = computed(() => {
   const items = []
 
@@ -894,6 +936,11 @@ const onPresenceFilterChange = () => {
   refreshApplications()
 }
 
+const onBilletFilterChange = () => {
+  serverPagination.value.page = 1
+  refreshApplications()
+}
+
 const onAssignedTeamsFilterChange = () => {
   serverPagination.value.page = 1
   refreshApplications()
@@ -904,6 +951,7 @@ const resetApplicationsFilters = () => {
   applicationsFilterSource.value = 'ALL'
   applicationsFilterTeams.value = []
   applicationsFilterPresence.value = []
+  applicationsFilterBillet.value = []
   applicationsFilterAssignedTeams.value = []
   globalFilter.value = ''
   sorting.value = [{ id: TRI_PAR_DEFAUT.champ, desc: TRI_PAR_DEFAUT.descendant }]
@@ -921,6 +969,7 @@ const filtresCourants = (): FiltresCandidatures => ({
   statut: applicationsFilterStatus.value,
   equipesSouhaitees: applicationsFilterTeams.value,
   presence: applicationsFilterPresence.value,
+  billet: applicationsFilterBillet.value,
   equipesAssignees: applicationsFilterAssignedTeams.value,
   recherche: globalFilter.value,
 })
@@ -1497,6 +1546,47 @@ const columns = computed((): TableColumn<any>[] => [
       )
     },
     size: 100,
+  } as TableColumn<any>,
+  // Colonne Statut du billet au contrôle d'accès
+  {
+    accessorKey: 'billet',
+    header: t('volunteers.table_ticket'),
+    enableSorting: false,
+    /*
+     * ⚠️ TROIS ÉTATS, PAS DEUX. Un bénévole présent à aucune des trois périodes n'a pas de billet
+     * du tout : il n'est pas « non validé », il n'a rien à valider. Afficher « non validé » pour
+     * lui ferait chercher un oubli là où il n'y en a pas — et la règle employée ici est celle du
+     * guichet (`benevolePresentSurPlace`), pour que les deux écrans ne se contredisent jamais.
+     */
+    cell: ({ row }: any) => {
+      const surPlace =
+        row.original.eventAvailability !== false ||
+        row.original.setupAvailability === true ||
+        row.original.teardownAvailability === true
+
+      if (!surPlace) {
+        return h(
+          resolveComponent('UBadge'),
+          { color: 'neutral', variant: 'soft', size: 'sm' },
+          { default: () => t('volunteers.ticket_none') }
+        )
+      }
+
+      if (row.original.entryValidated) {
+        return h(
+          resolveComponent('UBadge'),
+          { color: 'success', variant: 'soft', size: 'sm' },
+          { default: () => t('volunteers.ticket_validated') }
+        )
+      }
+
+      return h(
+        resolveComponent('UBadge'),
+        { color: 'warning', variant: 'soft', size: 'sm' },
+        { default: () => t('volunteers.ticket_not_validated') }
+      )
+    },
+    size: 110,
   } as TableColumn<any>,
   // Colonne Date d'arrivée
   {

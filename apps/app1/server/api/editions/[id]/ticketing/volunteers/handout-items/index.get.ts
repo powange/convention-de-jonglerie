@@ -1,5 +1,6 @@
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { normaliserPhases } from '~~/shared/utils/phases-edition'
 
 export default wrapApiHandler(
   async (event) => {
@@ -47,6 +48,9 @@ export default wrapApiHandler(
           teamId: item.teamId,
           name: item.handoutItem.name,
           quantity: item.quantity,
+          // Normalisé plutôt que rendu brut : la colonne a d'abord reçu le JSON `null` sur les
+          // lignes antérieures, et l'écran ne doit pas avoir à connaître cette histoire.
+          phases: normaliserPhases(item.phases),
           team: item.team,
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,

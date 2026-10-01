@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { normaliserPhases, PHASES_EDITION, type PhaseEdition } from '~~/shared/utils/phases-edition'
+
 /**
  * Une entrée d'association « article à remettre », telle que l'envoient les modales de
  * billetterie : l'article, et le nombre d'exemplaires remis.
@@ -12,6 +14,16 @@ export const handoutItemSelectionSchema = z.union([
   z.object({
     handoutItemId: z.number().int().positive(),
     quantity: z.number().int().min(1).max(999).optional(),
+    /**
+     * Les phases où l'article est remis — seuls les bénévoles s'en servent aujourd'hui.
+     *
+     * ⚠️ FACULTATIF, ET IGNORÉ PAR LES AUTRES PORTEURS. Les tarifs, options, spectacles et repas
+     * passent par ce même schéma et leurs tables n'ont pas de colonne `phases` : ils déstructurent
+     * `{ handoutItemId, quantity }` et laissent tomber le reste. L'ajouter ici plutôt que dans un
+     * second schéma évite d'avoir deux normalisations — ce module raconte déjà ce qu'avait coûté
+     * leur divergence passée.
+     */
+    phases: z.array(z.enum(PHASES_EDITION)).optional(),
   }),
 ])
 
@@ -20,6 +32,8 @@ export type HandoutItemSelection = z.infer<typeof handoutItemSelectionSchema>
 export interface NormalizedHandoutItemSelection {
   handoutItemId: number
   quantity: number
+  /** Vide = toutes les phases. Seuls les bénévoles le lisent. */
+  phases: PhaseEdition[]
 }
 
 /**
@@ -49,10 +63,14 @@ export function normalizeHandoutItemSelections(
   for (const entry of entries) {
     const normalized =
       typeof entry === 'number'
-        ? { handoutItemId: entry, quantity: 1 }
+        ? { handoutItemId: entry, quantity: 1, phases: [] }
         : {
             handoutItemId: entry.handoutItemId,
             quantity: Math.max(1, Math.trunc(entry.quantity ?? 1) || 1),
+            // Normalisé ici plutôt qu'au point d'écriture : la forme nue (un simple nombre) doit
+            // rendre la même structure que la forme objet, sans quoi l'appelant devrait savoir
+            // laquelle il a reçue.
+            phases: normaliserPhases(entry.phases),
           }
     parEntree.set(normalized.handoutItemId, normalized)
   }

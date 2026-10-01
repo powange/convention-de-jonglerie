@@ -76,11 +76,15 @@ export default wrapApiHandler(
       await tx.editionVolunteerHandoutItem.deleteMany({ where: { editionId, teamId } })
       if (selections.length > 0) {
         await tx.editionVolunteerHandoutItem.createMany({
-          data: selections.map(({ handoutItemId, quantity }) => ({
+          // `phases` est écrit ici et nulle part ailleurs : c'est le seul porteur d'articles qui
+          // en ait une colonne. Vide = toutes les phases, donc une association sans choix explicite
+          // se comporte comme avant ce réglage.
+          data: selections.map(({ handoutItemId, quantity, phases }) => ({
             editionId,
             teamId,
             handoutItemId,
             quantity,
+            phases,
           })),
         })
       }

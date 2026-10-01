@@ -56,7 +56,10 @@ describe('PUT /api/editions/[id]/ticketing/volunteers/handout-items', () => {
 
     expect(result.success).toBe(true)
     expect(lignesEcrites('editionVolunteerHandoutItem')).toEqual([
-      { editionId: 22, teamId: null, handoutItemId: 5, quantity: 4 },
+      // ⚠️ `phases: []` = toutes les périodes. Seul le point d'API des BÉNÉVOLES écrit ce champ :
+      // les organisateurs et les artistes, plus bas dans ce fichier, n'ont pas la colonne et ne
+      // doivent surtout pas la recevoir.
+      { editionId: 22, teamId: null, handoutItemId: 5, quantity: 4, phases: [] },
     ])
   })
 
@@ -107,7 +110,7 @@ describe('PUT /api/editions/[id]/ticketing/volunteers/handout-items', () => {
     })
 
     expect(lignesEcrites('editionVolunteerHandoutItem')).toEqual([
-      { editionId: 22, teamId: null, handoutItemId: 5, quantity: 3 },
+      { editionId: 22, teamId: null, handoutItemId: 5, quantity: 3, phases: [] },
     ])
   })
 

@@ -51,6 +51,8 @@ export interface FiltresDeCandidatures {
   source: string
   equipesSouhaitees: string[]
   presence: string[]
+  /** Statut du billet au contrôle d'accès : `validated`, `not_validated`, `no_ticket`. */
+  billet: string[]
   equipesAssignees: string[]
   recherche: string
 }
@@ -80,6 +82,7 @@ export function filtresDepuisUrl(query: Record<string, unknown>): FiltresDeCandi
     source: typeof query.source === 'string' && query.source ? query.source : SOURCE_PAR_DEFAUT,
     equipesSouhaitees: listeDepuisUrl(query.teams),
     presence: listeDepuisUrl(query.presence),
+    billet: listeDepuisUrl(query.ticket),
     equipesAssignees: listeDepuisUrl(query.assignedTeams),
     recherche: typeof query.search === 'string' ? query.search : '',
   }
@@ -103,6 +106,7 @@ export function requeteCandidatures(
     source: _so,
     teams: _t,
     presence: _p,
+    ticket: _b,
     assignedTeams: _a,
     search: _r,
     page: _pg,
@@ -118,6 +122,7 @@ export function requeteCandidatures(
   poser('source', filtres.source === SOURCE_PAR_DEFAUT ? '' : filtres.source)
   poser('teams', filtres.equipesSouhaitees.join(','))
   poser('presence', filtres.presence.join(','))
+  poser('ticket', filtres.billet.join(','))
   poser('assignedTeams', filtres.equipesAssignees.join(','))
   // La recherche est recopiée telle quelle, espaces compris : c'est ce que la personne a tapé,
   // et le serveur s'en charge déjà. La rogner ici ferait diverger l'URL de ce que montre le champ.

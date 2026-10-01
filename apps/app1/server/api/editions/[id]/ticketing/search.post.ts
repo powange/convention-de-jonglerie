@@ -14,6 +14,11 @@ import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-a
 import { resoudreLesValidateurs } from '#server/utils/ticketing/nom-du-validateur'
 import { montantARembourser } from '#server/utils/ticketing/remboursement-du'
 import { sanitizeEmail } from '#server/utils/validation-helpers'
+import {
+  normaliserPhases,
+  phasesDuBenevole,
+  phasesSeRencontrent,
+} from '~~/shared/utils/phases-edition'
 
 const bodySchema = z.object({
   searchTerm: z.string().min(1),
@@ -360,8 +365,27 @@ export default wrapApiHandler(
         const volunteerHandoutItems =
           teamSpecificItems.length > 0 ? teamSpecificItems : articlesGlobauxBenevoles
 
+        /*
+         * Puis les PHASES : un article réservé au montage ne va pas à qui ne vient que pendant
+         * l'événement, et réciproquement.
+         *
+         * ⚠️ LE FILTRE VIENT APRÈS LA SURCHARGE, et c'est délibéré. Les deux règles répondent à
+         * des questions différentes : la surcharge dit QUELLE LISTE s'applique — celle de
+         * l'équipe remplace la globale —, les phases disent QUI dans cette liste est concerné.
+         * Les mêler ferait retomber sur la liste globale un bénévole dont l'équipe a bien des
+         * articles, simplement pas pour sa phase : on lui remettrait alors des articles que
+         * l'organisation avait justement remplacés.
+         *
+         * Une liste de phases vide ne restreint rien : c'est l'état de toutes les associations
+         * antérieures à ce réglage.
+         */
+        const phasesDuBeneficiaire = phasesDuBenevole(volunteer)
+        const articlesDeLaPhase = volunteerHandoutItems.filter((association) =>
+          phasesSeRencontrent(normaliserPhases(association.phases), phasesDuBeneficiaire)
+        )
+
         // Collecter les articles (équipes) ; l'agrégation a lieu après les repas.
-        const volunteerItemEntries: any[] = [...volunteerHandoutItems]
+        const volunteerItemEntries: any[] = [...articlesDeLaPhase]
 
         const volunteerMeals = repasParBenevole.get(volunteer.id) ?? []
 

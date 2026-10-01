@@ -196,6 +196,16 @@ model EditionVolunteerHandoutItem {
   /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
   quantity      Int      @default(1)
   teamId        String? // NULL = global (tous les bénévoles), défini = équipe spécifique
+  /// Les phases où cet article est remis : `SETUP`, `EVENT`, `TEARDOWN`.
+  ///
+  /// ⚠️ TABLEAU VIDE = TOUTES LES PHASES, et c'est ce qui rend la migration sans rattrapage :
+  /// les associations existantes gardent exactement le comportement qu'elles avaient.
+  ///
+  /// ⚠️⚠️ MÊME FORME ET MÊME VOCABULAIRE QUE `VolunteerMeal.phases`, délibérément. Ces deux
+  /// réglages répondent à la même question — « à quel moment de l'édition cela s'applique-t-il ? » —
+  /// et les écrire différemment obligerait à traduire de l'un vers l'autre à chaque lecture, pour
+  /// finir par diverger.
+  phases        Json     @default("[]")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

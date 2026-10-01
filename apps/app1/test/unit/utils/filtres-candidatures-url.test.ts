@@ -22,6 +22,7 @@ const defauts = {
   source: SOURCE_PAR_DEFAUT,
   equipesSouhaitees: [],
   presence: [],
+  billet: [],
   equipesAssignees: [],
   recherche: '',
 }
@@ -46,6 +47,7 @@ describe('filtresDepuisUrl', () => {
       source: 'MANUAL',
       equipesSouhaitees: ['bar', 'cuisine'],
       presence: ['evenement'],
+      billet: [],
       equipesAssignees: ['hygiene'],
       recherche: 'dupont',
     })
@@ -89,6 +91,7 @@ describe('requeteCandidatures', () => {
       source: 'APPLICATION',
       equipesSouhaitees: ['bar'],
       presence: ['montage', 'evenement'],
+      billet: [],
       equipesAssignees: ['hygiene'],
       recherche: 'martin',
     }
@@ -122,6 +125,7 @@ describe('requeteCandidatures et la page', () => {
     source: SOURCE_PAR_DEFAUT,
     equipesSouhaitees: [],
     presence: [],
+    billet: [],
     equipesAssignees: [],
     recherche: '',
   }
