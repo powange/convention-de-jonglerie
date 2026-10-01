@@ -51,11 +51,29 @@ Raccourci pour tout lancer (hors DB):
 
 ## Environnement DB de test
 
-- MySQL via Docker Compose, port 3307 (voir `docker-compose.test.yml`)
-- Base: `convention_db` (valeur par défaut)
+- MySQL via Docker Compose, **port 3310** (voir `docker-compose.test.yml`)
+- Base: **`convention_db_test`** (valeur par défaut)
 - Utilisateur: `convention_user` / `convention_password` (valeurs par défaut)
-- URL par défaut si aucune n’est fournie: `mysql://convention_user:convention_password@localhost:3307/convention_db`
+- URL par défaut si aucune n’est fournie: `mysql://convention_user:convention_password@localhost:3310/convention_db_test`
 - Migrations gérées par `scripts/migrate-test.js` et `test/setup-db.ts`
+- Base **jetable** : elle vit en `tmpfs`, donc rien n’y survit à l’arrêt du conteneur — et les
+  migrations s’y rejouent en quelques secondes au lieu de quelques minutes.
+
+> ⚠️ **Ces tests VIDENT la base qu’on leur désigne**, et ils l’ont déjà fait sur la base de
+> développement, par deux chemins : depuis le conteneur de dev, et depuis l’hôte avec les commandes
+> ci-dessus, parce que `docker-compose.test.yml` partageait son nom de projet, son
+> `container_name` et son volume avec `docker-compose.dev.yml`.
+>
+> Deux barrières existent désormais. Les cinq fichiers compose de test portent un nom de projet
+> distinct (`convention-de-jonglerie-test`), donc leurs volumes ne peuvent plus résoudre ceux du
+> développement. Et `test/setup-db.ts` **refuse de démarrer** si le nom de la base visée ne contient
+> pas `test` — y compris si `DATABASE_URL` vient du `.env` de développement.
+>
+> Pour jouer ces tests sur une base durable en local, passer `TEST_DATABASE_URL` vers une base
+> dédiée dont le nom contient `test` (p. ex. `convention_test_integration`).
+
+Les anciennes valeurs annoncées ici (port 3307, base `convention_db`) étaient fausses des deux
+côtés : le fichier publiait 3308, et `convention_db` est le nom de la base de **travail**.
 
 ## Arborescence utile
 

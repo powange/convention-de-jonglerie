@@ -13,11 +13,60 @@ try {
   console.warn('Prisma Client non disponible, les tests DB seront skippés')
 }
 
-// Forcer l'utilisation de la base de données de test
-// En environnement Docker, utiliser l'URL fournie par l'environnement
+/*
+ * Forcer l'utilisation de la base de données de test.
+ *
+ * ⚠️ LE DÉFAUT PAR DÉFAUT VISAIT 3308/convention_db, c'est-à-dire, sur la pile de développement, le
+ * PORT DE LA BASE MIROIR avec le NOM DE LA BASE DE TRAVAIL. Aucune de ces deux valeurs ne désigne
+ * une base de test : il visait, selon ce qui écoutait, la base miroir du développement ou rien.
+ * Il pointe désormais le conteneur de `docker-compose.test.yml`, qui a son propre port (3310), sa
+ * propre identité Compose et une base en RAM.
+ */
 if (!process.env.TEST_DATABASE_URL && !process.env.DATABASE_URL) {
   process.env.DATABASE_URL =
-    'mysql://convention_user:convention_password@localhost:3308/convention_db'
+    'mysql://convention_user:convention_password@localhost:3310/convention_db_test'
+}
+
+/**
+ * Le nom de la base que ces tests vont VIDER.
+ *
+ * ⚠️⚠️ LA BARRIÈRE QUI MANQUAIT, et qui compte plus que toutes les séparations de fichiers :
+ * `cleanDatabase()` supprime utilisateurs, conventions, éditions, covoiturage, publications et
+ * bénévoles de la base que l'environnement désigne — sans jamais vérifier LAQUELLE. Un
+ * `DATABASE_URL` hérité du `.env` de développement suffisait donc à détruire la base de travail, et
+ * c'est arrivé par deux chemins différents : depuis le conteneur de dev, et depuis l'hôte avec les
+ * commandes documentées `npm run test:setup` / `npm run test:db:run`.
+ *
+ * La règle est volontairement grossière — le nom doit contenir « test » — parce qu'une règle fine
+ * serait une règle qu'on contourne par accident. Elle laisse passer `convention_db_test` (la CI),
+ * `convention_db_test` (le conteneur de test) et `convention_test_integration` (la base dédiée
+ * qu'on emploie en local), et elle refuse `convention_db`.
+ *
+ * Elle LÈVE au lieu d'avertir : un avertissement laisserait la suite continuer, et le test suivant
+ * écrirait dans la base de travail. C'est précisément ce que faisait le `catch` de `cleanDatabase`.
+ */
+const NOM_DE_BASE_ATTENDU = 'test'
+
+function nomDeLaBaseVisee(): string {
+  const url = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+  if (!url) return ''
+  try {
+    return new URL(url).pathname.slice(1)
+  } catch {
+    return ''
+  }
+}
+
+function exigerUneBaseDeTest(): void {
+  const nom = nomDeLaBaseVisee()
+  if (nom.includes(NOM_DE_BASE_ATTENDU)) return
+
+  throw new Error(
+    `Refus de lancer les tests d'intégration sur la base « ${nom || '(inconnue)'} » : son nom ne ` +
+      `contient pas « ${NOM_DE_BASE_ATTENDU} ».\n` +
+      `Ces tests VIDENT la base qu'on leur désigne. Démarrez celle de test ` +
+      `(npm run test:setup, port 3310) ou passez TEST_DATABASE_URL vers une base dédiée.`
+  )
 }
 
 // Instance Prisma pour les tests avec adaptateur MariaDB (Prisma 7)
@@ -51,6 +100,10 @@ export { prismaTest }
 if (process.env.TEST_WITH_DB === 'true') {
   beforeAll(async () => {
     console.log("🔄 Initialisation des tests d'intégration...")
+    // Avant TOUTE connexion : on ne se connecte même pas à une base qu'on n'a pas le droit de
+    // vider. Placé ici et non dans `cleanDatabase` pour que l'échec soit franc et immédiat, au
+    // lieu de survenir après que des tests ont déjà écrit.
+    exigerUneBaseDeTest()
     try {
       // Attendre que MySQL soit prêt (la DB est déjà démarrée par le script)
       await waitForDatabase()
@@ -97,6 +150,10 @@ async function waitForDatabase(maxRetries = 20) {
 // Fonction pour nettoyer la base de données
 async function cleanDatabase() {
   if (!prismaTest) return
+
+  // Deuxième contrôle, au plus près de la destruction : cette fonction est appelée par le
+  // `beforeAll` ci-dessus, mais rien n'empêche un futur appelant de la joindre autrement.
+  exigerUneBaseDeTest()
 
   try {
     // Supprimer dans l'ordre des dépendances (enfants avant parents)

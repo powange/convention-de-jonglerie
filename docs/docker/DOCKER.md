@@ -198,10 +198,11 @@ mysql -h localhost -P 3306 -u convention_user -p convention_db
 mysql://convention_user:convention_password@localhost:3306/convention_db
 ```
 
-Pour l'environnement de tests (docker-compose.test.yml), MySQL est exposé sur le port 3307 pour éviter les conflits locaux :
+Pour l'environnement de tests (docker-compose.test.yml), MySQL est exposé sur le port **3310** pour éviter les conflits locaux (3306 est la base de dev, 3308 sa base miroir, 3307 est pris par un autre projet) :
 
-- **Port** : `3307`
-- **URL** : `mysql://convention_user:convention_password@localhost:3307/convention_db`
+- **Port** : `3310`
+- **URL** : `mysql://convention_user:convention_password@localhost:3310/convention_db_test`
+- **Nom de projet Compose** : `convention-de-jonglerie-test` — distinct de celui du développement, sans quoi les volumes se confondent (la base de dev a déjà été vidée ainsi)
 
 ### Migrations Prisma
 

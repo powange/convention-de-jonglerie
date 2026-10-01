@@ -69,7 +69,7 @@ npm run app1:docker:test:rebuild
 
 Les tests utilisent automatiquement les bonnes variables d'environnement :
 
-- Base de données de test isolée sur le port 3307
+- Base de données de test isolée sur le port 3311
 - JWT secret de test
 - Emails désactivés
 
@@ -83,9 +83,9 @@ Reconstruisez l'image Docker :
 npm run app1:docker:test:rebuild
 ```
 
-### Port 3307 déjà utilisé
+### Port 3311 déjà utilisé
 
-La base de données de test utilise le port 3307. Assurez-vous qu'il est libre ou modifiez le port dans `docker-compose.test-integration.yml`.
+La base de données de test utilise le port 3311. Assurez-vous qu'il est libre ou modifiez le port dans `docker-compose.test-integration.yml`.
 
 ### Nettoyer complètement l'environnement
 
