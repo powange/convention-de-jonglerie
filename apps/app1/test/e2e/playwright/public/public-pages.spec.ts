@@ -27,10 +27,24 @@ test.describe('Pages publiques', () => {
 })
 
 test.describe('Page 404', () => {
-  test('affiche une page 404 pour une URL inexistante', async ({ page, goto }) => {
+  /**
+   * ⚠️ CETTE SPEC ATTENDAIT UN TITRE « 404 » — celui de la page d'erreur par défaut de Nuxt, que
+   * le site n'a plus. Elle décrivait donc l'absence de page d'erreur, pas un choix.
+   *
+   * Ce qu'elle garde maintenant : qu'une adresse inconnue s'annonce en toutes lettres, qu'elle
+   * porte toujours son code, et qu'elle ne propose PAS de réessayer — un rechargement ne mènerait
+   * qu'au même 404. Le bouton de reprise, lui, n'existe que pour un chargement interrompu.
+   *
+   * 📍 C'est la seule épreuve de la page d'erreur dans une application CONSTRUITE : les tests de
+   * composant la montent, ils ne disent rien du rendu réel ni de la locale retenue (ici fr-FR,
+   * fixée par la configuration Playwright).
+   */
+  test('annonce une adresse introuvable, sans proposer de réessayer', async ({ page, goto }) => {
     await goto('/cette-page-nexiste-pas', { waitUntil: 'hydration' })
 
-    // La page doit afficher un message d'erreur 404
-    await expect(page.getByRole('heading', { name: '404' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /introuvable/i })).toBeVisible()
+    await expect(page.getByText('404', { exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: /réessayer/i })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: /accueil/i })).toBeVisible()
   })
 })
