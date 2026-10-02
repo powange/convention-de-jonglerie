@@ -86,17 +86,26 @@ attente qui dépasse quelques minutes ne signale donc pas une pile lente — ell
 déclenché trop tôt, ou que le webhook n'a rien déclenché du tout. Ne pas relancer en boucle :
 revenir à l'étape 1 et vérifier l'image.
 
-### 2. Relever le build actuel
+### 2. Relever le commit actuellement servi
 
-C'est la seule référence qui permettra de constater la bascule :
+⚠️ **`/_nuxt/builds/latest.json` N'EXISTE PLUS** — il répond 404, et prendre ce 404 pour une panne
+ferait conclure l'inverse de la vérité. Depuis le 2 octobre 2026, le répertoire des fichiers de
+build porte l'empreinte du commit (`/_nuxt-<sha>/`, cf. `shared/utils/repertoire-de-build.ts`), et
+le manifeste a suivi.
+
+Le remède est plus simple que ce qu'il remplace, et dit davantage : **le répertoire nomme le commit
+déployé**, là où l'identifiant de build était opaque.
 
 ```bash
-curl -s --max-time 20 https://test.juggling-convention.com/_nuxt/builds/latest.json
-curl -s --max-time 20 https://juggling-convention.com/_nuxt/builds/latest.json
+for u in https://test.juggling-convention.com https://juggling-convention.com; do
+  printf '%-40s ' "$u"
+  curl -s --max-time 30 "$u/" | grep -oE '/_nuxt-[A-Za-z0-9]+/' | head -1
+done
+git rev-parse origin/main | cut -c1-12   # ce qu'on doit y lire après la bascule
 ```
 
-L'identifiant est **déterministe par commit** : deux environnements sur le même commit affichent
-le même. Le noter avant de déclencher.
+Le noter avant de déclencher. Un répertoire `/_nuxt/` nu signifie une image construite sans
+`BUILD_SHA` — à signaler, la bascule ne serait alors plus vérifiable de cette façon.
 
 ### 3. Confirmation
 
@@ -138,20 +147,23 @@ Si la variable est absente ou vide, **arrêter** et demander à l'utilisateur de
 
 ### 6. Vérifier la bascule — l'étape qui compte
 
-Attendre que l'identifiant de build change, avec une boucle `until` et non une suite de `sleep` :
+Attendre que le répertoire des assets porte le nouveau commit, avec une boucle `until` et non une
+suite de `sleep` :
 
 ```bash
-until curl -s --max-time 15 https://test.juggling-convention.com/_nuxt/builds/latest.json | grep -q '"id"' \
-   && ! curl -s --max-time 15 https://test.juggling-convention.com/_nuxt/builds/latest.json | grep -q '<ANCIEN_ID>'; do
-  sleep 25
-done
-curl -s --max-time 20 https://test.juggling-convention.com/_nuxt/builds/latest.json
+ATTENDU=$(git rev-parse origin/main | cut -c1-12)
+U=https://test.juggling-convention.com
+until curl -s --max-time 20 "$U/" | grep -q "/_nuxt-$ATTENDU/"; do sleep 25; done
+curl -s --max-time 20 "$U/" | grep -oE '/_nuxt-[A-Za-z0-9]+/' | head -1
 ```
 
-Deux pièges :
+Attendre le commit ATTENDU, et non la simple disparition de l'ancien : c'est ce qui distingue une
+bascule réussie d'une page d'erreur, qui ne contient évidemment ni l'un ni l'autre.
 
-- **Un 502 juste après le webhook est normal** — la pile redémarre. Attendre une réponse JSON
-  valide, d'où la double condition ci-dessus.
+Un piège :
+
+- **Un 502 juste après le webhook est normal** — la pile redémarre. La condition ci-dessus ne sort
+  que sur une page qui contient vraiment le nouveau répertoire, donc elle l'absorbe.
 - Compter uniquement sur l'absence de l'ancien identifiant sortirait de la boucle sur une page
   d'erreur, qui ne contient évidemment pas cet identifiant.
 

@@ -117,7 +117,7 @@ reste souhaitable, côté infrastructure.
 ## Vérifier un déploiement
 
 Un code HTTP 204 du webhook signifie « déclenché », pas « déployé ». Un identifiant de build ne
-suffit pas non plus : `/_nuxt/builds/latest.json` est lui-même mis en cache par le CDN.
+suffit pas non plus : le manifeste de build est lui-même mis en cache par le CDN. (Son chemin a changé le 2 octobre 2026 — il suit désormais le répertoire par build, `/_nuxt-<sha>/builds/latest.json`.)
 
 Les deux méthodes fiables :
 
