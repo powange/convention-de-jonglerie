@@ -21,6 +21,30 @@ const creneau = (
   assignedOrganizersList: organisateurs.map((userId) => ({ user: { id: userId } })),
 })
 
+/**
+ * Le créneau tel que l'API le rend, sans le renommage que fait le planning de gestion.
+ *
+ * ⚠️ C'EST LE DÉFAUT QUE LES DEUX CAS CI-DESSOUS ÉPROUVENT.
+ * `/api/editions/:id/volunteer-time-slots` rend `assignments` et `organizerAssignments` ; seul
+ * `planning.vue` les recopie sous `assignedVolunteersList` / `assignedOrganizersList`. La page
+ * PUBLIQUE des bénévoles passait la réponse brute à la modale « créneaux du bénévole », qui
+ * n'affichait donc JAMAIS rien — pour personne, et sans erreur. Les dix cas qui existaient ici ne
+ * pouvaient pas le voir : leur fabrique ne connaissait que la forme renommée.
+ */
+const creneauDeLApi = (
+  id: string,
+  startDateTime: string,
+  endDateTime: string,
+  benevoles: number[] = [],
+  organisateurs: number[] = []
+) => ({
+  id,
+  startDateTime,
+  endDateTime,
+  assignments: benevoles.map((userId) => ({ user: { id: userId } })),
+  organizerAssignments: organisateurs.map((userId) => ({ user: { id: userId } })),
+})
+
 const ALICE = 1
 const ORGA = 50
 
@@ -32,6 +56,31 @@ describe('creneauxDuBenevole', () => {
     ]
 
     expect(creneauxDuBenevole(creneaux, ALICE).map((l) => l.creneau.id)).toEqual(['a'])
+  })
+
+  it("retient les créneaux rendus sous la forme de l'API", () => {
+    const creneaux = [
+      creneauDeLApi('a', '2026-10-02T09:00:00Z', '2026-10-02T11:00:00Z', [ALICE]),
+      creneauDeLApi('b', '2026-10-02T14:00:00Z', '2026-10-02T16:00:00Z', [2]),
+      creneauDeLApi('c', '2026-10-02T18:00:00Z', '2026-10-02T20:00:00Z', [], [ORGA]),
+    ]
+
+    expect(creneauxDuBenevole(creneaux, ALICE).map((l) => l.creneau.id)).toEqual(['a'])
+    expect(creneauxDuBenevole(creneaux, ORGA).map((l) => l.creneau.id)).toEqual(['c'])
+  })
+
+  it('accepte les deux formes dans une même liste, sans compter deux fois', () => {
+    // Un écran peut mêler les deux : la réponse de l'API et un créneau qu'il a lui-même recopié.
+    const creneaux = [
+      creneauDeLApi('a', '2026-10-02T09:00:00Z', '2026-10-02T11:00:00Z', [ALICE]),
+      creneau('b', '2026-10-02T14:00:00Z', '2026-10-02T16:00:00Z', [ALICE]),
+      {
+        ...creneauDeLApi('c', '2026-10-02T18:00:00Z', '2026-10-02T20:00:00Z', [ALICE]),
+        assignedVolunteersList: [{ user: { id: ALICE } }],
+      },
+    ]
+
+    expect(creneauxDuBenevole(creneaux, ALICE).map((l) => l.creneau.id)).toEqual(['a', 'b', 'c'])
   })
 
   it('compte les affectations d’organisateur comme les autres', () => {
