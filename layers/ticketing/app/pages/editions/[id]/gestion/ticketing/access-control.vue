@@ -1128,11 +1128,20 @@ const handleInvalidateEntry = async (participantId: number) => {
  *
  * L'entrée reste refusée : on solde une dette, on ne rouvre pas un droit.
  */
-const handleRefund = async (itemId: number, refunded: boolean) => {
+const handleRefund = async (
+  itemId: number,
+  refunded: boolean,
+  /**
+   * Ce que le geste solde. La fiche envoie « commande » quand toute la dette revient à la même
+   * personne : on rend l'argent une fois, pas ligne par ligne. Elle retombe sur « billet » dès que
+   * les lignes dues portent des noms différents — voir `nomsMultiples` dans `remboursement-du.ts`.
+   */
+  portee: 'billet' | 'commande' = 'billet'
+) => {
   try {
     await $fetch(`/api/editions/${editionId}/ticketing/order-items/${itemId}/refund`, {
       method: 'PATCH',
-      body: { refunded },
+      body: { refunded, portee },
     })
 
     toast.add({

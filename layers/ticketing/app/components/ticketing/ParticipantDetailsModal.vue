@@ -27,7 +27,7 @@
           d'entrer.
         -->
         <div
-          v-if="montantARembourser !== null"
+          v-if="sommeDue !== null"
           class="p-4 rounded-lg bg-gradient-to-r from-warning-50 to-warning-100 dark:from-warning-900/20 dark:to-warning-800/20 border border-warning-200 dark:border-warning-800 space-y-3"
         >
           <div class="flex items-center justify-between gap-4">
@@ -41,9 +41,40 @@
               </span>
             </div>
             <span class="text-2xl font-bold text-warning-600 dark:text-warning-400">
-              {{ money(montantARembourser) }}
+              {{ money(sommeDue) }}
             </span>
           </div>
+
+          <!--
+            Le détail de ce qu'on rend, dès qu'il y a plus d'une ligne.
+
+            ⚠️ Un seul chiffre ne se vérifie pas. L'écran annonçait 34 € là où la commande en devait
+            58 : quatre repas annulés manquaient à l'appel, et rien ne permettait de s'en rendre
+            compte au guichet. Le détail est ce qui rend le total contrôlable par la personne qui
+            tient la caisse.
+          -->
+          <ul
+            v-if="soldeToutLaCommande && lignesDues.length > 1"
+            class="text-xs text-gray-600 dark:text-gray-400 space-y-1 border-t border-warning-200 dark:border-warning-800 pt-2"
+          >
+            <li v-for="ligne in lignesDues" :key="ligne.id" class="flex justify-between gap-3">
+              <span class="truncate">{{ ligne.name }}</span>
+              <span class="font-medium tabular-nums shrink-0">{{ money(ligne.amount) }}</span>
+            </li>
+          </ul>
+
+          <!--
+            Plusieurs titulaires : on ne solde PAS d'un geste, et on dit pourquoi.
+
+            Rendre le total de la commande à qui présente un billet donnerait à une personne
+            l'argent des autres. L'écran retombe donc sur la ligne scannée.
+          -->
+          <p
+            v-else-if="detteDeLaCommande?.nomsMultiples"
+            class="text-xs text-gray-600 dark:text-gray-400 border-t border-warning-200 dark:border-warning-800 pt-2"
+          >
+            {{ $t('edition.ticketing.refund_several_holders') }}
+          </p>
           <UButton
             block
             color="warning"
@@ -774,7 +805,7 @@
     :title="$t('edition.ticketing.refund_confirm_title')"
     :description="
       $t('edition.ticketing.refund_confirm_description', {
-        amount: money(montantARembourser ?? 0),
+        amount: money(sommeDue ?? 0),
         name: nomDuPorteur,
       })
     "
@@ -869,6 +900,22 @@ interface TicketData {
     amount: number
     state: string
     qrCode?: string
+    /** La somme due pour CE billet. Calculée par le serveur (`remboursement-du.ts`). */
+    refundDue?: number | null
+    refunded?: boolean
+    refundedAt?: string | Date | null
+    /**
+     * Ce que doit la COMMANDE entière, et à combien de personnes.
+     *
+     * ⚠️ C'est elle qu'on annonce au guichet : on rend l'argent une fois. N'afficher que
+     * `refundDue` faisait réclamer 34 € sur une commande qui en devait 58.
+     */
+    detteDeLaCommande?: {
+      total: number
+      lignes: Array<{ id: number; name: string | null; amount: number }>
+      /** Plusieurs titulaires : chaque ligne se rembourse alors séparément. */
+      nomsMultiples: boolean
+    } | null
     user: {
       firstName: string
       lastName: string
@@ -1066,7 +1113,7 @@ const emit = defineEmits<{
    * `true` solde la dette, `false` la rétablit — le second sert à défaire une erreur sans quitter
    * le guichet. La page appelle le point d'API et rafraîchit la fiche.
    */
-  refund: [itemId: number, refunded: boolean]
+  refund: [itemId: number, refunded: boolean, portee: 'billet' | 'commande']
   validate: [
     participantIds: number[],
     paymentInfo?: {
@@ -1326,6 +1373,40 @@ const billetScanne = computed(() => {
  */
 const montantARembourser = computed(() => billetScanne.value?.refundDue ?? null)
 
+/**
+ * Ce que doit la COMMANDE entière, rendu par le serveur.
+ *
+ * ⚠️ LE DÉFAUT QUE CELA CORRIGE. L'écran n'annonçait que la ligne scannée : sur la commande 937 de
+ * la base de développement, il réclamait 34 € pour un billet d'entrée alors que quatre repas
+ * annulés, soit 24 € de plus, restaient dus. Le bénévole rendait 34 €, la personne repartait, et
+ * la dette restait — sans que rien ne l'ait signalée.
+ */
+const detteDeLaCommande = computed(() => billetScanne.value?.detteDeLaCommande ?? null)
+
+/**
+ * La commande se solde-t-elle d'un seul geste ?
+ *
+ * Non quand ses lignes dues portent des noms différents : une commande groupée paie pour plusieurs
+ * participants, et rendre le total à qui présente un billet donnerait à une personne l'argent des
+ * autres. Mesuré : la commande 686 porte trois t-shirts à trois noms, sous un même e-mail de
+ * payeur. On retombe alors sur la ligne scannée, et chacune se solde quand elle se présente.
+ */
+const soldeToutLaCommande = computed(
+  () => !!detteDeLaCommande.value && !detteDeLaCommande.value.nomsMultiples
+)
+
+/** La somme réellement annoncée au guichet, et celle que le bouton va solder. */
+const sommeDue = computed(() => {
+  if (soldeToutLaCommande.value) {
+    const total = detteDeLaCommande.value?.total ?? 0
+    return total > 0 ? total : null
+  }
+  return montantARembourser.value
+})
+
+/** Le détail de ce qui est soldé — pour qu'on voie ce qu'on rend, et non un seul chiffre. */
+const lignesDues = computed(() => detteDeLaCommande.value?.lignes ?? [])
+
 const dejaRembourse = computed(
   () => billetScanne.value?.state === 'Canceled' && billetScanne.value?.refunded === true
 )
@@ -1348,11 +1429,14 @@ const nomDuPorteur = computed(() => {
 
 const confirmerLeRemboursement = () => {
   confirmationDuRemboursement.value = false
-  if (billetScanne.value) emit('refund', billetScanne.value.id, true)
+  if (billetScanne.value)
+    emit('refund', billetScanne.value.id, true, soldeToutLaCommande.value ? 'commande' : 'billet')
 }
 
 const annulerLeRemboursement = () => {
-  if (billetScanne.value) emit('refund', billetScanne.value.id, false)
+  // Symétrique du geste : ce qu'on a soldé d'un coup se dé-solde d'un coup.
+  if (billetScanne.value)
+    emit('refund', billetScanne.value.id, false, soldeToutLaCommande.value ? 'commande' : 'billet')
 }
 
 /**

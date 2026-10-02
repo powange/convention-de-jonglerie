@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { montantARembourser } from '../../../server/utils/ticketing/remboursement-du'
+import {
+  detteDeCommande,
+  montantARembourser,
+} from '../../../server/utils/ticketing/remboursement-du'
 
 /**
  * « Doit-on encore de l'argent à qui présente ce billet ? »
@@ -80,5 +83,98 @@ describe('montantARembourser', () => {
     // Un tiers des commandes portent plusieurs billets : rendre le total de la commande à qui
     // présente l'un d'eux rembourserait les autres au passage.
     expect(montantARembourser(billet({ amount: 1200 }))).toBe(1200)
+  })
+})
+
+/**
+ * La dette d'une COMMANDE, et non d'un billet.
+ *
+ * ⚠️ CE QUI A ÉTÉ SIGNALÉ. Au contrôle d'accès, la commande 937 de la base de développement
+ * affichait « 34 € à rembourser » alors qu'elle en devait 58 : les quatre repas annulés restaient
+ * dus et rien ne les annonçait. Le guichet rend l'argent UNE fois, à la personne en face — il doit
+ * donc voir le total de la commande.
+ *
+ * 🔬 LES DEUX CAS SONT CEUX DE LA BASE, relevés avant d'écrire la règle. C'est ce qui distingue
+ * une garde utile d'une garde inventée.
+ */
+describe('detteDeCommande', () => {
+  const COMMANDE_REGLEE_AU_GUICHET = { status: 'Onsite', paymentMethod: 'cash' }
+
+  const ligne = (
+    id: number,
+    amount: number,
+    firstName: string | null,
+    lastName: string | null,
+    extra: { state?: string; refunded?: boolean; name?: string } = {}
+  ) => ({
+    id,
+    name: extra.name ?? `Ligne ${id}`,
+    amount,
+    firstName,
+    lastName,
+    state: extra.state ?? 'Canceled',
+    refunded: extra.refunded ?? false,
+  })
+
+  it('totalise toute la commande — le cas 937, un titulaire et ses repas', () => {
+    const dette = detteDeCommande(
+      [
+        ligne(1451, 3400, 'Anne Claire', 'Durand'),
+        ligne(1452, 600, 'Anonyme', 'Anonyme'),
+        ligne(1453, 600, 'Anonyme', 'Anonyme'),
+        ligne(1454, 600, 'Anonyme', 'Anonyme'),
+        ligne(1455, 600, 'Anonyme', 'Anonyme'),
+      ],
+      COMMANDE_REGLEE_AU_GUICHET
+    )
+
+    // 🔬 58 € et non 34 : c'est tout le défaut signalé.
+    expect(dette.total).toBe(5800)
+    expect(dette.lignes).toHaveLength(5)
+    // Les lignes non nommées ne sont pas des personnes : le total se rend en une fois.
+    expect(dette.nomsMultiples).toBe(false)
+  })
+
+  it('signale une commande à plusieurs titulaires — le cas 686, trois t-shirts', () => {
+    const dette = detteDeCommande(
+      [
+        ligne(1087, 1800, 'Virgil', 'SORMAIL'),
+        ligne(1089, 1800, 'Eloïne', 'SORMAIL'),
+        ligne(1090, 1800, 'MaryLou', 'LE ROUX'),
+      ],
+      COMMANDE_REGLEE_AU_GUICHET
+    )
+
+    expect(dette.total).toBe(5400)
+    // ⚠️ Sans ce drapeau, qui présente un des trois billets repartirait avec l'argent des deux
+    // autres. Ces trois lignes partagent pourtant le même e-mail — celui du payeur.
+    expect(dette.nomsMultiples).toBe(true)
+  })
+
+  it('ne compte ni les billets valides, ni ceux déjà remboursés', () => {
+    const dette = detteDeCommande(
+      [
+        ligne(1, 3400, 'Anne Claire', 'Durand'),
+        ligne(2, 600, 'Anne Claire', 'Durand', { state: 'Processed' }),
+        ligne(3, 600, 'Anne Claire', 'Durand', { refunded: true }),
+      ],
+      COMMANDE_REGLEE_AU_GUICHET
+    )
+
+    expect(dette.total).toBe(3400)
+    expect(dette.lignes.map((l) => l.id)).toEqual([1])
+  })
+
+  it('ne doit rien sur une commande jamais réglée', () => {
+    // Un participant ajouté au guichet sans moyen de paiement part en `Pending` : l'argent n'est
+    // jamais entré, il n'y a donc rien à rendre.
+    const dette = detteDeCommande([ligne(1, 3400, 'Anne Claire', 'Durand')], {
+      status: 'Pending',
+      paymentMethod: null,
+    })
+
+    expect(dette.total).toBe(0)
+    expect(dette.lignes).toEqual([])
+    expect(dette.nomsMultiples).toBe(false)
   })
 })

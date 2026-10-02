@@ -8,6 +8,18 @@ import { validateEditionId, validateResourceId } from '#server/utils/validation-
 
 const bodySchema = z.object({
   refunded: z.boolean(),
+  /**
+   * Ce que le geste solde : ce billet seul, ou toutes les lignes dues de sa commande.
+   *
+   * ⚠️ POURQUOI « COMMANDE » EXISTE. Au guichet, on rend l'argent UNE fois, à la personne en face.
+   * N'offrir que « billet » faisait rendre 34 € sur une commande qui en devait 58 — quatre repas
+   * annulés restaient dus, et il aurait fallu scanner chaque ligne pour les solder (commande 937,
+   * base de développement).
+   *
+   * 📍 Le défaut reste `billet` : la liste des commandes, elle, solde bien ligne par ligne, et un
+   * appel qui ne dit rien ne doit pas se mettre soudain à en solder cinq.
+   */
+  portee: z.enum(['billet', 'commande']).default('billet'),
 })
 
 /**
@@ -54,6 +66,7 @@ export default wrapApiHandler(
         where: { id: itemId },
         select: {
           id: true,
+          orderId: true,
           state: true,
           refunded: true,
           order: { select: { editionId: true } },
@@ -69,23 +82,56 @@ export default wrapApiHandler(
       if (item.order.editionId !== editionId)
         throw createError({ status: 403, message: "Ce billet n'appartient pas à cette édition" })
 
-      // Rembourser suppose d'avoir annulé : sans quoi on rendrait l'argent d'un billet qui donne
-      // toujours droit d'entrée.
-      if (body.refunded && item.state !== 'Canceled')
+      /*
+       * Rembourser suppose d'avoir annulé : sans quoi on rendrait l'argent d'un billet qui donne
+       * toujours droit d'entrée.
+       *
+       * 📍 La règle ne vaut QUE pour la portée « billet ». Sur toute une commande, c'est le
+       * `updateMany` plus bas qui ne retient que les lignes annulées — et quelqu'un peut très bien
+       * présenter son billet d'entrée valide alors que ses repas, eux, ont été annulés. Exiger ici
+       * que le billet scanné soit annulé rendrait sa dette insoldable.
+       */
+      if (body.portee === 'billet' && body.refunded && item.state !== 'Canceled')
         throw createError({
           status: 400,
           message: "Ce billet n'est pas annulé : annulez-le avant d'enregistrer un remboursement",
         })
 
-      await prisma.ticketingOrderItem.update({
-        where: { id: itemId },
-        data: body.refunded
-          ? { refunded: true, refundedAt: new Date(), refundedById: user.id }
-          : { refunded: false, refundedAt: null, refundedById: null },
+      const marque = body.refunded
+        ? { refunded: true, refundedAt: new Date(), refundedById: user.id }
+        : { refunded: false, refundedAt: null, refundedById: null }
+
+      if (body.portee === 'billet') {
+        await prisma.ticketingOrderItem.update({ where: { id: itemId }, data: marque })
+        return createSuccessResponse(
+          null,
+          body.refunded ? 'Remboursement enregistré' : 'Remboursement annulé'
+        )
+      }
+
+      /*
+       * Toute la commande, en UN `updateMany` et non une boucle d'appels.
+       *
+       * ⚠️ Le `where` porte la condition, et c'est ce qui rend le geste sûr : seules les lignes
+       * ANNULÉES et pas encore dans l'état voulu changent. Un billet valide de la même commande
+       * n'est jamais touché — il donne toujours droit d'entrée —, et un double clic ne réécrit
+       * rien puisque la seconde passe ne trouve plus personne.
+       *
+       * Les lignes annulées d'une commande groupée appartiennent parfois à des personnes
+       * DIFFÉRENTES ; c'est l'écran qui refuse alors ce geste (`nomsMultiples`, dans
+       * `remboursement-du.ts`), parce que lui seul sait qui se tient au guichet.
+       */
+      const { count } = await prisma.ticketingOrderItem.updateMany({
+        where: {
+          orderId: item.orderId,
+          state: 'Canceled',
+          refunded: !body.refunded,
+        },
+        data: marque,
       })
 
       return createSuccessResponse(
-        null,
+        { lignes: count },
         body.refunded ? 'Remboursement enregistré' : 'Remboursement annulé'
       )
     } catch (error: unknown) {
