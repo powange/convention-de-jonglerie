@@ -1,12 +1,22 @@
 import vue from '@vitejs/plugin-vue'
 import { version as nuxtVersion } from 'nuxt/package.json'
 
+import { repertoireDeBuild } from './shared/utils/repertoire-de-build'
+
 /**
  * Réception d'un fichier de sauvegarde : archive complète (dump + images), donc bien
  * au-delà de la limite par défaut de nuxt-security. Partagé par la restauration et
  * l'import simple — une route de sauvegarde qui reçoit un fichier sans cette règle
  * répond 413 dès quelques dizaines de Mo.
  */
+/**
+ * Le répertoire des fichiers de build, propre à chaque construction en production.
+ *
+ * Le pourquoi — un fichier périmé servi par le CDN sous un nom réutilisé — est écrit en entier
+ * dans `shared/utils/repertoire-de-build.ts`, avec les mesures qui l'ont établi.
+ */
+const buildAssetsDir = repertoireDeBuild(process.env.NUXT_BUILD_SHA)
+
 const backupUploadSecurity = {
   security: {
     requestSizeLimiter: {
@@ -120,6 +130,8 @@ export default defineNuxtConfig({
   },
 
   app: {
+    buildAssetsDir,
+
     head: {
       titleTemplate: '%s | Juggling Convention',
       link: [

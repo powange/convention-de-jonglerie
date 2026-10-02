@@ -82,6 +82,11 @@ jobs:
           file: apps/app1/Dockerfile
           target: runtime
           push: true
+          # Nomme le répertoire des fichiers de build : `/_nuxt-<empreinte>/`. Deux constructions
+          # ne partagent alors plus aucune URL — un CDN qui les tient pour immuables ne peut plus
+          # servir le fichier d'un build à la place d'un autre (vu en production le 02/10/2026).
+          build-args: |
+            BUILD_SHA=${{ github.sha }}
           tags: |
             ghcr.io/${{ github.repository }}:main
             ghcr.io/${{ github.repository }}:sha-${{ github.sha }}

@@ -72,6 +72,11 @@ describe('classifyRequest', () => {
   // hors ligne réussissait sur une page entièrement blanche.
   it('garde les fichiers de build', () => {
     expect(classifyRequest(`${ORIGIN}/_nuxt/entry.B3kf9.js`, 'script', ORIGIN)).toBe('asset')
+    // ⚠️ En production le répertoire porte l'empreinte du build (`/_nuxt-<sha>/`) : sans ce cas,
+    // le worker cesserait de conserver le moindre fichier de build, en silence.
+    expect(classifyRequest(`${ORIGIN}/_nuxt-8098dfc2df58/entry.B3kf9.js`, 'script', ORIGIN)).toBe(
+      'asset'
+    )
     expect(classifyRequest(`${ORIGIN}/_nuxt/entry.aQ2x1.css`, 'style', ORIGIN)).toBe('asset')
   })
 

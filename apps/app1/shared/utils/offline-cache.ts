@@ -100,7 +100,10 @@ export function classifyRequest(url: string, destination: string, origin: string
   // Fichiers de build. Une page en cache sans eux s'affiche vide : le rendu serveur arrive, mais
   // l'application ne peut pas reprendre la main. Leur nom portant une empreinte, ils ne changent
   // jamais de contenu — le cache prime donc sur le réseau.
-  if (parsed.pathname.indexOf('/_nuxt/') === 0) return 'asset'
+  // `_nuxt` ou `_nuxt-<empreinte>` : en production le répertoire porte l'empreinte du build
+  // (cf. `buildAssetsDir` dans nuxt.config.ts). Sans le suffixe, le worker cesserait de conserver
+  // le moindre fichier de build — le site redeviendrait inutilisable hors ligne, en silence.
+  if (/^\/_nuxt(-[A-Za-z0-9]+)?\//.test(parsed.pathname)) return 'asset'
 
   // Traductions. Le module i18n les prérend en fichiers statiques hachés, servis depuis un
   // chemin à part — et non depuis le dossier des fichiers de build, comme je l'ai longtemps cru.

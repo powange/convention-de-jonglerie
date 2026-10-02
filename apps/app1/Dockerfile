@@ -52,6 +52,18 @@ COPY apps/app1/ ./
 COPY layers/ /app/layers/
 # Augmenter la limite de mémoire pour le build Docker (8GB)
 # --mount=type=cache : persiste le cache Nuxt/Vite entre les builds Docker (accélère les rebuilds via Portainer)
+# L'empreinte du commit construit, transmise par la CI (`publier-image.yml`).
+#
+# ⚠️ ELLE NOMME LE RÉPERTOIRE DES FICHIERS DE BUILD : `/_nuxt-<empreinte>/` au lieu de `/_nuxt/`
+# (cf. `buildAssetsDir` dans nuxt.config.ts). Sans elle, deux constructions se partagent les mêmes
+# URL, et un CDN qui les tient pour immuables peut servir un fichier d'un build pour un autre —
+# c'est arrivé en production le 2 octobre 2026.
+#
+# Absente, le build reste valide et retombe sur `/_nuxt/` : une construction locale ou un essai
+# manuel n'ont pas à fournir de SHA.
+ARG BUILD_SHA=""
+ENV NUXT_BUILD_SHA=$BUILD_SHA
+
 RUN --mount=type=cache,target=/app/apps/app1/node_modules/.cache \
     NODE_OPTIONS='--max-old-space-size=8192' npx nuxt build
 
