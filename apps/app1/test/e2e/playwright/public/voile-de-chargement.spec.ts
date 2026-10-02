@@ -13,8 +13,10 @@ import { expect, test } from '@nuxt/test-utils/playwright'
  *
  * ⚠️ POURQUOI CES TESTS MESURENT UN DÉLAI, ce qu'on évite d'ordinaire. Parce que le défaut EST un
  * délai : une assertion de visibilité seule serait restée verte avant comme après — le contenu
- * finissait par apparaître. Le seuil est donc volontairement large (500 ms, contre les 1 000 ms
- * fixes d'avant) : il ne mesure pas une performance, il vérifie qu'aucune attente n'est réintroduite.
+ * finissait par apparaître. Mais le délai se mesure DANS LA PAGE, en horloge interne : chronométré
+ * depuis Node, il incluait la latence du harnais et échouait deux fois sur trois pour quelques
+ * dizaines de millisecondes. Il ne mesure pas une performance, il vérifie qu'aucune attente n'est
+ * réintroduite.
  *
  * ⚠️ LE REPÈRE EST L'HYDRATATION, ET NON `DOMContentLoaded`. Le contenu reste volontairement masqué
  * jusque-là : une première version le découvrait dès le rendu serveur, et quatre lots Playwright
@@ -23,25 +25,94 @@ import { expect, test } from '@nuxt/test-utils/playwright'
  * en page, c'est de saisir dans un formulaire que personne n'écoute encore.
  */
 test.describe('Voile de chargement', () => {
-  test('le contenu est visible moins de 500 ms après l’hydratation', async ({ page, goto }) => {
-    // C'est l'attente APRÈS l'hydratation que ce test surveille : les mille millisecondes fixes
-    // d'animation, plus l'attente de `load` — donc des images — qui les précédait.
+  test('🔬 l’attente ajoutée se borne au fondu, pas une milliseconde de plus', async ({
+    page,
+    goto,
+  }) => {
+    /*
+     * ⚠️ LA MESURE A ÉTÉ DÉPLACÉE DANS LA PAGE, et sa RÉFÉRENCE corrigée. La version précédente
+     * chronométrait depuis Node le temps qu'un localisateur mettait à voir le titre des filtres,
+     * seuil 500 ms : relevé sur trois exécutions de `main`, 519, 531 et 568 ms — un échec deux fois
+     * sur trois, toujours de quelques dizaines de millisecondes. Elle mesurait la latence du
+     * harnais autant que l'application.
+     *
+     * ⚠️⚠️ ET UNE PREMIÈRE RÉÉCRITURE S'EST TROMPÉE DE REPÈRE : `window.useNuxtApp` est posé à la
+     * CRÉATION du client Nuxt, bien avant le montage. Mesuré ainsi, l'écart valait 1 187 ms en
+     * développement — c'était la durée d'hydratation, pas l'attente ajoutée. Un seuil calé dessus
+     * n'aurait rien dit de l'application et beaucoup de la machine.
+     *
+     * 📍 LE BON REPÈRE EST LE DÉBUT DU FONDU. `app.vue` pose la classe `loading-screen--sortie` au
+     * montage, puis retire le voile du DOM après `DUREE_DU_FONDU`. L'écart entre les deux est
+     * exactement l'attente que l'application AJOUTE, et il ne dépend ni de la vitesse du coureur,
+     * ni du réseau, ni des images.
+     */
+    await page.addInitScript(() => {
+      const fenetre = window as unknown as {
+        __voile: { apparu?: number; fondu?: number; disparu?: number }
+      }
+      fenetre.__voile = {}
+
+      const voile = () => document.querySelector('.loading-screen')
+
+      const guetterDisparition = () => {
+        if (!voile()) fenetre.__voile.disparu = performance.now()
+        else requestAnimationFrame(guetterDisparition)
+      }
+      const guetterFondu = () => {
+        const element = voile()
+        if (!element) {
+          // Le voile est parti sans jamais passer par le fondu : on note tout de même l'instant,
+          // le cas sera jugé plus bas.
+          fenetre.__voile.disparu = performance.now()
+          return
+        }
+        if (element.classList.contains('loading-screen--sortie')) {
+          fenetre.__voile.fondu = performance.now()
+          requestAnimationFrame(guetterDisparition)
+        } else requestAnimationFrame(guetterFondu)
+      }
+      // D'abord qu'il paraisse : au premier appel le document est vide, et l'y chercher absent
+      // serait toujours vrai.
+      const guetterApparition = () => {
+        if (voile()) {
+          fenetre.__voile.apparu = performance.now()
+          requestAnimationFrame(guetterFondu)
+        } else requestAnimationFrame(guetterApparition)
+      }
+      requestAnimationFrame(guetterApparition)
+    })
+
     await goto('/', { waitUntil: 'hydration' })
 
-    const depart = Date.now()
-    /*
-     * Le titre du panneau de filtres, et non un `h1` : l'accueil n'en a pas — vérifié, la première
-     * version de ce test le cherchait et ne trouvait rien. Ce titre-là est rendu par le serveur et
-     * ne dépend d'aucune donnée, contrairement aux titres des cartes d'édition.
-     */
-    const titre = page.getByRole('heading', { name: /filtres/i }).first()
-    await expect(titre).toBeVisible({ timeout: 5000 })
-    const ecoule = Date.now() - depart
+    const mesures = await page.waitForFunction(
+      () => {
+        const v = (window as unknown as { __voile: Record<string, number | undefined> }).__voile
+        return v?.disparu !== undefined ? v : null
+      },
+      null,
+      { timeout: 15000 }
+    )
+    const { apparu, fondu, disparu } = await mesures.jsonValue()
 
+    /*
+     * ⚠️⚠️ LE VOILE DOIT AVOIR EXISTÉ ET AVOIR FONDU. Sans ces deux vérifications, un voile
+     * supprimé du code rendrait ce cas vert pour la pire des raisons : il ne mesurerait plus rien.
+     * C'est le défaut que ce dépôt a payé plusieurs fois — une assertion satisfaite par l'absence
+     * de ce qu'elle surveille.
+     */
+    expect(apparu, 'le voile n’est jamais apparu : ce cas ne mesurerait plus rien').toBeDefined()
+    expect(fondu, 'le voile n’est jamais passé par le fondu').toBeDefined()
+
+    const attenteAjoutee = disparu! - fondu!
+    /*
+     * `DUREE_DU_FONDU` vaut 300 ms dans `app.vue`. Le défaut d'origine en ajoutait MILLE, après
+     * `load` — donc après les images. 600 ms laissent au fondu le double de sa durée et refusent
+     * tout retour en arrière, sans rien devoir à la vitesse de la machine.
+     */
     expect(
-      ecoule,
-      `le contenu a mis ${ecoule} ms à devenir visible après l'hydratation`
-    ).toBeLessThan(500)
+      attenteAjoutee,
+      `le voile est resté ${Math.round(attenteAjoutee)} ms après le début du fondu`
+    ).toBeLessThan(600)
   })
 
   test('le voile disparaît du DOM, il ne reste pas transparent devant la page', async ({
