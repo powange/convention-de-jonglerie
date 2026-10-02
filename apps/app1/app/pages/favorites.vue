@@ -109,30 +109,43 @@
         </div>
       </div>
 
-      <!-- Vue Agenda -->
+      <!--
+        Vue Agenda. Même frontière d'erreur que sur l'accueil : une bribe qui n'arrive pas ne doit
+        pas emporter la liste des favoris. Voir `app/utils/composant-differe.ts`.
+      -->
       <div v-else-if="viewMode === 'agenda'">
         <ClientOnly>
-          <HomeAgenda :editions="filteredFavoriteEditions" />
+          <NuxtErrorBoundary>
+            <HomeAgenda :editions="filteredFavoriteEditions" />
+            <template #error="{ clear }">
+              <UiEchecDeChargement @reessayer="clear" />
+            </template>
+          </NuxtErrorBoundary>
         </ClientOnly>
       </div>
 
       <!-- Vue en carte -->
       <div v-else-if="viewMode === 'map'">
-        <FavoritesMap :editions="filteredFavoriteEditions" />
+        <NuxtErrorBoundary>
+          <FavoritesMap :editions="filteredFavoriteEditions" />
+          <template #error="{ clear }">
+            <UiEchecDeChargement @reessayer="clear" />
+          </template>
+        </NuxtErrorBoundary>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 import { useEditionStore } from '~/stores/editions'
 import { useFavoritesEditionsStore } from '~/stores/favoritesEditions'
 
 // Lazy loading des composants
-const FavoritesMap = defineAsyncComponent(() => import('~/components/FavoritesMap.vue'))
-const HomeAgenda = defineAsyncComponent(() => import('~/components/HomeAgenda.vue'))
+const FavoritesMap = composantDiffere(() => import('~/components/FavoritesMap.vue'))
+const HomeAgenda = composantDiffere(() => import('~/components/HomeAgenda.vue'))
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({

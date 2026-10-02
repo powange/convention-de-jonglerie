@@ -522,6 +522,8 @@
     "cannot_publish_comment": "Nelze publikovat publikaci",
     "cannot_publish_reply": "Nelze zveřejnit komentář",
     "cannot_remove_favorite": "Nelze odebrat oblíbené položky",
+    "chunk_load_failed_description": "Připojení bylo během načítání přerušeno. Zkuste to znovu – zbytek stránky zůstává funkční.",
+    "chunk_load_failed_title": "Tento blok se nepodařilo načíst",
     "conflict": "Konflikt s existujícími daty",
     "content_required": "Obsah je vyžadován",
     "content_too_long": "Obsah nesmí překročit {max} znaků",

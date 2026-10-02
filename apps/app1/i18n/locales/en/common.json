@@ -522,6 +522,8 @@
     "cannot_publish_comment": "Cannot publish comment",
     "cannot_publish_reply": "Cannot publish reply",
     "cannot_remove_favorite": "Cannot remove from favorites",
+    "chunk_load_failed_description": "The connection was interrupted while it was loading. Try again — the rest of the page still works.",
+    "chunk_load_failed_title": "This section could not be loaded",
     "conflict": "Conflict with existing data",
     "content_required": "Content is required",
     "content_too_long": "Content cannot exceed {max} characters",

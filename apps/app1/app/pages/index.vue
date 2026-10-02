@@ -194,16 +194,32 @@
           </div>
         </div>
 
-        <!-- Vue Agenda -->
+        <!--
+          Vue Agenda.
+
+          La frontière d'erreur est indispensable, et non une précaution : sans elle, une bribe
+          qui n'arrive pas fait disparaître l'accueil entier — liste des conventions comprise —
+          derrière une page « 500 ». Vu en production le 2 octobre 2026.
+        -->
         <div v-else-if="viewMode === 'agenda'">
           <ClientOnly>
-            <HomeAgenda :editions="editionStore.allEditions" />
+            <NuxtErrorBoundary>
+              <HomeAgenda :editions="editionStore.allEditions" />
+              <template #error="{ clear }">
+                <UiEchecDeChargement @reessayer="clear" />
+              </template>
+            </NuxtErrorBoundary>
           </ClientOnly>
         </div>
 
         <!-- Vue carte -->
         <div v-else-if="viewMode === 'map'">
-          <HomeMap :editions="editionStore.allEditions" />
+          <NuxtErrorBoundary>
+            <HomeMap :editions="editionStore.allEditions" />
+            <template #error="{ clear }">
+              <UiEchecDeChargement @reessayer="clear" />
+            </template>
+          </NuxtErrorBoundary>
         </div>
       </div>
     </div>
@@ -213,7 +229,7 @@
 <script setup lang="ts">
 import { CalendarDate } from '@internationalized/date'
 import { useDebounceFn, useIntersectionObserver } from '@vueuse/core'
-import { onMounted, computed, reactive, watch, ref, defineAsyncComponent, toRaw } from 'vue'
+import { onMounted, computed, reactive, watch, ref, toRaw } from 'vue'
 
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
 import { useAuthStore } from '~/stores/auth'
@@ -307,9 +323,9 @@ useSchemaOrg([
   }),
 ])
 
-// Lazy loading optimisé des composants (une seule fois)
-const HomeMap = defineAsyncComponent(() => import('~/components/HomeMap.vue'))
-const HomeAgenda = defineAsyncComponent(() => import('~/components/HomeAgenda.vue'))
+// Lazy loading optimisé des composants (une seule fois), avec reprise sur bribe manquante
+const HomeMap = composantDiffere(() => import('~/components/HomeMap.vue'))
+const HomeAgenda = composantDiffere(() => import('~/components/HomeAgenda.vue'))
 
 const editionStore = useEditionStore()
 const authStore = useAuthStore()

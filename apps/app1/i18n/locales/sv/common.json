@@ -522,6 +522,8 @@
     "cannot_publish_comment": "Det går inte att publicera publikationen",
     "cannot_publish_reply": "Det går inte att publicera kommentaren",
     "cannot_remove_favorite": "Det går inte att ta bort favoriter",
+    "chunk_load_failed_description": "Anslutningen bröts under inläsningen. Försök igen – resten av sidan fungerar fortfarande.",
+    "chunk_load_failed_title": "Det här avsnittet kunde inte läsas in",
     "conflict": "Konflikt med befintliga data",
     "content_required": "Innehåll krävs",
     "content_too_long": "Innehållet får inte överstiga {max} tecken",

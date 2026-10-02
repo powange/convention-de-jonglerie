@@ -522,6 +522,8 @@
     "cannot_publish_comment": "Kommentar kann nicht veröffentlicht werden",
     "cannot_publish_reply": "Antwort kann nicht veröffentlicht werden",
     "cannot_remove_favorite": "Kann nicht aus Favoriten entfernt werden",
+    "chunk_load_failed_description": "Die Verbindung wurde beim Laden unterbrochen. Versuchen Sie es erneut – der Rest der Seite bleibt nutzbar.",
+    "chunk_load_failed_title": "Dieser Bereich konnte nicht geladen werden",
     "conflict": "Konflikt mit vorhandenen Daten",
     "content_required": "Inhalt ist erforderlich",
     "content_too_long": "Der Inhalt darf nicht länger als {max} Zeichen sein",

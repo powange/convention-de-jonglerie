@@ -522,6 +522,8 @@
     "cannot_publish_comment": "Kan opmerking niet publiceren",
     "cannot_publish_reply": "Kan antwoord niet publiceren",
     "cannot_remove_favorite": "Kan niet uit favorieten verwijderen",
+    "chunk_load_failed_description": "De verbinding werd tijdens het laden onderbroken. Probeer het opnieuw — de rest van de pagina blijft bruikbaar.",
+    "chunk_load_failed_title": "Dit onderdeel kon niet worden geladen",
     "conflict": "Conflict met bestaande gegevens",
     "content_required": "Inhoud is vereist",
     "content_too_long": "Inhoud mag niet meer dan {max} tekens bevatten",
