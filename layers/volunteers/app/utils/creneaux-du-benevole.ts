@@ -30,13 +30,33 @@ export interface CreneauAvecIntervalle<T> {
   intervalleMinutes: number | null
 }
 
-/** Les personnes affectées à un créneau, bénévoles et organisateurs confondus. */
+/**
+ * Les personnes affectées à un créneau, bénévoles et organisateurs confondus.
+ *
+ * ⚠️ DEUX NOMS POUR LA MÊME CHOSE, ET C'EST LÀ QUE LE DÉFAUT VIVAIT.
+ * `/api/editions/:id/volunteer-time-slots` rend `assignments` et `organizerAssignments` ; le
+ * planning de gestion les RECOPIE ensuite sous `assignedVolunteersList` et
+ * `assignedOrganizersList` avant de les passer à ses composants. Cette fonction ne connaissait que
+ * les seconds — donc sur la page publique des bénévoles, qui passe la réponse de l'API telle
+ * quelle, la modale « créneaux du bénévole » n'affichait **jamais rien, pour personne**, sans
+ * erreur ni trace. Un responsable d'équipe cliquait sur un membre et voyait « aucun créneau »
+ * alors qu'il en avait.
+ *
+ * On lit donc les deux formes. Le choix de les CUMULER plutôt que d'en préférer une : un écran
+ * peut mêler les deux — la liste de l'API et un créneau qu'il a lui-même recomposé —, et un
+ * identifiant vu deux fois ne change rien, puisque ce qui compte est l'appartenance.
+ */
 function personnesDuCreneau(creneau: CreneauAffecte): number[] {
   const affectations = [
     ...(creneau.assignedVolunteersList ?? []),
     ...(creneau.assignedOrganizersList ?? []),
+    ...(creneau.assignments ?? []),
+    ...(creneau.organizerAssignments ?? []),
   ]
-  return affectations.map((affectation: any) => affectation?.user?.id).filter((id) => id != null)
+  const ids = affectations
+    .map((affectation: any) => affectation?.user?.id)
+    .filter((id) => id != null)
+  return [...new Set(ids)]
 }
 
 /**

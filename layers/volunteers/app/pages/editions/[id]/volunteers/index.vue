@@ -801,10 +801,17 @@ const { timeSlots: creneauxDuPlanning } = useVolunteerTimeSlots(editionIdSiDroit
 /**
  * Les créneaux d'un bénévole, ouverts en cliquant son nom dans « Mes équipes ».
  *
- * ⚠️ CE QUE LE RESPONSABLE Y VERRA, et c'est le serveur qui le décide, pas cet écran : le point
- * d'API des créneaux rend en détail les équipes dont on est responsable et anonymise le reste. Un
- * responsable voit donc les créneaux de son bénévole DANS SES ÉQUIPES — pas son emploi du temps
- * entier sur l'édition. C'est voulu : ce qu'il organise, et rien de plus.
+ * ⚠️ CORRECTION D'UN COMMENTAIRE QUI ÉTAIT FAUX. Il affirmait ici qu'un responsable ne voit les
+ * créneaux de son bénévole que DANS SES ÉQUIPES, le serveur « anonymisant le reste ». Le serveur
+ * masque bien l'identité civile des autres équipes — mais il conserve l'`id` de la personne
+ * (`creneauPseudonymise`, sans lui le client ne pourrait pas reconnaître deux fois la même).
+ * La modale montre donc l'emploi du temps du bénévole sur TOUTE l'édition, équipes des autres
+ * comprises, nommées et colorées.
+ *
+ * 📍 Et c'est bien ce qu'on veut : la question d'un responsable est « cette personne est-elle
+ * libre à cette heure ? », à laquelle une liste tronquée à ses propres équipes répondrait de
+ * travers. Aucune donnée nouvelle n'est divulguée au passage — ces affectations sont déjà dans la
+ * réponse que cet écran reçoit, et visibles dans le planning public.
  */
 const creneauxBenevoleModalOpen = ref(false)
 const benevoleObserve = ref<{ id: number; pseudo: string } | null>(null)
