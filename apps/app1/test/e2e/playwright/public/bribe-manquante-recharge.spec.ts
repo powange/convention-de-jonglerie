@@ -100,6 +100,19 @@ test.describe('Une bribe manquante ne doit pas afficher de 500', () => {
   const rendreInaccessible = async (page: Page, bribes: string[], { durable = false } = {}) => {
     let actif = true
     const coupees = new Set<string>()
+    /*
+     * ⚠️ CE QUE LA PAGE DEMANDE RÉELLEMENT, enregistré à part. `page.on('request')` n'est pas
+     * soumis au plafond d'interception : c'est la seule vue fiable, et elle rend le message
+     * d'échec explicite au lieu de laisser deviner. Cinq versions de ce fichier ont échoué faute
+     * de pouvoir comparer ce qu'on visait à ce qui partait.
+     */
+    const demandees: string[] = []
+    page.on('request', (requete) => {
+      const url = requete.url()
+      if (url.includes('/_nuxt/') && url.endsWith('.js')) {
+        demandees.push(url.split('/_nuxt/')[1] ?? url)
+      }
+    })
     if (!durable) {
       page.on('request', (requete) => {
         if (requete.resourceType() === 'document' && coupees.size > 0) actif = false
@@ -115,7 +128,7 @@ test.describe('Une bribe manquante ne doit pas afficher de 500', () => {
         await route.abort('failed')
       })
     }
-    return coupees
+    return { coupees, demandees }
   }
 
   /** Ouvre l'accueil et attend que l'application ait réellement démarré côté client. */
@@ -134,7 +147,7 @@ test.describe('Une bribe manquante ne doit pas afficher de 500', () => {
       'aucune bribe de FullCalendar déduite du build : la déduction a cessé de fonctionner, et ce lot ne prouverait plus rien'
     ).toBeGreaterThan(0)
 
-    const coupees = await rendreInaccessible(page, bribes)
+    const { coupees, demandees } = await rendreInaccessible(page, bribes)
     await ouvrirLAccueilHydrate(page)
 
     await page.evaluate(() => {
@@ -153,7 +166,10 @@ test.describe('Une bribe manquante ne doit pas afficher de 500', () => {
      * signalaient l'absence de RECHARGEMENT là où le défaut était l'absence de COUPURE.
      */
     await expect
-      .poll(() => coupees.size, { timeout: 20000, message: 'aucune bribe coupée' })
+      .poll(() => coupees.size, {
+        timeout: 20000,
+        message: `aucune bribe coupée.\nVISÉES (${bribes.length}) : ${bribes.join(', ')}\nDEMANDÉES (${demandees.length}) : ${[...new Set(demandees)].slice(-25).join(', ')}`,
+      })
       .toBeGreaterThan(0)
 
     // 🔬 L'ASSERTION QUI PORTE LE POINT : le témoin posé dans la fenêtre ne survit pas à un nouveau
@@ -193,7 +209,7 @@ test.describe('Une bribe manquante ne doit pas afficher de 500', () => {
       if (requete.resourceType() === 'document') documents++
     })
 
-    const coupees = await rendreInaccessible(page, bribes, { durable: true })
+    const { coupees, demandees } = await rendreInaccessible(page, bribes, { durable: true })
     await ouvrirLAccueilHydrate(page)
 
     await page.locator('[data-vue-agenda]').click()
@@ -201,7 +217,10 @@ test.describe('Une bribe manquante ne doit pas afficher de 500', () => {
     // n'aurait pas retenue.
     await page.waitForTimeout(13000)
 
-    expect(coupees.size, 'une bribe doit bien avoir été coupée').toBeGreaterThan(0)
+    expect(
+      coupees.size,
+      `une bribe doit bien avoir été coupée.\nVISÉES : ${bribes.join(', ')}\nDEMANDÉES : ${[...new Set(demandees)].slice(-25).join(', ')}`
+    ).toBeGreaterThan(0)
     // Le chargement initial, plus UN rechargement. La marge laisse passer une requête de document
     // supplémentaire sans laisser passer une boucle, qui en produirait des dizaines.
     expect(documents, `requêtes de document observées : ${documents}`).toBeLessThanOrEqual(3)
