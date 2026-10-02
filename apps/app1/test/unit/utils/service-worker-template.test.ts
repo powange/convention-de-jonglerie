@@ -3,6 +3,8 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { classifyRequest } from '../../../shared/utils/offline-cache'
+
 /**
  * Le service worker est produit par un littéral de gabarit dans une route Nitro.
  *
@@ -55,5 +57,26 @@ describe('gabarits du service worker', () => {
     // gabarit, pas les valeurs injectées à l'exécution.
     const neutral = literalAfter(source, debut).replace(/\$\{[^}]*\}/g, 'null')
     expect(() => new Function(neutral)).not.toThrow()
+  })
+
+  /**
+   * ⚠️ `classifyRequest` EST RECOPIÉE DANS LE WORKER PAR `toString()`, donc elle doit se suffire à
+   * elle-même. Une constante importée du module — un motif partagé, un seuil — serait `undefined`
+   * à l'exécution : `ReferenceError` au premier `fetch`, le script entier tombe, et le site perd
+   * tout son cache hors ligne **sans que rien ne le signale**.
+   *
+   * Failli arriver le 2 octobre 2026 en sortant un motif de chemin dans un fichier partagé. Les
+   * deux épreuves voisines ne l'auraient pas vu : un identifiant libre s'analyse parfaitement.
+   *
+   * 🔬 D'où une évaluation ISOLÉE, puis un appel réel : c'est l'appel qui révèle la dépendance.
+   */
+  it('classifyRequest ne dépend de rien hors d’elle-même', () => {
+    const isolee = new Function(
+      `return (${classifyRequest.toString()})`
+    )() as typeof classifyRequest
+
+    expect(isolee('https://x.fr/_nuxt/abc.js', 'script', 'https://x.fr')).toBe('asset')
+    expect(isolee('https://x.fr/_nuxt-9f3a1c/abc.js', 'script', 'https://x.fr')).toBe('asset')
+    expect(isolee('https://x.fr/', 'document', 'https://x.fr')).toBe('page')
   })
 })

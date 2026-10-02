@@ -9,9 +9,23 @@
 export default defineEventHandler((event) => {
   const url = event.node.req.url || ''
 
-  // Assets statiques avec hash (générés par Vite avec fingerprinting)
-  // Ces fichiers ont un hash dans leur nom, donc si le contenu change, le nom change
-  if (url.match(/\/_nuxt\/.*\.(js|css|png|jpg|jpeg|gif|svg|webp|avif|woff2?|ttf|eot|ico)$/)) {
+  /*
+   * Fichiers de build, servis comme immuables.
+   *
+   * ⚠️ `_nuxt` OU `_nuxt-<empreinte>` : en production, le répertoire porte l'empreinte du build
+   * (cf. `buildAssetsDir` dans nuxt.config.ts). Ne reconnaître que `/_nuxt/` ferait tomber ces
+   * fichiers dans la branche « pas de cache » — sans erreur, mais en rechargeant tout le bundle
+   * à chaque visite.
+   *
+   * 📍 Et c'est bien le répertoire par build qui REND cette promesse vraie : sous `/_nuxt/`, deux
+   * constructions pouvaient servir un même nom avec des contenus différents, et `immutable`
+   * figeait le mauvais pour un an.
+   */
+  if (
+    url.match(
+      /\/_nuxt(-[A-Za-z0-9]+)?\/.*\.(js|css|png|jpg|jpeg|gif|svg|webp|avif|woff2?|ttf|eot|ico)$/
+    )
+  ) {
     setResponseHeader(event, 'Cache-Control', 'public, max-age=31536000, immutable')
   }
 
