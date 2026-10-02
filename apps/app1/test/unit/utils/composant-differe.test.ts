@@ -31,6 +31,19 @@ describe('echecDeBribe', () => {
     expect(echecDeBribe(new Error('Unable to preload CSS for /_nuxt/entry.css'))).toBe(true)
   })
 
+  it("lit le message d'une erreur SÉRIALISÉE, qui n'est pas une instance d'Error", () => {
+    /*
+     * 🔬 LE CAS DE PRODUCTION. L'erreur transmise à `error.vue` a traversé une sérialisation : un
+     * objet nu `{ statusCode, message }`. Une version précédente ne lisait `.message` que sur une
+     * vraie `Error` et retombait sur `String(erreur)`, soit « [object Object] » — la détection
+     * échouait donc exactement là où elle servait, sans rien signaler.
+     */
+    expect(echecDeBribe({ statusCode: 500, message: MESSAGE_CHROME })).toBe(true)
+    expect(echecDeBribe({ statusCode: 500, statusMessage: MESSAGE_SAFARI })).toBe(true)
+    expect(echecDeBribe(MESSAGE_FIREFOX)).toBe(true)
+    expect(echecDeBribe({ statusCode: 500, message: 'Boum' })).toBe(false)
+  })
+
   it('ne confond pas une erreur du composant lui-même avec une bribe manquante', () => {
     // Rejouer celle-ci deux fois de plus ne ferait que retarder l'affichage de l'erreur.
     expect(echecDeBribe(new Error("Cannot read properties of undefined (reading 'name')"))).toBe(

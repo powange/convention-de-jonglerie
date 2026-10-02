@@ -45,10 +45,32 @@ const ATTENTE_AVANT_REPRISE_MS = 300
  * « Importing a module script failed » (Safari). D'où le motif, et non une égalité de chaîne.
  */
 export function echecDeBribe(erreur: unknown): boolean {
-  const message = erreur instanceof Error ? erreur.message : String(erreur ?? '')
   return /dynamically imported module|Importing a module script failed|Unable to preload CSS/i.test(
-    message
+    messageDe(erreur)
   )
+}
+
+/**
+ * Le texte d'une erreur, quelle qu'en soit la forme.
+ *
+ * ⚠️ NE PAS SE FIER À `instanceof Error`. Une erreur qui arrive à la page d'erreur de Nuxt a été
+ * SÉRIALISÉE : c'est un objet nu, `{ statusCode, message, statusMessage }`, dont `instanceof`
+ * répond faux. Une première version lisait `erreur.message` uniquement pour une vraie `Error` et
+ * retombait sinon sur `String(erreur)`, soit `"[object Object]"` — la détection échouait donc
+ * précisément dans le cas de production qu'elle devait couvrir, sans rien signaler. C'est un test
+ * qui l'a montré, pas la relecture.
+ *
+ * `statusMessage` est lu aussi : Nuxt y recopie parfois le message, et l'ignorer rejetterait le
+ * cas dans la branche « vraie erreur ».
+ */
+function messageDe(erreur: unknown): string {
+  if (typeof erreur === 'string') return erreur
+  if (erreur instanceof Error) return erreur.message
+  if (erreur && typeof erreur === 'object') {
+    const objet = erreur as Record<string, unknown>
+    return [objet.message, objet.statusMessage].filter((v) => typeof v === 'string').join(' ')
+  }
+  return ''
 }
 
 /** Faut-il reprendre ? `tentative` vaut 1 au premier échec, comme le veut Vue. */
