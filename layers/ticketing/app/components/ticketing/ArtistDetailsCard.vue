@@ -88,12 +88,7 @@
             :key="performance.id"
             class="text-xs text-gray-600 dark:text-gray-400 ml-6"
           >
-            {{
-              new Date(performance.startDateTime).toLocaleString('fr-FR', {
-                dateStyle: 'short',
-                timeStyle: 'short',
-              })
-            }}
+            {{ horaireDeLaRepresentation(performance.startDateTime) }}
             <span v-if="performance.location"> - {{ performance.location }}</span>
           </div>
         </div>
@@ -142,7 +137,7 @@
 <script setup lang="ts">
 import type TicketingUserInfoSection from './TicketingUserInfoSection.vue'
 
-import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+import { formaterDateHeure, formaterJournee } from '~~/shared/utils/fuseau-edition'
 
 // Utiliser le composable pour obtenir la configuration des artistes
 const { getParticipantTypeConfig } = useParticipantTypes()
@@ -202,6 +197,23 @@ defineEmits<{
 }>()
 
 const { locale } = useI18n()
+
+/**
+ * L'horaire d'une représentation, dans le fuseau de l'ÉDITION.
+ *
+ * ⚠️ MÊME DÉFAUT QUE DANS LA CARTE DES BÉNÉVOLES, et dans la MÊME modale : un
+ * `toLocaleString('fr-FR')` figeait la langue et lisait l'heure dans le fuseau du NAVIGATEUR.
+ * Signalé sur les créneaux d'un bénévole ; les représentations d'un artiste sont à un clic de là
+ * et portaient la faute à l'identique. Le commentaire d'`entryValidatedAt`, plus bas, décrivait
+ * déjà cette correction — elle n'avait pas été reportée sur ce bloc.
+ *
+ * 📍 Le format compact est conservé : c'est le fuseau qui était faux, pas la mise en forme.
+ */
+const horaireDeLaRepresentation = (instant: Date | string) =>
+  formaterJournee(instant, props.fuseau, locale.value, {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  })
 
 /**
  * Qui a validé, et quand — à l'heure du lieu.
