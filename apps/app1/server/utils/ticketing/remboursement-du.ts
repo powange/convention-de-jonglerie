@@ -5,11 +5,13 @@
  * conditions doivent tenir ensemble, et en oublier une fait réclamer de l'argent qu'on ne doit pas
  * — ou taire une dette réelle.
  *
- * ⚠️ Ce fichier ne doit rien importer d'autre que ses voisins de `ticketing/` : il est chargé tel
- * quel par les tests unitaires, hors Nuxt.
+ * ⚠️ Ce fichier ne doit importer que ses voisins de `ticketing/` et `~~/shared/utils` : il est
+ * chargé tel quel par les tests unitaires, hors Nuxt.
  */
 
 import { ETATS_DE_BILLET_ANNULE } from './billets-qui-comptent'
+
+import { ligneSansTitulaire } from '~~/shared/utils/participant-anonyme'
 
 export interface BilletPourRemboursement {
   state: string
@@ -76,5 +78,75 @@ export function billetARembourser() {
     state: { in: [...ETATS_DE_BILLET_ANNULE] },
     refunded: false,
     order: COMMANDE_REGLEE,
+  }
+}
+
+/** Une ligne de commande dont on doit encore l'argent. */
+export interface LigneDueDeCommande {
+  id: number
+  name: string | null
+  amount: number
+  firstName: string | null
+  lastName: string | null
+}
+
+export interface DetteDeCommande {
+  /** Somme due pour toute la commande, en centimes. */
+  total: number
+  /** Le détail, pour que le guichet voie ce qu'il solde. */
+  lignes: LigneDueDeCommande[]
+  /**
+   * Les lignes dues concernent-elles PLUSIEURS personnes ?
+   *
+   * ⚠️ C'EST LA GARDE QUI ÉVITE DE RENDRE L'ARGENT D'UN TIERS. Une commande groupée paie pour
+   * plusieurs participants nommés — mesuré sur la base de développement : la commande 686 porte
+   * trois t-shirts à trois noms distincts, sous un même e-mail de payeur. Rendre « toute la
+   * commande » à qui présente un de ces billets donnerait à une personne l'argent des autres.
+   *
+   * 📍 Les lignes NON NOMMÉES ne comptent pas comme des personnes : ce sont les repas et options
+   * rattachés à la commande, que l'ajout au guichet remplit avec un nom de remplissage. C'est
+   * exactement le cas de la commande 937 — un titulaire, quatre repas — où le total doit bien
+   * être rendu en une fois.
+   */
+  nomsMultiples: boolean
+}
+
+/**
+ * Tout ce que la commande d'un billet doit encore, et à combien de personnes.
+ *
+ * Le guichet rend l'argent UNE fois, à la personne en face : afficher la seule ligne scannée lui
+ * faisait rendre 34 € sur une commande qui en devait 58 — quatre repas annulés restaient dus, sans
+ * que rien ne les annonce. Signalé sur la base de développement, commande 937.
+ */
+export function detteDeCommande(
+  lignes: Array<LigneDueDeCommande & Pick<BilletPourRemboursement, 'state' | 'refunded'>>,
+  order: BilletPourRemboursement['order']
+): DetteDeCommande {
+  const dues = lignes.filter(
+    (ligne) =>
+      montantARembourser({
+        state: ligne.state,
+        refunded: ligne.refunded,
+        amount: ligne.amount,
+        order,
+      }) !== null
+  )
+
+  const titulaires = new Set(
+    dues
+      .filter((ligne) => !ligneSansTitulaire(ligne))
+      .map((ligne) => `${(ligne.firstName ?? '').trim()}|${(ligne.lastName ?? '').trim()}`)
+  )
+
+  return {
+    total: dues.reduce((somme, ligne) => somme + ligne.amount, 0),
+    lignes: dues.map(({ id, name, amount, firstName, lastName }) => ({
+      id,
+      name,
+      amount,
+      firstName,
+      lastName,
+    })),
+    nomsMultiples: titulaires.size > 1,
   }
 }

@@ -13,7 +13,7 @@ import {
 } from '#server/utils/ticketing/handout-items'
 import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
 import { resoudreLesValidateurs } from '#server/utils/ticketing/nom-du-validateur'
-import { montantARembourser } from '#server/utils/ticketing/remboursement-du'
+import { detteDeCommande, montantARembourser } from '#server/utils/ticketing/remboursement-du'
 import {
   normaliserPhases,
   phasesDuBenevole,
@@ -633,6 +633,30 @@ export default wrapApiHandler(
                     paymentMethod: orderItem.order.paymentMethod,
                   },
                 }),
+                /**
+                 * Ce que doit la COMMANDE entière, et à combien de personnes.
+                 *
+                 * ⚠️ Le guichet rend l'argent UNE fois, à qui se présente. N'annoncer que la ligne
+                 * scannée lui faisait rendre 34 € sur une commande qui en devait 58 : quatre repas
+                 * annulés restaient dus, et rien ne les signalait (commande 937, base de
+                 * développement). `nomsMultiples` est la garde — une commande groupée à plusieurs
+                 * titulaires ne se solde pas d'un geste, sous peine de rendre l'argent d'un tiers.
+                 */
+                detteDeLaCommande: detteDeCommande(
+                  orderItem.order.items.map((ligne) => ({
+                    id: ligne.id,
+                    name: ligne.name,
+                    amount: ligne.amount,
+                    firstName: ligne.firstName,
+                    lastName: ligne.lastName,
+                    state: ligne.state,
+                    refunded: ligne.refunded,
+                  })),
+                  {
+                    status: orderItem.order.status,
+                    paymentMethod: orderItem.order.paymentMethod,
+                  }
+                ),
                 qrCode: orderItem.qrCode,
                 user: {
                   firstName: orderItem.firstName,

@@ -12,7 +12,7 @@ import {
 } from '#server/utils/ticketing/handout-items'
 import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
 import { resoudreLesValidateurs } from '#server/utils/ticketing/nom-du-validateur'
-import { montantARembourser } from '#server/utils/ticketing/remboursement-du'
+import { detteDeCommande, montantARembourser } from '#server/utils/ticketing/remboursement-du'
 import { sanitizeEmail } from '#server/utils/validation-helpers'
 import {
   normaliserPhases,
@@ -610,6 +610,23 @@ export default wrapApiHandler(
                 amount: item.amount,
                 order: { status: item.order.status, paymentMethod: item.order.paymentMethod },
               }),
+              /**
+               * La dette de la COMMANDE entière — même contrat qu'au scan, et pour la même raison :
+               * trouver quelqu'un par son nom ou par son code QR ne doit pas annoncer deux sommes
+               * différentes.
+               */
+              detteDeLaCommande: detteDeCommande(
+                item.order.items.map((ligne) => ({
+                  id: ligne.id,
+                  name: ligne.name,
+                  amount: ligne.amount,
+                  firstName: ligne.firstName,
+                  lastName: ligne.lastName,
+                  state: ligne.state,
+                  refunded: ligne.refunded,
+                })),
+                { status: item.order.status, paymentMethod: item.order.paymentMethod }
+              ),
               qrCode: item.qrCode,
               user: {
                 firstName: item.firstName,
