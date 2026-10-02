@@ -480,7 +480,8 @@ import {
 import { useVolunteerTeams, useVolunteerSettings } from '#imports'
 
 const { t } = useI18n()
-const { formatDateTimeRange, formatDate } = useDateFormat()
+const { formatDateTimeRange: formaterPlage, formatDate: formaterDate } = useDateFormat()
+
 const toast = useToast()
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -578,6 +579,27 @@ await editionStore.fetchEditionById(editionId)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 /**
+ * Les formateurs transmis aux cartes, déjà ancrés au fuseau de l'ÉDITION.
+ *
+ * ⚠️ POURQUOI LES LIER ICI PLUTÔT QUE DE LES PASSER NUS. Sans fuseau, `useDateFormat` retombe sur
+ * `Europe/Paris` — un repli délibéré, mais qui n'est juste que pour les éditions françaises. Ces
+ * deux fonctions descendent dans le planning et dans la modale des créneaux d'un bénévole : une
+ * édition au Québec y annonçait des heures parisiennes, et un créneau de fin de soirée pouvait
+ * même changer de journée.
+ *
+ * Les lier une fois vaut mieux que d'ajouter l'argument à chaque appel chez l'enfant : un appel
+ * oublié ne se voit pas, il affiche simplement une autre heure.
+ *
+ * 📍 DÉCLARÉ SOUS `edition`, et pas plus haut : un `computed` qui lirait une référence pas encore
+ * initialisée fait lever le `setup` entier, donc une page blanche — ni le typage ni les tests ne
+ * le voient. Le dépôt l'a déjà payé une fois.
+ */
+const fuseauDeLEdition = computed(() => (edition.value as any)?.timezone ?? null)
+const formatDate = (date: string) => formaterDate(date, fuseauDeLEdition.value)
+const formatDateTimeRange = (debut: string, fin: string) =>
+  formaterPlage(debut, fin, fuseauDeLEdition.value)
+
+/**
  * La page publique n'est accessible que si `volunteersPagePublic` est activé.
  *
  * Trois exceptions, et elles doivent correspondre **exactement** à ce que l'onglet de l'en-tête
@@ -647,9 +669,7 @@ const planningPublie = computed(() => volunteersInfo.value?.planningPublished ==
 const editionName = computed(() => (edition.value ? getEditionDisplayName(edition.value) : ''))
 
 const editionDateRange = computed(() =>
-  edition.value
-    ? formatDateTimeRange(edition.value.startDate, edition.value.endDate, edition.value.timezone)
-    : ''
+  edition.value ? formatDateTimeRange(edition.value.startDate, edition.value.endDate) : ''
 )
 
 const seoTitle = computed(() => {

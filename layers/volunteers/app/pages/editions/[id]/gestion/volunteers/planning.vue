@@ -604,18 +604,35 @@ const formatDateTimeRange = (start: string, end: string) => {
 /**
  * Un instant seul, sans plage. Une représentation dont la durée n'est pas renseignée n'a pas de
  * fin connue : afficher « 20:00 - 20:00 » laisserait croire à un spectacle de durée nulle.
- * Même lecture locale des composants que ci-dessus, pour ne pas décaler d'un fuseau.
+ *
+ * ⚠️ CE QUE DISAIT LE COMMENTAIRE D'AVANT ÉTAIT FAUX : « même lecture locale des composants que
+ * ci-dessus, pour ne pas décaler d'un fuseau ». `getHours()` et `getMinutes()` lisent l'heure du
+ * NAVIGATEUR, pas celle du lieu — c'est précisément le décalage que le formateur voisin avait
+ * déjà corrigé. L'heure d'un spectacle dans les avertissements de chevauchement s'affichait donc
+ * décalée pour qui consultait depuis un autre fuseau, et pouvait changer de jour en soirée.
+ *
+ * Deux formateurs `Intl` avec un `timeZone`, comme la plage ci-dessus : une seule façon de lire
+ * l'heure sur cet écran.
  */
 const formatDateTime = (value: string) => {
   const instant = new Date(value.includes('T') ? value : value + 'T00:00:00')
+  if (Number.isNaN(instant.getTime())) return ''
+
+  const zone = fuseauUtilisable(fuseauEdition.value)
   const jour = new Intl.DateTimeFormat('fr-FR', {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
-  }).format(new Date(instant.getFullYear(), instant.getMonth(), instant.getDate()))
-  const heures = instant.getHours().toString().padStart(2, '0')
-  const minutes = instant.getMinutes().toString().padStart(2, '0')
-  return `${jour} ${heures}:${minutes}`
+    timeZone: zone,
+  }).format(instant)
+  const heure = new Intl.DateTimeFormat('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: zone,
+  }).format(instant)
+
+  return `${jour} ${heure}`
 }
 
 // Détection des chevauchements de créneaux

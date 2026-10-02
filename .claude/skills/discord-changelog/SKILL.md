@@ -48,7 +48,9 @@ rien annoncer.
 
 ```bash
 git log origin/main -1 --format='%h %s'
-curl -s --max-time 20 https://juggling-convention.com/_nuxt/builds/latest.json
+# Le répertoire des assets porte l'empreinte du commit déployé.
+# (`/_nuxt/builds/latest.json` n'existe plus : il répond 404.)
+curl -s --max-time 30 https://juggling-convention.com/ | grep -oE '/_nuxt-[A-Za-z0-9]+/' | head -1
 ```
 
 Si le déploiement n'a pas eu lieu, **s'arrêter** et le dire : proposer `/deploy prod`, ou rédiger

@@ -644,7 +644,14 @@ const exportToPdf = async () => {
           doc.setFontSize(9)
           doc.setFont('helvetica', 'normal')
           doc.setTextColor(107, 114, 128) // Gris
-          const timeRange = props.formatDateTimeRange(slot.startDateTime, slot.endDateTime)
+          // Le fuseau est passé ici comme il l'est pour le sous-titre, quelques lignes plus
+          // haut. L'oublier faisait retomber le formateur de la page PUBLIQUE sur Europe/Paris :
+          // le PDF annonçait des heures parisiennes pour une édition qui n'y est pas.
+          const timeRange = props.formatDateTimeRange(
+            slot.startDateTime,
+            slot.endDateTime,
+            props.edition?.timezone
+          )
           const timeRangeWidth = doc.getTextWidth(timeRange)
           doc.text(timeRange, pageWidth - margin - timeRangeWidth, currentY)
           currentY += 6

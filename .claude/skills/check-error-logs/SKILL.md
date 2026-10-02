@@ -156,7 +156,8 @@ Uniquement si au moins une correction (cause certaine) a été appliquée :
    que les corrections sont commit/push mais que le déploiement n'a pas pu être déclenché.
 
 4. **Contrôler la bascule sur l'API, et pas seulement sur l'accueil.** Attendre que
-   `/_nuxt/builds/latest.json` change d'identifiant, puis vérifier une page ET un endpoint qui
+   le répertoire des assets porte le nouveau commit (`curl -s $URL/ | grep -oE '/_nuxt-[A-Za-z0-9]+/'`
+   — `/_nuxt/builds/latest.json` n'existe plus et répond 404), puis vérifier une page ET un endpoint qui
    interroge la base. L'accueil peut répondre 200 alors que tout ce qui touche la base échoue :
    c'est exactement ce qui s'est produit lors de la panne du 23 août 2026, où seul l'appel à une
    route d'API a révélé l'étendue du problème.

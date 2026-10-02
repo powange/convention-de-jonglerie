@@ -124,14 +124,7 @@
             </UBadge>
           </div>
           <div class="text-xs text-gray-600 dark:text-gray-400 ml-6">
-            {{
-              new Date(slot.startDateTime).toLocaleString('fr-FR', {
-                dateStyle: 'short',
-                timeStyle: 'short',
-              })
-            }}
-            -
-            {{ new Date(slot.endDateTime).toLocaleString('fr-FR', { timeStyle: 'short' }) }}
+            {{ debutDuCreneau(slot.startDateTime) }} - {{ finDuCreneau(slot.endDateTime) }}
           </div>
         </div>
       </div>
@@ -166,7 +159,7 @@
 <script setup lang="ts">
 import type TicketingUserInfoSection from './TicketingUserInfoSection.vue'
 
-import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+import { formaterDateHeure, formaterHeure, formaterJournee } from '~~/shared/utils/fuseau-edition'
 
 // Utiliser le composable pour obtenir la configuration des bénévoles
 const { getParticipantTypeConfig } = useParticipantTypes()
@@ -228,6 +221,27 @@ defineEmits<{
 }>()
 
 const { locale } = useI18n()
+
+/**
+ * Les horaires d'un créneau, dans le fuseau de l'ÉDITION.
+ *
+ * ⚠️ CE QUI ÉTAIT ÉCRIT ICI : `new Date(slot.startDateTime).toLocaleString('fr-FR', …)`. Deux
+ * défauts d'un coup, et c'est exactement ceux que le commentaire d'`entryValidatedAt`, vingt
+ * lignes plus bas, décrit comme corrigés — la correction n'avait pas été reportée sur le bloc du
+ * dessus : la langue était figée pour tout le monde, et l'heure était lue dans le fuseau du
+ * NAVIGATEUR. Au guichet d'une convention à l'étranger, ou simplement pour un organisateur en
+ * déplacement, les créneaux s'affichaient décalés — sans rien qui le signale.
+ *
+ * 📍 Le format compact est conservé tel quel (`01/08/26 14:00`) : la ligne est en `text-xs` à côté
+ * du titre du créneau, et c'est le FUSEAU qui était faux, pas la mise en forme.
+ */
+const debutDuCreneau = (instant: Date | string) =>
+  formaterJournee(instant, props.fuseau, locale.value, {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  })
+
+const finDuCreneau = (instant: Date | string) => formaterHeure(instant, props.fuseau, locale.value)
 
 /**
  * Qui a validé, et quand — à l'heure du lieu.
