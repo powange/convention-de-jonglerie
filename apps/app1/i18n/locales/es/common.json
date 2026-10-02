@@ -522,6 +522,8 @@
     "cannot_publish_comment": "No se puede publicar el comentario",
     "cannot_publish_reply": "No se puede publicar la respuesta",
     "cannot_remove_favorite": "No se puede eliminar de favoritos",
+    "chunk_load_failed_description": "La conexión se interrumpió durante la carga. Vuelve a intentarlo: el resto de la página sigue funcionando.",
+    "chunk_load_failed_title": "No se ha podido cargar este bloque",
     "conflict": "Conflicto con datos existentes",
     "content_required": "El contenido es requerido",
     "content_too_long": "El contenido no puede exceder {max} caracteres",

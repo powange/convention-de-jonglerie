@@ -522,6 +522,8 @@
     "cannot_publish_comment": "Kan ikke offentliggøre kommentar",
     "cannot_publish_reply": "Kan ikke offentliggøre svar",
     "cannot_remove_favorite": "Kan ikke fjerne fra favoritter",
+    "chunk_load_failed_description": "Forbindelsen blev afbrudt under indlæsningen. Prøv igen – resten af siden kan stadig bruges.",
+    "chunk_load_failed_title": "Dette afsnit kunne ikke indlæses",
     "conflict": "Konflikt med eksisterende data",
     "content_required": "Indhold er påkrævet",
     "content_too_long": "Indholdet må ikke overstige {max} tegn",

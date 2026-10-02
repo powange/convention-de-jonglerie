@@ -640,19 +640,31 @@ import {
 
 const { money } = useEditionCurrency()
 
-const AccessValidationChart = defineAsyncComponent(
+/**
+ * Quatre graphiques chargés à la demande. `composantDiffere` rejoue deux fois une bribe qui
+ * n'arrive pas, là où `defineAsyncComponent` n'essayait qu'une fois — voir
+ * `apps/app1/app/utils/composant-differe.ts` pour le défaut constaté en production.
+ *
+ * 📍 CE QUI MANQUE ENCORE ICI, et qui est délibéré : les pages publiques entourent en plus leur
+ * composant d'un `<NuxtErrorBoundary>`, qui contient l'échec définitif au lieu de laisser la page
+ * entière disparaître. Les quatre graphiques de cet écran sont pris dans des chaînes
+ * `v-if` / `v-else-if` ; y glisser une frontière demande de déplacer ces conditions, ce qui n'a
+ * pas sa place dans un correctif d'urgence. Après les deux reprises, cet écran se comporte donc
+ * encore comme avant.
+ */
+const AccessValidationChart = composantDiffere(
   () => import('~/components/ticketing/stats/AccessValidationChart.vue')
 )
 
-const OrderSourceChart = defineAsyncComponent(
+const OrderSourceChart = composantDiffere(
   () => import('~/components/ticketing/stats/OrderSourceChart.vue')
 )
 
-const PurchaseChart = defineAsyncComponent(
+const PurchaseChart = composantDiffere(
   () => import('~/components/ticketing/stats/PurchaseChart.vue')
 )
 
-const AffluenceChart = defineAsyncComponent(
+const AffluenceChart = composantDiffere(
   () => import('~/components/ticketing/stats/AffluenceChart.vue')
 )
 

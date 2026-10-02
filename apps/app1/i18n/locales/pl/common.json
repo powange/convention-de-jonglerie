@@ -522,6 +522,8 @@
     "cannot_publish_comment": "Nie można opublikować komentarza",
     "cannot_publish_reply": "Nie można opublikować odpowiedzi",
     "cannot_remove_favorite": "Nie można usunąć z ulubionych",
+    "chunk_load_failed_description": "Połączenie zostało przerwane w trakcie wczytywania. Spróbuj ponownie — reszta strony nadal działa.",
+    "chunk_load_failed_title": "Nie udało się wczytać tego bloku",
     "conflict": "Konflikt z istniejącymi danymi",
     "content_required": "Treść jest wymagana",
     "content_too_long": "Treść nie może przekroczyć {max} znaków",
