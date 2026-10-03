@@ -6,17 +6,32 @@
         <h2 class="text-lg font-semibold">{{ $t('edition.ticketing.entry_stats') }}</h2>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <!--
+        ⚠️ PAS DE NOMBRE DE COLONNES FIGÉ, et c'est la correction de fond.
+
+        La grille était `grid-cols-1 md:grid-cols-2 lg:grid-cols-5`. Or le nombre de cartes VARIE
+        de deux à cinq : bénévoles, artistes et organisateurs ne s'affichent que si l'édition en
+        compte. Cinq colonnes imposées laissaient donc trois colonnes vides sur une édition sans
+        bénévoles ni artistes, et deux colonnes pour cinq cartes entre 768 et 1024 px — le cas le
+        plus courant, une fenêtre de portable à demi réduite ou une tablette.
+
+        `auto-fit` + `minmax` laisse le NAVIGATEUR décider combien de cartes tiennent, à partir
+        d'une largeur minimale lisible. Plus aucun point de rupture : la mise en page suit la
+        largeur réelle du conteneur, à toutes les tailles, et s'adapte d'elle-même au nombre de
+        cartes présentes. C'est aussi ce qui évite de caler quoi que ce soit sur une taille
+        d'écran mesurée.
+      -->
+      <div class="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(13rem,1fr))]">
         <!-- Total des entrées validées -->
         <div
           class="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border-2 border-white dark:border-white"
         >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-sm text-gray-600 dark:text-gray-400 truncate">
                 {{ $t('edition.ticketing.total_entries') }}
               </p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white">
+              <p class="text-2xl font-bold text-gray-900 dark:text-white tabular-nums">
                 {{ totalValide }}
               </p>
               <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
@@ -24,7 +39,11 @@
                 {{ $t('edition.ticketing.validated_today').toLowerCase() }}
               </p>
             </div>
-            <UIcon name="i-heroicons-users" class="text-gray-600 dark:text-gray-400" size="32" />
+            <UIcon
+              name="i-heroicons-users"
+              class="text-gray-600 dark:text-gray-400 shrink-0"
+              size="32"
+            />
           </div>
         </div>
 
@@ -36,13 +55,13 @@
           type="button"
           @click="parPersonne = !parPersonne"
         >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-sm text-gray-600 dark:text-gray-400 truncate">
                 {{ $t('ticketing.stats.participants') }}
               </p>
               <p
-                :class="`text-2xl font-bold ${ticketConfig.textClass} ${ticketConfig.darkTextClass}`"
+                :class="`text-2xl font-bold tabular-nums ${ticketConfig.textClass} ${ticketConfig.darkTextClass}`"
               >
                 {{ participantsValides }} / {{ participantsTotal }}
               </p>
@@ -62,7 +81,11 @@
                 }}
               </p>
             </div>
-            <UIcon :name="ticketConfig.icon" :class="ticketConfig.iconColorClass" size="32" />
+            <UIcon
+              :name="ticketConfig.icon"
+              :class="[ticketConfig.iconColorClass, 'shrink-0']"
+              size="32"
+            />
           </div>
         </button>
 
@@ -72,13 +95,13 @@
           :class="`p-4 ${volunteerConfig.bgClass} ${volunteerConfig.darkBgClass} ${volunteerConfig.hoverBgClass} ${volunteerConfig.darkHoverBgClass} rounded-lg transition-colors cursor-pointer text-left w-full`"
           @click="$emit('show-volunteers-not-validated')"
         >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-sm text-gray-600 dark:text-gray-400 truncate">
                 {{ $t('ticketing.stats.volunteers') }}
               </p>
               <p
-                :class="`text-2xl font-bold ${volunteerConfig.textClass} ${volunteerConfig.darkTextClass}`"
+                :class="`text-2xl font-bold tabular-nums ${volunteerConfig.textClass} ${volunteerConfig.darkTextClass}`"
               >
                 {{ stats.volunteersValidated }} / {{ stats.totalVolunteers }}
               </p>
@@ -86,7 +109,11 @@
                 {{ stats.volunteersValidatedToday }} aujourd'hui
               </p>
             </div>
-            <UIcon :name="volunteerConfig.icon" :class="volunteerConfig.iconColorClass" size="32" />
+            <UIcon
+              :name="volunteerConfig.icon"
+              :class="[volunteerConfig.iconColorClass, 'shrink-0']"
+              size="32"
+            />
           </div>
         </button>
 
@@ -96,13 +123,13 @@
           :class="`p-4 ${artistConfig.bgClass} ${artistConfig.darkBgClass} ${artistConfig.hoverBgClass} ${artistConfig.darkHoverBgClass} rounded-lg transition-colors cursor-pointer text-left w-full`"
           @click="$emit('show-artists-not-validated')"
         >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-sm text-gray-600 dark:text-gray-400 truncate">
                 {{ $t('ticketing.stats.artists') }}
               </p>
               <p
-                :class="`text-2xl font-bold ${artistConfig.textClass} ${artistConfig.darkTextClass}`"
+                :class="`text-2xl font-bold tabular-nums ${artistConfig.textClass} ${artistConfig.darkTextClass}`"
               >
                 {{ stats.artistsValidated }} / {{ stats.totalArtists }}
               </p>
@@ -110,7 +137,11 @@
                 {{ stats.artistsValidatedToday }} aujourd'hui
               </p>
             </div>
-            <UIcon :name="artistConfig.icon" :class="artistConfig.iconColorClass" size="32" />
+            <UIcon
+              :name="artistConfig.icon"
+              :class="[artistConfig.iconColorClass, 'shrink-0']"
+              size="32"
+            />
           </div>
         </button>
 
@@ -120,13 +151,13 @@
           :class="`p-4 ${organizerConfig.bgClass} ${organizerConfig.darkBgClass} ${organizerConfig.hoverBgClass} ${organizerConfig.darkHoverBgClass} rounded-lg transition-colors cursor-pointer text-left w-full`"
           @click="$emit('show-organizers-not-validated')"
         >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-sm text-gray-600 dark:text-gray-400 truncate">
                 {{ $t('ticketing.stats.organizers') }}
               </p>
               <p
-                :class="`text-2xl font-bold ${organizerConfig.textClass} ${organizerConfig.darkTextClass}`"
+                :class="`text-2xl font-bold tabular-nums ${organizerConfig.textClass} ${organizerConfig.darkTextClass}`"
               >
                 {{ stats.organizersValidated }} / {{ stats.totalOrganizers }}
               </p>
@@ -134,7 +165,11 @@
                 {{ stats.organizersValidatedToday }} aujourd'hui
               </p>
             </div>
-            <UIcon :name="organizerConfig.icon" :class="organizerConfig.iconColorClass" size="32" />
+            <UIcon
+              :name="organizerConfig.icon"
+              :class="[organizerConfig.iconColorClass, 'shrink-0']"
+              size="32"
+            />
           </div>
         </button>
       </div>
