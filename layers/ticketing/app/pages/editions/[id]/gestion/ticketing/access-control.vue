@@ -75,7 +75,7 @@
               </UButton>
 
               <!-- Zone de recherche -->
-              <div class="space-y-4">
+              <div ref="zoneDeRecherche" class="space-y-4">
                 <UFormField :help="$t('ticketing.access_control.search_description')">
                   <UFieldGroup class="w-full">
                     <UInput
@@ -537,10 +537,18 @@
             />
 
             <div v-else class="space-y-2 max-h-[60vh] overflow-y-auto">
-              <div
+              <button
                 v-for="volunteer in volunteersNotValidated"
                 :key="volunteer.id"
-                class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                type="button"
+                class="w-full text-left p-3 bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors enabled:cursor-pointer enabled:hover:bg-gray-100 dark:enabled:hover:bg-gray-700"
+                :disabled="!volunteer.user?.email"
+                :title="
+                  volunteer.user?.email
+                    ? $t('ticketing.access_control.search_this_person')
+                    : undefined
+                "
+                @click="rechercherDepuisLaListe(volunteer.user?.email)"
               >
                 <UiUserDisplayForAdmin :user="volunteer.user" size="md" :show-email="true" />
                 <div
@@ -550,7 +558,7 @@
                   {{ $t('ticketing.access_control.teams_label', volunteer.teams.length) }}
                   {{ volunteer.teams.map((t) => t.name).join(', ') }}
                 </div>
-              </div>
+              </button>
             </div>
           </div>
         </template>
@@ -598,10 +606,16 @@
             />
 
             <div v-else class="space-y-2 max-h-[60vh] overflow-y-auto">
-              <div
+              <button
                 v-for="artist in artistsNotValidated"
                 :key="artist.id"
-                class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                type="button"
+                class="w-full text-left p-3 bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors enabled:cursor-pointer enabled:hover:bg-gray-100 dark:enabled:hover:bg-gray-700"
+                :disabled="!artist.user?.email"
+                :title="
+                  artist.user?.email ? $t('ticketing.access_control.search_this_person') : undefined
+                "
+                @click="rechercherDepuisLaListe(artist.user?.email)"
               >
                 <UiUserDisplayForAdmin :user="artist.user" size="md" :show-email="true" />
                 <div
@@ -611,7 +625,7 @@
                   {{ $t('ticketing.access_control.shows_label', artist.shows.length) }}
                   {{ artist.shows.map((s) => s.title).join(', ') }}
                 </div>
-              </div>
+              </button>
             </div>
           </div>
         </template>
@@ -657,10 +671,18 @@
             />
 
             <div v-else class="space-y-2 max-h-[60vh] overflow-y-auto">
-              <div
+              <button
                 v-for="organizer in organizersNotValidated"
                 :key="organizer.id"
-                class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                type="button"
+                class="w-full text-left p-3 bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors enabled:cursor-pointer enabled:hover:bg-gray-100 dark:enabled:hover:bg-gray-700"
+                :disabled="!organizer.user?.email"
+                :title="
+                  organizer.user?.email
+                    ? $t('ticketing.access_control.search_this_person')
+                    : undefined
+                "
+                @click="rechercherDepuisLaListe(organizer.user?.email)"
               >
                 <UiUserDisplayForAdmin :user="organizer.user" size="md" :show-email="true">
                   <template v-if="organizer.title" #badge>
@@ -669,7 +691,7 @@
                     </UBadge>
                   </template>
                 </UiUserDisplayForAdmin>
-              </div>
+              </button>
             </div>
           </div>
         </template>
@@ -1250,6 +1272,43 @@ const searchTickets = () => {
   if (!searchTerm.value || searchTerm.value.length < 2 || searching.value) return
   searchResults.value = null
   executeSearchTickets()
+}
+
+/**
+ * Depuis une liste de « non validés », aller droit à la fiche de la personne.
+ *
+ * ⚠️ POURQUOI PAR L'ADRESSE E-MAIL. C'est la seule donnée que ces trois listes partagent avec la
+ * recherche du guichet, et la seule qui identifie quelqu'un sans ambiguïté : deux bénévoles peuvent
+ * porter le même nom, et le pseudo n'est pas cherché par ce point d'API.
+ *
+ * 📍 On ferme les trois modales, pas seulement celle d'où l'on vient : une seule est ouverte à la
+ * fois, mais les fermer toutes évite qu'un ajout de liste demain laisse un panneau derrière lui.
+ *
+ * Sans adresse, le bouton est désactivé — plutôt qu'un clic qui lance une recherche vide et rend
+ * un écran sans résultat, qu'on prendrait pour une panne.
+ */
+const zoneDeRecherche = ref<HTMLElement | null>(null)
+
+const rechercherDepuisLaListe = (email: string | null | undefined) => {
+  if (!email) return
+
+  volunteersNotValidatedModalOpen.value = false
+  artistsNotValidatedModalOpen.value = false
+  organizersNotValidatedModalOpen.value = false
+
+  searchTerm.value = email
+  searchTickets()
+
+  /*
+   * ⚠️ RAMENER LE LECTEUR À LA RECHERCHE. Elle se tient tout en HAUT de la page, alors que les
+   * cartes de statistiques — d'où l'on vient — sont plus bas : fermer la modale laisserait les
+   * résultats hors de l'écran, et le clic passerait pour sans effet.
+   *
+   * `nextTick` parce que le panneau doit être refermé avant qu'on mesure où défiler.
+   */
+  nextTick(() => {
+    zoneDeRecherche.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  })
 }
 
 const selectSearchResult = (result: any) => {
