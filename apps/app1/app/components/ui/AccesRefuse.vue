@@ -29,6 +29,8 @@
       variant="solid"
       icon="i-heroicons-shield-check"
       :label="t('pages.access_denied.enable_admin_mode')"
+      :loading="bascule"
+      :disabled="bascule"
       @click="basculerEnModeAdmin"
     />
   </div>
@@ -73,6 +75,19 @@ withDefaults(
 const peutBasculerEnAdmin = computed(() => authStore.isGlobalAdmin && !authStore.adminMode)
 
 /**
+ * L'état de la bascule, et ce qu'il sert vraiment.
+ *
+ * ⚠️ IL NE S'AGIT PAS D'ORNEMENT. Le rechargement qui suit prend une seconde pendant laquelle
+ * l'écran ne bouge pas : sans ce témoin, le clic paraît sans effet et on clique à nouveau.
+ * Signalé à l'usage — « le bouton me recharge complètement la page » — et c'est bien le fait que
+ * rien ne l'annonce qui surprend, pas le rechargement lui-même.
+ *
+ * 📍 Il garde aussi du double clic : `enableAdminMode` est idempotent, mais déclencher deux
+ * rechargements l'est moins.
+ */
+const bascule = ref(false)
+
+/**
  * ⚠️ UN RECHARGEMENT DUR, ET C'EST VOULU. `enableAdminMode()` pose un cookie que le SERVEUR lit :
  * tant que les données n'ont pas été redemandées avec lui, l'écran afficherait le même refus et le
  * bouton paraîtrait sans effet. Chacun des 47 écrans charge ses données à sa façon ; recharger est
@@ -81,8 +96,17 @@ const peutBasculerEnAdmin = computed(() => authStore.isGlobalAdmin && !authStore
  * `window.location.reload()` plutôt que `reloadNuxtApp()` : ce dernier porte une garde anti-boucle
  * de dix secondes par chemin, qui refuserait un second clic. Un geste de l'utilisateur doit
  * toujours agir.
+ *
+ * 📍 POURQUOI PAS UNE SIMPLE BASCULE, SANS RECHARGER. Les permissions du store tiennent déjà
+ * compte du mode admin : l'affichage basculerait instantanément. Mesuré pourtant, 16 des 47 écrans
+ * chargent leurs données au montage SANS vérifier l'accès — leur requête a donc déjà essuyé un
+ * 403, et la page s'ouvrirait avec des listes vides. Un écran qui a l'air de marcher et qui ment
+ * est pire qu'une seconde d'attente. Rendre ces 16 écrans capables de recharger à l'ouverture de
+ * l'accès est un lot à part, pas une ligne ici.
  */
 function basculerEnModeAdmin() {
+  if (bascule.value) return
+  bascule.value = true
   authStore.enableAdminMode()
   window.location.reload()
 }
