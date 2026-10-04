@@ -52,6 +52,16 @@
             :required="true"
             :description="locationLabels.cityHint"
           >
+            <!--
+              ⚠️ LES DEUX `reset-search-term-*` SONT À `false`, ET C'EST LE CORRECTIF.
+
+              `UInputMenu` vide le terme de recherche À LA SÉLECTION et AU DÉPART DU CHAMP, par
+              défaut. Or c'est ce terme qui alimente `form.locationCity` : on choisissait
+              « Marseille » dans la liste, le champ l'affichait, et le modèle recevait une chaîne
+              VIDE — « la ville n'est pas valide, il faut la rentrer », sur une ville qu'on voyait
+              à l'écran. Le départ du champ produisait le même effet sur une saisie libre, ce qui
+              défaisait en silence l'intention écrite plus bas : « ce que l'on tape EST la ville ».
+            -->
             <UInputMenu
               v-model="selectedCity"
               v-model:search-term="searchTerm"
@@ -63,6 +73,8 @@
               class="w-full"
               ignore-filter
               label-key="name"
+              :reset-search-term-on-select="false"
+              :reset-search-term-on-blur="false"
             >
               <template #item-label="{ item }">
                 <div>
@@ -540,9 +552,14 @@ watch(searchTerm, (saisie) => {
 })
 
 watch(selectedCity, (newCity) => {
-  if (newCity) {
-    form.locationCity = newCity.name
-  }
+  if (!newCity) return
+  form.locationCity = newCity.name
+  /*
+   * Le champ affiche le terme de recherche : sans cette ligne, choisir une suggestion laisserait
+   * à l'écran ce qu'on avait commencé à taper (« Marse ») plutôt que le libellé retenu. Les deux
+   * `reset-search-term-*` étant désormais à `false`, plus personne ne l'écrase après nous.
+   */
+  searchTerm.value = newCity.name
 })
 
 // Initialiser selectedCity si on édite
