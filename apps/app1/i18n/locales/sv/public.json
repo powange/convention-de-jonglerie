@@ -17,6 +17,7 @@
   "pages": {
     "access_denied": {
       "description": "Du har inte rätt att komma åt den här sidan.",
+      "enable_admin_mode": "Aktivera administratörsläge",
       "title": "Åtkomst nekad",
       "volunteers_description": "Du har inte de nödvändiga behörigheterna för att visa volontäransökningar."
     },

@@ -4,7 +4,7 @@
       <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!canAccess">
-      <p class="text-red-500">{{ $t('errors.access_denied') }}</p>
+      <UiAccesRefuse />
     </div>
     <div v-else-if="!show">
       <p class="text-red-500">{{ $t('gestion.shows.show_not_found') }}</p>

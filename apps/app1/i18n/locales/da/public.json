@@ -17,6 +17,7 @@
   "pages": {
     "access_denied": {
       "description": "Du har ikke rettigheder til at få adgang til denne side.",
+      "enable_admin_mode": "Aktivér administratortilstand",
       "title": "Adgang nægtet",
       "volunteers_description": "Du har ikke de nødvendige rettigheder til at se frivilligansøgninger."
     },

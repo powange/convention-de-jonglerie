@@ -17,6 +17,7 @@
   "pages": {
     "access_denied": {
       "description": "Je hebt niet de rechten om deze pagina te bekijken.",
+      "enable_admin_mode": "Beheerdersmodus inschakelen",
       "title": "Toegang geweigerd",
       "volunteers_description": "U heeft niet de benodigde rechten om de vrijwilligersaanvragen te bekijken."
     },

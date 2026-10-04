@@ -7,13 +7,7 @@
       <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
-      <UAlert
-        icon="i-heroicons-exclamation-triangle"
-        color="error"
-        variant="soft"
-        :title="$t('pages.access_denied.title')"
-        :description="$t('pages.access_denied.description')"
-      />
+      <UiAccesRefuse />
     </div>
     <!-- Fonctionnalité éteinte : ce n'est pas un refus de droits, et le dire ainsi épargne de
          chercher une permission qu'on a déjà. L'écart avec les autres modules est assumé — un

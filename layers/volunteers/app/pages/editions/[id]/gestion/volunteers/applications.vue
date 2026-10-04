@@ -7,13 +7,7 @@
       <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
-      <UAlert
-        icon="i-heroicons-exclamation-triangle"
-        color="error"
-        variant="soft"
-        :title="$t('pages.access_denied.title')"
-        :description="$t('pages.access_denied.description')"
-      />
+      <UiAccesRefuse />
     </div>
     <div v-else>
       <!-- Titre de la page. Empilé sur mobile : côte à côte, le bouton gardait sa largeur
@@ -106,16 +100,15 @@
           </div>
         </div>
 
-        <!-- Message si pas les permissions -->
-        <UCard v-if="!canViewVolunteersTable && !editionStore.loading && authStore.isAuthenticated">
-          <div class="text-center py-12">
-            <UIcon name="i-heroicons-lock-closed" class="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h2 class="text-xl font-semibold mb-2">{{ $t('pages.access_denied.title') }}</h2>
-            <p class="text-gray-600 dark:text-gray-400">
-              {{ $t('pages.access_denied.volunteers_description') }}
-            </p>
-          </div>
-        </UCard>
+        <!--
+          Refus du TABLEAU seul : la page reste accessible, c'est la liste des candidatures qui ne
+          l'est pas. Même composant que le refus de page entière, pour que le raccourci
+          administrateur y soit aussi — c'est précisément là qu'un administrateur bute.
+        -->
+        <UiAccesRefuse
+          v-if="!canViewVolunteersTable && !editionStore.loading && authStore.isAuthenticated"
+          :description="$t('pages.access_denied.volunteers_description')"
+        />
       </div>
     </div>
 

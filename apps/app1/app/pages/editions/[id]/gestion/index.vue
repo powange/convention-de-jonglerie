@@ -7,13 +7,7 @@
       <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
-      <UAlert
-        icon="i-heroicons-exclamation-triangle"
-        color="error"
-        variant="soft"
-        :title="$t('pages.access_denied.title')"
-        :description="$t('pages.access_denied.description')"
-      />
+      <UiAccesRefuse />
     </div>
     <div v-else>
       <!-- Amené ici par la détection de position : le dire, et offrir d'en repartir. Sans ce
