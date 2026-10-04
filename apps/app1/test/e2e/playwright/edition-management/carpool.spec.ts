@@ -81,8 +81,12 @@ test.describe.serial('Module Covoiturage', () => {
       .first()
       .click()
 
-    // Le champ se désigne par son placeholder, relevé lui aussi : « Ex: Paris, Lyon, Marseille ».
-    const ville = page.getByPlaceholder(/ex:\s*paris/i)
+    /*
+     * Le champ se désigne par son NOM ACCESSIBLE, « Ville de départ* », relevé dans l'instantané
+     * de page d'un échec de CI. Le placeholder, lui, n'est pas exposé sur ce combobox — une
+     * première version visait `getByPlaceholder` et ne trouvait rien.
+     */
+    const ville = page.getByRole('combobox', { name: /ville de départ/i })
     await expect(ville).toBeVisible()
     await ville.fill('Marseille')
     await expect(ville).toHaveValue('Marseille')
