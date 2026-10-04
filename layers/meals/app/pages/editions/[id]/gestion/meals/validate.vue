@@ -913,7 +913,33 @@ onMounted(async () => {
       // Erreur silencieuse
     }
   }
-
-  await fetchMeals()
 })
+
+/** Les repas n'ont été demandés qu'une fois, même si l'accès se confirme en plusieurs temps. */
+let repasDemandes = false
+
+/**
+ * Demander les repas SEULEMENT une fois l'accès accordé.
+ *
+ * ⚠️ CE QUI ÉTAIT FAIT, ET CE QUE ÇA COÛTAIT. `fetchMeals()` partait au montage, sans attendre de
+ * savoir si la page avait droit à ces données — or la permission de validation se résout en
+ * asynchrone, dans le watch ci-dessus. Quelqu'un sans le droit voyait donc bien le refus à
+ * l'écran, mais l'appel partait quand même et récoltait un 403, consigné dans le journal d'erreurs
+ * de production. Relevé deux jours de suite sur cette page, sur deux dates de repas différentes.
+ *
+ * 📍 Et ce n'est pas qu'une question de bruit : un journal d'erreurs qui se remplit de refus
+ * attendus est un journal qu'on cesse de lire.
+ *
+ * `immediate` parce que l'accès peut déjà être acquis au moment où ce watch s'installe — par un
+ * lien depuis la gestion, où l'édition est en cache.
+ */
+watch(
+  canAccess,
+  (autorise) => {
+    if (!autorise || repasDemandes) return
+    repasDemandes = true
+    fetchMeals()
+  },
+  { immediate: true }
+)
 </script>
