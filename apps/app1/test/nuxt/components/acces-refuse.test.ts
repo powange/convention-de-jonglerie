@@ -80,6 +80,27 @@ describe('UiAccesRefuse', () => {
     recharger.mockRestore()
   })
 
+  it('annonce la bascule et se protège du double clic', async () => {
+    /*
+     * ⚠️ CE QUE CE CAS GARDE. Le rechargement prend une seconde pendant laquelle l'écran ne bouge
+     * pas : sans témoin, le clic paraît sans effet et on clique à nouveau. Signalé à l'usage.
+     * Deux rechargements déclenchés valent moins qu'un.
+     */
+    faux.isGlobalAdmin = true
+    const recharger = vi.spyOn(window.location, 'reload').mockImplementation(() => {})
+
+    const composant = await mountSuspended(AccesRefuse)
+    const bouton = composant.find('button')
+    await bouton.trigger('click')
+
+    expect(composant.find('button').attributes('disabled')).toBeDefined()
+
+    await composant.find('button').trigger('click')
+    expect(faux.enableAdminMode).toHaveBeenCalledTimes(1)
+    expect(recharger).toHaveBeenCalledTimes(1)
+    recharger.mockRestore()
+  })
+
   it('laisse remplacer la description, comme le font deux écrans de bénévolat', async () => {
     const composant = await mountSuspended(AccesRefuse, {
       props: { description: 'Formulation propre au bénévolat' },
