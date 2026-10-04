@@ -17,13 +17,7 @@
 
     <!-- Erreur : accès refusé -->
     <div v-else-if="!canEdit">
-      <UAlert
-        icon="i-lucide-shield-alert"
-        color="error"
-        variant="soft"
-        :title="$t('pages.access_denied.title')"
-        :description="$t('pages.access_denied.description')"
-      />
+      <UiAccesRefuse />
     </div>
 
     <!-- Contenu principal -->

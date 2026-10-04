@@ -14,13 +14,7 @@
     </div>
 
     <div v-else-if="!canEdit">
-      <UAlert
-        icon="i-lucide-shield-alert"
-        color="error"
-        variant="soft"
-        :title="$t('pages.access_denied.title')"
-        :description="$t('pages.access_denied.description')"
-      />
+      <UiAccesRefuse />
     </div>
 
     <div v-else class="space-y-6">

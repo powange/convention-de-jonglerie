@@ -17,6 +17,7 @@
   "pages": {
     "access_denied": {
       "description": "No tienes permisos para acceder a esta página.",
+      "enable_admin_mode": "Activar el modo administrador",
       "title": "Acceso denegado",
       "volunteers_description": "No tiene los permisos necesarios para ver las candidaturas de voluntarios."
     },

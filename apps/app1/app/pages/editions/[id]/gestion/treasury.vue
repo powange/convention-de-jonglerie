@@ -5,13 +5,7 @@
     </div>
 
     <div v-else-if="error">
-      <UAlert
-        icon="i-lucide-shield-alert"
-        color="error"
-        variant="soft"
-        :title="$t('pages.access_denied.title')"
-        :description="error.data?.message || error.message"
-      />
+      <UiAccesRefuse />
     </div>
 
     <div v-else class="space-y-6">

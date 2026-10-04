@@ -17,6 +17,7 @@
   "pages": {
     "access_denied": {
       "description": "You don't have the rights to access this page.",
+      "enable_admin_mode": "Enable administrator mode",
       "title": "Access denied",
       "volunteers_description": "You do not have the necessary permissions to view volunteer applications."
     },

@@ -17,6 +17,7 @@
   "pages": {
     "access_denied": {
       "description": "K přístupu na tuto stránku nemáte práva.",
+      "enable_admin_mode": "Zapnout režim správce",
       "title": "Přístup odepřen",
       "volunteers_description": "Nemáte potřebná oprávnění k zobrazení přihlášek dobrovolníků."
     },
