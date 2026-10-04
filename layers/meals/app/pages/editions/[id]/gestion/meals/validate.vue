@@ -363,9 +363,22 @@
                 :key="person.uniqueId"
                 class="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
               >
-                <div class="flex items-start justify-between gap-3 mb-3">
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 mb-2">
+                <!--
+                  ⚠️ `flex-wrap`, ET UNE LARGEUR MINIMALE SUR LA COLONNE DE TEXTE.
+
+                  Cette rangée était un `flex` sans repli : à toutes les largeurs, les étiquettes
+                  et le bouton se disputaient la même ligne. Sur un téléphone, « Annuler »
+                  chevauchait la pastille « Consommé » — le cas déjà validé est le pire des deux,
+                  c'est celui qui porte une étiquette de plus et le libellé de bouton le plus long.
+
+                  Le repli ne dépend d'aucun point de rupture : passé sous la largeur minimale du
+                  texte, le bouton descend de lui-même. Seule sa largeur pleine une fois descendu
+                  en demande un — une cible franche compte quand on valide des repas à la chaîne,
+                  avec une file devant soi.
+                -->
+                <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+                  <div class="min-w-[12rem] flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
                       <UBadge :color="getPersonTypeBadgeColor(person.type)" variant="soft">
                         {{ $t(`gestion.meals.person_type.${person.type}`) }}
                       </UBadge>
@@ -390,6 +403,7 @@
                     v-if="!person.consumedAt"
                     color="success"
                     icon="i-heroicons-check"
+                    class="w-full justify-center sm:w-auto"
                     :loading="validatingIds.includes(person.uniqueId)"
                     @click="validateMeal(person)"
                   >
@@ -400,6 +414,7 @@
                     color="error"
                     variant="soft"
                     icon="i-heroicons-x-mark"
+                    class="w-full justify-center sm:w-auto"
                     :loading="validatingIds.includes(person.uniqueId)"
                     @click="cancelMeal(person)"
                   >
