@@ -72,9 +72,12 @@ import { escapeHtml } from '~/utils/mapMarkers'
 
 import {
   cadreDesPoints,
+  genreDuPoint,
   pointsDuCovoiturage,
+  traitsVersLaConvention,
   type AnnonceLocalisable,
   type AnnonceSansPoint,
+  type GenreDuPoint,
   type PointDuCovoiturage,
 } from '../../../utils/points-du-covoiturage'
 
@@ -156,13 +159,22 @@ function popupDuPoint(point: PointDuCovoiturage): string {
   ].join('')
 }
 
+/**
+ * Une couleur par genre de point, et UNE SEULE TABLE.
+ *
+ * L'épingle et le trait qui en part doivent porter la même : deux ternaires jumeaux dans deux
+ * fonctions voisines finissent toujours par se contredire, et personne ne remarque un trait vert
+ * sous une épingle bleue.
+ */
+const COULEUR_PAR_GENRE: Record<GenreDuPoint, string> = {
+  offres: '#2563eb', // bleu
+  demandes: '#16a34a', // vert
+  mixte: '#7c3aed', // violet
+}
+
 /** Une pastille dont la couleur dit ce qu'on trouve là, et le chiffre combien. */
 function iconeDuPoint(point: PointDuCovoiturage) {
-  const couleur = !point.demandes.length
-    ? '#2563eb' // offres seules — bleu
-    : !point.offres.length
-      ? '#16a34a' // demandes seules — vert
-      : '#7c3aed' // les deux — violet
+  const couleur = COULEUR_PAR_GENRE[genreDuPoint(point)]
   return window.L!.divIcon({
     className: '',
     html: `<div style="background:${couleur};color:#fff;border:2px solid #fff;border-radius:9999px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font:600 12px/1 sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.4)">${point.total}</div>`,
@@ -189,8 +201,69 @@ function iconeDeLaConvention() {
  * montage. L'écran porte un interrupteur « archives » qui change les listes — passer un `computed`
  * à l'option laisserait la carte figée sur son premier état, sans rien signaler.
  */
+/*
+ * Les traits sont tenus à part des marqueurs.
+ *
+ * ⚠️ `useLeafletMap` ne connaît que les marqueurs : il n'a ni `addPolyline` ni de ménage pour eux.
+ * Sans cette liste, chaque redessin EMPILERAIT de nouveaux traits sur les précédents — et comme ils
+ * se superposent exactement, on ne verrait rien, jusqu'à ce que la carte rame.
+ *
+ * `shallowRef` : une `Polyline` est une classe Leaflet, que la réactivité profonde de Vue recopie
+ * en objet plat — elle y perd ses membres privés. C'est la même raison qui fait que le composable
+ * tient sa carte en `shallowRef`.
+ */
+const traits = shallowRef<unknown[]>([])
+
+/**
+ * L'instance Leaflet NUE, hors de tout proxy Vue.
+ *
+ * ⚠️ SANS `toRaw`, AUCUN TRAIT N'EST DESSINÉ — en silence. `useLeafletMap` expose sa carte en
+ * `readonly()`, et `readonly()` est PROFOND : `map.value` est un proxy en lecture seule de
+ * l'instance Leaflet. `polyline.addTo(proxy)` fait appeler `map.addLayer()`, qui mute l'état
+ * interne de la carte ; Vue refuse la mutation, le calque n'est jamais enregistré, et le panneau
+ * de superposition reste VIDE. Aucune exception n'est levée : seulement un avertissement Vue dans
+ * la console, que ni les tests ni une sonde écoutant `pageerror` ne voient.
+ *
+ * 📍 Les marqueurs, eux, marchent — parce que le composable les ajoute avec sa référence INTERNE,
+ * qui n'est pas protégée. C'est précisément ce qui rend le défaut déroutant : la moitié de la carte
+ * fonctionne.
+ */
+function carteNue() {
+  return map.value ? (toRaw(map.value) as never) : null
+}
+
+function effacerLesTraits() {
+  const carte = carteNue()
+  if (!carte) return
+  for (const trait of traits.value) {
+    ;(carte as { removeLayer: (c: unknown) => void }).removeLayer(trait)
+  }
+  traits.value = []
+}
+
 function redessiner() {
   if (!map.value || !window.L) return
+
+  /*
+   * Les traits AVANT les marqueurs : dans Leaflet, ce qui est ajouté en dernier passe devant, et
+   * une droite qui traverserait une épingle la rendrait moins lisible. Discrets aussi — opacité
+   * basse, trait fin : leur rôle est de montrer la convergence, pas de se faire remarquer.
+   */
+  effacerLesTraits()
+  traits.value = traitsVersLaConvention(points.value, props.convention).map((trait) =>
+    window
+      .L!.polyline(trait.segment, {
+        color: COULEUR_PAR_GENRE[trait.genre],
+        weight: 2,
+        opacity: 0.45,
+        // Pointillé : un trait plein se lirait comme une route, or ce n'est PAS un itinéraire —
+        // c'est un lien entre deux lieux. Décidé avec l'utilisateur le 05/10/2026 contre un vrai
+        // calcul d'itinéraire, qui aurait eu l'air précis au départ d'un centre-ville approximatif.
+        dashArray: '6 6',
+        interactive: false,
+      })
+      .addTo(carteNue() as never)
+  )
 
   const marqueurs = points.value.map((point) => ({
     id: point.cle,

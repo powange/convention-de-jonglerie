@@ -119,6 +119,56 @@ test.describe.serial('Covoiturage : la vue carte', () => {
     await expect(page.getByText('ZzzVilleIntrouvable')).toBeVisible()
   })
 
+  test('un trait par ville, et PAS UN DE PLUS après un redessin', async ({ page, goto }) => {
+    const { editionId } = loadState()
+
+    /*
+     * ⚠️ IGNORÉ PLUTÔT QUE VACUEMENT VERT, et ce filet a une histoire. Les traits exigent les
+     * coordonnées de l'édition, qui sont NULLABLES. Une première version acceptait « 0 ou 2
+     * traits » pour couvrir ce cas : elle comptait 0, vérifiait que 0 reste 0, et passait au vert
+     * en masquant un vrai défaut — aucun trait n'était dessiné du tout, faute de `toRaw`.
+     *
+     * 📍 En pratique, `data.setup.ts` crée une édition dont l'adresse se géocode (mesuré :
+     * 48.8704, 2.3146), donc ce test s'exécute. Le `skip` ne couvre que le jour où ce géocodage
+     * échouerait : mieux vaut un test ignoré, qui se voit, qu'un test vert qui ne prouve rien.
+     */
+    const edition = await (await page.request.get(`${BASE}/api/editions/${editionId}`)).json()
+    test.skip(
+      typeof edition?.latitude !== 'number',
+      'édition E2E sans coordonnées : aucun trait à compter, le test serait vacue'
+    )
+
+    await page.setViewportSize({ width: 1280, height: 900 })
+    await expect(async () => {
+      await goto(`/editions/${editionId}/carpool`, { waitUntil: 'hydration' })
+      await expect(page.getByRole('tab', { name: /Carte/i })).toBeVisible({ timeout: 5000 })
+    }).toPass({ timeout: 30000, intervals: [2000, 3000, 5000] })
+
+    await page.getByRole('tab', { name: /Carte/i }).click()
+    await expect(page.locator('.leaflet-container')).toBeVisible({ timeout: 30000 })
+
+    // Deux villes placées, donc exactement deux traits.
+    const traits = page.locator('.leaflet-overlay-pane path')
+    await expect.poll(() => traits.count(), { timeout: 15000 }).toBe(2)
+    const avant = await traits.count()
+
+    /*
+     * ⚠️ LE POINT QUI COMPTE. `useLeafletMap` ne connaît que les marqueurs : rien n'efface les
+     * traits. Sans le ménage explicite, chaque redessin en EMPILERAIT de nouveaux sur les
+     * précédents — et comme ils se superposent exactement, on ne verrait rien jusqu'à ce que la
+     * carte rame. On force deux redessins en basculant les archives.
+     */
+    for (const libelle of ['Afficher tout', 'Actifs seulement']) {
+      const bouton = page.getByRole('button', { name: libelle })
+      if (await bouton.count()) {
+        await bouton.click()
+        await page.waitForTimeout(1500)
+      }
+    }
+
+    await expect.poll(() => traits.count(), { timeout: 15000 }).toBe(avant)
+  })
+
   test('nettoyage : supprimer les annonces créées', async ({ page }) => {
     for (const id of creees.filter(Boolean)) {
       // Par identité, jamais par position : ce sont de vraies données de la base de développement.
