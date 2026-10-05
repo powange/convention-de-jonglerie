@@ -432,9 +432,22 @@
                       person.email || '-'
                     }}</span>
                   </div>
+                  <!--
+                    Le numéro appelle, d'un geste. C'est au comptoir des repas qu'on cherche
+                    quelqu'un qui ne s'est pas présenté : recopier dix chiffres à la main, debout
+                    devant une file, n'a aucune raison d'être.
+
+                    Même forme que la colonne « Téléphone » de la gestion des organisateurs : un
+                    lien `tel:` sur le numéro lui-même, qui garde la mise en page de la ligne.
+                  -->
                   <div v-if="person.phone">
                     <span class="text-gray-500 dark:text-gray-400">{{ $t('common.phone') }}:</span>
-                    <span class="ml-2 text-gray-900 dark:text-white">{{ person.phone }}</span>
+                    <a
+                      :href="`tel:${person.phone}`"
+                      class="ml-2 text-primary-600 dark:text-primary-400 hover:underline"
+                    >
+                      {{ person.phone }}
+                    </a>
                   </div>
                   <div v-if="person.consumedAt" class="sm:col-span-2">
                     <span class="text-gray-500 dark:text-gray-400"
