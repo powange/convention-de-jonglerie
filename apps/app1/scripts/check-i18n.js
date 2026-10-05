@@ -355,6 +355,20 @@ function preprocessVueContent(content) {
   // Créer une copie du contenu pour le traitement
   let processedContent = content
 
+  /*
+   * 0. Les commentaires HTML du gabarit.
+   *
+   * ⚠️ `removeComments` n'est appliqué qu'aux fichiers .ts et .js : dans un .vue, un commentaire
+   * de gabarit n'était jamais retiré. Citer une clé pour EXPLIQUER un correctif — « or c'est ce
+   * terme qui alimente `form.locationCity` » — la faisait donc compter comme utilisée, et
+   * l'analyse la réclamait comme manquante.
+   *
+   * 📍 Le remède a déjà été appliqué cinq fois au cas par cas, en reformulant le commentaire
+   * fautif. C'est le détecteur qu'il fallait corriger : un commentaire explique le code, il ne
+   * doit pas en faire partie.
+   */
+  processedContent = processedContent.replace(/<!--[\s\S]*?-->/g, '')
+
   // 1. Supprimer le contenu des interpolations {{ }} SEULEMENT si elles ne contiennent pas d'appels de traduction
   processedContent = processedContent.replace(/\{\{([^}]*)\}\}/g, (match, inner) => {
     // Garder les interpolations qui contiennent $t( ou t(
