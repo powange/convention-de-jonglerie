@@ -20,8 +20,8 @@
       <p v-if="showEmail && user.email" class="text-sm text-gray-500 dark:text-gray-400 truncate">
         {{ user.email }}
       </p>
-      <p v-if="showPhone && user.phone" class="text-sm text-gray-500 dark:text-gray-400 truncate">
-        {{ user.phone }}
+      <p v-if="showPhone && user.phone" class="text-sm truncate">
+        <UiLienTelephone :numero="user.phone" />
       </p>
     </div>
   </div>

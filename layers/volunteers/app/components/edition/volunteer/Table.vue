@@ -334,9 +334,11 @@
               </UPopover>
             </div>
             <span class="text-xs text-gray-500">{{ row.original.user.email }}</span>
-            <span v-if="row.original.user.phone" class="text-xs text-gray-500">{{
-              row.original.user.phone
-            }}</span>
+            <UiLienTelephone
+              v-if="row.original.user.phone"
+              :numero="row.original.user.phone"
+              classe-du-lien="text-xs text-primary-600 dark:text-primary-400 hover:underline"
+            />
           </div>
         </template>
         <template #actions-cell="{ row }">

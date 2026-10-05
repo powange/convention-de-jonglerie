@@ -155,7 +155,9 @@
 
               <div class="flex justify-between">
                 <span class="text-gray-600 dark:text-gray-400">{{ $t('profile.phone') }}:</span>
-                <span class="font-medium">{{ user.phone || '-' }}</span>
+                <span class="font-medium">
+                  <UiLienTelephone :numero="user.phone" vide="-" />
+                </span>
               </div>
 
               <div class="flex justify-between">
@@ -205,7 +207,9 @@
                 <span class="text-gray-600 dark:text-gray-400">
                   {{ $t('profile.health.emergency_contact_phone') }}:
                 </span>
-                <span class="font-medium">{{ user.emergencyContactPhone }}</span>
+                <span class="font-medium">
+                  <UiLienTelephone :numero="user.emergencyContactPhone" />
+                </span>
               </div>
             </div>
 

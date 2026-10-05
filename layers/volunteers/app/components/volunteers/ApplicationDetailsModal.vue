@@ -168,7 +168,9 @@
               <span class="text-gray-600 dark:text-gray-400"
                 >{{ $t('pages.volunteers.emergency_contact_phone') }}:</span
               >
-              <span class="ml-2">{{ application.emergencyContactPhone }}</span>
+              <span class="ml-2">
+                <UiLienTelephone :numero="application.emergencyContactPhone" />
+              </span>
             </div>
           </div>
         </div>
