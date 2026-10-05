@@ -3,6 +3,7 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { CATEGORIES_DE_GESTION } from '../../../app/utils/categories-de-gestion'
 import { MODULES_DE_GESTION } from '../../../app/utils/modules-de-gestion'
 
 /**
@@ -102,5 +103,66 @@ describe('les liens de gestion disent la même chose partout', () => {
   it('le registre ne garde pas de module que plus personne n’atteint', () => {
     const orphelins = Object.keys(MODULES_DE_GESTION).filter((cle) => !barreListe.includes(cle))
     expect(orphelins, 'module au registre sans aucun lien vers lui').toEqual([])
+  })
+})
+
+/**
+ * Chaque section repliable du menu prend la couleur que l'accueil donne à la même section.
+ *
+ * ⚠️ POURQUOI CE TEST EXISTE. `teindreSelonLeRegistre` tire la teinte d'une CATÉGORIE de la
+ * propriété `categorie` de l'entrée. Cinq des six sections la déclaraient ; « Stock matériel »
+ * non, et son icône restait donc à la couleur du thème, alors que l'accueil l'affichait en
+ * ambre depuis toujours. Signalé par l'utilisateur.
+ *
+ * 📍 Rien ne pouvait le dire : une entrée sans `categorie` n'est pas une erreur — c'est le cas
+ * normal des entrées qui ne sont pas des catégories (« Voir l'édition », « Vue d'ensemble »).
+ * L'omission se confond donc avec un cas légitime, et ne se voit qu'à l'œil, sur l'écran.
+ */
+describe('les sections repliables du menu sont teintées', () => {
+  /**
+   * Les sections repliables, par leur `value` dans le menu, et la catégorie dont elles prennent
+   * la couleur. Les deux identifiants DIFFÈRENT parfois (`volunteers` → `benevoles`), d'où cette
+   * table : c'est elle qu'il faut étendre en ajoutant une section, ce qui force à se poser la
+   * question de la couleur.
+   */
+  const SECTIONS = {
+    infos: 'infos',
+    volunteers: 'benevoles',
+    artists: 'artistes',
+    meals: 'repas',
+    ticketing: 'billetterie',
+    stock: 'stock',
+  } as const
+
+  const valeursDuMenu = [
+    ...new Set([...barre.matchAll(/^\s*value: '([a-z-]+)',/gm)].map((m) => m[1]!)),
+  ]
+
+  it('la table couvre exactement les sections du menu', () => {
+    // Si quelqu'un ajoute une section sans l'inscrire ici, c'est ce test qui le dit — et non une
+    // icône grise que personne ne remarque.
+    expect(valeursDuMenu.sort()).toEqual(Object.keys(SECTIONS).sort())
+  })
+
+  it('chaque section déclare sa catégorie dans le menu', () => {
+    const sansCategorie = Object.entries(SECTIONS)
+      .filter(([, categorie]) => !barre.includes(`categorie: '${categorie}',`))
+      .map(([section, categorie]) => `${section} → categorie: '${categorie}'`)
+    expect(sansCategorie, 'à déclarer sur l’entrée parente du menu').toEqual([])
+  })
+
+  it('chaque catégorie citée par le menu existe au registre', () => {
+    const citees = [...new Set([...barre.matchAll(/categorie: '([a-z-]+)',/g)].map((m) => m[1]!))]
+    const inconnues = citees.filter((c) => !CATEGORIES_DE_GESTION[c])
+    expect(inconnues, 'catégorie citée mais absente de CATEGORIES_DE_GESTION').toEqual([])
+  })
+
+  it('une catégorie du registre donne bien une classe de teinte', () => {
+    // Une entrée sans `classeDansUnLien` laisserait l'icône du menu grise sans rien signaler.
+    for (const [id, categorie] of Object.entries(CATEGORIES_DE_GESTION)) {
+      expect(categorie.classeDansUnLien, `teinte de ${id}`).toBeTruthy()
+      // Tailwind ne génère que ce qu'il lit : une classe composée à l'exécution n'existerait pas.
+      expect(categorie.classeDansUnLien).not.toContain('${')
+    }
   })
 })
