@@ -2,7 +2,14 @@
   <UModal v-model:open="isOpen" :title="title">
     <template #body>
       <div class="space-y-4">
-        <UFormField :label="$t('gestion.treasury.entry_kind')" required>
+        <!--
+          Le choix de la nature ne s'affiche QUE si le sens n'est pas imposé.
+          ⚠️ Et il reste présent EN MODIFICATION, délibérément : c'est le seul moyen de corriger une
+          ligne saisie du mauvais côté. À la création, le bouton d'où l'on vient l'a déjà tranché,
+          et le titre de la modale le redit — sans quoi plus rien n'indiquerait de quel côté on
+          écrit.
+        -->
+        <UFormField v-if="!sensImpose" :label="$t('gestion.treasury.entry_kind')" required>
           <UFieldGroup>
             <UButton
               v-for="option in kindOptions"
@@ -207,6 +214,14 @@ const dateDeLEntree = (entree?: { operationDate?: string | null } | null): strin
 
 const props = defineProps<{
   open: boolean
+  /**
+   * Le sens imposé par le bouton d'où vient l'ouverture — « Ajouter une charge » ou « Ajouter un
+   * produit ».
+   *
+   * Absent en modification : la ligne porte déjà son sens, et on garde la possibilité de le
+   * changer. Présent en création, il masque le sélecteur et pose la nature d'emblée.
+   */
+  sensImpose?: 'EXPENSE' | 'INCOME' | null
   /** Ligne existante à modifier, ou `null` pour une création. */
   entry: {
     entryId?: number
@@ -426,9 +441,19 @@ function choisirSens(sens: 'EXPENSE' | 'INCOME') {
 }
 
 const isEditing = computed(() => !!props.entry?.entryId)
-const title = computed(() =>
-  isEditing.value ? t('gestion.treasury.edit_entry') : t('gestion.treasury.add_entry')
-)
+/**
+ * Le titre nomme la nature à la création.
+ *
+ * ⚠️ Nécessaire depuis que le sélecteur disparaît : sans lui, « Ajouter une ligne » ne dirait plus
+ * si l'on saisit une charge ou un produit, et une erreur de côté ne se verrait qu'après
+ * enregistrement.
+ */
+const title = computed(() => {
+  if (isEditing.value) return t('gestion.treasury.edit_entry')
+  if (props.sensImpose === 'EXPENSE') return t('gestion.treasury.add_expense')
+  if (props.sensImpose === 'INCOME') return t('gestion.treasury.add_income')
+  return t('gestion.treasury.add_entry')
+})
 const isValid = computed(() => form.title.trim().length > 0 && form.amount > 0)
 
 // Repartir des valeurs de la ligne à chaque ouverture : sans cela, une modification garderait la
@@ -437,7 +462,8 @@ watch(
   () => [props.open, props.entry] as const,
   ([open, entry]) => {
     if (!open) return
-    form.kind = entry?.kind ?? 'EXPENSE'
+    // La ligne d'abord (modification), puis le sens du bouton (création), puis le défaut.
+    form.kind = entry?.kind ?? props.sensImpose ?? 'EXPENSE'
     form.title = entry?.title ?? ''
     form.description = entry?.description ?? ''
     /*

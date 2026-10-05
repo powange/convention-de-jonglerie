@@ -1135,7 +1135,9 @@
       "filters": "Filtry",
       "no_line": "Žádné řádky",
       "filter_search_help": "Vyhledávání se týká označení a popisu, po slovech v libovolném pořadí.",
-      "plan_search_help": "Kódy se hledají od začátku, označení kdekoli."
+      "plan_search_help": "Kódy se hledají od začátku, označení kdekoli.",
+      "add_expense": "Přidat náklad",
+      "add_income": "Přidat výnos"
     },
     "program": {
       "description": "Sestavte časovou osu ročníku: workshopy, představení a další body programu.",

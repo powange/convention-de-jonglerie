@@ -1135,7 +1135,9 @@
       "filters": "Filtre",
       "no_line": "Ingen linjer",
       "filter_search_help": "Søgningen omfatter betegnelsen og beskrivelsen, ord for ord i vilkårlig rækkefølge.",
-      "plan_search_help": "Koder søges fra begyndelsen, betegnelser hvor som helst."
+      "plan_search_help": "Koder søges fra begyndelsen, betegnelser hvor som helst.",
+      "add_expense": "Tilføj en udgift",
+      "add_income": "Tilføj en indtægt"
     },
     "program": {
       "description": "Sammensæt udgavens tidslinje: workshops, shows og andre programpunkter.",

@@ -1135,7 +1135,9 @@
       "filters": "Filters",
       "no_line": "No rows",
       "filter_search_help": "The search covers the label and the description, word by word in any order.",
-      "plan_search_help": "Codes are matched from their beginning, labels anywhere."
+      "plan_search_help": "Codes are matched from their beginning, labels anywhere.",
+      "add_expense": "Add an expense",
+      "add_income": "Add an income"
     },
     "program": {
       "description": "Build the edition's timeline: workshops, shows and other moments.",

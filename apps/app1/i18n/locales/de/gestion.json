@@ -1135,7 +1135,9 @@
       "filters": "Filter",
       "no_line": "Keine Zeilen",
       "filter_search_help": "Die Suche umfasst Bezeichnung und Beschreibung, Wort für Wort in beliebiger Reihenfolge.",
-      "plan_search_help": "Codes werden ab ihrem Anfang gesucht, Bezeichnungen an beliebiger Stelle."
+      "plan_search_help": "Codes werden ab ihrem Anfang gesucht, Bezeichnungen an beliebiger Stelle.",
+      "add_expense": "Aufwand hinzufügen",
+      "add_income": "Ertrag hinzufügen"
     },
     "program": {
       "description": "Stellen Sie den Zeitplan der Ausgabe zusammen: Workshops, Shows und weitere Momente.",

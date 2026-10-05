@@ -1135,7 +1135,9 @@
       "filters": "Filtry",
       "no_line": "Brak wierszy",
       "filter_search_help": "Wyszukiwanie obejmuje nazwę i opis, słowo po słowie w dowolnej kolejności.",
-      "plan_search_help": "Kody wyszukiwane są od początku, nazwy w dowolnym miejscu."
+      "plan_search_help": "Kody wyszukiwane są od początku, nazwy w dowolnym miejscu.",
+      "add_expense": "Dodaj koszt",
+      "add_income": "Dodaj przychód"
     },
     "program": {
       "description": "Ułóż oś czasu edycji: warsztaty, pokazy i inne wydarzenia.",

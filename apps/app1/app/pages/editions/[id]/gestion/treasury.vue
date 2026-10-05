@@ -24,11 +24,6 @@
             :label="$t('gestion.treasury.manage_codes')"
             @click="codesModalOpen = true"
           />
-          <UButton
-            icon="i-lucide-plus"
-            :label="$t('gestion.treasury.add_entry')"
-            @click="openEntryModal()"
-          />
         </div>
       </div>
 
@@ -179,10 +174,26 @@
 
       <UCard v-for="(group, index) in groups" :key="group.kind">
         <template #header>
-          <div class="flex items-center gap-2">
+          <!--
+            Le bouton d'ajout vit SUR SA CARTE, et non en haut de page : c'est là qu'on regarde
+            quand on veut ajouter une charge, et le sens se lit alors du lieu du clic plutôt que
+            d'un sélecteur dans la modale.
+
+            `flex-wrap` et `ml-auto` : sur un écran étroit le bouton passe à la ligne au lieu
+            d'écraser le titre, et sur un écran large il se cale à droite sans largeur en dur.
+          -->
+          <div class="flex flex-wrap items-center gap-2">
             <UIcon :name="group.icon" class="h-5 w-5" :class="group.iconColor" />
             <h2 class="font-semibold">{{ group.label }}</h2>
             <UBadge color="neutral" variant="subtle" size="sm">{{ group.lines.length }}</UBadge>
+            <UButton
+              class="ml-auto"
+              size="sm"
+              icon="i-lucide-plus"
+              :label="group.addLabel"
+              :data-testid="`treasury-add-${group.kind.toLowerCase()}`"
+              @click="openEntryModal(null, group.kind)"
+            />
           </div>
         </template>
 
@@ -438,6 +449,7 @@
     <TreasuryEntryModal
       v-model:open="entryModalOpen"
       :entry="editedLine"
+      :sens-impose="sensImpose"
       :codes="data?.codes ?? []"
       :currency="currency"
       :edition-id="editionId"
@@ -724,6 +736,7 @@ const groups = computed(() => {
     {
       kind: 'EXPENSE' as const,
       label: t('gestion.treasury.expenses'),
+      addLabel: t('gestion.treasury.add_expense'),
       icon: 'i-lucide-trending-down',
       iconColor: 'text-red-500',
       lines: lines.filter((l) => l.kind === 'EXPENSE'),
@@ -731,6 +744,7 @@ const groups = computed(() => {
     {
       kind: 'INCOME' as const,
       label: t('gestion.treasury.incomes'),
+      addLabel: t('gestion.treasury.add_income'),
       icon: 'i-lucide-trending-up',
       iconColor: 'text-emerald-500',
       lines: lines.filter((l) => l.kind === 'INCOME'),
@@ -1030,9 +1044,19 @@ const justificatifEstUnPdf = computed(
 const entryModalOpen = ref(false)
 const codesModalOpen = ref(false)
 const editedLine = ref<TreasuryLine | null>(null)
+/** Le sens voulu à la création : celui du bouton cliqué. `null` en modification. */
+const sensImpose = ref<'EXPENSE' | 'INCOME' | null>(null)
 
-function openEntryModal(line?: TreasuryLine) {
+/**
+ * Ouvre la modale, en création pour un sens donné ou en modification d'une ligne.
+ *
+ * ⚠️ `sensImpose` est REMIS À ZÉRO quand on modifie, et ce n'est pas un détail : sans cela, une
+ * modification ouverte après une création garderait le sens du dernier bouton cliqué, le sélecteur
+ * resterait masqué, et on ne pourrait plus corriger une ligne saisie du mauvais côté.
+ */
+function openEntryModal(line?: TreasuryLine | null, sens?: 'EXPENSE' | 'INCOME') {
   editedLine.value = line ?? null
+  sensImpose.value = line ? null : (sens ?? null)
   entryModalOpen.value = true
 }
 

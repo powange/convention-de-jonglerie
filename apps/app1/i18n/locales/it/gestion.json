@@ -1135,7 +1135,9 @@
       "filters": "Filtri",
       "no_line": "Nessuna riga",
       "filter_search_help": "La ricerca riguarda la voce e la descrizione, parola per parola in qualsiasi ordine.",
-      "plan_search_help": "I codici si cercano dall'inizio, le voci ovunque."
+      "plan_search_help": "I codici si cercano dall'inizio, le voci ovunque.",
+      "add_expense": "Aggiungi un costo",
+      "add_income": "Aggiungi un ricavo"
     },
     "program": {
       "description": "Componi la cronologia dell'edizione: workshop, spettacoli e altri momenti.",
