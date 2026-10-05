@@ -13,7 +13,11 @@ vi.hoisted(() => {
   if (!g.wrapApiHandler) g.wrapApiHandler = (handler: any) => handler
   if (!g.validateEditionId) g.validateEditionId = (e: any) => parseInt(e?.context?.params?.id, 10)
   if (!g.createSuccessResponse)
-    g.createSuccessResponse = (data: unknown, message?: string) => ({ success: true, data, message })
+    g.createSuccessResponse = (data: unknown, message?: string) => ({
+      success: true,
+      data,
+      message,
+    })
 })
 
 import { global } from '../../../globales-nitro'
@@ -37,9 +41,7 @@ vi.mock('#server/utils/auth-utils', () => ({
 }))
 
 const handler = (
-  await import(
-    '../../../../../../../layers/stock/server/api/editions/[id]/stock-groups/[groupId]/items/reorder.put'
-  )
+  await import('../../../../../../../layers/stock/server/api/editions/[id]/stock-groups/[groupId]/items/reorder.put')
 ).default
 
 const prismaMock = (globalThis as any).prisma
