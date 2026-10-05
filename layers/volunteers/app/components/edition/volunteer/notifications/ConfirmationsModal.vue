@@ -124,7 +124,7 @@
                   >
                     <div class="mb-1">{{ volunteer.user.email }}</div>
                     <div v-if="volunteer.user.phone" class="font-medium">
-                      {{ volunteer.user.phone }}
+                      <UiLienTelephone :numero="volunteer.user.phone" />
                     </div>
                   </div>
                 </div>

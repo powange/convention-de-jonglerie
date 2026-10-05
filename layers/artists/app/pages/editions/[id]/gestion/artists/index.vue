@@ -281,9 +281,7 @@
 
               <!-- Téléphone -->
               <template #phone-cell="{ row }">
-                <span class="text-gray-600 dark:text-gray-400">{{
-                  row.original.user.phone || '-'
-                }}</span>
+                <UiLienTelephone :numero="row.original.user.phone" vide="-" />
               </template>
 
               <!-- Arrivée -->
