@@ -722,7 +722,9 @@
       "reorder_down": "Flytta ned",
       "reorder_drag": "Dra för att flytta",
       "reorder_error": "Kunde inte spara ordningen",
-      "reorder_up": "Flytta upp"
+      "reorder_up": "Flytta upp",
+      "loans_description": "Utrustning som lånats utifrån, att hämta och sedan lämna tillbaka",
+      "missing_description": "Vad som saknas efter räkningen, och inköpslistorna för att köpa det igen"
     },
     "ticketing": {
       "access_control_description": "Skanna och validera biljetter vid entrén",

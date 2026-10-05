@@ -722,7 +722,9 @@
       "title": "Equipment stock",
       "upcoming": "Upcoming",
       "usage": "Usage",
-      "usage_placeholder": "e.g.: Fire show Saturday 10 PM"
+      "usage_placeholder": "e.g.: Fire show Saturday 10 PM",
+      "loans_description": "Equipment borrowed from outside, to collect then return",
+      "missing_description": "What is missing once counted, and the shopping lists to rebuy it"
     },
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",

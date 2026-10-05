@@ -426,6 +426,16 @@
               color="purple"
             />
 
+            <!-- Doublons de repas. Même public que la configuration et la liste : la page refuse
+                 qui n'a pas `canManageMeals`, et la section entière porte déjà cette condition. -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/meals/duplicates`"
+              icon="i-heroicons-document-duplicate"
+              :title="$t('gestion.meals.duplicates.title')"
+              :description="$t('gestion.meals.duplicates.description')"
+              color="cyan"
+            />
+
             <!-- Validation des repas -->
             <ManagementNavigationCard
               :to="`/editions/${edition.id}/gestion/meals/validate`"
@@ -611,6 +621,26 @@
               :title="$t('gestion.stock.manage_title')"
               :description="$t('gestion.stock.manage_description')"
               color="amber"
+            />
+
+            <!-- Emprunts et « ce qui manque » : deux pages qui TRAVERSENT les groupes, et que
+                 l'accueil ne proposait pas alors que la barre latérale les offre depuis toujours.
+                 Elles prennent la condition de la section, identique à celle du menu
+                 (`canAccessStock`), qui inclut les responsables d'équipe. -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/stock/loans`"
+              icon="i-heroicons-hand-raised"
+              :title="$t('gestion.stock.loans_title')"
+              :description="$t('gestion.stock.loans_description')"
+              color="teal"
+            />
+
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/stock/missing`"
+              icon="i-heroicons-shopping-cart"
+              :title="$t('gestion.stock.missing_title')"
+              :description="$t('gestion.stock.missing_description')"
+              color="rose"
             />
           </div>
         </ManagementCategorySection>

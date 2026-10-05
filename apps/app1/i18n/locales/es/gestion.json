@@ -722,7 +722,9 @@
       "reorder_down": "Bajar",
       "reorder_drag": "Arrastra para mover",
       "reorder_error": "No se pudo guardar el orden",
-      "reorder_up": "Subir"
+      "reorder_up": "Subir",
+      "loans_description": "El material prestado desde fuera, para recoger y luego devolver",
+      "missing_description": "Lo que falta tras el recuento, y las listas de la compra para reponerlo"
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",

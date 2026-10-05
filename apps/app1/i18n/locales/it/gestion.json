@@ -722,7 +722,9 @@
       "reorder_down": "Sposta giù",
       "reorder_drag": "Trascina per spostare",
       "reorder_error": "Impossibile salvare l'ordine",
-      "reorder_up": "Sposta su"
+      "reorder_up": "Sposta su",
+      "loans_description": "Il materiale prestato dall'esterno, da ritirare e poi restituire",
+      "missing_description": "Ciò che manca dopo il conteggio, e le liste della spesa per ricomprarlo"
     },
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",

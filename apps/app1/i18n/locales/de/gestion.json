@@ -722,7 +722,9 @@
       "reorder_down": "Nach unten",
       "reorder_drag": "Zum Verschieben ziehen",
       "reorder_error": "Reihenfolge konnte nicht gespeichert werden",
-      "reorder_up": "Nach oben"
+      "reorder_up": "Nach oben",
+      "loans_description": "Von außen geliehenes Material, das abzuholen und dann zurückzugeben ist",
+      "missing_description": "Was nach der Zählung fehlt, und die Einkaufslisten zum Nachkaufen"
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",
