@@ -432,9 +432,22 @@
                       person.email || '-'
                     }}</span>
                   </div>
+                  <!--
+                    Le numéro appelle, d'un geste. C'est au comptoir des repas qu'on cherche
+                    quelqu'un qui ne s'est pas présenté : recopier dix chiffres à la main, debout
+                    devant une file, n'a aucune raison d'être.
+
+                    Même forme que la colonne « Téléphone » de la gestion des organisateurs : un
+                    lien `tel:` sur le numéro lui-même, qui garde la mise en page de la ligne.
+                  -->
                   <div v-if="person.phone">
                     <span class="text-gray-500 dark:text-gray-400">{{ $t('common.phone') }}:</span>
-                    <span class="ml-2 text-gray-900 dark:text-white">{{ person.phone }}</span>
+                    <a
+                      :href="`tel:${person.phone}`"
+                      class="ml-2 text-primary-600 dark:text-primary-400 hover:underline"
+                    >
+                      {{ person.phone }}
+                    </a>
                   </div>
                   <div v-if="person.consumedAt" class="sm:col-span-2">
                     <span class="text-gray-500 dark:text-gray-400"
@@ -517,13 +530,22 @@
                   </p>
                   <!-- Le téléphone à côté de l'adresse : au comptoir, on appelle plutôt qu'on
                        n'écrit. Absent chez beaucoup, d'où la ligne qui disparaît au lieu d'un
-                       tiret — une ligne vide de plus ferait chercher ce qui n'existe pas. -->
-                  <p
-                    v-if="person.phone"
-                    class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1"
-                  >
-                    <UIcon name="i-heroicons-phone" class="h-3.5 w-3.5 shrink-0" />
-                    {{ person.phone }}
+                       tiret — une ligne vide de plus ferait chercher ce qui n'existe pas.
+
+                       Et il APPELLE, comme dans le résultat de recherche : c'est depuis cette
+                       liste qu'on relance les gens qui ne se sont pas présentés, donc l'endroit
+                       même où recopier un numéro à la main n'a pas de sens. -->
+                  <p v-if="person.phone" class="text-sm flex items-center gap-1">
+                    <UIcon
+                      name="i-heroicons-phone"
+                      class="h-3.5 w-3.5 shrink-0 text-gray-500 dark:text-gray-400"
+                    />
+                    <a
+                      :href="`tel:${person.phone}`"
+                      class="text-primary-600 dark:text-primary-400 hover:underline"
+                    >
+                      {{ person.phone }}
+                    </a>
                   </p>
                 </div>
                 <UButton
