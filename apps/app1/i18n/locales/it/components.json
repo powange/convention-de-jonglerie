@@ -83,7 +83,21 @@
       "confirm_delete_offer_passengers": "{count} passeggero confermato sarà avvisato | {count} passeggeri confermati saranno avvisati",
       "confirm_delete_offer_passengers_hint": "Riceveranno una notifica che il viaggio non si terrà più, e dovranno cercare un altro passaggio. Anche le richieste ancora in attesa vengono avvisate.",
       "confirm_delete_offer_title": "Eliminare questa offerta?",
-      "confirm_delete_offer_with_passengers": "Questa offerta ha passeggeri confermati. Eliminarla è definitivo."
+      "confirm_delete_offer_with_passengers": "Questa offerta ha passeggeri confermati. Eliminarla è definitivo.",
+      "map_and_more": "e {count} altro | e {count} altri",
+      "map_convention": "Luogo della convention",
+      "map_empty": "Niente da mostrare sulla mappa",
+      "map_empty_hint": "Gli annunci compariranno qui appena una città potrà essere localizzata.",
+      "map_error": "Impossibile caricare la mappa",
+      "map_loading": "Caricamento della mappa…",
+      "map_offers_here": "{count} offerta da qui | {count} offerte da qui",
+      "map_requests_here": "{count} richiesta da questa città | {count} richieste da questa città",
+      "map_see_offer": "Vedi l'offerta",
+      "map_see_request": "Vedi la richiesta",
+      "map_tab": "Mappa",
+      "map_tab_short": "Mappa",
+      "map_without_point": "Annunci senza posizione",
+      "map_without_point_hint": "La loro città non è stata localizzata sulla mappa: sono elencati qui per non perderli."
     },
     "convention_form": {
       "click_to_select_image": "Clicca per selezionare un'immagine",

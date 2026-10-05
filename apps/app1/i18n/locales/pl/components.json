@@ -83,7 +83,21 @@
       "confirm_delete_offer_passengers": "{count} potwierdzony pasażer zostanie powiadomiony | {count} potwierdzonych pasażerów zostanie powiadomionych",
       "confirm_delete_offer_passengers_hint": "Otrzymają powiadomienie, że podróż się nie odbędzie, i będą musieli znaleźć inny przejazd. Prośby wciąż oczekujące również są powiadamiane.",
       "confirm_delete_offer_title": "Usunąć tę ofertę?",
-      "confirm_delete_offer_with_passengers": "Ta oferta ma potwierdzonych pasażerów. Usunięcie jest nieodwracalne."
+      "confirm_delete_offer_with_passengers": "Ta oferta ma potwierdzonych pasażerów. Usunięcie jest nieodwracalne.",
+      "map_and_more": "i {count} inne | i {count} innych",
+      "map_convention": "Miejsce konwentu",
+      "map_empty": "Nie ma czego pokazać na mapie",
+      "map_empty_hint": "Ogłoszenia pojawią się tutaj, gdy miasto da się zlokalizować.",
+      "map_error": "Nie udało się wczytać mapy",
+      "map_loading": "Wczytywanie mapy…",
+      "map_offers_here": "{count} oferta stąd | {count} ofert stąd",
+      "map_requests_here": "{count} prośba z tego miasta | {count} prośb z tego miasta",
+      "map_see_offer": "Zobacz ofertę",
+      "map_see_request": "Zobacz prośbę",
+      "map_tab": "Mapa",
+      "map_tab_short": "Mapa",
+      "map_without_point": "Ogłoszenia bez pozycji",
+      "map_without_point_hint": "Ich miasta nie udało się zlokalizować na mapie: są wymienione tutaj, by nie zginęły."
     },
     "convention_form": {
       "click_to_select_image": "Kliknij, aby wybrać obraz",

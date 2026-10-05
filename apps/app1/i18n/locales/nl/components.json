@@ -83,7 +83,21 @@
       "confirm_delete_offer_passengers": "{count} bevestigde passagier krijgt een melding | {count} bevestigde passagiers krijgen een melding",
       "confirm_delete_offer_passengers_hint": "Ze krijgen een melding dat de rit niet meer doorgaat en moeten een andere rit zoeken. Nog openstaande aanvragen worden ook gewaarschuwd.",
       "confirm_delete_offer_title": "Dit aanbod verwijderen?",
-      "confirm_delete_offer_with_passengers": "Dit aanbod heeft bevestigde passagiers. Verwijderen is definitief."
+      "confirm_delete_offer_with_passengers": "Dit aanbod heeft bevestigde passagiers. Verwijderen is definitief.",
+      "map_and_more": "en {count} andere | en {count} andere",
+      "map_convention": "Locatie van de conventie",
+      "map_empty": "Niets om op de kaart te tonen",
+      "map_empty_hint": "De advertenties verschijnen hier zodra een stad gevonden kan worden.",
+      "map_error": "De kaart kon niet geladen worden",
+      "map_loading": "Kaart wordt geladen…",
+      "map_offers_here": "{count} aanbod vanaf hier | {count} aanbiedingen vanaf hier",
+      "map_requests_here": "{count} verzoek uit deze stad | {count} verzoeken uit deze stad",
+      "map_see_offer": "Bekijk het aanbod",
+      "map_see_request": "Bekijk het verzoek",
+      "map_tab": "Kaart",
+      "map_tab_short": "Kaart",
+      "map_without_point": "Advertenties zonder positie",
+      "map_without_point_hint": "Hun stad kon niet op de kaart gevonden worden: ze staan hier zodat ze niet verloren gaan."
     },
     "convention_form": {
       "click_to_select_image": "Klik om een afbeelding te selecteren",

@@ -73,6 +73,7 @@
     "volunteer-notifications.spec.ts"
   ],
   "gestion-3b": [
+    "carpool-carte.spec.ts",
     "etat-retenu-dans-url.spec.ts",
     "stock-filtres-alignement.spec.ts",
     "stock-lot-mobile.spec.ts",

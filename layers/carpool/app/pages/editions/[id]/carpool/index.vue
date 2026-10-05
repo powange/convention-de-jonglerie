@@ -11,7 +11,14 @@
       <EditionHeader :edition="edition" current-page="carpool" />
 
       <!-- Contenu du covoiturage -->
-      <EditionCarpoolSection :edition-id="edition.id" />
+      <EditionCarpoolSection
+        :edition-id="edition.id"
+        :convention="{
+          nom: editionName,
+          latitude: edition.latitude,
+          longitude: edition.longitude,
+        }"
+      />
     </div>
   </div>
 </template>

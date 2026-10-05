@@ -157,6 +157,23 @@
           </div>
         </div>
       </template>
+
+      <!--
+        La carte. `UTabs` démonte les panneaux inactifs (`unmountOnHide` vaut `true` par défaut) :
+        Leaflet n'est donc chargé qu'à l'ouverture de cet onglet, et pas pour tout visiteur.
+
+        Elle reçoit les MÊMES listes que les deux onglets voisins, donc elle respecte
+        l'interrupteur « archives » sans rien savoir de lui. C'est ce qui évite une carte qui
+        paraîtrait vide là où les listes montrent des annonces.
+      -->
+      <template #carte>
+        <EditionCarpoolMapView
+          :edition-id="props.editionId"
+          :offres="offers"
+          :demandes="requests"
+          :convention="props.convention"
+        />
+      </template>
     </UTabs>
   </div>
 </template>
@@ -168,6 +185,13 @@ import { useAuthStore } from '#imports'
 
 interface Props {
   editionId: number
+  /**
+   * Le lieu de la convention : l'autre extrémité de tous les trajets, et le centre de la carte.
+   *
+   * Passé en PROP plutôt que relu depuis le store : la page le tient déjà, et un second appel pour
+   * une donnée qu'on a sous la main est une occasion de divergence.
+   */
+  convention?: { nom?: string | null; latitude?: number | null; longitude?: number | null } | null
 }
 
 const props = defineProps<Props>()
@@ -203,6 +227,17 @@ const tabs = computed(() => [
     label: `${isSmallScreen.value ? t('components.carpool.requests_short') : t('components.carpool.requests_long')} (${requests.value.length})`,
     icon: 'i-heroicons-magnifying-glass',
     slot: 'requests',
+  },
+  {
+    value: 'carte',
+    // Sans compteur : le nombre d'ÉPINGLES n'est pas le nombre d'annonces — plusieurs partent de la
+    // même ville —, et afficher le second à côté d'une carte qui en montre moins ferait croire à
+    // des points manquants.
+    label: isSmallScreen.value
+      ? t('components.carpool.map_tab_short')
+      : t('components.carpool.map_tab'),
+    icon: 'i-heroicons-map',
+    slot: 'carte',
   },
 ])
 

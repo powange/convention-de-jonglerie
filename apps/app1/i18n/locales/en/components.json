@@ -83,7 +83,21 @@
       "confirm_delete_offer_passengers": "{count} confirmed passenger will be notified | {count} confirmed passengers will be notified",
       "confirm_delete_offer_passengers_hint": "They will receive a notification telling them the trip is no longer happening, and will have to look for another ride. Requests still pending are notified too.",
       "confirm_delete_offer_title": "Delete this offer?",
-      "confirm_delete_offer_with_passengers": "This offer has confirmed passengers. Deleting it is permanent."
+      "confirm_delete_offer_with_passengers": "This offer has confirmed passengers. Deleting it is permanent.",
+      "map_and_more": "and {count} more | and {count} more",
+      "map_convention": "Convention venue",
+      "map_empty": "Nothing to show on the map",
+      "map_empty_hint": "Listings will appear here as soon as a city can be located.",
+      "map_error": "The map could not be loaded",
+      "map_loading": "Loading the map…",
+      "map_offers_here": "{count} offer from here | {count} offers from here",
+      "map_requests_here": "{count} request from this city | {count} requests from this city",
+      "map_see_offer": "See the offer",
+      "map_see_request": "See the request",
+      "map_tab": "Map",
+      "map_tab_short": "Map",
+      "map_without_point": "Listings without a position",
+      "map_without_point_hint": "Their city could not be located on the map: they are listed here so they are not lost."
     },
     "convention_form": {
       "click_to_select_image": "Click to select an image",

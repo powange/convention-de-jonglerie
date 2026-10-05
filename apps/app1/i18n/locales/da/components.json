@@ -83,7 +83,21 @@
       "confirm_delete_offer_passengers": "{count} bekræftet passager får besked | {count} bekræftede passagerer får besked",
       "confirm_delete_offer_passengers_hint": "De får en besked om, at turen ikke længere finder sted, og skal finde en anden samkørsel. Anmodninger, der stadig afventer svar, får også besked.",
       "confirm_delete_offer_title": "Slet dette tilbud?",
-      "confirm_delete_offer_with_passengers": "Dette tilbud har bekræftede passagerer. Sletningen kan ikke fortrydes."
+      "confirm_delete_offer_with_passengers": "Dette tilbud har bekræftede passagerer. Sletningen kan ikke fortrydes.",
+      "map_and_more": "og {count} mere | og {count} flere",
+      "map_convention": "Stedet for konventet",
+      "map_empty": "Intet at vise på kortet",
+      "map_empty_hint": "Opslagene vises her, så snart en by kan placeres.",
+      "map_error": "Kortet kunne ikke indlæses",
+      "map_loading": "Indlæser kortet…",
+      "map_offers_here": "{count} tilbud herfra | {count} tilbud herfra",
+      "map_requests_here": "{count} efterspørgsel fra denne by | {count} efterspørgsler fra denne by",
+      "map_see_offer": "Se tilbuddet",
+      "map_see_request": "Se efterspørgslen",
+      "map_tab": "Kort",
+      "map_tab_short": "Kort",
+      "map_without_point": "Opslag uden position",
+      "map_without_point_hint": "Deres by kunne ikke placeres på kortet: de er listet her for ikke at blive glemt."
     },
     "convention_form": {
       "click_to_select_image": "Klik for at vælge et billede",
