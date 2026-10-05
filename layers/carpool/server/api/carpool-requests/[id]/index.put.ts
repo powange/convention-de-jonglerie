@@ -1,3 +1,5 @@
+import { coordonneesPourMiseAJour } from '../../../utils/coordonnees-annonce'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth, requireResourceOwner } from '#server/utils/auth-utils'
 import { carpoolRequestInclude } from '#server/utils/prisma-select-helpers'
@@ -40,6 +42,24 @@ export default wrapApiHandler(
     }
     if (validatedData.locationCity) {
       updateData.locationCity = validatedData.locationCity.trim()
+    }
+
+    /*
+     * La coordonnée : fournie, recalculée, ou effacée — jamais laissée en arrière.
+     *
+     * ⚠️ Sans ces lignes, changer la ville sans renvoyer de coordonnée laissait l'ANCIEN point en
+     * base : un marqueur à des centaines de kilomètres, sans erreur et parfaitement plausible.
+     * Voir `coordonnees-annonce.ts` pour la règle complète.
+     */
+    const coordonnees = await coordonneesPourMiseAJour({
+      villeAvant: existingRequest.locationCity,
+      villeApres: validatedData.locationCity,
+      latitude: validatedData.latitude,
+      longitude: validatedData.longitude,
+    })
+    if (coordonnees) {
+      updateData.latitude = coordonnees.latitude
+      updateData.longitude = coordonnees.longitude
     }
     if (validatedData.seatsNeeded !== undefined) {
       updateData.seatsNeeded = validatedData.seatsNeeded

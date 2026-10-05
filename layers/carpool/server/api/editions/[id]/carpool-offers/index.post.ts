@@ -1,3 +1,5 @@
+import { coordonneesPourCreation } from '../../../../utils/coordonnees-annonce'
+
 import { useCarpoolPorts } from '#server/carpool/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -21,6 +23,14 @@ export default wrapApiHandler(
       throw createError({ status: 404, message: 'Edition non trouvée' })
     }
 
+    // La coordonnée de la ville : celle que le formulaire a retenue, ou un géocodage de repli.
+    // `null` ne doit jamais empêcher la création — voir `coordonnees-annonce.ts`.
+    const coordonnees = await coordonneesPourCreation({
+      ville: validatedData.locationCity,
+      latitude: validatedData.latitude,
+      longitude: validatedData.longitude,
+    })
+
     // Créer l'offre de covoiturage
     const carpoolOffer = await prisma.carpoolOffer.create({
       data: {
@@ -29,6 +39,8 @@ export default wrapApiHandler(
         tripDate: new Date(validatedData.tripDate),
         locationCity: validatedData.locationCity,
         locationAddress: validatedData.locationAddress,
+        latitude: coordonnees.latitude,
+        longitude: coordonnees.longitude,
         availableSeats: validatedData.availableSeats,
         direction: validatedData.direction,
         description: validatedData.description,

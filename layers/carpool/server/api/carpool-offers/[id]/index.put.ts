@@ -1,3 +1,5 @@
+import { coordonneesPourMiseAJour } from '../../../utils/coordonnees-annonce'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth, requireResourceOwner } from '#server/utils/auth-utils'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
@@ -41,6 +43,24 @@ export default wrapApiHandler(
         tripDate: (val) => new Date(val),
       },
     })
+
+    /*
+     * La coordonnée : fournie, recalculée, ou effacée — jamais laissée en arrière.
+     *
+     * ⚠️ Sans ces lignes, changer la ville sans renvoyer de coordonnée laissait l'ANCIEN point en
+     * base : un marqueur à des centaines de kilomètres, sans erreur et parfaitement plausible.
+     * Voir `coordonnees-annonce.ts` pour la règle complète.
+     */
+    const coordonnees = await coordonneesPourMiseAJour({
+      villeAvant: existingOffer.locationCity,
+      villeApres: validatedData.locationCity,
+      latitude: validatedData.latitude,
+      longitude: validatedData.longitude,
+    })
+    if (coordonnees) {
+      updateData.latitude = coordonnees.latitude
+      updateData.longitude = coordonnees.longitude
+    }
 
     /*
      * Ce qui compte pour un passager déjà inscrit : QUAND et D'OÙ.
