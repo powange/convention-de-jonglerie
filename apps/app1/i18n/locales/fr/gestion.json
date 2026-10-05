@@ -1050,6 +1050,8 @@
     },
     "treasury": {
       "add_entry": "Ajouter une ligne",
+      "add_expense": "Ajouter une charge",
+      "add_income": "Ajouter un produit",
       "advanced_by_name": "Avancé par {name}",
       "balance": "Solde",
       "balance_hint": "Produits moins charges, réglés ou non",

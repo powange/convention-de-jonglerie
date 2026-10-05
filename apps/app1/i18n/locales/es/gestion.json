@@ -1135,7 +1135,9 @@
       "filters": "Filtros",
       "no_line": "Sin líneas",
       "filter_search_help": "La búsqueda abarca el concepto y la descripción, por palabras en cualquier orden.",
-      "plan_search_help": "Los códigos se buscan por su inicio; los conceptos, en cualquier posición."
+      "plan_search_help": "Los códigos se buscan por su inicio; los conceptos, en cualquier posición.",
+      "add_expense": "Añadir un gasto",
+      "add_income": "Añadir un ingreso"
     },
     "program": {
       "description": "Componga la cronología de la edición: workshops, espectáculos y otros momentos.",

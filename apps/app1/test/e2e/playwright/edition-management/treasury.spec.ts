@@ -74,6 +74,71 @@ test.describe.serial("Trésorerie d'une édition", () => {
   })
 
   /**
+   * Un bouton par nature, SUR SA CARTE, et le sens n'est plus à choisir dans la modale.
+   *
+   * ⚠️ POURQUOI SUR LA CARTE. Un bouton unique en haut de page obligeait à trancher la nature
+   * APRÈS avoir cliqué, dans un sélecteur qu'on pouvait laisser sur sa valeur précédente : une
+   * charge se saisissait en produit sans que rien ne l'empêche. Le lieu du clic porte désormais
+   * l'information.
+   *
+   * 📍 Le sélecteur SUBSISTE en modification, délibérément : c'est le seul moyen de corriger une
+   * ligne saisie du mauvais côté. Les deux moitiés sont vérifiées ici.
+   */
+  test('offre un bouton par nature, sur sa carte', async ({ page, goto }) => {
+    const { editionId } = loadState()
+
+    await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
+    await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
+
+    // L'ancien bouton générique n'existe plus.
+    await expect(page.getByRole('button', { name: 'Ajouter une ligne' })).toHaveCount(0)
+
+    /*
+     * Chaque bouton est DANS l'en-tête de sa carte, à côté du titre — et non quelque part sur la
+     * page. On remonte au parent du titre, qui est précisément cet en-tête.
+     */
+    for (const [titre, testid] of [
+      ['Charges', 'treasury-add-expense'],
+      ['Produits', 'treasury-add-income'],
+    ] as const) {
+      const enTete = page.getByRole('heading', { name: titre, exact: true }).locator('..')
+      await expect(enTete.getByTestId(testid), `bouton sur la carte « ${titre} »`).toBeVisible()
+    }
+
+    // À la création, la nature est imposée : le titre la nomme, le sélecteur a disparu.
+    await page.getByRole('button', { name: 'Ajouter un produit' }).click()
+    const creation = page.getByRole('dialog')
+    await expect(creation.getByText('Ajouter un produit')).toBeVisible()
+    await expect(creation.getByText('Nature', { exact: true })).toHaveCount(0)
+    await page.keyboard.press('Escape')
+    await expect(creation).toBeHidden({ timeout: 10000 })
+
+    /*
+     * À la MODIFICATION, il revient. Sans la remise à zéro du sens dans `openEntryModal`, ce
+     * sélecteur resterait masqué après la création ci-dessus — et la ligne saisie du mauvais côté
+     * deviendrait incorrigeable.
+     */
+    await page.getByRole('button', { name: 'Modifier' }).first().click()
+    const modification = page.getByRole('dialog')
+    await expect(modification.getByText('Modifier la ligne')).toBeVisible()
+    await expect(modification.getByText('Nature', { exact: true })).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(modification).toBeHidden({ timeout: 10000 })
+
+    /*
+     * Et sur un téléphone, le bouton PASSE À LA LIGNE au lieu de pousser le titre hors de l'écran.
+     * C'est ce que fait `flex-wrap` ; on le mesure plutôt que de s'y fier, un en-tête qui déborde
+     * étant exactement ce qu'un ajout de bouton provoque.
+     */
+    await page.setViewportSize({ width: 390, height: 844 })
+    await expect(page.getByTestId('treasury-add-expense')).toBeVisible()
+    const debordement = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1
+    )
+    expect(debordement, 'la page défile horizontalement sur téléphone').toBe(false)
+  })
+
+  /**
    * Les filtres, et ce qu'ils ne doivent PAS emporter avec eux.
    *
    * Un filtre qui se contenterait de masquer des rangées paraîtrait juste tout en mentant sur deux
@@ -235,10 +300,18 @@ async function addEntry(
   page: import('@playwright/test').Page,
   entry: { kind: 'Charge' | 'Produit'; title: string; amount: number }
 ) {
-  await page.getByRole('button', { name: 'Ajouter une ligne' }).click()
-  await page.getByRole('button', { name: entry.kind, exact: true }).click()
+  /*
+   * Le sens vient du BOUTON, plus d'un sélecteur dans la modale : « Ajouter une charge » sur la
+   * carte des charges, « Ajouter un produit » sur celle des produits.
+   */
+  const bouton = entry.kind === 'Charge' ? 'Ajouter une charge' : 'Ajouter un produit'
+  await page.getByRole('button', { name: bouton }).click()
 
   const dialog = page.getByRole('dialog')
+
+  // Et le formulaire est DÉJÀ du bon côté : son titre le nomme, et aucune nature n'est à choisir.
+  await expect(dialog.getByText(bouton)).toBeVisible()
+  await expect(dialog.getByText('Nature', { exact: true })).toHaveCount(0)
   await dialog.getByRole('textbox').first().fill(entry.title)
 
   // Le champ numérique ne commet sa valeur qu'à la sortie du champ : sans ce `Tab`, le modèle

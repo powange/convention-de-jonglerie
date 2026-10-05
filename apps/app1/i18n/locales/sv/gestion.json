@@ -1135,7 +1135,9 @@
       "filters": "Filter",
       "no_line": "Inga rader",
       "filter_search_help": "Sökningen omfattar benämningen och beskrivningen, ord för ord i valfri ordning.",
-      "plan_search_help": "Koder söks från början, benämningar var som helst."
+      "plan_search_help": "Koder söks från början, benämningar var som helst.",
+      "add_expense": "Lägg till en kostnad",
+      "add_income": "Lägg till en intäkt"
     },
     "program": {
       "description": "Sätt samman upplagans tidslinje: workshops, föreställningar och andra moment.",

@@ -1135,7 +1135,9 @@
       "filters": "Filters",
       "no_line": "Geen regels",
       "filter_search_help": "De zoekopdracht geldt voor de omschrijving en de beschrijving, woord voor woord in willekeurige volgorde.",
-      "plan_search_help": "Codes worden vanaf het begin gezocht, omschrijvingen overal."
+      "plan_search_help": "Codes worden vanaf het begin gezocht, omschrijvingen overal.",
+      "add_expense": "Een kost toevoegen",
+      "add_income": "Een opbrengst toevoegen"
     },
     "program": {
       "description": "Stel de tijdlijn van de editie samen: workshops, shows en andere momenten.",
