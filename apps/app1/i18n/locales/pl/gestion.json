@@ -722,7 +722,9 @@
       "reorder_down": "Przenieś w dół",
       "reorder_drag": "Przeciągnij, aby przenieść",
       "reorder_error": "Nie udało się zapisać kolejności",
-      "reorder_up": "Przenieś w górę"
+      "reorder_up": "Przenieś w górę",
+      "loans_description": "Sprzęt wypożyczony z zewnątrz, do odbioru i następnie zwrotu",
+      "missing_description": "Czego brakuje po przeliczeniu, i listy zakupów, by to odkupić"
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",

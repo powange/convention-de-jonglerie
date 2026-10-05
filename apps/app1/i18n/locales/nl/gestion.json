@@ -722,7 +722,9 @@
       "reorder_down": "Omlaag",
       "reorder_drag": "Sleep om te verplaatsen",
       "reorder_error": "Volgorde kon niet worden opgeslagen",
-      "reorder_up": "Omhoog"
+      "reorder_up": "Omhoog",
+      "loans_description": "Van buiten geleend materiaal, op te halen en daarna terug te geven",
+      "missing_description": "Wat na het tellen ontbreekt, en de boodschappenlijsten om het bij te kopen"
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",

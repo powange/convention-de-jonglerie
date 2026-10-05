@@ -20,6 +20,11 @@ import type { CouleurDeModule } from '~/utils/couleurs-de-module'
  *
  * La CLÉ est le chemin sous `/gestion/`, tel qu'il apparaît dans l'URL. Une page sans entrée ici
  * affichera son titre sans icône, ce qui reste correct — l'oubli est visible, jamais bloquant.
+ *
+ * ⚠️ SAUF POUR UNE SOUS-PAGE, et c'est ce qui a masqué trois oublis : `moduleDeGestion` retombe
+ * sur le module PARENT. `stock/loans` prenait donc l'icône et la couleur du stock, et l'en-tête
+ * de la page paraissait juste — rien ne signalait l'absence. Les trois ont été ajoutées le
+ * 05/10/2026, en même temps que leurs cartes, absentes de l'accueil pour la même raison.
  */
 export interface ModuleDeGestion {
   icone: string
@@ -41,12 +46,15 @@ export const MODULES_DE_GESTION: Record<string, ModuleDeGestion> = {
   map: { icone: 'i-lucide-map', couleur: 'blue' },
   meals: { icone: 'cbi:mealie', couleur: 'orange' },
   'meals/list': { icone: 'i-heroicons-list-bullet', couleur: 'purple' },
+  'meals/duplicates': { icone: 'i-heroicons-document-duplicate', couleur: 'cyan' },
   'meals/validate': { icone: 'i-heroicons-check-badge', couleur: 'green' },
   organizers: { icone: 'i-heroicons-user-group', couleur: 'purple' },
   program: { icone: 'i-heroicons-calendar-days', couleur: 'amber' },
   services: { icone: 'i-lucide-wrench', couleur: 'teal' },
   'shows-call': { icone: 'i-heroicons-megaphone', couleur: 'amber' },
   stock: { icone: 'i-heroicons-archive-box', couleur: 'amber' },
+  'stock/loans': { icone: 'i-heroicons-hand-raised', couleur: 'teal' },
+  'stock/missing': { icone: 'i-heroicons-shopping-cart', couleur: 'rose' },
   tasks: { icone: 'i-heroicons-clipboard-document-check', couleur: 'rose' },
   'ticketing/access-control': { icone: 'i-heroicons-shield-check', couleur: 'blue' },
   'ticketing/config': { icone: 'i-heroicons-cog-6-tooth', couleur: 'blue' },

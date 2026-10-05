@@ -722,7 +722,9 @@
       "reorder_down": "Descer",
       "reorder_drag": "Arraste para mover",
       "reorder_error": "Não foi possível guardar a ordem",
-      "reorder_up": "Subir"
+      "reorder_up": "Subir",
+      "loans_description": "O material emprestado do exterior, a recolher e depois a devolver",
+      "missing_description": "O que falta depois da contagem, e as listas de compras para o recomprar"
     },
     "ticketing": {
       "access_control_description": "Digitalizar e validar bilhetes à entrada",

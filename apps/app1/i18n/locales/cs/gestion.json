@@ -722,7 +722,9 @@
       "reorder_down": "Posunout dolů",
       "reorder_drag": "Přetažením přesunete",
       "reorder_error": "Pořadí nelze uložit",
-      "reorder_up": "Posunout nahoru"
+      "reorder_up": "Posunout nahoru",
+      "loans_description": "Vybavení vypůjčené zvenčí, které je třeba vyzvednout a poté vrátit",
+      "missing_description": "Co po inventuře chybí, a nákupní seznamy na dokoupení"
     },
     "ticketing": {
       "access_control_description": "Skenování a ověřování vstupenek u vstupu",

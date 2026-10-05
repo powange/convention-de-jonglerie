@@ -722,7 +722,9 @@
       "reorder_down": "Flyt ned",
       "reorder_drag": "Træk for at flytte",
       "reorder_error": "Rækkefølgen kunne ikke gemmes",
-      "reorder_up": "Flyt op"
+      "reorder_up": "Flyt op",
+      "loans_description": "Udstyr lånt udefra, som skal hentes og derefter returneres",
+      "missing_description": "Hvad der mangler efter optællingen, og indkøbslisterne til at genanskaffe det"
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",
