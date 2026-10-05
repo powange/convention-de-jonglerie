@@ -841,6 +841,10 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     managementSection.push({
       label: t('gestion.stock.title'),
       icon: 'i-heroicons-archive-box',
+      // Sans cette ligne, l'icône restait à la couleur du thème : `teindreSelonLeRegistre` tire la
+      // teinte d'une CATÉGORIE de cette propriété, et cinq des six sections repliables la
+      // déclaraient. L'accueil, lui, la lisait déjà — les deux surfaces se contredisaient.
+      categorie: 'stock',
       value: 'stock',
       popover: {},
       ...pastilleMenu(...(COMPTEURS_PAR_ENTREE.stock ?? [])),
