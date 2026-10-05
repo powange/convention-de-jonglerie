@@ -74,6 +74,7 @@
     "etat-retenu-dans-url.spec.ts",
     "stock-filtres-alignement.spec.ts",
     "stock-lot-mobile.spec.ts",
+    "stock-ordre-objets.spec.ts",
     "treasury.spec.ts",
     "volunteer-leader-visibility.spec.ts",
     "volunteer-planning.spec.ts",

@@ -200,6 +200,22 @@
         <!-- `UTable` plutôt qu'un tableau écrit à la main : le tri par colonne et le choix des
              colonnes visibles viennent avec, au lieu d'être à réécrire ici. Le clic sur une ligne
              mène à la fiche, comme avant. -->
+        <!--
+          Pourquoi le déplacement n'est pas proposé, et comment le retrouver.
+
+          ⚠️ Sans cette mention, la fonctionnalité existe mais reste introuvable : on trie par nom,
+          les poignées disparaissent, et rien ne dit que c'est le tri qui les a fait partir.
+        -->
+        <UAlert
+          v-if="raisonSansReordonnancement"
+          icon="i-heroicons-information-circle"
+          color="neutral"
+          variant="subtle"
+          :description="raisonSansReordonnancement"
+          :actions="actionsSansReordonnancement"
+          class="mx-4 mt-4"
+        />
+
         <UTable
           ref="tableRef"
           v-model:sorting="tri"
@@ -208,8 +224,44 @@
           :get-row-id="(objet: any) => String(objet.id)"
           :data="objetsAffiches"
           :columns="colonnes"
+          :ui="{ tbody: 'objets-du-groupe' }"
           class="w-full"
         >
+          <!--
+            La poignée et les deux boutons : glisser à la souris, ou monter/descendre au doigt.
+            Les deux chemins mènent au même enregistrement, qui envoie la liste entière.
+          -->
+          <template #ordre-cell="{ row }">
+            <div class="flex items-center gap-0.5">
+              <UIcon
+                name="i-heroicons-bars-3"
+                class="poignee-ordre size-4 shrink-0 cursor-grab text-gray-400 active:cursor-grabbing"
+                :aria-label="$t('gestion.stock.reorder_drag')"
+              />
+              <div class="flex flex-col">
+                <UButton
+                  size="xs"
+                  color="neutral"
+                  variant="ghost"
+                  icon="i-heroicons-chevron-up"
+                  :disabled="row.index === 0 || reordonnancementEnCours"
+                  :aria-label="$t('gestion.stock.reorder_up')"
+                  :title="$t('gestion.stock.reorder_up')"
+                  @click.stop="deplacerObjet(row.original.id, -1)"
+                />
+                <UButton
+                  size="xs"
+                  color="neutral"
+                  variant="ghost"
+                  icon="i-heroicons-chevron-down"
+                  :disabled="row.index === objetsAffiches.length - 1 || reordonnancementEnCours"
+                  :aria-label="$t('gestion.stock.reorder_down')"
+                  :title="$t('gestion.stock.reorder_down')"
+                  @click.stop="deplacerObjet(row.original.id, 1)"
+                />
+              </div>
+            </div>
+          </template>
           <template #select-header="{ table }">
             <UCheckbox
               :model-value="
@@ -709,6 +761,8 @@
 </template>
 
 <script setup lang="ts">
+import { useSortable } from '@vueuse/integrations/useSortable'
+
 import {
   colonnesExportablesVisibles,
   tableauAExporter,
@@ -784,7 +838,14 @@ interface StockTag {
 
 const tableRef = ref()
 // Le nom d'abord : c'est l'ordre dans lequel on cherche un objet quand on ne sait plus où il est.
-const tri = ref<{ id: string; desc: boolean }[]>([{ id: 'name', desc: false }])
+/**
+ * Aucun tri de colonne au départ : c'est l'ORDRE DES OBJETS qui s'affiche.
+ *
+ * ⚠️ Le tableau démarrait trié par nom, si bien que l'ordre du groupe — pourtant stocké depuis
+ * l'origine dans `displayOrder` — n'était jamais visible. Cliquer sur un en-tête trie toujours ;
+ * simplement, plus aucune colonne ne l'impose à l'ouverture.
+ */
+const tri = ref<{ id: string; desc: boolean }[]>([])
 // Masquées d'entrée : elles ne servent qu'à préparer une tournée, et le menu « Colonnes » les
 // ramène quand on en a besoin.
 /**
@@ -849,6 +910,12 @@ function enTeteTriable(column: Column<any>, libelle: string) {
  * dans une zone, sous une valeur vide.
  */
 const colonnes = computed((): TableColumn<any>[] => [
+  // La colonne de déplacement n'existe que lorsque le déplacement est possible : elle DISPARAÎT
+  // dès qu'une colonne est triée ou qu'un filtre est posé, plutôt que de proposer un geste sans
+  // effet. Voir `peutReordonner`.
+  ...(peutReordonner.value
+    ? [{ id: 'ordre', enableSorting: false, enableHiding: false, size: 72 }]
+    : []),
   {
     id: 'select',
     enableSorting: false,
@@ -1196,6 +1263,48 @@ const group = computed<StockGroupItem | null>(
   () => allGroups.value.find((g) => g.id === groupId.value) || null
 )
 
+/*
+ * ⚠️ `canManage` ET LES GARDES DE RÉORDONNANCEMENT REMONTÉES ICI, pour la raison que l'encart
+ * ci-dessous énonce déjà : `useColonnesDansUrl` lit la liste des colonnes PENDANT LE `setup`, et
+ * cette liste interroge désormais `peutReordonner` — lequel interroge `canManage`. Déclarés plus
+ * bas, comme ils l'étaient, on tombait sur des variables pas encore initialisées : le `setup`
+ * levait, et la page s'affichait ENTIÈREMENT BLANCHE.
+ *
+ * 📍 Rien ne le signalait : le typage est satisfait, les tests de composant passent, le serveur
+ * répond 200 — la page de gestion est rendue côté client. Seul un test Playwright l'a vue, et
+ * l'indice dans la console envoyait sur une fausse piste (« Unauthorized » dans les outils de
+ * développement, et toutes les props des modales à `undefined`).
+ */
+const canManage = computed(() =>
+  peutGererLeStock(edition.value as any, authStore.user?.id, authStore.isAdminModeActive)
+)
+
+/**
+ * Peut-on déplacer un objet dans son groupe ?
+ *
+ * ⚠️ NON DÈS QU'UNE COLONNE EST TRIÉE, et c'est la règle demandée : l'affichage est alors recalculé
+ * à partir de cette colonne, et un déplacement n'y correspondrait à rien. Les poignées et les
+ * boutons DISPARAISSENT plutôt que d'être grisés — un bouton inerte fait cliquer, puis chercher
+ * pourquoi rien ne se passe.
+ *
+ * 📍 NON DAVANTAGE QUAND UN FILTRE EST POSÉ, et c'est la même raison poussée d'un cran : la liste
+ * ne montre alors qu'une partie des objets du groupe. Le point d'API exige la liste COMPLÈTE —
+ * accepter un sous-ensemble laisserait les absents sur leur ancien rang, mêlés aux nouveaux.
+ */
+const triActif = computed(() => tri.value.length > 0)
+
+const filtreActif = computed(
+  () =>
+    tagsFiltres.value.length > 0 ||
+    etatsFiltres.value.length > 0 ||
+    nomFiltre.value.trim() !== '' ||
+    lieuFiltre.value.trim() !== ''
+)
+
+const peutReordonner = computed(
+  () => canManage.value && !triActif.value && !filtreActif.value && objetsAffiches.value.length > 1
+)
+
 /** Les colonnes que le lecteur a le droit de masquer — l'URL ne peut pas en cacher d'autres. */
 const colonnesMasquables = computed(() => colonnesMasquablesDe(colonnes.value))
 
@@ -1222,9 +1331,105 @@ useSeoMeta({
       : t('gestion.stock.title'),
 })
 
-const canManage = computed(() =>
-  peutGererLeStock(edition.value as any, authStore.user?.id, authStore.isAdminModeActive)
+/** Ce qui empêche de réordonner, dit en clair — sinon la fonctionnalité reste introuvable. */
+const raisonSansReordonnancement = computed(() => {
+  if (!canManage.value || objetsAffiches.value.length <= 1) return null
+  if (triActif.value) return t('gestion.stock.reorder_blocked_by_sort')
+  if (filtreActif.value) return t('gestion.stock.reorder_blocked_by_filter')
+  return null
+})
+
+/**
+ * Le bouton de l'encart, en PROP et non en slot.
+ *
+ * ⚠️ `UAlert` rend son conteneur d'actions dès que le slot est FOURNI (`!!slots.actions`), même si
+ * le contenu du slot ne rend rien. Un `v-if` posé à l'intérieur laissait donc un bloc vide quand
+ * c'est un filtre qui bloque — cas où il n'y a justement aucun bouton à proposer. La prop, elle,
+ * ne rend le conteneur que s'il y a une action.
+ */
+const actionsSansReordonnancement = computed(() =>
+  triActif.value
+    ? [
+        {
+          label: t('gestion.stock.reorder_clear_sort'),
+          icon: 'i-heroicons-bars-arrow-down',
+          color: 'neutral' as const,
+          variant: 'outline' as const,
+          onClick: () => {
+            tri.value = []
+          },
+        },
+      ]
+    : undefined
 )
+
+const reordonnancementEnCours = ref(false)
+
+/**
+ * Enregistre l'ordre après un déplacement.
+ *
+ * ⚠️ ON ENVOIE TOUJOURS LA LISTE ENTIÈRE du groupe, dans son nouvel ordre — pas seulement les deux
+ * objets échangés. C'est ce que le point d'API exige, et c'est ce qui rend le résultat
+ * déterministe : les rangs valent la position dans la liste, pas un écart appliqué de proche en
+ * proche.
+ *
+ * On recharge ensuite depuis le serveur plutôt que de réécrire la liste locale : la source de
+ * vérité reste unique, et un refus se voit immédiatement au lieu de laisser l'écran mentir.
+ */
+async function enregistrerOrdre(itemIds: number[]) {
+  if (reordonnancementEnCours.value) return
+  reordonnancementEnCours.value = true
+  try {
+    await $fetch(`/api/editions/${editionId}/stock-groups/${groupId.value}/items/reorder`, {
+      method: 'PUT',
+      body: { itemIds },
+    })
+    await fetchAll()
+  } catch (error: any) {
+    useToast().add({
+      title: t('gestion.stock.reorder_error'),
+      description: error?.data?.message,
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    reordonnancementEnCours.value = false
+  }
+}
+
+/**
+ * Le glisser-déposer, tel que la documentation de Nuxt UI le montre pour `UTable`.
+ *
+ * ⚠️ `onUpdate` EST FOURNI, ET C'EST DÉLIBÉRÉ : sans lui, `useSortable` écrirait dans la liste
+ * qu'on lui passe — or `objetsAffiches` est un `computed` filtré, qu'on ne peut pas muter. En
+ * fournissant ce rappel, on garde la main : on calcule l'ordre, on l'enregistre, et le serveur
+ * reste la source de vérité.
+ *
+ * La poignée restreint le glissement à une zone précise : sans elle, tirer sur une ligne pour
+ * sélectionner du texte déplacerait l'objet.
+ */
+useSortable('.objets-du-groupe', objetsAffiches, {
+  handle: '.poignee-ordre',
+  animation: 150,
+  onUpdate: (evenement: { oldIndex?: number; newIndex?: number }) => {
+    const { oldIndex, newIndex } = evenement
+    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return
+    const ids = objetsAffiches.value.map((o: any) => o.id)
+    const [deplace] = ids.splice(oldIndex, 1)
+    ids.splice(newIndex, 0, deplace as number)
+    enregistrerOrdre(ids)
+  },
+})
+
+/** Déplace un objet d'un rang, par bouton — le chemin qui marche au doigt. */
+function deplacerObjet(itemId: number, sens: -1 | 1) {
+  const ids = objetsAffiches.value.map((o: any) => o.id)
+  const depuis = ids.indexOf(itemId)
+  const vers = depuis + sens
+  if (depuis < 0 || vers < 0 || vers >= ids.length) return
+  ids.splice(vers, 0, ids.splice(depuis, 1)[0] as number)
+  enregistrerOrdre(ids)
+}
 
 async function fetchAll() {
   try {

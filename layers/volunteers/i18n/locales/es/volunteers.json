@@ -656,6 +656,11 @@
     "source_all": "Todas las procedencias",
     "delay_bornes": "Entre {min} y {max} minutos. Un valor negativo adelanta el turno.",
     "notify_include_without_slot": "Escribir también a los voluntarios sin turno",
-    "notify_include_without_slot_help": "Recibirán un mensaje anunciando que sus turnos llegarán. Los voluntarios de refuerzo y los miembros de equipos autónomos nunca están incluidos: para ellos, no tener turno es normal."
+    "notify_include_without_slot_help": "Recibirán un mensaje anunciando que sus turnos llegarán. Los voluntarios de refuerzo y los miembros de equipos autónomos nunca están incluidos: para ellos, no tener turno es normal.",
+    "table_ticket": "Entrada",
+    "ticket_all": "Todas las entradas",
+    "ticket_none": "Sin entrada",
+    "ticket_not_validated": "Entrada no validada",
+    "ticket_validated": "Entrada validada"
   }
 }

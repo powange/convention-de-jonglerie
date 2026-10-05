@@ -715,7 +715,14 @@
       "shopping_mark_counted_confirm": "A contagem de {count} objeto(s) assinalado(s) de «{name}» passará à quantidade esperada: deixarão de aparecer como em falta. Os objetos não assinalados não mudam.",
       "shopping_mark_counted_done": "Contagem atualizada",
       "items_filter_help": "A pesquisa abrange o nome do objeto e os locais de levantamento e devolução, nunca as descrições.",
-      "name_filter_help": "A pesquisa abrange o nome do objeto, não a sua descrição."
+      "name_filter_help": "A pesquisa abrange o nome do objeto, não a sua descrição.",
+      "reorder_blocked_by_filter": "Há um filtro ativo: a ordem dos objetos só pode ser alterada na lista completa.",
+      "reorder_blocked_by_sort": "A tabela está ordenada por uma coluna: a ordem dos objetos não pode ser alterada.",
+      "reorder_clear_sort": "Remover a ordenação",
+      "reorder_down": "Descer",
+      "reorder_drag": "Arraste para mover",
+      "reorder_error": "Não foi possível guardar a ordem",
+      "reorder_up": "Subir"
     },
     "ticketing": {
       "access_control_description": "Digitalizar e validar bilhetes à entrada",

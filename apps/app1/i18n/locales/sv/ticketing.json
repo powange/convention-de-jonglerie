@@ -66,7 +66,12 @@
       "volunteer_found": "Volontär hittad",
       "volunteers_count": "{count} volontär inte validerad | {count} volontärer inte validerade",
       "volunteers_not_validated_description": "Lista över accepterade volontärer som ännu inte har skannat sin biljett vid inpasseringskontrollen.",
-      "volunteers_not_validated_title": "Volontärer som inte har validerat sin biljett"
+      "volunteers_not_validated_title": "Volontärer som inte har validerat sin biljett",
+      "phase": {
+        "montage": "Endast uppbyggnad",
+        "demontage": "Endast nedmontering",
+        "montage-demontage": "Uppbyggnad och nedmontering"
+      }
     },
     "counters": {
       "connected": "Ansluten",
@@ -197,7 +202,10 @@
         "organisateurs": "{count} arrangör | {count} arrangörer",
         "repas": "{count} måltid | {count} måltider",
         "coordination": "och"
-      }
+      },
+      "periodes": "Perioder",
+      "periodes_et_quantite": "Perioder och antal",
+      "phases_toutes": "Alla perioder"
     },
     "my_ticket": {
       "how_to_use_description": "Visa upp denna QR-kod vid entrén för att validera din biljett.",

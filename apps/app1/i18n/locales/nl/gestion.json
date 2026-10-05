@@ -715,7 +715,14 @@
       "shopping_mark_counted_confirm": "De telling van {count} aangevinkt(e) item(s) uit “{name}” wordt op de verwachte hoeveelheid gezet: ze verschijnen niet langer als ontbrekend. Niet-aangevinkte items blijven ongewijzigd.",
       "shopping_mark_counted_done": "Telling bijgewerkt",
       "items_filter_help": "De zoekopdracht geldt voor de naam van het voorwerp en de ophaal- en teruggaveplaatsen, nooit voor de beschrijvingen.",
-      "name_filter_help": "De zoekopdracht geldt voor de naam van het voorwerp, niet voor de beschrijving."
+      "name_filter_help": "De zoekopdracht geldt voor de naam van het voorwerp, niet voor de beschrijving.",
+      "reorder_blocked_by_filter": "Er is een filter actief: de volgorde van de items kan alleen in de volledige lijst worden gewijzigd.",
+      "reorder_blocked_by_sort": "De tabel is op een kolom gesorteerd: de volgorde van de items kan niet worden gewijzigd.",
+      "reorder_clear_sort": "Sortering verwijderen",
+      "reorder_down": "Omlaag",
+      "reorder_drag": "Sleep om te verplaatsen",
+      "reorder_error": "Volgorde kon niet worden opgeslagen",
+      "reorder_up": "Omhoog"
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",

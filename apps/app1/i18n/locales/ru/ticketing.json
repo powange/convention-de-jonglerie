@@ -66,7 +66,12 @@
       "volunteer_found": "Волонтёр найден",
       "volunteers_count": "{count} волонтёр не подтверждён | {count} волонтёров не подтверждено",
       "volunteers_not_validated_description": "Список принятых волонтёров, которые ещё не отсканировали свой билет на контроле доступа.",
-      "volunteers_not_validated_title": "Волонтёры, не подтвердившие билет"
+      "volunteers_not_validated_title": "Волонтёры, не подтвердившие билет",
+      "phase": {
+        "montage": "Только сборка",
+        "demontage": "Только разборка",
+        "montage-demontage": "Сборка и разборка"
+      }
     },
     "counters": {
       "connected": "Подключено",
@@ -197,7 +202,10 @@
         "organisateurs": "{count} организатор | {count} организаторов",
         "repas": "{count} приём пищи | {count} приёмов пищи",
         "coordination": "и"
-      }
+      },
+      "periodes": "Периоды",
+      "periodes_et_quantite": "Периоды и количество",
+      "phases_toutes": "Все периоды"
     },
     "my_ticket": {
       "how_to_use_description": "Покажите этот QR-код на входе для валидации билета.",

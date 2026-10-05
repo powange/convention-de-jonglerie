@@ -656,6 +656,11 @@
     "source_all": "Tutte le provenienze",
     "delay_bornes": "Tra {min} e {max} minuti. Un valore negativo anticipa il turno.",
     "notify_include_without_slot": "Scrivere anche ai volontari senza turno",
-    "notify_include_without_slot_help": "Riceveranno un messaggio che annuncia l'arrivo dei loro turni. I volontari di rinforzo e i membri di squadre autonome non sono mai coinvolti: per loro, non avere turni è normale."
+    "notify_include_without_slot_help": "Riceveranno un messaggio che annuncia l'arrivo dei loro turni. I volontari di rinforzo e i membri di squadre autonome non sono mai coinvolti: per loro, non avere turni è normale.",
+    "table_ticket": "Biglietto",
+    "ticket_all": "Tutti i biglietti",
+    "ticket_none": "Nessun biglietto",
+    "ticket_not_validated": "Biglietto non convalidato",
+    "ticket_validated": "Biglietto convalidato"
   }
 }

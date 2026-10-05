@@ -715,7 +715,14 @@
       "shopping_mark_counted_confirm": "Optællingen af {count} afkrydsede genstand(e) fra “{name}” sættes til det forventede antal: de vises ikke længere som manglende. Ikke-afkrydsede genstande ændres ikke.",
       "shopping_mark_counted_done": "Optælling opdateret",
       "items_filter_help": "Søgningen omfatter genstandens navn samt afhentnings- og afleveringssteder, aldrig beskrivelserne.",
-      "name_filter_help": "Søgningen omfatter genstandens navn, ikke dens beskrivelse."
+      "name_filter_help": "Søgningen omfatter genstandens navn, ikke dens beskrivelse.",
+      "reorder_blocked_by_filter": "Der er et filter aktivt: rækkefølgen af genstande kan kun ændres på den fulde liste.",
+      "reorder_blocked_by_sort": "Tabellen er sorteret efter en kolonne: rækkefølgen af genstande kan ikke ændres.",
+      "reorder_clear_sort": "Fjern sortering",
+      "reorder_down": "Flyt ned",
+      "reorder_drag": "Træk for at flytte",
+      "reorder_error": "Rækkefølgen kunne ikke gemmes",
+      "reorder_up": "Flyt op"
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",

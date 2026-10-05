@@ -715,7 +715,14 @@
       "shopping_mark_counted_confirm": "Der Bestand von {count} angehakten Artikel(n) aus „{name}“ wird auf die erwartete Menge gesetzt: Sie gelten dann nicht mehr als fehlend. Nicht angehakte Artikel bleiben unverändert.",
       "shopping_mark_counted_done": "Bestand aktualisiert",
       "items_filter_help": "Die Suche umfasst den Namen des Gegenstands sowie die Abhol- und Rückgabeorte, niemals die Beschreibungen.",
-      "name_filter_help": "Die Suche umfasst den Namen des Gegenstands, nicht seine Beschreibung."
+      "name_filter_help": "Die Suche umfasst den Namen des Gegenstands, nicht seine Beschreibung.",
+      "reorder_blocked_by_filter": "Ein Filter ist aktiv: Die Reihenfolge der Gegenstände kann nur in der vollständigen Liste geändert werden.",
+      "reorder_blocked_by_sort": "Die Tabelle ist nach einer Spalte sortiert: Die Reihenfolge der Gegenstände kann nicht geändert werden.",
+      "reorder_clear_sort": "Sortierung aufheben",
+      "reorder_down": "Nach unten",
+      "reorder_drag": "Zum Verschieben ziehen",
+      "reorder_error": "Reihenfolge konnte nicht gespeichert werden",
+      "reorder_up": "Nach oben"
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",
