@@ -83,7 +83,21 @@
       "confirm_delete_offer_passengers": "{count} passageiro confirmado será avisado | {count} passageiros confirmados serão avisados",
       "confirm_delete_offer_passengers_hint": "Receberão uma notificação a indicar que a viagem já não se realiza e terão de procurar outra partilha de carro. Os pedidos ainda pendentes também são avisados.",
       "confirm_delete_offer_title": "Eliminar esta oferta?",
-      "confirm_delete_offer_with_passengers": "Esta oferta tem passageiros confirmados. Eliminá-la é definitivo."
+      "confirm_delete_offer_with_passengers": "Esta oferta tem passageiros confirmados. Eliminá-la é definitivo.",
+      "map_and_more": "e {count} outro | e {count} outros",
+      "map_convention": "Local da convenção",
+      "map_empty": "Nada a mostrar no mapa",
+      "map_empty_hint": "Os anúncios aparecerão aqui assim que uma cidade puder ser localizada.",
+      "map_error": "Não foi possível carregar o mapa",
+      "map_loading": "A carregar o mapa…",
+      "map_offers_here": "{count} oferta a partir daqui | {count} ofertas a partir daqui",
+      "map_requests_here": "{count} pedido desta cidade | {count} pedidos desta cidade",
+      "map_see_offer": "Ver a oferta",
+      "map_see_request": "Ver o pedido",
+      "map_tab": "Mapa",
+      "map_tab_short": "Mapa",
+      "map_without_point": "Anúncios sem posição",
+      "map_without_point_hint": "Não foi possível localizar a cidade no mapa: estão listados aqui para não se perderem."
     },
     "convention_form": {
       "click_to_select_image": "Clique para seleccionar uma imagem",

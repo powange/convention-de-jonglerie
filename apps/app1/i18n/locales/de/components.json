@@ -83,7 +83,21 @@
       "confirm_delete_offer_passengers": "{count} bestätigter Mitfahrer wird benachrichtigt | {count} bestätigte Mitfahrende werden benachrichtigt",
       "confirm_delete_offer_passengers_hint": "Sie erhalten eine Benachrichtigung, dass die Fahrt nicht mehr stattfindet, und müssen sich eine andere Mitfahrgelegenheit suchen. Noch offene Anfragen werden ebenfalls benachrichtigt.",
       "confirm_delete_offer_title": "Dieses Angebot löschen?",
-      "confirm_delete_offer_with_passengers": "Dieses Angebot hat bestätigte Mitfahrende. Das Löschen ist endgültig."
+      "confirm_delete_offer_with_passengers": "Dieses Angebot hat bestätigte Mitfahrende. Das Löschen ist endgültig.",
+      "map_and_more": "und {count} weiteres | und {count} weitere",
+      "map_convention": "Ort der Convention",
+      "map_empty": "Nichts auf der Karte anzuzeigen",
+      "map_empty_hint": "Die Anzeigen erscheinen hier, sobald eine Stadt verortet werden kann.",
+      "map_error": "Die Karte konnte nicht geladen werden",
+      "map_loading": "Karte wird geladen…",
+      "map_offers_here": "{count} Angebot von hier | {count} Angebote von hier",
+      "map_requests_here": "{count} Anfrage aus dieser Stadt | {count} Anfragen aus dieser Stadt",
+      "map_see_offer": "Angebot ansehen",
+      "map_see_request": "Anfrage ansehen",
+      "map_tab": "Karte",
+      "map_tab_short": "Karte",
+      "map_without_point": "Anzeigen ohne Position",
+      "map_without_point_hint": "Ihre Stadt konnte auf der Karte nicht verortet werden: sie sind hier aufgeführt, damit sie nicht verloren gehen."
     },
     "convention_form": {
       "click_to_select_image": "Klicken, um ein Bild auszuwählen",

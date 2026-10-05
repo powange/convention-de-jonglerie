@@ -83,7 +83,21 @@
       "confirm_delete_offer_passengers": "{count} potvrzený spolujezdec bude informován | {count} potvrzených spolujezdců bude informováno",
       "confirm_delete_offer_passengers_hint": "Dostanou oznámení, že jízda se už neuskuteční, a budou si muset najít jinou. Informovány jsou i žádosti, které stále čekají na odpověď.",
       "confirm_delete_offer_title": "Smazat tuto nabídku?",
-      "confirm_delete_offer_with_passengers": "Tato nabídka má potvrzené spolujezdce. Smazání je nezvratné."
+      "confirm_delete_offer_with_passengers": "Tato nabídka má potvrzené spolujezdce. Smazání je nezvratné.",
+      "map_and_more": "a {count} další | a {count} dalších",
+      "map_convention": "Místo konání",
+      "map_empty": "Na mapě není co zobrazit",
+      "map_empty_hint": "Inzeráty se zde objeví, jakmile bude možné určit polohu města.",
+      "map_error": "Mapu nebylo možné načíst",
+      "map_loading": "Načítání mapy…",
+      "map_offers_here": "{count} nabídka odsud | {count} nabídek odsud",
+      "map_requests_here": "{count} poptávka z tohoto města | {count} poptávek z tohoto města",
+      "map_see_offer": "Zobrazit nabídku",
+      "map_see_request": "Zobrazit poptávku",
+      "map_tab": "Mapa",
+      "map_tab_short": "Mapa",
+      "map_without_point": "Inzeráty bez polohy",
+      "map_without_point_hint": "Jejich město nebylo možné najít na mapě: jsou uvedeny zde, aby se neztratily."
     },
     "convention_form": {
       "click_to_select_image": "Kliknutím vyberete obrázek",
