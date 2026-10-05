@@ -176,12 +176,24 @@ export const useAuthStore = defineStore('auth', {
       if (import.meta.server || !langueDuProfil) return
 
       try {
-        const { locale, locales } = useI18n()
-        if (locale.value === langueDuProfil) return
+        /*
+         * ⚠️ `useNuxtApp().$i18n` ET NON `useI18n()`. Le composable exige d'être appelé AU SOMMET
+         * D'UN `setup` ; ici nous sommes dans une action Pinia, et vue-i18n lève
+         * « Must be called at the top of a `setup` function ». L'exception était attrapée juste en
+         * dessous, si bien que la fonction ne faisait RIEN tout en journalisant une erreur à
+         * chaque chargement de page.
+         *
+         * 📍 Et pour tout utilisateur connecté : `preferredLanguage` est NON NULLABLE, avec « fr »
+         * par défaut, donc la sortie anticipée ci-dessus ne protège personne — et la levée se
+         * produit AVANT la comparaison avec la locale courante, donc même quand il n'y avait rien
+         * à changer. C'est `useChangementDeLangue` qui emploie déjà le bon accès, juste à côté.
+         */
+        const i18n = useNuxtApp().$i18n
+        if (i18n.locale.value === langueDuProfil) return
 
         // Une langue que l'application ne sert pas (compte ancien, code retiré depuis) : on la
         // laisse tomber plutôt que de tenter une bascule qui rendrait l'écran en clés brutes.
-        const connue = locales.value.some((l: any) => (l.code ?? l) === langueDuProfil)
+        const connue = i18n.locales.value.some((l: any) => (l.code ?? l) === langueDuProfil)
         if (!connue) return
 
         await useChangementDeLangue().changerDeLangue(langueDuProfil)
