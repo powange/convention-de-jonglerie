@@ -113,6 +113,64 @@ export function pointsDuCovoiturage(entree: {
 }
 
 /**
+ * Ce qu'on trouve à un point : des offres, des demandes, ou les deux.
+ *
+ * Remonté ici depuis le composant, où un ternaire décidait la couleur de l'épingle. Le trait vers
+ * la convention doit reprendre EXACTEMENT la même, et deux ternaires jumeaux dans deux fonctions
+ * voisines finissent toujours par se contredire.
+ */
+export type GenreDuPoint = 'offres' | 'demandes' | 'mixte'
+
+export function genreDuPoint(point: PointDuCovoiturage): GenreDuPoint {
+  if (!point.demandes.length) return 'offres'
+  if (!point.offres.length) return 'demandes'
+  return 'mixte'
+}
+
+/** Un trait entre une ville et le lieu de la convention. */
+export interface TraitVersLaConvention {
+  cle: string
+  /** Les deux extrémités, dans l'ordre où Leaflet les attend. */
+  segment: [[number, number], [number, number]]
+  genre: GenreDuPoint
+}
+
+/**
+ * Les traits reliant chaque ville au lieu de la convention.
+ *
+ * ⚠️ RIEN SANS LE LIEU DE LA CONVENTION. Une édition dont les coordonnées manquent — elles sont
+ * nullables — ne doit pas produire de traits partant de `[0, 0]` : on verrait neuf droites filer
+ * vers le golfe de Guinée, ce qui est un dessin parfaitement plausible et parfaitement faux.
+ *
+ * 📍 PAS DE FLÈCHE, et c'est délibéré. L'aller et le retour sont un troisième axe, après la ville
+ * et le genre d'annonce ; le porter sur le trait demanderait un greffon Leaflet et surchargerait un
+ * dessin dont le seul rôle est de montrer la convergence. La direction vit dans la popup, qui
+ * énumère déjà ce que le point contient.
+ */
+export function traitsVersLaConvention(
+  points: PointDuCovoiturage[],
+  convention?: { latitude?: number | null; longitude?: number | null } | null
+): TraitVersLaConvention[] {
+  if (
+    !convention ||
+    typeof convention.latitude !== 'number' ||
+    typeof convention.longitude !== 'number' ||
+    !Number.isFinite(convention.latitude) ||
+    !Number.isFinite(convention.longitude)
+  ) {
+    return []
+  }
+
+  const arrivee: [number, number] = [convention.latitude, convention.longitude]
+
+  return points.map((point) => ({
+    cle: point.cle,
+    segment: [point.position, arrivee],
+    genre: genreDuPoint(point),
+  }))
+}
+
+/**
  * Le rectangle qui contient tout ce qu'il faut montrer, ou `null` s'il n'y a rien.
  *
  * ⚠️ LE LIEU DE LA CONVENTION EN FAIT PARTIE, et c'est le point de la demande : une carte du
