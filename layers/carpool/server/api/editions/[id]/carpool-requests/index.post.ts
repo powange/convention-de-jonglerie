@@ -1,3 +1,5 @@
+import { coordonneesPourCreation } from '../../../../utils/coordonnees-annonce'
+
 import { useCarpoolPorts } from '#server/carpool/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -22,12 +24,21 @@ export default wrapApiHandler(
     }
 
     // Créer la demande de covoiturage
+    // Même règle que pour une offre : la coordonnée du formulaire, sinon un géocodage de repli.
+    const coordonnees = await coordonneesPourCreation({
+      ville: validatedData.locationCity,
+      latitude: validatedData.latitude,
+      longitude: validatedData.longitude,
+    })
+
     const carpoolRequest = await prisma.carpoolRequest.create({
       data: {
         editionId,
         userId: user.id,
         tripDate: new Date(validatedData.tripDate),
         locationCity: validatedData.locationCity,
+        latitude: coordonnees.latitude,
+        longitude: coordonnees.longitude,
         seatsNeeded: validatedData.seatsNeeded,
         direction: validatedData.direction,
         description: validatedData.description,

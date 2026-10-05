@@ -378,6 +378,32 @@ const carpoolDirectionSchema = z.enum(['TO_EVENT', 'FROM_EVENT'], {
   message: 'Direction invalide',
 })
 
+/*
+ * La coordonnée de la ville, pour la vue carte.
+ *
+ * ⚠️ IL FAUT LES DÉCLARER ICI, et c'est la seule raison de ces lignes : **zod retire les clés qu'il
+ * ne déclare pas**. Le formulaire les enverrait, elles disparaîtraient sans erreur, et l'annonce
+ * naîtrait sans point — exactement ce qui est arrivé aux trois préférences du trajet (voir le
+ * commentaire de `carpoolOfferSchema`).
+ *
+ * `.nullable()` autant qu'`.optional()` : le formulaire envoie `null` quand aucune suggestion n'a
+ * été retenue, et c'est une information — « je n'ai pas de coordonnée », à distinguer de « je ne
+ * parle pas de ce champ ».
+ */
+const carpoolLatitudeSchema = z.coerce
+  .number()
+  .min(-90, 'Latitude invalide')
+  .max(90, 'Latitude invalide')
+  .optional()
+  .nullable()
+
+const carpoolLongitudeSchema = z.coerce
+  .number()
+  .min(-180, 'Longitude invalide')
+  .max(180, 'Longitude invalide')
+  .optional()
+  .nullable()
+
 const carpoolDescriptionSchema = z
   .string()
   .max(500, 'La description ne peut pas dépasser 500 caractères')
@@ -385,6 +411,8 @@ const carpoolDescriptionSchema = z
 
 export const carpoolOfferSchema = z.object({
   locationCity: carpoolLocationCitySchema,
+  latitude: carpoolLatitudeSchema,
+  longitude: carpoolLongitudeSchema,
   locationAddress: z
     .string()
     .min(1, 'Adresse requise')
@@ -414,6 +442,8 @@ export const carpoolOfferSchema = z.object({
 
 export const carpoolRequestSchema = z.object({
   locationCity: carpoolLocationCitySchema,
+  latitude: carpoolLatitudeSchema,
+  longitude: carpoolLongitudeSchema,
   tripDate: dateSchema,
   seatsNeeded: z.coerce
     .number()
@@ -430,6 +460,8 @@ export const carpoolRequestSchema = z.object({
 export const updateCarpoolOfferSchema = z.object({
   tripDate: z.string().optional(),
   locationCity: z.string().min(1, 'La ville de départ est requise').optional(),
+  latitude: carpoolLatitudeSchema,
+  longitude: carpoolLongitudeSchema,
   locationAddress: z.string().min(1, "L'adresse de départ est requise").optional(),
   availableSeats: z
     .number()
@@ -447,6 +479,8 @@ export const updateCarpoolOfferSchema = z.object({
 export const updateCarpoolRequestSchema = z.object({
   tripDate: z.string().optional(),
   locationCity: z.string().min(1, 'La ville de départ est requise').optional(),
+  latitude: carpoolLatitudeSchema,
+  longitude: carpoolLongitudeSchema,
   seatsNeeded: z
     .number()
     .int()

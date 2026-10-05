@@ -57,6 +57,10 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
       userId: 1,
       tripDate: new Date('2024-07-15T08:00:00Z'),
       locationCity: 'Lyon',
+      // La ligne mockée n'en porte pas : `null` et non `undefined`, car la transformation normalise.
+      // `toEqual` étant exhaustif, c'est bien ici que l'exposition des deux champs se vérifie.
+      latitude: null,
+      longitude: null,
       seatsNeeded: 2,
       direction: undefined,
       description: 'Cherche covoiturage',

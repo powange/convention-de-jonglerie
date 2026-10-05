@@ -103,6 +103,10 @@ export function transformCarpoolOffer(offer: any, viewerId?: number) {
     tripDate: offer.tripDate,
     locationCity: offer.locationCity,
     locationAddress: offer.locationAddress,
+    // La coordonnée de la ville, pour la vue carte. `null` est une valeur ordinaire : la ville
+    // se saisit librement et toutes n'ont pas de point — l'écran les nomme au lieu de les perdre.
+    latitude: offer.latitude ?? null,
+    longitude: offer.longitude ?? null,
     availableSeats,
     description: offer.description,
     hasPhoneNumber: !!offer.phoneNumber,
@@ -151,6 +155,8 @@ export function transformCarpoolRequest(request: any, viewerId?: number) {
     userId: request.userId,
     tripDate: request.tripDate,
     locationCity: request.locationCity,
+    latitude: request.latitude ?? null,
+    longitude: request.longitude ?? null,
     seatsNeeded: request.seatsNeeded,
     direction: request.direction,
     description: request.description,

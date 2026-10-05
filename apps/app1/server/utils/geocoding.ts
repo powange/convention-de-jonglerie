@@ -100,6 +100,48 @@ export async function geocodeAddress(
   }
 }
 
+/**
+ * Géocode une VILLE seule, avec le filtre du formulaire de covoiturage.
+ *
+ * ⚠️ `geocodeAddress` ne convient pas : il exige un code postal et un pays, que le covoiturage n'a
+ * pas — une annonce ne porte qu'un nom de ville saisi librement.
+ *
+ * 📍 LE MÊME FILTRE QUE LE FORMULAIRE — settlements seulement (`city`, `town`, `village`) — pour
+ * que le repli serveur rende la coordonnée qu'une suggestion aurait donnée. Sans cela, la même
+ * ville porterait deux points sur la carte selon la façon dont elle a été saisie.
+ *
+ * Rend `null` sans bruit : une ville introuvable est un cas NORMAL (saisie libre, service
+ * indisponible), et l'annonce doit naître quand même — l'écran la nomme alors parmi les annonces
+ * sans point, plutôt que de la perdre.
+ */
+export async function geocodeVille(ville: string): Promise<GeocodingResult | null> {
+  const nom = ville.trim()
+  if (!nom) return null
+
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(nom)}&limit=5&accept-language=fr&addressdetails=1&featuretype=settlement&class=place&type=city,town,village`,
+      { headers: { 'User-Agent': 'Convention-de-Jonglerie-App/1.0' } }
+    )
+    if (!response.ok) return null
+
+    const data = await response.json()
+    const retenu = (Array.isArray(data) ? data : []).find((d: { addresstype?: string }) =>
+      ['city', 'town', 'village'].includes(d.addresstype ?? '')
+    )
+    if (!retenu) return null
+
+    return {
+      latitude: parseFloat(retenu.lat),
+      longitude: parseFloat(retenu.lon),
+      formattedAddress: retenu.display_name,
+    }
+  } catch {
+    // Volontairement muet : ce repli ne doit jamais faire échouer la création d'une annonce.
+    return null
+  }
+}
+
 // Fonction commune pour faire les requêtes de géocodage
 async function makeGeocodingRequest(address: string): Promise<GeocodingResult | null> {
   try {

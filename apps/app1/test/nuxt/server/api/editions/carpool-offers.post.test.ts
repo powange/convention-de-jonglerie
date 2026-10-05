@@ -1,5 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
+/*
+ * ⚠️ LE GÉOCODAGE EST MOCKÉ, ET IL LE FAUT. Sans coordonnée dans le corps, le point d'API appelle
+ * `geocodeVille` en repli — donc Nominatim, pour de vrai, depuis la CI : lent, instable, et
+ * impoli envers un service public gratuit. Le mock rend un point connu, ce qui éprouve en plus
+ * que le repli est bien branché sur le `create`.
+ */
+const { mockGeocodeVille } = vi.hoisted(() => ({ mockGeocodeVille: vi.fn() }))
+vi.mock('#server/utils/geocoding', () => ({ geocodeVille: mockGeocodeVille }))
+
 import handler from '../../../../../../../layers/carpool/server/api/editions/[id]/carpool-offers/index.post'
 import { global } from '../../../globales-nitro'
 
@@ -20,6 +29,8 @@ const mockEvent = {
 
 describe('/api/editions/[id]/carpool-offers POST', () => {
   beforeEach(() => {
+    mockGeocodeVille.mockReset()
+    mockGeocodeVille.mockResolvedValue({ latitude: 45.7578, longitude: 4.832 })
     // Reset tous les mocks avant chaque test
     prismaMock.edition.findUnique.mockReset()
     prismaMock.carpoolOffer.create.mockReset()
@@ -83,6 +94,10 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
         tripDate: new Date(requestBody.tripDate),
         locationCity: requestBody.locationCity,
         locationAddress: requestBody.locationAddress,
+        // Le corps ne porte pas de coordonnée : c'est le géocodage de repli qui la fournit. Les
+        // voir ici prouve que le repli est branché — leur absence serait le défaut.
+        latitude: 45.7578,
+        longitude: 4.832,
         availableSeats: requestBody.availableSeats,
         direction: requestBody.direction,
         description: requestBody.description,

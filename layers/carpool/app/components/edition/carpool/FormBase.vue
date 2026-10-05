@@ -305,6 +305,15 @@ const { t, locale } = useI18n()
 // État du formulaire
 const form = reactive({
   locationCity: props.initialData?.locationCity || '',
+  /*
+   * La coordonnée de la ville, pour la vue carte.
+   *
+   * `null` et non `undefined` : le serveur distingue « je n'ai pas de coordonnée » — il géocodera
+   * alors la ville — de « je ne parle pas de ce champ », qui sur une modification signifie « ne
+   * change rien ». `buildPayload` étale `...form`, les deux partent donc sans rien de plus.
+   */
+  latitude: props.initialData?.latitude ?? null,
+  longitude: props.initialData?.longitude ?? null,
   locationAddress: props.initialData?.locationAddress || '',
   tripDate: props.initialData?.tripDate || null,
   direction: props.initialData?.direction || 'TO_EVENT',
@@ -548,12 +557,34 @@ const onSubmit = () => {
  * remplace la saisie par son libellé canonique, mais ne la conditionne plus.
  */
 watch(searchTerm, (saisie) => {
-  form.locationCity = (saisie ?? '').trim()
+  const texte = (saisie ?? '').trim()
+  form.locationCity = texte
+  /*
+   * ⚠️ ET LA COORDONNÉE S'EFFACE DÈS QUE LE TEXTE S'ÉCARTE DE LA SUGGESTION.
+   *
+   * Sans cela, choisir « Marseille » puis continuer à taper laissait le point de Marseille sur une
+   * ville devenue « Marseill » ou tout autre chose : un marqueur qui ne décrit plus ce qui est
+   * écrit, sans rien pour le signaler. Effacée, la coordonnée sera recalculée côté serveur à partir
+   * de la saisie libre — et si elle est introuvable, l'annonce naît sans point, ce qui est un cas
+   * prévu.
+   */
+  if (texte !== (selectedCity.value?.name ?? '').trim()) {
+    form.latitude = null
+    form.longitude = null
+  }
 })
 
 watch(selectedCity, (newCity) => {
   if (!newCity) return
   form.locationCity = newCity.name
+  /*
+   * LA COORDONNÉE VIENT DE LA SUGGESTION RETENUE, et c'est la meilleure qu'on puisse avoir : c'est
+   * la personne qui a tranché entre deux homonymes. Interrogé sur le seul nom « Vienne », Nominatim
+   * rend Vienne en Autriche — à 800 km de Vienne en Isère. Aucune heuristique serveur ne vaut ce
+   * choix, d'où la priorité donnée ici.
+   */
+  form.latitude = typeof newCity.lat === 'number' ? newCity.lat : null
+  form.longitude = typeof newCity.lon === 'number' ? newCity.lon : null
   /*
    * Le champ affiche le terme de recherche : sans cette ligne, choisir une suggestion laisserait
    * à l'écran ce qu'on avait commencé à taper (« Marse ») plutôt que le libellé retenu. Les deux
@@ -565,9 +596,18 @@ watch(selectedCity, (newCity) => {
 // Initialiser selectedCity si on édite
 onMounted(() => {
   if (props.initialData?.locationCity) {
-    // Ni `lat` ni `lon` : `departureCoordinates` n'existe ni dans le schéma Prisma ni dans les
-    // schémas zod — le formulaire portait un champ que rien n'enregistrait ni ne relisait.
-    selectedCity.value = { name: props.initialData.locationCity }
+    /*
+     * ⚠️ LA COORDONNÉE EST REPRISE, et ce commentaire disait l'inverse jusqu'au 05/10/2026 :
+     * « ni `lat` ni `lon` […] n'existe dans le schéma Prisma ». C'est désormais faux — les deux
+     * colonnes existent et l'API les rend. La reprendre ici est nécessaire, sans quoi ouvrir le
+     * formulaire en modification et valider sans toucher à la ville EFFACERAIT le point : le
+     * `watch(searchTerm)` comparerait la saisie à une suggestion sans nom.
+     */
+    selectedCity.value = {
+      name: props.initialData.locationCity,
+      lat: props.initialData.latitude ?? null,
+      lon: props.initialData.longitude ?? null,
+    }
     searchTerm.value = props.initialData.locationCity
   }
 })

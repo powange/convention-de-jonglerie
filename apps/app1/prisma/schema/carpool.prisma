@@ -2,6 +2,19 @@
 // Covoiturage — Offres, demandes, réservations et commentaires
 // =============================================================================
 
+/*
+ * LA COORDONNÉE DE LA VILLE, pour la vue carte.
+ *
+ * ⚠️ NULLABLE, ET ÇA LE RESTERA. La ville se saisit LIBREMENT — une correction délibérée : la
+ * restreindre aux suggestions laissait le bouton de création grisé sans message quand Nominatim
+ * tombait ou que la ville sortait des pays acceptés. On ne peut donc jamais garantir une
+ * coordonnée, et toute lecture qui le suppose perdra des annonces en silence.
+ *
+ * 📍 C'est la VILLE qui est géocodée, pas `locationAddress` — décidé le 05/10/2026. L'adresse est
+ * du texte libre (« devant la gare ») qui échoue souvent, et les demandes n'ont de toute façon que
+ * leur ville : un seul niveau de précision sur la carte. L'adresse reste affichée en texte.
+ */
+
 enum CarpoolDirection {
   TO_EVENT // Aller vers la convention
   FROM_EVENT // Retour depuis la convention
@@ -20,6 +33,8 @@ model CarpoolOffer {
   tripDate        DateTime
   locationCity    String
   locationAddress String
+  latitude        Float?
+  longitude       Float?
   availableSeats  Int
   direction       CarpoolDirection   @default(TO_EVENT)
   description     String?            @db.Text
@@ -45,6 +60,8 @@ model CarpoolRequest {
   userId       Int
   tripDate     DateTime
   locationCity String
+  latitude     Float?
+  longitude    Float?
   seatsNeeded  Int                     @default(1)
   direction    CarpoolDirection        @default(TO_EVENT)
   description  String?                 @db.Text
