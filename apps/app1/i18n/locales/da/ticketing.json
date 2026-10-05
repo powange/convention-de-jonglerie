@@ -66,7 +66,12 @@
       "volunteer_found": "Frivillig fundet",
       "volunteers_count": "{count} frivillig ikke valideret | {count} frivillige ikke valideret",
       "volunteers_not_validated_description": "Liste over accepterede frivillige, der endnu ikke har scannet deres billet ved adgangskontrollen.",
-      "volunteers_not_validated_title": "Frivillige, der ikke har valideret deres billet"
+      "volunteers_not_validated_title": "Frivillige, der ikke har valideret deres billet",
+      "phase": {
+        "montage": "Kun opsætning",
+        "demontage": "Kun nedtagning",
+        "montage-demontage": "Opsætning og nedtagning"
+      }
     },
     "counters": {
       "connected": "Tilsluttet",
@@ -197,7 +202,10 @@
         "organisateurs": "{count} arrangør | {count} arrangører",
         "repas": "{count} måltid | {count} måltider",
         "coordination": "og"
-      }
+      },
+      "periodes": "Perioder",
+      "periodes_et_quantite": "Perioder og antal",
+      "phases_toutes": "Alle perioder"
     },
     "my_ticket": {
       "how_to_use_description": "Vis denne QR-kode ved indgangen for at validere din billet.",

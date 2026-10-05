@@ -715,7 +715,14 @@
       "shopping_mark_counted_confirm": "Il conteggio di {count} oggetto/i spuntato/i da «{name}» sarà portato alla quantità prevista: non risulteranno più mancanti. Gli oggetti non spuntati restano invariati.",
       "shopping_mark_counted_done": "Conteggio aggiornato",
       "items_filter_help": "La ricerca riguarda il nome dell'oggetto e i luoghi di ritiro e di restituzione, mai le descrizioni.",
-      "name_filter_help": "La ricerca riguarda il nome dell'oggetto, non la sua descrizione."
+      "name_filter_help": "La ricerca riguarda il nome dell'oggetto, non la sua descrizione.",
+      "reorder_blocked_by_filter": "È attivo un filtro: l'ordine degli oggetti può essere modificato solo nell'elenco completo.",
+      "reorder_blocked_by_sort": "La tabella è ordinata per colonna: l'ordine degli oggetti non può essere modificato.",
+      "reorder_clear_sort": "Rimuovi l'ordinamento",
+      "reorder_down": "Sposta giù",
+      "reorder_drag": "Trascina per spostare",
+      "reorder_error": "Impossibile salvare l'ordine",
+      "reorder_up": "Sposta su"
     },
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",

@@ -656,6 +656,11 @@
     "source_all": "Všechny původy",
     "delay_bornes": "Mezi {min} a {max} minutami. Negativní hodnota posune směnu dopředu.",
     "notify_include_without_slot": "Napsat i dobrovolníkům bez směny",
-    "notify_include_without_slot_help": "Dostanou zprávu, že jejich směny teprve přijdou. Záskoky a členové samostatných týmů nejsou nikdy zahrnuti: pro ně je normální nemít směnu."
+    "notify_include_without_slot_help": "Dostanou zprávu, že jejich směny teprve přijdou. Záskoky a členové samostatných týmů nejsou nikdy zahrnuti: pro ně je normální nemít směnu.",
+    "table_ticket": "Vstupenka",
+    "ticket_all": "Všechny vstupenky",
+    "ticket_none": "Bez vstupenky",
+    "ticket_not_validated": "Vstupenka neověřena",
+    "ticket_validated": "Vstupenka ověřena"
   }
 }

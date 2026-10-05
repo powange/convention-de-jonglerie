@@ -66,7 +66,12 @@
       "volunteer_found": "Znaleziono wolontariusza",
       "volunteers_count": "{count} wolontariusz niezwalidowany | {count} wolontariuszy niezwalidowanych",
       "volunteers_not_validated_description": "Lista zaakceptowanych wolontariuszy, którzy jeszcze nie zeskanowali biletu przy kontroli dostępu.",
-      "volunteers_not_validated_title": "Wolontariusze, którzy nie zwalidowali biletu"
+      "volunteers_not_validated_title": "Wolontariusze, którzy nie zwalidowali biletu",
+      "phase": {
+        "montage": "Tylko montaż",
+        "demontage": "Tylko demontaż",
+        "montage-demontage": "Montaż i demontaż"
+      }
     },
     "counters": {
       "connected": "Połączono",
@@ -197,7 +202,10 @@
         "organisateurs": "{count} organizator | {count} organizatorów",
         "repas": "{count} posiłek | {count} posiłków",
         "coordination": "i"
-      }
+      },
+      "periodes": "Okresy",
+      "periodes_et_quantite": "Okresy i liczba",
+      "phases_toutes": "Wszystkie okresy"
     },
     "my_ticket": {
       "how_to_use_description": "Pokaż ten kod QR przy wejściu, aby zwalidować swój bilet.",

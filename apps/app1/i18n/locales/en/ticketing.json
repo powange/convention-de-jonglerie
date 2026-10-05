@@ -66,7 +66,12 @@
       "volunteer_found": "Volunteer found",
       "volunteers_count": "{count} volunteer not validated | {count} volunteers not validated",
       "volunteers_not_validated_description": "List of accepted volunteers who have not yet scanned their ticket at access control.",
-      "volunteers_not_validated_title": "Volunteers who haven't validated their ticket"
+      "volunteers_not_validated_title": "Volunteers who haven't validated their ticket",
+      "phase": {
+        "montage": "Setup only",
+        "demontage": "Teardown only",
+        "montage-demontage": "Setup and teardown"
+      }
     },
     "counters": {
       "connected": "Connected",
@@ -197,7 +202,10 @@
         "organisateurs": "{count} organizer | {count} organizers",
         "repas": "{count} meal | {count} meals",
         "coordination": "and"
-      }
+      },
+      "periodes": "Periods",
+      "periodes_et_quantite": "Periods and quantity",
+      "phases_toutes": "All periods"
     },
     "my_ticket": {
       "how_to_use_description": "Show this QR code at the entrance to validate your ticket.",

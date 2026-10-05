@@ -715,7 +715,14 @@
       "shopping_mark_counted_confirm": "Počet {count} zaškrtnutých položek ze seznamu „{name}“ bude nastaven na očekávané množství: přestanou se zobrazovat jako chybějící. Nezaškrtnuté položky zůstanou beze změny.",
       "shopping_mark_counted_done": "Počet aktualizován",
       "items_filter_help": "Vyhledávání se týká názvu předmětu a míst vyzvednutí a vrácení, nikdy popisů.",
-      "name_filter_help": "Vyhledávání se týká názvu předmětu, nikoli jeho popisu."
+      "name_filter_help": "Vyhledávání se týká názvu předmětu, nikoli jeho popisu.",
+      "reorder_blocked_by_filter": "Je aktivní filtr: pořadí předmětů lze změnit pouze v úplném seznamu.",
+      "reorder_blocked_by_sort": "Tabulka je seřazena podle sloupce: pořadí předmětů nelze změnit.",
+      "reorder_clear_sort": "Zrušit řazení",
+      "reorder_down": "Posunout dolů",
+      "reorder_drag": "Přetažením přesunete",
+      "reorder_error": "Pořadí nelze uložit",
+      "reorder_up": "Posunout nahoru"
     },
     "ticketing": {
       "access_control_description": "Skenování a ověřování vstupenek u vstupu",

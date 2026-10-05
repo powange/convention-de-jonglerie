@@ -66,7 +66,12 @@
       "volunteer_found": "Voluntario encontrado",
       "volunteers_count": "{count} voluntario no validado | {count} voluntarios no validados",
       "volunteers_not_validated_description": "Lista de voluntarios aceptados que aún no han escaneado su entrada en el control de acceso.",
-      "volunteers_not_validated_title": "Voluntarios que no han validado su entrada"
+      "volunteers_not_validated_title": "Voluntarios que no han validado su entrada",
+      "phase": {
+        "montage": "Solo montaje",
+        "demontage": "Solo desmontaje",
+        "montage-demontage": "Montaje y desmontaje"
+      }
     },
     "counters": {
       "connected": "Conectado",
@@ -197,7 +202,10 @@
         "organisateurs": "{count} organizador | {count} organizadores",
         "repas": "{count} comida | {count} comidas",
         "coordination": "y"
-      }
+      },
+      "periodes": "Periodos",
+      "periodes_et_quantite": "Periodos y cantidad",
+      "phases_toutes": "Todos los periodos"
     },
     "my_ticket": {
       "how_to_use_description": "Presente este código QR en la entrada para validar su entrada.",

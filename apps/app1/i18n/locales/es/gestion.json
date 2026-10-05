@@ -715,7 +715,14 @@
       "shopping_mark_counted_confirm": "El recuento de {count} objeto(s) marcado(s) de «{name}» se ajustará a la cantidad esperada: dejarán de aparecer como faltantes. Los objetos no marcados no cambian.",
       "shopping_mark_counted_done": "Recuento actualizado",
       "items_filter_help": "La búsqueda abarca el nombre del objeto y los lugares de recogida y devolución, nunca las descripciones.",
-      "name_filter_help": "La búsqueda abarca el nombre del objeto, no su descripción."
+      "name_filter_help": "La búsqueda abarca el nombre del objeto, no su descripción.",
+      "reorder_blocked_by_filter": "Hay un filtro activo: el orden de los objetos solo se puede cambiar en la lista completa.",
+      "reorder_blocked_by_sort": "La tabla está ordenada por una columna: el orden de los objetos no se puede cambiar.",
+      "reorder_clear_sort": "Quitar la ordenación",
+      "reorder_down": "Bajar",
+      "reorder_drag": "Arrastra para mover",
+      "reorder_error": "No se pudo guardar el orden",
+      "reorder_up": "Subir"
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",

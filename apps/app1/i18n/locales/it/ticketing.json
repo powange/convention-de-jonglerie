@@ -66,7 +66,12 @@
       "volunteer_found": "Volontario trovato",
       "volunteers_count": "{count} volontario non convalidato | {count} volontari non convalidati",
       "volunteers_not_validated_description": "Elenco dei volontari accettati che non hanno ancora scansionato il biglietto al controllo accessi.",
-      "volunteers_not_validated_title": "Volontari che non hanno convalidato il biglietto"
+      "volunteers_not_validated_title": "Volontari che non hanno convalidato il biglietto",
+      "phase": {
+        "montage": "Solo montaggio",
+        "demontage": "Solo smontaggio",
+        "montage-demontage": "Montaggio e smontaggio"
+      }
     },
     "counters": {
       "connected": "Connesso",
@@ -197,7 +202,10 @@
         "organisateurs": "{count} organizzatore | {count} organizzatori",
         "repas": "{count} pasto | {count} pasti",
         "coordination": "e"
-      }
+      },
+      "periodes": "Periodi",
+      "periodes_et_quantite": "Periodi e quantità",
+      "phases_toutes": "Tutti i periodi"
     },
     "my_ticket": {
       "how_to_use_description": "Mostra questo codice QR all'ingresso per convalidare il tuo biglietto.",

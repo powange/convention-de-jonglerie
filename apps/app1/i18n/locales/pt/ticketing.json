@@ -66,7 +66,12 @@
       "volunteer_found": "Voluntário encontrado",
       "volunteers_count": "{count} voluntário não validado | {count} voluntários não validados",
       "volunteers_not_validated_description": "Lista de voluntários aceitos que ainda não digitalizaram o seu bilhete no controlo de acesso.",
-      "volunteers_not_validated_title": "Voluntários que não validaram o bilhete"
+      "volunteers_not_validated_title": "Voluntários que não validaram o bilhete",
+      "phase": {
+        "montage": "Apenas montagem",
+        "demontage": "Apenas desmontagem",
+        "montage-demontage": "Montagem e desmontagem"
+      }
     },
     "counters": {
       "connected": "Conectado",
@@ -197,7 +202,10 @@
         "organisateurs": "{count} organizador | {count} organizadores",
         "repas": "{count} refeição | {count} refeições",
         "coordination": "e"
-      }
+      },
+      "periodes": "Períodos",
+      "periodes_et_quantite": "Períodos e quantidade",
+      "phases_toutes": "Todos os períodos"
     },
     "my_ticket": {
       "how_to_use_description": "Apresente este código QR na entrada para validar o seu bilhete.",

@@ -66,7 +66,12 @@
       "volunteer_found": "Vrijwilliger gevonden",
       "volunteers_count": "{count} vrijwilliger niet gevalideerd | {count} vrijwilligers niet gevalideerd",
       "volunteers_not_validated_description": "Lijst van geaccepteerde vrijwilligers die hun ticket nog niet hebben gescand bij de toegangscontrole.",
-      "volunteers_not_validated_title": "Vrijwilligers die hun ticket niet hebben gevalideerd"
+      "volunteers_not_validated_title": "Vrijwilligers die hun ticket niet hebben gevalideerd",
+      "phase": {
+        "montage": "Alleen opbouw",
+        "demontage": "Alleen afbouw",
+        "montage-demontage": "Opbouw en afbouw"
+      }
     },
     "counters": {
       "connected": "Verbonden",
@@ -197,7 +202,10 @@
         "organisateurs": "{count} organisator | {count} organisatoren",
         "repas": "{count} maaltijd | {count} maaltijden",
         "coordination": "en"
-      }
+      },
+      "periodes": "Periodes",
+      "periodes_et_quantite": "Periodes en aantal",
+      "phases_toutes": "Alle periodes"
     },
     "my_ticket": {
       "how_to_use_description": "Toon deze QR-code bij de ingang om je ticket te valideren.",

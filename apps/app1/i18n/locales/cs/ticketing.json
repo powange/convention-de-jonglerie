@@ -66,7 +66,12 @@
       "volunteer_found": "Nalezený dobrovolník",
       "volunteers_count": "{count} dobrovolník neověřen | {count} dobrovolníků neověřeno",
       "volunteers_not_validated_description": "Seznam přijatých dobrovolníků, kteří ještě nenaskenovali vstupenku při kontrole vstupu.",
-      "volunteers_not_validated_title": "Dobrovolníci, kteří neověřili vstupenku"
+      "volunteers_not_validated_title": "Dobrovolníci, kteří neověřili vstupenku",
+      "phase": {
+        "montage": "Pouze montáž",
+        "demontage": "Pouze demontáž",
+        "montage-demontage": "Montáž a demontáž"
+      }
     },
     "counters": {
       "connected": "Připojeno",
@@ -197,7 +202,10 @@
         "organisateurs": "{count} organizátor | {count} organizátorů",
         "repas": "{count} jídlo | {count} jídel",
         "coordination": "a"
-      }
+      },
+      "periodes": "Období",
+      "periodes_et_quantite": "Období a množství",
+      "phases_toutes": "Všechna období"
     },
     "my_ticket": {
       "how_to_use_description": "U vstupu předložte tento QR kód a ověřte si platnost vstupenky.",

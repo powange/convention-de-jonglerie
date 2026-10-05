@@ -715,7 +715,14 @@
       "shopping_mark_counted_confirm": "Liczba {count} zaznaczonych przedmiotów z „{name}” zostanie ustawiona na oczekiwaną ilość: przestaną być wykazywane jako brakujące. Niezaznaczone przedmioty pozostają bez zmian.",
       "shopping_mark_counted_done": "Zaktualizowano stan",
       "items_filter_help": "Wyszukiwanie obejmuje nazwę przedmiotu oraz miejsca odbioru i zwrotu, nigdy opisy.",
-      "name_filter_help": "Wyszukiwanie obejmuje nazwę przedmiotu, a nie jego opis."
+      "name_filter_help": "Wyszukiwanie obejmuje nazwę przedmiotu, a nie jego opis.",
+      "reorder_blocked_by_filter": "Filtr jest aktywny: kolejność przedmiotów można zmienić tylko na pełnej liście.",
+      "reorder_blocked_by_sort": "Tabela jest posortowana według kolumny: kolejności przedmiotów nie można zmienić.",
+      "reorder_clear_sort": "Usuń sortowanie",
+      "reorder_down": "Przenieś w dół",
+      "reorder_drag": "Przeciągnij, aby przenieść",
+      "reorder_error": "Nie udało się zapisać kolejności",
+      "reorder_up": "Przenieś w górę"
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",

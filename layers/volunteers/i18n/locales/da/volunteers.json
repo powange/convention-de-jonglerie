@@ -656,6 +656,11 @@
     "source_all": "Alle oprindelser",
     "delay_bornes": "Mellem {min} og {max} minutter. En negativ værdi fremrykker vagten.",
     "notify_include_without_slot": "Skriv også til frivillige uden vagt",
-    "notify_include_without_slot_help": "De får en besked om, at deres vagter er på vej. Flyvende frivillige og medlemmer af selvstyrende teams er aldrig omfattet: for dem er det normalt ikke at have en vagt."
+    "notify_include_without_slot_help": "De får en besked om, at deres vagter er på vej. Flyvende frivillige og medlemmer af selvstyrende teams er aldrig omfattet: for dem er det normalt ikke at have en vagt.",
+    "table_ticket": "Billet",
+    "ticket_all": "Alle billetter",
+    "ticket_none": "Ingen billet",
+    "ticket_not_validated": "Billet ikke valideret",
+    "ticket_validated": "Billet valideret"
   }
 }

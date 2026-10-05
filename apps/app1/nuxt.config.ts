@@ -738,6 +738,21 @@ export default defineNuxtConfig({
         '@nuxt/ui > prosemirror-view',
         '@nuxt/ui > prosemirror-gapcursor',
         '@tiptap/extension-emoji',
+        /*
+         * Le glisser-déposer des objets d'un groupe de stock (`useSortable`, donc SortableJS).
+         *
+         * ⚠️ ABSENT DE CETTE LISTE, LA PAGE NE S'AFFICHE PAS EN DÉVELOPPEMENT. Vite découvrait
+         * l'import au moment de la navigation, se mettait à ré-optimiser ses dépendances
+         * (« dependency optimized: @vueuse/integrations/useSortable ») et rechargeait la page
+         * en pleine route : écran vide, aucune erreur dans la console, et un « Unauthorized »
+         * dans les outils de développement qui envoie chercher un problème de session.
+         *
+         * 📍 C'est exactement la panne des vues timeline de FullCalendar, ci-dessus. Seul un test
+         * Playwright l'a vue : le typage, les tests de composant et un code 200 la laissent
+         * passer, et la construction de production n'est pas concernée.
+         */
+        '@vueuse/integrations/useSortable',
+        'sortablejs',
       ],
       exclude: ['node-cron', '@prisma/client'],
     },

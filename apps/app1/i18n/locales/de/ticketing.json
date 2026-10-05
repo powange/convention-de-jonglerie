@@ -66,7 +66,12 @@
       "volunteer_found": "Freiwilliger gefunden",
       "volunteers_count": "{count} Freiwilliger nicht validiert | {count} Freiwillige nicht validiert",
       "volunteers_not_validated_description": "Liste der akzeptierten Freiwilligen, die ihr Ticket noch nicht an der Zugangskontrolle gescannt haben.",
-      "volunteers_not_validated_title": "Freiwillige, die ihr Ticket nicht validiert haben"
+      "volunteers_not_validated_title": "Freiwillige, die ihr Ticket nicht validiert haben",
+      "phase": {
+        "montage": "Nur Aufbau",
+        "demontage": "Nur Abbau",
+        "montage-demontage": "Aufbau und Abbau"
+      }
     },
     "counters": {
       "connected": "Verbunden",
@@ -197,7 +202,10 @@
         "organisateurs": "{count} Organisator | {count} Organisatoren",
         "repas": "{count} Mahlzeit | {count} Mahlzeiten",
         "coordination": "und"
-      }
+      },
+      "periodes": "Zeiträume",
+      "periodes_et_quantite": "Zeiträume und Menge",
+      "phases_toutes": "Alle Zeiträume"
     },
     "my_ticket": {
       "how_to_use_description": "Zeigen Sie diesen QR-Code am Eingang, um Ihr Ticket zu validieren.",

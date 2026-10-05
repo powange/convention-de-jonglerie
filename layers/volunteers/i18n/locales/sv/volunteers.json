@@ -656,6 +656,11 @@
     "source_all": "Alla ursprung",
     "delay_bornes": "Mellan {min} och {max} minuter. Ett negativt värde tidigarelägger passet.",
     "notify_include_without_slot": "Skriv även till volontärer utan pass",
-    "notify_include_without_slot_help": "De får ett meddelande om att deras pass är på väg. Flygande volontärer och medlemmar i självstyrande team omfattas aldrig: för dem är det normalt att inte ha något pass."
+    "notify_include_without_slot_help": "De får ett meddelande om att deras pass är på väg. Flygande volontärer och medlemmar i självstyrande team omfattas aldrig: för dem är det normalt att inte ha något pass.",
+    "table_ticket": "Biljett",
+    "ticket_all": "Alla biljetter",
+    "ticket_none": "Ingen biljett",
+    "ticket_not_validated": "Biljett inte validerad",
+    "ticket_validated": "Biljett validerad"
   }
 }
