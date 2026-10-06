@@ -285,7 +285,8 @@
       "ticket_canceled": "Biglietto annullato",
       "ticket_restore": "Ripristina questo biglietto",
       "ticket_restored": "Biglietto ripristinato",
-      "to_refund_badge": "Da rimborsare"
+      "to_refund_badge": "Da rimborsare",
+      "order_canceled_part": "di cui {amount} annullato"
     },
     "participant": {
       "entry_validated": "Ingresso già convalidato",

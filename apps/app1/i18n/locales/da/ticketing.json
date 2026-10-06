@@ -285,7 +285,8 @@
       "ticket_canceled": "Billet annulleret",
       "ticket_restore": "Gendan denne billet",
       "ticket_restored": "Billet gendannet",
-      "to_refund_badge": "Skal refunderes"
+      "to_refund_badge": "Skal refunderes",
+      "order_canceled_part": "heraf {amount} annulleret"
     },
     "participant": {
       "entry_validated": "Adgang allerede valideret",

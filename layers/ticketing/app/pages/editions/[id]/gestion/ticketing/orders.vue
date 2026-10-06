@@ -646,8 +646,23 @@
               </div>
               <!-- Montant + menu actions -->
               <div class="flex items-start gap-2 flex-shrink-0">
-                <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                  {{ money(order.amount) }}
+                <div class="text-right">
+                  <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                    {{ money(order.amount) }}
+                  </div>
+                  <!-- Le montant payé ne baisse pas quand on annule un billet : la part annulée
+                       est donc annoncée dessous, sans quoi la commande paraît rapporter ce
+                       qu'elle ne rapporte plus. -->
+                  <p
+                    v-if="(order.canceledAmount ?? 0) > 0"
+                    class="text-xs text-red-600 dark:text-red-400"
+                  >
+                    {{
+                      $t('ticketing.orders.order_canceled_part', {
+                        amount: money(order.canceledAmount ?? 0),
+                      })
+                    }}
+                  </p>
                 </div>
                 <!-- Menu d'actions -->
                 <UDropdownMenu :items="getOrderMenuItems(order)" :ui="{ content: 'min-w-48' }">
@@ -1208,29 +1223,6 @@
                 {{ money(stats.amountsByPaymentMethod.pending) }}
               </p>
             </div>
-
-            <!-- Remboursé -->
-            <div
-              v-if="
-                stats?.amountsByPaymentMethod?.refunded && stats.amountsByPaymentMethod.refunded > 0
-              "
-              class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
-            >
-              <div class="flex items-center gap-3">
-                <div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                  <UIcon name="i-heroicons-arrow-uturn-left" class="h-5 w-5 text-red-600" />
-                </div>
-                <div>
-                  <p class="font-medium text-gray-900 dark:text-white">Remboursé</p>
-                  <p class="text-xs text-gray-600 dark:text-gray-400">
-                    Commandes annulées et remboursées
-                  </p>
-                </div>
-              </div>
-              <p class="text-lg font-bold text-red-600">
-                {{ money(stats.amountsByPaymentMethod.refunded) }}
-              </p>
-            </div>
           </div>
 
           <!-- Total -->
@@ -1248,6 +1240,32 @@
                 {{ money(stats.totalAmount) }}
               </p>
             </div>
+          </div>
+
+          <!-- Annulé — SOUS le total, et hors de lui. Il y était additionné : le « Total général »
+               comptait l'argent des billets annulés au lieu de l'écarter, et l'intitulé
+               « remboursé » promettait un remboursement que rien ne garantit. Ce qui reste à
+               rendre se lit avec le filtre « À rembourser ». -->
+          <div
+            v-if="
+              stats?.amountsByPaymentMethod?.refunded && stats.amountsByPaymentMethod.refunded > 0
+            "
+            class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
+          >
+            <div class="flex items-center gap-3">
+              <div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                <UIcon name="i-heroicons-x-circle" class="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <p class="font-medium text-gray-900 dark:text-white">Annulé</p>
+                <p class="text-xs text-gray-600 dark:text-gray-400">
+                  Billets et commandes annulés, remboursés ou non — non compris dans le total
+                </p>
+              </div>
+            </div>
+            <p class="text-lg font-bold text-red-600">
+              {{ money(stats.amountsByPaymentMethod.refunded) }}
+            </p>
           </div>
         </div>
       </template>

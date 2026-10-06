@@ -285,7 +285,8 @@
       "ticket_canceled": "Ticket cancelled",
       "ticket_restore": "Restore this ticket",
       "ticket_restored": "Ticket restored",
-      "to_refund_badge": "To refund"
+      "to_refund_badge": "To refund",
+      "order_canceled_part": "of which {amount} canceled"
     },
     "participant": {
       "entry_validated": "Entry already validated",

@@ -300,6 +300,7 @@
       "status_onsite": "Payée sur place",
       "status_pending": "En attente de paiement",
       "status_processed": "Payée en ligne",
+      "order_canceled_part": "dont {amount} annulé",
       "ticket_cancel": "Annuler ce billet",
       "ticket_cancel_error": "Erreur lors de l'annulation du billet",
       "ticket_canceled": "Billet annulé",

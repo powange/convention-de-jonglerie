@@ -628,6 +628,10 @@ export default wrapApiHandler(
                   state: orderItem.state,
                   refunded: orderItem.refunded,
                   amount: orderItem.amount,
+                  // Les options du billet scanné ne sont chargées que sur les lignes de sa
+                  // commande : on les y reprend, plutôt que de recharger le billet.
+                  selectedOptions: orderItem.order.items.find((ligne) => ligne.id === orderItem.id)
+                    ?.selectedOptions,
                   order: {
                     status: orderItem.order.status,
                     paymentMethod: orderItem.order.paymentMethod,
@@ -651,6 +655,7 @@ export default wrapApiHandler(
                     lastName: ligne.lastName,
                     state: ligne.state,
                     refunded: ligne.refunded,
+                    selectedOptions: ligne.selectedOptions,
                   })),
                   {
                     status: orderItem.order.status,

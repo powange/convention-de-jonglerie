@@ -285,7 +285,8 @@
       "ticket_canceled": "Ticket storniert",
       "ticket_restore": "Dieses Ticket wiederherstellen",
       "ticket_restored": "Ticket wiederhergestellt",
-      "to_refund_badge": "Zu erstatten"
+      "to_refund_badge": "Zu erstatten",
+      "order_canceled_part": "davon {amount} storniert"
     },
     "participant": {
       "entry_validated": "Eintritt bereits validiert",

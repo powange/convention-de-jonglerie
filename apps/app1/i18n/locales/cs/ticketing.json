@@ -285,7 +285,8 @@
       "ticket_canceled": "Vstupenka zrušena",
       "ticket_restore": "Obnovit tuto vstupenku",
       "ticket_restored": "Vstupenka obnovena",
-      "to_refund_badge": "K vrácení"
+      "to_refund_badge": "K vrácení",
+      "order_canceled_part": "z toho {amount} zrušeno"
     },
     "participant": {
       "entry_validated": "Položka již byla ověřena",

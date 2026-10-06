@@ -614,6 +614,7 @@ export default wrapApiHandler(
                 state: item.state,
                 refunded: item.refunded,
                 amount: item.amount,
+                selectedOptions: item.selectedOptions,
                 order: { status: item.order.status, paymentMethod: item.order.paymentMethod },
               }),
               /**
@@ -630,6 +631,7 @@ export default wrapApiHandler(
                   lastName: ligne.lastName,
                   state: ligne.state,
                   refunded: ligne.refunded,
+                  selectedOptions: ligne.selectedOptions,
                 })),
                 { status: item.order.status, paymentMethod: item.order.paymentMethod }
               ),

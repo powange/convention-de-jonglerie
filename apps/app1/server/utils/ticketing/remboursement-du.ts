@@ -16,7 +16,17 @@ import { ligneSansTitulaire } from '~~/shared/utils/participant-anonyme'
 export interface BilletPourRemboursement {
   state: string
   refunded: boolean
+  /** Le prix du billet SEUL. Ses options s'y ajoutent, voir `selectedOptions`. */
   amount: number
+  /**
+   * Les options payées avec ce billet, et rendues avec lui.
+   *
+   * ⚠️ Sans elles, la dette ne comptait que le prix du billet : un billet gratuit dont seules les
+   * options avaient été payées s'annonçait « 0 € dû » au guichet, et un billet à 20 € portant un
+   * repas à 13 € en annonçait 20. Le prix d'une option ne vit nulle part ailleurs — ni dans la
+   * ligne, ni dans ce que le guichet lisait. Facultatif pour que l'absence se lise « aucune ».
+   */
+  selectedOptions?: ReadonlyArray<{ amount: number | null }> | null
   order: {
     status: string
     /** `null` sur une commande jamais réglée, et sur les commandes importées. */
@@ -53,7 +63,15 @@ export function montantARembourser(billet: BilletPourRemboursement): number | nu
   if (!(ETATS_DE_BILLET_ANNULE as readonly string[]).includes(billet.state)) return null
   if (billet.refunded) return null
   if (!commandeReglee(billet.order)) return null
-  return billet.amount
+  return prixAvecOptions(billet)
+}
+
+/** Ce qu'a coûté un billet, options comprises, en centimes. */
+function prixAvecOptions(billet: Pick<BilletPourRemboursement, 'amount' | 'selectedOptions'>) {
+  return (
+    billet.amount +
+    (billet.selectedOptions ?? []).reduce((somme, option) => somme + (option.amount ?? 0), 0)
+  )
 }
 
 /**
@@ -85,6 +103,7 @@ export function billetARembourser() {
 export interface LigneDueDeCommande {
   id: number
   name: string | null
+  /** En sortie : ce qui est dû pour la ligne, options comprises. */
   amount: number
   firstName: string | null
   lastName: string | null
@@ -119,18 +138,23 @@ export interface DetteDeCommande {
  * que rien ne les annonce. Signalé sur la base de développement, commande 937.
  */
 export function detteDeCommande(
-  lignes: Array<LigneDueDeCommande & Pick<BilletPourRemboursement, 'state' | 'refunded'>>,
+  lignes: Array<
+    LigneDueDeCommande & Pick<BilletPourRemboursement, 'state' | 'refunded' | 'selectedOptions'>
+  >,
   order: BilletPourRemboursement['order']
 ): DetteDeCommande {
-  const dues = lignes.filter(
-    (ligne) =>
-      montantARembourser({
-        state: ligne.state,
-        refunded: ligne.refunded,
-        amount: ligne.amount,
-        order,
-      }) !== null
-  )
+  // Le montant dû de chaque ligne, options comprises — celui que `montantARembourser` annonce
+  // pour le billet scanné, sans quoi la ligne et sa commande donneraient deux sommes.
+  const dues = lignes.flatMap((ligne) => {
+    const du = montantARembourser({
+      state: ligne.state,
+      refunded: ligne.refunded,
+      amount: ligne.amount,
+      selectedOptions: ligne.selectedOptions,
+      order,
+    })
+    return du === null ? [] : [{ ...ligne, amount: du }]
+  })
 
   const titulaires = new Set(
     dues

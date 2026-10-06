@@ -285,7 +285,8 @@
       "ticket_canceled": "Билет аннулирован",
       "ticket_restore": "Восстановить этот билет",
       "ticket_restored": "Билет восстановлен",
-      "to_refund_badge": "К возврату"
+      "to_refund_badge": "К возврату",
+      "order_canceled_part": "из них {amount} отменено"
     },
     "participant": {
       "entry_validated": "Вход уже подтвержден",

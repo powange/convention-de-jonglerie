@@ -2,6 +2,7 @@ import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpe
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { alternativesMotCle, motsClesDeLaRequete } from '#server/utils/recherche-mots-cles'
+import { ETATS_DE_BILLET_ANNULE } from '#server/utils/ticketing/billets-qui-comptent'
 import { billetARembourser, montantARembourser } from '#server/utils/ticketing/remboursement-du'
 import { validatePagination, validateEditionId } from '#server/utils/validation-helpers'
 import {
@@ -368,118 +369,110 @@ export default wrapApiHandler(
         })
       }
 
+      /**
+       * Ce que rapporte un billet, et s'il rapporte encore — la règle de la trésorerie.
+       *
+       * ⚠️ On somme les BILLETS, jamais `order.amount`. Le montant de la commande est figé à sa
+       * création : annuler un billet ne le baisse pas, si bien qu'il comptait comme vendus les
+       * billets annulés un par un (édition 22 : 4 tee-shirts sur 14, 72 € en trop sous le seul
+       * filtre de ce tarif). Il n'apportait rien d'autre : mesuré sur toute la base de
+       * développement, il vaut TOUJOURS la somme des billets et de leurs options. Les 18
+       * commandes où il dépassait la somme des billets s'expliquent entièrement par leurs
+       * options — et non par des frais de billetterie externe, comme on l'a cru un temps.
+       *
+       * 📍 Les options comptent, filtre posé ou non. Sous un filtre d'article, le montant
+       * reprenait le seul prix des billets et les perdait.
+       *
+       * Annulé = billet `Canceled` OU commande annulée (`Refunded`), exactement comme
+       * `aggregateTicketingItems` côté trésorerie : les deux écrans doivent tomber d'accord.
+       */
+      const prixDuBillet = (item: {
+        amount: number
+        selectedOptions: ReadonlyArray<{ amount: number | null }>
+      }) =>
+        item.amount + item.selectedOptions.reduce((sum, option) => sum + (option.amount ?? 0), 0)
+
+      const billetAnnule = (order: { status: string }, item: { state: string }) =>
+        order.status === 'Refunded' ||
+        (ETATS_DE_BILLET_ANNULE as readonly string[]).includes(item.state)
+
       // Calculer les stats globales en tenant compte des filtres
       let stats = null
       if (!search) {
         const allOrders = await prisma.ticketingOrder.findMany({
           where: filtresSansRecherche,
           select: {
-            amount: true,
             status: true,
             paymentMethod: true,
             externalTicketingId: true,
             items: {
               // De quoi rejouer les filtres article par article : sans `tierId`, sans
-              // `entryValidated` et sans les options, on ne peut que tout compter.
+              // `entryValidated` et sans les options, on ne peut que tout compter. `state` et le
+              // prix des options servent au montant : un billet annulé ne compte pas, et ses
+              // options suivent son sort.
               select: {
                 type: true,
                 amount: true,
+                state: true,
                 tierId: true,
                 entryValidated: true,
-                selectedOptions: { select: { optionId: true } },
+                selectedOptions: { select: { optionId: true, amount: true } },
               },
             },
           },
         })
 
-        /** Les articles de cette commande que les filtres retiennent réellement. */
-        const retenusDe = (order: (typeof allOrders)[number]) =>
-          articlesRetenus(order.items, filtresDArticles)
+        let totalItems = 0
+        let totalAmount = 0
+        let totalDonations = 0
+        let totalDonationsAmount = 0
+        const amountsByPaymentMethod = {
+          cardHelloAsso: 0,
+          cardOnsite: 0,
+          cash: 0,
+          check: 0,
+          online: 0,
+          pending: 0,
+          /**
+           * Les billets annulés — commande entière ou billet seul. **Hors du total**, annoncés à
+           * part : ils étaient additionnés au « Total général », qui comptait donc deux fois ce
+           * qu'il aurait dû retirer. Le nom de la clé reste `refunded` pour les écrans déjà
+           * ouverts ; il ne dit PAS que l'argent a été rendu — le filtre « À rembourser » le dit.
+           */
+          refunded: 0,
+        }
 
-        /**
-         * Ce que cette commande apporte au montant affiché.
-         *
-         * Sans tri d'article, c'est le montant de la COMMANDE, et rien ne change : sur 565
-         * commandes de cette base, 18 ont un montant supérieur à la somme de leurs articles —
-         * des frais de billetterie externe, qui ne sont portés par aucun article. Reconstituer
-         * systématiquement le montant en sommant les articles ferait donc baisser un chiffre
-         * qu'on rapproche d'un relevé bancaire.
-         *
-         * Dès qu'un tri est actif, en revanche, le montant suit les articles retenus : c'est ce
-         * que le filtre promet, et laisser le total de la commande entière contredirait le
-         * compte de billets affiché juste à côté.
-         */
-        const montantDe = (
-          order: (typeof allOrders)[number],
-          retenus: ReturnType<typeof retenusDe>
-        ) =>
-          triDesArticlesActif ? retenus.reduce((sum, item) => sum + item.amount, 0) : order.amount
+        for (const order of allOrders) {
+          for (const item of articlesRetenus(order.items, filtresDArticles)) {
+            const prix = prixDuBillet(item)
 
-        const parCommande = allOrders.map((order) => {
-          const retenus = retenusDe(order)
-          return { order, retenus, montant: montantDe(order, retenus) }
-        })
-
-        const totalItems = parCommande.reduce(
-          (sum, { retenus }) => sum + retenus.filter((item) => item.type !== 'Donation').length,
-          0
-        )
-
-        const totalAmount = parCommande.reduce((sum, { montant }) => sum + montant, 0)
-
-        const totalDonations = parCommande.reduce(
-          (sum, { retenus }) => sum + retenus.filter((item) => item.type === 'Donation').length,
-          0
-        )
-
-        const totalDonationsAmount = parCommande.reduce(
-          (sum, { retenus }) =>
-            sum +
-            retenus
-              .filter((item) => item.type === 'Donation')
-              .reduce((itemSum, item) => itemSum + item.amount, 0),
-          0
-        )
-
-        // Calculer les montants par méthode de paiement
-        const amountsByPaymentMethod = parCommande.reduce(
-          (acc, { order, montant }) => {
-            // La même contribution que celle du total : sinon le détail par moyen de paiement
-            // cesserait d'additionner jusqu'au montant affiché juste au-dessus.
-            const amount = montant
-
-            if (order.status === 'Pending') {
-              acc.pending += amount
-            } else if (order.status === 'Refunded') {
-              acc.refunded += amount
-            } else if (order.paymentMethod === 'card') {
-              // Distinguer carte HelloAsso et carte sur place
-              if (order.externalTicketingId) {
-                acc.cardHelloAsso += amount
-              } else {
-                acc.cardOnsite += amount
-              }
-            } else if (order.paymentMethod === 'cash') {
-              acc.cash += amount
-            } else if (order.paymentMethod === 'check') {
-              acc.check += amount
-            } else if (order.status === 'Processed' || order.status === 'Onsite') {
-              // Anciennes commandes payées sans méthode spécifique
-              acc.online += amount
+            if (billetAnnule(order, item)) {
+              amountsByPaymentMethod.refunded += prix
+              continue
             }
 
-            return acc
-          },
-          {
-            cardHelloAsso: 0,
-            cardOnsite: 0,
-            cash: 0,
-            check: 0,
-            online: 0,
-            pending: 0,
-            refunded: 0,
+            // Un statut inconnu ne rapporte rien, comme en trésorerie : l'additionner au total
+            // sans pouvoir le ranger nulle part ferait un détail qui ne retombe plus sur le total.
+            if (order.status === 'Pending') amountsByPaymentMethod.pending += prix
+            else if (order.status !== 'Processed' && order.status !== 'Onsite') continue
+            else if (order.paymentMethod === 'card') {
+              // Distinguer carte HelloAsso et carte sur place
+              if (order.externalTicketingId) amountsByPaymentMethod.cardHelloAsso += prix
+              else amountsByPaymentMethod.cardOnsite += prix
+            } else if (order.paymentMethod === 'cash') amountsByPaymentMethod.cash += prix
+            else if (order.paymentMethod === 'check') amountsByPaymentMethod.check += prix
+            // Payée sans moyen de paiement renseigné
+            else amountsByPaymentMethod.online += prix
+
+            totalAmount += prix
+            if (item.type === 'Donation') {
+              totalDonations += 1
+              totalDonationsAmount += prix
+            } else {
+              totalItems += 1
+            }
           }
-        )
+        }
 
         stats = {
           totalOrders: total,
@@ -502,6 +495,17 @@ export default wrapApiHandler(
        */
       const commandesMarquees = orders.map((order) => ({
         ...order,
+        /**
+         * La part de `amount` qui ne rapporte plus : billets annulés, options comprises.
+         *
+         * `amount` reste ce qui a été payé — c'est lui qu'on rapproche d'un relevé —, mais il ne
+         * baisse pas quand on annule un billet : la commande 686 affichait 102 € avec trois de
+         * ses cinq tee-shirts annulés. L'écran l'annonce donc à côté, plutôt que de le taire.
+         */
+        canceledAmount: (order.items ?? []).reduce(
+          (sum: number, item: any) => sum + (billetAnnule(order, item) ? prixDuBillet(item) : 0),
+          0
+        ),
         items: (order.items ?? []).map((item: any) => ({
           ...item,
           retenuParLesFiltres: !triDesArticlesActif || articleRetenu(item, filtresDArticles),
@@ -517,6 +521,7 @@ export default wrapApiHandler(
             state: item.state,
             refunded: item.refunded,
             amount: item.amount,
+            selectedOptions: item.selectedOptions,
             order: { status: order.status, paymentMethod: order.paymentMethod },
           }),
         })),
