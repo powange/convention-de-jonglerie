@@ -18,8 +18,17 @@ export interface UploadOptions {
 
 export interface UploadEndpoint {
   /** Type d'endpoint d'upload */
-  type: 'convention' | 'edition' | 'show' | 'lost-found' | 'treasury' | 'profile' | 'generic'
-  /** ID de l'entité (requis pour convention, edition, lost-found, treasury) */
+  type:
+    | 'convention'
+    | 'edition'
+    | 'show'
+    | 'lost-found'
+    | 'treasury'
+    /** Justificatifs d'un artiste. Point d'API distinct de `treasury` : le droit n'est pas le même. */
+    | 'artist'
+    | 'profile'
+    | 'generic'
+  /** ID de l'entité (requis pour convention, edition, lost-found, treasury, artist) */
   id?: number | string
 }
 

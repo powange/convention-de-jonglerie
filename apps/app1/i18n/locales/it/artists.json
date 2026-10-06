@@ -195,6 +195,15 @@
     "delete_empty_shows_intro": "Questi cabaret resterebbero senza alcun numero:",
     "delete_orphan_acts_hint": "Ciò che non è selezionato resta. Un numero senza interprete non impedisce nulla: appare nella scaletta e nella scheda tecnica, senza nome.",
     "delete_orphan_acts_intro": "Questo numero non avrebbe più nessuno a interpretarlo: | Questi {count} numeri non avrebbero più nessuno a interpretarli:",
-    "search_help": "La ricerca riguarda tutte le colonne visualizzate: nascondere una colonna la esclude anche dalla ricerca."
+    "search_help": "La ricerca riguarda tutte le colonne visualizzate: nascondere una colonna la esclude anche dalla ricerca.",
+    "consumables_not_paid": "Materiali di consumo non rimborsati",
+    "consumables_receipt": "Giustificativo dei materiali di consumo",
+    "consumables_receipt_help": "Scontrino, fattura — immagine o PDF",
+    "payment_not_paid": "Cachet non versato",
+    "reimbursement_not_paid": "Rimborso viaggio non versato",
+    "reimbursement_receipt": "Giustificativo del rimborso viaggio",
+    "reimbursement_receipt_help": "Biglietto del treno, fattura del carburante, pedaggio — immagine o PDF",
+    "tab_informations": "Informazioni",
+    "tab_payment": "Pagamento"
   }
 }

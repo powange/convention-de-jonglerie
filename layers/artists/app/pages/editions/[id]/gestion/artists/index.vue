@@ -370,12 +370,24 @@
               <template #payment-cell="{ row }">
                 <div v-if="row.original.payment" class="flex items-center gap-2">
                   <span class="font-medium">{{ formatAmount(Number(row.original.payment)) }}</span>
+                  <!--
+                    ⚠️ UN LIBELLÉ, PAS UN SYMBOLE. « ✓ » et « ○ » se ressemblent dans une pastille
+                    de cette taille, et rien ne disait de quoi ils parlaient : on devait ouvrir la
+                    fiche pour en être sûr. L'état se lit maintenant sans décodage.
+                  -->
                   <UBadge
                     :color="row.original.paymentPaid ? 'success' : 'warning'"
                     variant="soft"
                     size="sm"
+                    :icon="
+                      row.original.paymentPaid ? 'i-heroicons-check-circle' : 'i-heroicons-clock'
+                    "
                   >
-                    {{ row.original.paymentPaid ? '✓' : '○' }}
+                    {{
+                      row.original.paymentPaid
+                        ? $t('artists.payment_paid')
+                        : $t('artists.payment_not_paid')
+                    }}
                   </UBadge>
                 </div>
                 <span v-else class="text-gray-400">-</span>
@@ -398,14 +410,35 @@
                     <span class="font-medium">{{
                       formatAmount(Number(row.original.reimbursementActual))
                     }}</span>
-                    <UBadge
-                      :color="row.original.reimbursementActualPaid ? 'success' : 'warning'"
-                      variant="soft"
-                      size="sm"
-                    >
-                      {{ row.original.reimbursementActualPaid ? '✓' : '○' }}
-                    </UBadge>
                   </div>
+                  <!--
+                    ⚠️ LA PASTILLE VIT HORS DU BLOC « RÉEL », et c'est la seconde moitié du
+                    correctif. Elle y était enfermée : tant que le montant réel n'était pas saisi,
+                    RIEN ne disait si l'on avait rendu l'argent — alors que c'est justement l'état
+                    qu'on vient chercher sur cette page. Un défraiement prévu mais non réglé
+                    s'affiche désormais comme tel.
+                  -->
+                  <!--
+                    ⚠️ UN LIBELLÉ, PAS UN SYMBOLE. « ✓ » et « ○ » se ressemblent dans une pastille
+                    de cette taille, et rien ne disait de quoi ils parlaient : on devait ouvrir la
+                    fiche pour en être sûr. L'état se lit maintenant sans décodage.
+                  -->
+                  <UBadge
+                    :color="row.original.reimbursementActualPaid ? 'success' : 'warning'"
+                    variant="soft"
+                    size="sm"
+                    :icon="
+                      row.original.reimbursementActualPaid
+                        ? 'i-heroicons-check-circle'
+                        : 'i-heroicons-clock'
+                    "
+                  >
+                    {{
+                      row.original.reimbursementActualPaid
+                        ? $t('artists.reimbursement_paid')
+                        : $t('artists.reimbursement_not_paid')
+                    }}
+                  </UBadge>
                 </div>
                 <span v-else class="text-gray-400">-</span>
               </template>
@@ -427,14 +460,35 @@
                     <span class="font-medium">{{
                       formatAmount(Number(row.original.consumablesActual))
                     }}</span>
-                    <UBadge
-                      :color="row.original.consumablesActualPaid ? 'success' : 'warning'"
-                      variant="soft"
-                      size="sm"
-                    >
-                      {{ row.original.consumablesActualPaid ? '✓' : '○' }}
-                    </UBadge>
                   </div>
+                  <!--
+                    ⚠️ LA PASTILLE VIT HORS DU BLOC « RÉEL », et c'est la seconde moitié du
+                    correctif. Elle y était enfermée : tant que le montant réel n'était pas saisi,
+                    RIEN ne disait si l'on avait rendu l'argent — alors que c'est justement l'état
+                    qu'on vient chercher sur cette page. Un défraiement prévu mais non réglé
+                    s'affiche désormais comme tel.
+                  -->
+                  <!--
+                    ⚠️ UN LIBELLÉ, PAS UN SYMBOLE. « ✓ » et « ○ » se ressemblent dans une pastille
+                    de cette taille, et rien ne disait de quoi ils parlaient : on devait ouvrir la
+                    fiche pour en être sûr. L'état se lit maintenant sans décodage.
+                  -->
+                  <UBadge
+                    :color="row.original.consumablesActualPaid ? 'success' : 'warning'"
+                    variant="soft"
+                    size="sm"
+                    :icon="
+                      row.original.consumablesActualPaid
+                        ? 'i-heroicons-check-circle'
+                        : 'i-heroicons-clock'
+                    "
+                  >
+                    {{
+                      row.original.consumablesActualPaid
+                        ? $t('artists.consumables_paid')
+                        : $t('artists.consumables_not_paid')
+                    }}
+                  </UBadge>
                 </div>
                 <span v-else class="text-gray-400">-</span>
               </template>

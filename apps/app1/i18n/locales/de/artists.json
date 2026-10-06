@@ -195,6 +195,15 @@
     "delete_empty_shows_intro": "Diesen Kabaretts bliebe keine einzige Nummer:",
     "delete_orphan_acts_hint": "Was nicht angehakt ist, bleibt bestehen. Eine Nummer ohne Interpret stört nichts: Sie erscheint im Ablauf und im technischen Blatt, ohne Namen.",
     "delete_orphan_acts_intro": "Diese Nummer hätte niemanden mehr, der sie aufführt: | Diese {count} Nummern hätten niemanden mehr, der sie aufführt:",
-    "search_help": "Die Suche umfasst alle angezeigten Spalten: Wird eine Spalte ausgeblendet, entfällt sie auch aus der Suche."
+    "search_help": "Die Suche umfasst alle angezeigten Spalten: Wird eine Spalte ausgeblendet, entfällt sie auch aus der Suche.",
+    "consumables_not_paid": "Verbrauchsmaterialien nicht erstattet",
+    "consumables_receipt": "Beleg für die Verbrauchsmaterialien",
+    "consumables_receipt_help": "Kassenbon, Rechnung — Bild oder PDF",
+    "payment_not_paid": "Gage nicht gezahlt",
+    "reimbursement_not_paid": "Fahrtkosten nicht erstattet",
+    "reimbursement_receipt": "Beleg für die Fahrtkosten",
+    "reimbursement_receipt_help": "Zugticket, Tankbeleg, Maut — Bild oder PDF",
+    "tab_informations": "Angaben",
+    "tab_payment": "Zahlung"
   }
 }

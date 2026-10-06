@@ -195,6 +195,15 @@
     "delete_empty_shows_intro": "Estos cabarets se quedarían sin ningún número:",
     "delete_orphan_acts_hint": "Lo que no se marque permanece. Un número sin intérprete no impide nada: aparece en el orden y en la ficha técnica, sin nombre.",
     "delete_orphan_acts_intro": "Este número se quedaría sin nadie para interpretarlo: | Estos {count} números se quedarían sin nadie para interpretarlos:",
-    "search_help": "La búsqueda abarca todas las columnas mostradas: ocultar una columna también la excluye de la búsqueda."
+    "search_help": "La búsqueda abarca todas las columnas mostradas: ocultar una columna también la excluye de la búsqueda.",
+    "consumables_not_paid": "Consumibles no reembolsados",
+    "consumables_receipt": "Justificante de los consumibles",
+    "consumables_receipt_help": "Tique de caja, factura — imagen o PDF",
+    "payment_not_paid": "Caché no abonado",
+    "reimbursement_not_paid": "Desplazamiento no reembolsado",
+    "reimbursement_receipt": "Justificante del desplazamiento",
+    "reimbursement_receipt_help": "Billete de tren, factura de gasolina, peaje — imagen o PDF",
+    "tab_informations": "Información",
+    "tab_payment": "Pago"
   }
 }

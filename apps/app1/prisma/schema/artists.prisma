@@ -33,7 +33,7 @@ enum AccommodationType {
 }
 
 model EditionArtist {
-  id                      Int                @id @default(autoincrement())
+  id                      Int       @id @default(autoincrement())
   editionId               Int
   userId                  Int
   /// Arrivée et départ sur place, en INSTANTS.
@@ -46,8 +46,8 @@ model EditionArtist {
   /// une heure saisie « 15 h sur place » serait relue comme 15 h UTC.
   arrivalDateTime         DateTime?
   departureDateTime       DateTime?
-  qrCodeToken             String?            @unique
-  entryValidated          Boolean            @default(false)
+  qrCodeToken             String?   @unique
+  entryValidated          Boolean   @default(false)
   entryValidatedAt        DateTime?
   entryValidatedBy        Int?
   // Montants en **centimes entiers**, dans la devise de l'édition. Les additionner en flottant
@@ -55,13 +55,26 @@ model EditionArtist {
   // trésorerie les agrège avec ceux de la billetterie, déjà en centimes. Conversion depuis les
   // unités courantes dans `shared/utils/money.ts`, jamais par un `* 100` disséminé.
   payment                 Int?
-  paymentPaid             Boolean            @default(false)
+  paymentPaid             Boolean   @default(false)
   reimbursementMax        Int?
   reimbursementActual     Int?
-  reimbursementActualPaid Boolean            @default(false)
+  reimbursementActualPaid Boolean   @default(false)
   consumablesMax          Int?
   consumablesActual       Int?
-  consumablesActualPaid   Boolean            @default(false)
+  consumablesActualPaid   Boolean   @default(false)
+
+  /// Le justificatif du DÉFRAIEMENT : billet de train, facture d'essence, péage.
+  ///
+  /// ⚠️ Une URL écrite par le CLIENT, comme `imageUrl` en trésorerie : le serveur n'en garde que le
+  /// nom de fichier et ne suit jamais le chemin reçu — voir `artist-receipt-files.ts`. Un `PUT`
+  /// pourrait sinon y glisser `../../../../etc/passwd`.
+  ///
+  /// 📍 Images ET PDF : beaucoup de billets de train n'existent que sous cette forme, et il
+  /// faudrait sinon en faire une capture d'écran.
+  reimbursementReceiptUrl String?
+
+  /// Le justificatif des CONSOMMABLES. Même contrat que celui du défraiement ci-dessus.
+  consumablesReceiptUrl   String?
   organizerNotes          String?            @db.Text
   accommodationAutonomous Boolean            @default(false)
   accommodationType       AccommodationType?

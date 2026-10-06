@@ -195,6 +195,15 @@
     "delete_empty_shows_intro": "Deze cabarets zouden helemaal zonder nummers komen te zitten:",
     "delete_orphan_acts_hint": "Wat niet is aangevinkt blijft staan. Een nummer zonder uitvoerder belemmert niets: het verschijnt in het verloop en op het technische blad, zonder naam.",
     "delete_orphan_acts_intro": "Dit nummer zou niemand meer hebben om het uit te voeren: | Deze {count} nummers zouden niemand meer hebben om ze uit te voeren:",
-    "search_help": "De zoekopdracht geldt voor alle weergegeven kolommen: een kolom verbergen haalt die ook uit de zoekopdracht."
+    "search_help": "De zoekopdracht geldt voor alle weergegeven kolommen: een kolom verbergen haalt die ook uit de zoekopdracht.",
+    "consumables_not_paid": "Verbruiksgoederen niet terugbetaald",
+    "consumables_receipt": "Bewijs van de verbruiksgoederen",
+    "consumables_receipt_help": "Kassabon, factuur — afbeelding of PDF",
+    "payment_not_paid": "Gage niet betaald",
+    "reimbursement_not_paid": "Reiskosten niet terugbetaald",
+    "reimbursement_receipt": "Bewijs van de reiskosten",
+    "reimbursement_receipt_help": "Treinkaartje, tankbon, tol — afbeelding of PDF",
+    "tab_informations": "Gegevens",
+    "tab_payment": "Betaling"
   }
 }
