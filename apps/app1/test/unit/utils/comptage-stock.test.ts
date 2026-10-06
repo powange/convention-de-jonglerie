@@ -4,7 +4,9 @@ import {
   comptagesAEnvoyer,
   compteRetenu,
   ecartComptage,
+  effacementsDeComptage,
   nombreEnAttente,
+  TAILLE_MAX_LOT_COMPTAGE,
   resumeComptage,
 } from '../../../../../layers/stock/app/utils/comptage-stock'
 
@@ -153,5 +155,30 @@ describe('nombreEnAttente', () => {
 
   it('rend zéro quand rien n’a bougé', () => {
     expect(nombreEnAttente([ligne({ finalQuantity: 5 })])).toBe(0)
+  })
+})
+
+describe('effacementsDeComptage', () => {
+  it('efface en `null`, et non à zéro : l’objet redevient « jamais compté »', () => {
+    expect(effacementsDeComptage([4, 9])).toEqual([
+      [
+        { id: 4, finalQuantity: null },
+        { id: 9, finalQuantity: null },
+      ],
+    ])
+  })
+
+  it('découpe en lots que le serveur accepte', () => {
+    // 343 objets : la taille réelle du stock de l'édition de développement.
+    const ids = Array.from({ length: 343 }, (_, i) => i + 1)
+    const lots = effacementsDeComptage(ids)
+
+    expect(lots.map((lot) => lot.length)).toEqual([TAILLE_MAX_LOT_COMPTAGE, 143])
+    expect(lots.flat().map((e) => e.id)).toEqual(ids)
+  })
+
+  it('ne rend aucun lot sans objet, et ne double pas un identifiant répété', () => {
+    expect(effacementsDeComptage([])).toEqual([])
+    expect(effacementsDeComptage([3, 3]).flat()).toEqual([{ id: 3, finalQuantity: null }])
   })
 })

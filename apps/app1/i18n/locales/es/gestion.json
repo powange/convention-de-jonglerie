@@ -724,7 +724,13 @@
       "reorder_error": "No se pudo guardar el orden",
       "reorder_up": "Subir",
       "loans_description": "El material prestado desde fuera, para recoger y luego devolver",
-      "missing_description": "Lo que falta tras el recuento, y las listas de la compra para reponerlo"
+      "missing_description": "Lo que falta tras el recuento, y las listas de la compra para reponerlo",
+      "missing_none_complete": "Todavía no se ha contado ningún objeto como completo.",
+      "missing_reset_count": "Volver a contar ({count})",
+      "missing_reset_count_confirm": "Se borrará el recuento de {count} objeto: volverá a «Por contar». | Se borrará el recuento de {count} objetos: volverán a «Por contar».",
+      "missing_reset_count_done": "{count} objeto pendiente de volver a contar | {count} objetos pendientes de volver a contar",
+      "missing_reset_count_title": "Volver a contar",
+      "missing_tab_complete": "Completos"
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",

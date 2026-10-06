@@ -724,7 +724,13 @@
       "usage": "Usage",
       "usage_placeholder": "e.g.: Fire show Saturday 10 PM",
       "loans_description": "Equipment borrowed from outside, to collect then return",
-      "missing_description": "What is missing once counted, and the shopping lists to rebuy it"
+      "missing_description": "What is missing once counted, and the shopping lists to rebuy it",
+      "missing_none_complete": "No item has been counted as complete yet.",
+      "missing_reset_count": "Count again ({count})",
+      "missing_reset_count_confirm": "The count of {count} item will be cleared: it will go back to “To count”. | The count of {count} items will be cleared: they will go back to “To count”.",
+      "missing_reset_count_done": "{count} item set to count again | {count} items set to count again",
+      "missing_reset_count_title": "Count again",
+      "missing_tab_complete": "Complete"
     },
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",

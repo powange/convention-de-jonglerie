@@ -724,7 +724,13 @@
       "reorder_error": "Nie udało się zapisać kolejności",
       "reorder_up": "Przenieś w górę",
       "loans_description": "Sprzęt wypożyczony z zewnątrz, do odbioru i następnie zwrotu",
-      "missing_description": "Czego brakuje po przeliczeniu, i listy zakupów, by to odkupić"
+      "missing_description": "Czego brakuje po przeliczeniu, i listy zakupów, by to odkupić",
+      "missing_none_complete": "Żaden przedmiot nie został jeszcze policzony jako kompletny.",
+      "missing_reset_count": "Policz ponownie ({count})",
+      "missing_reset_count_confirm": "Liczenie {count} przedmiotu zostanie usunięte: wróci do „Do policzenia”. | Liczenie {count} przedmiotów zostanie usunięte: wrócą do „Do policzenia”.",
+      "missing_reset_count_done": "{count} przedmiot do ponownego policzenia | {count} przedmiotów do ponownego policzenia",
+      "missing_reset_count_title": "Policz ponownie",
+      "missing_tab_complete": "Kompletne"
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",

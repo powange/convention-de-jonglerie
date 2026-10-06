@@ -724,7 +724,13 @@
       "reorder_error": "Não foi possível guardar a ordem",
       "reorder_up": "Subir",
       "loans_description": "O material emprestado do exterior, a recolher e depois a devolver",
-      "missing_description": "O que falta depois da contagem, e as listas de compras para o recomprar"
+      "missing_description": "O que falta depois da contagem, e as listas de compras para o recomprar",
+      "missing_none_complete": "Nenhum objeto foi ainda contado como completo.",
+      "missing_reset_count": "Voltar a contar ({count})",
+      "missing_reset_count_confirm": "A contagem de {count} objeto será apagada: voltará para «Por contar». | A contagem de {count} objetos será apagada: voltarão para «Por contar».",
+      "missing_reset_count_done": "{count} objeto para voltar a contar | {count} objetos para voltar a contar",
+      "missing_reset_count_title": "Voltar a contar",
+      "missing_tab_complete": "Completos"
     },
     "ticketing": {
       "access_control_description": "Digitalizar e validar bilhetes à entrada",

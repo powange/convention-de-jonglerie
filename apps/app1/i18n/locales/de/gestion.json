@@ -724,7 +724,13 @@
       "reorder_error": "Reihenfolge konnte nicht gespeichert werden",
       "reorder_up": "Nach oben",
       "loans_description": "Von außen geliehenes Material, das abzuholen und dann zurückzugeben ist",
-      "missing_description": "Was nach der Zählung fehlt, und die Einkaufslisten zum Nachkaufen"
+      "missing_description": "Was nach der Zählung fehlt, und die Einkaufslisten zum Nachkaufen",
+      "missing_none_complete": "Noch kein Gegenstand wurde als vollständig gezählt.",
+      "missing_reset_count": "Erneut zählen ({count})",
+      "missing_reset_count_confirm": "Die Zählung von {count} Gegenstand wird gelöscht: Er kommt zurück zu „Zu zählen“. | Die Zählung von {count} Gegenständen wird gelöscht: Sie kommen zurück zu „Zu zählen“.",
+      "missing_reset_count_done": "{count} Gegenstand erneut zu zählen | {count} Gegenstände erneut zu zählen",
+      "missing_reset_count_title": "Erneut zählen",
+      "missing_tab_complete": "Vollständig"
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",
