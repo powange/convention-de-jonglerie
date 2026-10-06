@@ -241,17 +241,30 @@ test.describe.serial('Module Stock matériel', () => {
     await expect(modale).toBeVisible({ timeout: 5000 })
     await modale.getByRole('button', { name: /remettre à compter/i }).click()
 
+    // ⚠️ Attendre que la modale se REFERME avant toute autre assertion. Ouverte, elle pose
+    // `aria-hidden` sur le reste de la page : `getByRole('row')` n'y trouve alors plus aucune ligne,
+    // et « la ligne a disparu » se vérifiait à l'instant du clic — avant même l'envoi. La première
+    // version de ce test passait ainsi l'étape, puis lisait la base trop tôt.
+    await expect(modale).toBeHidden({ timeout: 10000 })
+
     // L'objet quitte l'onglet…
     await expect(ligne).toHaveCount(0, { timeout: 10000 })
 
-    // …et la base dit « jamais compté », pas « zéro ».
-    const lecture = await page.request.get(
-      `http://localhost:3000/api/editions/${editionId}/stock-comptage`
-    )
-    expect(lecture.ok()).toBe(true)
-    const objets: { id: number; finalQuantity: number | null }[] =
-      (await lecture.json())?.data?.items ?? []
-    expect(objets.find((objet) => objet.id === stockItemId)?.finalQuantity).toBeNull()
+    // …et la base dit « jamais compté », pas « zéro ». Relue jusqu'à stabilisation plutôt qu'une
+    // fois : c'est l'écriture qu'on éprouve, pas la vitesse du serveur.
+    await expect
+      .poll(
+        async () => {
+          const lecture = await page.request.get(
+            `http://localhost:3000/api/editions/${editionId}/stock-comptage`
+          )
+          const objets: { id: number; finalQuantity: number | null }[] =
+            (await lecture.json())?.data?.items ?? []
+          return objets.find((objet) => objet.id === stockItemId)?.finalQuantity
+        },
+        { timeout: 10000 }
+      )
+      .toBeNull()
 
     // Il est revenu dans « À compter ».
     await page.getByRole('tab', { name: /à compter/i }).click()
