@@ -23,6 +23,20 @@
         </UFormField>
 
         <UFormField :label="$t('tasks.task_assignees')" :error="fieldErrors.assigneeIds">
+          <!--
+            ⚠️ L'AVATAR VIENT DE `UiUserAvatar`, PAS DE LA PROP `avatar` DE NUXT UI.
+
+            La liste passait `avatar: { src: getUserAvatar(u, 32) }`. Or `getUserAvatar` rend, pour
+            qui n'a pas de photo, une URL Gravatar en `d=404` — volontairement introuvable. C'est
+            `getUserAvatarWithCache` qui guette cet échec et retombe sur les initiales colorées, et
+            seul `UiUserAvatar` l'appelle. Le sélecteur affichait donc le repli de Nuxt UI, gris et
+            uniforme, là où le reste de l'application montre la lettre sur sa couleur.
+
+            📍 La recherche, elle, continue de porter sur l'état civil ET l'adresse : `label` ne
+            garde que le pseudo, le reste passe en `description` (seconde ligne de la liste
+            déroulée), et `filter-fields` nomme les deux. Sans ce `filter-fields`, Nuxt UI ne
+            filtrerait que sur `label` et chercher un nom de famille ne rendrait plus rien.
+          -->
           <USelectMenu
             v-model="selectedAssignees"
             :items="userItems"
@@ -30,9 +44,28 @@
             :placeholder="$t('gestion.task.task_assignees_placeholder')"
             searchable
             :searchable-placeholder="$t('common.search')"
+            :filter-fields="['label', 'description']"
             class="w-full"
             :ui="{ content: 'min-w-fit' }"
           >
+            <template #default="{ modelValue: selection }">
+              <span v-if="!selection?.length" class="text-gray-400">
+                {{ $t('gestion.task.task_assignees_placeholder') }}
+              </span>
+              <div v-else class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span
+                  v-for="personne in selection"
+                  :key="personne.id"
+                  class="inline-flex items-center gap-1.5 min-w-0"
+                >
+                  <UiUserAvatar :user="personne" size="sm" />
+                  <span class="truncate">{{ nomCompletDUnCompte(personne) }}</span>
+                </span>
+              </div>
+            </template>
+            <template #item-leading="{ item }">
+              <UiUserAvatar :user="item" size="sm" />
+            </template>
             <template #item-trailing="{ item }">
               <UBadge v-if="item.isLegacy" color="warning" variant="soft" size="xs">
                 {{ $t('gestion.task.assignee_legacy_badge') }}
@@ -165,6 +198,7 @@
  * groupes ne transmet plus.
  */
 import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
+import { nomCompletDUnCompte } from '~~/shared/utils/nom-affichable'
 
 interface AssignedUser {
   id: number
@@ -270,19 +304,26 @@ interface UserItem extends AssignedUser {
    * assignation et ne la portent pas.
    */
   email?: string
+  /** Le pseudo seul : c'est lui qu'on lit en premier, dans la liste comme replié. */
   label: string
+  /** L'état civil et l'adresse — affichés sous le pseudo, et surtout cherchables. */
+  description?: string
   isLegacy?: boolean
-  avatar: { src: string; alt: string; loading: 'lazy' }
 }
 
-const { getUserAvatar } = useAvatar()
-
 function toUserItem(u: AssignedUser & { email?: string }, isLegacy = false): UserItem {
+  const etatCivil = [u.prenom, u.nom]
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .join(' ')
+
   return {
     ...u,
-    label: u.pseudo + (u.email ? ' — ' + u.email : ''),
+    label: u.pseudo,
+    // `undefined` plutôt qu'une chaîne vide : Nuxt UI n'affiche alors aucune seconde ligne, au
+    // lieu d'en réserver la hauteur pour rien.
+    description: [etatCivil, u.email].filter(Boolean).join(' — ') || undefined,
     isLegacy,
-    avatar: { src: getUserAvatar(u, 32), alt: u.pseudo, loading: 'lazy' },
   }
 }
 

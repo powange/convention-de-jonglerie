@@ -56,12 +56,19 @@
           <span v-if="!selected?.length">
             {{ $t('tasks.filters.assignee_placeholder') }}
           </span>
-          <span v-else-if="selected.length === 1">
-            {{ selected[0].label }}
+          <span v-else-if="selected.length === 1" class="inline-flex items-center gap-1.5 min-w-0">
+            <UiUserAvatar :user="selected[0].user" size="sm" />
+            <span class="truncate">{{ selected[0].label }}</span>
           </span>
           <span v-else>
             {{ $t('tasks.filters.assignees_count', { count: selected.length }) }}
           </span>
+        </template>
+        <!-- Même raison qu'en modale : `getUserAvatar` rend du Gravatar en `d=404` pour qui n'a
+             pas de photo, et seul `UiUserAvatar` guette cet échec pour afficher l'initiale sur sa
+             couleur. Passer l'URL à la prop `avatar` de Nuxt UI donnait un repli gris uniforme. -->
+        <template #item-leading="{ item }">
+          <UiUserAvatar :user="item.user" size="sm" />
         </template>
       </USelectMenu>
 
@@ -206,16 +213,14 @@ const selectedStatuses = ref<StatusItem[]>(
 interface AssigneeItem {
   label: string
   value: number
+  /** Porté jusqu'au gabarit : c'est `UiUserAvatar` qui dessine la vignette, pas Nuxt UI. */
   user: AssignableUser
-  avatar: { src: string; alt: string; loading: 'lazy' }
 }
-const { getUserAvatar } = useAvatar()
 function buildAssigneeItem(u: AssignableUser): AssigneeItem {
   return {
     label: u.pseudo,
     value: u.id,
     user: u,
-    avatar: { src: getUserAvatar(u, 32), alt: u.pseudo, loading: 'lazy' },
   }
 }
 const assigneeItems = computed<AssigneeItem[]>(() => {

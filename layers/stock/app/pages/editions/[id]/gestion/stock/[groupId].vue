@@ -29,7 +29,6 @@
       <UCard>
         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div class="flex items-start gap-3 flex-1 min-w-0">
-            <UIcon name="i-heroicons-archive-box" class="text-amber-600 size-6 mt-1 shrink-0" />
             <div class="flex-1 min-w-0">
               <!-- 20 px et non 24, délibérément : ce titre nomme un ENREGISTREMENT — ce
                    groupe, cet objet — et non un écran du module. Le cran en dessous dit

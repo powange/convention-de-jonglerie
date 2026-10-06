@@ -3,7 +3,6 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
       <div class="flex items-center gap-3">
-        <UIcon name="i-heroicons-archive-box" class="text-amber-600 size-6" />
         <ManagementPageHeader :titre="$t('gestion.stock.title')" />
       </div>
       <UButton
