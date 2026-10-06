@@ -403,7 +403,10 @@
       "validated_today": "Heute validiert",
       "volunteer": "Freiwilliger",
       "volunteer_accepted": "Freiwilliger akzeptiert",
-      "volunteer_management": "Freiwilligenverwaltung"
+      "volunteer_management": "Freiwilligenverwaltung",
+      "same_as_buyer": "Wie Käufer",
+      "selected_count": "{n} Teilnehmer ausgewählt | {n} Teilnehmer ausgewählt",
+      "validate_entry_count": "Einlass bestätigen ({count})"
     },
     "ticketing_title": "Ticketing",
     "useful_links": "Nützliche Links",

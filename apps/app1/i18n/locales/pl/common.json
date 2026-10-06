@@ -403,7 +403,10 @@
       "validated_today": "Zwalidowane dzisiaj",
       "volunteer": "Wolontariusz",
       "volunteer_accepted": "Wolontariusz zaakceptowany",
-      "volunteer_management": "Zarządzanie wolontariuszami"
+      "volunteer_management": "Zarządzanie wolontariuszami",
+      "same_as_buyer": "Tak jak kupujący",
+      "selected_count": "Wybrano {n} uczestnika | Wybrano {n} uczestników",
+      "validate_entry_count": "Potwierdź wejście ({count})"
     },
     "ticketing_title": "System biletowy",
     "useful_links": "Przydatne linki",

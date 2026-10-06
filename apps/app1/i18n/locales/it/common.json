@@ -403,7 +403,10 @@
       "validated_today": "Convalidati oggi",
       "volunteer": "Volontario",
       "volunteer_accepted": "Volontario accettato",
-      "volunteer_management": "Gestione volontari"
+      "volunteer_management": "Gestione volontari",
+      "same_as_buyer": "Come l'acquirente",
+      "selected_count": "{n} partecipante selezionato | {n} partecipanti selezionati",
+      "validate_entry_count": "Convalida l'ingresso ({count})"
     },
     "ticketing_title": "Biglietteria",
     "useful_links": "Link utili",

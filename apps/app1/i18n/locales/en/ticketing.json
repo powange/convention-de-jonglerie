@@ -71,7 +71,12 @@
         "montage": "Setup only",
         "demontage": "Teardown only",
         "montage-demontage": "Setup and teardown"
-      }
+      },
+      "group_motif_email": "Matched on name AND email address, with no shared account: please check this really is the same person.",
+      "group_partial": "Incomplete check-in",
+      "group_title": "People with several entries",
+      "group_validate": "Check in the remaining entry | Check in the {count} remaining entries",
+      "group_validated": "{count} entry checked in | {count} entries checked in"
     },
     "counters": {
       "connected": "Connected",

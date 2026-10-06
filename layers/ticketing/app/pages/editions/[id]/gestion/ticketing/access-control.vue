@@ -100,6 +100,79 @@
                     trouvé{{ searchResults.total > 1 ? 's' : '' }}
                   </div>
 
+                  <!--
+                    ─── Les PERSONNES à plusieurs titres ─────────────────────────────────────
+
+                    ⚠️ CE BLOC S'AJOUTE, IL NE REMPLACE RIEN. Les quatre listes restent dessous,
+                    intactes : c'est là qu'on lit le détail d'un billet, ses options, ses créneaux,
+                    ses articles à remettre. Ici on ne propose qu'un geste — valider tout ce que
+                    cette personne porte.
+
+                    📍 N'apparaît que s'il reste au moins DEUX titres à valider. Un seul titre
+                    restant est déjà servi par les listes, et le proposer en double n'ajouterait
+                    qu'une façon de se tromper — voir `meriteUnGesteGroupe`.
+                  -->
+                  <div v-if="personnesAValiderEnBloc.length > 0" class="space-y-2">
+                    <div
+                      class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      <UIcon name="i-heroicons-user-group" class="text-primary-500" />
+                      {{ $t('ticketing.access_control.group_title') }}
+                    </div>
+                    <div
+                      v-for="personne in personnesAValiderEnBloc"
+                      :key="personne.cle"
+                      class="p-3 rounded-lg border-2 border-primary-200 dark:border-primary-900 bg-primary-50/50 dark:bg-primary-900/10 space-y-2"
+                    >
+                      <div class="flex flex-wrap items-center gap-2">
+                        <span class="font-medium text-gray-900 dark:text-white">
+                          {{ personne.libelle }}
+                        </span>
+                        <!--
+                          La COULEUR dit la nature, la COCHE dit la validation. La couleur portait
+                          les deux auparavant — vert si validé, gris sinon —, et les quatre natures
+                          se ressemblaient donc toutes.
+                        -->
+                        <UBadge
+                          v-for="titre in personne.titres"
+                          :key="`${titre.nature}-${titre.id}`"
+                          size="sm"
+                          variant="soft"
+                          color="neutral"
+                          :class="pastilleDeNature(titre.nature).classes"
+                          :icon="titre.entryValidated ? 'i-heroicons-check' : undefined"
+                          :label="pastilleDeNature(titre.nature).libelle"
+                        />
+                      </div>
+
+                      <!--
+                        ⚠️ LE MOTIF EST DIT, et ce n'est pas décoratif. Un rapprochement par
+                        courriel et nom N'EST PAS CERTAIN : mesuré sur la base de développement,
+                        163 courriels sur 609 portent des billets à plusieurs noms. L'annoncer
+                        laisse l'opérateur vérifier avant de valider quelqu'un qui n'est pas là.
+                      -->
+                      <p
+                        v-if="personne.motif === 'courriel-et-nom'"
+                        class="text-xs text-amber-700 dark:text-amber-400"
+                      >
+                        {{ $t('ticketing.access_control.group_motif_email') }}
+                      </p>
+
+                      <UButton
+                        size="sm"
+                        icon="i-heroicons-check-badge"
+                        :loading="validationEnBloc === personne.cle"
+                        :disabled="validationEnBloc !== null"
+                        :label="
+                          $t('ticketing.access_control.group_validate', {
+                            count: personne.aValider,
+                          })
+                        "
+                        @click="ouvrirValidationGroupee(personne)"
+                      />
+                    </div>
+                  </div>
+
                   <!-- Liste des billets -->
                   <div v-if="searchResults.tickets.length > 0" class="space-y-2">
                     <div
@@ -129,7 +202,7 @@
                             </div>
                           </div>
                           <div class="flex items-center gap-2">
-                            <UBadge :color="ticketConfig.color">{{
+                            <UBadge color="neutral" :class="pastilleDeNature('ticket').classes">{{
                               $t('ticketing.stats.participants')
                             }}</UBadge>
                             <UIcon
@@ -179,7 +252,7 @@
                             </div>
                           </div>
                           <div class="flex items-center gap-2">
-                            <UBadge :color="artistConfig.color">{{
+                            <UBadge color="neutral" :class="pastilleDeNature('artist').classes">{{
                               $t('ticketing.stats.artists')
                             }}</UBadge>
                             <UIcon
@@ -292,9 +365,11 @@
                             </div>
                           </div>
                           <div class="flex items-center gap-2">
-                            <UBadge :color="organizerConfig.color">{{
-                              $t('common.organizer')
-                            }}</UBadge>
+                            <UBadge
+                              color="neutral"
+                              :class="pastilleDeNature('organizer').classes"
+                              >{{ $t('common.organizer') }}</UBadge
+                            >
                             <UIcon
                               v-if="result.participant.organizer.entryValidated"
                               name="i-heroicons-check-circle"
@@ -474,11 +549,16 @@
       />
 
       <!-- Modal détails du participant -->
+      <!--
+        `titres` ne sert qu'au geste groupé : la fiche y empile alors toutes les parties de la
+        personne. Vide, elle retombe sur `participant` — le parcours individuel, inchangé.
+      -->
       <TicketingParticipantDetailsModal
         v-model:open="participantModalOpen"
         :participant="selectedParticipant"
         :type="participantType"
         :is-refunded="isRefundedOrder"
+        :titres="titresDuGroupe"
         :fuseau="edition?.timezone"
         @validate="handleValidateParticipants"
         @invalidate="handleInvalidateEntry"
@@ -708,6 +788,10 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
+import { regrouperLesSectionsParCommande } from '../../../../../utils/sections-de-la-fiche'
+
+import type { TitreAffiche } from '../../../../../components/ticketing/ParticipantDetailsModal.vue'
+
 import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
 
 const route = useRoute()
@@ -727,6 +811,31 @@ const ticketConfig = getParticipantTypeConfig('ticket')
 const volunteerConfig = getParticipantTypeConfig('volunteer')
 const artistConfig = getParticipantTypeConfig('artist')
 const organizerConfig = getParticipantTypeConfig('organizer')
+
+/**
+ * La pastille d'une nature de titre : son libellé et ses couleurs, celles de `useParticipantTypes`.
+ *
+ * ⚠️ PAS `:color="config.color"`, ET C'EST TOUT L'OBJET DE CE HELPER. `UBadge` n'accepte que les
+ * sept couleurs SÉMANTIQUES de Nuxt UI — `primary`, `success`, `warning`… —, jamais un nom de
+ * palette Tailwind. Or `config.color` vaut `blue`, `yellow`, `purple` : la pastille retombe alors
+ * sur `primary` **sans erreur ni avertissement**, et quatre natures sortent de la même couleur.
+ * C'est précisément le défaut qu'on vient corriger ; trois pastilles de la page en souffraient
+ * déjà. Les classes `bgClass`/`textClass` du même objet, elles, sont du Tailwind véritable : ce
+ * sont elles qui colorent déjà les icônes des en-têtes de listes — et c'est aussi la forme que
+ * `meals/list.vue` a retenue, après y avoir trouvé trois natures sur quatre coloriées à la main
+ * et en contradiction avec le reste du site.
+ *
+ * 📍 `color="neutral"` reste posé sur la pastille comme fond de teinte : les classes passées en
+ * `class` l'emportent (tailwind-merge), et la pastille garde une apparence correcte si la
+ * configuration d'une nature venait à manquer une classe.
+ */
+const pastilleDeNature = (nature: NatureDeTitre) => {
+  const config = getParticipantTypeConfig(nature)
+  return {
+    libelle: t(config.labelKey),
+    classes: [config.bgClass, config.textClass, config.darkBgClass, config.darkTextClass],
+  }
+}
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
@@ -763,6 +872,48 @@ const isRefundedOrder = ref(false)
 const historiqueOuvert = ref(false)
 const searchTerm = ref('')
 const searchResults = ref<any>(null)
+
+/*
+ * ─── Les PERSONNES, et leurs titres ──────────────────────────────────────────────────────────
+ *
+ * Une même personne peut porter un billet, une candidature de bénévole, une fiche d'artiste et une
+ * place d'organisateur : quatre tables, quatre drapeaux, et jusqu'ici quatre recherches. Le point
+ * d'API les rapproche ; cet écran ne fait que proposer de les valider d'un geste.
+ *
+ * ⚠️ LES QUATRE LISTES RESTENT, INTACTES. Ce bloc s'ajoute au-dessus d'elles et ne remplace rien :
+ * c'est là qu'on lit le détail d'un billet, ses options, ses créneaux, ses articles à remettre.
+ */
+const personnes = ref<
+  {
+    cle: string
+    motif: 'compte' | 'courriel-et-nom'
+    libelle: string
+    aValider: number
+    titres: {
+      nature: 'ticket' | 'volunteer' | 'artist' | 'organizer'
+      id: number
+      entryValidated?: boolean
+    }[]
+  }[]
+>([])
+
+/**
+ * Celles qui valent d'être proposées : PLUSIEURS titres, et au moins un à valider.
+ *
+ * Une personne à titre unique est déjà parfaitement servie par les listes du dessous — la
+ * proposer en double n'ajouterait qu'une façon de se tromper. Et une personne entièrement validée
+ * n'a rien à valider : la montrer ferait cliquer pour rien.
+ */
+/**
+ * Les personnes à qui proposer un geste groupé.
+ *
+ * La règle vit dans `regroupement-controle-acces`, où elle est éprouvée : il faut au moins DEUX
+ * titres restant à valider, et non deux titres tout court.
+ */
+const personnesAValiderEnBloc = computed(() => personnes.value.filter(meriteUnGesteGroupe))
+
+/** En cours de validation groupée, par clé de personne. */
+const validationEnBloc = ref<string | null>(null)
 const recentValidations = ref<any[]>([])
 const loadingValidations = ref(false)
 const stats = ref({
@@ -1018,56 +1169,232 @@ const circonstanceDe = (entree: {
   return t('ticketing.access_control.entry_already_validated_unknown')
 }
 
+/**
+ * Valide TOUS les titres d'une personne, d'un geste.
+ *
+ * ⚠️ UN APPEL PAR NATURE, et c'est délibéré pour cette première version : le point d'API n'accepte
+ * qu'un `type` par requête, et l'élargir serait un lot à lui seul. Les appels sont séquentiels pour
+ * que les erreurs se lisent une par une.
+ *
+ * 📍 EN CAS D'ÉCHEC PARTIEL, ON GARDE CE QUI EST PASSÉ. C'est le choix prudent au guichet : une
+ * personne à moitié validée entre quand même, et le compte rendu dit ce qui reste. Tout annuler
+ * ferait ressortir quelqu'un déjà à l'intérieur.
+ *
+ * ⚠️ Les articles à remettre ne demandent aucun traitement ici : valider l'entrée VAUT remise dans
+ * ce dépôt, aucune trace séparée n'est tenue. Les fusionner serait donc un pur affichage, et les
+ * listes du dessous les montrent déjà par titre.
+ */
+type TitreDuGroupe = {
+  nature: 'ticket' | 'volunteer' | 'artist' | 'organizer'
+  id: number
+  entryValidated?: boolean
+}
+type GroupeAValider = { cle: string; libelle: string; titres: TitreDuGroupe[] }
+
+/** Les titres cochés, par `nature-id` : le même identifiant peut servir à deux natures. */
+
+/**
+ * Les titres empilés dans la fiche, pour le geste groupé.
+ *
+ * Vide en temps normal : la fiche retombe alors sur le participant unique, et le parcours
+ * individuel ne change pas d'un iota.
+ */
+const titresDuGroupe = ref<TitreAffiche[]>([])
+
+/**
+ * Retrouve, dans les résultats de recherche, l'entrée complète d'un titre.
+ *
+ * 📍 Les listes rendues par la recherche portent DÉJÀ la forme qu'attend la fiche — `{ type,
+ * isRefunded, participant }`. On les réutilise telles quelles plutôt que d'en rebâtir une : une
+ * seconde construction divergerait au premier champ ajouté côté serveur.
+ */
+/**
+ * Retrouve, dans les résultats de recherche, l'entrée complète d'un titre.
+ *
+ * 📍 Les listes rendues par la recherche portent DÉJÀ la forme qu'attend la fiche — `{ type,
+ * isRefunded, participant }`. On les réutilise telles quelles plutôt que d'en rebâtir une : une
+ * seconde construction divergerait au premier champ ajouté côté serveur.
+ */
+function entreeDuTitre(titre: TitreDuGroupe): (TitreAffiche & { commande?: number }) | null {
+  const listes: Record<string, any[]> = {
+    ticket: searchResults.value?.tickets ?? [],
+    volunteer: searchResults.value?.volunteers ?? [],
+    artist: searchResults.value?.artists ?? [],
+    organizer: searchResults.value?.organizers ?? [],
+  }
+
+  const entree = (listes[titre.nature] ?? []).find(
+    (r: any) => r.participant?.[titre.nature]?.id === titre.id
+  )
+  if (!entree) return null
+
+  return {
+    participant: entree.participant,
+    type: titre.nature,
+    isRefunded: entree.isRefunded ?? false,
+    preselection: titre.nature === 'ticket' ? [titre.id] : undefined,
+    /*
+     * ⚠️ `orderId`, SURTOUT PAS `order.id`. Ce dernier porte le numéro HelloAsso, `null` pour une
+     * commande saisie sur place : le regroupement marchait alors pour les commandes en ligne et
+     * jamais pour les ventes au guichet, où la commande s'affichait autant de fois qu'elle avait
+     * de billets. Relevé sur l'édition 22 : une commande de cinq billets, `helloAssoOrderId` nul.
+     */
+    commande: titre.nature === 'ticket' ? entree.participant?.ticket?.order?.orderId : undefined,
+  }
+}
+
+/**
+ * Ouvre la fiche sur TOUS les titres de la personne, les uns à la suite des autres.
+ *
+ * ⚠️ C'EST LA FICHE COMPLÈTE, pas un résumé. Le bouton validait auparavant d'un trait, sans jamais
+ * annoncer les articles à remettre ni laisser choisir — alors qu'un billet à tarif particulier et
+ * une place d'organisateur donnent droit chacun aux siens.
+ */
+/**
+ * Ouvre la fiche sur TOUS les titres de la personne, les uns à la suite des autres.
+ *
+ * ⚠️ UNE SECTION PAR COMMANDE, PAS PAR BILLET, et c'est la subtilité du lot. Un titre de billet
+ * désigne une LIGNE de commande, alors que la section affiche la commande ENTIÈRE. Cinq billets
+ * d'une même commande donnaient donc cinq sections montrant chacune les cinq — la commande répétée
+ * cinq fois dans la fiche. On réunit les lignes d'une même commande en une section, dont elles
+ * forment la présélection.
+ *
+ * 📍 Les autres natures ne se regroupent pas : une candidature de bénévole, une fiche d'artiste et
+ * une place d'organisateur sont trois objets distincts, chacun sa section.
+ */
+/**
+ * Ouvre la fiche sur TOUS les titres de la personne, les uns à la suite des autres.
+ *
+ * ⚠️ UNE SECTION PAR COMMANDE, PAS PAR BILLET. Un titre de billet désigne une LIGNE, alors que la
+ * section affiche la commande ENTIÈRE : cinq billets d'une même commande donnaient cinq sections
+ * montrant chacune les cinq. La règle vit dans `sections-de-la-fiche`, où elle est éprouvée.
+ */
+function ouvrirValidationGroupee(personne: GroupeAValider) {
+  /*
+   * ⚠️ SEULEMENT CE QUI RESTE À VALIDER. Le bouton a déjà compté — « Valider les 2 titres
+   * restants » — et la fiche doit montrer ces deux-là. Un billet validé la veille qui s'y
+   * ajouterait ferait douter de ce qu'on s'apprête à valider. Les titres déjà validés restent
+   * visibles dans les quatre listes, juste en dessous.
+   */
+  const sections = regrouperLesSectionsParCommande(
+    titresAValider(personne)
+      .map(entreeDuTitre)
+      .filter((e): e is TitreAffiche & { commande?: number } => e !== null)
+  ) as TitreAffiche[]
+
+  // Un titre introuvable dans les résultats ne doit pas ouvrir une fiche vide.
+  if (sections.length === 0) return
+
+  titresDuGroupe.value = sections
+  selectedParticipant.value = null
+  participantModalOpen.value = true
+}
+
+/**
+ * Les articles dus au titre des titres COCHÉS.
+ *
+ * ⚠️ RECALCULÉS À CHAQUE DÉCOCHAGE, et c'est le point : décocher un titre doit retirer SES
+ * articles de la liste. Une liste figée à l'ouverture ferait remettre les articles d'un titre
+ * qu'on vient justement de ne pas valider.
+ *
+ * 📍 Les articles viennent des résultats de recherche, déjà en main — le serveur les a calculés
+ * tarif, options et champs personnalisés compris. Rien n'est demandé à nouveau.
+ */
+
+/** Valide les seuls titres cochés, puis referme. */
+
+/**
+ * Relance la recherche en cours, pour que les listes affichées disent la vérité.
+ *
+ * ⚠️ POURQUOI C'EST NÉCESSAIRE. Valider ou dévalider rechargeait les statistiques et la fiche
+ * OUVERTE, jamais les listes derrière elle. On fermait la modale et le billet qu'on venait de
+ * valider s'y affichait encore « à valider » — ou l'inverse après une dévalidation. Un guichet qui
+ * montre un état périmé fait revalider ce qui l'est déjà, ou chercher une panne qui n'existe pas.
+ *
+ * 📍 LA LISTE N'EST PAS VIDÉE AVANT, contrairement à `searchTickets` : on remplace l'ancienne par
+ * la nouvelle quand elle arrive. La vider ferait clignoter l'écran à chaque validation, et
+ * l'opérateur perdrait des yeux la ligne qu'il était en train de traiter.
+ */
+function rafraichirLaRecherche() {
+  // Rien à rafraîchir sans recherche affichée ; et sous deux caractères, le serveur refuse — on
+  // ferait une requête pour rien, dont l'échec s'afficherait en message d'erreur.
+  if (!searchResults.value || !searchTerm.value || searchTerm.value.length < 2) return
+  executeSearchTickets()
+}
+
 const handleValidateParticipants = async (
-  participantIds: number[],
+  lots: { type: string; ids: number[]; userInfo?: Record<string, string | null | undefined> }[],
   paymentInfo?: {
     paymentMethod?: 'cash' | 'card' | 'check' | null
     checkNumber?: string
-  },
-  userInfo?: {
-    firstName?: string | null
-    lastName?: string | null
-    email?: string | null
-    phone?: string | null
   }
 ) => {
-  try {
-    // Appeler l'API pour valider les participants
-    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/validate-entry`, {
-      method: 'POST',
-      body: {
-        participantIds,
-        type: participantType.value,
-        paymentMethod: paymentInfo?.paymentMethod,
-        checkNumber: paymentInfo?.checkNumber,
-        userInfo,
-      },
-    })
+  if (lots.length === 0) return
 
-    toast.add(compteRenduDeValidation(result?.data, participantIds.length))
+  /*
+   * ⚠️ UN APPEL PAR NATURE, et la nature vient du LOT. Elle se lisait auparavant dans
+   * `participantType`, un état global : une personne qui porte un billet et une place
+   * d'organisateur n'en a qu'une seule de validée, l'autre partant dans la mauvaise table — sans
+   * erreur, puisque les identifiants existent des deux côtés.
+   *
+   * 📍 En SÉQUENCE, pas en parallèle : un échec partiel doit laisser intact ce qui est déjà passé,
+   * et le compte rendu dire lequel a échoué. Les lots sont au plus quatre.
+   */
+  let valides = 0
+  const echecs: string[] = []
 
-    // Recharger les statistiques et les dernières validations
-    await Promise.all([loadStats(), loadRecentValidations()])
-
-    // Recharger le participant pour afficher le nouveau statut
-    if (participantType.value === 'volunteer' && selectedParticipant.value?.volunteer?.id) {
-      await reloadParticipant(selectedParticipant.value.volunteer.id, 'volunteer')
-    } else if (participantType.value === 'artist' && selectedParticipant.value?.artist?.id) {
-      await reloadParticipant(selectedParticipant.value.artist.id, 'artist')
-    } else if (participantType.value === 'organizer' && selectedParticipant.value?.organizer?.id) {
-      await reloadParticipant(selectedParticipant.value.organizer.id, 'organizer')
-    } else if (participantType.value === 'ticket' && selectedParticipant.value?.ticket?.qrCode) {
-      await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
+  for (const lot of lots) {
+    try {
+      const result: any = await $fetch(`/api/editions/${editionId}/ticketing/validate-entry`, {
+        method: 'POST',
+        body: {
+          participantIds: lot.ids,
+          type: lot.type,
+          paymentMethod: paymentInfo?.paymentMethod,
+          checkNumber: paymentInfo?.checkNumber,
+          userInfo: lot.userInfo,
+        },
+      })
+      valides += lot.ids.length
+      // Le compte rendu détaillé du serveur ne vaut que pour un lot unique ; au-delà, on résume.
+      if (lots.length === 1) toast.add(compteRenduDeValidation(result?.data, lot.ids.length))
+    } catch (error: unknown) {
+      const err = error as { data?: { message?: string } }
+      echecs.push(
+        `${lot.type} : ${err.data?.message ?? t('ticketing.access_control.validate_error')}`
+      )
     }
-  } catch (error: unknown) {
-    const err = error as { data?: { message?: string } }
-    toast.add({
-      title: t('ticketing.access_control.error_title'),
-      description: err.data?.message || t('ticketing.access_control.validate_error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
   }
+
+  if (lots.length > 1 || echecs.length) {
+    toast.add(
+      echecs.length
+        ? {
+            title: t('ticketing.access_control.group_partial'),
+            description: echecs.join(' · '),
+            icon: 'i-heroicons-exclamation-triangle',
+            color: 'warning' as const,
+          }
+        : {
+            title: t('ticketing.access_control.group_validated', { count: valides }),
+            icon: 'i-heroicons-check-circle',
+            color: 'success' as const,
+          }
+    )
+  }
+
+  await Promise.all([loadStats(), loadRecentValidations()])
+  rafraichirLaRecherche()
+
+  /*
+   * ⚠️ PAS DE RECHARGEMENT DE LA FICHE ICI, contrairement à la dévalidation juste en dessous.
+   * Depuis que la validation referme la fiche — c'est son dernier geste —, recharger le
+   * participant mettrait à jour un état que plus personne n'affiche. C'était une requête de plus
+   * à chaque validation, au moment précis où le guichet a du monde devant lui.
+   *
+   * 📍 Et elle se serait trompée de cible dans le cas groupé : elle lit `participantType`, l'état
+   * global qui ne désigne qu'un titre.
+   */
 }
 
 const reloadParticipant = async (
@@ -1095,13 +1422,18 @@ const reloadParticipant = async (
   }
 }
 
-const handleInvalidateEntry = async (participantId: number) => {
+const handleInvalidateEntry = async (type: string, participantId: number) => {
   try {
+    /*
+     * ⚠️ LA NATURE VIENT DE LA MODALE, plus de `participantType`. Cet état global désignait le
+     * titre par lequel on était entré ; avec plusieurs titres empilés, dévalider le second
+     * s'adressait à la table du premier.
+     */
     await $fetch(`/api/editions/${editionId}/ticketing/invalidate-entry`, {
       method: 'POST',
       body: {
         participantId,
-        type: participantType.value,
+        type,
       },
     })
 
@@ -1114,6 +1446,9 @@ const handleInvalidateEntry = async (participantId: number) => {
 
     // Recharger les statistiques et les dernières validations
     await Promise.all([loadStats(), loadRecentValidations()])
+
+    // Et les listes de résultats, qui restaient figées sur l'état d'avant.
+    rafraichirLaRecherche()
 
     // Recharger le participant pour afficher le nouveau statut
     if (participantType.value === 'volunteer' && selectedParticipant.value?.volunteer?.id) {
@@ -1172,6 +1507,9 @@ const handleRefund = async (
     if (selectedParticipant.value?.ticket?.qrCode) {
       await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
     }
+
+    // Et la liste derrière, qui porte elle aussi l'état « remboursé ».
+    rafraichirLaRecherche()
   } catch (error: unknown) {
     const err = error as { data?: { message?: string } }
     toast.add({
@@ -1258,6 +1596,8 @@ const { execute: executeSearchTickets, loading: searching } = useApiAction(
     errorMessages: { default: t('ticketing.access_control.search_error') },
     onSuccess: (response: any) => {
       searchResults.value = response?.results || null
+      // Rendu EN PLUS des quatre listes, jamais à leur place.
+      personnes.value = response?.personnes || []
     },
   }
 )
@@ -1306,6 +1646,10 @@ const rechercherDepuisLaListe = (email: string | null | undefined) => {
 }
 
 const selectSearchResult = (result: any) => {
+  // ⚠️ VIDER LA PILE D'ABORD : sans cela, cliquer un résultat après un geste groupé rouvrirait la
+  // fiche sur le groupe précédent, puisque `titres` l'emporte sur `participant`.
+  titresDuGroupe.value = []
+
   // Afficher la modal avec les détails du participant
   selectedParticipant.value = result.participant
   participantType.value = result.type || 'ticket'

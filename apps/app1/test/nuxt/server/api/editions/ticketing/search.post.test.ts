@@ -424,4 +424,157 @@ describe('POST /api/editions/[id]/ticketing/search', () => {
       )
     }
   })
+
+  /*
+   * ─── Le rapprochement par personne ─────────────────────────────────────────────────────────
+   *
+   * `regrouperParPersonne` est éprouvée à part, sur des titres déjà formés. Ce qui se joue ICI est
+   * tout autre : le handler doit CONSTRUIRE ces titres depuis quatre formes Prisma différentes, et
+   * construire la table des comptes qui permet à un billet de rejoindre une candidature. Rien de
+   * tout cela ne lève d'erreur quand il se trompe — on obtient des groupes d'un seul titre, ou des
+   * personnes sans nom, et l'écran paraît simplement « ne pas marcher ».
+   *
+   * ⚠️ UN AVERTISSEMENT QUE JE ME SUIS DONNÉ À MOI-MÊME : j'ai d'abord écrit ici qu'un champ lu au
+   * mauvais niveau — `application.prenom` au lieu de `application.user.prenom` — serait attrapé
+   * par le premier test. C'ÉTAIT FAUX, et le sabotage l'a montré : le groupe se forme sur le
+   * COMPTE, que les noms du titre soient bons ou non. Seul le LIBELLÉ en dépend, d'où le test qui
+   * le vérifie sur un bénévole SEUL — sans billet dont le nom viendrait masquer le défaut.
+   */
+  describe('les personnes rapprochées', () => {
+    // Même boîte, même nom que le compte du bénévole : c'est ce qui doit les réunir.
+    const billetDAda = (over: Record<string, unknown> = {}) => ({
+      id: 500,
+      helloAssoItemId: null,
+      name: 'Pass',
+      type: null,
+      amount: 100,
+      state: 'Processed',
+      qrCode: 'x',
+      firstName: 'A',
+      lastName: 'B',
+      email: 'p0@x.fr',
+      entryValidated: false,
+      customFields: null,
+      tier: null,
+      selectedOptions: [],
+      order: {
+        id: 1,
+        helloAssoOrderId: 42,
+        status: 'Processed',
+        payerFirstName: 'A',
+        payerLastName: 'B',
+        payerEmail: 'p0@x.fr',
+        externalTicketing: null,
+        items: [],
+      },
+      ...over,
+    })
+
+    const benevoleAda = {
+      id: 900,
+      userId: 1,
+      user: { id: 1, pseudo: 'p0', prenom: 'A', nom: 'B', email: 'p0@x.fr' },
+      teamAssignments: [],
+      handoutItems: [],
+      shows: [],
+      entryValidated: false,
+    }
+
+    it('RÉUNIT un billet et une candidature de bénévole', async () => {
+      /*
+       * ⚠️ LE CAS QUI JUSTIFIE LE LOT : jusqu'ici il fallait chercher deux fois cette personne.
+       * Le billet n'a pas de compte en base — c'est la table des comptes, bâtie depuis les
+       * bénévoles trouvés, qui permet de le rattacher.
+       */
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([billetDAda()])
+      prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([benevoleAda])
+
+      const { personnes } = (await searchHandler(mockEvent as any)).data
+
+      expect(personnes).toHaveLength(1)
+      expect([...personnes[0].titres].map((t: any) => t.nature).sort()).toEqual([
+        'ticket',
+        'volunteer',
+      ])
+      // Deux titres à valider : c'est ce nombre que l'écran annonce sur le bouton groupé.
+      expect(personnes[0].aValider).toBe(2)
+    })
+
+    it('rend l’identifiant INTERNE de la commande, distinct du numéro HelloAsso', async () => {
+      /*
+       * ⚠️ DEUX CHAMPS VOISINS, ET UN SEUL IDENTIFIE LA COMMANDE. `order.id` porte le numéro
+       * HelloAsso — `null` dès qu'une commande est saisie sur place ou vient d'un autre
+       * fournisseur. Le guichet s'en servait pour réunir les lignes d'une même commande : cela
+       * marchait pour les commandes en ligne et JAMAIS pour les ventes sur place, où la commande
+       * s'affichait autant de fois qu'elle avait de billets.
+       *
+       * Ce test existe parce que les deux champs se ressemblent assez pour qu'on « nettoie » le
+       * doublon apparent, et que rien d'autre ne dirait ce qu'on vient de casser.
+       */
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
+        billetDAda({ order: { ...billetDAda().order, id: 938, helloAssoOrderId: null } }),
+      ])
+
+      const { results } = (await searchHandler(mockEvent as any)).data
+      const commande = results.tickets[0].participant.ticket.order
+
+      expect(commande.orderId).toBe(938)
+      // Et le champ historique reste ce qu'il est : nul pour une commande saisie sur place.
+      expect(commande.id).toBeNull()
+    })
+
+    it('ne construit PAS de table de comptes au prix d’une requête de plus', async () => {
+      // La table se bâtit depuis les résultats déjà en main. Une requête supplémentaire ici se
+      // paierait sur chaque frappe au guichet.
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([billetDAda()])
+      prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([benevoleAda])
+
+      await searchHandler(mockEvent as any)
+
+      expect(prismaMock.user.findMany).not.toHaveBeenCalled()
+    })
+
+    it('NOMME la personne, même sans billet pour lui prêter un nom', async () => {
+      /*
+       * Le libellé est le seul endroit où les noms portés par le titre lui-même comptent. Sur un
+       * bénévole SEUL, le lire au mauvais niveau donne un groupe sans nom : l'écran affiche un
+       * bouton « valider 1 titre » au-dessus du vide. Un billet présent masquerait le défaut, son
+       * propre nom prenant la place.
+       */
+      prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([benevoleAda])
+
+      const { personnes } = (await searchHandler(mockEvent as any)).data
+
+      expect(personnes[0].libelle).toBe('A B')
+    })
+
+    it('ne RAPPROCHE PAS un billet au nom différent du compte', async () => {
+      /*
+       * ⚠️ LA GARDE QUI ÉVITE LE PIRE, vue depuis le handler : un billet acheté par un parent pour
+       * son enfant porte le courriel du parent et le nom de l'enfant. Les réunir ferait valider
+       * l'entrée d'un absent d'un seul clic.
+       */
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
+        billetDAda({ firstName: 'Lucie', lastName: 'B' }),
+      ])
+      prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([benevoleAda])
+
+      const { personnes } = (await searchHandler(mockEvent as any)).data
+
+      expect(personnes).toHaveLength(2)
+    })
+
+    it('ne RETIRE RIEN des quatre listes', async () => {
+      // Le rapprochement s'ajoute, il ne remplace pas : tout le détail actuellement affiché doit
+      // rester là, sans quoi le lot ferait perdre de l'information en prétendant en donner.
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([billetDAda()])
+      prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([benevoleAda])
+
+      const { results } = (await searchHandler(mockEvent as any)).data
+
+      expect(results.tickets).toHaveLength(1)
+      expect(results.volunteers).toHaveLength(1)
+      expect(results.total).toBe(2)
+    })
+  })
 })

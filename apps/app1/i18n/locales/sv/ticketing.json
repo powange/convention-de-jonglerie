@@ -71,7 +71,12 @@
         "montage": "Endast uppbyggnad",
         "demontage": "Endast nedmontering",
         "montage-demontage": "Uppbyggnad och nedmontering"
-      }
+      },
+      "group_motif_email": "Kopplade via namn OCH e-postadress, eftersom inget gemensamt konto finns: kontrollera att det verkligen är samma person.",
+      "group_partial": "Ofullständig bekräftelse",
+      "group_title": "Personer med flera entréer",
+      "group_validate": "Bekräfta den återstående entrén | Bekräfta de {count} återstående entréerna",
+      "group_validated": "{count} entré bekräftad | {count} entréer bekräftade"
     },
     "counters": {
       "connected": "Ansluten",

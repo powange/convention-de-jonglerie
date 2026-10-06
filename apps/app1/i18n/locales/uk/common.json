@@ -403,7 +403,10 @@
       "validated_today": "Перевірено сьогодні",
       "volunteer": "Волонтер",
       "volunteer_accepted": "Волонтера прийнято",
-      "volunteer_management": "Управління волонтерами"
+      "volunteer_management": "Управління волонтерами",
+      "same_as_buyer": "Так само, як у покупця",
+      "selected_count": "Вибрано {n} учасника | Вибрано {n} учасників",
+      "validate_entry_count": "Підтвердити вхід ({count})"
     },
     "ticketing_title": "Продаж квитків",
     "useful_links": "Корисні посилання",

@@ -14,11 +14,17 @@ import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-a
 import { resoudreLesValidateurs } from '#server/utils/ticketing/nom-du-validateur'
 import { detteDeCommande, montantARembourser } from '#server/utils/ticketing/remboursement-du'
 import { sanitizeEmail } from '#server/utils/validation-helpers'
+import { cleDeBoiteDeReception } from '~~/shared/utils/adresse-email'
 import {
   normaliserPhases,
   phasesDuBenevole,
   phasesSeRencontrent,
 } from '~~/shared/utils/phases-edition'
+import {
+  regrouperParPersonne,
+  type CompteConnu,
+  type TitreRapprochable,
+} from '~~/shared/utils/regroupement-controle-acces'
 
 const bodySchema = z.object({
   searchTerm: z.string().min(1),
@@ -634,7 +640,16 @@ export default wrapApiHandler(
                 email: item.email,
               },
               order: {
+                /**
+                 * ⚠️ CE N'EST PAS L'IDENTIFIANT DE LA COMMANDE, mais son numéro chez HelloAsso —
+                 * `null` dès qu'elle a été saisie sur place. Le nom trompe, et il a trompé : le
+                 * guichet s'en servait pour réunir les lignes d'une même commande, ce qui
+                 * marchait pour HelloAsso et jamais pour les ventes sur place. D'où `orderId`
+                 * juste en dessous, qui, lui, identifie la commande.
+                 */
                 id: item.order.helloAssoOrderId,
+                /** L'identifiant interne de la commande. Toujours présent, quelle que soit l'origine. */
+                orderId: item.order.id,
                 status: item.order.status,
                 /** `null` quand la commande a été saisie sur place. */
                 provider: item.order.externalTicketing?.provider ?? null,
@@ -804,7 +819,94 @@ export default wrapApiHandler(
         total: orderItems.length + volunteers.length + artists.length + organizers.length,
       }
 
-      return createSuccessResponse({ results })
+      /*
+       * ─── Le rapprochement par PERSONNE ──────────────────────────────────────────────────────
+       *
+       * Une même personne peut porter un billet, une candidature de bénévole, une fiche d'artiste
+       * et une place d'organisateur : quatre tables, quatre drapeaux de validation, et jusqu'ici
+       * quatre recherches. Ce bloc dit QUI est qui ; il ne valide rien.
+       *
+       * ⚠️ LA TABLE DES COMPTES SE CONSTRUIT SANS REQUÊTE : les bénévoles, artistes et
+       * organisateurs trouvés portent déjà leurs comptes, et c'est avec eux qu'un billet doit se
+       * rapprocher. Chercher des comptes au-delà serait inutile — un billet dont la personne n'est
+       * pas dans les résultats n'a rien à rejoindre.
+       *
+       * 📍 LIMITE CONNUE : une recherche par NUMÉRO DE COMMANDE ne ramène que le billet, donc rien
+       * à quoi le rapprocher. C'est acceptable — on cherche une personne par son nom quand on veut
+       * tous ses titres — mais il faut le savoir avant de s'étonner.
+       */
+      const comptesParBoite = new Map<string, CompteConnu[]>()
+      const noterLeCompte = (
+        user: { id: number; prenom?: string | null; nom?: string | null },
+        email?: string | null
+      ) => {
+        const boite = cleDeBoiteDeReception(email)
+        if (!boite) return
+        const liste = comptesParBoite.get(boite) ?? []
+        // Un même compte peut arriver par plusieurs titres : on ne le note qu'une fois, sinon il
+        // paraîtrait « ambigu » face à lui-même et aucun billet ne se rapprocherait.
+        if (!liste.some((compte) => compte.userId === user.id)) {
+          liste.push({ userId: user.id, prenom: user.prenom, nom: user.nom })
+        }
+        comptesParBoite.set(boite, liste)
+      }
+
+      for (const application of volunteers) {
+        noterLeCompte(application.user, application.user.email)
+      }
+      for (const artist of artists) {
+        noterLeCompte(artist.user, artist.user.email)
+      }
+      for (const editionOrganizer of organizers) {
+        noterLeCompte(editionOrganizer.organizer.user, editionOrganizer.organizer.user.email)
+      }
+
+      const titres: TitreRapprochable[] = [
+        ...orderItems.map((item) => ({
+          nature: 'ticket' as const,
+          id: item.id,
+          email: item.email,
+          prenom: item.firstName,
+          nom: item.lastName,
+          entryValidated: item.entryValidated,
+        })),
+        ...volunteers.map((application) => ({
+          nature: 'volunteer' as const,
+          id: application.id,
+          userId: application.user.id,
+          email: application.user.email,
+          prenom: application.user.prenom,
+          nom: application.user.nom,
+          entryValidated: application.entryValidated,
+        })),
+        ...artists.map((artist) => ({
+          nature: 'artist' as const,
+          id: artist.id,
+          userId: artist.user.id,
+          email: artist.user.email,
+          prenom: artist.user.prenom,
+          nom: artist.user.nom,
+          entryValidated: artist.entryValidated,
+        })),
+        ...organizers.map((editionOrganizer) => ({
+          nature: 'organizer' as const,
+          id: editionOrganizer.id,
+          userId: editionOrganizer.organizer.user.id,
+          email: editionOrganizer.organizer.user.email,
+          prenom: editionOrganizer.organizer.user.prenom,
+          nom: editionOrganizer.organizer.user.nom,
+          entryValidated: editionOrganizer.entryValidated,
+        })),
+      ]
+
+      /*
+       * Rendu EN PLUS des quatre listes, jamais à leur place : aucune information actuellement
+       * affichée ne doit disparaître. L'écran s'en sert pour proposer une validation groupée ; les
+       * listes restent la source de tout le détail.
+       */
+      const personnes = regrouperParPersonne(titres, comptesParBoite)
+
+      return createSuccessResponse({ results, personnes })
     } catch (error: unknown) {
       console.error('Database search error:', error)
       throw createError({

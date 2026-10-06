@@ -7,6 +7,12 @@
       </h4>
     </div>
 
+    <!--
+      ⚠️ CHAQUE `UInput` PORTE `w-full`. Sans lui, le champ garde sa largeur propre et flotte dans
+      sa colonne : prénom, nom et adresse paraissaient tous trop étroits, et une adresse un peu
+      longue sortait rognée. C'est le motif de la maison — 195 champs du dépôt le portent —, et
+      cette section l'avait manqué sur ses quatre champs.
+    -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
         <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
@@ -18,6 +24,7 @@
           :placeholder="$t('ticketing.participant.first_name')"
           icon="i-heroicons-user"
           size="sm"
+          class="w-full"
           @update:model-value="$emit('update:firstName', $event)"
         />
       </div>
@@ -31,6 +38,7 @@
           :placeholder="$t('ticketing.participant.last_name')"
           icon="i-heroicons-user"
           size="sm"
+          class="w-full"
           @update:model-value="$emit('update:lastName', $event)"
         />
       </div>
@@ -45,7 +53,13 @@
         Le champ est montré en lecture seule plutôt que masqué : savoir quelle adresse est
         enregistrée sert au comptoir, et une case qui disparaît se lit comme un défaut.
       -->
-      <div v-if="isEmailVerified">
+      <!--
+        ⚠️ EMAIL ET TÉLÉPHONE PRENNENT CHACUN UNE LIGNE ENTIÈRE, prénom et nom restant côte à côte.
+        En demi-colonne, l'adresse sortait rognée et le téléphone — indicatif de pays PUIS numéro,
+        donc deux champs dans un — perdait la fin du numéro. Les deux renseignements qu'on vient
+        vérifier au guichet étaient précisément les deux qu'on ne pouvait pas lire en entier.
+      -->
+      <div v-if="isEmailVerified" class="md:col-span-2">
         <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
           {{ $t('edition.ticketing.email') }}
         </p>
@@ -55,18 +69,20 @@
           icon="i-heroicons-envelope"
           size="sm"
           readonly
+          class="w-full"
           :ui="{ base: 'cursor-default' }"
         />
       </div>
       <EmailValidationInput
         v-else
         ref="emailInput"
+        class="md:col-span-2"
         :model-value="email"
         :original-email="originalEmail"
         :user-id="userId"
         @update:model-value="$emit('update:email', $event)"
       />
-      <div>
+      <div class="md:col-span-2">
         <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
           {{ $t('ticketing.participant.phone') }}
         </p>

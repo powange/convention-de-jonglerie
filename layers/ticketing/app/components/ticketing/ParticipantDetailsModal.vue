@@ -1,747 +1,93 @@
 <template>
+  <!--
+    ⚠️ `content`, PAS `width`. `UModal` n'expose pas d'emplacement `width` — sa liste est
+    `overlay | content | header | wrapper | body | footer | title | description | close`. Une
+    valeur passée sous un nom inconnu est ignorée EN SILENCE : cette modale est restée à la
+    largeur par défaut alors qu'on croyait lui en avoir donné une.
+
+    📍 Huit autres modales du dépôt portent encore ce réglage sans effet. Elles ne sont pas
+    corrigées ici : chacune mérite qu'on regarde la largeur qu'elle demandait avant de la lui
+    rendre d'un coup.
+
+    📍 La largeur DÉPEND du contenu : une seule section n'a rien à faire d'un écran de 1280 px,
+    où ses champs s'étireraient en lignes illisibles. Voir `largeurDeLaFiche`.
+  -->
   <UModal
     v-model:open="isOpen"
     :title="$t('edition.ticketing.participant_modal_title')"
     :description="$t('edition.ticketing.participant_modal_description')"
-    :ui="{ width: 'sm:max-w-2xl' }"
+    :ui="{ content: largeurDeLaFiche }"
   >
     <template #body>
-      <!-- Affichage pour un billet -->
-      <div v-if="isTicket && participant && 'ticket' in participant" class="space-y-6">
-        <!-- Alerte pour les commandes annulées -->
-        <UAlert
-          v-if="isRefunded"
-          icon="i-heroicons-exclamation-triangle"
-          color="error"
-          variant="soft"
-          title="Commande annulée"
-          description="Cette commande a été annulée. Les billets ne peuvent pas être validés."
-        />
+      <!--
+        ⚠️ UNE SECTION PAR TITRE, les unes à la suite des autres.
 
-        <!--
-          La somme qu'on doit à la personne qui présente ce billet.
+        Cette modale ne savait montrer qu'un titre : un aiguillage à quatre branches sur un
+        participant unique. Or une même personne porte un billet ET une place d'organisateur, et le
+        guichet devait fermer la fiche pour voir l'autre, en perdant de vue ce qu'il venait d'y
+        lire. Le corps est sorti dans `ParticipantTitleSection`, qu'on empile.
 
-          Symétrique du bloc « Montant à payer » de la modale de paiement, et au même endroit du
-          parcours : c'est à la porte qu'on rencontre la personne, donc là qu'on lui rend son
-          argent. L'entrée reste refusée — ce bouton solde une dette, il ne rouvre pas le droit
-          d'entrer.
-        -->
-        <div
-          v-if="sommeDue !== null"
-          class="p-4 rounded-lg bg-gradient-to-r from-warning-50 to-warning-100 dark:from-warning-900/20 dark:to-warning-800/20 border border-warning-200 dark:border-warning-800 space-y-3"
-        >
-          <div class="flex items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-              <UIcon
-                name="i-heroicons-banknotes"
-                class="text-warning-600 dark:text-warning-400 h-5 w-5"
-              />
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {{ $t('edition.ticketing.refund_amount_label') }}
-              </span>
-            </div>
-            <span class="text-2xl font-bold text-warning-600 dark:text-warning-400">
-              {{ money(sommeDue) }}
-            </span>
-          </div>
+        📍 LE PARCOURS INDIVIDUEL NE CHANGE PAS : sans `titres`, la modale affiche le seul
+        `participant` qu'on lui passe, et c'est une pile d'un élément.
+      -->
+      <!--
+        ⚠️ DEUX COLONNES SEULEMENT À PARTIR DE DEUX SECTIONS, et seulement à partir de `lg`. Une
+        seule section dans une grille à deux colonnes laisserait la moitié de la fiche vide ; et
+        sous `lg`, deux colonnes rendraient chaque section plus étroite que ses propres
+        formulaires, qui passent eux-mêmes en deux colonnes dès `md`.
 
+        📍 `items-start` : sans lui, les sections d'une même rangée s'étirent à la hauteur de la
+        plus haute. Une commande de cinq billets à côté d'une fiche de bénévole donnerait un bloc
+        de bénévole long de tout l'écran, pour trois champs.
+      -->
+      <div :class="plusieursSections ? 'grid lg:grid-cols-2 gap-8 items-start' : 'space-y-8'">
+        <div v-for="(titre, index) in titresAffiches" :key="`${titre.type}-${index}`">
           <!--
-            Le détail de ce qu'on rend, dès qu'il y a plus d'une ligne.
-
-            ⚠️ Un seul chiffre ne se vérifie pas. L'écran annonçait 34 € là où la commande en devait
-            58 : quatre repas annulés manquaient à l'appel, et rien ne permettait de s'en rendre
-            compte au guichet. Le détail est ce qui rend le total contrôlable par la personne qui
-            tient la caisse.
+            Le séparateur n'a de sens qu'empilé. En colonnes, il tracerait un trait au-dessus de
+            la section de droite, qui ne suit rien.
           -->
-          <ul
-            v-if="soldeToutLaCommande && lignesDues.length > 1"
-            class="text-xs text-gray-600 dark:text-gray-400 space-y-1 border-t border-warning-200 dark:border-warning-800 pt-2"
-          >
-            <li v-for="ligne in lignesDues" :key="ligne.id" class="flex justify-between gap-3">
-              <span class="truncate">{{ ligne.name }}</span>
-              <span class="font-medium tabular-nums shrink-0">{{ money(ligne.amount) }}</span>
-            </li>
-          </ul>
-
-          <!--
-            Plusieurs titulaires : on ne solde PAS d'un geste, et on dit pourquoi.
-
-            Rendre le total de la commande à qui présente un billet donnerait à une personne
-            l'argent des autres. L'écran retombe donc sur la ligne scannée.
-          -->
-          <p
-            v-else-if="detteDeLaCommande?.nomsMultiples"
-            class="text-xs text-gray-600 dark:text-gray-400 border-t border-warning-200 dark:border-warning-800 pt-2"
-          >
-            {{ $t('edition.ticketing.refund_several_holders') }}
-          </p>
-          <UButton
-            block
-            color="warning"
-            icon="i-heroicons-check-circle"
-            :label="$t('edition.ticketing.refund_mark_done')"
-            @click="confirmationDuRemboursement = true"
+          <USeparator v-if="index > 0" class="mb-6" :class="{ 'lg:hidden': plusieursSections }" />
+          <ParticipantTitleSection
+            :participant="titre.participant"
+            :type="titre.type"
+            :is-refunded="titre.isRefunded"
+            :fuseau="fuseau"
+            :validating="validating"
+            :preselection="titre.preselection"
+            @update:selection="noterLaSelection(index, $event)"
+            @update:infos="noterLesInfos(index, $event)"
+            @update:email-valid="noterLaValiditeDuCourriel(index, $event)"
+            @demander-validation="demanderLaValidationGlobale()"
+            @demander-devalidation="demanderLaDevalidation(index, $event)"
+            @refund="(itemId, refunded, portee) => emit('refund', itemId, refunded, portee)"
           />
         </div>
 
-        <!--
-          Dette déjà soldée : on le dit, pour qu'on ne rende pas l'argent deux fois.
-
-          Et on peut revenir dessus, sur place. Sans ce bouton, un bénévole qui s'est trompé devait
-          faire corriger l'erreur dans la gestion, depuis la liste des commandes — c'est-à-dire
-          demander à quelqu'un d'autre, la personne encore devant lui.
-
-          Pas de confirmation ici, à la différence du remboursement : celui-ci efface une dette,
-          celui-là la rétablit. On ne met pas de friction sur le geste qui répare.
-        -->
-        <UAlert
-          v-else-if="dejaRembourse"
-          icon="i-heroicons-check-circle"
-          color="success"
-          variant="soft"
-          :title="$t('edition.ticketing.refund_already_done')"
-          :description="dateDuRemboursement"
-        >
-          <template #actions>
-            <UButton
-              size="xs"
-              color="neutral"
-              variant="ghost"
-              icon="i-heroicons-arrow-uturn-left"
-              :label="$t('edition.ticketing.refund_undo')"
-              @click="annulerLeRemboursement"
-            />
-          </template>
-        </UAlert>
-
-        <!-- Type d'accès -->
-        <div
-          :class="`flex items-center justify-between p-4 rounded-lg ${ticketConfig.bgClass} ${ticketConfig.darkBgClass}`"
-        >
-          <div class="flex items-center gap-3">
-            <UIcon :name="ticketConfig.icon" :class="ticketConfig.iconColorClass" size="32" />
-            <div>
-              <p :class="`text-sm ${ticketConfig.textClass} ${ticketConfig.darkTextClass}`">
-                {{ $t('edition.ticketing.access_type') }}
-              </p>
-              <p class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ $t('ticketing.stats.participants') }}
-              </p>
-            </div>
-          </div>
-          <UBadge :color="ticketConfig.color" variant="soft" size="lg">
-            {{ $t('edition.ticketing.participant') }}
-          </UBadge>
+        <div v-if="titresAffiches.length === 0" class="py-8 text-center">
+          <UIcon name="i-heroicons-user-circle" class="mx-auto h-16 w-16 text-gray-400 mb-3" />
+          <p class="text-gray-500">{{ $t('edition.ticketing.no_info_available') }}</p>
         </div>
-
-        <!-- Informations de la commande -->
-        <div class="space-y-4">
-          <div
-            class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700"
-          >
-            <div class="flex items-center gap-2">
-              <UIcon
-                name="i-heroicons-shopping-cart"
-                class="text-purple-600 dark:text-purple-400"
-              />
-              <h4 class="font-semibold text-gray-900 dark:text-white">
-                {{ $t('edition.ticketing.order') }}
-              </h4>
-            </div>
-            <!-- La provenance de la commande, par l'utilitaire partagé.
-
-                 La condition portait auparavant sur l'identifiant de la commande, qui vaut en
-                 réalité celui d'HelloAsso : elle marchait par accident pour ce fournisseur, et
-                 laissait une commande Infomaniak sans aucune origine. Le logo du site couvre
-                 désormais les commandes saisies sur place, comme dans les listes.
-
-                 (Le nom pointé de cette propriété est écrit en toutes lettres à dessein : dans un
-                 commentaire de gabarit, le détecteur i18n le prendrait pour une clé manquante.) -->
-            <img
-              v-if="participant.ticket.order"
-              :src="logoDuFournisseur(participant.ticket.order.provider)"
-              :alt="
-                nomDuFournisseur(participant.ticket.order.provider) ??
-                $t('gestion.ticketing.origin_site')
-              "
-              :title="
-                nomDuFournisseur(participant.ticket.order.provider) ??
-                $t('gestion.ticketing.origin_site')
-              "
-              class="h-5 w-5 object-contain"
-            />
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('edition.ticketing.buyer') }}
-              </p>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ participant.ticket.order.payer.firstName }}
-                {{ participant.ticket.order.payer.lastName }}
-              </p>
-            </div>
-            <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('edition.ticketing.buyer_email') }}
-              </p>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ participant.ticket.order.payer.email }}
-              </p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div v-if="participant.ticket.order.id">
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('edition.ticketing.order_id') }}
-              </p>
-              <p class="text-sm font-mono font-medium text-gray-900 dark:text-white">
-                #{{ participant.ticket.order.id }}
-              </p>
-            </div>
-            <div v-if="participant.ticket.order.status">
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Statut de la commande</p>
-              <!--
-                `Canceled` ne figure plus ici : c'est un état de LIGNE, jamais un statut de
-                commande. Les deux branches qui le testaient ne se sont donc jamais exécutées —
-                une commande s'annule par `Refunded`, un billet par `Canceled`, et les deux
-                vocabulaires ne se recouvrent pas (cf. `billets-qui-comptent.ts`).
-              -->
-              <UBadge :color="couleurDuStatut" :label="libelleDuStatut" variant="soft" />
-            </div>
-          </div>
-        </div>
-
-        <!-- Informations des participants -->
-        <div v-if="participantItems && participantItems.length > 0" class="space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-            <UIcon name="i-heroicons-user" class="text-primary-600 dark:text-primary-400" />
-            <h4 class="font-semibold text-gray-900 dark:text-white">
-              {{
-                participantItems.length > 1 ? 'Participants' : $t('edition.ticketing.participant')
-              }}
-            </h4>
-          </div>
-
-          <div class="space-y-3">
-            <div
-              v-for="item in participantItems"
-              :key="item.id"
-              class="p-3 rounded-lg relative"
-              :class="
-                item.entryValidated
-                  ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 opacity-75'
-                  : 'bg-gray-50 dark:bg-gray-900'
-              "
-            >
-              <!-- Badge "Déjà validé" en haut à droite -->
-              <div
-                v-if="item.entryValidated"
-                class="absolute top-2 right-2 flex items-center gap-1 text-xs font-medium text-green-600 dark:text-green-400"
-              >
-                <UIcon name="i-heroicons-check-circle-solid" class="h-4 w-4" />
-                {{ $t('ticketing.participant.entry_validated') }}
-              </div>
-
-              <div class="flex items-start gap-3">
-                <input
-                  v-if="estValidable(item)"
-                  :id="`participant-${item.id}`"
-                  v-model="selectedParticipants"
-                  type="checkbox"
-                  :value="item.id"
-                  class="mt-1.5 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                />
-                <div
-                  v-else
-                  class="mt-1.5 h-4 w-4 rounded flex items-center justify-center"
-                  :class="
-                    item.entryValidated
-                      ? 'bg-green-100 dark:bg-green-900/30'
-                      : 'bg-gray-100 dark:bg-gray-800'
-                  "
-                >
-                  <UIcon
-                    v-if="item.entryValidated"
-                    name="i-heroicons-check"
-                    class="h-3 w-3 text-green-600 dark:text-green-400"
-                  />
-                  <UIcon
-                    v-else-if="isRefunded"
-                    name="i-heroicons-x-mark"
-                    class="h-3 w-3 text-red-600 dark:text-red-400"
-                  />
-                </div>
-
-                <div class="flex-1">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {{ $t('edition.ticketing.full_name') }}
-                      </p>
-                      <p
-                        class="text-sm font-medium"
-                        :class="
-                          item.entryValidated
-                            ? 'text-gray-600 dark:text-gray-400'
-                            : 'text-gray-900 dark:text-white'
-                        "
-                      >
-                        {{ item.firstName || '-' }} {{ item.lastName || '-' }}
-                      </p>
-                    </div>
-                    <div>
-                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {{ $t('edition.ticketing.email') }}
-                      </p>
-                      <p
-                        class="text-sm font-medium"
-                        :class="
-                          item.entryValidated
-                            ? 'text-gray-600 dark:text-gray-400'
-                            : 'text-gray-900 dark:text-white'
-                        "
-                      >
-                        {{ item.email || '-' }}
-                      </p>
-                    </div>
-                  </div>
-                  <div class="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                          {{ $t('ticketing.participant.ticket_type') }}
-                        </p>
-                        <p
-                          class="text-sm font-medium"
-                          :class="
-                            item.entryValidated
-                              ? 'text-gray-600 dark:text-gray-400'
-                              : 'text-gray-900 dark:text-white'
-                          "
-                        >
-                          {{ item.name }}
-                        </p>
-                      </div>
-                      <div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                          {{ $t('edition.ticketing.amount') }}
-                        </p>
-                        <p
-                          class="text-sm font-medium"
-                          :class="
-                            item.entryValidated
-                              ? 'text-gray-600 dark:text-gray-400'
-                              : 'text-primary-600 dark:text-primary-400'
-                          "
-                        >
-                          {{ money(getItemTotalAmount(item)) }}
-                          <span
-                            v-if="item.selectedOptions && item.selectedOptions.length > 0"
-                            class="text-xs opacity-75"
-                          >
-                            ({{ money(item.amount) }} + options)
-                          </span>
-                        </p>
-                      </div>
-                      <div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                          Statut du billet
-                        </p>
-                        <UBadge
-                          :color="
-                            item.state === 'Processed'
-                              ? 'success'
-                              : item.state === 'Pending'
-                                ? 'warning'
-                                : item.state === 'Refunded' || item.state === 'Canceled'
-                                  ? 'error'
-                                  : 'neutral'
-                          "
-                          variant="soft"
-                          size="lg"
-                        >
-                          {{
-                            item.state === 'Processed'
-                              ? 'Valide'
-                              : item.state === 'Pending'
-                                ? 'En attente'
-                                : item.state === 'Refunded'
-                                  ? 'Remboursé'
-                                  : item.state === 'Canceled'
-                                    ? 'Annulé'
-                                    : item.state
-                          }}
-                        </UBadge>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Champs personnalisés du tarif -->
-                  <div
-                    v-if="item.customFields && item.customFields.length > 0"
-                    class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700"
-                  >
-                    <p
-                      class="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium uppercase tracking-wide"
-                    >
-                      Informations complémentaires
-                    </p>
-                    <div class="space-y-2">
-                      <div
-                        v-for="(field, idx) in item.customFields"
-                        :key="idx"
-                        class="p-2 rounded bg-gray-50 dark:bg-gray-800/50"
-                      >
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
-                          {{ field.name }}
-                        </p>
-                        <p
-                          class="text-sm font-medium"
-                          :class="
-                            item.entryValidated
-                              ? 'text-gray-600 dark:text-gray-400'
-                              : 'text-gray-900 dark:text-white'
-                          "
-                        >
-                          {{ field.answer }}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Options sélectionnées -->
-                  <div
-                    v-if="item.selectedOptions && item.selectedOptions.length > 0"
-                    class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700"
-                  >
-                    <p
-                      class="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium uppercase tracking-wide"
-                    >
-                      Options
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                      <UBadge
-                        v-for="selectedOption in item.selectedOptions"
-                        :key="selectedOption.id"
-                        color="primary"
-                        variant="soft"
-                        size="sm"
-                      >
-                        {{ selectedOption.option.name }}
-                        <span v-if="selectedOption.option.price" class="ml-1 opacity-75">
-                          (+{{ money(selectedOption.option.price) }})
-                        </span>
-                      </UBadge>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Bouton dévalider en bas de la carte -->
-              <div
-                v-if="item.entryValidated"
-                class="mt-3 pt-3 border-t border-green-200 dark:border-green-800 flex flex-wrap items-center justify-between gap-2"
-              >
-                <p class="text-xs text-green-700 dark:text-green-300">
-                  <span v-if="nomDuValidateur(item)">
-                    {{ $t('ticketing.participant.validated_by', { name: nomDuValidateur(item) }) }}
-                  </span>
-                  {{
-                    dateDeValidation(item)
-                      ? $t('ticketing.participant.validated_on', { date: dateDeValidation(item) })
-                      : ''
-                  }}
-                </p>
-                <UButton
-                  color="error"
-                  variant="soft"
-                  size="xs"
-                  icon="i-heroicons-x-circle"
-                  @click="invalidateTicket(item.id)"
-                >
-                  Dévalider l'entrée
-                </UButton>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bouton pour tout sélectionner/désélectionner.
-
-               Absent quand aucun billet ne peut plus être validé — tous entrés, ou annulés : le
-               « Tout désélectionner » qui s'y affichait alors ne portait sur rien. -->
-          <div v-if="participantsValidables.length > 0" class="flex justify-end">
-            <UButton
-              v-if="selectedParticipants.length < participantsValidables.length"
-              variant="ghost"
-              size="sm"
-              @click="selectAllParticipants"
-            >
-              Tout sélectionner
-            </UButton>
-            <UButton v-else variant="ghost" size="sm" @click="selectedParticipants = []">
-              Tout désélectionner
-            </UButton>
-          </div>
-        </div>
-
-        <!-- Section Donations -->
-        <div v-if="donationItems && donationItems.length > 0" class="space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-            <UIcon name="i-heroicons-heart" class="text-pink-600 dark:text-pink-400" />
-            <h4 class="font-semibold text-gray-900 dark:text-white">
-              {{ donationItems.length > 1 ? 'Donations' : 'Donation' }}
-            </h4>
-          </div>
-
-          <div class="space-y-3">
-            <div
-              v-for="item in donationItems"
-              :key="item.id"
-              class="p-3 rounded-lg bg-pink-50 dark:bg-pink-900/20 border border-pink-200 dark:border-pink-800"
-            >
-              <div class="flex-1">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      {{ $t('edition.ticketing.full_name') }}
-                    </p>
-                    <p class="text-sm font-medium text-gray-900 dark:text-white">
-                      {{ item.firstName || '-' }} {{ item.lastName || '-' }}
-                    </p>
-                  </div>
-                  <div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      {{ $t('edition.ticketing.email') }}
-                    </p>
-                    <p class="text-sm font-medium text-gray-900 dark:text-white">
-                      {{ item.email || '-' }}
-                    </p>
-                  </div>
-                </div>
-                <div class="mt-2 pt-2 border-t border-pink-200 dark:border-pink-700">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {{ $t('ticketing.participant.type') }}
-                      </p>
-                      <p class="text-sm font-medium text-gray-900 dark:text-white">
-                        {{ item.name || item.type }}
-                      </p>
-                    </div>
-                    <div>
-                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {{ $t('edition.ticketing.amount') }}
-                      </p>
-                      <p class="text-sm font-medium text-pink-600 dark:text-pink-400">
-                        {{ money(item.amount) }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Section Adhésions -->
-        <div v-if="membershipItems && membershipItems.length > 0" class="space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-            <UIcon name="i-heroicons-identification" class="text-blue-600 dark:text-blue-400" />
-            <h4 class="font-semibold text-gray-900 dark:text-white">
-              {{ membershipItems.length > 1 ? 'Adhésions' : 'Adhésion' }}
-            </h4>
-          </div>
-
-          <div class="space-y-3">
-            <div
-              v-for="item in membershipItems"
-              :key="item.id"
-              class="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
-            >
-              <div class="flex-1">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      {{ $t('edition.ticketing.full_name') }}
-                    </p>
-                    <p class="text-sm font-medium text-gray-900 dark:text-white">
-                      {{ item.firstName || '-' }} {{ item.lastName || '-' }}
-                    </p>
-                  </div>
-                  <div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      {{ $t('edition.ticketing.email') }}
-                    </p>
-                    <p class="text-sm font-medium text-gray-900 dark:text-white">
-                      {{ item.email || '-' }}
-                    </p>
-                  </div>
-                </div>
-                <div class="mt-2 pt-2 border-t border-blue-200 dark:border-blue-700">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {{ $t('ticketing.participant.type') }}
-                      </p>
-                      <p class="text-sm font-medium text-gray-900 dark:text-white">
-                        {{ item.name || item.type }}
-                      </p>
-                    </div>
-                    <div>
-                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {{ $t('edition.ticketing.amount') }}
-                      </p>
-                      <p class="text-sm font-medium text-blue-600 dark:text-blue-400">
-                        {{ money(item.amount) }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Section Paiements -->
-        <div v-if="paymentItems && paymentItems.length > 0" class="space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-            <UIcon name="i-heroicons-credit-card" class="text-purple-600 dark:text-purple-400" />
-            <h4 class="font-semibold text-gray-900 dark:text-white">
-              {{ paymentItems.length > 1 ? 'Paiements' : 'Paiement' }}
-            </h4>
-          </div>
-
-          <div class="space-y-3">
-            <div
-              v-for="item in paymentItems"
-              :key="item.id"
-              class="p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800"
-            >
-              <div class="flex-1">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      {{ $t('edition.ticketing.full_name') }}
-                    </p>
-                    <p class="text-sm font-medium text-gray-900 dark:text-white">
-                      {{ item.firstName || '-' }} {{ item.lastName || '-' }}
-                    </p>
-                  </div>
-                  <div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      {{ $t('edition.ticketing.email') }}
-                    </p>
-                    <p class="text-sm font-medium text-gray-900 dark:text-white">
-                      {{ item.email || '-' }}
-                    </p>
-                  </div>
-                </div>
-                <div class="mt-2 pt-2 border-t border-purple-200 dark:border-purple-700">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {{ $t('ticketing.participant.type') }}
-                      </p>
-                      <p class="text-sm font-medium text-gray-900 dark:text-white">
-                        {{ item.name || item.type }}
-                      </p>
-                    </div>
-                    <div>
-                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {{ $t('edition.ticketing.amount') }}
-                      </p>
-                      <p class="text-sm font-medium text-purple-600 dark:text-purple-400">
-                        {{ money(item.amount) }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Affichage pour un bénévole -->
-      <VolunteerDetailsCard
-        v-else-if="isVolunteer && participant && 'volunteer' in participant"
-        :volunteer="participant.volunteer"
-        :fuseau="fuseau"
-        :editable-first-name="editableFirstName"
-        :editable-last-name="editableLastName"
-        :editable-email="editableEmail"
-        :editable-phone="editablePhone"
-        :validating="validating"
-        @update:first-name="editableFirstName = $event"
-        @update:last-name="editableLastName = $event"
-        @update:email="editableEmail = $event"
-        @update:phone="editablePhone = $event"
-        @validate="showValidateConfirm"
-        @invalidate="showInvalidateConfirm"
-      />
-
-      <!-- Affichage pour un artiste -->
-      <ArtistDetailsCard
-        v-else-if="isArtist && participant && 'artist' in participant"
-        :artist="participant.artist"
-        :fuseau="fuseau"
-        :editable-first-name="editableFirstName"
-        :editable-last-name="editableLastName"
-        :editable-email="editableEmail"
-        :editable-phone="editablePhone"
-        :validating="validating"
-        @update:first-name="editableFirstName = $event"
-        @update:last-name="editableLastName = $event"
-        @update:email="editableEmail = $event"
-        @update:phone="editablePhone = $event"
-        @validate="showValidateConfirm"
-        @invalidate="showInvalidateConfirm"
-      />
-
-      <!-- Affichage pour un organisateur -->
-      <OrganizerDetailsCard
-        v-else-if="isOrganizer && participant && 'organizer' in participant"
-        :organizer="participant.organizer"
-        :fuseau="fuseau"
-        :editable-first-name="editableFirstName"
-        :editable-last-name="editableLastName"
-        :editable-email="editableEmail"
-        :editable-phone="editablePhone"
-        :validating="validating"
-        @update:first-name="editableFirstName = $event"
-        @update:last-name="editableLastName = $event"
-        @update:email="editableEmail = $event"
-        @update:phone="editablePhone = $event"
-        @validate="showValidateConfirm"
-        @invalidate="showInvalidateConfirm"
-      />
-
-      <!-- Message si aucun participant -->
-      <div v-else class="py-8 text-center">
-        <UIcon name="i-heroicons-user-circle" class="mx-auto h-16 w-16 text-gray-400 mb-3" />
-        <p class="text-gray-500">{{ $t('edition.ticketing.no_info_available') }}</p>
       </div>
     </template>
 
-    <template v-if="isTicket && selectedParticipants.length > 0" #footer>
+    <!--
+      ⚠️ UN SEUL PIED, POUR TOUS LES TITRES. Il n'appartenait qu'au billet : avec plusieurs titres,
+      un bouton par section ferait valider la personne en trois gestes, et chacun rouvrirait une
+      liste d'articles à remettre partielle. Le compte annoncé est celui de TOUT ce qui part.
+    -->
+    <template v-if="aQuelqueChoseAValider" #footer>
       <div class="flex justify-end items-center gap-2 w-full">
         <div class="text-sm text-gray-600 dark:text-gray-400">
-          {{ selectedParticipants.length }} participant{{
-            selectedParticipants.length > 1 ? 's' : ''
-          }}
-          sélectionné{{ selectedParticipants.length > 1 ? 's' : '' }}
+          {{ $t('edition.ticketing.selected_count', nombreAValider) }}
         </div>
         <UButton
-          v-if="!isRefunded"
           color="success"
           icon="i-heroicons-check-circle"
           :loading="validating"
-          @click="showValidateTicketsConfirm"
+          :disabled="!toutesLesAdressesValides"
+          @click="demanderLaValidationGlobale"
         >
-          Valider l'entrée ({{ selectedParticipants.length }})
+          {{ $t('edition.ticketing.validate_entry_count', { count: nombreAValider }) }}
         </UButton>
       </div>
     </template>
@@ -880,18 +226,16 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import { logoDuFournisseur, nomDuFournisseur } from '../../utils/ticketing/fournisseur'
+import {
+  listeDesArticlesARemettre,
+  type ArticleACocher,
+  type ArticleDePersonne,
+  type SourceDArticles,
+} from '../../utils/articles-a-remettre'
 
-import ArtistDetailsCard from './ArtistDetailsCard.vue'
-import OrganizerDetailsCard from './OrganizerDetailsCard.vue'
-import VolunteerDetailsCard from './VolunteerDetailsCard.vue'
-
-import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+import ParticipantTitleSection from './ParticipantTitleSection.vue'
 
 const { money } = useEditionCurrency()
-
-const { getParticipantTypeConfig } = useParticipantTypes()
-const ticketConfig = getParticipantTypeConfig('ticket')
 
 interface TicketData {
   ticket: {
@@ -1096,11 +440,38 @@ interface OrganizerData {
 
 type ParticipantData = TicketData | VolunteerData | ArtistData | OrganizerData
 
+export interface TitreAffiche {
+  participant: ParticipantData
+  type: 'ticket' | 'volunteer' | 'artist' | 'organizer'
+  isRefunded?: boolean
+  /** Pour un billet : les lignes de CETTE commande qui appartiennent à la personne cherchée. */
+  preselection?: number[]
+}
+
+/** Ce qu'on valide, titre par titre : la nature décide de la table, les identifiants des lignes. */
+export interface ValidationDUnTitre {
+  type: 'ticket' | 'volunteer' | 'artist' | 'organizer'
+  ids: number[]
+  userInfo?: {
+    firstName?: string | null
+    lastName?: string | null
+    email?: string | null
+    phone?: string | null
+  }
+}
+
 const props = defineProps<{
   open: boolean
   participant?: ParticipantData
   type?: 'ticket' | 'volunteer' | 'artist' | 'organizer'
   isRefunded?: boolean // Indique si la commande est annulée
+  /**
+   * PLUSIEURS titres d'une même personne, à empiler.
+   *
+   * Absent, la modale retombe sur le `participant` unique : c'est le parcours individuel, que ce
+   * prop ne doit pas déranger. Il s'ajoute, il ne remplace pas.
+   */
+  titres?: TitreAffiche[]
   /** Fuseau de l'édition : une entrée se date à l'heure du LIEU, pas du navigateur. */
   fuseau?: string | null
 }>()
@@ -1114,40 +485,22 @@ const emit = defineEmits<{
    * le guichet. La page appelle le point d'API et rafraîchit la fiche.
    */
   refund: [itemId: number, refunded: boolean, portee: 'billet' | 'commande']
+  /**
+   * ⚠️ UNE LISTE, ET NON UN SEUL TITRE. L'ancien contrat émettait des identifiants et laissait la
+   * page deviner leur nature depuis un état global : avec un billet ET une place d'organisateur,
+   * cette nature unique en désignait forcément une des deux, et l'autre partait dans la mauvaise
+   * table — sans erreur, puisque les identifiants existent des deux côtés.
+   */
   validate: [
-    participantIds: number[],
-    paymentInfo?: {
+    lots: ValidationDUnTitre[],
+    paiement?: {
       paymentMethod?: 'cash' | 'card' | 'check' | null
       checkNumber?: string
     },
-    userInfo?: {
-      firstName?: string | null
-      lastName?: string | null
-      email?: string | null
-      phone?: string | null
-    },
   ]
-  invalidate: [participantId: number]
+  /** La nature accompagne l'identifiant, pour la même raison. */
+  invalidate: [type: 'ticket' | 'volunteer' | 'artist' | 'organizer', participantId: number]
 }>()
-
-const { locale } = useI18n()
-
-/**
- * Qui a validé un billet, et quand — à l'heure du lieu.
- *
- * Mêmes règles que dans les trois cartes de détail : un contrôle d'accès se relit sur place, et
- * la langue de l'horodatage est celle du lecteur, pas un `fr-FR` figé dans le gabarit. Le
- * validateur n'était pas du tout rendu ici : l'API ne le renvoyait pas pour les billets.
- */
-const nomDuValidateur = (item: {
-  entryValidatedBy?: { firstName: string; lastName: string } | null
-}) =>
-  item.entryValidatedBy
-    ? `${item.entryValidatedBy.firstName} ${item.entryValidatedBy.lastName}`
-    : ''
-
-const dateDeValidation = (item: { entryValidatedAt?: string | Date }) =>
-  item.entryValidatedAt ? formaterDateHeure(item.entryValidatedAt, props.fuseau, locale.value) : ''
 
 /**
  * « Ce billet peut-il encore être validé ? »
@@ -1174,6 +527,115 @@ const isOpen = computed({
   set: (value) => emit('update:open', value),
 })
 
+/**
+ * Les titres à empiler.
+ *
+ * 📍 `titres` quand on le lui donne, sinon le seul `participant` : le parcours individuel passe par
+ * la même pile, d'un élément. Une seule façon d'afficher, donc un seul endroit où se tromper.
+ */
+const titresAffiches = computed<TitreAffiche[]>(() => {
+  if (props.titres?.length) return props.titres
+  if (!props.participant || !props.type) return []
+  return [{ participant: props.participant, type: props.type, isRefunded: props.isRefunded }]
+})
+
+/** Les lignes cochées, section par section. */
+const selectionParSection = ref<Record<number, number[]>>({})
+/** Les champs corrigés au guichet, section par section — chaque titre a SON compte. */
+const infosParSection = ref<Record<number, ValidationDUnTitre['userInfo']>>({})
+
+const noterLaSelection = (index: number, ids: number[]) => {
+  selectionParSection.value = { ...selectionParSection.value, [index]: ids }
+}
+
+const noterLesInfos = (index: number, infos: ValidationDUnTitre['userInfo']) => {
+  infosParSection.value = { ...infosParSection.value, [index]: infos }
+}
+
+/**
+ * L'adresse de chaque section est-elle valide ?
+ *
+ * ⚠️ CETTE GARDE A FAILLI SE PERDRE. Elle vivait sur le bouton de chaque carte — désactivé tant
+ * que l'adresse corrigée au guichet était en erreur. En déplaçant la validation dans le pied, le
+ * bouton est parti et la garde avec lui : on aurait validé une entrée sur une adresse invalide,
+ * sans rien pour l'empêcher et sans que rien ne le signale.
+ *
+ * 📍 Absente pour une section, on la suppose VALIDE : seules les trois cartes de personne portent
+ * un champ d'adresse ; un billet n'en a pas, et il ne doit pas se retrouver bloqué par un signal
+ * que personne ne lui enverra jamais.
+ */
+const validiteParSection = ref<Record<number, boolean>>({})
+
+const noterLaValiditeDuCourriel = (index: number, valide: boolean) => {
+  validiteParSection.value = { ...validiteParSection.value, [index]: valide }
+}
+
+const toutesLesAdressesValides = computed(() =>
+  titresAffiches.value.every((_, index) => validiteParSection.value[index] !== false)
+)
+
+/**
+ * L'identifiant d'un titre dans SA table.
+ *
+ * ⚠️ Pour un billet, ce sont les LIGNES cochées — une commande en porte plusieurs. Pour les trois
+ * autres natures il n'y a qu'un titre, qu'on valide en entier : aucune case ne le représente, et
+ * attendre une sélection ferait un bouton qui ne part jamais.
+ */
+const idsDuTitre = (titre: TitreAffiche, index: number): number[] => {
+  if (titre.type === 'ticket') return selectionParSection.value[index] ?? []
+  const porteur = (titre.participant as Record<string, { id: number } | undefined>)[titre.type]
+  return porteur ? [porteur.id] : []
+}
+
+/** Déjà validé ? On ne le repropose pas : revalider n'a aucun effet et brouillerait le compte. */
+const titreDejaValide = (titre: TitreAffiche): boolean => {
+  if (titre.type === 'ticket') return false
+  const porteur = (titre.participant as Record<string, { entryValidated?: boolean } | undefined>)[
+    titre.type
+  ]
+  return porteur?.entryValidated === true
+}
+
+/** Ce que le bouton du pied enverra : tous les titres, chacun avec ses identifiants. */
+const lotsAValider = computed<ValidationDUnTitre[]>(() =>
+  titresAffiches.value
+    .map((titre, index) => ({
+      titre,
+      index,
+      ids: titreDejaValide(titre) || titre.isRefunded ? [] : idsDuTitre(titre, index),
+    }))
+    .filter(({ ids }) => ids.length > 0)
+    .map(({ titre, index, ids }) => ({
+      type: titre.type,
+      ids,
+      userInfo: infosParSection.value[index],
+    }))
+)
+
+/** Plusieurs titres à l'écran : la fiche s'élargit et passe en deux colonnes. */
+const plusieursSections = computed(() => titresAffiches.value.length > 1)
+
+/**
+ * La largeur de la fiche, selon ce qu'elle a à montrer.
+ *
+ * ⚠️ ELLE N'EST PAS CONSTANTE, et c'est voulu. Une seule section — le parcours individuel, de loin
+ * le plus courant — n'a rien à faire d'une fiche de 1280 px : ses champs s'y étireraient en lignes
+ * qu'on lit mal, et le regard devrait traverser l'écran pour aller d'une étiquette à sa valeur.
+ * Deux sections côte à côte, en revanche, ont besoin de cette place : sous 1280 px, chaque colonne
+ * deviendrait plus étroite que les formulaires qu'elle contient, qui passent eux-mêmes en deux
+ * colonnes dès `md`.
+ *
+ * 📍 `sm:` et non `lg:` : c'est le préfixe qu'emploie Nuxt UI pour la largeur de ses modales, et
+ * la contrainte est un MAXIMUM — sous cette taille, la fiche occupe simplement l'écran.
+ */
+const largeurDeLaFiche = computed(() => (plusieursSections.value ? 'sm:max-w-7xl' : 'sm:max-w-4xl'))
+
+const nombreAValider = computed(() =>
+  lotsAValider.value.reduce((total, lot) => total + lot.ids.length, 0)
+)
+
+const aQuelqueChoseAValider = computed(() => nombreAValider.value > 0)
+
 const isVolunteer = computed(() => props.type === 'volunteer')
 const isArtist = computed(() => props.type === 'artist')
 const isOrganizer = computed(() => props.type === 'organizer')
@@ -1191,7 +653,6 @@ const showInvalidateModal = ref(false)
 const showPaymentConfirmModal = ref(false)
 const paymentMethod = ref<'cash' | 'card' | 'check' | null>(null)
 const checkNumber = ref('')
-const ticketToInvalidate = ref<number | null>(null)
 
 // Gestion des informations éditables pour artistes et bénévoles
 const editableFirstName = ref<string | null>(null)
@@ -1199,111 +660,73 @@ const editableLastName = ref<string | null>(null)
 const editableEmail = ref<string | null>(null)
 const editablePhone = ref<string | null>(null)
 
-// Gestion des articles à remettre
-const handoutItemsToDistribute = computed(() => {
-  const itemsList: Array<{ id: string; name: string; participantName?: string }> = []
-  let globalIndex = 0 // Compteur global pour garantir l'unicité
+/*
+ * Les articles à remettre, pour LE titre que cette modale montre.
+ *
+ * ⚠️ LE CALCUL N'EST PLUS ICI. Il vit dans `articles-a-remettre`, parce que le contrôle d'accès
+ * doit maintenant l'appliquer à PLUSIEURS titres d'un coup — une personne qui a un billet et une
+ * place d'organisateur reçoit les articles des deux. Deux copies de cette règle auraient fini par
+ * se contredire, et c'est déjà arrivé une fois : un bracelet non cumulable s'affichait en deux
+ * lignes pour avoir été compté sous deux clés. Ce qui reste ici est la seule chose propre à cette
+ * modale : lire le participant qu'on lui a passé.
+ */
+/**
+ * Les articles à remettre, pour TOUS les titres cochés.
+ *
+ * ⚠️ C'EST LE DÉFAUT QUI A LANCÉ CE CHANTIER. La liste ne regardait qu'un titre : une personne qui
+ * a un billet à tarif particulier ET une place d'organisateur se voyait remettre les articles de
+ * l'un des deux, jamais des deux. Rien ne le disait — on validait, et le compte ne tombait qu'au
+ * stock, en fin d'événement.
+ *
+ * 📍 La règle d'agrégation vit dans `articles-a-remettre`, partagée : le même tee-shirt dû à deux
+ * titres fait deux tee-shirts, le même dû deux fois par un titre n'en fait qu'un, suivi de « ×2 ».
+ */
+const handoutItemsToDistribute = computed<ArticleACocher[]>(() => {
+  const sources: SourceDArticles[] = []
+  const defauts = { volunteer: 'Bénévole', artist: 'Artiste', organizer: 'Organisateur' } as const
 
-  // Un article peut arriver par plusieurs associations (ex. artiste jouant dans
-  // deux spectacles). On cumule les quantités et on n'affiche l'article qu'une
-  // fois, suivi du total à remettre.
-  const totals = new Map<string, { name: string; participantName?: string; quantity: number }>()
-  const addItem = (key: string, name: string, quantity: number, participantName?: string) => {
-    const existing = totals.get(key)
-    if (existing) existing.quantity += quantity
-    else totals.set(key, { name, participantName, quantity })
-  }
+  titresAffiches.value.forEach((titre, index) => {
+    const ids = idsDuTitre(titre, index)
+    if (ids.length === 0) return
 
-  // Articles pour les billets
-  if (props.participant && 'ticket' in props.participant) {
-    const itemsToCheck =
-      props.participant.ticket.order.items?.filter((item) =>
-        selectedParticipants.value.includes(item.id)
-      ) || []
-
-    for (const item of itemsToCheck) {
-      const participantName =
-        `${item.firstName || ''} ${item.lastName || ''}`.trim() || 'Participant'
-
-      // La liste vient du serveur, tarif, options et champs personnalisés déjà réunis.
-      //
-      // L'écran la recomposait auparavant lui-même, en additionnant les quantités sans
-      // connaître le drapeau `cumulative` et en rangeant les articles du tarif et ceux des
-      // options sous des clés distinctes : un bracelet non cumulable attaché aux deux
-      // apparaissait en DEUX lignes à cocher. La règle n'a qu'un seul endroit où vivre.
-      for (const handout of item.handoutItems || []) {
-        // L'origine, quand elle éclaire ce qu'on remet : « (Taille du tee-shirt) » ou
-        // « (Camping) » dit d'où sort l'article mieux que son seul nom.
-        let itemName = handout.handoutItem.name
-        if (handout.source === 'customField' && handout.customFieldName) {
-          itemName = `${handout.handoutItem.name} (${handout.customFieldName})`
-        } else if (handout.source === 'option' && handout.optionName) {
-          itemName = `${handout.handoutItem.name} (${handout.optionName})`
-        }
-
-        addItem(
-          `${item.id}-${handout.handoutItem.id}`,
-          itemName,
-          handout.quantity ?? 1,
-          participantName
-        )
+    if (titre.type === 'ticket') {
+      if (!('ticket' in titre.participant)) return
+      const lignes = (titre.participant.ticket.order.items ?? []).filter((item) =>
+        ids.includes(item.id)
+      )
+      for (const ligne of lignes) {
+        sources.push({
+          nature: 'ticket',
+          porteur: `${ligne.firstName || ''} ${ligne.lastName || ''}`.trim() || 'Participant',
+          ligne: ligne.id,
+          articles: ligne.handoutItems || [],
+        })
       }
+      return
     }
-  }
 
-  // Articles pour les bénévoles
-  if (props.participant && 'volunteer' in props.participant) {
-    const volunteerName =
-      `${props.participant.volunteer.user.firstName} ${props.participant.volunteer.user.lastName}`.trim() ||
-      'Bénévole'
+    const porteur = (
+      titre.participant as Record<
+        string,
+        | {
+            user?: { firstName?: string | null; lastName?: string | null }
+            handoutItems?: ArticleDePersonne[]
+          }
+        | undefined
+      >
+    )[titre.type]
+    if (!porteur?.handoutItems?.length) return
 
-    if (props.participant.volunteer.handoutItems) {
-      for (const item of props.participant.volunteer.handoutItems) {
-        addItem(`volunteer-${item.id}`, item.name, item.quantity ?? 1, volunteerName)
-      }
-    }
-  }
-
-  // Articles pour les artistes
-  if (props.participant && 'artist' in props.participant) {
-    const artistName =
-      `${props.participant.artist.user.firstName} ${props.participant.artist.user.lastName}`.trim() ||
-      'Artiste'
-
-    if (props.participant.artist.handoutItems) {
-      for (const item of props.participant.artist.handoutItems) {
-        addItem(`artist-${item.id}`, item.name, item.quantity ?? 1, artistName)
-      }
-    }
-  }
-
-  // Articles pour les organisateurs
-  //
-  // Cette branche manquait. Tout le reste de la chaîne existait pourtant — deux tables, un
-  // onglet de configuration, trois points d'API et un calcul serveur — mais la liste s'arrêtait
-  // ici : un organisateur se présentait au guichet et ne se voyait rien remettre, quoi qu'on
-  // eût paramétré.
-  if (props.participant && 'organizer' in props.participant) {
-    const organizerName =
-      `${props.participant.organizer.user.firstName} ${props.participant.organizer.user.lastName}`.trim() ||
-      'Organisateur'
-
-    if (props.participant.organizer.handoutItems) {
-      for (const item of props.participant.organizer.handoutItems) {
-        addItem(`organizer-${item.id}`, item.name, item.quantity ?? 1, organizerName)
-      }
-    }
-  }
-
-  for (const [key, entry] of totals) {
-    itemsList.push({
-      id: `${key}-${globalIndex++}`,
-      name: `${entry.name}${entry.quantity > 1 ? ` ×${entry.quantity}` : ''} - ${entry.participantName}`,
-      participantName: entry.participantName,
+    sources.push({
+      nature: titre.type,
+      porteur:
+        `${porteur.user?.firstName ?? ''} ${porteur.user?.lastName ?? ''}`.trim() ||
+        defauts[titre.type as keyof typeof defauts],
+      articles: porteur.handoutItems,
     })
-  }
+  })
 
-  return itemsList
+  return listeDesArticlesARemettre(sources)
 })
 
 // Synchroniser les champs éditables avec les données du participant
@@ -1404,21 +827,6 @@ const sommeDue = computed(() => {
   return montantARembourser.value
 })
 
-/** Le détail de ce qui est soldé — pour qu'on voie ce qu'on rend, et non un seul chiffre. */
-const lignesDues = computed(() => detteDeLaCommande.value?.lignes ?? [])
-
-const dejaRembourse = computed(
-  () => billetScanne.value?.state === 'Canceled' && billetScanne.value?.refunded === true
-)
-
-const dateDuRemboursement = computed(() => {
-  const quand = billetScanne.value?.refundedAt
-  // Les remboursements rattrapés à la reprise n'ont pas de date : on sait QUE l'argent a été
-  // rendu, pas quand. Mieux vaut ne rien dater que dater faux.
-  if (!quand) return undefined
-  return formaterDateHeure(quand, props.fuseau, locale.value)
-})
-
 const confirmationDuRemboursement = ref(false)
 
 /** Le nom de qui présente le billet, pour que la question désigne une personne et pas « ce billet ». */
@@ -1433,65 +841,6 @@ const confirmerLeRemboursement = () => {
     emit('refund', billetScanne.value.id, true, soldeToutLaCommande.value ? 'commande' : 'billet')
 }
 
-const annulerLeRemboursement = () => {
-  // Symétrique du geste : ce qu'on a soldé d'un coup se dé-solde d'un coup.
-  if (billetScanne.value)
-    emit('refund', billetScanne.value.id, false, soldeToutLaCommande.value ? 'commande' : 'billet')
-}
-
-/**
- * Le statut de la COMMANDE, rendu lisible.
- *
- * Les quatre valeurs sont celles que la billetterie enregistre réellement — relevées sur les
- * données dans `billets-qui-comptent.ts`, et non supposées. `Canceled` n'en fait pas partie :
- * c'est un état de billet. Une valeur inconnue s'affiche telle quelle plutôt que d'être traduite
- * de travers.
- */
-const STATUTS_DE_COMMANDE: Record<string, { couleur: string; libelle: string }> = {
-  Processed: { couleur: 'success', libelle: 'Payée' },
-  Pending: { couleur: 'warning', libelle: 'En attente de paiement' },
-  Onsite: { couleur: 'info', libelle: 'Sur place' },
-  Refunded: { couleur: 'error', libelle: 'Annulée' },
-}
-
-const statutDeLaCommande = computed(() => {
-  if (!props.participant || !('ticket' in props.participant)) return ''
-  return props.participant.ticket.order.status || ''
-})
-
-const couleurDuStatut = computed(
-  () => STATUTS_DE_COMMANDE[statutDeLaCommande.value]?.couleur ?? 'neutral'
-)
-
-const libelleDuStatut = computed(
-  () => STATUTS_DE_COMMANDE[statutDeLaCommande.value]?.libelle ?? statutDeLaCommande.value
-)
-
-// Computed pour séparer les items entre participants et types spéciaux
-const participantItems = computed(() => {
-  if (!props.participant || !('ticket' in props.participant)) return []
-  return (
-    props.participant.ticket.order.items?.filter(
-      (item) => item.type !== 'Donation' && item.type !== 'Membership' && item.type !== 'Payment'
-    ) || []
-  )
-})
-
-const donationItems = computed(() => {
-  if (!props.participant || !('ticket' in props.participant)) return []
-  return props.participant.ticket.order.items?.filter((item) => item.type === 'Donation') || []
-})
-
-const membershipItems = computed(() => {
-  if (!props.participant || !('ticket' in props.participant)) return []
-  return props.participant.ticket.order.items?.filter((item) => item.type === 'Membership') || []
-})
-
-const paymentItems = computed(() => {
-  if (!props.participant || !('ticket' in props.participant)) return []
-  return props.participant.ticket.order.items?.filter((item) => item.type === 'Payment') || []
-})
-
 // Calcule le montant total d'un item (billet + options)
 const getItemTotalAmount = (item: {
   amount: number
@@ -1502,56 +851,44 @@ const getItemTotalAmount = (item: {
   return item.amount + optionsTotal
 }
 
-/** Les billets de la commande qu'on peut encore cocher : ni entrés, ni annulés. */
-const participantsValidables = computed(() =>
-  participantItems.value.filter((item) => estValidable(item))
+// Computed pour calculer le montant total à payer (billet + options)
+/**
+ * La somme à encaisser : celle de TOUS les billets cochés, toutes sections confondues.
+ *
+ * Elle ne regardait qu'une commande. Avec deux billets issus de deux commandes, on annonçait au
+ * guichet la moitié de ce qu'on allait encaisser.
+ */
+const amountToPay = computed(() =>
+  titresAffiches.value.reduce((total, titre, index) => {
+    if (titre.type !== 'ticket' || !('ticket' in titre.participant)) return total
+    const ids = idsDuTitre(titre, index)
+    const lignes = (titre.participant.ticket.order.items ?? []).filter((item) =>
+      ids.length > 0 ? ids.includes(item.id) : estValidable(item)
+    )
+    return total + lignes.reduce((somme, item) => somme + getItemTotalAmount(item), 0)
+  }, 0)
 )
 
-const selectAllParticipants = () => {
-  if (props.participant && 'ticket' in props.participant) {
-    // Ne sélectionner que les participants non-validés et non-donations
-    selectedParticipants.value = participantsValidables.value.map((item) => item.id)
-  }
-}
+/**
+ * Le geste du pied : valider TOUT ce qui est coché, toutes sections confondues.
+ *
+ * ⚠️ L'ÉCRAN DE RÈGLEMENT SE POSE UNE FOIS. Il s'ouvrait par titre ; avec plusieurs billets, on
+ * répondait trois fois à la même question et deux des réponses se perdaient.
+ */
+const demanderLaValidationGlobale = () => {
+  if (!aQuelqueChoseAValider.value) return
 
-// Computed pour calculer le montant total à payer (billet + options)
-const amountToPay = computed(() => {
-  if (!props.participant || !('ticket' in props.participant)) return 0
+  const enAttenteDePaiement = titresAffiches.value.some(
+    (titre, index) =>
+      titre.type === 'ticket' &&
+      idsDuTitre(titre, index).length > 0 &&
+      'ticket' in titre.participant &&
+      titre.participant.ticket.state === 'Pending'
+  )
 
-  // Si des participants sont sélectionnés, calculer uniquement leur total
-  if (selectedParticipants.value.length > 0) {
-    return participantItems.value
-      .filter((item) => selectedParticipants.value.includes(item.id))
-      .reduce((total, item) => total + getItemTotalAmount(item), 0)
-  }
-
-  // Sinon, calculer le total de la commande (seulement les items non validés)
-  return participantItems.value
-    .filter((item) => estValidable(item))
-    .reduce((total, item) => total + getItemTotalAmount(item), 0)
-})
-
-const showValidateTicketsConfirm = () => {
-  if (selectedParticipants.value.length === 0) return
-
-  // Vérifier si la commande est en attente de paiement
-  if (props.participant && 'ticket' in props.participant) {
-    if (props.participant.ticket.state === 'Pending') {
-      showPaymentConfirmModal.value = true
-      return
-    }
-  }
-
-  showValidateModal.value = true
-}
-
-const showValidateConfirm = () => {
-  // Vérifier si la commande est en attente de paiement
-  if (props.participant && 'ticket' in props.participant) {
-    if (props.participant.ticket.state === 'Pending') {
-      showPaymentConfirmModal.value = true
-      return
-    }
+  if (enAttenteDePaiement) {
+    showPaymentConfirmModal.value = true
+    return
   }
 
   showValidateModal.value = true
@@ -1560,75 +897,31 @@ const showValidateConfirm = () => {
 const confirmValidateEntry = async () => {
   validating.value = true
   try {
-    // Si c'est un bénévole
-    if (props.participant && 'volunteer' in props.participant) {
-      emit(
-        'validate',
-        [props.participant.volunteer.id],
-        {
-          paymentMethod: paymentMethod.value,
-          checkNumber: checkNumber.value,
-        },
-        {
-          firstName: editableFirstName.value,
-          lastName: editableLastName.value,
-          email: editableEmail.value,
-          phone: editablePhone.value,
-        }
-      )
-    }
-    // Si c'est un artiste
-    else if (props.participant && 'artist' in props.participant) {
-      emit(
-        'validate',
-        [props.participant.artist.id],
-        {
-          paymentMethod: paymentMethod.value,
-          checkNumber: checkNumber.value,
-        },
-        {
-          firstName: editableFirstName.value,
-          lastName: editableLastName.value,
-          email: editableEmail.value,
-          phone: editablePhone.value,
-        }
-      )
-    }
-    // Si c'est un organisateur
-    else if (props.participant && 'organizer' in props.participant) {
-      emit(
-        'validate',
-        [props.participant.organizer.id],
-        {
-          paymentMethod: paymentMethod.value,
-          checkNumber: checkNumber.value,
-        },
-        {
-          firstName: editableFirstName.value,
-          lastName: editableLastName.value,
-          email: editableEmail.value,
-          phone: editablePhone.value,
-        }
-      )
-    }
-    // Si ce sont des tickets sélectionnés
-    else if (selectedParticipants.value.length > 0) {
-      emit(
-        'validate',
-        selectedParticipants.value,
-        {
-          paymentMethod: paymentMethod.value,
-          checkNumber: checkNumber.value,
-        },
-        undefined
-      )
-      // Réinitialiser la sélection après validation
-      selectedParticipants.value = []
-    }
+    /*
+     * ⚠️ UN SEUL ÉMIS, PORTANT TOUS LES LOTS. L'ancienne version enchaînait quatre branches `if`
+     * sur le participant unique et n'émettait donc jamais qu'une nature. La page, elle, lisait la
+     * nature dans un état global : deux endroits qui devaient s'accorder sur une valeur que ni
+     * l'un ni l'autre ne pouvait tenir dès qu'il y avait deux titres.
+     */
+    emit('validate', lotsAValider.value, {
+      paymentMethod: paymentMethod.value,
+      checkNumber: checkNumber.value,
+    })
+
     showValidateModal.value = false
-    // Réinitialiser le choix de paiement pour la prochaine validation
     paymentMethod.value = null
     checkNumber.value = ''
+
+    /*
+     * ⚠️ ON FERME AUSSI LA FICHE. La confirmation des articles à remettre est le dernier geste du
+     * guichet : une fois les cases cochées et l'entrée validée, il n'y a plus rien à faire de ces
+     * billets. La fiche restait ouverte sur un état déjà périmé — les titres y paraissaient encore
+     * « à valider » —, et il fallait la fermer à la main pour revenir à la recherche, la personne
+     * suivante attendant devant le comptoir.
+     *
+     * 📍 C'est la page qui rafraîchit ensuite les listes : le nouvel état se lit là, pas ici.
+     */
+    isOpen.value = false
   } finally {
     validating.value = false
   }
@@ -1640,36 +933,33 @@ const confirmPaymentAndContinue = () => {
   showValidateModal.value = true
 }
 
-const showInvalidateConfirm = () => {
-  showInvalidateModal.value = true
-}
+/** Quelle section demande une dévalidation, et quelle ligne s'il s'agit d'un billet. */
+const devalidationDemandee = ref<{ index: number; itemId?: number } | null>(null)
 
-const invalidateTicket = (ticketId: number) => {
-  ticketToInvalidate.value = ticketId
+const demanderLaDevalidation = (index: number, itemId?: number) => {
+  devalidationDemandee.value = { index, itemId }
   showInvalidateModal.value = true
 }
 
 const invalidateEntry = async () => {
+  const demande = devalidationDemandee.value
+  if (!demande) return
+
   validating.value = true
   try {
-    // Si c'est un bénévole
-    if (props.participant && 'volunteer' in props.participant) {
-      emit('invalidate', props.participant.volunteer.id)
-    }
-    // Si c'est un artiste
-    else if (props.participant && 'artist' in props.participant) {
-      emit('invalidate', props.participant.artist.id)
-    }
-    // Si c'est un organisateur
-    else if (props.participant && 'organizer' in props.participant) {
-      emit('invalidate', props.participant.organizer.id)
-    }
-    // Si c'est un ticket
-    else if (ticketToInvalidate.value) {
-      emit('invalidate', ticketToInvalidate.value)
-    }
+    const titre = titresAffiches.value[demande.index]
+    if (!titre) return
+
+    /*
+     * ⚠️ LA NATURE PART AVEC L'IDENTIFIANT. Elle se déduisait du participant unique de la modale ;
+     * avec plusieurs titres, ce raccourci désignait toujours le premier et dévalidait dans la
+     * mauvaise table — sans erreur, les identifiants existant des deux côtés.
+     */
+    const id = demande.itemId ?? idsDuTitre(titre, demande.index)[0]
+    if (id !== undefined) emit('invalidate', titre.type, id)
+
     showInvalidateModal.value = false
-    ticketToInvalidate.value = null
+    devalidationDemandee.value = null
   } finally {
     validating.value = false
   }
