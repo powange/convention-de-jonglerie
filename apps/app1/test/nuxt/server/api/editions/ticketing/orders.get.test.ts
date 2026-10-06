@@ -56,6 +56,7 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
             state: 'Processed',
             refunded: false,
             tier: { id: 1, name: 'Tarif normal' },
+            selectedOptions: [],
           },
         ],
       },
@@ -71,6 +72,8 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
     expect(res.data).toEqual([
       {
         ...mockOrders[0],
+        // Aucun billet annulé : rien à retirer de ce qu'a rapporté la commande.
+        canceledAmount: 0,
         items: [
           {
             ...mockOrders[0]!.items[0],
@@ -105,15 +108,17 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
     const mockOrders = [
       {
         id: 1,
-        amount: 5000,
-        items: [{ type: 'Participant', amount: 5000 }],
+        status: 'Processed',
+        paymentMethod: 'cash',
+        items: [{ type: 'Participant', amount: 5000, state: 'Processed', selectedOptions: [] }],
       },
       {
         id: 2,
-        amount: 3000,
+        status: 'Processed',
+        paymentMethod: 'cash',
         items: [
-          { type: 'Participant', amount: 2500 },
-          { type: 'Donation', amount: 500 },
+          { type: 'Participant', amount: 2500, state: 'Processed', selectedOptions: [] },
+          { type: 'Donation', amount: 500, state: 'Processed', selectedOptions: [] },
         ],
       },
     ]
@@ -134,7 +139,7 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       amountsByPaymentMethod: {
         cardHelloAsso: 0,
         cardOnsite: 0,
-        cash: 0,
+        cash: 8000,
         check: 0,
         online: 0,
         pending: 0,
@@ -154,7 +159,17 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
         // L'article porte son tarif : sous un filtre de tarif, un article sans `tierId` ne peut
         // pas être celui que la requête a retenu, et le gabarit décrivait une situation qui
         // n'existe pas.
-        items: [{ type: 'Participant', amount: 5000, tierId: 1, selectedOptions: [] }],
+        status: 'Processed',
+        paymentMethod: 'cash',
+        items: [
+          {
+            type: 'Participant',
+            amount: 5000,
+            state: 'Processed',
+            tierId: 1,
+            selectedOptions: [],
+          },
+        ],
       },
     ]
 
@@ -189,7 +204,7 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       amountsByPaymentMethod: {
         cardHelloAsso: 0,
         cardOnsite: 0,
-        cash: 0,
+        cash: 5000,
         check: 0,
         online: 0,
         pending: 0,
@@ -215,19 +230,19 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
           ],
         }),
         select: {
-          amount: true,
           status: true,
           paymentMethod: true,
           externalTicketingId: true,
           items: {
-            // De quoi rejouer les filtres article par article : sans ces champs, les stats ne
-            // peuvent que compter TOUS les articles des commandes retenues.
+            // De quoi rejouer les filtres article par article, et compter le prix des options
+            // et l'état du billet : un billet annulé sort du montant.
             select: {
               type: true,
               amount: true,
+              state: true,
               tierId: true,
               entryValidated: true,
-              selectedOptions: { select: { optionId: true } },
+              selectedOptions: { select: { optionId: true, amount: true } },
             },
           },
         },
@@ -244,7 +259,17 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
         id: 1,
         amount: 5000,
         // Sous un filtre « entrée validée », l'article retenu l'est forcément.
-        items: [{ type: 'Participant', amount: 5000, entryValidated: true, selectedOptions: [] }],
+        status: 'Processed',
+        paymentMethod: 'cash',
+        items: [
+          {
+            type: 'Participant',
+            amount: 5000,
+            state: 'Processed',
+            entryValidated: true,
+            selectedOptions: [],
+          },
+        ],
       },
     ]
 
@@ -278,7 +303,7 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       amountsByPaymentMethod: {
         cardHelloAsso: 0,
         cardOnsite: 0,
-        cash: 0,
+        cash: 5000,
         check: 0,
         online: 0,
         pending: 0,
@@ -302,19 +327,19 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
           ],
         }),
         select: {
-          amount: true,
           status: true,
           paymentMethod: true,
           externalTicketingId: true,
           items: {
-            // De quoi rejouer les filtres article par article : sans ces champs, les stats ne
-            // peuvent que compter TOUS les articles des commandes retenues.
+            // De quoi rejouer les filtres article par article, et compter le prix des options
+            // et l'état du billet : un billet annulé sort du montant.
             select: {
               type: true,
               amount: true,
+              state: true,
               tierId: true,
               entryValidated: true,
-              selectedOptions: { select: { optionId: true } },
+              selectedOptions: { select: { optionId: true, amount: true } },
             },
           },
         },
@@ -337,8 +362,8 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       paymentMethod: 'cash',
       externalTicketingId: null,
       items: [
-        { type: 'Registration', amount: 2500, tierId: 72, selectedOptions: [] },
-        { type: 'Registration', amount: 3500, tierId: 87, selectedOptions: [] },
+        { type: 'Registration', amount: 2500, state: 'Processed', tierId: 72, selectedOptions: [] },
+        { type: 'Registration', amount: 3500, state: 'Processed', tierId: 87, selectedOptions: [] },
       ],
     }
 
@@ -368,35 +393,165 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
     expect(articles.map((a: any) => a.retenuParLesFiltres)).toEqual([true, false])
   })
 
-  it('laisse les totaux intacts quand aucun filtre d’article n’est posé', async () => {
-    // Le garde-fou de la correction précédente : sans filtre, on somme le montant de la
-    // COMMANDE, et non ses articles. Sur cette base, 18 commandes sur 565 portent des frais de
-    // billetterie externe qu'aucun article ne représente — les reconstituer ferait baisser un
-    // chiffre qu'on rapproche d'un relevé bancaire.
+  it('compte les options, filtre posé ou non', async () => {
+    // Le montant d'une commande dépasse la somme de ses billets du prix de leurs options — c'est
+    // le cas des 18 commandes de l'édition 9 où l'écart avait été pris pour des frais de
+    // billetterie externe. Sous un filtre de tarif, le montant reprenait le seul prix des billets
+    // et perdait les options.
     mockCanAccess.mockResolvedValue(true)
-    global.getQuery.mockReturnValue({ page: '1', limit: '20' })
+    global.getQuery.mockReturnValue({ page: '1', limit: '20', tierIds: '4' })
 
-    const avecFrais = {
+    const avecOptions = {
       id: 257,
-      amount: 5700,
       status: 'Processed',
       paymentMethod: 'card',
       externalTicketingId: 3,
-      items: [{ type: 'Registration', amount: 5000, tierId: 4, selectedOptions: [] }],
+      items: [
+        {
+          type: 'Registration',
+          amount: 5000,
+          state: 'Processed',
+          tierId: 4,
+          selectedOptions: [
+            { optionId: 1, amount: 500 },
+            { optionId: 2, amount: 200 },
+          ],
+        },
+      ],
     }
 
     prismaMock.ticketingOrder.count.mockResolvedValue(1)
     prismaMock.ticketingOrder.findMany
       .mockResolvedValueOnce([
-        { ...avecFrais, externalTicketing: null, items: [{ ...avecFrais.items[0], id: 1 }] },
+        { ...avecOptions, externalTicketing: null, items: [{ ...avecOptions.items[0], id: 1 }] },
       ] as any)
-      .mockResolvedValueOnce([avecFrais] as any)
+      .mockResolvedValueOnce([avecOptions] as any)
 
     const res = await handler(baseEvent as any)
 
     expect(res.stats!.totalItems).toBe(1)
     expect(res.stats!.totalAmount).toBe(5700)
     expect(res.stats!.amountsByPaymentMethod.cardHelloAsso).toBe(5700)
+  })
+
+  it('écarte du total les billets annulés, sans les ajouter au « Total général »', async () => {
+    // Les chiffres réels du tarif 84 de l'édition 22, réduits à deux commandes : la commande 686
+    // garde son montant de 4 tee-shirts alors que 3 sont annulés, et une commande entière
+    // annulée était ADDITIONNÉE au total sous l'intitulé « Remboursé ».
+    mockCanAccess.mockResolvedValue(true)
+    global.getQuery.mockReturnValue({ page: '1', limit: '20' })
+
+    const billet = (state: string, amount = 1800) => ({
+      type: 'Registration',
+      amount,
+      state,
+      tierId: 84,
+      selectedOptions: [],
+    })
+    const commandes = [
+      {
+        id: 686,
+        status: 'Processed',
+        paymentMethod: 'card',
+        externalTicketingId: 3,
+        items: [billet('Canceled'), billet('Processed'), billet('Canceled'), billet('Canceled')],
+      },
+      {
+        id: 1116,
+        status: 'Refunded',
+        paymentMethod: 'card',
+        externalTicketingId: null,
+        items: [billet('Canceled', 2800)],
+      },
+      {
+        id: 937,
+        status: 'Onsite',
+        paymentMethod: 'cash',
+        externalTicketingId: null,
+        items: [
+          billet('Processed', 3400),
+          // Un don annulé ne compte ni dans les dons, ni dans le montant.
+          { ...billet('Canceled', 500), type: 'Donation' },
+        ],
+      },
+    ]
+
+    prismaMock.ticketingOrder.count.mockResolvedValue(3)
+    prismaMock.ticketingOrder.findMany
+      .mockResolvedValueOnce([] as any)
+      .mockResolvedValueOnce(commandes as any)
+
+    const res = await handler(baseEvent as any)
+
+    expect(res.stats).toEqual({
+      // Le nombre de commandes LISTÉES : la commande annulée y figure toujours.
+      totalOrders: 3,
+      totalItems: 2,
+      totalAmount: 5200, // 1800 + 3400
+      totalDonations: 0,
+      totalDonationsAmount: 0,
+      amountsByPaymentMethod: {
+        cardHelloAsso: 1800,
+        cardOnsite: 0,
+        cash: 3400,
+        check: 0,
+        online: 0,
+        pending: 0,
+        refunded: 1800 * 3 + 2800 + 500, // hors du total
+      },
+    })
+  })
+
+  it('annonce sur chaque commande la part annulée, options comprises', async () => {
+    // La commande 686 : cinq billets, trois annulés, et un montant payé qui ne bouge pas.
+    mockCanAccess.mockResolvedValue(true)
+    global.getQuery.mockReturnValue({ page: '1', limit: '20', search: 'x' })
+
+    const billet = (id: number, state: string, options: number[] = []) => ({
+      id,
+      type: 'Registration',
+      amount: 1800,
+      state,
+      refunded: false,
+      selectedOptions: options.map((amount, i) => ({ id: i, optionId: i, amount })),
+    })
+    const commandes = [
+      {
+        id: 686,
+        amount: 10200,
+        status: 'Processed',
+        paymentMethod: 'card',
+        externalTicketing: null,
+        items: [
+          billet(1, 'Canceled', [500]),
+          billet(2, 'Processed'),
+          billet(3, 'Canceled'),
+          billet(4, 'Canceled'),
+          billet(5, 'Processed', [300]),
+        ],
+      },
+      {
+        id: 1116,
+        amount: 2800,
+        status: 'Refunded',
+        paymentMethod: 'card',
+        externalTicketing: null,
+        // Commande annulée en entier : tout est annulé, même un billet resté `Processed`.
+        items: [{ ...billet(6, 'Processed'), amount: 2800 }],
+      },
+    ]
+
+    prismaMock.ticketingOrder.count.mockResolvedValue(2)
+    prismaMock.ticketingOrder.findMany.mockResolvedValueOnce(commandes as any)
+
+    const res = await handler(baseEvent as any)
+
+    const lues = res.data as any[]
+    expect(lues[0].canceledAmount).toBe(1800 * 3 + 500)
+    expect(lues[0].amount).toBe(10200)
+    expect(lues[1].canceledAmount).toBe(2800)
+    // La somme due d'un billet annulé reprend ses options.
+    expect(lues[0].items[0].refundDue).toBe(2300)
   })
 
   it('compte juste quand DEUX commandes sont retenues, dont une seule est mixte', async () => {
@@ -414,7 +569,15 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
         status: 'Processed',
         paymentMethod: 'cash',
         externalTicketingId: null,
-        items: [{ type: 'Registration', amount: 1800, tierId: 84, selectedOptions: [] }],
+        items: [
+          {
+            type: 'Registration',
+            amount: 1800,
+            state: 'Processed',
+            tierId: 84,
+            selectedOptions: [],
+          },
+        ],
       },
       {
         id: 537,
@@ -423,8 +586,20 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
         paymentMethod: 'cash',
         externalTicketingId: null,
         items: [
-          { type: 'Registration', amount: 1800, tierId: 84, selectedOptions: [] },
-          { type: 'Registration', amount: 3000, tierId: 87, selectedOptions: [] },
+          {
+            type: 'Registration',
+            amount: 1800,
+            state: 'Processed',
+            tierId: 84,
+            selectedOptions: [],
+          },
+          {
+            type: 'Registration',
+            amount: 3000,
+            state: 'Processed',
+            tierId: 87,
+            selectedOptions: [],
+          },
         ],
       },
     ]

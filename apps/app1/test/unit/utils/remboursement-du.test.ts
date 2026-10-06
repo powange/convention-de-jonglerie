@@ -84,6 +84,29 @@ describe('montantARembourser', () => {
     // présente l'un d'eux rembourserait les autres au passage.
     expect(montantARembourser(billet({ amount: 1200 }))).toBe(1200)
   })
+
+  describe('les options payées avec le billet', () => {
+    it('sont dues avec lui', () => {
+      expect(
+        montantARembourser(billet({ amount: 2000, selectedOptions: [{ amount: 1300 }] }))
+      ).toBe(3300)
+    })
+
+    it('rendent un billet gratuit dû — le cas de la commande 302, édition 9', () => {
+      // Billet à 0 €, deux options à 13 € et 6 € : l'ancienne règle annonçait « 0 € dû ».
+      expect(
+        montantARembourser(
+          billet({ amount: 0, selectedOptions: [{ amount: 1300 }, { amount: 600 }] })
+        )
+      ).toBe(1900)
+    })
+
+    it('comptent zéro pour une option gratuite', () => {
+      expect(
+        montantARembourser(billet({ amount: 1200, selectedOptions: [{ amount: null }] }))
+      ).toBe(1200)
+    })
+  })
 })
 
 /**
@@ -163,6 +186,19 @@ describe('detteDeCommande', () => {
 
     expect(dette.total).toBe(3400)
     expect(dette.lignes.map((l) => l.id)).toEqual([1])
+  })
+
+  it('compte les options de chaque ligne, dans le total ET dans le détail', () => {
+    const dette = detteDeCommande(
+      [
+        { ...ligne(1, 0, 'Anne Claire', 'Durand'), selectedOptions: [{ amount: 1300 }] },
+        ligne(2, 600, 'Anonyme', 'Anonyme'),
+      ],
+      COMMANDE_REGLEE_AU_GUICHET
+    )
+
+    expect(dette.total).toBe(1900)
+    expect(dette.lignes.map((l) => l.amount)).toEqual([1300, 600])
   })
 
   it('ne doit rien sur une commande jamais réglée', () => {

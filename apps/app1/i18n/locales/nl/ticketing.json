@@ -285,7 +285,8 @@
       "ticket_canceled": "Ticket geannuleerd",
       "ticket_restore": "Dit ticket herstellen",
       "ticket_restored": "Ticket hersteld",
-      "to_refund_badge": "Terug te betalen"
+      "to_refund_badge": "Terug te betalen",
+      "order_canceled_part": "waarvan {amount} geannuleerd"
     },
     "participant": {
       "entry_validated": "Toegang al gevalideerd",

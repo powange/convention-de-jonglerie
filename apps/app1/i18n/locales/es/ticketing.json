@@ -285,7 +285,8 @@
       "ticket_canceled": "Entrada anulada",
       "ticket_restore": "Restablecer esta entrada",
       "ticket_restored": "Entrada restablecida",
-      "to_refund_badge": "Por reembolsar"
+      "to_refund_badge": "Por reembolsar",
+      "order_canceled_part": "de los cuales {amount} cancelado"
     },
     "participant": {
       "entry_validated": "Entrada ya validada",

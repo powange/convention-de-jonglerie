@@ -285,7 +285,8 @@
       "ticket_canceled": "Biljett avbokad",
       "ticket_restore": "Återställ den här biljetten",
       "ticket_restored": "Biljett återställd",
-      "to_refund_badge": "Att återbetala"
+      "to_refund_badge": "Att återbetala",
+      "order_canceled_part": "varav {amount} avbokat"
     },
     "participant": {
       "entry_validated": "Posten är redan validerad",

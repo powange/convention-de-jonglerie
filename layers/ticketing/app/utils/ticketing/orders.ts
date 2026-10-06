@@ -43,6 +43,8 @@ export interface Order {
   payerLastName: string
   payerEmail: string
   amount: number
+  /** La part de `amount` dont les billets sont annulés, options comprises. Rendue par la liste. */
+  canceledAmount?: number
   status: string
   paymentMethod?: string | null
   checkNumber?: string | null

@@ -285,7 +285,8 @@
       "ticket_canceled": "Bilet anulowany",
       "ticket_restore": "Przywróć ten bilet",
       "ticket_restored": "Bilet przywrócony",
-      "to_refund_badge": "Do zwrotu"
+      "to_refund_badge": "Do zwrotu",
+      "order_canceled_part": "w tym {amount} anulowano"
     },
     "participant": {
       "entry_validated": "Wejście już zwalidowane",
