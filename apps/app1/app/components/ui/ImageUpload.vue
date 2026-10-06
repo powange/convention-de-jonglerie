@@ -427,6 +427,11 @@ const upload = async () => {
       case 'treasury':
         apiUrl = '/api/files/treasury'
         break
+      // Les justificatifs d'un artiste ont leur propre point d'API : celui de la trésorerie exige
+      // le droit des comptes, qu'un gestionnaire d'artistes n'a pas forcément.
+      case 'artist':
+        apiUrl = '/api/files/artist'
+        break
       case 'profile':
         apiUrl = '/api/files/profile'
         break

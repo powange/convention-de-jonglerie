@@ -9,6 +9,7 @@ import {
   canManageArtists,
 } from '#server/utils/permissions/edition-permissions'
 import { buildUpdateData } from '#server/utils/prisma-helpers'
+import { deplacerJustificatif } from '#server/utils/treasury-receipt-files'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 import { schemaAdresseEmail } from '~~/shared/utils/adresse-email'
 import { toCents } from '~~/shared/utils/money'
@@ -34,6 +35,16 @@ const updateArtistSchema = z.object({
   consumablesMax: z.number().nonnegative().max(100000).optional().nullable(),
   consumablesActual: z.number().nonnegative().max(100000).optional().nullable(),
   consumablesActualPaid: z.boolean().optional(),
+  /**
+   * Les justificatifs : billet de train, facture d'essence, ticket de courses.
+   *
+   * ⚠️ EXCLUS DE `buildUpdateData` PLUS BAS, et écrits à la main après déplacement. Recopiés tels
+   * quels, ils garderaient l'URL TEMPORAIRE en base — le fichier serait purgé et le justificatif
+   * perdu — et surtout ils contourneraient la garde qui vérifie que l'URL désigne bien le dossier
+   * de cette édition, et le domaine « artists » et non celui de la trésorerie.
+   */
+  reimbursementReceiptUrl: z.string().max(500).optional().nullable(),
+  consumablesReceiptUrl: z.string().max(500).optional().nullable(),
   accommodationAutonomous: z.boolean().optional(),
   accommodationType: z.enum(['TENT', 'VEHICLE', 'HOSTED', 'OTHER']).optional().nullable(),
   accommodationTypeOther: z.string().max(500).optional().nullable(),
@@ -282,24 +293,54 @@ export default wrapApiHandler(
       await prisma.user.update({ where: { id: existingArtist.user.id }, data: majProfil as never })
     }
 
+    /*
+     * Les JUSTIFICATIFS, déplacés du dossier temporaire vers celui de l'édition.
+     *
+     * ⚠️ APRÈS le contrôle des droits et AVANT l'écriture : `deplacerJustificatif` porte les gardes
+     * — l'URL doit être temporaire, ou désigner exactement le dossier `artists` de CETTE édition.
+     * Sans elle, un client pourrait enregistrer l'URL d'une pièce comptable de la trésorerie, que
+     * la page des artistes afficherait ensuite à des gens qui n'ont pas le droit de la voir.
+     *
+     * 📍 `undefined` quand le champ n'est pas envoyé : on ne touche pas à un justificatif que la
+     * modale n'a pas montré. `null` l'efface, ce qui est le geste « retirer le justificatif ».
+     */
+    // 📍 `edition` est déjà chargée plus haut, avec son `conventionId` : une seconde requête ne
+    // ferait que la relire, et le compilateur refusait d'ailleurs le doublon de nom.
+    const justificatifs: Record<string, string | null> = {}
+    for (const champ of ['reimbursementReceiptUrl', 'consumablesReceiptUrl'] as const) {
+      if (!(champ in validatedData)) continue
+      justificatifs[champ] = await deplacerJustificatif(
+        validatedData[champ] as string | null | undefined,
+        edition,
+        'artists'
+      )
+    }
+
     // Mettre à jour l'artiste
     const updatedArtist = await prisma.editionArtist.update({
       where: { id: artistId },
       // `buildUpdateData` recopie tout ce qui n'est pas exclu : sans les trois exclusions
       // ci-dessous, il continuerait d'alimenter les colonnes que l'on gèle. Écriture invisible
       // au balayage, parce que dynamique — c'est elle qui a failli passer entre les mailles.
-      data: buildUpdateData(validatedData, {
-        exclude: [
-          'userEmail',
-          'userPrenom',
-          'userNom',
-          'userPhone',
-          'switchToUserId',
-          'dietaryPreference',
-          'allergies',
-          'allergySeverity',
-        ],
-      }),
+      data: {
+        ...buildUpdateData(validatedData, {
+          exclude: [
+            'userEmail',
+            'userPrenom',
+            'userNom',
+            'userPhone',
+            'switchToUserId',
+            'dietaryPreference',
+            'allergies',
+            'allergySeverity',
+            // Écrits à la main juste en dessous, APRÈS déplacement depuis le dossier temporaire.
+            'reimbursementReceiptUrl',
+            'consumablesReceiptUrl',
+          ],
+        }),
+        // Les justificatifs déplacés, écrits à la main : voir le bloc ci-dessus.
+        ...justificatifs,
+      },
       include: {
         user: {
           select: {

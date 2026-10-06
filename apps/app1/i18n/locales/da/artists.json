@@ -195,6 +195,15 @@
     "delete_empty_shows_intro": "Disse kabaretter ville stå helt uden numre:",
     "delete_orphan_acts_hint": "Det, der ikke er markeret, bliver stående. Et nummer uden udøver forhindrer ingenting: det står stadig i rækkefølgen og på det tekniske ark, uden navn.",
     "delete_orphan_acts_intro": "Dette nummer ville ikke have nogen tilbage til at udføre det: | Disse {count} numre ville ikke have nogen tilbage til at udføre dem:",
-    "search_help": "Søgningen omfatter alle viste kolonner: skjuler du en kolonne, fjernes den også fra søgningen."
+    "search_help": "Søgningen omfatter alle viste kolonner: skjuler du en kolonne, fjernes den også fra søgningen.",
+    "consumables_not_paid": "Forbrugsvarer ikke refunderet",
+    "consumables_receipt": "Dokumentation for forbrugsvarer",
+    "consumables_receipt_help": "Kassebon, faktura — billede eller PDF",
+    "payment_not_paid": "Honorar ikke udbetalt",
+    "reimbursement_not_paid": "Rejseudgifter ikke refunderet",
+    "reimbursement_receipt": "Dokumentation for rejseudgifter",
+    "reimbursement_receipt_help": "Togbillet, benzinkvittering, vejafgift — billede eller PDF",
+    "tab_informations": "Oplysninger",
+    "tab_payment": "Betaling"
   }
 }

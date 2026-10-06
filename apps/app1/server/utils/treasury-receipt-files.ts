@@ -9,15 +9,29 @@ import { createError } from 'h3'
 /** Racine du stockage, la même que celle où écrit `storeFileLocally` et que sert `/uploads/**`. */
 const racineStockage = () => process.env.NUXT_FILE_STORAGE_MOUNT || '/uploads'
 
-/** Dossier définitif des justificatifs d'une édition. */
-const dossierEdition = (edition: { id: number; conventionId: number }) =>
+/**
+ * Le DOMAINE d'un justificatif : le sous-dossier où il vit, et le dossier temporaire d'où il vient.
+ *
+ * ⚠️ UN PARAMÈTRE ET NON UNE SECONDE COPIE DE CE FICHIER. Les justificatifs d'un artiste — billet
+ * de train, facture d'essence — obéissent exactement aux mêmes règles que les pièces comptables :
+ * dépôt temporaire, déplacement à l'enregistrement, nom de fichier dépouillé de tout chemin. Seul
+ * le sous-dossier change. Recopier le fichier aurait fait diverger deux gardes de sécurité, et
+ * c'est précisément le genre d'écart qu'on ne voit qu'en étant attaqué.
+ */
+export type DomaineDeJustificatif = 'treasury' | 'artists'
+
+/** Dossier définitif des justificatifs d'une édition, pour un domaine donné. */
+const dossierEdition = (
+  edition: { id: number; conventionId: number },
+  domaine: DomaineDeJustificatif
+) =>
   join(
     racineStockage(),
     'conventions',
     String(edition.conventionId),
     'editions',
     String(edition.id),
-    'treasury'
+    domaine
   )
 
 /**
@@ -53,7 +67,8 @@ function nomDeFichierSeul(chemin: string): string | null {
  */
 export async function deplacerJustificatif(
   imageUrl: string | null | undefined,
-  edition: { id: number; conventionId: number }
+  edition: { id: number; conventionId: number },
+  domaine: DomaineDeJustificatif = 'treasury'
 ): Promise<string | null> {
   if (!imageUrl) return null
 
@@ -61,7 +76,7 @@ export async function deplacerJustificatif(
     // Forme exacte et rien de plus : le nom de fichier ne peut contenir aucune barre oblique, sans
     // quoi `.../treasury/x/../../autre` retomberait dans le motif.
     const attendu = new RegExp(
-      `^/uploads/conventions/${edition.conventionId}/editions/${edition.id}/treasury/[^/]+$`
+      `^/uploads/conventions/${edition.conventionId}/editions/${edition.id}/${domaine}/[^/]+$`
     )
     if (!attendu.test(imageUrl)) {
       throw createError({ status: 400, message: 'Justificatif invalide' })
@@ -72,17 +87,17 @@ export async function deplacerJustificatif(
   const nom = nomDeFichierSeul(imageUrl)
   if (!nom) return null
 
-  const source = join(racineStockage(), 'temp', 'treasury', String(edition.id), nom)
-  const dossier = dossierEdition(edition)
+  const source = join(racineStockage(), 'temp', domaine, String(edition.id), nom)
+  const dossier = dossierEdition(edition, domaine)
 
   try {
     await mkdir(dossier, { recursive: true })
     await rename(source, join(dossier, nom))
-    return `/uploads/conventions/${edition.conventionId}/editions/${edition.id}/treasury/${nom}`
+    return `/uploads/conventions/${edition.conventionId}/editions/${edition.id}/${domaine}/${nom}`
   } catch (error) {
     // Le fichier temporaire a disparu — session trop longue, purge, double enregistrement. Mieux
     // vaut une entrée sans justificatif qu'un refus d'enregistrer une ligne comptable.
-    console.warn('[trésorerie] justificatif temporaire introuvable', source, error)
+    console.warn(`[${domaine}] justificatif temporaire introuvable`, source, error)
     return null
   }
 }
@@ -102,14 +117,15 @@ export async function deplacerJustificatif(
  */
 export async function supprimerJustificatif(
   imageUrl: string | null | undefined,
-  edition: { id: number; conventionId: number }
+  edition: { id: number; conventionId: number },
+  domaine: DomaineDeJustificatif = 'treasury'
 ): Promise<void> {
   if (!imageUrl) return
 
   const nomFichier = nomDeFichierSeul(imageUrl)
   if (!nomFichier) return
 
-  const chemin = join(dossierEdition(edition), nomFichier)
+  const chemin = join(dossierEdition(edition, domaine), nomFichier)
 
   try {
     await unlink(chemin)

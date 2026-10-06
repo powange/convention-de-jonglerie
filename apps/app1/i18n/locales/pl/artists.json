@@ -195,6 +195,15 @@
     "delete_empty_shows_intro": "Te kabarety zostałyby bez żadnego numeru:",
     "delete_orphan_acts_hint": "To, co nie zostanie zaznaczone, pozostaje. Numer bez wykonawcy niczemu nie przeszkadza: pojawia się w przebiegu i na karcie technicznej, bez nazwiska.",
     "delete_orphan_acts_intro": "Ten numer nie miałby już nikogo do wykonania: | Te {count} numery nie miałyby już nikogo do wykonania:",
-    "search_help": "Wyszukiwanie obejmuje wszystkie wyświetlane kolumny: ukrycie kolumny usuwa ją również z wyszukiwania."
+    "search_help": "Wyszukiwanie obejmuje wszystkie wyświetlane kolumny: ukrycie kolumny usuwa ją również z wyszukiwania.",
+    "consumables_not_paid": "Materiały niezwrócone",
+    "consumables_receipt": "Dowód zakupu materiałów",
+    "consumables_receipt_help": "Paragon, faktura — obraz lub PDF",
+    "payment_not_paid": "Honorarium niewypłacone",
+    "reimbursement_not_paid": "Koszty podróży niezwrócone",
+    "reimbursement_receipt": "Dowód zwrotu kosztów podróży",
+    "reimbursement_receipt_help": "Bilet kolejowy, faktura za paliwo, opłata drogowa — obraz lub PDF",
+    "tab_informations": "Informacje",
+    "tab_payment": "Płatność"
   }
 }

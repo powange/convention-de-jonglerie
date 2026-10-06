@@ -195,6 +195,15 @@
     "delete_empty_shows_intro": "Těmto kabaretům by nezůstalo jediné číslo:",
     "delete_orphan_acts_hint": "Co není zaškrtnuto, zůstává. Číslo bez interpreta ničemu nebrání: objeví se v programu i v technickém listu, bez jména.",
     "delete_orphan_acts_intro": "Toto číslo by nemělo nikoho, kdo by je zahrál: | Tato {count} čísla by neměla nikoho, kdo by je zahrál:",
-    "search_help": "Vyhledávání se týká všech zobrazených sloupců: skrytím sloupce jej z vyhledávání také vyřadíte."
+    "search_help": "Vyhledávání se týká všech zobrazených sloupců: skrytím sloupce jej z vyhledávání také vyřadíte.",
+    "consumables_not_paid": "Spotřební materiál neproplacen",
+    "consumables_receipt": "Doklad o spotřebním materiálu",
+    "consumables_receipt_help": "Účtenka, faktura — obrázek nebo PDF",
+    "payment_not_paid": "Honorář nevyplacen",
+    "reimbursement_not_paid": "Cestovné neproplaceno",
+    "reimbursement_receipt": "Doklad o cestovních nákladech",
+    "reimbursement_receipt_help": "Jízdenka, účtenka za palivo, mýtné — obrázek nebo PDF",
+    "tab_informations": "Informace",
+    "tab_payment": "Platba"
   }
 }

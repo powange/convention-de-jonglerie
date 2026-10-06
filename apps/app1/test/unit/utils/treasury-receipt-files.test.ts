@@ -170,3 +170,75 @@ describe('deplacerJustificatif', () => {
     expect(await deplacerJustificatif(pdf, EDITION)).toBe(pdf)
   })
 })
+
+/**
+ * Le même dispositif, pour les justificatifs d'un ARTISTE.
+ *
+ * ⚠️ POURQUOI UN PARAMÈTRE ET NON UNE SECONDE COPIE DU FICHIER. Un billet de train obéit aux mêmes
+ * règles qu'une pièce comptable : dépôt temporaire, déplacement à l'enregistrement, nom dépouillé
+ * de tout chemin. Seul le sous-dossier change. Recopier le fichier aurait fait diverger deux gardes
+ * de SÉCURITÉ — et un écart de ce genre ne se voit qu'en étant attaqué.
+ *
+ * Ces tests valent donc autant pour ce qu'ils vérifient que pour ce qu'ils interdisent : que le
+ * domaine ne serve pas de porte dérobée vers le dossier d'un autre.
+ */
+describe('les justificatifs d’un artiste', () => {
+  const DOSSIER_ARTISTES = '/uploads/conventions/4/editions/21/artists'
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    renameMock.mockResolvedValue(undefined)
+    mkdirMock.mockResolvedValue(undefined)
+    unlinkMock.mockResolvedValue(undefined)
+  })
+
+  it('déplace depuis le dossier temporaire du BON domaine', async () => {
+    const url = await deplacerJustificatif(
+      '/uploads/temp/artists/21/billet-a1b2c3d4.jpg',
+      EDITION,
+      'artists'
+    )
+
+    expect(url).toBe(`${DOSSIER_ARTISTES}/billet-a1b2c3d4.jpg`)
+    expect(renameMock).toHaveBeenCalledWith(
+      '/uploads/temp/artists/21/billet-a1b2c3d4.jpg',
+      `${DOSSIER_ARTISTES}/billet-a1b2c3d4.jpg`
+    )
+  })
+
+  it('⚠️ REFUSE un justificatif qui désigne le dossier d’un AUTRE domaine', async () => {
+    /*
+     * Le cœur de la garde : sans elle, un client pourrait enregistrer sur un artiste l'URL d'une
+     * pièce comptable de la même édition — et la page de gestion des artistes l'afficherait à des
+     * gens qui n'ont pas le droit de voir la trésorerie.
+     */
+    await expect(
+      deplacerJustificatif(`${DOSSIER}/ticket-a1b2c3d4.jpg`, EDITION, 'artists')
+    ).rejects.toThrow(/Justificatif invalide/)
+  })
+
+  it('…et le domaine « treasury » refuse symétriquement celui des artistes', async () => {
+    // Le témoin de la précédente : la garde doit mordre dans les deux sens, pas seulement dans
+    // celui qu'on vient d'ajouter.
+    await expect(
+      deplacerJustificatif(`${DOSSIER_ARTISTES}/billet-a1b2c3d4.jpg`, EDITION)
+    ).rejects.toThrow(/Justificatif invalide/)
+  })
+
+  it('⚠️ la traversée de répertoire reste impossible', async () => {
+    // `imageUrl` est une colonne que le client écrit. Le nom est dépouillé de tout dossier et
+    // recollé à celui de l'édition, reconstruit ici : `../../../etc/passwd` se réduit à `passwd`.
+    await deplacerJustificatif('/uploads/temp/../../../../etc/passwd', EDITION, 'artists')
+
+    expect(renameMock).toHaveBeenCalledWith(
+      '/uploads/temp/artists/21/passwd',
+      `${DOSSIER_ARTISTES}/passwd`
+    )
+  })
+
+  it('supprime dans le dossier du domaine, et nulle part ailleurs', async () => {
+    await supprimerJustificatif(`${DOSSIER_ARTISTES}/billet-a1b2c3d4.jpg`, EDITION, 'artists')
+
+    expect(unlinkMock).toHaveBeenCalledWith(`${DOSSIER_ARTISTES}/billet-a1b2c3d4.jpg`)
+  })
+})
