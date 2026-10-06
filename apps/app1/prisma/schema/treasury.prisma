@@ -50,6 +50,30 @@ model TreasuryCode {
 }
 
 /// Ligne saisie à la main, en charge ou en produit.
+/// Les tarifs de billetterie dont une ligne de trésorerie tire son montant.
+///
+/// ⚠️ CE N'EST PAS UNE SOUSTRACTION, C'EST UN RÉACHEMINEMENT. Une ligne de commande dont le tarif
+/// est rattaché ici part vers ce produit nommé AU LIEU d'aller dans « Billetterie — entrées » ou
+/// « Billetterie — autres produits ». Rien n'est retranché après coup, donc aucun écart au centime
+/// n'est possible et le total de l'édition ne bouge pas : seule sa ventilation s'affine.
+///
+/// ⚠️ `@@unique([tierId])` : un tarif n'appartient qu'à UNE SEULE ligne. Sans cette contrainte,
+/// son montant serait compté deux fois — et une règle seulement vérifiée par le code finit
+/// toujours par être contournée par un autre chemin d'écriture.
+///
+/// `onDelete: Cascade` des deux côtés : supprimer la ligne défait les liens, et un tarif supprimé
+/// sort simplement du calcul sans laisser de lien orphelin.
+model TreasuryEntryTier {
+  entryId Int
+  tierId  Int
+  entry   TreasuryEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  tier    TicketingTier @relation(fields: [tierId], references: [id], onDelete: Cascade)
+
+  @@id([entryId, tierId])
+  @@unique([tierId])
+  @@index([entryId], map: "TreasuryEntryTier_entryId_fkey")
+}
+
 model TreasuryEntry {
   id             Int               @id @default(autoincrement())
   editionId      Int
@@ -90,6 +114,11 @@ model TreasuryEntry {
   /// `null` sur les entrées antérieures à ce champ : on ne leur invente pas de date, et un tri
   /// croissant les regroupe en tête.
   operationDate  DateTime?         @db.Date
+  /// Les tarifs dont cette ligne tire son montant. Vide = montant saisi à la main.
+  ///
+  /// Quand elle en porte, `amount` ci-dessus n'est PAS lu : le montant est recalculé à chaque
+  /// lecture depuis les commandes. On y laisse 0 plutôt qu'une valeur qui mentirait.
+  tiers          TreasuryEntryTier[]
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
 

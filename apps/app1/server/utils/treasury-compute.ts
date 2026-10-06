@@ -36,6 +36,13 @@ export interface TreasuryLine extends TreasuryAmounts {
   entryId?: number
   kind: TreasuryKind
   title: string
+  /**
+   * Les tarifs dont cette ligne tire son montant. Absent ou vide = montant saisi à la main.
+   *
+   * Transmis au client pour qu'il puisse le dire à l'écran : un montant qu'on ne peut pas modifier
+   * doit s'annoncer comme tel, sinon on tape dedans et on cherche pourquoi rien ne change.
+   */
+  tierIds?: number[]
   description?: string | null
   code?: { id: number; code: string; label: string } | null
   /** Justificatif d'une ligne saisie à la main ; les lignes calculées n'en portent pas. */
@@ -115,12 +122,28 @@ export interface TicketingTotals {
   participants: TicketingStatusTotals
   donations: TicketingStatusTotals
   other: TicketingStatusTotals
+  /**
+   * Ce qu'ont rapporté les tarifs rattachés à une ligne de trésorerie, par identifiant de ligne.
+   *
+   * ⚠️ CES MONTANTS NE SONT PAS DANS `participants` NI DANS `other` : la ligne de commande part
+   * ici AU LIEU d'y aller. C'est un réacheminement, pas une soustraction — donc le total de
+   * l'édition ne bouge pas, et aucun écart au centime n'est possible.
+   */
+  parLigne: Record<number, TicketingStatusTotals>
+}
+
+/** Le rattachement d'une ligne de trésorerie à des tarifs. */
+export interface RegroupementDeTarifs {
+  entryId: number
+  tierIds: number[]
 }
 
 export interface ManualEntryRow {
   id: number
   kind: TreasuryKind
   title: string
+  /** Les tarifs rattachés. Non vide = `amount` n'est PAS lu, le montant vient des commandes. */
+  tierIds?: number[]
   description: string | null
   amount: number
   code: { id: number; code: string; label: string } | null
@@ -255,6 +278,13 @@ export interface TicketingItemRow {
   /** `null` quand la ligne n'a pas de tarif : don, vêtement ajouté à la main. */
   countAsParticipant: boolean | null
   /**
+   * Le tarif de la ligne, quand elle en a un.
+   *
+   * Sert à réacheminer la ligne vers un produit nommé qui l'a rattaché. `null` pour un don ou une
+   * vente annexe : ceux-là ne peuvent pas être regroupés par tarif, et restent où ils sont.
+   */
+  tierId?: number | null
+  /**
    * Type de ligne tel que la billetterie l'enregistre. `Donation` isole les dons, que rien
    * d'autre ne distingue : ils n'ont pas de tarif, comme les ventes annexes.
    */
@@ -274,7 +304,10 @@ const REFUNDED_STATUSES = ['Refunded']
  * Une ligne sans tarif ni type de don rejoint les autres produits. La compter comme participant
  * gonflerait le produit des entrées d'un montant qui n'en est pas.
  */
-export function aggregateTicketingItems(rows: TicketingItemRow[]): TicketingTotals {
+export function aggregateTicketingItems(
+  rows: TicketingItemRow[],
+  regroupements: RegroupementDeTarifs[] = []
+): TicketingTotals {
   const empty = (): TicketingStatusTotals => ({
     processed: 0,
     onsite: 0,
@@ -282,15 +315,44 @@ export function aggregateTicketingItems(rows: TicketingItemRow[]): TicketingTota
     refunded: 0,
     canceled: 0,
   })
-  const totals: TicketingTotals = { participants: empty(), donations: empty(), other: empty() }
+  const totals: TicketingTotals = {
+    participants: empty(),
+    donations: empty(),
+    other: empty(),
+    parLigne: {},
+  }
+
+  /*
+   * Quel tarif part vers quelle ligne de trésorerie.
+   *
+   * ⚠️ Un tarif n'appartient qu'à UNE ligne — la base le garantit par un index unique sur
+   * `tierId`. Si deux regroupements le réclamaient malgré tout, le dernier lu gagne : on ne le
+   * compte jamais deux fois, quoi qu'il arrive en entrée.
+   */
+  const ligneDuTarif = new Map<number, number>()
+  for (const regroupement of regroupements) {
+    totals.parLigne[regroupement.entryId] = empty()
+    for (const tierId of regroupement.tierIds) ligneDuTarif.set(tierId, regroupement.entryId)
+  }
 
   for (const row of rows) {
+    /*
+     * Le rattachement passe AVANT tout : c'est ce qui fait du découpage un réacheminement.
+     *
+     * 📍 Un don n'a pas de tarif, donc ce test ne lui vole jamais sa ligne — et une vente annexe
+     * sans tarif non plus. Seules les lignes qui PORTENT un tarif rattaché changent de
+     * destination.
+     */
+    const entryId = row.tierId != null ? ligneDuTarif.get(row.tierId) : undefined
+
     const bucket =
-      row.type === 'Donation'
-        ? totals.donations
-        : row.countAsParticipant === true
-          ? totals.participants
-          : totals.other
+      entryId !== undefined
+        ? totals.parLigne[entryId]!
+        : row.type === 'Donation'
+          ? totals.donations
+          : row.countAsParticipant === true
+            ? totals.participants
+            : totals.other
 
     // L'état de la LIGNE passe avant le statut de sa commande : une ligne annulée ne produit rien,
     // même dans une commande encaissée. `ETATS_DE_BILLET_ANNULE` est la liste que la porte
@@ -397,11 +459,38 @@ export function computeTreasury(input: ComputeInput): TreasuryReport {
       // colonne du CSV restaient vides quoi qu'on saisisse, sans qu'aucune erreur ne le dise.
       operationDate: entry.operationDate ?? null,
       readOnly: false,
-      // Une ligne saisie à la main est réglée par défaut. Marquée prévisionnelle, elle passe en
-      // engagé : le solde ne bouge pas — il additionne les deux — mais le réglé cesse de compter
-      // un montant qui n'a pas été payé.
-      settled: entry.isForecast ? 0 : entry.amount,
-      pending: entry.isForecast ? entry.amount : 0,
+      tierIds: entry.tierIds?.length ? entry.tierIds : undefined,
+      /*
+       * Le montant : calculé depuis les commandes si des tarifs sont rattachés, saisi sinon.
+       *
+       * ⚠️ `amount` EN BASE N'EST PAS LU dans le premier cas — on y laisse 0, et le lire donnerait
+       * un montant figé à la création, qui cesserait de suivre les ventes sans que rien ne le
+       * dise.
+       *
+       * 📍 Les mêmes règles de statut que les lignes de billetterie, par `ticketingAmounts` :
+       * encaissé = `Processed` + `Onsite`, attendu = `Pending`, annulé et remboursé pour rien. Un
+       * calcul maison divergerait du solde affiché juste au-dessus.
+       *
+       * `isForecast` est sans objet ici : un montant tiré des commandes est déjà réparti entre
+       * réglé et attendu par le statut de celles-ci.
+       */
+      ...(entry.tierIds?.length
+        ? ticketingAmounts(
+            ticketing.parLigne[entry.id] ?? {
+              processed: 0,
+              onsite: 0,
+              pending: 0,
+              refunded: 0,
+              canceled: 0,
+            }
+          )
+        : {
+            // Une ligne saisie à la main est réglée par défaut. Marquée prévisionnelle, elle passe
+            // en engagé : le solde ne bouge pas — il additionne les deux — mais le réglé cesse de
+            // compter un montant qui n'a pas été payé.
+            settled: entry.isForecast ? 0 : entry.amount,
+            pending: entry.isForecast ? entry.amount : 0,
+          }),
     })
   }
 

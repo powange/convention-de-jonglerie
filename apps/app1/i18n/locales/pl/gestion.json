@@ -1137,7 +1137,11 @@
       "filter_search_help": "Wyszukiwanie obejmuje nazwę i opis, słowo po słowie w dowolnej kolejności.",
       "plan_search_help": "Kody wyszukiwane są od początku, nazwy w dowolnym miejscu.",
       "add_expense": "Dodaj koszt",
-      "add_income": "Dodaj przychód"
+      "add_income": "Dodaj przychód",
+      "amount_from_tiers": "Kwota obliczona z cen biletów",
+      "amount_from_tiers_help": "Kwota będzie podążać za sprzedażą wybranych cen i opuści wiersz „Bilety — inne przychody”, zamiast się do niego dodawać.",
+      "linked_tiers": "Powiązane ceny",
+      "linked_tiers_placeholder": "Wybierz jedną lub więcej cen"
     },
     "program": {
       "description": "Ułóż oś czasu edycji: warsztaty, pokazy i inne wydarzenia.",

@@ -1137,7 +1137,11 @@
       "filter_search_help": "A pesquisa abrange a designação e a descrição, palavra a palavra em qualquer ordem.",
       "plan_search_help": "Os códigos procuram-se pelo início, as designações em qualquer posição.",
       "add_expense": "Adicionar um gasto",
-      "add_income": "Adicionar um rendimento"
+      "add_income": "Adicionar um rendimento",
+      "amount_from_tiers": "Montante calculado a partir de tarifas",
+      "amount_from_tiers_help": "O montante seguirá as vendas das tarifas escolhidas e sairá da linha «Bilheteira — outros rendimentos» em vez de se somar a ela.",
+      "linked_tiers": "Tarifas associadas",
+      "linked_tiers_placeholder": "Escolher uma ou mais tarifas"
     },
     "program": {
       "description": "Componha a cronologia da edição: workshops, espetáculos e outros momentos.",

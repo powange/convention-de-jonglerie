@@ -3,25 +3,17 @@
     <template #body>
       <div class="space-y-4">
         <!--
-          Le choix de la nature ne s'affiche QUE si le sens n'est pas imposé.
-          ⚠️ Et il reste présent EN MODIFICATION, délibérément : c'est le seul moyen de corriger une
-          ligne saisie du mauvais côté. À la création, le bouton d'où l'on vient l'a déjà tranché,
-          et le titre de la modale le redit — sans quoi plus rien n'indiquerait de quel côté on
-          écrit.
+          ⚠️ AUCUN CHOIX DE NATURE, ni à la création ni à la modification.
+
+          À la création, le bouton d'où l'on vient l'a tranchée — « Ajouter une charge » ou
+          « Ajouter un produit » — et le titre de la modale la redit. À la modification, elle ne
+          change plus : décidé avec l'utilisateur le 06/10/2026, « le produit est un produit et
+          restera un produit ». Le serveur refuse d'ailleurs un changement de nature, pour que la
+          règle ne tienne pas qu'à l'écran.
+
+          📍 Rattraper une ligne du mauvais côté se fait donc en la supprimant et en la
+          ressaisissant — un geste de plus, mais aucune ambiguïté sur ce que porte une ligne.
         -->
-        <UFormField v-if="!sensImpose" :label="$t('gestion.treasury.entry_kind')" required>
-          <UFieldGroup>
-            <UButton
-              v-for="option in kindOptions"
-              :key="option.value"
-              :color="form.kind === option.value ? option.color : 'neutral'"
-              :variant="form.kind === option.value ? 'solid' : 'outline'"
-              :icon="option.icon"
-              :label="option.label"
-              @click="choisirSens(option.value)"
-            />
-          </UFieldGroup>
-        </UFormField>
 
         <UFormField :label="$t('gestion.treasury.entry_title')" required>
           <UInput v-model="form.title" class="w-full" maxlength="150" />
@@ -38,7 +30,36 @@
           après l'autre.
         -->
         <div class="flex flex-col gap-4">
-          <UFormField :label="$t('common.amount')" required>
+          <!--
+            Un produit peut tirer son montant de TARIFS de billetterie au lieu d'être saisi.
+
+            ⚠️ Réservé aux produits : rattacher des ventes à une charge inverserait le signe d'un
+            encaissement, et le serveur le refuse. L'interrupteur n'apparaît donc pas sur une
+            charge, plutôt que d'être proposé puis rejeté.
+          -->
+          <UFormField
+            v-if="form.kind === 'INCOME' && tarifsDisponibles.length > 0"
+            :label="$t('gestion.treasury.amount_from_tiers')"
+            :description="$t('gestion.treasury.amount_from_tiers_help')"
+          >
+            <USwitch v-model="montantDepuisTarifs" />
+          </UFormField>
+
+          <UFormField v-if="montantCalcule" :label="$t('gestion.treasury.linked_tiers')" required>
+            <!-- Un tarif déjà rattaché ailleurs n'est pas proposé : son montant serait compté deux
+                 fois, et le serveur le refuserait sans qu'on sache par qui il est pris. -->
+            <USelectMenu
+              v-model="tarifsChoisis"
+              multiple
+              :items="tarifsDisponibles"
+              label-key="label"
+              value-key="id"
+              class="w-full"
+              :placeholder="$t('gestion.treasury.linked_tiers_placeholder')"
+            />
+          </UFormField>
+
+          <UFormField v-else :label="$t('common.amount')" required>
             <!-- Saisie en unité courante ; le serveur convertit en centimes. `step-snapping`
                  désactivé, sinon un montant hors du pas serait ramené au multiple le plus proche. -->
             <UInputNumber
@@ -227,6 +248,8 @@ const props = defineProps<{
     entryId?: number
     kind: 'EXPENSE' | 'INCOME'
     title: string
+    /** Les tarifs rattachés, s'il s'agit d'un produit calculé. */
+    tierIds?: number[]
     description?: string | null
     /**
      * Le montant réglé, en centimes. Zéro sur une ligne prévisionnelle : `treasury-compute` place
@@ -247,6 +270,12 @@ const props = defineProps<{
     advancedByName?: string | null
   } | null
   codes: { id: number; code: string; label: string }[]
+  /**
+   * Les tarifs de l'édition, et pour chacun la ligne qui le réclame déjà (`prisPar`).
+   *
+   * Fournis par la trésorerie elle-même, avec les codes : la modale en a besoin dès son ouverture.
+   */
+  tiers?: { id: number; label: string; countAsParticipant: boolean; prisPar: number | null }[]
   currency: string
   editionId: number
   /** Les noms libres déjà employés sur cette édition, à reproposer plutôt qu'à faire retaper. */
@@ -377,21 +406,6 @@ function ajouterNomAvance(nom: string) {
   nomAvance.value = propre
 }
 
-const kindOptions = computed(() => [
-  {
-    value: 'EXPENSE' as const,
-    label: t('gestion.treasury.expense'),
-    icon: 'i-lucide-trending-down',
-    color: 'error' as const,
-  },
-  {
-    value: 'INCOME' as const,
-    label: t('gestion.treasury.income'),
-    icon: 'i-lucide-trending-up',
-    color: 'success' as const,
-  },
-])
-
 /**
  * Les codes proposés dépendent du sens de la ligne.
  *
@@ -428,18 +442,11 @@ const codeItems = computed(() => [
  * chaque ouverture, et un observateur aurait effacé le code d'une ligne existante au seul motif
  * qu'elle ne suit pas la numérotation — une perte de donnée silencieuse, à l'affichage.
  */
-function choisirSens(sens: 'EXPENSE' | 'INCOME') {
-  if (form.kind === sens) return
-  form.kind = sens
-  // Sans recherche : la liste du nouveau sens, celle que la personne va voir. Si le code choisi
-  // n'y figure pas, il n'a plus lieu d'être — on ne garde pas une imputation que le formulaire
-  // ne montre plus.
-  const eligibles = codesProposes(props.codes, { sens })
-  if (form.codeId !== null && !eligibles.some((c) => c.id === form.codeId)) {
-    form.codeId = null
-  }
-}
-
+/*
+ * `kindOptions` et `choisirSens` ont été retirés avec le sélecteur de nature. Le second remettait
+ * à zéro le code d'imputation quand le sens changeait : la nature ne changeant plus, il n'avait
+ * plus d'appelant — et un code mort finit par être relu comme une règle encore en vigueur.
+ */
 const isEditing = computed(() => !!props.entry?.entryId)
 /**
  * Le titre nomme la nature à la création.
@@ -454,7 +461,37 @@ const title = computed(() => {
   if (props.sensImpose === 'INCOME') return t('gestion.treasury.add_income')
   return t('gestion.treasury.add_entry')
 })
-const isValid = computed(() => form.title.trim().length > 0 && form.amount > 0)
+/** L'interrupteur « montant calculé depuis des tarifs ». */
+const montantDepuisTarifs = ref(false)
+const tarifsChoisis = ref<number[]>([])
+
+/**
+ * Les tarifs qu'on peut encore rattacher : les libres, plus ceux de la ligne qu'on modifie.
+ *
+ * ⚠️ Un tarif pris par une AUTRE ligne n'est pas proposé — son montant serait compté deux fois, et
+ * le serveur le refuserait sans pouvoir dire par qui il est pris. Mais ceux de la ligne courante
+ * doivent rester visibles, sinon rouvrir un produit calculé afficherait un sélecteur vide et le
+ * réenregistrer DÉTACHERAIT tout.
+ */
+const tarifsDisponibles = computed(() =>
+  (props.tiers ?? []).filter(
+    (tarif) => tarif.prisPar === null || tarif.prisPar === props.entry?.entryId
+  )
+)
+
+/** Le montant est-il calculé ? Vrai dès que l'interrupteur est mis, sur un produit. */
+const montantCalcule = computed(() => form.kind === 'INCOME' && montantDepuisTarifs.value)
+
+/**
+ * Validité : un titre, et SELON LE CAS un montant ou au moins un tarif.
+ *
+ * Sans cette distinction, le bouton « Enregistrer » restait désactivé sur un produit calculé —
+ * dont le montant vaut zéro par construction — et rien n'expliquait pourquoi.
+ */
+const isValid = computed(() => {
+  if (form.title.trim().length === 0) return false
+  return montantCalcule.value ? tarifsChoisis.value.length > 0 : form.amount > 0
+})
 
 // Repartir des valeurs de la ligne à chaque ouverture : sans cela, une modification garderait la
 // saisie précédente, et une création rouvrirait le dernier montant tapé.
@@ -500,6 +537,10 @@ watch(
     modeAvance.value = nomAvance.value ? 'libre' : 'compte'
     nomsAjoutes.value = []
     rechercheAvance.value = ''
+    // Les tarifs de la ligne : l'interrupteur se met de lui-même si elle en porte, sans quoi
+    // rouvrir un produit calculé montrerait un champ de montant à zéro.
+    tarifsChoisis.value = [...(entry?.tierIds ?? [])]
+    montantDepuisTarifs.value = tarifsChoisis.value.length > 0
   },
   { immediate: true }
 )
@@ -508,7 +549,23 @@ const body = () => ({
   kind: form.kind,
   title: form.title.trim(),
   description: form.description.trim() || null,
-  amount: form.amount,
+  /*
+   * ⚠️ AUCUN MONTANT QUAND IL EST CALCULÉ, et c'est la correction d'un vrai défaut : le formulaire
+   * envoyait `0`, que le schéma du `PUT` refuse — il exige un montant strictement positif. La
+   * requête repartait en 400, la modale restait ouverte, et comme un 400 est une erreur ATTENDUE
+   * elle n'apparaissait dans aucun journal.
+   *
+   * 📍 Omettre le champ plutôt qu'assouplir le serveur : un produit calculé n'a pas de montant à
+   * saisir, son corps ne doit donc pas en parler. Le serveur garde ainsi sa garantie pour les
+   * lignes saisies à la main.
+   */
+  ...(montantCalcule.value ? {} : { amount: form.amount }),
+  /*
+   * ⚠️ `[]` ET NON `undefined` quand l'interrupteur est éteint : le tableau vide DÉTACHE les tarifs
+   * côté serveur, là où l'absence du champ ne toucherait à rien. C'est ce qui permet de repasser un
+   * produit calculé en produit saisi — sans cela, éteindre l'interrupteur n'aurait aucun effet.
+   */
+  tierIds: montantCalcule.value ? tarifsChoisis.value : [],
   codeId: form.codeId,
   imageUrl: form.imageUrl,
   isForecast: form.isForecast,

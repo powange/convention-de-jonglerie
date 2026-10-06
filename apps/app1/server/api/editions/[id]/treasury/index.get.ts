@@ -40,7 +40,7 @@ export default wrapApiHandler(
 
     const codeSelect = { id: true, code: true, label: true } as const
 
-    const [artists, orderItems, manualEntries, sourceCodeRows, codes] = await Promise.all([
+    const [artists, orderItems, manualEntries, tiers, sourceCodeRows, codes] = await Promise.all([
       prisma.editionArtist.findMany({
         where: { editionId },
         select: {
@@ -65,7 +65,9 @@ export default wrapApiHandler(
           // commande encaissée, et elle était comptée comme un produit.
           state: true,
           order: { select: { status: true } },
-          tier: { select: { countAsParticipant: true } },
+          // `id` en plus de `countAsParticipant` : c'est lui qui permet de réacheminer la ligne
+          // vers un produit nommé qui a rattaché ce tarif.
+          tier: { select: { id: true, countAsParticipant: true } },
           // Le prix d'une option n'est nulle part ailleurs : ni dans la ligne, ni dans le total
           // de la commande, tous deux calculés avant que les options n'existent.
           selectedOptions: { select: { amount: true } },
@@ -90,6 +92,29 @@ export default wrapApiHandler(
           advancedBy: { select: userWithProfileAndGravatarSelect },
           advancedByName: true,
           code: { select: codeSelect },
+          // Les tarifs dont la ligne tire son montant. Non vide ⇒ `amount` ci-dessus n'est pas lu.
+          tiers: { select: { tierId: true } },
+        },
+      }),
+      /*
+       * Les tarifs de l'édition, pour le sélecteur de la modale.
+       *
+       * 📍 Renvoyés avec la trésorerie plutôt que par un second appel, comme `codes` juste
+       * au-dessus : la modale en a besoin dès son ouverture, et un appel séparé la ferait
+       * s'afficher vide le temps d'un battement.
+       *
+       * `customName` l'emporte sur `name` quand il est posé — même règle qu'ailleurs dans la
+       * billetterie.
+       */
+      prisma.ticketingTier.findMany({
+        where: { editionId },
+        orderBy: [{ position: 'asc' }, { id: 'asc' }],
+        select: {
+          id: true,
+          name: true,
+          customName: true,
+          countAsParticipant: true,
+          treasuryEntries: { select: { entryId: true } },
         },
       }),
       prisma.treasurySourceCode.findMany({
@@ -103,24 +128,56 @@ export default wrapApiHandler(
       }),
     ])
 
+    /*
+     * Les regroupements, tirés des entrées : chaque ligne qui porte des tarifs réclame les ventes
+     * de ceux-ci. Passés à l'agrégation AVANT qu'elle ne ventile, pour que le montant parte au bon
+     * endroit du premier coup — rien n'est retranché après coup.
+     */
+    const regroupements = manualEntries
+      .filter((entry) => entry.tiers.length > 0)
+      .map((entry) => ({ entryId: entry.id, tierIds: entry.tiers.map((lien) => lien.tierId) }))
+
     const ticketing: TicketingTotals = aggregateTicketingItems(
       orderItems.map((item) => ({
         amount: item.amount + item.selectedOptions.reduce((sum, option) => sum + option.amount, 0),
         orderStatus: item.order.status,
         itemState: item.state,
         countAsParticipant: item.tier?.countAsParticipant ?? null,
+        tierId: item.tier?.id ?? null,
         type: item.type,
-      }))
+      })),
+      regroupements
     )
     const sourceCodes = Object.fromEntries(
       sourceCodeRows.map((row) => [row.source as TreasurySourceKey, row.code])
     )
 
-    const report = computeTreasury({ artists, ticketing, manualEntries, sourceCodes })
+    const report = computeTreasury({
+      artists,
+      ticketing,
+      manualEntries: manualEntries.map((entry) => ({
+        ...entry,
+        tierIds: entry.tiers.map((lien) => lien.tierId),
+      })),
+      sourceCodes,
+    })
 
     return createSuccessResponse({
       currency: edition.currency,
       codes,
+      /*
+       * `prisPar` dit à quelle ligne un tarif est déjà rattaché — `null` s'il est libre.
+       *
+       * Un tarif n'appartient qu'à UNE ligne (index unique en base) : sans cette information, le
+       * sélecteur proposerait un tarif déjà pris, l'enregistrement serait refusé, et l'utilisateur
+       * ne saurait pas par qui.
+       */
+      tiers: tiers.map((tier) => ({
+        id: tier.id,
+        label: tier.customName || tier.name,
+        countAsParticipant: tier.countAsParticipant,
+        prisPar: tier.treasuryEntries[0]?.entryId ?? null,
+      })),
       ...report,
     })
   },

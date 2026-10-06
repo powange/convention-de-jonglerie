@@ -64,3 +64,58 @@ export function avanceNormalisee(saisie: {
     reimbursed: avancePortee ? (saisie.reimbursed ?? false) : false,
   }
 }
+
+/**
+ * Les tarifs qu'une ligne de trésorerie peut rattacher pour en tirer son montant.
+ *
+ * Trois refus, et chacun protège d'un compte faux plutôt que d'une saisie malpropre :
+ *
+ * **1. Un tarif d'une autre édition.** Son produit n'a rien à voir avec cette trésorerie, et le
+ * réacheminement irait chercher des ventes d'ailleurs.
+ *
+ * **2. Un tarif déjà rattaché à une AUTRE ligne.** Son montant serait compté deux fois. La base
+ * porte un index unique sur `tierId` qui l'interdit de toute façon — mais un refus explicite dit
+ * *pourquoi*, là où la contrainte ne rendrait qu'une erreur de clé dupliquée.
+ *
+ * **3. Un rattachement sur une CHARGE.** Le produit de la billetterie est un produit : en tirer
+ * une charge inverserait le signe d'un montant encaissé.
+ *
+ * `entryId` est l'exception attendue en modification : une ligne garde ses propres tarifs.
+ */
+export async function assertTarifsRattachables(
+  editionId: number,
+  kind: 'EXPENSE' | 'INCOME',
+  tierIds: number[] | null | undefined,
+  entryId?: number
+): Promise<void> {
+  if (!tierIds?.length) return
+
+  if (kind !== 'INCOME') {
+    throw createError({
+      status: 400,
+      message: 'Seul un produit peut tirer son montant de tarifs de billetterie',
+    })
+  }
+
+  const tarifs = await prisma.ticketingTier.findMany({
+    where: { id: { in: tierIds }, editionId },
+    select: { id: true, treasuryEntries: { select: { entryId: true } } },
+  })
+
+  if (tarifs.length !== new Set(tierIds).size) {
+    throw createError({
+      status: 400,
+      message: "Un des tarifs choisis n'appartient pas à cette édition",
+    })
+  }
+
+  const pris = tarifs.filter((tarif) =>
+    tarif.treasuryEntries.some((lien) => lien.entryId !== entryId)
+  )
+  if (pris.length) {
+    throw createError({
+      status: 400,
+      message: 'Un des tarifs choisis est déjà rattaché à une autre ligne de trésorerie',
+    })
+  }
+}

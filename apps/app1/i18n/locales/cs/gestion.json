@@ -1137,7 +1137,11 @@
       "filter_search_help": "Vyhledávání se týká označení a popisu, po slovech v libovolném pořadí.",
       "plan_search_help": "Kódy se hledají od začátku, označení kdekoli.",
       "add_expense": "Přidat náklad",
-      "add_income": "Přidat výnos"
+      "add_income": "Přidat výnos",
+      "amount_from_tiers": "Částka vypočtená z cen",
+      "amount_from_tiers_help": "Částka bude sledovat prodeje vybraných cen a opustí řádek „Vstupenky — ostatní výnosy“ místo toho, aby se k němu přičetla.",
+      "linked_tiers": "Připojené ceny",
+      "linked_tiers_placeholder": "Vyberte jednu nebo více cen"
     },
     "program": {
       "description": "Sestavte časovou osu ročníku: workshopy, představení a další body programu.",

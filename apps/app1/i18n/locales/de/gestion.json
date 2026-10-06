@@ -1137,7 +1137,11 @@
       "filter_search_help": "Die Suche umfasst Bezeichnung und Beschreibung, Wort für Wort in beliebiger Reihenfolge.",
       "plan_search_help": "Codes werden ab ihrem Anfang gesucht, Bezeichnungen an beliebiger Stelle.",
       "add_expense": "Aufwand hinzufügen",
-      "add_income": "Ertrag hinzufügen"
+      "add_income": "Ertrag hinzufügen",
+      "amount_from_tiers": "Betrag aus Tarifen berechnet",
+      "amount_from_tiers_help": "Der Betrag folgt den Verkäufen der gewählten Tarife und verlässt die Zeile „Ticketing — sonstige Erträge“, anstatt sich zu ihr zu addieren.",
+      "linked_tiers": "Verknüpfte Tarife",
+      "linked_tiers_placeholder": "Einen oder mehrere Tarife wählen"
     },
     "program": {
       "description": "Stellen Sie den Zeitplan der Ausgabe zusammen: Workshops, Shows und weitere Momente.",
