@@ -406,7 +406,14 @@
       "volunteer_management": "Freiwilligenverwaltung",
       "same_as_buyer": "Wie Käufer",
       "selected_count": "{n} Teilnehmer ausgewählt | {n} Teilnehmer ausgewählt",
-      "validate_entry_count": "Einlass bestätigen ({count})"
+      "validate_entry_count": "Einlass bestätigen ({count})",
+      "discount_already_done": "Rabatt bereits zurückgezahlt",
+      "discount_amount_label": "Zurückzuzahlender Rabatt",
+      "discount_confirm_description": "Bestätigen Sie, dass Sie {name} {amount} zurückgegeben haben? Das Ticket bleibt gültig.",
+      "discount_confirm_title": "Rückzahlung des Rabatts bestätigen",
+      "discount_mark_done": "Rabatt zurückgezahlt",
+      "discount_still_valid": "Dieses Ticket ist nicht storniert: Es berechtigt weiterhin zum Eintritt.",
+      "discount_undo": "Rückgängig machen"
     },
     "ticketing_title": "Ticketing",
     "useful_links": "Nützliche Links",

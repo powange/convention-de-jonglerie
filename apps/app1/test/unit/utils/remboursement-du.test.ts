@@ -214,3 +214,98 @@ describe('detteDeCommande', () => {
     expect(dette.nomsMultiples).toBe(false)
   })
 })
+
+/**
+ * La REMISE, et l'argent qu'elle met en jeu.
+ *
+ * ⚠️ ACCORDER N'EST PAS RENDRE, exactement comme annuler n'est pas rembourser. Sur une commande
+ * déjà réglée, une remise accordée reste une dette tant que les espèces ne sont pas sorties — et
+ * c'est le guichet qui la solde, devant la personne.
+ *
+ * ⚠️ POURQUOI DEUX CASES ET NON UNE. `refunded` solde le prix ENTIER d'un billet annulé ;
+ * `discountPaidBack` solde la seule remise d'un billet vivant. Les confondre ferait rendre deux
+ * fois le même argent — en espèces, et sans rattrapage possible.
+ */
+describe('montantARembourser et les remises', () => {
+  const billet = (surcharge: Record<string, unknown> = {}) => ({
+    state: 'Processed',
+    refunded: false,
+    amount: 2000,
+    discountAmount: 0,
+    discountPaidBack: false,
+    order: { status: 'Onsite', paymentMethod: 'cash' },
+    ...surcharge,
+  })
+
+  describe('billet VIVANT', () => {
+    it('on doit la remise tant qu’elle n’est pas rendue', () => {
+      expect(montantARembourser(billet({ discountAmount: 500 }))).toBe(500)
+    })
+
+    it('⚠️ on doit la REMISE, et non le prix du billet', () => {
+      // Le billet n'est pas annulé : la personne garde son entrée. Rendre 20 € au lieu de 5 €
+      // ferait sortir de la caisse quinze euros qui ne sont dus à personne.
+      expect(montantARembourser(billet({ discountAmount: 500 }))).not.toBe(2000)
+    })
+
+    it('plus rien une fois rendue', () => {
+      expect(montantARembourser(billet({ discountAmount: 500, discountPaidBack: true }))).toBeNull()
+    })
+
+    it('rien sans remise : un billet vivant ne doit rien', () => {
+      // Le témoin négatif : sans lui, une règle qui rendrait toujours un montant passerait.
+      expect(montantARembourser(billet())).toBeNull()
+    })
+
+    it('rien sur une commande en attente de paiement', () => {
+      // La remise y réduit ce qui reste à payer : aucun argent n'a à sortir.
+      expect(
+        montantARembourser(
+          billet({ discountAmount: 500, order: { status: 'Pending', paymentMethod: null } })
+        )
+      ).toBeNull()
+    })
+  })
+
+  describe('billet ANNULÉ après une remise', () => {
+    it('⚠️ LE CAS QUI JUSTIFIE DEUX CASES : on doit le prix MOINS la remise déjà rendue', () => {
+      /*
+       * 20 € payés, 5 € de remise déjà rendus, puis annulation : il reste 15 € à rendre. Avec une
+       * case unique, le guichet annoncerait 20 € — cinq de trop, en espèces.
+       */
+      expect(
+        montantARembourser(
+          billet({ state: 'Canceled', discountAmount: 500, discountPaidBack: true })
+        )
+      ).toBe(1500)
+    })
+
+    it('…mais une remise NON rendue ne se soustrait pas', () => {
+      /*
+       * L'erreur inverse, tout aussi coûteuse : les 5 € n'ont jamais quitté la caisse, ils sont
+       * compris dans les 20 € qu'on s'apprête à rendre. Les retirer ferait repartir la personne
+       * avec cinq euros de moins que ce qu'elle a versé.
+       */
+      expect(
+        montantARembourser(
+          billet({ state: 'Canceled', discountAmount: 500, discountPaidBack: false })
+        )
+      ).toBe(2000)
+    })
+
+    it('plus rien une fois le billet remboursé', () => {
+      expect(
+        montantARembourser(billet({ state: 'Canceled', refunded: true, discountAmount: 500 }))
+      ).toBeNull()
+    })
+
+    it('une remise égale au prix, déjà rendue, ne laisse rien à devoir', () => {
+      // `0 €` n'est pas une dette : l'annoncer au guichet ferait chercher une caisse pour rien.
+      expect(
+        montantARembourser(
+          billet({ state: 'Canceled', discountAmount: 2000, discountPaidBack: true })
+        )
+      ).toBeNull()
+    })
+  })
+})

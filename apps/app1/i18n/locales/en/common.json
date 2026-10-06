@@ -406,7 +406,14 @@
       "volunteer_management": "Volunteer management",
       "same_as_buyer": "Same as buyer",
       "selected_count": "{n} participant selected | {n} participants selected",
-      "validate_entry_count": "Check in ({count})"
+      "validate_entry_count": "Check in ({count})",
+      "discount_already_done": "Discount already paid back",
+      "discount_amount_label": "Discount to pay back",
+      "discount_confirm_description": "Do you confirm you gave {amount} back to {name}? The ticket stays valid.",
+      "discount_confirm_title": "Confirm the discount was paid back",
+      "discount_mark_done": "Discount paid back",
+      "discount_still_valid": "This ticket is not cancelled: it still grants entry.",
+      "discount_undo": "Undo"
     },
     "ticketing_title": "Ticketing",
     "useful_links": "Useful links",

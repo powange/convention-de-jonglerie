@@ -406,7 +406,14 @@
       "volunteer_management": "Zarządzanie wolontariuszami",
       "same_as_buyer": "Tak jak kupujący",
       "selected_count": "Wybrano {n} uczestnika | Wybrano {n} uczestników",
-      "validate_entry_count": "Potwierdź wejście ({count})"
+      "validate_entry_count": "Potwierdź wejście ({count})",
+      "discount_already_done": "Rabat już zwrócony",
+      "discount_amount_label": "Rabat do zwrotu",
+      "discount_confirm_description": "Czy potwierdzasz, że zwrócono {amount} osobie {name}? Bilet pozostaje ważny.",
+      "discount_confirm_title": "Potwierdź zwrot rabatu",
+      "discount_mark_done": "Rabat zwrócony",
+      "discount_still_valid": "Ten bilet nie jest anulowany: nadal uprawnia do wejścia.",
+      "discount_undo": "Cofnij"
     },
     "ticketing_title": "System biletowy",
     "useful_links": "Przydatne linki",

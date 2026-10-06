@@ -619,6 +619,10 @@ export default wrapApiHandler(
                 // que cette case n'est pas cochée.
                 refunded: orderItem.refunded,
                 refundedAt: orderItem.refundedAt,
+                // Même contrat qu'à la recherche : la dette peut venir d'une remise.
+                discountAmount: orderItem.discountAmount,
+                discountPaidBack: orderItem.discountPaidBack,
+                discountPaidBackAt: orderItem.discountPaidBackAt,
                 /**
                  * La somme due, calculée ICI et non à l'écran : la règle tient en trois
                  * conditions dont une piégeuse — annuler une commande efface son statut « payée »,
@@ -628,6 +632,10 @@ export default wrapApiHandler(
                   state: orderItem.state,
                   refunded: orderItem.refunded,
                   amount: orderItem.amount,
+                  // La remise accordée et son sort : sans elles, une remise non rendue ne
+                  // produirait aucune dette au guichet, en silence.
+                  discountAmount: orderItem.discountAmount,
+                  discountPaidBack: orderItem.discountPaidBack,
                   // Les options du billet scanné ne sont chargées que sur les lignes de sa
                   // commande : on les y reprend, plutôt que de recharger le billet.
                   selectedOptions: orderItem.order.items.find((ligne) => ligne.id === orderItem.id)

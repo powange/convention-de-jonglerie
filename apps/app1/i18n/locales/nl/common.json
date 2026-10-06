@@ -406,7 +406,14 @@
       "volunteer_management": "Vrijwilligersbeheer",
       "same_as_buyer": "Zelfde als koper",
       "selected_count": "{n} deelnemer geselecteerd | {n} deelnemers geselecteerd",
-      "validate_entry_count": "Toegang bevestigen ({count})"
+      "validate_entry_count": "Toegang bevestigen ({count})",
+      "discount_already_done": "Korting al terugbetaald",
+      "discount_amount_label": "Terug te betalen korting",
+      "discount_confirm_description": "Bevestigt u dat u {amount} aan {name} hebt teruggegeven? Het ticket blijft geldig.",
+      "discount_confirm_title": "Terugbetaling van de korting bevestigen",
+      "discount_mark_done": "Korting terugbetaald",
+      "discount_still_valid": "Dit ticket is niet geannuleerd: het geeft nog steeds toegang.",
+      "discount_undo": "Ongedaan maken"
     },
     "ticketing_title": "Ticketing",
     "useful_links": "Nuttige links",

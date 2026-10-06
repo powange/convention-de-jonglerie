@@ -74,12 +74,16 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
         ...mockOrders[0],
         // Aucun billet annulé : rien à retirer de ce qu'a rapporté la commande.
         canceledAmount: 0,
+        // Ce qui a été RENDU en remise sur cette commande, à côté de ce qui a été annulé.
+        discountAmount: 0,
         items: [
           {
             ...mockOrders[0]!.items[0],
             retenuParLesFiltres: true,
             // Le billet n'est pas annulé : on ne doit rien.
             refundDue: null,
+            // Qui a accordé la remise — `null` quand il n'y en a pas, ou si le compte a disparu.
+            discountedBy: null,
           },
         ],
       },
@@ -141,6 +145,8 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
         cardOnsite: 0,
         cash: 8000,
         check: 0,
+        // Les remises accordées, cumulées — déjà déduites du total, annoncées à part.
+        discounted: 0,
         online: 0,
         pending: 0,
         refunded: 0,
@@ -206,6 +212,8 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
         cardOnsite: 0,
         cash: 5000,
         check: 0,
+        // Les remises accordées, cumulées — déjà déduites du total, annoncées à part.
+        discounted: 0,
         online: 0,
         pending: 0,
         refunded: 0,
@@ -243,6 +251,9 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
               tierId: true,
               entryValidated: true,
               selectedOptions: { select: { optionId: true, amount: true } },
+              // Sans elle, `montantNetDeLaLigne` lit `undefined` et ne retire rien : les
+              // statistiques repasseraient au brut, en silence.
+              discountAmount: true,
             },
           },
         },
@@ -305,6 +316,8 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
         cardOnsite: 0,
         cash: 5000,
         check: 0,
+        // Les remises accordées, cumulées — déjà déduites du total, annoncées à part.
+        discounted: 0,
         online: 0,
         pending: 0,
         refunded: 0,
@@ -340,6 +353,9 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
               tierId: true,
               entryValidated: true,
               selectedOptions: { select: { optionId: true, amount: true } },
+              // Sans elle, `montantNetDeLaLigne` lit `undefined` et ne retire rien : les
+              // statistiques repasseraient au brut, en silence.
+              discountAmount: true,
             },
           },
         },
@@ -495,6 +511,8 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
         cardOnsite: 0,
         cash: 3400,
         check: 0,
+        // Les remises accordées, cumulées — déjà déduites du total, annoncées à part.
+        discounted: 0,
         online: 0,
         pending: 0,
         refunded: 1800 * 3 + 2800 + 500, // hors du total
@@ -542,7 +560,15 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
     ]
 
     prismaMock.ticketingOrder.count.mockResolvedValue(2)
-    prismaMock.ticketingOrder.findMany.mockResolvedValueOnce(commandes as any)
+    /*
+     * DEUX réponses, et non une : la recherche n'empêche plus le calcul des statistiques, donc le
+     * point d'API interroge deux fois — la page affichée, puis l'ensemble filtré dont il tire les
+     * totaux. Avec un seul `…Once`, la seconde requête recevait `undefined` et le handler levait
+     * sur « allOrders is not iterable ».
+     */
+    prismaMock.ticketingOrder.findMany
+      .mockResolvedValueOnce(commandes as any)
+      .mockResolvedValueOnce(commandes as any)
 
     const res = await handler(baseEvent as any)
 
@@ -685,7 +711,17 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
     })
   })
 
-  it('ne calcule pas les stats si recherche active', async () => {
+  /*
+   * ⚠️ CE TEST DISAIT L'INVERSE, et il figeait un défaut. Les statistiques étaient sautées dès
+   * qu'une recherche était active, et le serveur renvoyait `null` — mais le client fait
+   * `if (response.stats)` et GARDAIT donc les chiffres d'avant. On ne voyait pas des totaux
+   * vides : on voyait ceux de la sélection précédente, plausibles et faux. Signalé par un
+   * utilisateur cherchant un nom.
+   *
+   * 📍 Le coût est nul, et même négatif : une recherche RESTREINT l'ensemble. Le cas lourd est
+   * l'absence de filtre, qui était déjà calculé.
+   */
+  it('⚠️ calcule les stats SUR la recherche, et ne les saute plus', async () => {
     mockCanAccess.mockResolvedValue(true)
     global.getQuery.mockReturnValue({ page: '1', limit: '20', search: 'John' })
 
@@ -706,9 +742,13 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
 
     const res = await handler(baseEvent as any)
 
-    expect(res.stats).toBeNull()
-    // Vérifier que findMany n'a été appelé qu'une fois (pour la pagination)
-    expect(prismaMock.ticketingOrder.findMany).toHaveBeenCalledTimes(1)
+    expect(res.stats).not.toBeNull()
+    // Deux requêtes : la page affichée, puis l'ensemble filtré dont on tire les totaux.
+    expect(prismaMock.ticketingOrder.findMany).toHaveBeenCalledTimes(2)
+    // ⚠️ Et la SECONDE porte la recherche : des totaux calculés sur un filtre amputé
+    // annonceraient deux cents commandes sous une liste qui en montre trois.
+    const requeteDesStats = prismaMock.ticketingOrder.findMany.mock.calls[1][0]
+    expect(JSON.stringify(requeteDesStats.where)).toContain('john')
   })
 
   it('filtre par recherche', async () => {

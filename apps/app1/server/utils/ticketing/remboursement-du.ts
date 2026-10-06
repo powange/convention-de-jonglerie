@@ -12,6 +12,7 @@
 import { ETATS_DE_BILLET_ANNULE } from './billets-qui-comptent'
 
 import { ligneSansTitulaire } from '~~/shared/utils/participant-anonyme'
+import { remiseDeLaLigne } from '~~/shared/utils/remise-de-ligne'
 
 export interface BilletPourRemboursement {
   state: string
@@ -27,6 +28,10 @@ export interface BilletPourRemboursement {
    * ligne, ni dans ce que le guichet lisait. Facultatif pour que l'absence se lise « aucune ».
    */
   selectedOptions?: ReadonlyArray<{ amount: number | null }> | null
+  /** La remise accordée sur ce billet, en centimes. Absente ou `0` : aucune. */
+  discountAmount?: number | null
+  /** La remise a-t-elle déjà été rendue ? Distinct de `refunded`, voir `montantARembourser`. */
+  discountPaidBack?: boolean | null
   order: {
     status: string
     /** `null` sur une commande jamais réglée, et sur les commandes importées. */
@@ -60,10 +65,44 @@ function commandeReglee(order: BilletPourRemboursement['order']): boolean {
  * de paiement part en `Pending`, et 22 commandes de la production sont dans ce cas).
  */
 export function montantARembourser(billet: BilletPourRemboursement): number | null {
-  if (!(ETATS_DE_BILLET_ANNULE as readonly string[]).includes(billet.state)) return null
-  if (billet.refunded) return null
+  /*
+   * Rien n'est dû sur une commande jamais réglée : un participant ajouté au guichet sans moyen de
+   * paiement part en `Pending`, et 22 commandes de la production sont dans ce cas. Une remise y
+   * réduit ce qui reste à payer — aucun argent n'a à sortir.
+   */
   if (!commandeReglee(billet.order)) return null
-  return prixAvecOptions(billet)
+
+  const remise = remiseDeLaLigne(billet)
+  const remiseEncoreDue = remise > 0 && !billet.discountPaidBack
+
+  /*
+   * ─── BILLET VIVANT ───────────────────────────────────────────────────────────────────────
+   *
+   * Il donne toujours droit d'entrée : on ne doit que la REMISE, et seulement tant qu'elle n'a pas
+   * été rendue.
+   */
+  if (!(ETATS_DE_BILLET_ANNULE as readonly string[]).includes(billet.state)) {
+    return remiseEncoreDue ? remise : null
+  }
+
+  /*
+   * ─── BILLET ANNULÉ ───────────────────────────────────────────────────────────────────────
+   *
+   * On doit le prix ENTIER… moins la remise DÉJÀ RENDUE.
+   *
+   * ⚠️ C'EST TOUT L'INTÉRÊT DE DEUX CASES DISTINCTES. Un billet à 20 € sur lequel on a rendu 5 € de
+   * remise, puis qu'on annule, ne doit plus que 15 € : les 5 € sont déjà sortis de la caisse. Avec
+   * une case unique, rien ne dirait laquelle des deux sommes a été rendue, et le guichet
+   * annoncerait 20 € — cinq de trop, sur un geste qu'on fait en espèces et qu'on ne rattrape pas.
+   *
+   * 📍 Une remise NON encore rendue ne se soustrait pas : elle est comprise dans le prix entier
+   * qu'on s'apprête à rendre. La soustraire ferait l'erreur inverse, et la personne repartirait
+   * avec cinq euros de moins que ce qu'elle a versé.
+   */
+  if (billet.refunded) return null
+
+  const du = prixAvecOptions(billet) - (billet.discountPaidBack ? remise : 0)
+  return du > 0 ? du : null
 }
 
 /** Ce qu'a coûté un billet, options comprises, en centimes. */
@@ -90,12 +129,28 @@ const COMMANDE_REGLEE = {
  *
  * À poser sur `TicketingOrderItem`. Répond exactement à ce que `montantARembourser` rend non nul,
  * et sert le filtre « à rembourser » de la liste des commandes.
+ *
+ * ⚠️ DEUX DETTES, ET NON UNE. Un billet ANNULÉ doit son prix entier ; un billet VIVANT doit la
+ * REMISE qu'on lui a accordée sans encore la rendre. Ne garder que la première laisserait une
+ * dette invisible au guichet — et c'est exactement ce que ce filtre existe pour empêcher.
+ *
+ * 📍 Jumeau de `montantARembourser` : l'un répond sur un objet chargé, l'autre se pose dans un
+ * `where`. Le fichier répète qu'une règle écrite deux fois finit par ne plus dire la même chose ;
+ * ils restent donc côte à côte, et les tests les comparent sur les mêmes cas.
  */
 export function billetARembourser() {
   return {
-    state: { in: [...ETATS_DE_BILLET_ANNULE] },
-    refunded: false,
     order: COMMANDE_REGLEE,
+    OR: [
+      // Billet annulé dont le prix n'a pas été rendu.
+      { state: { in: [...ETATS_DE_BILLET_ANNULE] }, refunded: false },
+      // Billet vivant portant une remise qu'on n'a pas encore rendue.
+      {
+        state: { notIn: [...ETATS_DE_BILLET_ANNULE] },
+        discountAmount: { gt: 0 },
+        discountPaidBack: false,
+      },
+    ],
   }
 }
 
@@ -143,8 +198,18 @@ export function detteDeCommande(
   >,
   order: BilletPourRemboursement['order']
 ): DetteDeCommande {
-  // Le montant dû de chaque ligne, options comprises — celui que `montantARembourser` annonce
-  // pour le billet scanné, sans quoi la ligne et sa commande donneraient deux sommes.
+  /*
+   * Le montant dû de chaque ligne, options comprises — celui que `montantARembourser` annonce pour
+   * le billet scanné, sans quoi la ligne et sa commande donneraient deux sommes.
+   *
+   * ⚠️ LES CHAMPS DE REMISE NE SONT PAS PASSÉS, ET C'EST VOULU — ne pas « corriger » cet oubli
+   * apparent. Ce total sert au geste « solder toute la commande », qui n'écrit QUE sur les lignes
+   * annulées. Y faire entrer une remise annoncerait une somme qu'un seul clic ne solderait pas :
+   * on rendrait l'argent, la dette resterait, et on la rendrait encore le lendemain.
+   *
+   * 📍 La dette d'une remise s'annonce donc au niveau du BILLET, et c'est `sommeDueAuGuichet` qui
+   * lui donne la précédence à l'écran.
+   */
   const dues = lignes.flatMap((ligne) => {
     const du = montantARembourser({
       state: ligne.state,

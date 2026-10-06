@@ -406,7 +406,14 @@
       "volunteer_management": "Frivillig förvaltning",
       "same_as_buyer": "Samma som köparen",
       "selected_count": "{n} deltagare vald | {n} deltagare valda",
-      "validate_entry_count": "Bekräfta entrén ({count})"
+      "validate_entry_count": "Bekräfta entrén ({count})",
+      "discount_already_done": "Rabatten är redan återbetald",
+      "discount_amount_label": "Rabatt att återbetala",
+      "discount_confirm_description": "Bekräftar du att du gett tillbaka {amount} till {name}? Biljetten förblir giltig.",
+      "discount_confirm_title": "Bekräfta att rabatten återbetalats",
+      "discount_mark_done": "Rabatt återbetald",
+      "discount_still_valid": "Den här biljetten är inte annullerad: den ger fortfarande tillträde.",
+      "discount_undo": "Ångra"
     },
     "ticketing_title": "Biljetter",
     "useful_links": "Användbara länkar",

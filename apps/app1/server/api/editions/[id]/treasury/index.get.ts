@@ -9,6 +9,7 @@ import {
   type TreasurySourceKey,
 } from '#server/utils/treasury-compute'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { montantNetDeLaLigne } from '~~/shared/utils/remise-de-ligne'
 
 /**
  * GET /api/editions/:id/treasury
@@ -71,6 +72,8 @@ export default wrapApiHandler(
           // Le prix d'une option n'est nulle part ailleurs : ni dans la ligne, ni dans le total
           // de la commande, tous deux calculés avant que les options n'existent.
           selectedOptions: { select: { amount: true } },
+          // La remise accordée après coup : elle se soustrait du produit. Voir le mapping plus bas.
+          discountAmount: true,
         },
       }),
       prisma.treasuryEntry.findMany({
@@ -139,7 +142,18 @@ export default wrapApiHandler(
 
     const ticketing: TicketingTotals = aggregateTicketingItems(
       orderItems.map((item) => ({
-        amount: item.amount + item.selectedOptions.reduce((sum, option) => sum + option.amount, 0),
+        /*
+         * ⚠️ LE NET, REMISE DÉDUITE — et c'est le seul endroit où la trésorerie l'apprend.
+         *
+         * Une remise porte sur un billet VIVANT : rien n'a été retiré de l'encaissé, contrairement
+         * à une annulation qui en retire la totalité. Sommer le brut ici laisserait le produit au
+         * prix plein et le ferait mentir du montant rendu — sans erreur, sans alerte, et le compte
+         * ne tomberait qu'au bilan.
+         *
+         * 📍 Une ligne annulée est écartée plus loin, avant que son montant ne compte : sa remise
+         * éventuelle ne pèse donc sur rien, ce qui est juste — on ne doit pas soustraire deux fois.
+         */
+        amount: montantNetDeLaLigne(item),
         orderStatus: item.order.status,
         itemState: item.state,
         countAsParticipant: item.tier?.countAsParticipant ?? null,

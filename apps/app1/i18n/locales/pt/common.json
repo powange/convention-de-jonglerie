@@ -406,7 +406,14 @@
       "volunteer_management": "Gestão de voluntários",
       "same_as_buyer": "Igual ao comprador",
       "selected_count": "{n} participante selecionado | {n} participantes selecionados",
-      "validate_entry_count": "Validar a entrada ({count})"
+      "validate_entry_count": "Validar a entrada ({count})",
+      "discount_already_done": "Desconto já devolvido",
+      "discount_amount_label": "Desconto a devolver",
+      "discount_confirm_description": "Confirma que devolveu {amount} a {name}? O bilhete continua válido.",
+      "discount_confirm_title": "Confirmar a devolução do desconto",
+      "discount_mark_done": "Desconto devolvido",
+      "discount_still_valid": "Este bilhete não está anulado: continua a dar direito de entrada.",
+      "discount_undo": "Anular"
     },
     "ticketing_title": "Bilheteria",
     "useful_links": "Ligações úteis",

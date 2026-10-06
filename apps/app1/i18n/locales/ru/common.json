@@ -406,7 +406,14 @@
       "volunteer_management": "Управление волонтерами",
       "same_as_buyer": "Как у покупателя",
       "selected_count": "Выбран {n} участник | Выбрано {n} участников",
-      "validate_entry_count": "Подтвердить вход ({count})"
+      "validate_entry_count": "Подтвердить вход ({count})",
+      "discount_already_done": "Скидка уже возвращена",
+      "discount_amount_label": "Скидка к возврату",
+      "discount_confirm_description": "Подтверждаете, что вернули {amount} человеку {name}? Билет остаётся действительным.",
+      "discount_confirm_title": "Подтвердить возврат скидки",
+      "discount_mark_done": "Скидка возвращена",
+      "discount_still_valid": "Этот билет не аннулирован: он по-прежнему даёт право на вход.",
+      "discount_undo": "Отменить"
     },
     "ticketing_title": "Продажа билетов",
     "useful_links": "Полезные ссылки",

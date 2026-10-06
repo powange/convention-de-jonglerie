@@ -609,11 +609,20 @@ export default wrapApiHandler(
               // cette case n'est pas cochée.
               refunded: item.refunded,
               refundedAt: item.refundedAt,
+              // La REMISE et son sort : le guichet doit pouvoir dire que la dette vient d'elle, et
+              // appeler le bon point d'API — rembourser un billet vivant est refusé par le serveur.
+              discountAmount: item.discountAmount,
+              discountPaidBack: item.discountPaidBack,
+              discountPaidBackAt: item.discountPaidBackAt,
               /** Voir `verify.post.ts` : la même règle, au même endroit du contrat. */
               refundDue: montantARembourser({
                 state: item.state,
                 refunded: item.refunded,
                 amount: item.amount,
+                // Voir `montantARembourser` : une remise non rendue est une dette, au même titre
+                // qu'un billet annulé non remboursé.
+                discountAmount: item.discountAmount,
+                discountPaidBack: item.discountPaidBack,
                 selectedOptions: item.selectedOptions,
                 order: { status: item.order.status, paymentMethod: item.order.paymentMethod },
               }),

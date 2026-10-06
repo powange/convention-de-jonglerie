@@ -16,6 +16,7 @@ const toutRempli = (): FiltresCommandes => ({
   options: [7],
   statutEntree: 'validated',
   remboursement: 'du',
+  remise: 'avec',
   statuts: ['Pending', 'Refunded'],
   moyensDePaiement: ['cash', 'check'],
   typesDeLigne: ['Registration'],
@@ -58,7 +59,7 @@ describe('nombreDeFiltresActifs', () => {
   it('compte chaque valeur retenue, pas chaque critère', () => {
     // Deux tarifs cochés valent deux restrictions : c'est ce que l'utilisateur voit dans le
     // panneau, et la pastille doit dire la même chose.
-    expect(nombreDeFiltresActifs(toutRempli())).toBe(2 + 1 + 1 + 1 + 2 + 2 + 1 + 1)
+    expect(nombreDeFiltresActifs(toutRempli())).toBe(2 + 1 + 1 + 1 + 1 + 2 + 2 + 1 + 1)
   })
 
   it('ne compte pas le statut « tous »', () => {
@@ -108,6 +109,7 @@ describe('requeteDesFiltres', () => {
       optionIds: [7],
       entryStatus: 'validated',
       refundStatus: 'du',
+      discountStatus: 'avec',
       statuses: ['Pending', 'Refunded'],
       paymentMethods: ['cash', 'check'],
       itemTypes: ['Registration'],
@@ -237,5 +239,34 @@ describe('les filtres dans l’URL', () => {
   it('ignore une valeur qui n’est pas une chaîne', () => {
     // `route.query` rend un tableau quand un paramètre apparaît deux fois dans l'adresse.
     expect(filtresDepuisUrl({ statuses: ['Pending', 'Refunded'] }).statuts).toEqual([])
+  })
+})
+
+describe('le filtre « avec remise »', () => {
+  /*
+   * ⚠️ IL NE DOIT PAS SE CONFONDRE AVEC LE REMBOURSEMENT, dont il est le voisin immédiat dans le
+   * panneau. L'un cherche une dette sur un billet ANNULÉ, l'autre un billet VIVANT dont on a rendu
+   * une partie du prix. Les deux se cumulent, et une seule lettre de différence dans un nom de
+   * paramètre les ferait silencieusement se recouvrir.
+   */
+  it('voyage dans l’URL sous son propre nom', () => {
+    const filtres = { ...filtresVides(), remise: 'avec' as const }
+
+    expect(parametresDUrl(filtres)).toMatchObject({ discountStatus: 'avec' })
+    expect(parametresDUrl(filtres)).not.toHaveProperty('refundStatus')
+  })
+
+  it('part au serveur, et seulement quand il restreint', () => {
+    expect(requeteDesFiltres({ ...filtresVides(), remise: 'sans' })).toMatchObject({
+      discountStatus: 'sans',
+    })
+    // `all` n'est pas un filtre : l'envoyer ferait porter une condition à une requête qui n'en
+    // demande aucune.
+    expect(requeteDesFiltres(filtresVides()).discountStatus).toBeUndefined()
+  })
+
+  it('refuse une valeur inventée dans l’URL', () => {
+    // Une URL bricolée ne doit pas poser un critère que le serveur ne sait pas lire.
+    expect(filtresDepuisUrl({ discountStatus: 'nimportequoi' }).remise).toBe('all')
   })
 })

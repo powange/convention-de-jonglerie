@@ -43,7 +43,11 @@
               class="text-warning-600 dark:text-warning-400 h-5 w-5"
             />
             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ $t('edition.ticketing.refund_amount_label') }}
+              {{
+                detteEstUneRemise
+                  ? $t('edition.ticketing.discount_amount_label')
+                  : $t('edition.ticketing.refund_amount_label')
+              }}
             </span>
           </div>
           <span class="text-2xl font-bold text-warning-600 dark:text-warning-400">
@@ -60,7 +64,7 @@
           tient la caisse.
         -->
         <ul
-          v-if="soldeToutLaCommande && lignesDues.length > 1"
+          v-if="!detteEstUneRemise && soldeToutLaCommande && lignesDues.length > 1"
           class="text-xs text-gray-600 dark:text-gray-400 space-y-1 border-t border-warning-200 dark:border-warning-800 pt-2"
         >
           <li v-for="ligne in lignesDues" :key="ligne.id" class="flex justify-between gap-3">
@@ -81,12 +85,27 @@
         >
           {{ $t('edition.ticketing.refund_several_holders') }}
         </p>
+        <!--
+          ⚠️ Sur une remise, on dit que le billet RESTE VALIDE. Ce bloc annonce une somme à rendre
+          dans un encadré d'alerte, au même endroit que celui d'une annulation : sans cette
+          phrase, on lit « argent à rendre » et l'on croit l'entrée refusée.
+        -->
+        <p
+          v-if="detteEstUneRemise"
+          class="text-xs text-gray-600 dark:text-gray-400 border-t border-warning-200 dark:border-warning-800 pt-2"
+        >
+          {{ $t('edition.ticketing.discount_still_valid') }}
+        </p>
         <UButton
           block
           color="warning"
           icon="i-heroicons-check-circle"
-          :label="$t('edition.ticketing.refund_mark_done')"
-          @click="confirmationDuRemboursement = true"
+          :label="
+            detteEstUneRemise
+              ? $t('edition.ticketing.discount_mark_done')
+              : $t('edition.ticketing.refund_mark_done')
+          "
+          @click="demanderLeRemboursement"
         />
       </div>
 
@@ -100,6 +119,31 @@
         Pas de confirmation ici, à la différence du remboursement : celui-ci efface une dette,
         celui-là la rétablit. On ne met pas de friction sur le geste qui répare.
       -->
+      <!--
+        Remise déjà rendue. Jumeau de l'encart ci-dessous, et pour la même raison : sans lui, on
+        rendrait l'argent une seconde fois. Le bouton de retour en arrière évite d'aller faire
+        corriger l'erreur en gestion, la personne encore devant soi.
+      -->
+      <UAlert
+        v-else-if="remiseDejaRendue"
+        icon="i-heroicons-receipt-percent"
+        color="info"
+        variant="soft"
+        :title="$t('edition.ticketing.discount_already_done')"
+        :description="dateDeLaRemiseRendue"
+      >
+        <template #actions>
+          <UButton
+            size="xs"
+            color="neutral"
+            variant="ghost"
+            icon="i-heroicons-arrow-uturn-left"
+            :label="$t('edition.ticketing.discount_undo')"
+            @click="annulerLaRemiseRendue"
+          />
+        </template>
+      </UAlert>
+
       <UAlert
         v-else-if="dejaRembourse"
         icon="i-heroicons-check-circle"
@@ -758,6 +802,7 @@ import OrganizerDetailsCard from './OrganizerDetailsCard.vue'
 import VolunteerDetailsCard from './VolunteerDetailsCard.vue'
 
 import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+import { sommeDueAuGuichet } from '~~/shared/utils/somme-due-au-guichet'
 
 const { money } = useEditionCurrency()
 
@@ -775,6 +820,10 @@ interface TicketData {
     refundDue?: number | null
     refunded?: boolean
     refundedAt?: string | Date | null
+    /** La remise accordée, et si son argent est déjà sorti de la caisse. */
+    discountAmount?: number | null
+    discountPaidBack?: boolean | null
+    discountPaidBackAt?: string | Date | null
     /**
      * Ce que doit la COMMANDE entière, et à combien de personnes.
      *
@@ -996,6 +1045,19 @@ const emit = defineEmits<{
   refund: [itemId: number, refunded: boolean, portee: 'billet' | 'commande']
   /** Ce titre demande à être validé. Le parent confirme, pour tous les titres à la fois. */
   'demander-validation': []
+  /** L'argent d'une remise est-il sorti de la caisse ? Jumeau de `refund`, pour l'autre dette. */
+  'remise-rendue': [itemId: number, rendue: boolean]
+  /** Ce billet demande à solder sa dette : le parent pose la question avant d'émettre `refund`. */
+  'demander-remboursement': [
+    demande: {
+      itemId: number
+      /** D'où vient la dette : une annulation, ou une remise accordée et pas encore rendue. */
+      nature: 'annulation' | 'remise'
+      portee: 'billet' | 'commande'
+      montant: number
+      porteur: string
+    },
+  ]
   /** Ce titre demande à être dévalidé ; l'identifiant désigne une LIGNE précise, pour un billet. */
   'demander-devalidation': [itemId?: number]
   /** Les lignes cochées de cette commande, dont le parent tire les articles à remettre. */
@@ -1191,17 +1253,49 @@ const soldeToutLaCommande = computed(
   () => !!detteDeLaCommande.value && !detteDeLaCommande.value.nomsMultiples
 )
 
-/** La somme réellement annoncée au guichet, et celle que le bouton va solder. */
-const sommeDue = computed(() => {
-  if (soldeToutLaCommande.value) {
-    const total = detteDeLaCommande.value?.total ?? 0
-    return total > 0 ? total : null
-  }
-  return montantARembourser.value
+/**
+ * La somme annoncée au guichet, et celle que le bouton va solder.
+ *
+ * La précédence vit dans `somme-due-au-guichet`, où elle est éprouvée : elle a déjà échoué en
+ * silence, l'encadré ne s'affichant jamais pour une remise alors que le serveur annonçait la dette.
+ */
+const sommeDue = computed(() =>
+  sommeDueAuGuichet({
+    estUneRemise: detteEstUneRemise.value,
+    dueParLeBillet: montantARembourser.value,
+    soldeToutLaCommande: soldeToutLaCommande.value,
+    dueParLaCommande: detteDeLaCommande.value?.total ?? 0,
+  })
+)
+const lignesDues = computed(() => detteDeLaCommande.value?.lignes ?? [])
+
+/**
+ * La dette affichée vient-elle d'une REMISE plutôt que d'une annulation ?
+ *
+ * ⚠️ CE N'EST PAS UNE NUANCE D'AFFICHAGE : les deux dettes se soldent par des points d'API
+ * DIFFÉRENTS. Le serveur refuse de « rembourser » un billet vivant — garde explicite — donc
+ * appeler le mauvais rendrait une erreur 400 au moment précis où l'on a les espèces à la main.
+ *
+ * 📍 Le billet est vivant par construction : `montantARembourser` ne rend une dette de remise que
+ * sur un billet non annulé.
+ */
+const detteEstUneRemise = computed(() => {
+  const billet = billetScanne.value
+  if (!billet || billet.state === 'Canceled') return false
+  return (billet.discountAmount ?? 0) > 0 && billet.discountPaidBack !== true
 })
 
-/** Le détail de ce qui est soldé — pour qu'on voie ce qu'on rend, et non un seul chiffre. */
-const lignesDues = computed(() => detteDeLaCommande.value?.lignes ?? [])
+/** La remise de ce billet a-t-elle déjà été rendue ? */
+const remiseDejaRendue = computed(() => {
+  const billet = billetScanne.value
+  return (billet?.discountAmount ?? 0) > 0 && billet?.discountPaidBack === true
+})
+
+const dateDeLaRemiseRendue = computed(() => {
+  const quand = billetScanne.value?.discountPaidBackAt
+  if (!quand) return undefined
+  return formaterDateHeure(quand, props.fuseau, locale.value)
+})
 
 const dejaRembourse = computed(
   () => billetScanne.value?.state === 'Canceled' && billetScanne.value?.refunded === true
@@ -1215,7 +1309,38 @@ const dateDuRemboursement = computed(() => {
   return formaterDateHeure(quand, props.fuseau, locale.value)
 })
 
-const confirmationDuRemboursement = ref(false)
+/**
+ * Demande au parent d'ouvrir la confirmation.
+ *
+ * ⚠️ CE DRAPEAU ÉTAIT LOCAL, ET PLUS RIEN NE LE LISAIT. En sortant ce bloc de la modale, le bouton
+ * a gardé son `confirmationDuRemboursement = true` tandis que la modale de confirmation restait
+ * chez le parent, avec son propre drapeau du même nom. Résultat : le bouton ne faisait RIEN, et
+ * rien ne le disait — pas d'erreur, pas de message, un clic sans effet au guichet, devant la
+ * personne à qui l'on devait de l'argent.
+ *
+ * 📍 La section envoie tout ce que la question doit porter — le montant et le nom —, pour que le
+ * parent n'ait pas à le recalculer depuis un participant qu'il ne connaît plus en mode groupé.
+ */
+const demanderLeRemboursement = () => {
+  if (!billetScanne.value) return
+  emit('demander-remboursement', {
+    itemId: billetScanne.value.id,
+    // ⚠️ La nature décide du point d'API : rembourser un billet vivant est refusé par le serveur.
+    nature: detteEstUneRemise.value ? 'remise' : 'annulation',
+    // Une remise ne se solde jamais « sur toute la commande » : elle porte sur ce billet-là.
+    portee: detteEstUneRemise.value || !soldeToutLaCommande.value ? 'billet' : 'commande',
+    montant: sommeDue.value ?? 0,
+    porteur: [billetScanne.value.user?.firstName, billetScanne.value.user?.lastName]
+      .filter(Boolean)
+      .join(' ')
+      .trim(),
+  })
+}
+
+/** Rétablir la dette d'une remise, sur place — symétrique de `annulerLeRemboursement`. */
+const annulerLaRemiseRendue = () => {
+  if (billetScanne.value) emit('remise-rendue', billetScanne.value.id, false)
+}
 
 const annulerLeRemboursement = () => {
   // Symétrique du geste : ce qu'on a soldé d'un coup se dé-solde d'un coup.

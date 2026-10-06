@@ -563,6 +563,7 @@
         @validate="handleValidateParticipants"
         @invalidate="handleInvalidateEntry"
         @refund="handleRefund"
+        @remise-rendue="handleRemiseRendue"
       />
 
       <!-- Modal ajout de participant -->
@@ -1419,6 +1420,47 @@ const reloadParticipant = async (
     }
   } catch {
     // Erreur silencieuse lors du rechargement du participant
+  }
+}
+
+/**
+ * L'argent d'une REMISE a-t-il été rendu ?
+ *
+ * ⚠️ UN POINT D'API DISTINCT DU REMBOURSEMENT, et ce n'est pas une préférence : le serveur refuse
+ * de « rembourser » un billet vivant. Une remise porte sur un billet qui donne toujours droit
+ * d'entrée, et elle ne solde pas la même somme que l'annulation — d'où deux colonnes et deux
+ * routes. Les confondre rendrait deux fois le même argent, en espèces, sans rattrapage.
+ */
+const handleRemiseRendue = async (itemId: number, rendue: boolean) => {
+  try {
+    await $fetch(`/api/editions/${editionId}/ticketing/order-items/${itemId}/discount-paid-back`, {
+      method: 'PATCH',
+      body: { paidBack: rendue },
+    })
+
+    toast.add({
+      title: rendue
+        ? t('edition.ticketing.discount_mark_done')
+        : t('edition.ticketing.discount_already_done'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    await Promise.all([loadStats(), loadRecentValidations()])
+    // Comme les quatre autres parcours : la liste derrière porte la dette, elle se périme ici.
+    rafraichirLaRecherche()
+
+    if (selectedParticipant.value?.ticket?.qrCode) {
+      await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
+    }
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string } }
+    toast.add({
+      title: t('ticketing.access_control.error_title'),
+      description: err.data?.message || t('ticketing.access_control.validate_error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
   }
 }
 

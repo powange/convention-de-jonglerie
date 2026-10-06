@@ -406,7 +406,14 @@
       "volunteer_management": "Dobrovolné řízení",
       "same_as_buyer": "Stejné jako kupující",
       "selected_count": "Vybrán {n} účastník | Vybráno {n} účastníků",
-      "validate_entry_count": "Potvrdit vstup ({count})"
+      "validate_entry_count": "Potvrdit vstup ({count})",
+      "discount_already_done": "Sleva již vrácena",
+      "discount_amount_label": "Sleva k vrácení",
+      "discount_confirm_description": "Potvrzujete, že jste vrátili {amount} osobě {name}? Vstupenka zůstává platná.",
+      "discount_confirm_title": "Potvrdit vrácení slevy",
+      "discount_mark_done": "Sleva vrácena",
+      "discount_still_valid": "Tato vstupenka není zrušena: stále opravňuje ke vstupu.",
+      "discount_undo": "Vrátit zpět"
     },
     "ticketing_title": "Vstupenky",
     "useful_links": "Užitečné odkazy",
