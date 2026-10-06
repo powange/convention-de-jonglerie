@@ -132,6 +132,8 @@ model TicketingTier {
   @@unique([externalTicketingId, helloAssoTierId])
   @@index([externalTicketingId])
   @@index([editionId])
+  /// Rattachement éventuel à une ligne de trésorerie, qui tire alors son montant de ce tarif.
+  treasuryEntries     TreasuryEntryTier[]
 }
 
 model TicketingQuota {

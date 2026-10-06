@@ -56,6 +56,17 @@ describe('la date d’opération d’une entrée de trésorerie', () => {
     prismaMock.treasuryEntry.findMany.mockResolvedValue([])
     prismaMock.treasurySourceCode.findMany.mockResolvedValue([])
     prismaMock.treasuryCode.findMany.mockResolvedValue([])
+    /*
+     * ⚠️ Les TARIFS, que la trésorerie lit depuis qu'un produit peut tirer son montant de
+     * certains d'entre eux. Sans ce bouchon, `findMany` rend `undefined`, le point d'API lève sur
+     * `tiers.map` et le test échoue sur un « Erreur serveur interne » qui ne dit pas d'où il
+     * vient.
+     *
+     * 📍 On le déclare ici plutôt que de rendre le point d'API défensif : en production Prisma
+     * rend toujours un tableau, et un `?? []` masquerait un manque du harnais au lieu de le
+     * signaler.
+     */
+    prismaMock.ticketingTier.findMany.mockResolvedValue([])
   })
 
   const creerAvec = async (corps: Record<string, unknown>) => {

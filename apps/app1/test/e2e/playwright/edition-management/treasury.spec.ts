@@ -2,7 +2,9 @@ import type { Page } from '@playwright/test'
 
 import { expect, test } from '@nuxt/test-utils/playwright'
 
-import { apiPost, loadState, updateEdition } from '../helpers'
+import { apiDelete, apiPost, apiPut, loadState, updateEdition } from '../helpers'
+
+const BASE = 'http://localhost:3000'
 
 /**
  * Trésorerie d'une édition : `/editions/:id/gestion/treasury`.
@@ -37,11 +39,9 @@ test.describe.serial("Trésorerie d'une édition", () => {
     // Le code est unique par convention. Un `describe.serial` rejoue tout le bloc à chaque
     // nouvelle tentative : avec un code figé, la 2ᵉ tentative se heurtait au code créé par la
     // 1ʳᵉ et échouait sur un conflit, masquant l'échec qui avait déclenché la reprise.
-    const response = await apiPost(
-      page,
-      `http://localhost:3000/api/editions/${editionId}/treasury/codes`,
-      { data: { code: `E2E-6257-${testInfo.retry}`, label: 'Rémunérations E2E' } }
-    )
+    const response = await apiPost(page, `${BASE}/api/editions/${editionId}/treasury/codes`, {
+      data: { code: `E2E-6257-${testInfo.retry}`, label: 'Rémunérations E2E' },
+    })
     expect(response.ok(), `Création du code échouée : ${await response.text()}`).toBe(true)
   })
 
@@ -114,14 +114,17 @@ test.describe.serial("Trésorerie d'une édition", () => {
     await expect(creation).toBeHidden({ timeout: 10000 })
 
     /*
-     * À la MODIFICATION, il revient. Sans la remise à zéro du sens dans `openEntryModal`, ce
-     * sélecteur resterait masqué après la création ci-dessus — et la ligne saisie du mauvais côté
-     * deviendrait incorrigeable.
+     * ⚠️ ET IL NE REVIENT PAS À LA MODIFICATION NON PLUS. « Le produit est un produit et restera un
+     * produit » — décidé avec l'utilisateur le 06/10/2026, qui revient sur mon arbitrage initial :
+     * j'avais gardé le sélecteur là pour rattraper une ligne du mauvais côté.
+     *
+     * 📍 Ce test affirmait exactement le contraire jusqu'à cette date. Un test qui garde une règle
+     * abandonnée est pire qu'un test absent : il empêche de livrer la nouvelle.
      */
     await page.getByRole('button', { name: 'Modifier' }).first().click()
     const modification = page.getByRole('dialog')
     await expect(modification.getByText('Modifier la ligne')).toBeVisible()
-    await expect(modification.getByText('Nature', { exact: true })).toBeVisible()
+    await expect(modification.getByText('Nature', { exact: true })).toHaveCount(0)
     await page.keyboard.press('Escape')
     await expect(modification).toBeHidden({ timeout: 10000 })
 
@@ -136,6 +139,296 @@ test.describe.serial("Trésorerie d'une édition", () => {
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1
     )
     expect(debordement, 'la page défile horizontalement sur téléphone').toBe(false)
+  })
+
+  /**
+   * Un produit dont le montant est TIRÉ DE TARIFS choisis.
+   *
+   * ⚠️ CE QUI SE VÉRIFIE ICI, ET QUE RIEN D'AUTRE NE PEUT VOIR : que le montant quitte réellement
+   * « Billetterie — autres produits » au lieu de s'y ajouter. C'est un RÉACHEMINEMENT — la ligne
+   * de commande part vers le produit nommé au lieu d'aller dans le fourre-tout — donc le total de
+   * l'édition ne doit pas bouger d'un centime.
+   *
+   * 📍 CE QUE CE PARCOURS PROUVE, ET CE QU'IL NE PROUVE PAS. Il couvre le CÂBLAGE : que le point
+   * d'API lise le tarif de chaque ligne de commande, qu'il construise les regroupements, que
+   * Prisma connaisse la table de liaison, et que les deux refus tiennent. Trois choses qu'un test
+   * unitaire mocké ne voit pas.
+   *
+   * ⚠️ Il NE prouve PAS l'arithmétique : le tarif créé ici n'a aucune vente, donc les montants
+   * valent zéro et la comparaison « ce qui sort du fourre-tout = ce qui entre dans la ligne »
+   * compare 0 à 0. Fabriquer une vraie vente demanderait une commande complète ; l'arithmétique
+   * est couverte, avec de vrais montants, par `treasury-compute.test.ts` — dont le cas « le total
+   * ne bouge pas, avec ou sans regroupement ».
+   */
+  test('crée un produit tiré de tarifs, sans bouger le total', async ({ page, goto }) => {
+    const { editionId } = loadState()
+
+    /*
+     * On CRÉE le tarif plutôt que d'espérer en trouver un.
+     *
+     * ⚠️ Une première version se contentait d'un `test.skip` quand l'édition n'avait aucun tarif —
+     * et elle a été ignorée au premier passage, laissant la chaîne serveur ENTIÈREMENT non
+     * éprouvée. Un test ignoré se voit, c'est déjà mieux qu'un vert creux, mais il ne prouve rien :
+     * ici la donnée manquante se fabrique en un appel.
+     */
+    await updateEdition(page, editionId, { ticketingEnabled: true })
+    const tarif = await apiPost(page, `${BASE}/api/editions/${editionId}/ticketing/tiers`, {
+      data: {
+        name: 'Repas samedi E2E',
+        price: 1200,
+        // `false` : ce tarif rejoint « autres produits », exactement le cas que l'utilisateur
+        // décrit. Le cas « compté comme participant » est couvert par les tests unitaires.
+        countAsParticipant: false,
+      },
+    })
+    expect(tarif.ok(), 'création du tarif refusée').toBe(true)
+    /*
+     * ⚠️ `data.tier.id`, et la réponse est lue UNE SEULE FOIS. Appeler `.json()` deux fois sur la
+     * même réponse Playwright ne rend rien la seconde — l'identifiant sortait `undefined`, le
+     * rattachement visait un tarif inexistant, et l'échec parlait du tarif « absent des libres »
+     * plutôt que de sa lecture.
+     */
+    const tierId: number = (await tarif.json())?.data?.tier?.id
+    expect(tierId, 'identifiant du tarif créé illisible').toBeTruthy()
+
+    // Les tarifs de l'édition, tels que la trésorerie les expose pour le sélecteur.
+    const avant = await (
+      await page.request.get(`${BASE}/api/editions/${editionId}/treasury`)
+    ).json()
+    const tarifs: { id: number; label: string; prisPar: number | null }[] = avant?.data?.tiers ?? []
+    expect(tarifs.length, 'la trésorerie n’expose aucun tarif').toBeGreaterThan(0)
+
+    const libres = tarifs.filter((tarif) => tarif.prisPar === null)
+    expect(libres.length, 'aucun tarif libre à rattacher').toBeGreaterThan(0)
+    expect(
+      libres.some((t) => t.id === tierId),
+      'le tarif créé n’apparaît pas comme libre'
+    ).toBe(true)
+
+    const soldeAvant = avant.data.totals.income.settled + avant.data.totals.income.pending
+    const autresAvant =
+      avant.data.lines.find((l: { source?: string }) => l.source === 'TICKETING_OTHER') ?? null
+
+    const creation = await apiPost(page, `${BASE}/api/editions/${editionId}/treasury/entries`, {
+      data: {
+        kind: 'INCOME',
+        title: 'Repas du samedi E2E',
+        // Pas de montant : c'est tout l'objet du rattachement. Le schéma ne l'exige que sans
+        // tarifs, et l'envoyer ici serait de toute façon ignoré.
+        amount: 0,
+        tierIds: [tierId],
+      },
+    })
+    expect(creation.ok(), `création refusée : ${await creation.text()}`).toBe(true)
+    const entryId = (await creation.json())?.data?.id
+    expect(entryId).toBeTruthy()
+
+    const apres = await (
+      await page.request.get(`${BASE}/api/editions/${editionId}/treasury`)
+    ).json()
+
+    const ligne = apres.data.lines.find((l: { entryId?: number }) => l.entryId === entryId)
+    expect(ligne, 'la ligne créée est absente du rapport').toBeTruthy()
+    expect(ligne.tierIds, 'la ligne ne dit pas qu’elle est rattachée').toEqual([tierId])
+
+    /*
+     * ⚠️ L'INVARIANT. Le produit total de l'édition ne bouge pas : ce qui part dans la nouvelle
+     * ligne est exactement ce qui quitte « autres produits ». Un montant ajouté au lieu d'être
+     * réacheminé ferait grimper ce total, et c'est le défaut le plus facile à commettre ici.
+     */
+    const soldeApres = apres.data.totals.income.settled + apres.data.totals.income.pending
+    expect(soldeApres, 'le produit total a bougé : le montant a été ajouté, pas réacheminé').toBe(
+      soldeAvant
+    )
+
+    // Et si ce tarif avait vendu quelque chose, « autres produits » a bien diminué d'autant.
+    const autresApres = apres.data.lines.find(
+      (l: { source?: string }) => l.source === 'TICKETING_OTHER'
+    )
+    const sortiDuFourreTout =
+      (autresAvant?.settled ?? 0) +
+      (autresAvant?.pending ?? 0) -
+      (autresApres.settled + autresApres.pending)
+    expect(sortiDuFourreTout, 'ce qui quitte le fourre-tout ≠ ce qui entre dans la ligne').toBe(
+      ligne.settled + ligne.pending
+    )
+
+    // Un second produit ne peut PAS réclamer le même tarif : son montant serait compté deux fois.
+    const doublon = await apiPost(page, `${BASE}/api/editions/${editionId}/treasury/entries`, {
+      data: { kind: 'INCOME', title: 'Doublon E2E', amount: 0, tierIds: [tierId] },
+    })
+    expect(doublon.status(), 'le tarif déjà pris aurait dû être refusé').toBe(400)
+
+    // Et un rattachement sur une CHARGE est refusé : cela inverserait le signe d'un encaissement.
+    const charge = await apiPost(page, `${BASE}/api/editions/${editionId}/treasury/entries`, {
+      data: { kind: 'EXPENSE', title: 'Charge E2E', amount: 0, tierIds: [tierId] },
+    })
+    expect(charge.status(), 'un rattachement sur une charge aurait dû être refusé').toBe(400)
+
+    /*
+     * ⚠️ ET ON ENREGISTRE UNE MODIFICATION, ce qui manquait.
+     *
+     * La première version de ce parcours créait, rouvrait, puis fermait par « Échap » — elle n'a
+     * donc JAMAIS exercé le `PUT`. Celui-ci échouait sur « Cannot access 'data' before
+     * initialization » : la garde des tarifs y lisait le corps avant sa déclaration. Signalé par
+     * l'utilisateur, pas par les tests.
+     *
+     * 📍 Trois cas d'un coup : renommer sans toucher aux tarifs, DÉTACHER (ce qui rend la ligne à
+     * la saisie manuelle), et rattacher à nouveau.
+     */
+    const renommage = await apiPut(
+      page,
+      `${BASE}/api/editions/${editionId}/treasury/entries/${entryId}`,
+      {
+        data: { title: 'Repas du samedi E2E — renommé' },
+      }
+    )
+    expect(renommage.ok(), `renommage refusé : ${await renommage.text()}`).toBe(true)
+
+    const toujoursRattachee = await (
+      await page.request.get(`${BASE}/api/editions/${editionId}/treasury`)
+    ).json()
+    const apresRenommage = toujoursRattachee.data.lines.find(
+      (l: { entryId?: number }) => l.entryId === entryId
+    )
+    expect(apresRenommage.title).toBe('Repas du samedi E2E — renommé')
+    // Une requête qui ne parle pas des tarifs ne doit RIEN y changer.
+    expect(apresRenommage.tierIds, 'le renommage a détaché les tarifs').toEqual([tierId])
+
+    // `[]` détache : la ligne redevient saisissable, et son montant repasse à ce qu'on envoie.
+    const detachement = await apiPut(
+      page,
+      `${BASE}/api/editions/${editionId}/treasury/entries/${entryId}`,
+      {
+        data: { tierIds: [], amount: 42 },
+      }
+    )
+    expect(detachement.ok(), `détachement refusé : ${await detachement.text()}`).toBe(true)
+
+    const detachee = await (
+      await page.request.get(`${BASE}/api/editions/${editionId}/treasury`)
+    ).json()
+    const ligneDetachee = detachee.data.lines.find(
+      (l: { entryId?: number }) => l.entryId === entryId
+    )
+    expect(ligneDetachee.tierIds, 'les tarifs n’ont pas été détachés').toBeUndefined()
+    expect(ligneDetachee.settled, 'le montant saisi n’est pas repris après détachement').toBe(4200)
+
+    // Et le tarif redevient libre pour une autre ligne.
+    const libereApres = await (
+      await page.request.get(`${BASE}/api/editions/${editionId}/treasury`)
+    ).json()
+    expect(
+      libereApres.data.tiers.find((tarif: { id: number }) => tarif.id === tierId)?.prisPar,
+      'le tarif est resté marqué comme pris'
+    ).toBeNull()
+
+    await apiDelete(page, `${BASE}/api/editions/${editionId}/treasury/entries/${entryId}`)
+    await apiDelete(page, `${BASE}/api/editions/${editionId}/ticketing/tiers/${tierId}`)
+    await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
+  })
+
+  /**
+   * La modale sait créer un produit calculé, et le rouvrir sans le détacher.
+   *
+   * ⚠️ CE QUE LE PARCOURS SERVEUR NE VOIT PAS. Deux pièges vivent uniquement dans l'écran : le
+   * bouton « Enregistrer » resterait désactivé sur un produit calculé — dont le montant vaut zéro
+   * par construction — et rouvrir un tel produit afficherait un sélecteur VIDE, si bien que le
+   * réenregistrer DÉTACHERAIT tous ses tarifs sans rien demander.
+   */
+  test('la modale crée un produit calculé et le rouvre rattaché', async ({ page, goto }) => {
+    const { editionId } = loadState()
+
+    await updateEdition(page, editionId, { ticketingEnabled: true })
+    const tarif = await apiPost(page, `${BASE}/api/editions/${editionId}/ticketing/tiers`, {
+      data: { name: 'Camping E2E', price: 800, countAsParticipant: false },
+    })
+    expect(tarif.ok()).toBe(true)
+    const tierId: number = (await tarif.json())?.data?.tier?.id
+    expect(tierId).toBeTruthy()
+
+    await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
+    await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
+
+    await page.getByRole('button', { name: 'Ajouter un produit' }).click()
+    const dialog = page.getByRole('dialog')
+    await dialog.getByRole('textbox').first().fill('Camping E2E — produit')
+
+    // L'interrupteur remplace le champ de montant par le sélecteur de tarifs.
+    await dialog.getByRole('switch').first().click()
+    await expect(dialog.getByRole('spinbutton')).toHaveCount(0)
+
+    /*
+     * ⚠️ `USelectMenu` s'expose en `button "Show popup"` — ni comme un `combobox`, ni sous son
+     * texte indicatif. J'ai deviné deux fois avant de lire l'arbre d'accessibilité, qui le disait.
+     *
+     * 📍 Et il y a DEUX boutons « Show popup » dans cette modale, l'autre étant le code
+     * d'imputation. On clique donc son TEXTE INDICATIF, qui n'appartient qu'à ce champ — plutôt
+     * qu'un `.first()`, que le prochain champ ajouté au-dessus casserait.
+     */
+    await dialog.getByText('Choisir un ou plusieurs tarifs').click()
+    await page.getByRole('option', { name: 'Camping E2E' }).click()
+    await page.keyboard.press('Escape')
+
+    /*
+     * ⚠️ LE POINT QUI COMPTE : le bouton s'active SANS montant saisi. C'est la validation qui
+     * devait apprendre à distinguer les deux cas — sinon on remplit, on choisit, et rien ne
+     * s'enregistre sans qu'aucun message ne dise pourquoi.
+     */
+    const enregistrer = dialog.getByRole('button', { name: 'Enregistrer' })
+    await expect(enregistrer, 'le bouton est resté désactivé sans montant').toBeEnabled({
+      timeout: 10000,
+    })
+    await enregistrer.click()
+    await expect(dialog).toBeHidden({ timeout: 15000 })
+
+    // La ligne existe, et son montant vient des ventes : zéro ici, le tarif n'ayant rien vendu.
+    const creee = page.getByRole('row', { name: /Camping E2E — produit/ })
+    await expect(creee).toBeVisible({ timeout: 15000 })
+
+    /*
+     * Et on la ROUVRE : le sélecteur doit montrer son tarif. Un sélecteur vide ferait du
+     * réenregistrement un détachement silencieux.
+     */
+    await creee.getByRole('button', { name: 'Modifier' }).click()
+    const edition = page.getByRole('dialog')
+    await expect(edition.getByText('Modifier la ligne')).toBeVisible()
+    await expect(edition.getByRole('switch', { name: /Montant calculé/ })).toBeChecked()
+    // `exact` : sans lui, le libellé attraperait aussi « Camping E2E — produit », le titre.
+    await expect(
+      edition.getByText('Camping E2E', { exact: true }),
+      'le sélecteur est vide : réenregistrer détacherait les tarifs'
+    ).toBeVisible()
+
+    /*
+     * ⚠️ ON ENREGISTRE, au lieu de fermer par « Échap ».
+     *
+     * La première version fermait sans enregistrer, et n'a donc jamais exercé le chemin
+     * écran → `PUT`. Celui-ci échouait sur « Cannot access 'data' before initialization » :
+     * l'utilisateur l'a trouvé, pas ce test. Un parcours qui ouvre une modale et la referme ne
+     * prouve rien de ce qu'elle enregistre.
+     */
+    const enregistrerModif = edition.getByRole('button', { name: 'Enregistrer' })
+    await expect(enregistrerModif).toBeEnabled({ timeout: 10000 })
+    await enregistrerModif.click()
+    await expect(edition).toBeHidden({ timeout: 15000 })
+
+    // Et la ligne est toujours là, toujours rattachée : l'enregistrement n'a rien détaché.
+    await expect(page.getByRole('row', { name: /Camping E2E — produit/ })).toBeVisible({
+      timeout: 15000,
+    })
+
+    // Nettoyage : la ligne puis le tarif.
+    const rapport = await (
+      await page.request.get(`${BASE}/api/editions/${editionId}/treasury`)
+    ).json()
+    const ligne = rapport.data.lines.find(
+      (l: { title?: string }) => l.title === 'Camping E2E — produit'
+    )
+    if (ligne?.entryId) {
+      await apiDelete(page, `${BASE}/api/editions/${editionId}/treasury/entries/${ligne.entryId}`)
+    }
+    await apiDelete(page, `${BASE}/api/editions/${editionId}/ticketing/tiers/${tierId}`)
   })
 
   /**

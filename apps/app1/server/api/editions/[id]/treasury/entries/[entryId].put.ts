@@ -3,7 +3,11 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTreasuryById } from '#server/utils/permissions/edition-permissions'
-import { assertCodeBelongsToEdition, avanceNormalisee } from '#server/utils/treasury-guards'
+import {
+  assertCodeBelongsToEdition,
+  assertTarifsRattachables,
+  avanceNormalisee,
+} from '#server/utils/treasury-guards'
 import { deplacerJustificatif, supprimerJustificatif } from '#server/utils/treasury-receipt-files'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 import { toCents } from '~~/shared/utils/money'
@@ -13,6 +17,14 @@ const bodySchema = z.object({
   title: z.string().min(1).max(150).optional(),
   description: z.string().max(2000).nullable().optional(),
   amount: z.number().positive().max(10_000_000).optional(),
+  /**
+   * Les tarifs rattachés, remplacés en bloc.
+   *
+   * ⚠️ `[]` N'EST PAS `undefined` ici : le tableau vide DÉTACHE tous les tarifs et rend la ligne à
+   * la saisie manuelle, alors que l'absence du champ ne touche à rien. C'est ce qui permet de
+   * repasser un produit calculé en produit saisi.
+   */
+  tierIds: z.array(z.number().int().positive()).max(200).optional(),
   codeId: z.number().int().positive().nullable().optional(),
   imageUrl: z.string().max(500).nullable().optional(),
   isForecast: z.boolean().optional(),
@@ -79,6 +91,34 @@ export default wrapApiHandler(
     const data = bodySchema.parse(await readBody(event))
     await assertCodeBelongsToEdition(editionId, data.codeId)
 
+    /*
+     * ⚠️ APRÈS la lecture du corps, et ce n'est pas un détail de style : placée au-dessus — juste
+     * après la lecture de `existing` — cette garde lisait `data` avant sa déclaration. Zone morte
+     * temporelle, et la requête échouait sur « Cannot access 'data' before initialization » dès
+     * qu'on enregistrait une modification. Signalé par l'utilisateur.
+     *
+     * 📍 Le `kind` EFFECTIF, et non celui du corps : une requête qui ne change que les tarifs
+     * n'envoie pas `kind`, et lire `data.kind` seul laisserait passer un rattachement sur une
+     * charge. `entryId` exempte la ligne de ses propres tarifs.
+     */
+    /*
+     * ⚠️ LA NATURE NE CHANGE PAS. « Le produit est un produit et restera un produit » — décidé avec
+     * l'utilisateur le 06/10/2026, et refusé ici plutôt qu'au seul niveau de l'écran : une règle
+     * qui ne tient qu'à l'interface se contourne par n'importe quel autre client.
+     *
+     * 📍 On REFUSE au lieu d'ignorer. Zod retirerait silencieusement un `kind` non déclaré, et le
+     * client croirait avoir changé la nature d'une ligne qui n'a pas bougé. Le formulaire renvoie
+     * la nature inchangée, donc ce refus ne le gêne jamais.
+     */
+    if (data.kind !== undefined && data.kind !== existing.kind) {
+      throw createError({
+        status: 400,
+        message: "La nature d'une ligne ne se modifie pas : supprimez-la et ressaisissez-la",
+      })
+    }
+
+    await assertTarifsRattachables(editionId, existing.kind, data.tierIds, entryId)
+
     // Le justificatif change : déplacer le nouveau depuis `temp/` avant d'écrire, pour ne pas
     // enregistrer une référence vers un fichier qui n'a pas bougé.
     const nouveauJustificatif =
@@ -97,10 +137,26 @@ export default wrapApiHandler(
     await prisma.treasuryEntry.update({
       where: { id: entryId },
       data: {
-        ...(data.kind !== undefined && { kind: data.kind }),
+        // `kind` n'est PAS écrit : le refus ci-dessus garantit qu'il est identique, et l'omettre
+        // ici rend la règle visible à la lecture de l'`update`.
         ...(data.title !== undefined && { title: data.title }),
         ...(data.description !== undefined && { description: data.description }),
-        ...(data.amount !== undefined && { amount: toCents(data.amount)! }),
+        /*
+         * Le montant : zéro dès que des tarifs sont rattachés, puisqu'il est alors recalculé à
+         * chaque lecture. Sans cette remise à zéro, détacher les tarifs plus tard ferait
+         * RÉAPPARAÎTRE le montant saisi avant le rattachement — un chiffre d'une autre époque,
+         * parfaitement plausible.
+         */
+        ...(data.tierIds?.length
+          ? { amount: 0 }
+          : data.amount !== undefined && { amount: toCents(data.amount)! }),
+        // Remplacement EN BLOC : `[]` détache tout, l'absence du champ ne touche à rien.
+        ...(data.tierIds !== undefined && {
+          tiers: {
+            deleteMany: {},
+            ...(data.tierIds.length ? { create: data.tierIds.map((tierId) => ({ tierId })) } : {}),
+          },
+        }),
         ...(data.codeId !== undefined && { codeId: data.codeId }),
         // `null` explicite = justificatif retiré ; absent = laissé tel quel.
         ...(nouveauJustificatif !== undefined && { imageUrl: nouveauJustificatif }),

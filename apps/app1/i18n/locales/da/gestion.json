@@ -1137,7 +1137,11 @@
       "filter_search_help": "Søgningen omfatter betegnelsen og beskrivelsen, ord for ord i vilkårlig rækkefølge.",
       "plan_search_help": "Koder søges fra begyndelsen, betegnelser hvor som helst.",
       "add_expense": "Tilføj en udgift",
-      "add_income": "Tilføj en indtægt"
+      "add_income": "Tilføj en indtægt",
+      "amount_from_tiers": "Beløb beregnet ud fra priser",
+      "amount_from_tiers_help": "Beløbet følger salget af de valgte priser og forlader linjen »Billetsalg — andre indtægter« i stedet for at lægges til den.",
+      "linked_tiers": "Tilknyttede priser",
+      "linked_tiers_placeholder": "Vælg en eller flere priser"
     },
     "program": {
       "description": "Sammensæt udgavens tidslinje: workshops, shows og andre programpunkter.",

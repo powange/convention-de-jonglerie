@@ -451,6 +451,7 @@
       :entry="editedLine"
       :sens-impose="sensImpose"
       :codes="data?.codes ?? []"
+      :tiers="data?.tiers ?? []"
       :currency="currency"
       :edition-id="editionId"
       :noms-avance-connus="nomsAvanceConnus"

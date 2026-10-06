@@ -1137,7 +1137,11 @@
       "filter_search_help": "The search covers the label and the description, word by word in any order.",
       "plan_search_help": "Codes are matched from their beginning, labels anywhere.",
       "add_expense": "Add an expense",
-      "add_income": "Add an income"
+      "add_income": "Add an income",
+      "amount_from_tiers": "Amount computed from tiers",
+      "amount_from_tiers_help": "The amount will follow the sales of the chosen tiers, and will leave the “Ticketing — other income” line instead of adding to it.",
+      "linked_tiers": "Linked tiers",
+      "linked_tiers_placeholder": "Choose one or more tiers"
     },
     "program": {
       "description": "Build the edition's timeline: workshops, shows and other moments.",

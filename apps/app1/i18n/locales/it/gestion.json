@@ -1137,7 +1137,11 @@
       "filter_search_help": "La ricerca riguarda la voce e la descrizione, parola per parola in qualsiasi ordine.",
       "plan_search_help": "I codici si cercano dall'inizio, le voci ovunque.",
       "add_expense": "Aggiungi un costo",
-      "add_income": "Aggiungi un ricavo"
+      "add_income": "Aggiungi un ricavo",
+      "amount_from_tiers": "Importo calcolato dalle tariffe",
+      "amount_from_tiers_help": "L'importo seguirà le vendite delle tariffe scelte e uscirà dalla riga «Biglietteria — altri ricavi» invece di aggiungersi a essa.",
+      "linked_tiers": "Tariffe collegate",
+      "linked_tiers_placeholder": "Scegli una o più tariffe"
     },
     "program": {
       "description": "Componi la cronologia dell'edizione: workshop, spettacoli e altri momenti.",

@@ -649,3 +649,115 @@ describe('computeTreasury — date d’opération', () => {
     }
   })
 })
+
+/**
+ * Un produit nommé qui tire son montant de tarifs choisis.
+ *
+ * ⚠️ CE N'EST PAS UNE SOUSTRACTION, C'EST UN RÉACHEMINEMENT, et c'est l'invariant que ces tests
+ * gardent : la ligne de commande part vers le produit nommé AU LIEU d'aller dans « entrées » ou
+ * « autres produits ». Un montant retranché après coup aurait pu dériver au centime ou être
+ * compté deux fois ; ici le total ne peut pas bouger, par construction.
+ */
+describe('aggregateTicketingItems — regroupement par tarifs', () => {
+  const item = (over: Partial<Parameters<typeof aggregateTicketingItems>[0][number]> = {}) => ({
+    amount: 1000,
+    orderStatus: 'Processed',
+    itemState: 'Processed' as string | null,
+    countAsParticipant: false as boolean | null,
+    type: 'Registration' as string | null,
+    ...over,
+  })
+
+  it('détourne un tarif rattaché hors des autres produits', () => {
+    const totals = aggregateTicketingItems(
+      [item({ amount: 2500, tierId: 7 }), item({ amount: 1500, tierId: 9 })],
+      [{ entryId: 42, tierIds: [7] }]
+    )
+
+    expect(totals.parLigne[42]!.processed).toBe(2500)
+    // Le tarif 9 n'est rattaché à rien : il reste où il était.
+    expect(totals.other.processed).toBe(1500)
+  })
+
+  it('détourne aussi un tarif COMPTÉ COMME PARTICIPANT', () => {
+    /*
+     * Décidé avec l'utilisateur le 06/10/2026 : tous les tarifs sont rattachables, pas seulement
+     * ceux des « autres produits ». Le montant quitte alors « Billetterie — entrées », ce qui
+     * entame la ligne qu'on rapproche du nombre de participants — c'est assumé.
+     */
+    const totals = aggregateTicketingItems(
+      [item({ amount: 3000, countAsParticipant: true, tierId: 3 })],
+      [{ entryId: 11, tierIds: [3] }]
+    )
+
+    expect(totals.participants.processed).toBe(0)
+    expect(totals.parLigne[11]!.processed).toBe(3000)
+  })
+
+  it('ne touche PAS aux dons, qui n’ont pas de tarif', () => {
+    const totals = aggregateTicketingItems(
+      [item({ amount: 5000, countAsParticipant: null, type: 'Donation', tierId: null })],
+      [{ entryId: 1, tierIds: [7] }]
+    )
+
+    expect(totals.donations.processed).toBe(5000)
+    expect(totals.parLigne[1]!.processed).toBe(0)
+  })
+
+  it('applique les mêmes règles de statut que les autres lignes', () => {
+    // Sans cela, le produit nommé divergerait du solde affiché juste au-dessus de lui.
+    const totals = aggregateTicketingItems(
+      [
+        item({ amount: 100, tierId: 7, orderStatus: 'Processed' }),
+        item({ amount: 200, tierId: 7, orderStatus: 'Onsite' }),
+        item({ amount: 400, tierId: 7, orderStatus: 'Pending' }),
+        item({ amount: 800, tierId: 7, orderStatus: 'Refunded' }),
+        item({ amount: 1600, tierId: 7, itemState: 'Canceled' }),
+      ],
+      [{ entryId: 5, tierIds: [7] }]
+    )
+
+    const bucket = totals.parLigne[5]!
+    expect(bucket.processed).toBe(100)
+    expect(bucket.onsite).toBe(200)
+    expect(bucket.pending).toBe(400)
+    expect(bucket.refunded).toBe(800)
+    expect(bucket.canceled).toBe(1600)
+  })
+
+  it('LE TOTAL NE BOUGE PAS, avec ou sans regroupement', () => {
+    /*
+     * L'invariant qui justifie tout le dessin. On somme les quatre seaux dans les deux cas : un
+     * réacheminement ne crée ni ne détruit d'argent, il le range ailleurs.
+     */
+    const lignes = [
+      item({ amount: 2500, countAsParticipant: true, tierId: 1 }),
+      item({ amount: 1500, tierId: 2 }),
+      item({ amount: 700, countAsParticipant: null, type: 'Donation', tierId: null }),
+    ]
+    const somme = (totals: ReturnType<typeof aggregateTicketingItems>) =>
+      [
+        totals.participants,
+        totals.donations,
+        totals.other,
+        ...Object.values(totals.parLigne),
+      ].reduce((t, b) => t + b.processed + b.onsite + b.pending, 0)
+
+    expect(somme(aggregateTicketingItems(lignes))).toBe(4700)
+    expect(somme(aggregateTicketingItems(lignes, [{ entryId: 8, tierIds: [1, 2] }]))).toBe(4700)
+  })
+
+  it('déclare un seau VIDE pour un regroupement sans vente', () => {
+    // Sinon `parLigne[id]` serait `undefined` et la ligne afficherait un montant absent plutôt que
+    // zéro — un produit créé avant la première vente doit s'afficher à 0, pas disparaître.
+    const totals = aggregateTicketingItems([], [{ entryId: 3, tierIds: [7] }])
+
+    expect(totals.parLigne[3]).toEqual({
+      processed: 0,
+      onsite: 0,
+      pending: 0,
+      refunded: 0,
+      canceled: 0,
+    })
+  })
+})
