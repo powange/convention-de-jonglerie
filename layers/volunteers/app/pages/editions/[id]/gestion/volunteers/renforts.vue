@@ -23,7 +23,6 @@
           size="sm"
           :to="`/editions/${editionId}/gestion/volunteers`"
         />
-        <UIcon name="i-heroicons-bolt" class="text-info-500 size-6" />
         <ManagementPageHeader :titre="t('volunteers.renforts_title')" />
       </div>
 

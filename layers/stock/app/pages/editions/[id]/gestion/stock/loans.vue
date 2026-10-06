@@ -20,7 +20,6 @@
           size="sm"
           :to="`/editions/${editionId}/gestion/stock`"
         />
-        <UIcon name="i-heroicons-hand-raised" class="text-amber-600 size-6" />
         <ManagementPageHeader :titre="t('gestion.stock.loans_title')" />
       </div>
     </div>

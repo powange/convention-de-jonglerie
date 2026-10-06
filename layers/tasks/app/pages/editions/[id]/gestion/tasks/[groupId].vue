@@ -38,10 +38,6 @@
       <UCard>
         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div class="flex items-start gap-3 flex-1 min-w-0">
-            <UIcon
-              name="i-heroicons-clipboard-document-check"
-              class="text-rose-500 size-6 mt-1 shrink-0"
-            />
             <div class="flex-1 min-w-0">
               <!-- 20 px et non 24, délibérément : ce titre nomme un ENREGISTREMENT — ce
                    groupe, cet objet — et non un écran du module. Le cran en dessous dit
@@ -151,21 +147,28 @@
                   </div>
                 </div>
               </div>
-              <div v-if="task.assignments.length" class="flex -space-x-1 shrink-0">
-                <UiUserAvatar
+              <!--
+                ⚠️ LE NOM À CÔTÉ DE L'AVATAR, et des avatars PLUS PETITS. Trois vignettes de 32 px
+                empilées prenaient plus de place que le titre de la tâche, sans dire QUI était assigné :
+                il fallait survoler, ou ouvrir la tâche. Une liste sert justement à ne pas l'ouvrir.
+              
+                📍 Le nom vient de `nomAffichableDUnCompte` : le pseudo d'abord — c'est sous ce nom qu'on
+                se reconnaît ici —, puis l'état civil. L'adresse e-mail n'apparaît qu'en dernier recours,
+                et surtout pas dans une liste que tout le monde regarde.
+              -->
+              <div
+                v-if="task.assignments.length"
+                class="flex flex-wrap items-center gap-x-2 gap-y-1"
+              >
+                <span
                   v-for="a in task.assignments.slice(0, 3)"
                   :key="a.user.id"
-                  :user="a.user"
-                  size="md"
-                  class="ring-2 ring-white dark:ring-gray-900"
-                />
-                <UBadge
-                  v-if="task.assignments.length > 3"
-                  color="neutral"
-                  variant="soft"
-                  size="md"
-                  class="ring-2 ring-white dark:ring-gray-900"
+                  class="inline-flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400"
                 >
+                  <UiUserAvatar :user="a.user" size="sm" />
+                  <span class="truncate max-w-28">{{ nomAffichableDUnCompte(a.user) }}</span>
+                </span>
+                <UBadge v-if="task.assignments.length > 3" color="neutral" variant="soft" size="sm">
                   +{{ task.assignments.length - 3 }}
                 </UBadge>
               </div>
@@ -248,20 +251,32 @@
                     —
                   </div>
                 </div>
-                <div v-if="task.assignments.length" class="flex -space-x-1">
-                  <UiUserAvatar
+                <!--
+                  ⚠️ LE NOM À CÔTÉ DE L'AVATAR, et des avatars PLUS PETITS. Trois vignettes de 32 px
+                  empilées prenaient plus de place que le titre de la tâche, sans dire QUI était assigné :
+                  il fallait survoler, ou ouvrir la tâche. Une liste sert justement à ne pas l'ouvrir.
+                
+                  📍 Le nom vient de `nomAffichableDUnCompte` : le pseudo d'abord — c'est sous ce nom qu'on
+                  se reconnaît ici —, puis l'état civil. L'adresse e-mail n'apparaît qu'en dernier recours,
+                  et surtout pas dans une liste que tout le monde regarde.
+                -->
+                <div
+                  v-if="task.assignments.length"
+                  class="flex flex-wrap items-center gap-x-2 gap-y-1"
+                >
+                  <span
                     v-for="a in task.assignments.slice(0, 3)"
                     :key="a.user.id"
-                    :user="a.user"
-                    size="md"
-                    class="ring-2 ring-white dark:ring-gray-900"
-                  />
+                    class="inline-flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400"
+                  >
+                    <UiUserAvatar :user="a.user" size="sm" />
+                    <span class="truncate max-w-28">{{ nomAffichableDUnCompte(a.user) }}</span>
+                  </span>
                   <UBadge
                     v-if="task.assignments.length > 3"
                     color="neutral"
                     variant="soft"
-                    size="md"
-                    class="ring-2 ring-white dark:ring-gray-900"
+                    size="sm"
                   >
                     +{{ task.assignments.length - 3 }}
                   </UBadge>
@@ -327,6 +342,7 @@
 import type { TaskFiltersValue, TaskSort } from '../../../../../components/tasks/TaskFilters.vue'
 
 import { valeurDepuisUrl } from '~~/shared/utils/filtres-url'
+import { nomAffichableDUnCompte } from '~~/shared/utils/nom-affichable'
 import { contientLaSaisie } from '~~/shared/utils/recherche-texte'
 
 definePageMeta({

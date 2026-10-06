@@ -29,7 +29,6 @@
           size="sm"
           :to="`/editions/${editionId}/gestion/stock`"
         />
-        <UIcon name="i-heroicons-shopping-cart" class="text-primary-600 size-6" />
         <ManagementPageHeader :titre="t('gestion.stock.missing_title')" />
       </div>
     </div>
