@@ -71,7 +71,12 @@
         "montage": "Pouze montáž",
         "demontage": "Pouze demontáž",
         "montage-demontage": "Montáž a demontáž"
-      }
+      },
+      "group_motif_email": "Spojeno podle jména A e-mailové adresy, bez společného účtu: ověřte, že jde opravdu o tutéž osobu.",
+      "group_partial": "Neúplné potvrzení",
+      "group_title": "Osoby s více vstupy",
+      "group_validate": "Potvrdit zbývající vstup | Potvrdit {count} zbývající vstupy",
+      "group_validated": "Potvrzen {count} vstup | Potvrzeno {count} vstupů"
     },
     "counters": {
       "connected": "Připojeno",

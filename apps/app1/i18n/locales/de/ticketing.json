@@ -71,7 +71,12 @@
         "montage": "Nur Aufbau",
         "demontage": "Nur Abbau",
         "montage-demontage": "Aufbau und Abbau"
-      }
+      },
+      "group_motif_email": "Über Name UND E-Mail-Adresse zugeordnet, ohne gemeinsames Konto: Bitte prüfen Sie, ob es sich wirklich um dieselbe Person handelt.",
+      "group_partial": "Unvollständiger Einlass",
+      "group_title": "Personen mit mehreren Zugängen",
+      "group_validate": "Verbleibenden Zugang bestätigen | Die {count} verbleibenden Zugänge bestätigen",
+      "group_validated": "{count} Zugang bestätigt | {count} Zugänge bestätigt"
     },
     "counters": {
       "connected": "Verbunden",

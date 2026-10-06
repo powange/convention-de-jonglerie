@@ -71,7 +71,12 @@
         "montage": "Kun opsætning",
         "demontage": "Kun nedtagning",
         "montage-demontage": "Opsætning og nedtagning"
-      }
+      },
+      "group_motif_email": "Sammenkædet på navn OG e-mailadresse, da der ikke findes en fælles konto: kontrollér, at det virkelig er den samme person.",
+      "group_partial": "Ufuldstændig bekræftelse",
+      "group_title": "Personer med flere adgange",
+      "group_validate": "Bekræft den resterende adgang | Bekræft de {count} resterende adgange",
+      "group_validated": "{count} adgang bekræftet | {count} adgange bekræftet"
     },
     "counters": {
       "connected": "Tilsluttet",

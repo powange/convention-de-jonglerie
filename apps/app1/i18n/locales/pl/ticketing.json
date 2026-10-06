@@ -71,7 +71,12 @@
         "montage": "Tylko montaż",
         "demontage": "Tylko demontaż",
         "montage-demontage": "Montaż i demontaż"
-      }
+      },
+      "group_motif_email": "Powiązane na podstawie imienia i nazwiska ORAZ adresu e-mail, wobec braku wspólnego konta: sprawdź, czy to na pewno ta sama osoba.",
+      "group_partial": "Niepełne potwierdzenie",
+      "group_title": "Osoby z kilkoma wejściami",
+      "group_validate": "Potwierdź pozostałe wejście | Potwierdź {count} pozostałe wejścia",
+      "group_validated": "Potwierdzono {count} wejście | Potwierdzono {count} wejścia"
     },
     "counters": {
       "connected": "Połączono",

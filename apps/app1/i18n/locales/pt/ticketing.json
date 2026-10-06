@@ -71,7 +71,12 @@
         "montage": "Apenas montagem",
         "demontage": "Apenas desmontagem",
         "montage-demontage": "Montagem e desmontagem"
-      }
+      },
+      "group_motif_email": "Associadas pelo nome E pelo endereço de e-mail, na falta de uma conta comum: verifique se se trata mesmo da mesma pessoa.",
+      "group_partial": "Validação incompleta",
+      "group_title": "Pessoas com vários acessos",
+      "group_validate": "Validar o acesso restante | Validar os {count} acessos restantes",
+      "group_validated": "{count} acesso validado | {count} acessos validados"
     },
     "counters": {
       "connected": "Conectado",

@@ -66,9 +66,25 @@
       @update:phone="$emit('update:phone', $event)"
     />
 
-    <!-- Boutons d'action -->
-    <div class="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+    <!-- Boutons d'action. Le conteneur suit son bouton : vide, il laisserait un trait et une
+         marge sous la fiche, qu'on lirait comme un bloc qui n'a pas fini de charger. -->
+    <div
+      v-if="organizer.entryValidated"
+      class="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-700"
+    >
+      <!--
+        ⚠️ CETTE CARTE NE VALIDE PLUS, elle ne fait que DÉVALIDER.
+
+        Le pied de la fiche porte désormais la validation pour toutes les natures, et plus
+        seulement pour les billets : deux boutons voisins annonçaient donc deux gestes différents
+        — « Valider l'entrée » et « Valider l'entrée (1) » — alors que le premier déclenchait le
+        second. Le doublon existait même avec UN seul titre, ce que j'avais d'abord manqué.
+
+        📍 La dévalidation reste ici : elle ne concerne que ce titre, et le pied ne sait pas la
+        faire. C'est pourquoi le bouton n'a pas disparu, seulement sa face « valider ».
+      -->
       <UButton
+        v-if="organizer.entryValidated"
         :color="organizer.entryValidated ? 'error' : 'success'"
         :icon="organizer.entryValidated ? 'i-heroicons-x-circle' : 'i-heroicons-check-circle'"
         :loading="validating"
@@ -119,13 +135,20 @@ const props = defineProps<{
   fuseau?: string | null
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   'update:firstName': [value: string | null]
   'update:lastName': [value: string | null]
   'update:email': [value: string | null]
   'update:phone': [value: string | null]
   validate: []
   invalidate: []
+  /**
+   * ⚠️ LA VALIDITÉ DE L'ADRESSE REMONTE, et ce n'est pas un raffinement. Le bouton de cette carte
+   * refusait de valider tant que l'adresse corrigée au guichet était invalide ; il a cédé sa place
+   * au bouton du pied, qui n'a pas cette garde. Sans ce signal, on validerait une entrée avec une
+   * adresse en erreur, sans rien pour l'empêcher.
+   */
+  'update:email-valid': [valide: boolean]
 }>()
 
 const { locale } = useI18n()
@@ -157,4 +180,11 @@ const userInfoSection = ref<InstanceType<typeof TicketingUserInfoSection> | null
 const isEmailValid = computed(() => {
   return userInfoSection.value?.emailInput?.emailValidation?.isValid ?? true
 })
+
+/*
+ * ⚠️ `immediate` : sans lui, le parent n'apprendrait la validité qu'au PREMIER changement. Une
+ * fiche ouverte puis validée sans qu'on touche au champ laisserait le parent sans réponse, et il
+ * devrait supposer — dans un sens ou dans l'autre, c'est une supposition de trop au guichet.
+ */
+watch(isEmailValid, (valide) => emit('update:email-valid', valide), { immediate: true })
 </script>

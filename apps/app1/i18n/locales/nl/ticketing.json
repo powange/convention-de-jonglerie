@@ -71,7 +71,12 @@
         "montage": "Alleen opbouw",
         "demontage": "Alleen afbouw",
         "montage-demontage": "Opbouw en afbouw"
-      }
+      },
+      "group_motif_email": "Gekoppeld op naam ÉN e-mailadres, zonder gedeeld account: controleer of het echt om dezelfde persoon gaat.",
+      "group_partial": "Onvolledige bevestiging",
+      "group_title": "Personen met meerdere toegangen",
+      "group_validate": "Resterende toegang bevestigen | De {count} resterende toegangen bevestigen",
+      "group_validated": "{count} toegang bevestigd | {count} toegangen bevestigd"
     },
     "counters": {
       "connected": "Verbonden",

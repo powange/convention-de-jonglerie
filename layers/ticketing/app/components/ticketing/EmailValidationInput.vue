@@ -3,12 +3,18 @@
     <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
       {{ $t('edition.ticketing.email') }}
     </p>
+    <!--
+      `w-full` : sans lui, `UInput` garde sa largeur propre et une adresse un peu longue sort
+      rognée — « ma.omer.mail@gmail.co… » au guichet, là où l'on vérifie justement l'adresse.
+      C'est le motif de la maison (195 champs du dépôt le portent) ; ce champ-ci l'avait manqué.
+    -->
     <UInput
       :model-value="modelValue"
       type="email"
       :placeholder="$t('edition.ticketing.email')"
       icon="i-heroicons-envelope"
       size="sm"
+      class="w-full"
       :color="emailValidation.isValid ? undefined : 'error'"
       @update:model-value="$emit('update:modelValue', $event)"
     />
