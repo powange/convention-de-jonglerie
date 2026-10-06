@@ -724,7 +724,13 @@
       "reorder_error": "Rækkefølgen kunne ikke gemmes",
       "reorder_up": "Flyt op",
       "loans_description": "Udstyr lånt udefra, som skal hentes og derefter returneres",
-      "missing_description": "Hvad der mangler efter optællingen, og indkøbslisterne til at genanskaffe det"
+      "missing_description": "Hvad der mangler efter optællingen, og indkøbslisterne til at genanskaffe det",
+      "missing_none_complete": "Ingen genstand er endnu talt som komplet.",
+      "missing_reset_count": "Tæl igen ({count})",
+      "missing_reset_count_confirm": "Optællingen af {count} genstand slettes: den vender tilbage til „Skal tælles“. | Optællingen af {count} genstande slettes: de vender tilbage til „Skal tælles“.",
+      "missing_reset_count_done": "{count} genstand skal tælles igen | {count} genstande skal tælles igen",
+      "missing_reset_count_title": "Tæl igen",
+      "missing_tab_complete": "Komplet"
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",

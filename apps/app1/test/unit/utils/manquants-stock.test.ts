@@ -4,6 +4,7 @@ import {
   estAjoutableAUneListe,
   etatDeRachat,
   objetsARacheter,
+  objetsComplets,
   objetsNonComptes,
   quantiteARacheter,
   resumeRachat,
@@ -126,7 +127,63 @@ describe('objetsNonComptes', () => {
   })
 })
 
+describe('objetsComplets', () => {
+  it('garde ce qui est compté au bon compte, surplus compris, groupe par groupe', () => {
+    // Le surplus n'a rien à racheter : il rejoint les objets au complet, comme dans `etatDeRachat`.
+    const liste = objetsComplets([
+      objet({
+        id: 1,
+        name: 'Praticable',
+        quantity: 2,
+        finalQuantity: 5,
+        group: { id: 2, name: 'Scène' },
+      }),
+      objet({ id: 2, name: 'Gobelet', quantity: 10, finalQuantity: 7 }),
+      objet({
+        id: 3,
+        name: 'Enceinte',
+        quantity: 4,
+        finalQuantity: 4,
+        group: { id: 1, name: 'Audio' },
+      }),
+      objet({ id: 4, name: 'Câble', group: { id: 1, name: 'Audio' } }),
+      objet({
+        id: 5,
+        name: 'Micro',
+        quantity: 0,
+        finalQuantity: 0,
+        group: { id: 1, name: 'Audio' },
+      }),
+    ])
+
+    // Ni le manquant (Gobelet) ni le non-compté (Câble).
+    expect(liste.map((o) => o.name)).toEqual(['Enceinte', 'Micro', 'Praticable'])
+  })
+
+  it('classe sur l’enregistré : une saisie non enregistrée ne fait pas changer d’onglet', () => {
+    // Taper « 3 » sur un objet au complet ne doit pas le faire disparaître sous le curseur.
+    const liste = objetsComplets([objet({ quantity: 4, finalQuantity: 4, saisie: 3 })])
+    expect(liste).toHaveLength(1)
+  })
+
+  it('ne retient pas un comptage tapé sur un objet jamais compté', () => {
+    expect(objetsComplets([objet({ quantity: 4, finalQuantity: null, saisie: 4 })])).toEqual([])
+  })
+})
+
 describe('resumeRachat', () => {
+  it('compte les objets au complet, ce que l’onglet annonce', () => {
+    const resume = resumeRachat([
+      objet({ id: 1, quantity: 10, finalQuantity: 7 }),
+      objet({ id: 2, quantity: 4, finalQuantity: 4 }),
+      objet({ id: 3, quantity: 2, finalQuantity: 6 }),
+      objet({ id: 4 }),
+    ])
+
+    expect(resume.complets).toBe(2)
+    expect(resume.objetsManquants + resume.nonComptes + resume.complets).toBe(resume.total)
+  })
+
   it('compte les objets manquants et les exemplaires séparément', () => {
     // Deux nouvelles différentes : combien d'articles sur la liste, et combien d'unités à payer.
     const resume = resumeRachat([
@@ -152,6 +209,7 @@ describe('resumeRachat', () => {
       objetsManquants: 1,
       exemplairesARacheter: 3,
       nonComptes: 2,
+      complets: 0,
       total: 3,
     })
   })
@@ -172,6 +230,7 @@ describe('resumeRachat', () => {
       objetsManquants: 0,
       exemplairesARacheter: 0,
       nonComptes: 0,
+      complets: 0,
       total: 0,
     })
   })
@@ -245,10 +304,12 @@ describe('la saisie du jour ne change pas d’onglet', () => {
       objetsManquants: 1,
       exemplairesARacheter: 3,
       nonComptes: 1,
+      complets: 0,
       total: 2,
     })
     expect(resume.nonComptes).toBe(objetsNonComptes(lignes).length)
     expect(resume.objetsManquants).toBe(objetsARacheter(lignes).length)
+    expect(resume.complets).toBe(objetsComplets(lignes).length)
   })
 
   it('classe les manquants sur l’écart ENREGISTRÉ, pas sur celui qu’on tape', () => {

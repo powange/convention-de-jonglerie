@@ -122,6 +122,22 @@ export function objetsNonComptes(objets: ObjetManquant[]): ObjetManquant[] {
     .sort((a, b) => a.group.name.localeCompare(b.group.name) || a.name.localeCompare(b.name))
 }
 
+/**
+ * Ce qui a été compté et revient au bon compte — surplus compris, puisqu'il n'y a rien à racheter.
+ *
+ * C'est la seule liste d'où l'on puisse RECOMMENCER un comptage. Un objet au complet n'apparaît ni
+ * dans les manquants ni dans les non-comptés : une fois son compte juste enregistré, il sortait de
+ * la page, et plus rien ne permettait de le recompter sans ouvrir son groupe.
+ *
+ * Même tri que les non-comptés, groupe puis nom, et pour la même raison : c'est caisse par caisse
+ * qu'on décide de rouvrir. Sur l'ENREGISTRÉ, comme les deux autres listes.
+ */
+export function objetsComplets(objets: ObjetManquant[]): ObjetManquant[] {
+  return objets
+    .filter((objet) => etatDeRachat(sansSaisie(objet)) === 'complet')
+    .sort((a, b) => a.group.name.localeCompare(b.group.name) || a.name.localeCompare(b.name))
+}
+
 /** Ce que l'en-tête de la page annonce. */
 export interface ResumeRachat {
   /** Combien d'objets distincts manquent, au moins partiellement. */
@@ -130,6 +146,8 @@ export interface ResumeRachat {
   exemplairesARacheter: number
   /** Combien d'objets attendent encore d'être comptés. */
   nonComptes: number
+  /** Combien d'objets ont été comptés au complet — le compteur du quatrième onglet. */
+  complets: number
   /** Combien d'objets en tout dans l'édition. */
   total: number
 }
@@ -146,6 +164,7 @@ export function resumeRachat(objets: ObjetManquant[]): ResumeRachat {
   let objetsManquants = 0
   let exemplairesARacheter = 0
   let nonComptes = 0
+  let complets = 0
 
   for (const objet of objets) {
     // Sur l'ENREGISTRÉ, comme les deux listes qu'il résume. Un résumé qui suivrait la frappe
@@ -157,13 +176,15 @@ export function resumeRachat(objets: ObjetManquant[]): ResumeRachat {
       nonComptes += 1
       continue
     }
-    if (etat === 'manquant') {
-      objetsManquants += 1
-      exemplairesARacheter += quantiteARacheter(enregistre) ?? 0
+    if (etat === 'complet') {
+      complets += 1
+      continue
     }
+    objetsManquants += 1
+    exemplairesARacheter += quantiteARacheter(enregistre) ?? 0
   }
 
-  return { objetsManquants, exemplairesARacheter, nonComptes, total: objets.length }
+  return { objetsManquants, exemplairesARacheter, nonComptes, complets, total: objets.length }
 }
 
 /**

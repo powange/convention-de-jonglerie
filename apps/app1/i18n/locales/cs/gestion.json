@@ -724,7 +724,13 @@
       "reorder_error": "Pořadí nelze uložit",
       "reorder_up": "Posunout nahoru",
       "loans_description": "Vybavení vypůjčené zvenčí, které je třeba vyzvednout a poté vrátit",
-      "missing_description": "Co po inventuře chybí, a nákupní seznamy na dokoupení"
+      "missing_description": "Co po inventuře chybí, a nákupní seznamy na dokoupení",
+      "missing_none_complete": "Zatím žádná položka nebyla spočítána jako kompletní.",
+      "missing_reset_count": "Spočítat znovu ({count})",
+      "missing_reset_count_confirm": "Počet u {count} položky bude smazán: vrátí se do „K spočítání“. | Počet u {count} položek bude smazán: vrátí se do „K spočítání“.",
+      "missing_reset_count_done": "{count} položka ke znovuspočítání | {count} položek ke znovuspočítání",
+      "missing_reset_count_title": "Spočítat znovu",
+      "missing_tab_complete": "Kompletní"
     },
     "ticketing": {
       "access_control_description": "Skenování a ověřování vstupenek u vstupu",

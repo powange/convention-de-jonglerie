@@ -724,7 +724,13 @@
       "reorder_error": "Impossibile salvare l'ordine",
       "reorder_up": "Sposta su",
       "loans_description": "Il materiale prestato dall'esterno, da ritirare e poi restituire",
-      "missing_description": "Ciò che manca dopo il conteggio, e le liste della spesa per ricomprarlo"
+      "missing_description": "Ciò che manca dopo il conteggio, e le liste della spesa per ricomprarlo",
+      "missing_none_complete": "Nessun oggetto è ancora stato contato come completo.",
+      "missing_reset_count": "Ricontare ({count})",
+      "missing_reset_count_confirm": "Il conteggio di {count} oggetto sarà cancellato: tornerà in «Da contare». | Il conteggio di {count} oggetti sarà cancellato: torneranno in «Da contare».",
+      "missing_reset_count_done": "{count} oggetto da ricontare | {count} oggetti da ricontare",
+      "missing_reset_count_title": "Ricontare",
+      "missing_tab_complete": "Completi"
     },
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",

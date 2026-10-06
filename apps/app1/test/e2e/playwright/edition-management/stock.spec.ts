@@ -1,6 +1,6 @@
 import { expect, test } from '@nuxt/test-utils/playwright'
 
-import { apiDelete, apiPost, loadState, updateEdition } from '../helpers'
+import { apiDelete, apiPatch, apiPost, loadState, updateEdition } from '../helpers'
 
 test.describe.serial('Module Stock matériel', () => {
   let stockGroupId: number | null = null
@@ -204,6 +204,74 @@ test.describe.serial('Module Stock matériel', () => {
       expect(exceptions, `exceptions : ${exceptions.join(' | ')}`).toEqual([])
     })
   }
+
+  /**
+   * L'onglet « Au complet » : un objet compté au bon compte s'y retrouve, et l'on peut l'en sortir
+   * pour le recompter.
+   *
+   * Joué dans le navigateur, et pas seulement sur les utils : la sélection, la confirmation et
+   * l'envoi par lots vivent dans la page, et c'est là qu'un objet coché pourrait ne pas être celui
+   * qu'on efface. La ligne est visée par son NOM, jamais par sa position.
+   */
+  test('« Au complet » : remettre à compter un objet compté au bon compte', async ({
+    page,
+    goto,
+  }) => {
+    const { editionId } = loadState()
+    if (!stockItemId) throw new Error('stockItemId manquant')
+
+    // Le compte juste : 5 sur 5 prévus.
+    const compte = await apiPatch(
+      page,
+      `http://localhost:3000/api/editions/${editionId}/stock-items/bulk`,
+      { data: { itemIds: [stockItemId], comptage: [{ id: stockItemId, finalQuantity: 5 }] } }
+    )
+    expect(compte.ok()).toBe(true)
+
+    await goto(`/editions/${editionId}/gestion/stock/missing?onglet=complets`, {
+      waitUntil: 'hydration',
+    })
+
+    const ligne = page.getByRole('row').filter({ hasText: 'Rallonge 10m E2E' })
+    await expect(ligne).toBeVisible({ timeout: 15000 })
+    await ligne.getByRole('checkbox').check()
+
+    await page.getByRole('button', { name: /remettre à compter \(1\)/i }).click()
+    const modale = page.getByRole('dialog')
+    await expect(modale).toBeVisible({ timeout: 5000 })
+    await modale.getByRole('button', { name: /remettre à compter/i }).click()
+
+    // ⚠️ Attendre que la modale se REFERME avant toute autre assertion. Ouverte, elle pose
+    // `aria-hidden` sur le reste de la page : `getByRole('row')` n'y trouve alors plus aucune ligne,
+    // et « la ligne a disparu » se vérifiait à l'instant du clic — avant même l'envoi. La première
+    // version de ce test passait ainsi l'étape, puis lisait la base trop tôt.
+    await expect(modale).toBeHidden({ timeout: 10000 })
+
+    // L'objet quitte l'onglet…
+    await expect(ligne).toHaveCount(0, { timeout: 10000 })
+
+    // …et la base dit « jamais compté », pas « zéro ». Relue jusqu'à stabilisation plutôt qu'une
+    // fois : c'est l'écriture qu'on éprouve, pas la vitesse du serveur.
+    await expect
+      .poll(
+        async () => {
+          const lecture = await page.request.get(
+            `http://localhost:3000/api/editions/${editionId}/stock-comptage`
+          )
+          const objets: { id: number; finalQuantity: number | null }[] =
+            (await lecture.json())?.data?.items ?? []
+          return objets.find((objet) => objet.id === stockItemId)?.finalQuantity
+        },
+        { timeout: 10000 }
+      )
+      .toBeNull()
+
+    // Il est revenu dans « À compter ».
+    await page.getByRole('tab', { name: /à compter/i }).click()
+    await expect(page.getByRole('row').filter({ hasText: 'Rallonge 10m E2E' })).toBeVisible({
+      timeout: 10000,
+    })
+  })
 
   test('availability via API : 3 disponibles maintenant', async ({ page }) => {
     const { editionId } = loadState()

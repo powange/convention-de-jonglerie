@@ -6,8 +6,9 @@
   une fois, pour toute l'édition. Y répondre obligeait jusqu'ici à ouvrir chaque groupe et à faire
   la somme de tête.
 
-  Trois onglets pour trois moments : ce qui manque (on décide), ce qui reste à compter (le travail
-  qui rendrait la décision fiable), et les listes de courses (on achète).
+  Quatre onglets pour quatre moments : ce qui manque (on décide), ce qui reste à compter (le travail
+  qui rendrait la décision fiable), ce qui est au complet (d'où l'on peut recommencer un comptage),
+  et les listes de courses (on achète).
 
   ⚠️ Le deuxième onglet n'est pas un détail d'ergonomie. Un objet jamais compté n'est pas un objet
   complet, et tant qu'il en reste, la liste des manquants est incomplète sans le dire. C'est
@@ -361,7 +362,139 @@
         </UTable>
       </div>
 
-      <!-- ONGLET 3 : les listes de courses -->
+      <!-- ONGLET 3 : ce qui est au complet. Le seul endroit d'où l'on puisse recommencer un
+           comptage : une fois son compte juste enregistré, un objet sortait des deux autres
+           onglets, et plus rien sur cette page ne permettait de le recompter. -->
+      <div v-else-if="ongletActif === 'complets'" class="space-y-3">
+        <div
+          v-if="canManage && tousLesComplets.length > 0"
+          class="flex flex-wrap items-center gap-3"
+        >
+          <UButton
+            size="sm"
+            icon="i-heroicons-arrow-uturn-left"
+            :disabled="identifiantsCompletsSelectionnes.length === 0"
+            @click="remiseConfirmationOuverte = true"
+          >
+            {{
+              t('gestion.stock.missing_reset_count', {
+                count: identifiantsCompletsSelectionnes.length,
+              })
+            }}
+          </UButton>
+        </div>
+
+        <StockFiltresObjets
+          v-if="tousLesComplets.length > 0"
+          v-model:recherche="rechercheComplets"
+          v-model:groupes="groupesComplets"
+          v-model:tags="tagsComplets"
+          :objets="tousLesComplets"
+        />
+
+        <!-- Un onglet vide n'est ici ni une victoire ni un échec : c'est qu'on n'a encore rien
+             compté au complet. Le gris le dit, là où le vert des autres onglets dit « fini ». -->
+        <UiEtatVide
+          v-if="complets.length === 0"
+          :icone="
+            filtresCompletsPoses ? 'i-heroicons-funnel' : 'i-heroicons-clipboard-document-list'
+          "
+          classe-icone="text-gray-400"
+          :titre="
+            filtresCompletsPoses
+              ? t('gestion.stock.filter_no_results')
+              : t('gestion.stock.missing_none_complete')
+          "
+        />
+
+        <!-- `get-row-id` pour la même raison que dans les manquants : une sélection indexée sur
+             les positions désignerait d'autres objets dès que le tableau se réordonne. -->
+        <UTable
+          v-else
+          v-model:sorting="triComplets"
+          v-model:row-selection="selectionComplets"
+          :get-row-id="(objet: any) => String(objet.id)"
+          :data="complets"
+          :columns="colonnesComplets"
+        >
+          <template #choix-header="{ table }">
+            <UCheckbox
+              :model-value="
+                table.getIsSomePageRowsSelected()
+                  ? 'indeterminate'
+                  : table.getIsAllPageRowsSelected()
+              "
+              :aria-label="t('common.select_all')"
+              :ui="{ base: 'cursor-pointer' }"
+              @update:model-value="
+                (coche: boolean | 'indeterminate') => table.toggleAllPageRowsSelected(!!coche)
+              "
+            />
+          </template>
+          <template #choix-cell="{ row }">
+            <UCheckbox
+              :model-value="row.getIsSelected()"
+              :aria-label="t('common.select')"
+              :ui="{ base: 'cursor-pointer' }"
+              @update:model-value="
+                (coche: boolean | 'indeterminate') => row.toggleSelected(!!coche)
+              "
+            />
+          </template>
+          <template #name-cell="{ row }">
+            <div class="flex items-center gap-1.5">
+              <span class="font-medium">{{ row.original.name }}</span>
+              <UPopover
+                v-if="row.original.description?.trim()"
+                mode="hover"
+                :content="{ side: 'top' }"
+              >
+                <UIcon
+                  name="i-heroicons-information-circle"
+                  class="size-4 text-gray-400 shrink-0"
+                />
+                <template #content>
+                  <p class="p-3 text-sm max-w-xs whitespace-pre-wrap">
+                    {{ row.original.description }}
+                  </p>
+                </template>
+              </UPopover>
+            </div>
+          </template>
+          <template #group-cell="{ row }">
+            <span class="text-sm text-gray-500">{{ row.original.group.name }}</span>
+          </template>
+          <template #tags-cell="{ row }">
+            <div v-if="row.original.tags?.length" class="flex flex-wrap gap-1">
+              <StockTagBadge
+                v-for="lien in row.original.tags"
+                :key="lien.tag.id"
+                :tag="lien.tag"
+                size="xs"
+              />
+            </div>
+            <span v-else class="text-sm text-gray-400">—</span>
+          </template>
+          <!-- Modifiable comme dans les deux autres onglets : corriger UN chiffre faux ne doit pas
+               obliger à l'effacer pour le retaper ailleurs. -->
+          <template #compte-cell="{ row }">
+            <UInput
+              v-if="canManage"
+              :model-value="saisieAffichee(row.original.id)"
+              type="number"
+              min="0"
+              class="w-24"
+              :placeholder="t('gestion.stock.count_not_counted')"
+              @update:model-value="(valeur: string | number) => saisir(row.original.id, valeur)"
+            />
+            <span v-else class="tabular-nums">
+              {{ saisieAffichee(row.original.id) || t('gestion.stock.count_not_counted') }}
+            </span>
+          </template>
+        </UTable>
+      </div>
+
+      <!-- ONGLET 4 : les listes de courses -->
       <div v-else class="space-y-4">
         <div
           v-if="canManage || listes.length > 1 || optionsDeTags.length > 0"
@@ -642,6 +775,25 @@
       @cancel="comptageConfirmationOuvert = false"
     />
 
+    <!-- Confirmée : l'effacement ne se défait pas. Le comptage perdu n'est écrit nulle part
+         ailleurs, il faudrait rouvrir les caisses pour le retrouver. -->
+    <UiConfirmModal
+      v-model="remiseConfirmationOuverte"
+      :title="t('gestion.stock.missing_reset_count_title')"
+      :description="
+        t(
+          'gestion.stock.missing_reset_count_confirm',
+          { count: identifiantsCompletsSelectionnes.length },
+          identifiantsCompletsSelectionnes.length
+        )
+      "
+      :confirm-label="t('gestion.stock.missing_reset_count_title')"
+      confirm-color="warning"
+      :loading="remiseEnCours"
+      @confirm="remettreACompter"
+      @cancel="remiseConfirmationOuverte = false"
+    />
+
     <UiConfirmModal
       v-model="confirmationOuverte"
       :title="t('gestion.stock.shopping_delete_title')"
@@ -663,6 +815,7 @@ import { useAuthStore, useEditionStore } from '#imports'
 import {
   comptagesAEnvoyer,
   compteRetenu,
+  effacementsDeComptage,
   nombreEnAttente,
   type LigneComptage,
 } from '../../../../../utils/comptage-stock'
@@ -685,6 +838,7 @@ import {
 } from '../../../../../utils/liste-de-courses'
 import {
   objetsARacheter,
+  objetsComplets,
   objetsNonComptes,
   quantiteARacheter,
   resumeRachat,
@@ -738,7 +892,7 @@ interface ListeDeCourses {
 const objets = ref<ObjetManquant[]>([])
 const listes = ref<ListeDeCourses[]>([])
 const chargement = ref(true)
-const ONGLETS = ['racheter', 'compter', 'listes'] as const
+const ONGLETS = ['racheter', 'compter', 'complets', 'listes'] as const
 type Onglet = (typeof ONGLETS)[number]
 
 /**
@@ -773,6 +927,16 @@ const comptageEnCours = ref(false)
  * réordonner ou filtrer la liste ne déplace pas ce qui est coché.
  */
 const selectionLignes = ref<Record<string, boolean>>({})
+
+/**
+ * La sélection de l'onglet des objets au complet — distincte de celle des manquants.
+ *
+ * Une sélection commune ferait porter un geste par des lignes qu'on ne voit pas : cocher trois
+ * manquants pour une liste de courses, changer d'onglet, et « Remettre à compter » les effacerait.
+ */
+const selectionComplets = ref<Record<string, boolean>>({})
+const remiseConfirmationOuverte = ref(false)
+const remiseEnCours = ref(false)
 
 const modaleOuverte = ref(false)
 const itemIdsAVerser = ref<number[]>([])
@@ -846,6 +1010,10 @@ const rechercheACompter = ref('')
 const groupesACompter = ref<OptionGroupe[]>([])
 const tagsACompter = ref<OptionTag[]>([])
 
+const rechercheComplets = ref('')
+const groupesComplets = ref<OptionGroupe[]>([])
+const tagsComplets = ref<OptionTag[]>([])
+
 // ⚠️ Ces déclarations doivent rester AU-DESSUS du `watch` qui suit. Elles vivaient plus bas, à
 // côté des états de tri : un `watch` évalue sa source dès l'exécution du `setup`, pour enregistrer
 // ses dépendances, et lisait donc des `const` pas encore initialisées. « Cannot access before
@@ -863,6 +1031,15 @@ watch(
   [seulementHorsListe, rechercheManquants, groupesManquants, tagsManquants],
   () => {
     selectionLignes.value = {}
+  },
+  { deep: true }
+)
+
+// Même règle pour l'onglet des objets au complet, où le geste est plus lourd encore : il efface.
+watch(
+  [rechercheComplets, groupesComplets, tagsComplets],
+  () => {
+    selectionComplets.value = {}
   },
   { deep: true }
 )
@@ -918,6 +1095,18 @@ const nonComptes = computed(() =>
     tagsACompter.value
   )
 )
+/** L'onglet avant filtrage : c'est sur lui que les listes déroulantes se construisent. */
+const tousLesComplets = computed(() => objetsComplets(lignes.value))
+
+const complets = computed(() =>
+  appliquerFiltres(
+    tousLesComplets.value,
+    rechercheComplets.value,
+    groupesComplets.value,
+    tagsComplets.value
+  )
+)
+
 const resume = computed(() => resumeRachat(lignes.value))
 const enAttente = computed(() => nombreEnAttente(lignes.value as LigneComptage[]))
 
@@ -936,6 +1125,10 @@ const onglets = computed(() => [
   {
     label: `${t('gestion.stock.missing_tab_count')} (${resume.value.nonComptes})`,
     value: 'compter',
+  },
+  {
+    label: `${t('gestion.stock.missing_tab_complete')} (${resume.value.complets})`,
+    value: 'complets',
   },
   {
     label: `${t('gestion.stock.shopping_lists')} (${listes.value.length})`,
@@ -978,8 +1171,16 @@ const filtresACompterPoses = computed(
     tagsACompter.value.length > 0
 )
 
+const filtresCompletsPoses = computed(
+  () =>
+    rechercheComplets.value.trim() !== '' ||
+    groupesComplets.value.length > 0 ||
+    tagsComplets.value.length > 0
+)
+
 const triManquants = ref<{ id: string; desc: boolean }[]>([{ id: 'name', desc: false }])
 const triACompter = ref<{ id: string; desc: boolean }[]>([{ id: 'name', desc: false }])
+const triComplets = ref<{ id: string; desc: boolean }[]>([{ id: 'name', desc: false }])
 
 /** En-tête cliquable, avec la flèche qui dit le sens du tri en cours. */
 function enTeteTriable(column: Column<ObjetManquant>, libelle: string) {
@@ -1129,6 +1330,22 @@ const colonnesACompter = computed((): TableColumn<ObjetManquant>[] => [
     id: 'compte',
     header: t('gestion.stock.count_counted'),
     enableSorting: false,
+  },
+])
+
+/**
+ * Les colonnes des objets au complet : celles des non-comptés, la case de sélection en tête.
+ *
+ * Le « Compté » se trie ici, à la différence de l'onglet des non-comptés : il porte un nombre sur
+ * chaque ligne, et c'est la colonne où un surplus se repère.
+ */
+const colonnesComplets = computed((): TableColumn<ObjetManquant>[] => [
+  ...(canManage.value ? [{ id: 'choix', header: '', enableSorting: false }] : []),
+  ...colonnesACompter.value.filter((colonne) => colonne.id !== 'compte'),
+  {
+    id: 'compte',
+    accessorFn: compteTriable,
+    header: ({ column }) => enTeteTriable(column, t('gestion.stock.count_counted')),
   },
 ])
 
@@ -1467,6 +1684,80 @@ async function supprimerListe() {
   // liste disparue. L'URL, elle, resterait fausse, et c'est elle qu'on envoie à quelqu'un.
   if (liste && Number(route.query.liste) === liste.id) {
     listeChoisieId.value = listes.value[0]?.id ?? null
+  }
+}
+
+/**
+ * Les objets cochés ET affichés dans l'onglet des objets au complet.
+ *
+ * ⚠️ Le croisement avec ce qu'on voit n'est pas une précaution de style. Une clé de sélection
+ * survit à la disparition de sa ligne : cocher un objet, le recompter en manque et enregistrer le
+ * fait sortir de l'onglet — mais il resterait coché, et « Remettre à compter » effacerait un
+ * comptage qu'on n'a plus sous les yeux. Le geste efface : il ne porte que sur ce qui est visible.
+ */
+const identifiantsCompletsSelectionnes = computed(() => {
+  const affiches = new Set(complets.value.map((objet) => objet.id))
+  return Object.entries(selectionComplets.value)
+    .filter(([id, coche]) => coche && affiches.has(Number(id)))
+    .map(([id]) => Number(id))
+})
+
+/**
+ * Efface le comptage des objets cochés : ils redeviennent « jamais comptés » et repassent dans
+ * l'onglet « À compter ».
+ *
+ * Par lots, parce que le serveur n'en accepte que 200 à la fois et qu'une édition en porte plus.
+ * Un lot refusé arrête la suite : on recharge quand même, pour que l'écran dise ce qui a été
+ * effacé avant l'échec plutôt que de laisser croire que rien ne l'a été.
+ */
+const lotAEffacer = ref<{ id: number; finalQuantity: null }[]>([])
+
+const effacementDUnLot = useApiAction(`/api/editions/${editionId}/stock-items/bulk`, {
+  method: 'PATCH',
+  body: () => ({
+    itemIds: lotAEffacer.value.map((entree) => entree.id),
+    comptage: lotAEffacer.value,
+  }),
+  silentSuccess: true,
+  errorMessages: { default: t('common.error') },
+})
+
+async function remettreACompter() {
+  const ids = identifiantsCompletsSelectionnes.value
+  if (ids.length === 0) return
+
+  remiseEnCours.value = true
+  const effaces: number[] = []
+  try {
+    for (const lot of effacementsDeComptage(ids)) {
+      lotAEffacer.value = lot
+      if ((await effacementDUnLot.execute()) === null) break
+      effaces.push(...lot.map((entree) => entree.id))
+    }
+
+    // Une saisie en cours sur un objet qu'on vient d'effacer le ressusciterait au prochain
+    // enregistrement : elle part avec lui. Celle d'un objet qu'un lot refusé n'a pas effacé reste.
+    saisies.value = Object.fromEntries(
+      Object.entries(saisies.value).filter(([id]) => !effaces.includes(Number(id)))
+    )
+
+    selectionComplets.value = {}
+    await Promise.all([chargerObjets(), chargerListes()])
+
+    if (effaces.length > 0) {
+      useToast().add({
+        title: t(
+          'gestion.stock.missing_reset_count_done',
+          { count: effaces.length },
+          effaces.length
+        ),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+    }
+  } finally {
+    remiseEnCours.value = false
+    remiseConfirmationOuverte.value = false
   }
 }
 

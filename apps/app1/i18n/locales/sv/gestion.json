@@ -724,7 +724,13 @@
       "reorder_error": "Kunde inte spara ordningen",
       "reorder_up": "Flytta upp",
       "loans_description": "Utrustning som lånats utifrån, att hämta och sedan lämna tillbaka",
-      "missing_description": "Vad som saknas efter räkningen, och inköpslistorna för att köpa det igen"
+      "missing_description": "Vad som saknas efter räkningen, och inköpslistorna för att köpa det igen",
+      "missing_none_complete": "Inget föremål har ännu räknats som komplett.",
+      "missing_reset_count": "Räkna igen ({count})",
+      "missing_reset_count_confirm": "Räkningen av {count} föremål raderas: det går tillbaka till ”Att räkna”. | Räkningen av {count} föremål raderas: de går tillbaka till ”Att räkna”.",
+      "missing_reset_count_done": "{count} föremål ska räknas igen | {count} föremål ska räknas igen",
+      "missing_reset_count_title": "Räkna igen",
+      "missing_tab_complete": "Komplett"
     },
     "ticketing": {
       "access_control_description": "Skanna och validera biljetter vid entrén",

@@ -108,6 +108,29 @@ export function comptagesAEnvoyer(lignes: LigneComptage[]): ComptageAEnvoyer[] {
     .map((ligne) => ({ id: ligne.id, finalQuantity: ligne.saisie ?? null }))
 }
 
+/** Ce que le point d'API d'écriture groupée accepte en une fois — sa limite, recopiée ici. */
+export const TAILLE_MAX_LOT_COMPTAGE = 200
+
+/**
+ * L'effacement du comptage de ces objets, découpé en lots que le serveur accepte.
+ *
+ * `null` et non zéro : l'objet redevient « jamais compté », et repasse dans ce qui reste à
+ * compter. Le découpage n'est pas une précaution : une édition porte plus de 300 objets, et la
+ * case « tout sélectionner » de l'onglet des objets au complet les aurait tous envoyés d'un coup,
+ * pour un refus du serveur.
+ */
+export function effacementsDeComptage(
+  ids: readonly number[],
+  taille: number = TAILLE_MAX_LOT_COMPTAGE
+): ComptageAEnvoyer[][] {
+  const uniques = [...new Set(ids)]
+  const lots: ComptageAEnvoyer[][] = []
+  for (let debut = 0; debut < uniques.length; debut += taille) {
+    lots.push(uniques.slice(debut, debut + taille).map((id) => ({ id, finalQuantity: null })))
+  }
+  return lots
+}
+
 /** Combien de saisies attendent d'être enregistrées. Ce que la barre annonce. */
 export function nombreEnAttente(lignes: LigneComptage[]): number {
   return comptagesAEnvoyer(lignes).length

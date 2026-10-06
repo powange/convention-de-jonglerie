@@ -724,7 +724,13 @@
       "reorder_error": "Volgorde kon niet worden opgeslagen",
       "reorder_up": "Omhoog",
       "loans_description": "Van buiten geleend materiaal, op te halen en daarna terug te geven",
-      "missing_description": "Wat na het tellen ontbreekt, en de boodschappenlijsten om het bij te kopen"
+      "missing_description": "Wat na het tellen ontbreekt, en de boodschappenlijsten om het bij te kopen",
+      "missing_none_complete": "Er is nog geen voorwerp als volledig geteld.",
+      "missing_reset_count": "Opnieuw tellen ({count})",
+      "missing_reset_count_confirm": "De telling van {count} voorwerp wordt gewist: het gaat terug naar „Te tellen”. | De telling van {count} voorwerpen wordt gewist: ze gaan terug naar „Te tellen”.",
+      "missing_reset_count_done": "{count} voorwerp opnieuw te tellen | {count} voorwerpen opnieuw te tellen",
+      "missing_reset_count_title": "Opnieuw tellen",
+      "missing_tab_complete": "Volledig"
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",
