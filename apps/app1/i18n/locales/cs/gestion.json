@@ -1141,7 +1141,11 @@
       "amount_from_tiers": "Částka vypočtená z cen",
       "amount_from_tiers_help": "Částka bude sledovat prodeje vybraných cen a opustí řádek „Vstupenky — ostatní výnosy“ místo toho, aby se k němu přičetla.",
       "linked_tiers": "Připojené ceny",
-      "linked_tiers_placeholder": "Vyberte jednu nebo více cen"
+      "linked_tiers_placeholder": "Vyberte jednu nebo více cen",
+      "filter_state": "Stav",
+      "filter_state_advanced": "Zaplaceno předem",
+      "filter_state_all": "Všechny stavy",
+      "filter_state_forecast": "Předpokládané"
     },
     "program": {
       "description": "Sestavte časovou osu ročníku: workshopy, představení a další body programu.",

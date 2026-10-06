@@ -1141,7 +1141,11 @@
       "amount_from_tiers": "Kwota obliczona z cen biletów",
       "amount_from_tiers_help": "Kwota będzie podążać za sprzedażą wybranych cen i opuści wiersz „Bilety — inne przychody”, zamiast się do niego dodawać.",
       "linked_tiers": "Powiązane ceny",
-      "linked_tiers_placeholder": "Wybierz jedną lub więcej cen"
+      "linked_tiers_placeholder": "Wybierz jedną lub więcej cen",
+      "filter_state": "Stan",
+      "filter_state_advanced": "Zaliczkowane",
+      "filter_state_all": "Wszystkie stany",
+      "filter_state_forecast": "Przewidywane"
     },
     "program": {
       "description": "Ułóż oś czasu edycji: warsztaty, pokazy i inne wydarzenia.",

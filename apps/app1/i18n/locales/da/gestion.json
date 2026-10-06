@@ -1141,7 +1141,11 @@
       "amount_from_tiers": "Beløb beregnet ud fra priser",
       "amount_from_tiers_help": "Beløbet følger salget af de valgte priser og forlader linjen »Billetsalg — andre indtægter« i stedet for at lægges til den.",
       "linked_tiers": "Tilknyttede priser",
-      "linked_tiers_placeholder": "Vælg en eller flere priser"
+      "linked_tiers_placeholder": "Vælg en eller flere priser",
+      "filter_state": "Status",
+      "filter_state_advanced": "Lagt ud",
+      "filter_state_all": "Alle statusser",
+      "filter_state_forecast": "Forventede"
     },
     "program": {
       "description": "Sammensæt udgavens tidslinje: workshops, shows og andre programpunkter.",

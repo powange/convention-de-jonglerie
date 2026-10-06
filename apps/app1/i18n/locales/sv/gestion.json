@@ -1141,7 +1141,11 @@
       "amount_from_tiers": "Belopp beräknat från biljettpriser",
       "amount_from_tiers_help": "Beloppet följer försäljningen av de valda biljettpriserna och lämnar raden ”Biljetter — övriga intäkter” i stället för att läggas till den.",
       "linked_tiers": "Kopplade biljettpriser",
-      "linked_tiers_placeholder": "Välj ett eller flera biljettpriser"
+      "linked_tiers_placeholder": "Välj ett eller flera biljettpriser",
+      "filter_state": "Status",
+      "filter_state_advanced": "Förskotterade",
+      "filter_state_all": "Alla statusar",
+      "filter_state_forecast": "Planerade"
     },
     "program": {
       "description": "Sätt samman upplagans tidslinje: workshops, föreställningar och andra moment.",

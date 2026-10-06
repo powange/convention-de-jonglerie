@@ -1141,7 +1141,11 @@
       "amount_from_tiers": "Bedrag berekend uit tarieven",
       "amount_from_tiers_help": "Het bedrag volgt de verkoop van de gekozen tarieven en verlaat de regel “Ticketing — andere opbrengsten” in plaats van er bij op te tellen.",
       "linked_tiers": "Gekoppelde tarieven",
-      "linked_tiers_placeholder": "Kies een of meer tarieven"
+      "linked_tiers_placeholder": "Kies een of meer tarieven",
+      "filter_state": "Status",
+      "filter_state_advanced": "Voorgeschoten",
+      "filter_state_all": "Alle statussen",
+      "filter_state_forecast": "Verwacht"
     },
     "program": {
       "description": "Stel de tijdlijn van de editie samen: workshops, shows en andere momenten.",
