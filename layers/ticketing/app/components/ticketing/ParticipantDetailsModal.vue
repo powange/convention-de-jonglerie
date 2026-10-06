@@ -224,7 +224,10 @@
         <UButton
           color="primary"
           icon="i-heroicons-check"
-          :disabled="paymentMethod === 'check' && !checkNumber.trim()"
+          :disabled="
+            // Aucun mode retenu : on ne poursuit pas sans savoir comment la commande est réglée.
+            paymentMethod === undefined || (paymentMethod === 'check' && !checkNumber.trim())
+          "
           @click="confirmPaymentAndContinue"
         >
           Continuer
@@ -669,7 +672,15 @@ const validating = ref(false)
 const showValidateModal = ref(false)
 const showInvalidateModal = ref(false)
 const showPaymentConfirmModal = ref(false)
-const paymentMethod = ref<'cash' | 'card' | 'check' | null>(null)
+/**
+ * Le mode de paiement, `undefined` tant qu'on n'a rien choisi.
+ *
+ * ⚠️ MÊME RAISON QUE DANS `AddParticipantModal` : `null` est le choix « Non payé », pas l'absence
+ * de choix. Partir de `null` le cochait d'avance, et valider l'entrée d'un billet en attente de
+ * règlement enregistrait un impayé que personne n'avait décidé — alors qu'on venait peut-être
+ * d'encaisser les espèces.
+ */
+const paymentMethod = ref<'cash' | 'card' | 'check' | null | undefined>(undefined)
 const checkNumber = ref('')
 
 // Gestion des informations éditables pour artistes et bénévoles
@@ -898,7 +909,7 @@ const confirmValidateEntry = async () => {
     })
 
     showValidateModal.value = false
-    paymentMethod.value = null
+    paymentMethod.value = undefined
     checkNumber.value = ''
 
     /*
