@@ -288,6 +288,23 @@
                   />
                 </div>
 
+                <!-- Filtre « remise ». Voisin de celui du remboursement, et volontairement
+                     distinct : l'un cherche une dette sur un billet ANNULÉ, l'autre un billet
+                     VIVANT dont on a rendu une partie du prix. -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {{ $t('ticketing.orders.discount_filter_label') }}
+                  </label>
+                  <USelect
+                    v-model="filtres.remise"
+                    :items="remiseOptions"
+                    value-key="value"
+                    size="md"
+                    class="w-full"
+                    :ui="{ content: 'min-w-fit' }"
+                  />
+                </div>
+
                 <!-- Filtre par statut de commande.
                      Placé avant le moyen de paiement, qui en dépend : une commande en attente n'a
                      pas encore de moyen, et une commande annulée n'en a plus de pertinent. -->
@@ -647,7 +664,30 @@
               <!-- Montant + menu actions -->
               <div class="flex items-start gap-2 flex-shrink-0">
                 <div class="text-right">
-                  <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                  <!--
+                    ⚠️ LE CHIFFRE MIS EN AVANT EST CE QUE LA COMMANDE A RÉELLEMENT RAPPORTÉ.
+
+                    Il affichait le montant payé, remise comprise, avec la remise annoncée dessous :
+                    il fallait faire la soustraction de tête pour savoir ce qu'on avait encaissé, et
+                    le plus gros chiffre de la carte était celui qui ne valait plus. Le montant
+                    d'origine reste visible, barré, parce qu'il est ce qu'on rapproche d'un relevé
+                    bancaire — l'effacer ferait disparaître la seule trace de ce qui a été versé.
+
+                    📍 Même traitement que sur une ligne de billet, deux écrans plus bas : la même
+                    question doit se lire de la même façon.
+                  -->
+                  <div
+                    v-if="(order.discountAmount ?? 0) > 0"
+                    class="flex items-baseline justify-end gap-2"
+                  >
+                    <span class="text-sm text-gray-400 dark:text-gray-500 line-through">
+                      {{ money(order.amount) }}
+                    </span>
+                    <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                      {{ money(order.amount - (order.discountAmount ?? 0)) }}
+                    </span>
+                  </div>
+                  <div v-else class="text-2xl font-bold text-primary-600 dark:text-primary-400">
                     {{ money(order.amount) }}
                   </div>
                   <!-- Le montant payé ne baisse pas quand on annule un billet : la part annulée
@@ -660,6 +700,19 @@
                     {{
                       $t('ticketing.orders.order_canceled_part', {
                         amount: money(order.canceledAmount ?? 0),
+                      })
+                    }}
+                  </p>
+                  <!-- La remise est déjà déduite du chiffre en avant ; cette ligne dit COMBIEN a
+                       été rendu, ce que le prix barré seul ne donne qu'au prix d'une soustraction.
+                       Elle sert aussi d'explication au trait barré, qui autrement intriguerait. -->
+                  <p
+                    v-if="(order.discountAmount ?? 0) > 0"
+                    class="text-xs text-blue-600 dark:text-blue-400"
+                  >
+                    {{
+                      $t('ticketing.orders.order_discount_part', {
+                        amount: money(order.discountAmount ?? 0),
                       })
                     }}
                   </p>
@@ -819,9 +872,58 @@
                 <!-- Montant + statut + menu actions -->
                 <div class="flex items-start gap-2 flex-shrink-0">
                   <div class="text-right flex flex-col items-end gap-1">
-                    <div class="font-bold text-lg text-primary-600 dark:text-primary-400">
+                    <!--
+                      ⚠️ LE PRIX BARRÉ RESTE AFFICHÉ. Ne montrer que le net ferait disparaître la
+                      remise de l'écran : on lirait un billet à 15 € sans savoir qu'il en valait 20,
+                      et la question « pourquoi ce tarif ne correspond pas ? » n'aurait pas de
+                      réponse visible. Le montant payé reste le chiffre mis en avant.
+                    -->
+                    <div v-if="aUneRemise(item)" class="flex items-baseline gap-2">
+                      <span class="text-sm text-gray-400 dark:text-gray-500 line-through">
+                        {{ money(getItemTotalAmount(item)) }}
+                      </span>
+                      <span class="font-bold text-lg text-primary-600 dark:text-primary-400">
+                        {{ money(montantNetDeLaLigne(item)) }}
+                      </span>
+                    </div>
+                    <div v-else class="font-bold text-lg text-primary-600 dark:text-primary-400">
                       {{ money(getItemTotalAmount(item)) }}
                     </div>
+                    <!--
+                      ⚠️ QUI A ACCORDÉ LA REMISE, ET QUAND. La trace était enregistrée sans être
+                      lisible nulle part — or c'est elle, et elle seule, qui justifie un encaissé
+                      plus bas que le tarif affiché. Sans nom ni date, la remise se lit comme une
+                      anomalie de données plutôt que comme une décision.
+                    -->
+                    <!--
+                      ⚠️ LE `v-if` EST SUR L'ENVELOPPE, et il était sur la pastille : le composant
+                      flottant se montait alors pour chaque ligne SANS remise, avec un contenu vide.
+                      Rien ne se voyait, et c'est bien le problème — un millier de lignes, un
+                      millier d'enveloppes inutiles.
+
+                      ⚠️ UN POPOVER ET NON UNE INFOBULLE. L'infobulle s'ouvrait au survol et ne
+                      s'attrapait pas : impossible d'en sélectionner le contenu, et rien n'annonçait
+                      qu'il y avait quelque chose à lire. Le popover s'ouvre au CLIC — d'où le
+                      curseur en main, qui dit qu'il y a un geste à faire.
+                    -->
+                    <UPopover v-if="aUneRemise(item)">
+                      <UBadge
+                        color="info"
+                        variant="soft"
+                        class="cursor-pointer"
+                        icon="i-heroicons-receipt-percent"
+                      >
+                        {{ $t('ticketing.orders.discount_badge') }} · −{{
+                          money(remiseDeLaLigne(item))
+                        }}
+                      </UBadge>
+
+                      <template #content>
+                        <div class="p-3 max-w-xs text-sm text-gray-700 dark:text-gray-200">
+                          {{ origineDeLaRemise(item) }}
+                        </div>
+                      </template>
+                    </UPopover>
                     <UBadge
                       :color="
                         item.state === 'Processed'
@@ -872,6 +974,80 @@
         </div>
       </div>
     </div>
+
+    <!--
+      La REMISE accordée sur un billet.
+
+      ⚠️ L'ENCART D'EXPLICATION N'EST PAS DÉCORATIF. « Remise » et « remboursement » se ressemblent
+      assez pour qu'on prenne l'un pour l'autre, et les conséquences diffèrent du tout au tout : ici
+      le billet RESTE VALIDE et le produit de billetterie baisse ; là le billet est annulé et son
+      montant avait déjà quitté les comptes.
+    -->
+    <UModal v-model:open="remiseOuverte" :title="$t('ticketing.orders.discount_modal_title')">
+      <template #body>
+        <div class="space-y-4">
+          <UAlert
+            icon="i-heroicons-information-circle"
+            color="info"
+            variant="soft"
+            :description="$t('ticketing.orders.discount_help')"
+          />
+
+          <div v-if="billetEnCours" class="text-sm text-gray-600 dark:text-gray-400">
+            <span class="font-medium text-gray-900 dark:text-white">{{ billetEnCours.name }}</span>
+            ·
+            {{ money(prixDuBilletEnCours) }}
+          </div>
+
+          <UFormField
+            :label="$t('ticketing.orders.discount_field_label')"
+            :help="$t('ticketing.orders.discount_max', { amount: money(prixDuBilletEnCours) })"
+            :error="
+              remiseEnCentimes === null
+                ? $t('ticketing.orders.discount_max', { amount: money(prixDuBilletEnCours) })
+                : undefined
+            "
+          >
+            <UInput
+              v-model="remiseEnEuros"
+              type="text"
+              inputmode="decimal"
+              placeholder="0,00"
+              class="w-full"
+              @keyup.enter="validerLaRemise"
+            />
+          </UFormField>
+
+          <!--
+            Le NET est montré avant de valider : c'est le chiffre qui comptera, et le lire ici
+            évite de découvrir après coup qu'on s'est trompé d'un facteur dix.
+          -->
+          <p v-if="remiseEnCentimes !== null" class="text-sm text-gray-600 dark:text-gray-400">
+            {{ money(prixDuBilletEnCours) }} − {{ money(remiseEnCentimes) }} =
+            <span class="font-bold text-primary-600 dark:text-primary-400">
+              {{ money(prixDuBilletEnCours - remiseEnCentimes) }}
+            </span>
+          </p>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex justify-end gap-2 w-full">
+          <UButton color="neutral" variant="ghost" @click="remiseOuverte = false">
+            {{ $t('common.cancel') }}
+          </UButton>
+          <UButton
+            color="primary"
+            icon="i-heroicons-check"
+            :loading="remiseEnCours"
+            :disabled="remiseEnCentimes === null"
+            @click="validerLaRemise"
+          >
+            {{ $t('common.save') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
 
     <!-- Modal QR Code -->
     <UModal v-model:open="isQrModalOpen" title="QR Code du billet">
@@ -1267,6 +1443,40 @@
               {{ money(stats.amountsByPaymentMethod.refunded) }}
             </p>
           </div>
+
+          <!--
+            Les REMISES, sous le total comme l'annulé — mais pour la raison INVERSE.
+
+            ⚠️ L'annulé est HORS du total : son argent n'a jamais été gagné. Une remise, elle, est
+            DÉJÀ DÉDUITE du total, puisqu'elle porte sur un billet vivant dont on ne compte que le
+            net. Ce chiffre ne retranche donc rien — il dit combien a été rendu, ce que le total
+            seul ne peut pas montrer puisqu'il n'affiche que ce qui reste. D'où le libellé, qui le
+            précise : sans lui, on soustrairait une seconde fois de tête.
+          -->
+          <div
+            v-if="
+              stats?.amountsByPaymentMethod?.discounted &&
+              stats.amountsByPaymentMethod.discounted > 0
+            "
+            class="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
+          >
+            <div class="flex items-center gap-3">
+              <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <UIcon name="i-heroicons-receipt-percent" class="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p class="font-medium text-gray-900 dark:text-white">
+                  {{ $t('ticketing.orders.stats_discounted_title') }}
+                </p>
+                <p class="text-xs text-gray-600 dark:text-gray-400">
+                  {{ $t('ticketing.orders.stats_discounted_help') }}
+                </p>
+              </div>
+            </div>
+            <p class="text-lg font-bold text-blue-600">
+              −{{ money(stats.amountsByPaymentMethod.discounted) }}
+            </p>
+          </div>
         </div>
       </template>
     </UModal>
@@ -1492,6 +1702,8 @@ import { logoDuFournisseur, nomDuFournisseur } from '../../../../../utils/ticket
 import { fetchOrders, type Order } from '../../../../../utils/ticketing/orders'
 import { fetchTiers, type TicketingTier } from '../../../../../utils/ticketing/tiers'
 
+import { aUneRemise, montantNetDeLaLigne, remiseDeLaLigne } from '~~/shared/utils/remise-de-ligne'
+
 const { money } = useEditionCurrency()
 
 const route = useRoute()
@@ -1572,6 +1784,33 @@ const options = ref<TicketingOption[]>([])
  * Deux valeurs seulement : tout, ou ce qu'on doit. « Déjà remboursé » n'est une question que
  * personne ne pose — on cherche les dettes ouvertes, pas celles qui sont soldées.
  */
+/** Les trois états du filtre « remise ». `all` n'est pas un filtre : c'est son absence. */
+const remiseOptions = computed(() => [
+  { value: 'all', label: $t('ticketing.orders.discount_filter_all') },
+  { value: 'avec', label: $t('ticketing.orders.discount_filter_with') },
+  { value: 'sans', label: $t('ticketing.orders.discount_filter_without') },
+])
+
+/**
+ * « Remise de 2,00 € accordée par Emma Omer le 6 octobre ».
+ *
+ * 📍 Le nom peut manquer : `discountedById` est une référence MOLLE — un identifiant sans relation
+ * — et le compte peut avoir été supprimé ou fusionné. On le dit alors sans nom plutôt que d'écrire
+ * « accordée par null », et la date, elle, reste.
+ */
+const origineDeLaRemise = (item: any) => {
+  const montant = money(remiseDeLaLigne(item))
+  const date = item.discountedAt ? formatDate(item.discountedAt) : ''
+  const nom = [item.discountedBy?.firstName, item.discountedBy?.lastName]
+    .filter(Boolean)
+    .join(' ')
+    .trim()
+
+  return nom
+    ? $t('ticketing.orders.discount_by', { amount: montant, name: nom, date })
+    : $t('ticketing.orders.discount_by_unknown', { amount: montant, date })
+}
+
 const refundOptions = computed(() => [
   { label: $t('ticketing.orders.refund_filter_all'), value: 'all' },
   { label: $t('ticketing.orders.refund_filter_due'), value: 'du' },
@@ -1725,6 +1964,41 @@ const getItemMenuItems = (item: any) => {
         onSelect: () => showValidateModal(item),
       },
     ])
+  }
+
+  /*
+   * Groupe 2 bis : la REMISE.
+   *
+   * ⚠️ ELLE N'EST PAS UNE ANNULATION, et le menu doit le faire sentir : le billet reste valide, il
+   * donne toujours droit d'entrée, et seule une partie du prix repart. C'est pourquoi elle vit à
+   * part du groupe « annuler / rembourser » juste en dessous.
+   *
+   * 📍 Grisée sur un billet annulé : son montant a déjà quitté les comptes en entier, et une remise
+   * par-dessus le soustrairait une seconde fois. Le serveur refuse ; l'écran grise plutôt que de
+   * laisser tenter — comme il le fait déjà pour « rétablir un billet remboursé », juste en dessous.
+   */
+  if (!isSpecialType) {
+    const remises: any[] = [
+      {
+        label: aUneRemise(item)
+          ? $t('ticketing.orders.discount_edit')
+          : $t('ticketing.orders.discount_add'),
+        icon: 'i-heroicons-receipt-percent',
+        disabled: item.state === 'Canceled',
+        onSelect: () => ouvrirLaRemise(item),
+      },
+    ]
+
+    if (aUneRemise(item)) {
+      remises.push({
+        label: $t('ticketing.orders.discount_remove'),
+        icon: 'i-heroicons-x-mark',
+        color: 'warning' as const,
+        onSelect: () => enregistrerLaRemise(item, 0),
+      })
+    }
+
+    items.push(remises)
   }
 
   // Groupe 3 : annuler le billet, et dire si on a rendu l'argent.
@@ -1923,6 +2197,85 @@ const { execute: executerRemboursement } = useApiAction(
     },
   }
 )
+
+/**
+ * La REMISE accordée sur un billet.
+ *
+ * ⚠️ À NE PAS CONFONDRE AVEC LE REMBOURSEMENT juste au-dessus, qui porte sur un billet ANNULÉ et
+ * n'a aucun effet comptable — l'annulation a déjà tout retiré avant lui. Une remise porte sur un
+ * billet VIVANT et se déduit, elle, du produit de billetterie.
+ *
+ * Même motif que ses voisines : une référence tenue dans un `ref`, que l'URL et le corps relisent
+ * au moment de l'appel.
+ */
+const remiseOuverte = ref(false)
+/** La saisie, en EUROS. La conversion en centimes se fait au dernier moment, à l'envoi. */
+const remiseEnEuros = ref('')
+const remiseDemandee = ref(0)
+
+/** Le prix de référence : c'est lui que la remise ne peut pas dépasser. */
+const prixDuBilletEnCours = computed(() => getItemTotalAmount(billetEnCours.value))
+
+/**
+ * Les centimes saisis, ou `null` si la saisie n'est pas un montant recevable.
+ *
+ * ⚠️ `Math.round` et non une troncature : `parseFloat('12.10') * 100` vaut 1209.9999999999998 en
+ * virgule flottante, et `Math.trunc` rendrait 1209 — un centime perdu à chaque remise, invisible
+ * jusqu'au rapprochement bancaire.
+ */
+const remiseEnCentimes = computed(() => {
+  const saisie = remiseEnEuros.value.replace(',', '.').trim()
+  if (saisie === '') return 0
+
+  const euros = Number.parseFloat(saisie)
+  if (!Number.isFinite(euros) || euros < 0) return null
+
+  const centimes = Math.round(euros * 100)
+  return centimes > prixDuBilletEnCours.value ? null : centimes
+})
+
+const ouvrirLaRemise = (item: any) => {
+  billetEnCours.value = item
+  // On rouvre sur la remise EXISTANTE plutôt que sur un champ vide : modifier une remise de 5 €
+  // commence par voir qu'elle vaut 5 €, et l'effacer est un geste de moins que la ressaisir.
+  const remise = remiseDeLaLigne(item)
+  remiseEnEuros.value = remise > 0 ? (remise / 100).toFixed(2) : ''
+  remiseOuverte.value = true
+}
+
+const { execute: executerLaRemise, loading: remiseEnCours } = useApiAction(
+  () => `/api/editions/${editionId}/ticketing/order-items/${billetEnCours.value?.id}/discount`,
+  {
+    method: 'PATCH',
+    body: () => ({ discountAmount: remiseDemandee.value }),
+    errorMessages: { default: $t('ticketing.orders.discount_error') },
+    onSuccess: async () => {
+      useToast().add({
+        title:
+          remiseDemandee.value > 0
+            ? $t('ticketing.orders.discount_saved')
+            : $t('ticketing.orders.discount_removed'),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+      remiseOuverte.value = false
+      await loadOrders()
+    },
+  }
+)
+
+const enregistrerLaRemise = (item: any, centimes: number) => {
+  billetEnCours.value = item
+  remiseDemandee.value = centimes
+  executerLaRemise()
+}
+
+const validerLaRemise = () => {
+  // Le bouton est déjà désactivé dans ce cas ; la garde protège la touche Entrée.
+  if (remiseEnCentimes.value === null) return
+  remiseDemandee.value = remiseEnCentimes.value
+  executerLaRemise()
+}
 
 const basculerAnnulation = (item: any, annuler: boolean) => {
   billetEnCours.value = item

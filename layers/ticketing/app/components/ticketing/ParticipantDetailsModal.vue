@@ -59,6 +59,8 @@
             @update:email-valid="noterLaValiditeDuCourriel(index, $event)"
             @demander-validation="demanderLaValidationGlobale()"
             @demander-devalidation="demanderLaDevalidation(index, $event)"
+            @demander-remboursement="ouvrirLaConfirmationDeRemboursement"
+            @remise-rendue="(itemId, rendue) => emit('remise-rendue', itemId, rendue)"
             @refund="(itemId, refunded, portee) => emit('refund', itemId, refunded, portee)"
           />
         </div>
@@ -148,12 +150,21 @@
   -->
   <UiConfirmModal
     v-model="confirmationDuRemboursement"
-    :title="$t('edition.ticketing.refund_confirm_title')"
+    :title="
+      remboursementDemande?.nature === 'remise'
+        ? $t('edition.ticketing.discount_confirm_title')
+        : $t('edition.ticketing.refund_confirm_title')
+    "
     :description="
-      $t('edition.ticketing.refund_confirm_description', {
-        amount: money(sommeDue ?? 0),
-        name: nomDuPorteur,
-      })
+      remboursementDemande?.nature === 'remise'
+        ? $t('edition.ticketing.discount_confirm_description', {
+            amount: money(remboursementDemande?.montant ?? 0),
+            name: remboursementDemande?.porteur ?? '',
+          })
+        : $t('edition.ticketing.refund_confirm_description', {
+            amount: money(remboursementDemande?.montant ?? 0),
+            name: remboursementDemande?.porteur ?? '',
+          })
     "
     :confirm-label="$t('edition.ticketing.refund_mark_done')"
     confirm-color="warning"
@@ -498,6 +509,13 @@ const emit = defineEmits<{
       checkNumber?: string
     },
   ]
+  /**
+   * L'argent d'une REMISE a-t-il été rendu ?
+   *
+   * ⚠️ Un signal distinct de `refund`, parce que le serveur a deux points d'API : rembourser un
+   * billet vivant est refusé — la remise ne solde pas la même somme que l'annulation.
+   */
+  'remise-rendue': [itemId: number, rendue: boolean]
   /** La nature accompagne l'identifiant, pour la même raison. */
   invalidate: [type: 'ticket' | 'volunteer' | 'artist' | 'organizer', participantId: number]
 }>()
@@ -775,70 +793,41 @@ watch(
   }
 )
 
-/**
- * Le billet scanné, quand c'en est un.
- *
- * Les autres lignes de la commande sont dans `participantItems` ; celle-ci est celle qu'on vient
- * de présenter à la porte, et c'est d'elle qu'on parle quand on rend de l'argent.
- */
-const billetScanne = computed(() => {
-  if (!props.participant || !('ticket' in props.participant)) return null
-  return props.participant.ticket
-})
-
-/**
- * La somme due à la personne, ou `null` s'il n'y a rien à rendre.
- *
- * Calculée par le serveur (`montantARembourser`, dans `remboursement-du.ts`) et non ici : la règle
- * tient en trois conditions dont une piégeuse — annuler une commande remplace son statut « payée »
- * par « annulée », et seul le moyen de paiement témoigne encore qu'elle l'était. La recopier à
- * l'écran, c'était s'exposer à ce qu'elle diverge du jour où le serveur la corrigerait.
- */
-const montantARembourser = computed(() => billetScanne.value?.refundDue ?? null)
-
-/**
- * Ce que doit la COMMANDE entière, rendu par le serveur.
- *
- * ⚠️ LE DÉFAUT QUE CELA CORRIGE. L'écran n'annonçait que la ligne scannée : sur la commande 937 de
- * la base de développement, il réclamait 34 € pour un billet d'entrée alors que quatre repas
- * annulés, soit 24 € de plus, restaient dus. Le bénévole rendait 34 €, la personne repartait, et
- * la dette restait — sans que rien ne l'ait signalée.
- */
-const detteDeLaCommande = computed(() => billetScanne.value?.detteDeLaCommande ?? null)
-
-/**
- * La commande se solde-t-elle d'un seul geste ?
- *
- * Non quand ses lignes dues portent des noms différents : une commande groupée paie pour plusieurs
- * participants, et rendre le total à qui présente un billet donnerait à une personne l'argent des
- * autres. Mesuré : la commande 686 porte trois t-shirts à trois noms, sous un même e-mail de
- * payeur. On retombe alors sur la ligne scannée, et chacune se solde quand elle se présente.
- */
-const soldeToutLaCommande = computed(
-  () => !!detteDeLaCommande.value && !detteDeLaCommande.value.nomsMultiples
-)
-
-/** La somme réellement annoncée au guichet, et celle que le bouton va solder. */
-const sommeDue = computed(() => {
-  if (soldeToutLaCommande.value) {
-    const total = detteDeLaCommande.value?.total ?? 0
-    return total > 0 ? total : null
-  }
-  return montantARembourser.value
-})
-
 const confirmationDuRemboursement = ref(false)
 
-/** Le nom de qui présente le billet, pour que la question désigne une personne et pas « ce billet ». */
-const nomDuPorteur = computed(() => {
-  const porteur = billetScanne.value?.user
-  return [porteur?.firstName, porteur?.lastName].filter(Boolean).join(' ').trim()
-})
+/**
+ * Ce que le billet demandeur a transmis : son identifiant, la portée, le montant et le porteur.
+ *
+ * ⚠️ IL FAUT QUE LA DEMANDE PORTE TOUT CELA. Le parent le calculait depuis son `participant`, qui
+ * est `null` en mode groupé — la question aurait annoncé « 0,00 € à » sans nom, et le geste
+ * n'aurait visé aucun billet.
+ */
+const remboursementDemande = ref<{
+  itemId: number
+  nature: 'annulation' | 'remise'
+  portee: 'billet' | 'commande'
+  montant: number
+  porteur: string
+} | null>(null)
+
+const ouvrirLaConfirmationDeRemboursement = (demande: typeof remboursementDemande.value) => {
+  remboursementDemande.value = demande
+  confirmationDuRemboursement.value = true
+}
 
 const confirmerLeRemboursement = () => {
   confirmationDuRemboursement.value = false
-  if (billetScanne.value)
-    emit('refund', billetScanne.value.id, true, soldeToutLaCommande.value ? 'commande' : 'billet')
+  const demande = remboursementDemande.value
+  if (demande) {
+    /*
+     * ⚠️ DEUX DETTES, DEUX POINTS D'API. Le serveur refuse de « rembourser » un billet vivant :
+     * appeler le mauvais rendrait une erreur 400 au moment précis où l'on a les espèces en main,
+     * devant la personne.
+     */
+    if (demande.nature === 'remise') emit('remise-rendue', demande.itemId, true)
+    else emit('refund', demande.itemId, true, demande.portee)
+  }
+  remboursementDemande.value = null
 }
 
 // Calcule le montant total d'un item (billet + options)

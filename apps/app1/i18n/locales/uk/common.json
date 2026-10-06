@@ -406,7 +406,14 @@
       "volunteer_management": "Управління волонтерами",
       "same_as_buyer": "Так само, як у покупця",
       "selected_count": "Вибрано {n} учасника | Вибрано {n} учасників",
-      "validate_entry_count": "Підтвердити вхід ({count})"
+      "validate_entry_count": "Підтвердити вхід ({count})",
+      "discount_already_done": "Знижку вже повернуто",
+      "discount_amount_label": "Знижка до повернення",
+      "discount_confirm_description": "Підтверджуєте, що повернули {amount} особі {name}? Квиток залишається дійсним.",
+      "discount_confirm_title": "Підтвердити повернення знижки",
+      "discount_mark_done": "Знижку повернуто",
+      "discount_still_valid": "Цей квиток не скасовано: він і далі дає право на вхід.",
+      "discount_undo": "Скасувати дію"
     },
     "ticketing_title": "Продаж квитків",
     "useful_links": "Корисні посилання",

@@ -406,7 +406,14 @@
       "volunteer_management": "Frivilligstyring",
       "same_as_buyer": "Samme som køber",
       "selected_count": "{n} deltager valgt | {n} deltagere valgt",
-      "validate_entry_count": "Bekræft adgang ({count})"
+      "validate_entry_count": "Bekræft adgang ({count})",
+      "discount_already_done": "Rabat allerede tilbagebetalt",
+      "discount_amount_label": "Rabat til tilbagebetaling",
+      "discount_confirm_description": "Bekræfter du, at du har givet {amount} tilbage til {name}? Billetten er stadig gyldig.",
+      "discount_confirm_title": "Bekræft tilbagebetaling af rabatten",
+      "discount_mark_done": "Rabat tilbagebetalt",
+      "discount_still_valid": "Denne billet er ikke annulleret: den giver stadig adgang.",
+      "discount_undo": "Fortryd"
     },
     "ticketing_title": "Billetsystem",
     "useful_links": "Nyttige links",

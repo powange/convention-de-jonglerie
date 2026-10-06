@@ -3,6 +3,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { alternativesMotCle, motsClesDeLaRequete } from '#server/utils/recherche-mots-cles'
 import { ETATS_DE_BILLET_ANNULE } from '#server/utils/ticketing/billets-qui-comptent'
+import { resoudreLesValidateurs } from '#server/utils/ticketing/nom-du-validateur'
 import { billetARembourser, montantARembourser } from '#server/utils/ticketing/remboursement-du'
 import { validatePagination, validateEditionId } from '#server/utils/validation-helpers'
 import {
@@ -10,6 +11,7 @@ import {
   articlesRetenus,
   filtresDArticlesActifs,
 } from '~~/shared/utils/articles-de-commande-retenus'
+import { montantNetDeLaLigne, remiseDeLaLigne } from '~~/shared/utils/remise-de-ligne'
 
 interface CustomFieldAnswer {
   name: string
@@ -64,6 +66,8 @@ export default wrapApiHandler(
     const optionIds = optionIdsParam ? optionIdsParam.split(',').map((id) => parseInt(id)) : []
     const entryStatus = (query.entryStatus as string) || 'all'
     const refundStatus = (query.refundStatus as string) || 'all'
+    /** « avec » / « sans » remise, ou `all`. Voir la condition plus bas. */
+    const discountStatus = (query.discountStatus as string) || 'all'
     const paymentMethodsParam = (query.paymentMethods as string) || ''
     const paymentMethods = paymentMethodsParam
       ? paymentMethodsParam
@@ -211,6 +215,19 @@ export default wrapApiHandler(
         itemsConditions.push(billetARembourser())
       }
 
+      /*
+       * « Avec remise ».
+       *
+       * ⚠️ `gt: 0` ET NON `not: 0` : une remise négative ne devrait jamais être en base — le point
+       * d'API la refuse — mais si une donnée abîmée en portait une, `not: 0` la ferait passer pour
+       * une remise accordée. On cherche ce qui a été rendu, pas ce qui diffère de zéro.
+       */
+      if (discountStatus === 'avec') {
+        itemsConditions.push({ discountAmount: { gt: 0 } })
+      } else if (discountStatus === 'sans') {
+        itemsConditions.push({ discountAmount: { lte: 0 } })
+      }
+
       // Ajouter le filtre par options (mode OU - au moins une des options sélectionnées)
       if (optionIds.length > 0) {
         itemsConditions.push({
@@ -285,8 +302,6 @@ export default wrapApiHandler(
       const avecCriteres = (conditions: any[]) =>
         conditions.length > 0 ? { editionId, AND: conditions } : { editionId }
 
-      /** Les statistiques ne sont calculées qu'en l'absence de recherche : elles n'en ont pas. */
-      const filtresSansRecherche = avecCriteres(criteres)
       // Les clauses de recherche rejoignent les autres critères plutôt que de s'imbriquer dans un
       // `AND` de plus : une recherche vide — ou réduite à des espaces — n'en produit aucune, et
       // la liste reste alors celle de tous les résultats, ce qui est le bon défaut ICI (l'écran
@@ -386,21 +401,37 @@ export default wrapApiHandler(
        * Annulé = billet `Canceled` OU commande annulée (`Refunded`), exactement comme
        * `aggregateTicketingItems` côté trésorerie : les deux écrans doivent tomber d'accord.
        */
+      /*
+       * ⚠️ LE NET, REMISE DÉDUITE — comme la trésorerie. Le commentaire ci-dessus dit déjà que les
+       * deux écrans doivent tomber d'accord sur ce qu'est un billet annulé ; la remise appelle la
+       * même exigence. Sommer le brut ici afficherait un encaissé supérieur à celui de la
+       * trésorerie, et l'on chercherait l'écart dans la trésorerie, qui aurait raison.
+       */
       const prixDuBillet = (item: {
         amount: number
         selectedOptions: ReadonlyArray<{ amount: number | null }>
-      }) =>
-        item.amount + item.selectedOptions.reduce((sum, option) => sum + (option.amount ?? 0), 0)
+        discountAmount?: number | null
+      }) => montantNetDeLaLigne(item)
 
       const billetAnnule = (order: { status: string }, item: { state: string }) =>
         order.status === 'Refunded' ||
         (ETATS_DE_BILLET_ANNULE as readonly string[]).includes(item.state)
 
-      // Calculer les stats globales en tenant compte des filtres
+      /*
+       * Les statistiques de la sélection AFFICHÉE, recherche comprise.
+       *
+       * ⚠️ ELLES ÉTAIENT SAUTÉES DÈS QU'ON CHERCHAIT, et le client fait `if (response.stats)` :
+       * recevant `null`, il GARDAIT les chiffres d'avant. On ne voyait donc pas des statistiques
+       * vides — on voyait celles de la sélection précédente, ce qui se lit comme un écran qui ne
+       * s'actualise pas, et non comme une absence. Signalé sur une recherche par nom.
+       *
+       * 📍 Rien à craindre pour le coût : une recherche RESTREINT l'ensemble. Le cas lourd est
+       * l'absence de filtre, et c'est celui qui était déjà calculé.
+       */
       let stats = null
-      if (!search) {
+      {
         const allOrders = await prisma.ticketingOrder.findMany({
-          where: filtresSansRecherche,
+          where: filtreDesCommandes,
           select: {
             status: true,
             paymentMethod: true,
@@ -417,6 +448,9 @@ export default wrapApiHandler(
                 tierId: true,
                 entryValidated: true,
                 selectedOptions: { select: { optionId: true, amount: true } },
+                // Sans elle, `montantNetDeLaLigne` lit `undefined` et ne retire rien : les
+                // statistiques repasseraient au brut, en silence.
+                discountAmount: true,
               },
             },
           },
@@ -440,6 +474,17 @@ export default wrapApiHandler(
            * ouverts ; il ne dit PAS que l'argent a été rendu — le filtre « À rembourser » le dit.
            */
           refunded: 0,
+          /**
+           * Les REMISES accordées, cumulées. **Déjà déduites du total**, annoncées à part.
+           *
+           * ⚠️ C'est la différence avec `refunded` juste au-dessus, qui est hors du total : une
+           * remise porte sur un billet VIVANT, et `prixDuBillet` rend déjà le net. L'additionner
+           * au total le compterait une seconde fois ; l'en soustraire aussi. Ce chiffre ne sert
+           * qu'à dire COMBIEN a été rendu, puisque le total ne montre que ce qui reste.
+           *
+           * 📍 Les lignes annulées n'y entrent pas : leur montant est déjà écarté en entier.
+           */
+          discounted: 0,
         }
 
         for (const order of allOrders) {
@@ -450,6 +495,10 @@ export default wrapApiHandler(
               amountsByPaymentMethod.refunded += prix
               continue
             }
+
+            // Relevé APRÈS l'écart des lignes annulées, et sans toucher au total : `prix` est déjà
+            // net de la remise.
+            amountsByPaymentMethod.discounted += remiseDeLaLigne(item)
 
             // Un statut inconnu ne rapporte rien, comme en trésorerie : l'additionner au total
             // sans pouvoir le ranger nulle part ferait un détail qui ne retombe plus sur le total.
@@ -493,6 +542,22 @@ export default wrapApiHandler(
        * donc ce que le filtre écarte, plutôt que de le cacher ou de laisser croire que tout y
        * répond.
        */
+      /*
+       * Qui a accordé chaque remise, en UNE requête.
+       *
+       * ⚠️ `discountedById` est une référence MOLLE — un `User.id` sans relation Prisma, comme
+       * `entryValidatedBy` et `refundedById` ses voisines. On ne peut donc pas l'inclure dans la
+       * requête : il faut résoudre les noms à part.
+       *
+       * 📍 Le helper s'appelle « validateurs » parce que c'est l'usage qui l'a fait naître, mais il
+       * ne fait que nommer des utilisateurs. Son propre commentaire raconte qu'il a fallu NEUF
+       * copies de cette règle avant de l'extraire, et qu'elle avait produit deux fois le même
+       * défaut : en écrire une dixième ici serait reprendre exactement ce chemin.
+       */
+      const nomDuRemiseur = await resoudreLesValidateurs(
+        orders.flatMap((order: any) => (order.items ?? []).map((i: any) => i.discountedById))
+      )
+
       const commandesMarquees = orders.map((order) => ({
         ...order,
         /**
@@ -506,8 +571,25 @@ export default wrapApiHandler(
           (sum: number, item: any) => sum + (billetAnnule(order, item) ? prixDuBillet(item) : 0),
           0
         ),
+        /**
+         * Ce qui a été RENDU sur cette commande, remises cumulées.
+         *
+         * Même raison d'être que `canceledAmount` juste au-dessus : `amount` reste ce qui a été
+         * payé — c'est lui qu'on rapproche d'un relevé — et il ne baisse pas d'une remise. Sans
+         * cette ligne, une commande à 12 € dont on a rendu 2 € s'affiche à 12 € et rien ne dit
+         * qu'elle n'en a rapporté que 10.
+         *
+         * 📍 Les lignes ANNULÉES en sont exclues : leur montant a déjà quitté les comptes en
+         * entier, et compter leur remise ici la soustrairait une seconde fois à la lecture.
+         */
+        discountAmount: (order.items ?? []).reduce(
+          (sum: number, item: any) => sum + (billetAnnule(order, item) ? 0 : remiseDeLaLigne(item)),
+          0
+        ),
         items: (order.items ?? []).map((item: any) => ({
           ...item,
+          /** Qui a accordé la remise. `discountedAt` voyage déjà avec le reste de la ligne. */
+          discountedBy: nomDuRemiseur(item.discountedById),
           retenuParLesFiltres: !triDesArticlesActif || articleRetenu(item, filtresDArticles),
           /**
            * La somme qu'on doit encore pour ce billet, ou `null`.
@@ -521,6 +603,10 @@ export default wrapApiHandler(
             state: item.state,
             refunded: item.refunded,
             amount: item.amount,
+            // Le filtre « à rembourser » de cet écran retient désormais les deux dettes : il faut
+            // donc que le montant affiché les connaisse aussi.
+            discountAmount: item.discountAmount,
+            discountPaidBack: item.discountPaidBack,
             selectedOptions: item.selectedOptions,
             order: { status: order.status, paymentMethod: order.paymentMethod },
           }),

@@ -523,6 +523,57 @@ describe('POST /api/editions/[id]/ticketing/search', () => {
       expect(commande.id).toBeNull()
     })
 
+    it('⚠️ annonce la REMISE non rendue comme une somme due', async () => {
+      /*
+       * Le guichet n'affiche son encadré que si `refundDue` n'est pas nul. Une remise accordée sur
+       * une commande réglée est une dette au même titre qu'un billet annulé : sans ce champ, la
+       * personne repart sans son argent et rien à l'écran ne le signale.
+       */
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
+        billetDAda({ amount: 1200, discountAmount: 200, discountPaidBack: false }),
+      ])
+
+      const { results } = (await searchHandler(mockEvent as any)).data
+
+      expect(results.tickets[0].participant.ticket.refundDue).toBe(200)
+    })
+
+    it('⚠️ et RIEN sur une commande pas encore payée', async () => {
+      /*
+       * Une remise y réduit ce qui reste à PAYER : aucun argent n'a à sortir de la caisse.
+       * Annoncer « remise à rendre » ferait ouvrir la caisse pour quelqu'un qui n'a encore rien
+       * versé — et sur une convention, personne ne revérifie le statut de la commande au guichet.
+       */
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
+        billetDAda({
+          amount: 1200,
+          discountAmount: 200,
+          discountPaidBack: false,
+          state: 'Pending',
+          order: {
+            ...billetDAda().order,
+            status: 'Pending',
+            paymentMethod: null,
+          },
+        }),
+      ])
+
+      const { results } = (await searchHandler(mockEvent as any)).data
+
+      expect(results.tickets[0].participant.ticket.refundDue).toBeNull()
+    })
+
+    it('…et plus rien une fois la remise rendue', async () => {
+      // Le témoin négatif : sans lui, un `refundDue` toujours renseigné passerait le test ci-dessus.
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
+        billetDAda({ amount: 1200, discountAmount: 200, discountPaidBack: true }),
+      ])
+
+      const { results } = (await searchHandler(mockEvent as any)).data
+
+      expect(results.tickets[0].participant.ticket.refundDue).toBeNull()
+    })
+
     it('ne construit PAS de table de comptes au prix d’une requête de plus', async () => {
       // La table se bâtit depuis les résultats déjà en main. Une requête supplémentaire ici se
       // paierait sur chaque frappe au guichet.

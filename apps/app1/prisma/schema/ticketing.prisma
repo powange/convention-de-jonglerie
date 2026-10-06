@@ -128,12 +128,12 @@ model TicketingTier {
   customFields      TicketingTierCustomFieldAssociation[]
   meals             TicketingTierMeal[]
   options           TicketingTierOption[]
+  /// Rattachement éventuel à une ligne de trésorerie, qui tire alors son montant de ce tarif.
+  treasuryEntries   TreasuryEntryTier[]
 
   @@unique([externalTicketingId, helloAssoTierId])
   @@index([externalTicketingId])
   @@index([editionId])
-  /// Rattachement éventuel à une ligne de trésorerie, qui tire alors son montant de ce tarif.
-  treasuryEntries     TreasuryEntryTier[]
 }
 
 model TicketingQuota {
@@ -518,6 +518,49 @@ model TicketingOrderItem {
   /// annulées de la production viennent de HelloAsso.
   canceledAt   DateTime?
   canceledById Int?
+
+  /// La REMISE accordée après coup sur ce billet, en centimes.
+  ///
+  /// ⚠️ À NE PAS CONFONDRE AVEC `refunded` JUSTE EN DESSOUS, qui est autre chose. Celui-là
+  /// concerne un billet ANNULÉ : il dit si l'on a rendu l'argent d'une entrée à laquelle la
+  /// personne n'a plus droit. Ici le billet reste VIVANT — droit d'entrée, repas, articles à
+  /// remettre, quotas, tout est inchangé — et l'on rend seulement une partie du prix : un geste
+  /// commercial, une erreur de tarif, un dédommagement.
+  ///
+  /// ⚠️ ET CELLE-CI PÈSE SUR LA TRÉSORERIE, contrairement à `refunded`. Ce dernier n'a aucun effet
+  /// parce que l'annulation a déjà retiré la totalité du montant avant lui. Rien n'a été retiré
+  /// d'un billet vivant : si la remise n'était pas soustraite de l'encaissé, celui-ci resterait au
+  /// prix plein et se tromperait du montant rendu — sans erreur, sans alerte, et le compte ne
+  /// tomberait qu'au bilan.
+  ///
+  /// `0` est l'absence de remise, pas une remise de zéro : les deux se valent ici, et un entier
+  /// évite d'avoir à distinguer `null` de `0` dans chaque somme.
+  ///
+  /// 📍 Le système ENREGISTRE, il ne rembourse pas. HelloAsso ne sait pas rembourser partiellement
+  /// — c'est déjà noté plus bas pour `sourceCanceledAt` — donc le mouvement d'argent se fait à la
+  /// main, et ces colonnes en gardent la trace.
+  discountAmount Int       @default(0)
+  discountedAt   DateTime?
+  discountedById Int?
+
+  /// La remise a-t-elle été RENDUE à la personne, et quand, et par qui ?
+  ///
+  /// ⚠️ ACCORDER N'EST PAS RENDRE, exactement comme annuler n'est pas rembourser. Sur une commande
+  /// déjà réglée, une remise accordée reste de l'argent qu'on doit tant que les espèces ne sont pas
+  /// sorties. Le guichet affiche cette somme et coche cette case devant la personne.
+  ///
+  /// ⚠️ UNE CASE DISTINCTE DE `refunded`, et c'est un choix. Les deux pourraient paraître
+  /// interchangeables — les deux disent « l'argent est sorti » — mais ils ne portent pas sur la
+  /// même somme : `refunded` solde le prix ENTIER d'un billet annulé, celle-ci solde la seule
+  /// remise d'un billet vivant. Un billet remisé puis annulé doit son prix entier MOINS la remise
+  /// déjà rendue ; avec une case unique, rien ne dirait laquelle des deux sommes est sortie, et
+  /// l'on rendrait deux fois.
+  ///
+  /// 📍 Sans objet sur une commande en attente de paiement : la remise y réduit ce qui reste à
+  /// payer, aucun argent ne bouge. `montantARembourser` l'écarte déjà par `commandeReglee`.
+  discountPaidBack     Boolean   @default(false)
+  discountPaidBackAt   DateTime?
+  discountPaidBackById Int?
 
   /// A-t-on rendu l'argent à la personne, et quand, et qui l'a rendu ?
   ///

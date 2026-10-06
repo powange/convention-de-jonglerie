@@ -222,6 +222,22 @@ export const USER_REFERENCES: UserReference[] = [
    */
   { model: 'ticketingOrderItem', field: 'canceledById', group: 'misc', soft: true },
   { model: 'ticketingOrderItem', field: 'refundedById', group: 'misc', soft: true },
+  /**
+   * Qui a accordé la remise sur ce billet.
+   *
+   * `soft` pour la même raison que ses deux voisines. Et la même conséquence si on l'oubliait :
+   * rien ne casserait à la fusion, l'écran cesserait simplement de nommer qui a consenti la
+   * remise — c'est-à-dire la seule chose qui justifie un encaissé plus bas que le tarif affiché.
+   */
+  { model: 'ticketingOrderItem', field: 'discountedById', group: 'misc', soft: true },
+  /**
+   * Qui a RENDU l'argent de la remise, au guichet.
+   *
+   * Distinct de `discountedById` juste au-dessus : l'un a consenti la remise depuis la gestion,
+   * l'autre a sorti les espèces à la porte, et ce n'est pas la même personne. `soft` pour la même
+   * raison que ses voisines — un `User.id` sans relation.
+   */
+  { model: 'ticketingOrderItem', field: 'discountPaidBackById', group: 'misc', soft: true },
   // Journal des mouvements d'entrée. Même raison que le compteur ci-dessus : `SetNull` évite
   // l'erreur de clé étrangère mais efface le nom de qui a scanné. Un journal dont l'auteur
   // disparaît à la première fusion de comptes ne tranche plus aucun désaccord à la porte.

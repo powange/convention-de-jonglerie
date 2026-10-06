@@ -406,7 +406,14 @@
       "volunteer_management": "Gestione volontari",
       "same_as_buyer": "Come l'acquirente",
       "selected_count": "{n} partecipante selezionato | {n} partecipanti selezionati",
-      "validate_entry_count": "Convalida l'ingresso ({count})"
+      "validate_entry_count": "Convalida l'ingresso ({count})",
+      "discount_already_done": "Sconto già restituito",
+      "discount_amount_label": "Sconto da restituire",
+      "discount_confirm_description": "Confermi di aver restituito {amount} a {name}? Il biglietto resta valido.",
+      "discount_confirm_title": "Confermare la restituzione dello sconto",
+      "discount_mark_done": "Sconto restituito",
+      "discount_still_valid": "Questo biglietto non è annullato: dà sempre diritto all'ingresso.",
+      "discount_undo": "Annulla l'operazione"
     },
     "ticketing_title": "Biglietteria",
     "useful_links": "Link utili",
