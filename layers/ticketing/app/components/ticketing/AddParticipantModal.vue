@@ -795,7 +795,13 @@
           <UButton
             v-else
             color="primary"
-            :disabled="loading || (paymentMethod === 'check' && !checkNumber.trim())"
+            :disabled="
+              loading ||
+              // Aucun mode retenu : on ne crée pas une commande dont personne n'a dit comment
+              // elle est réglée. Sans objet sur une commande gratuite, qui n'en demande pas.
+              (!isFreeOrder && paymentMethod === undefined) ||
+              (paymentMethod === 'check' && !checkNumber.trim())
+            "
             :loading="loading"
             @click="submitOrder"
           >
@@ -929,7 +935,15 @@ const currentStep = ref(getInitialStep())
 const participantType = ref<'identified' | 'anonymous'>('identified')
 const loadingTiers = ref(false)
 const error = ref('')
-const paymentMethod = ref<'cash' | 'card' | 'check' | null>(null)
+/**
+ * Le mode de paiement, `undefined` tant qu'on n'a rien choisi.
+ *
+ * ⚠️ `undefined` ET NON `null` : `null` est le mode « Non payé », un choix délibéré qui laisse la
+ * commande en attente de règlement. Partir de `null` revenait à cocher ce choix d'avance — et il
+ * suffisait d'un clic sur « Créer la commande » pour enregistrer un impayé que personne n'avait
+ * décidé, sur une commande qu'on venait peut-être d'encaisser en espèces.
+ */
+const paymentMethod = ref<'cash' | 'card' | 'check' | null | undefined>(undefined)
 const checkNumber = ref('')
 const searchingUser = ref(false)
 const userFound = ref(false)
@@ -1121,7 +1135,7 @@ const canGoNext = computed(() => {
  * c'est-à-dire en attente de règlement — alors qu'il n'y a rien à régler.
  *
  * Le mode est décidé au moment de l'envoi plutôt que porté par un état : `resetForm` remet
- * `paymentMethod` à null, et un observateur ne se redéclencherait pas si le montant n'a pas
+ * `paymentMethod` à `undefined`, et un observateur ne se redéclencherait pas si le montant n'a pas
  * changé entre-temps.
  */
 const isFreeOrder = computed(() => totalAmount.value === 0)
@@ -1486,7 +1500,9 @@ const buildOrderData = () => {
     payerLastName: form.value.payerLastName,
     payerEmail: form.value.payerEmail,
     items: Object.values(itemsByTierAndPrice),
-    paymentMethod: isFreeOrder.value ? 'cash' : paymentMethod.value,
+    // `?? null` : `undefined` disparaîtrait du corps JSON, et le serveur lirait « champ absent »
+    // là où l'on veut dire « non payé ». Le bouton interdit déjà ce cas ; la garde est pour le code.
+    paymentMethod: isFreeOrder.value ? 'cash' : (paymentMethod.value ?? null),
     checkNumber: paymentMethod.value === 'check' ? checkNumber.value : undefined,
   }
 }
@@ -1642,7 +1658,7 @@ const closeModal = () => {
   billetsExistants.value = []
   currentStep.value = getInitialStep() // Retour à l'étape de choix du type ou directement à l'étape 0
   participantType.value = 'identified' // Réinitialiser au type par défaut
-  paymentMethod.value = null
+  paymentMethod.value = undefined
   checkNumber.value = ''
   form.value = {
     payerFirstName: '',

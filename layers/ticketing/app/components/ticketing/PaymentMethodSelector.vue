@@ -218,11 +218,20 @@ import { computed, ref } from 'vue'
 
 const { money } = useEditionCurrency()
 
+/**
+ * Le mode de paiement retenu.
+ *
+ * ⚠️ TROIS ÉTATS ET NON DEUX. `null` est un CHOIX — « Non payé », la commande reste en attente de
+ * règlement —, tandis que `undefined` dit qu'on n'a pas encore choisi. Les confondre, c'est ce
+ * qu'on faisait : « Non payé » apparaissait coché d'avance à l'ouverture, et un clic de trop sur
+ * « Créer la commande » enregistrait un impayé que personne n'avait décidé.
+ */
 export type PaymentMethod = 'cash' | 'card' | 'check' | null
 
 const props = withDefaults(
   defineProps<{
-    modelValue: PaymentMethod
+    /** `undefined` : aucun mode retenu pour l'instant — aucune vignette n'est alors mise en avant. */
+    modelValue?: PaymentMethod
     checkNumber?: string
     amount?: number
     showTitle?: boolean
