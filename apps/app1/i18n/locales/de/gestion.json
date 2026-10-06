@@ -1141,7 +1141,11 @@
       "amount_from_tiers": "Betrag aus Tarifen berechnet",
       "amount_from_tiers_help": "Der Betrag folgt den Verkäufen der gewählten Tarife und verlässt die Zeile „Ticketing — sonstige Erträge“, anstatt sich zu ihr zu addieren.",
       "linked_tiers": "Verknüpfte Tarife",
-      "linked_tiers_placeholder": "Einen oder mehrere Tarife wählen"
+      "linked_tiers_placeholder": "Einen oder mehrere Tarife wählen",
+      "filter_state": "Status",
+      "filter_state_advanced": "Vorgestreckt",
+      "filter_state_all": "Alle Status",
+      "filter_state_forecast": "Geplant"
     },
     "program": {
       "description": "Stellen Sie den Zeitplan der Ausgabe zusammen: Workshops, Shows und weitere Momente.",

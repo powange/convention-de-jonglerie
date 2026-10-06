@@ -1141,7 +1141,11 @@
       "amount_from_tiers": "Сума розрахована за тарифами",
       "amount_from_tiers_help": "Сума буде слідувати продажам обраних тарифів і покине рядок «Квитки — інші доходи», а не додасться до нього.",
       "linked_tiers": "Пов’язані тарифи",
-      "linked_tiers_placeholder": "Виберіть один або декілька тарифів"
+      "linked_tiers_placeholder": "Виберіть один або декілька тарифів",
+      "filter_state": "Стан",
+      "filter_state_advanced": "Оплачено власними",
+      "filter_state_all": "Усі стани",
+      "filter_state_forecast": "Планові"
     },
     "program": {
       "description": "Складіть розклад фестивалю: воркшопи, виступи та інші події.",

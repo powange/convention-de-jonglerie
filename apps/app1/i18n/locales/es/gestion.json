@@ -1141,7 +1141,11 @@
       "amount_from_tiers": "Importe calculado a partir de tarifas",
       "amount_from_tiers_help": "El importe seguirá las ventas de las tarifas elegidas y saldrá de la línea «Entradas — otros ingresos» en lugar de sumarse a ella.",
       "linked_tiers": "Tarifas vinculadas",
-      "linked_tiers_placeholder": "Elegir una o varias tarifas"
+      "linked_tiers_placeholder": "Elegir una o varias tarifas",
+      "filter_state": "Estado",
+      "filter_state_advanced": "Adelantadas",
+      "filter_state_all": "Todos los estados",
+      "filter_state_forecast": "Previstas"
     },
     "program": {
       "description": "Componga la cronología de la edición: workshops, espectáculos y otros momentos.",

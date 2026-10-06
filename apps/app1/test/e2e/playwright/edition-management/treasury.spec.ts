@@ -432,6 +432,56 @@ test.describe.serial("Trésorerie d'une édition", () => {
   })
 
   /**
+   * Le filtre par ÉTAT : avancées, prévisionnelles.
+   *
+   * ⚠️ CE QUE LES TESTS UNITAIRES NE VOIENT PAS. La règle de sélection est pure et couverte par
+   * `etats-de-tresorerie.test.ts`. Ce parcours couvre le CÂBLAGE : que le sélecteur existe dans
+   * les DEUX exemplaires des filtres — la barre et la modale du téléphone —, que l'état voyage
+   * dans l'URL, et qu'il survive à un rechargement. Un filtre qui ne se recopie pas par son lien
+   * est un filtre qu'on ne peut pas partager.
+   */
+  test('filtre par état, et le retient dans l’URL', async ({ page, goto }) => {
+    const { editionId } = loadState()
+
+    await page.setViewportSize({ width: 1400, height: 900 })
+    await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
+    await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
+
+    const avant = await lignes(page).count()
+    expect(avant, 'aucune ligne : la trésorerie ne charge pas').toBeGreaterThan(0)
+
+    // Le sélecteur s'expose en `button "Show popup"` — on clique son texte indicatif, qui
+    // n'appartient qu'à lui (leçon de la modale des tarifs).
+    await page.getByText('Tous les états').first().click()
+    await page.getByRole('option', { name: 'Prévisionnelles' }).click()
+    await page.keyboard.press('Escape')
+
+    /*
+     * ⚠️ L'URL D'ABORD : c'est elle qui prouve que le filtre est posé, indépendamment de ce que la
+     * liste contient. Les lignes PRÉVISIONNELLES de l'édition E2E dépendent des parcours voisins,
+     * donc compter les survivantes serait fragile — mais le filtre doit nécessairement RÉDUIRE ou
+     * égaler, jamais augmenter.
+     */
+    await expect
+      .poll(() => new URL(page.url()).searchParams.get('etat'), { timeout: 10000 })
+      .toBe('previsionnelle')
+    const apres = await lignes(page).count()
+    expect(apres, 'le filtre a AUGMENTÉ le nombre de lignes').toBeLessThanOrEqual(avant)
+
+    // Et il survit au rechargement : sans cela le lien ne se partage pas.
+    await goto(`/editions/${editionId}/gestion/treasury?etat=previsionnelle`, {
+      waitUntil: 'hydration',
+    })
+    await expect(page.getByText('Prévisionnelles').first()).toBeVisible({ timeout: 20000 })
+
+    // « Effacer les filtres » le retire aussi, sinon il resterait collé à l'écran.
+    await page.getByRole('button', { name: 'Effacer les filtres' }).click()
+    await expect
+      .poll(() => new URL(page.url()).searchParams.get('etat'), { timeout: 10000 })
+      .toBeNull()
+  })
+
+  /**
    * Les filtres, et ce qu'ils ne doivent PAS emporter avec eux.
    *
    * Un filtre qui se contenterait de masquer des rangées paraîtrait juste tout en mentant sur deux

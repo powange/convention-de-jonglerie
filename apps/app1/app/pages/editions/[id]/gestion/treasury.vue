@@ -64,6 +64,7 @@
         <TreasuryFilters
           v-model:texte="filtreTexte"
           v-model:codes="filtreCodes"
+          v-model:etats="filtreEtats"
           v-model:du="filtreDu"
           v-model:au="filtreAu"
           :choix-de-code="choixDeCode"
@@ -356,6 +357,7 @@
         <TreasuryFilters
           v-model:texte="filtreTexte"
           v-model:codes="filtreCodes"
+          v-model:etats="filtreEtats"
           v-model:du="filtreDu"
           v-model:au="filtreAu"
           :choix-de-code="choixDeCode"
@@ -468,6 +470,7 @@
 </template>
 
 <script setup lang="ts">
+import { correspondAuxEtats } from '~/utils/etats-de-tresorerie'
 import {
   montantPourPdf,
   nomFichierTresorerie,
@@ -624,11 +627,19 @@ const SANS_CODE = 'sans'
 
 const filtreTexte = ref(texteDepuisUrl(route.query.q))
 const filtreCodes = ref<string[]>(listeDepuisUrl(route.query.code))
+/** Les états retenus — « avancee », « previsionnelle ». Vide = tous. */
+const filtreEtats = ref<string[]>(listeDepuisUrl(route.query.etat))
 const filtreDu = ref(texteDepuisUrl(route.query.du))
 const filtreAu = ref(texteDepuisUrl(route.query.au))
 
 const filtreActif = computed(() =>
-  Boolean(filtreTexte.value || filtreCodes.value.length || filtreDu.value || filtreAu.value)
+  Boolean(
+    filtreTexte.value ||
+    filtreCodes.value.length ||
+    filtreEtats.value.length ||
+    filtreDu.value ||
+    filtreAu.value
+  )
 )
 
 /** La modale des filtres, sur téléphone uniquement. */
@@ -640,6 +651,7 @@ const nombreDeFiltres = computed(
     [
       Boolean(filtreTexte.value),
       filtreCodes.value.length > 0,
+      filtreEtats.value.length > 0,
       Boolean(filtreDu.value),
       Boolean(filtreAu.value),
     ].filter(Boolean).length
@@ -648,19 +660,21 @@ const nombreDeFiltres = computed(
 function effacerLesFiltres() {
   filtreTexte.value = ''
   filtreCodes.value = []
+  filtreEtats.value = []
   filtreDu.value = ''
   filtreAu.value = ''
 }
 
 // `replace` et non `push` : filtrer n'est pas naviguer. Sans cela, chaque frappe empilerait une
 // entrée d'historique et le bouton « Retour » remonterait la saisie lettre par lettre.
-watch([filtreTexte, filtreCodes, filtreDu, filtreAu], ([q, codes, du, au]) => {
+watch([filtreTexte, filtreCodes, filtreEtats, filtreDu, filtreAu], ([q, codes, etats, du, au]) => {
   router.replace({
     query: {
       ...route.query,
       q: q || undefined,
       // Séparés par des virgules, et absent quand rien n'est choisi : l'URL reste lisible.
       code: codes.length ? codes.join(',') : undefined,
+      etat: etats.length ? etats.join(',') : undefined,
       du: du || undefined,
       au: au || undefined,
     },
@@ -697,6 +711,10 @@ const correspondAuxFiltres = (line: TreasuryLine): boolean => {
     const sonCode = line.code ? String(line.code.id) : SANS_CODE
     if (!filtreCodes.value.includes(sonCode)) return false
   }
+
+  // Les ÉTATS : la règle vit dans `correspondAuxEtats`, qui est pure et testée. C'est elle qui
+  // décide qu'une sélection vide ne retire rien, et qu'un état inconnu ne retient rien.
+  if (!correspondAuxEtats(line, filtreEtats.value)) return false
 
   // Une période écarte nécessairement les lignes sans date : les lignes calculées n'en ont pas par
   // nature, et les entrées antérieures au champ n'en ont pas reçu. Les inclure reviendrait à dire

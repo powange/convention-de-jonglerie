@@ -1141,7 +1141,11 @@
       "amount_from_tiers": "Amount computed from tiers",
       "amount_from_tiers_help": "The amount will follow the sales of the chosen tiers, and will leave the “Ticketing — other income” line instead of adding to it.",
       "linked_tiers": "Linked tiers",
-      "linked_tiers_placeholder": "Choose one or more tiers"
+      "linked_tiers_placeholder": "Choose one or more tiers",
+      "filter_state": "Status",
+      "filter_state_advanced": "Advanced",
+      "filter_state_all": "All statuses",
+      "filter_state_forecast": "Forecast"
     },
     "program": {
       "description": "Build the edition's timeline: workshops, shows and other moments.",

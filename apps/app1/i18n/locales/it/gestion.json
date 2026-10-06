@@ -1141,7 +1141,11 @@
       "amount_from_tiers": "Importo calcolato dalle tariffe",
       "amount_from_tiers_help": "L'importo seguirà le vendite delle tariffe scelte e uscirà dalla riga «Biglietteria — altri ricavi» invece di aggiungersi a essa.",
       "linked_tiers": "Tariffe collegate",
-      "linked_tiers_placeholder": "Scegli una o più tariffe"
+      "linked_tiers_placeholder": "Scegli una o più tariffe",
+      "filter_state": "Stato",
+      "filter_state_advanced": "Anticipate",
+      "filter_state_all": "Tutti gli stati",
+      "filter_state_forecast": "Previste"
     },
     "program": {
       "description": "Componi la cronologia dell'edizione: workshop, spettacoli e altri momenti.",

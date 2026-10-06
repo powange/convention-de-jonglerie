@@ -43,6 +43,27 @@
 
       <!-- Une période, pas un jour : c'est ce qu'on interroge dans une trésorerie. Les deux bornes
            sont indépendantes — renseigner « du » seul se lit « depuis ». -->
+      <!--
+        Les ÉTATS d'une ligne : avancée par quelqu'un, prévisionnelle.
+        Un multi-select et non deux cases à cocher — c'est ce que fait déjà la page d'un groupe de
+        stock pour ses états, et deux cases auraient pris deux fois la place dans une barre qui
+        tient sur une ligne.
+      -->
+      <UFormField
+        :label="t('gestion.treasury.filter_state')"
+        :class="empile ? '' : 'w-full lg:w-56'"
+      >
+        <USelectMenu
+          v-model="etats"
+          multiple
+          :items="choixDEtat"
+          value-key="value"
+          label-key="label"
+          :placeholder="t('gestion.treasury.filter_state_all')"
+          class="w-full"
+        />
+      </UFormField>
+
       <UFormField
         :label="t('gestion.treasury.filter_from')"
         :class="empile ? '' : 'w-full lg:w-48'"
@@ -92,6 +113,17 @@ const texte = defineModel<string>('texte', { required: true })
  */
 const { saisie, appliquer } = useSaisieTemporisee(texte)
 const codes = defineModel<string[]>('codes', { required: true })
+const etats = defineModel<string[]>('etats', { required: true })
+
+/*
+ * Les libellés vivent ici et les valeurs dans `ETATS_DE_TRESORERIE` : la liste du sélecteur ne peut
+ * donc pas proposer un état que le filtre ne sait pas traiter — un test unitaire garde ce lien.
+ */
+const choixDEtat = computed(() => [
+  { value: 'avancee', label: t('gestion.treasury.filter_state_advanced') },
+  { value: 'previsionnelle', label: t('gestion.treasury.filter_state_forecast') },
+])
+
 const du = defineModel<string>('du', { required: true })
 const au = defineModel<string>('au', { required: true })
 

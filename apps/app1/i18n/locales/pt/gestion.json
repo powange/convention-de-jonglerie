@@ -1141,7 +1141,11 @@
       "amount_from_tiers": "Montante calculado a partir de tarifas",
       "amount_from_tiers_help": "O montante seguirá as vendas das tarifas escolhidas e sairá da linha «Bilheteira — outros rendimentos» em vez de se somar a ela.",
       "linked_tiers": "Tarifas associadas",
-      "linked_tiers_placeholder": "Escolher uma ou mais tarifas"
+      "linked_tiers_placeholder": "Escolher uma ou mais tarifas",
+      "filter_state": "Estado",
+      "filter_state_advanced": "Adiantadas",
+      "filter_state_all": "Todos os estados",
+      "filter_state_forecast": "Previstas"
     },
     "program": {
       "description": "Componha a cronologia da edição: workshops, espetáculos e outros momentos.",
