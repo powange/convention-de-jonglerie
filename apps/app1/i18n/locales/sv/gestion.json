@@ -1153,7 +1153,9 @@
       "filter_state_all": "Alla statusar",
       "filter_state_forecast": "Planerade",
       "reimburse_confirm_description": "De {count} posterna som {nom} har lagt ut för, totalt {montant}, markeras som återbetalda på en gång. För att ångra måste varje post öppnas igen.",
-      "reimburse_confirm_title": "Markera dessa utlägg som återbetalda?"
+      "reimburse_confirm_title": "Markera dessa utlägg som återbetalda?",
+      "reimbursed_badge": "Återbetald",
+      "reimbursed_on": "Återbetald den {date}"
     },
     "program": {
       "description": "Sätt samman upplagans tidslinje: workshops, föreställningar och andra moment.",

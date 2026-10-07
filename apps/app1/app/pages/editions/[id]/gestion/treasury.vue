@@ -253,21 +253,47 @@
                 <UBadge v-if="row.original.isForecast" color="neutral" variant="subtle" size="sm">
                   {{ $t('gestion.treasury.entry_forecast') }}
                 </UBadge>
-                <!-- Le nom affiché vient du compte quand il y en a un, du texte libre sinon :
-                   l'un des deux seulement est renseigné, le serveur s'en assure. -->
+                <!--
+                  L'AVANCE : QUI a avancé, puis si c'est soldé.
+
+                  Le nom vient du compte quand il y en a un, du texte libre sinon : l'un des deux
+                  seulement est renseigné, le serveur s'en assure.
+
+                  ⚠️ LA PASTILLE ORANGE RESTE APRÈS LE REMBOURSEMENT. Elle disparaissait, et la
+                  ligne redevenait alors identique à une ligne que personne n'avait avancée : on
+                  perdait l'information qu'il y avait eu une avance, et par qui. Le filtre
+                  « Avancées », lui, retient les deux états — il ne regarde pas `reimbursed` — si
+                  bien que la liste filtrée montrait des lignes dont rien n'expliquait la présence.
+
+                  📍 La pastille verte ne répète donc PAS le nom : il est déjà dans l'orange juste
+                  à côté, et « Avancé par Jean-Luc » suivi de « Remboursé à Jean-Luc » se lirait
+                  comme deux personnes.
+                -->
                 <UBadge
-                  v-if="nomDeLAvance(row.original) && !row.original.reimbursed"
+                  v-if="nomDeLAvance(row.original)"
                   color="warning"
                   variant="subtle"
                   size="sm"
-                  :title="
-                    $t('gestion.treasury.advanced_by_name', { name: nomDeLAvance(row.original) })
-                  "
                 >
                   {{
                     $t('gestion.treasury.advanced_by_name', { name: nomDeLAvance(row.original) })
                   }}
                 </UBadge>
+                <!--
+                  Le survol ne porte la date que si on la connaît : la colonne est arrivée après le
+                  booléen, et les avances soldées avant elle n'en ont pas. Promettre un « remboursé
+                  le … » pour celles-là demanderait de le déduire d'`updatedAt`, qui bouge au
+                  moindre changement de libellé — un chiffre faux et plausible.
+                -->
+                <UTooltip
+                  v-if="nomDeLAvance(row.original) && row.original.reimbursed"
+                  :text="dateDeRemboursementLisible(row.original.reimbursedAt)"
+                  :disabled="!row.original.reimbursedAt"
+                >
+                  <UBadge color="success" variant="subtle" size="sm">
+                    {{ $t('gestion.treasury.reimbursed_badge') }}
+                  </UBadge>
+                </UTooltip>
               </div>
             </template>
 
@@ -665,6 +691,7 @@ interface TreasuryLine {
   operationDate?: string | null
   advancedBy?: PersonneAvance | null
   reimbursed?: boolean
+  reimbursedAt?: string | null
   readOnly: boolean
   settled: number
   pending: number
@@ -718,6 +745,32 @@ const dateDOperation = (valeur: string) =>
     month: '2-digit',
     year: 'numeric',
   })
+
+/**
+ * « Remboursé le 7 octobre 2026 », pour le survol de la pastille verte.
+ *
+ * ⚠️ PAS EN UTC, à la différence de `dateDOperation` juste au-dessus — et la différence est
+ * voulue, pas une incohérence. `operationDate` est une colonne `DATE`, un jour sans heure que
+ * Prisma rend à minuit UTC : la lire dans un autre fuseau la décale d'un jour. `reimbursedAt` est
+ * un INSTANT, celui où quelqu'un a cliqué « Remboursé ». Le fuseau du lecteur est donc le bon : un
+ * virement fait à 23 h à Paris et relu « le lendemain » parce qu'on l'aurait épinglé en UTC serait
+ * faux pour le trésorier qui l'a fait.
+ *
+ * Le fuseau de l'ÉDITION ne conviendrait pas davantage : le remboursement est un acte comptable,
+ * pas un événement sur le site de la convention.
+ *
+ * Rend une chaîne vide sans date — l'infobulle est alors désactivée, et rien ne s'affiche.
+ */
+const dateDeRemboursementLisible = (valeur?: string | null) => {
+  if (!valeur) return ''
+  return t('gestion.treasury.reimbursed_on', {
+    date: new Date(valeur).toLocaleDateString(locale.value, {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }),
+  })
+}
 
 const currency = computed(() => data.value?.currency || DEFAULT_CURRENCY)
 const money = (cents: number) => formatCents(cents, currency.value, locale.value)

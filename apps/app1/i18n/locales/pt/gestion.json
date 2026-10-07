@@ -1153,7 +1153,9 @@
       "filter_state_all": "Todos os estados",
       "filter_state_forecast": "Previstas",
       "reimburse_confirm_description": "Os {count} lançamentos adiantados por {nom}, no total de {montant}, serão marcados como reembolsados de uma só vez. Para voltar atrás, será preciso reabrir cada lançamento.",
-      "reimburse_confirm_title": "Marcar estes adiantamentos como reembolsados?"
+      "reimburse_confirm_title": "Marcar estes adiantamentos como reembolsados?",
+      "reimbursed_badge": "Reembolsado",
+      "reimbursed_on": "Reembolsado em {date}"
     },
     "program": {
       "description": "Componha a cronologia da edição: workshops, espetáculos e outros momentos.",

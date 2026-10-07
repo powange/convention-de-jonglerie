@@ -1153,7 +1153,9 @@
       "filter_state_all": "Všechny stavy",
       "filter_state_forecast": "Předpokládané",
       "reimburse_confirm_description": "{count} záznamů, které zaplatil(a) {nom}, celkem {montant}, bude naráz označeno jako proplacené. Vrátit to zpět lze jen tím, že každý záznam otevřete znovu.",
-      "reimburse_confirm_title": "Označit tyto zálohy jako proplacené?"
+      "reimburse_confirm_title": "Označit tyto zálohy jako proplacené?",
+      "reimbursed_badge": "Proplaceno",
+      "reimbursed_on": "Proplaceno {date}"
     },
     "program": {
       "description": "Sestavte časovou osu ročníku: workshopy, představení a další body programu.",

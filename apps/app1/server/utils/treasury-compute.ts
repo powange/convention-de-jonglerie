@@ -55,6 +55,13 @@ export interface TreasuryLine extends TreasuryAmounts {
   advancedByName?: string | null
   reimbursed?: boolean
   /**
+   * Quand l'avance a été remboursée, pour l'afficher au survol de la pastille.
+   *
+   * ⚠️ `null` ne veut PAS dire « pas remboursé » : les avances soldées avant l'arrivée de la
+   * colonne n'ont pas de date. C'est `reimbursed` qui dit l'état.
+   */
+  reimbursedAt?: Date | string | null
+  /**
    * Le jour où l'argent a bougé, distinct de la date de saisie.
    *
    * `Date` telle que Prisma la rend, chaîne ISO une fois passée sur le réseau — comme
@@ -150,6 +157,8 @@ export interface ManualEntryRow {
   imageUrl?: string | null
   isForecast?: boolean
   reimbursed?: boolean
+  /** Instant du remboursement, ou `null` quand il est antérieur à cette colonne. */
+  reimbursedAt?: Date | string | null
   /** Colonne `DATE` : Prisma la rend à minuit UTC. */
   operationDate?: Date | string | null
   advancedBy?: PersonneAvance | null
@@ -455,6 +464,9 @@ export function computeTreasury(input: ComputeInput): TreasuryReport {
       advancedBy: entry.advancedBy ?? null,
       advancedByName: entry.advancedByName ?? null,
       reimbursed: entry.reimbursed ?? false,
+      // Même piège que la ligne suivante : lue en base et perdue ici, la date ne serait jamais
+      // affichée, et rien ne le signalerait.
+      reimbursedAt: entry.reimbursedAt ?? null,
       // Sans cette ligne, la date était lue en base, puis perdue ici : la colonne de l'écran et la
       // colonne du CSV restaient vides quoi qu'on saisisse, sans qu'aucune erreur ne le dise.
       operationDate: entry.operationDate ?? null,

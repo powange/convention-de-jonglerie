@@ -100,6 +100,19 @@ model TreasuryEntry {
   advancedByName String?           @db.VarChar(150)
   /// L'avance a-t-elle été remboursée à la personne ? Sans objet sans `advancedById`.
   reimbursed     Boolean           @default(false)
+
+  /// QUAND l'avance a été remboursée, pour l'afficher au survol de la pastille.
+  ///
+  /// ⚠️ `NULL` NE VEUT PAS DIRE « PAS REMBOURSÉ » : la colonne est arrivée après le booléen, et les
+  /// avances soldées avant elle n'ont pas de date — 45 lignes au moment de la migration. C'est
+  /// `reimbursed` qui dit l'état, cette colonne ne dit que la date quand on la connaît. Afficher un
+  /// « remboursé le … » déduit de `updatedAt` serait un chiffre faux et plausible : cette colonne
+  /// bouge au moindre changement de libellé.
+  ///
+  /// 📍 Posée et effacée par `dateDuRemboursement` (`server/utils/treasury-guards.ts`), appelée par
+  /// les TROIS points qui écrivent `reimbursed`. Un remboursement déjà daté ne voit pas sa date
+  /// bouger quand on réenregistre la ligne.
+  reimbursedAt   DateTime?
   /// Le jour où l'argent a bougé — celui du ticket de caisse, de la facture, du virement.
   ///
   /// À ne pas confondre avec `createdAt` juste en dessous, qui dit seulement quand la ligne a été

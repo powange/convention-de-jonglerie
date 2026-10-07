@@ -1153,7 +1153,9 @@
       "filter_state_all": "All statuses",
       "filter_state_forecast": "Forecast",
       "reimburse_confirm_description": "The {count} entries advanced by {nom}, totalling {montant}, will be marked as reimbursed all at once. To undo this, you will have to reopen each entry.",
-      "reimburse_confirm_title": "Mark these advances as reimbursed?"
+      "reimburse_confirm_title": "Mark these advances as reimbursed?",
+      "reimbursed_badge": "Reimbursed",
+      "reimbursed_on": "Reimbursed on {date}"
     },
     "program": {
       "description": "Build the edition's timeline: workshops, shows and other moments.",

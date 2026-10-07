@@ -7,6 +7,7 @@ import {
   assertCodeBelongsToEdition,
   assertTarifsRattachables,
   avanceNormalisee,
+  dateDuRemboursement,
 } from '#server/utils/treasury-guards'
 import { deplacerJustificatif, supprimerJustificatif } from '#server/utils/treasury-receipt-files'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
@@ -166,6 +167,12 @@ export default wrapApiHandler(
           operationDate: dateDOperation(data.operationDate),
         }),
         ...avance,
+        /*
+         * La date du remboursement, d'après la BASCULE et non la seule valeur reçue : une ligne
+         * déjà remboursée qu'on réenregistre pour corriger son libellé ne doit pas voir la date du
+         * versement se déplacer à aujourd'hui.
+         */
+        ...dateDuRemboursement(existing.reimbursed, avance.reimbursed),
       },
     })
 

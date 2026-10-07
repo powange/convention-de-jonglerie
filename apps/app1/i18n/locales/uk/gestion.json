@@ -1153,7 +1153,9 @@
       "filter_state_all": "Усі стани",
       "filter_state_forecast": "Планові",
       "reimburse_confirm_description": "{count} записів, сплачених {nom} на загальну суму {montant}, буде разом позначено як відшкодовані. Щоб це скасувати, доведеться відкрити кожен запис знову.",
-      "reimburse_confirm_title": "Позначити ці аванси як відшкодовані?"
+      "reimburse_confirm_title": "Позначити ці аванси як відшкодовані?",
+      "reimbursed_badge": "Відшкодовано",
+      "reimbursed_on": "Відшкодовано {date}"
     },
     "program": {
       "description": "Складіть розклад фестивалю: воркшопи, виступи та інші події.",

@@ -268,6 +268,63 @@ test.describe.serial('Trésorerie — avances à rembourser', () => {
     await expect(carte).not.toContainText(TOTAL_DU)
   })
 
+  test('une avance soldée garde « Avancé par », gagne « Remboursé », et sa date au survol', async ({
+    page,
+  }) => {
+    const { editionId } = loadState()
+
+    /*
+     * Le parcours précédent vient de solder ces trois avances : leur date est donc fraîche. C'est
+     * la seule façon de l'éprouver — les avances soldées AVANT l'arrivée de la colonne n'en ont
+     * pas, et l'écran n'affiche alors pas d'infobulle.
+     */
+    const rapport = await (
+      await page.request.get(`${BASE}/api/editions/${editionId}/treasury`)
+    ).json()
+    const lignes = (rapport?.data ?? rapport)?.lines ?? []
+    const soldee = lignes.find((l: { title?: string }) => l.title === `Avance E2E ${MONTANT_A}`)
+    expect(soldee, 'la ligne avancée est introuvable dans le rapport').toBeTruthy()
+    expect(soldee.reimbursed).toBe(true)
+    /*
+     * ⚠️ L'ASSERTION QUI TIENT TOUT LE RESTE. La date est lue en base puis recopiée dans le
+     * rapport par `treasury-compute` : l'oubli de cette recopie est déjà arrivé pour
+     * `operationDate`, et la colonne restait vide quoi qu'on saisisse, sans qu'aucune erreur ne le
+     * dise. Un test qui ne regarderait que l'écran verrait une infobulle désactivée et passerait.
+     */
+    expect(soldee.reimbursedAt, 'le remboursement n’a pas été daté').toBeTruthy()
+
+    await page.goto(`${BASE}/editions/${editionId}/gestion/treasury`)
+    await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
+
+    const ligne = page.locator('tbody tr').filter({ hasText: `Avance E2E ${MONTANT_A}` })
+    await expect(ligne).toBeVisible({ timeout: 20000 })
+
+    /*
+     * LES DEUX PASTILLES. L'orange disparaissait au remboursement, et la ligne redevenait
+     * identique à une ligne que personne n'avait avancée : on perdait qui avait avancé. Les deux
+     * assertions comptent — la verte seule laisserait réintroduire cette disparition.
+     */
+    await expect(ligne).toContainText(`Avancé par ${pseudo}`)
+    const pastilleVerte = ligne.getByText('Remboursé', { exact: true })
+    await expect(pastilleVerte).toBeVisible()
+
+    // Et le survol donne la date, calculée ici dans le même format que l'écran.
+    await pastilleVerte.hover()
+    const aujourdHui = new Date().toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+    /*
+     * `.first()` : l'infobulle rend son texte DEUX fois — le libellé visible, et une copie que
+     * Reka UI tient hors écran pour les lecteurs d'écran. Sans cela, Playwright refuse en mode
+     * strict, sur un défaut qui n'existe pas.
+     */
+    await expect(page.getByText(`Remboursé le ${aujourdHui}`).first()).toBeVisible({
+      timeout: 10000,
+    })
+  })
+
   test('nettoyer : retirer les lignes créées', async ({ page }) => {
     const { editionId } = loadState()
     /*

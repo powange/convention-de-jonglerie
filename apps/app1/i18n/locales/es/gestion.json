@@ -1153,7 +1153,9 @@
       "filter_state_all": "Todos los estados",
       "filter_state_forecast": "Previstas",
       "reimburse_confirm_description": "Los {count} apuntes adelantados por {nom}, por un total de {montant}, se marcarán como reembolsados de una sola vez. Para deshacerlo, habrá que volver a abrir cada apunte.",
-      "reimburse_confirm_title": "¿Marcar estos adelantos como reembolsados?"
+      "reimburse_confirm_title": "¿Marcar estos adelantos como reembolsados?",
+      "reimbursed_badge": "Reembolsado",
+      "reimbursed_on": "Reembolsado el {date}"
     },
     "program": {
       "description": "Componga la cronología de la edición: workshops, espectáculos y otros momentos.",
