@@ -776,7 +776,8 @@ export async function runAgentExploration(
   // Calculer les limites de contenu dynamiquement selon le context length du modèle
   const dynamicMaxContent = await getMaxContentSizeForProvider(
     aiProvider,
-    configToUse.lmstudioBaseUrl
+    configToUse.lmstudioBaseUrl,
+    configToUse.lmstudioModel
   )
   // Pour l'agent, on répartit le budget : ~40% par page, ~80% total (on garde de la marge pour les itérations)
   const maxPageContentSize = Math.max(

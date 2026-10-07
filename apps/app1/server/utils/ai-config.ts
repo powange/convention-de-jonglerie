@@ -1,3 +1,4 @@
+import { contexteDuModele, type ModeleLocal } from './contexte-du-modele-local'
 import { loggers } from './logger'
 
 import type { ServeurModele } from './fetch-helpers'
@@ -228,7 +229,10 @@ const DEFAULT_CONTEXT_LENGTHS: Record<string, number> = {
  * Récupère le context length du modèle LM Studio via l'API /v1/models
  * Retourne la valeur en cache si disponible et récente
  */
-export async function getLMStudioContextLength(baseUrl: string): Promise<number> {
+export async function getLMStudioContextLength(
+  baseUrl: string,
+  modelId?: string | null
+): Promise<number> {
   const now = Date.now()
 
   // Utiliser le cache si disponible et récent
@@ -240,34 +244,53 @@ export async function getLMStudioContextLength(baseUrl: string): Promise<number>
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), AI_TIMEOUTS.CONTEXT_LENGTH_DETECTION)
 
-    const response = await fetch(`${baseUrl}/v1/models`, {
-      signal: controller.signal,
-    })
+    /*
+     * `/api/v0/models` D'ABORD, et `/v1/models` en secours.
+     *
+     * L'API native rend `loaded_context_length` — ce que le serveur acceptera réellement — ET
+     * `max_context_length`, toujours présent. L'API compatible OpenAI ne rend `context_length` que
+     * modèle CHARGÉ, et LM Studio charge à la demande : au moment de la détection, souvent rien ne
+     * l'est, et l'on retombait alors sur 4096 jetons, soit ~6 200 caractères de contenu.
+     *
+     * Les deux sont interrogées pour ne pas dépendre d'une version de LM Studio : `/api/v0` est
+     * récente, et un serveur plus ancien n'en a pas.
+     */
+    const modelesDe = async (chemin: string) => {
+      const reponse = await fetch(`${baseUrl}${chemin}`, { signal: controller.signal })
+      if (!reponse.ok) return null
+      const corps = await reponse.json()
+      return Array.isArray(corps?.data) ? (corps.data as ModeleLocal[]) : null
+    }
+
+    const modeles = (await modelesDe('/api/v0/models')) ?? (await modelesDe('/v1/models'))
 
     clearTimeout(timeout)
 
-    if (!response.ok) {
-      log.warn(`Impossible de récupérer les modèles LM Studio: ${response.status}`)
+    if (!modeles?.length) {
+      log.warn('Impossible de récupérer les modèles LM Studio')
       return DEFAULT_CONTEXT_LENGTHS.lmstudio
     }
 
-    const data = await response.json()
+    const detecte = contexteDuModele(modeles, modelId, DEFAULT_CONTEXT_LENGTHS.lmstudio)
 
-    // LM Studio retourne { data: [{ id: "...", context_length: 8192, ... }] }
-    if (data.data && Array.isArray(data.data) && data.data.length > 0) {
-      const model = data.data[0]
-      const contextLength =
-        model.context_length || model.max_tokens || DEFAULT_CONTEXT_LENGTHS.lmstudio
+    cachedContextLength = detecte.jetons
+    cacheTimestamp = now
 
-      // Mettre en cache
-      cachedContextLength = contextLength
-      cacheTimestamp = now
-
-      log.info(`Context length LM Studio détecté: ${contextLength} tokens (modèle: ${model.id})`)
-      return contextLength
+    /*
+     * La SOURCE est journalisée, pas seulement la valeur : « 4096 » ne disait pas si le modèle
+     * l'annonçait ou si la détection avait échoué — et c'est toute la différence quand on cherche
+     * pourquoi l'extraction ne voit qu'un huitième de la page.
+     */
+    log.info(
+      `Context length LM Studio: ${detecte.jetons} jetons (source: ${detecte.source}, modèle: ${detecte.modele ?? 'inconnu'})`
+    )
+    if (detecte.source === 'defaut') {
+      log.warn(
+        `LM Studio n'annonce aucun contexte : repli sur ${DEFAULT_CONTEXT_LENGTHS.lmstudio} jetons. ` +
+          `Charger le modèle avant l'extraction, ou relever son contexte dans LM Studio.`
+      )
     }
-
-    return DEFAULT_CONTEXT_LENGTHS.lmstudio
+    return detecte.jetons
   } catch (error: any) {
     if (error.name === 'AbortError') {
       log.warn('Timeout lors de la récupération du context length LM Studio')
@@ -300,10 +323,13 @@ export function calculateMaxContentSize(contextLength: number): number {
  */
 export async function getMaxContentSizeForProvider(
   provider: string,
-  lmstudioBaseUrl?: string
+  lmstudioBaseUrl?: string,
+  // Sans lui, la détection lisait le contexte du PREMIER modèle installé, pas de celui qu'on
+  // interroge : avec plusieurs modèles téléchargés, la valeur venait d'un autre.
+  lmstudioModelId?: string | null
 ): Promise<number> {
   if (provider === 'lmstudio' && lmstudioBaseUrl) {
-    const contextLength = await getLMStudioContextLength(lmstudioBaseUrl)
+    const contextLength = await getLMStudioContextLength(lmstudioBaseUrl, lmstudioModelId)
     const maxContent = calculateMaxContentSize(contextLength)
     log.info(`Max content pour LM Studio: ${maxContent} caractères (context: ${contextLength})`)
     return maxContent
