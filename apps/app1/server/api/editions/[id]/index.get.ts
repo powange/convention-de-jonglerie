@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { optionalAuth } from '#server/utils/auth-utils'
+import { compterMesTachesDeLEdition } from '#server/utils/mes-taches-de-l-edition'
 import { checkAdminMode } from '#server/utils/organizer-management'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { visibiliteDuBenevolat } from '#server/utils/visibilite-benevoles'
@@ -215,9 +216,7 @@ export default wrapApiHandler(
     const tachesActivees = (edition as { tasksEnabled?: boolean }).tasksEnabled === true
     const mesTaches =
       visiteur && tachesActivees
-        ? await prisma.taskAssignment.count({
-            where: { userId: Number(visiteur.id), task: { taskGroup: { editionId } } },
-          })
+        ? await compterMesTachesDeLEdition(prisma, editionId, Number(visiteur.id))
         : 0
 
     return {

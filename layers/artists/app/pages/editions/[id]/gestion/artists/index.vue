@@ -129,10 +129,26 @@
       <!-- Totaux financiers. Ils suivent les filtres du tableau : filtrer par spectacle donne
            le budget de ce spectacle, ce qui est plus utile qu'un total figé de l'édition. -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!--
+          ⚠️ UN VRAI BOUTON QUAND LA CARTE EST CLIQUABLE, et pas un `div` avec un `@click`. Toute
+          la carte est la cible — c'est ce qui rend le lien « voir la liste » inutile —, mais une
+          surface cliquable qui n'est pas un bouton n'est atteignable ni au clavier ni par un
+          lecteur d'écran. `UCard` accepte `as` : la carte DEVIENT le bouton, au lieu d'en contenir
+          un.
+
+          📍 `text-left` : un bouton centre son contenu par défaut, ce qui décalerait ces trois
+          cartes-ci par rapport à leurs voisines.
+        -->
         <UCard
           v-for="total in financialTotals"
           :key="total.label"
-          :class="total.auClic ? 'cursor-pointer hover:shadow-md transition-shadow' : undefined"
+          :as="total.auClic ? 'button' : 'div'"
+          :type="total.auClic ? 'button' : undefined"
+          :class="
+            total.auClic
+              ? 'w-full text-left cursor-pointer hover:shadow-md transition-shadow'
+              : undefined
+          "
           @click="total.auClic?.()"
         >
           <div class="flex items-start gap-3">
@@ -146,15 +162,6 @@
               </p>
               <p v-if="total.hint" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 {{ total.hint }}
-              </p>
-              <!-- Une invitation explicite : une carte cliquable au milieu de trois qui ne le
-                   sont pas ne se devine pas, et le curseur seul ne le dit qu'au survol. -->
-              <p
-                v-if="total.auClic"
-                class="text-xs text-primary-600 dark:text-primary-400 mt-1 inline-flex items-center gap-1"
-              >
-                {{ $t('artists.to_pay_see_list') }}
-                <UIcon name="i-heroicons-arrow-right" class="size-3" />
               </p>
             </div>
           </div>

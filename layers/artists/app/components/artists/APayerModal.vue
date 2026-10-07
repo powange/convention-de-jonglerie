@@ -31,15 +31,31 @@
                 {{ nomCompletDUnCompte(ligne.artiste.user) }}
               </p>
 
+              <!--
+                ⚠️ UN `<a>` AVEC SES CLASSES, ET NON UN `ULink` NU. `ULink` hérite de la couleur de
+                son parent : posé dans un paragraphe gris, l'e-mail et le téléphone s'affichaient
+                exactement comme du texte mort, et rien n'invitait à les toucher. C'est le motif
+                déjà employé par l'espace artiste pour le téléphone d'un responsable de transport.
+
+                📍 `tel:` compte autant que `mailto:` ici : cette liste sert à relancer quelqu'un
+                qu'on doit payer, et on le fait depuis un téléphone au moins aussi souvent que
+                depuis un ordinateur.
+              -->
               <p class="text-xs text-gray-600 dark:text-gray-400 break-all">
-                <ULink :to="`mailto:${ligne.artiste.user.email}`">
+                <a
+                  :href="`mailto:${ligne.artiste.user.email}`"
+                  class="text-primary-600 dark:text-primary-400 hover:underline"
+                >
                   {{ ligne.artiste.user.email }}
-                </ULink>
+                </a>
                 <template v-if="ligne.artiste.user.phone">
                   ·
-                  <ULink :to="`tel:${ligne.artiste.user.phone}`">
+                  <a
+                    :href="`tel:${ligne.artiste.user.phone}`"
+                    class="text-primary-600 dark:text-primary-400 hover:underline"
+                  >
                     {{ ligne.artiste.user.phone }}
-                  </ULink>
+                  </a>
                 </template>
               </p>
 
@@ -49,16 +65,27 @@
                 obligerait à rouvrir chaque fiche. Le tableau de la page, lui, n'en montre qu'une
                 icône — il se parcourt à plusieurs et sur un écran partagé.
               -->
+              <!--
+                ⚠️ CHAQUE NUMÉRO EST NOMMÉ, et les deux sont INDÉPENDANTS. Une suite de chiffres
+                sans étiquette oblige à deviner duquel on parle, au moment précis où l'on recopie
+                vers une banque. Et le BIC vivait dans le paragraphe de l'IBAN : un artiste qui
+                aurait donné l'un sans l'autre n'en voyait aucun des deux.
+              -->
               <p
                 v-if="ligne.artiste.iban"
-                class="text-xs font-mono text-gray-700 dark:text-gray-300 break-all"
+                class="text-xs text-gray-700 dark:text-gray-300 break-all"
               >
-                {{ formaterIbanParGroupes(ligne.artiste.iban) }}
-                <span v-if="ligne.artiste.bic" class="text-gray-500 dark:text-gray-400">
-                  · {{ ligne.artiste.bic }}
-                </span>
+                <span class="text-gray-500 dark:text-gray-400">{{ $t('artists.iban') }} : </span>
+                <span class="font-mono">{{ formaterIbanParGroupes(ligne.artiste.iban) }}</span>
               </p>
-              <p v-else class="text-xs text-amber-600 dark:text-amber-400">
+              <p v-if="ligne.artiste.bic" class="text-xs text-gray-700 dark:text-gray-300">
+                <span class="text-gray-500 dark:text-gray-400">{{ $t('artists.bic') }} : </span>
+                <span class="font-mono">{{ ligne.artiste.bic }}</span>
+              </p>
+              <p
+                v-if="!ligne.artiste.iban && !ligne.artiste.bic"
+                class="text-xs text-amber-600 dark:text-amber-400"
+              >
                 {{ $t('artists.to_pay_no_bank') }}
               </p>
             </div>

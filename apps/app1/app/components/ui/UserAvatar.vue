@@ -1,5 +1,22 @@
 <template>
-  <img :src="displayUrl" :alt="altText" :class="avatarClasses" :style="customSizeStyle" />
+  <!--
+    ⚠️ `@error` EST LE DERNIER RECOURS, ET IL MANQUAIT. `getUserAvatarWithCache` mémorise dans le
+    navigateur, pour 24 h, qu'une image s'est chargée — et court-circuite alors toute reprise. Si le
+    fichier disparaît entre-temps (photo supprimée du disque, hébergeur tiers qui cesse de servir),
+    la décision mise en cache reste « succès », aucune erreur n'est traitée, et l'on affiche le
+    texte de remplacement sur fond vide : « Avatar de BEN SOLAR SOUND CIRKLE » au lieu d'un rond.
+    Constaté le 07/10/2026 sur la liste des artistes à payer.
+
+    📍 Celui-ci ne dépend d'aucun cache : il se déclenche sur l'échec RÉEL du chargement, quelle que
+    soit la raison, et quelle que soit ce que le cache croyait savoir.
+  -->
+  <img
+    :src="displayUrl"
+    :alt="altText"
+    :class="avatarClasses"
+    :style="customSizeStyle"
+    @error="auxInitiales"
+  />
 </template>
 
 <script setup lang="ts">
@@ -32,7 +49,7 @@ const props = withDefaults(defineProps<Props>(), {
   shrink: false,
 })
 
-const { getUserAvatarWithCache } = useAvatar()
+const { getUserAvatarWithCache, generateInitialsAvatar } = useAvatar()
 
 // Mapping des tailles vers les pixels
 const sizeMap = {
@@ -62,12 +79,34 @@ const avatarState = shallowRef(getUserAvatarWithCache(props.user, pixelSize.valu
 watch(
   () => [props.user.id, props.user.emailHash, props.user.profilePicture, pixelSize.value] as const,
   () => {
+    // Nouvelle personne, nouvelle chance : le repli de la précédente ne la concerne pas.
+    repliSurInitiales.value = null
     avatarState.value = getUserAvatarWithCache(props.user, pixelSize.value)
   }
 )
 
+/**
+ * Le repli posé par `@error`, quand le chargement a VRAIMENT échoué.
+ *
+ * Il prime sur l'URL calculée : c'est la seule information qui vienne du navigateur lui-même, et
+ * non d'un cache ou d'une déduction.
+ */
+const repliSurInitiales = ref<string | null>(null)
+
+/**
+ * Passer aux initiales dessinées.
+ *
+ * ⚠️ On ne repose pas le repli s'il est déjà en place : si l'image de repli échouait à son tour —
+ * elle ne le peut pas, c'est une `data:` URI, mais une version future pourrait changer cela —, le
+ * gestionnaire se rappellerait indéfiniment.
+ */
+function auxInitiales() {
+  const initiales = generateInitialsAvatar(props.user.pseudo || '?', pixelSize.value)
+  if (repliSurInitiales.value !== initiales) repliSurInitiales.value = initiales
+}
+
 // URL finale à afficher
-const displayUrl = computed(() => avatarState.value.currentUrl.value)
+const displayUrl = computed(() => repliSurInitiales.value ?? avatarState.value.currentUrl.value)
 
 const altText = computed(() => {
   if (props.user.pseudo) {
