@@ -784,13 +784,23 @@ const faqTabVisible = computed<boolean>(() => {
   return ed.faqEnabled === true && ed.faqPagePublic === true
 })
 
-// Visibilité onglet « Mes tâches » : module activé + utilisateur authentifié.
-// L'endpoint /tasks/mine filtre lui-même par utilisateur, et la page affiche un
-// empty state si l'utilisateur n'a aucune tâche assignée.
+/**
+ * Visibilité de l'onglet « Mes tâches » : module activé, utilisateur connecté, ET au moins une
+ * tâche qui lui est assignée.
+ *
+ * ⚠️ LA TROISIÈME CONDITION EST NOUVELLE. L'onglet s'affichait dès que le module était activé et
+ * renvoyait un état vide à qui n'avait rien d'assigné — soit la grande majorité des visiteurs.
+ * Un onglet qui mène à une page vide envoie chercher une fonctionnalité qu'on n'a pas.
+ *
+ * 📍 `hasMyTasks` est calculé par `/api/editions/[id]`, qui connaît déjà la session : l'onglet ne
+ * déclenche donc aucune requête à lui. Le commentaire de ce point d'API dit pourquoi le compte est
+ * par UTILISATEUR et non par édition.
+ */
 const myTasksTabVisible = computed<boolean>(() => {
   if (!props.edition) return false
   if (!authStore.isAuthenticated) return false
-  return (props.edition as { tasksEnabled?: boolean }).tasksEnabled === true
+  if ((props.edition as { tasksEnabled?: boolean }).tasksEnabled !== true) return false
+  return (props.edition as { hasMyTasks?: boolean }).hasMyTasks === true
 })
 
 // Visibilité onglet carte: le module doit être activé et la carte rendue publique. Reste à avoir

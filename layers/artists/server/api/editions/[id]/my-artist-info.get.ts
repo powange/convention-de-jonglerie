@@ -47,6 +47,13 @@ export default wrapApiHandler(
         invoiceProvided: true,
         feeRequested: true,
         feeProvided: true,
+        // L'artiste relit CE QU'IL A LUI-MÊME CONFIÉ, et peut le corriger depuis son espace.
+        // Ses coordonnées bancaires et ses justificatifs ne sortent jamais de sa propre fiche :
+        // la requête est ancrée sur `editionId_userId`.
+        iban: true,
+        bic: true,
+        reimbursementReceiptUrl: true,
+        consumablesReceiptUrl: true,
         user: {
           select: {
             prenom: true,
@@ -203,6 +210,10 @@ export default wrapApiHandler(
         invoiceProvided: artist.invoiceProvided,
         feeRequested: artist.feeRequested,
         feeProvided: artist.feeProvided,
+        iban: artist.iban,
+        bic: artist.bic,
+        reimbursementReceiptUrl: artist.reimbursementReceiptUrl,
+        consumablesReceiptUrl: artist.consumablesReceiptUrl,
         shows: groupedShows,
         mealSelections: artist.mealSelections.map((ms) => ({
           id: ms.id,

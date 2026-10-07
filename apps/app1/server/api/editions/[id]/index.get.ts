@@ -195,8 +195,35 @@ export default wrapApiHandler(
       maintenant: new Date(),
     })
 
+    /**
+     * Ai-je au moins une tâche assignée sur cette édition ?
+     *
+     * ⚠️ POUR NE PAS OFFRIR UN ONGLET QUI MÈNE À UNE PAGE VIDE. « Mes tâches » s'affichait dès que
+     * le module était activé, et renvoyait un état vide à qui n'avait rien d'assigné — c'est-à-dire
+     * à la grande majorité des visiteurs d'une édition. Même raisonnement que
+     * `volunteersHasFloatingTeam` juste en dessous.
+     *
+     * 📍 PAR UTILISATEUR, et non « cette édition a des tâches ». La règle par utilisateur couvre
+     * les deux cas — sans tâche du tout, personne n'en a — et elle seule ferme le cas gênant :
+     * une édition qui organise cent tâches dont aucune n'est la mienne.
+     *
+     * 📍 Un `count` et non la liste : l'onglet n'a besoin que de « oui ou non », et
+     * `TaskAssignment.userId` est indexé. Rien n'est demandé pour un visiteur anonyme ni pour une
+     * édition sans le module.
+     */
+    const visiteur = optionalAuth(event)
+    const tachesActivees = (edition as { tasksEnabled?: boolean }).tasksEnabled === true
+    const mesTaches =
+      visiteur && tachesActivees
+        ? await prisma.taskAssignment.count({
+            where: { userId: Number(visiteur.id), task: { taskGroup: { editionId } } },
+          })
+        : 0
+
     return {
       ...editionRest,
+      /** Voir le commentaire ci-dessus : l'onglet « Mes tâches » ne s'ouvre que sur du contenu. */
+      hasMyTasks: mesTaches > 0,
       // Ré-aplatir le compte des candidatures (relation déplacée sur Event).
       // `?? 0` : filet de sécurité, editionEvent existe toujours par invariant Edition.id == eventId.
       _count: {

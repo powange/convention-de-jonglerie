@@ -321,4 +321,61 @@ describe('/api/editions/[id] GET', () => {
       expect(result.volunteersHasFloatingTeam).toBe(false)
     })
   })
+
+  /**
+   * L'onglet « Mes tâches » ne doit pas s'ouvrir sur une page vide.
+   *
+   * ⚠️ LE COMPTE EST PAR UTILISATEUR, et c'est ce que ces cas tiennent. « Cette édition a-t-elle
+   * des tâches » aurait laissé l'onglet à qui n'en a aucune parmi les cent de l'édition — le cas
+   * gênant, et le plus fréquent.
+   *
+   * 📍 Les deux derniers cas comptent autant que les deux premiers : ils vérifient qu'AUCUNE
+   * requête n'est faite pour un visiteur anonyme ni pour une édition sans le module. Sans eux, on
+   * ajouterait un `count` sur chaque affichage de chaque page d'édition, pour rien.
+   */
+  describe('mes tâches', () => {
+    const editionAvecModule = (tasksEnabled: boolean) => ({
+      ...mockEdition,
+      tasksEnabled,
+      event: { _count: { volunteerApplications: 0, volunteerTeams: 0 }, volunteerSettings: null },
+    })
+
+    const appeler = async (tasksEnabled: boolean, connecte: boolean, taches = 0) => {
+      global.getRouterParam.mockReturnValue('1')
+      prismaMock.edition.findUnique.mockResolvedValue(editionAvecModule(tasksEnabled))
+      prismaMock.taskAssignment.count.mockResolvedValue(taches)
+      const contexte: Record<string, unknown> = { params: { id: '1' } }
+      if (connecte) contexte.user = { id: 9, pseudo: 'zebulon' }
+      return (await handler({ context: contexte } as any)) as any
+    }
+
+    it('annonce des tâches quand la personne en a au moins une', async () => {
+      const result = await appeler(true, true, 3)
+
+      expect(result.hasMyTasks).toBe(true)
+      expect(prismaMock.taskAssignment.count).toHaveBeenCalledWith({
+        where: { userId: 9, task: { taskGroup: { editionId: 1 } } },
+      })
+    })
+
+    it('⚠️ n’en annonce aucune quand l’édition en a mais pas elle', async () => {
+      const result = await appeler(true, true, 0)
+
+      expect(result.hasMyTasks).toBe(false)
+    })
+
+    it('ne demande rien pour un visiteur anonyme', async () => {
+      const result = await appeler(true, false)
+
+      expect(result.hasMyTasks).toBe(false)
+      expect(prismaMock.taskAssignment.count).not.toHaveBeenCalled()
+    })
+
+    it('ne demande rien quand le module est désactivé', async () => {
+      const result = await appeler(false, true)
+
+      expect(result.hasMyTasks).toBe(false)
+      expect(prismaMock.taskAssignment.count).not.toHaveBeenCalled()
+    })
+  })
 })

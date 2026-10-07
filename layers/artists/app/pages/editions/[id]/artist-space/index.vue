@@ -48,41 +48,245 @@
         </div>
       </UCard>
 
-      <!-- Informations artistes -->
-      <UCard v-if="edition.artistInfo">
-        <template #header>
-          <h2 class="text-lg font-semibold flex items-center gap-2">
-            <UIcon name="i-heroicons-information-circle" class="text-blue-500" />
-            {{ $t('artists.artist_info_title') }}
-          </h2>
-        </template>
+      <!--
+        Les informations de l'organisation et la présence de l'artiste, côte à côte au large.
 
-        <div class="prose prose-sm dark:prose-invert max-w-none">
-          <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
-          <!-- eslint-disable-next-line vue/no-v-html -->
-          <div :class="{ 'line-clamp-4': !artistInfoExpanded }" v-html="artistInfoHtml" />
-          <UButton
-            v-if="!artistInfoExpanded"
-            variant="ghost"
-            color="primary"
-            size="xs"
-            class="mt-2"
-            @click="artistInfoExpanded = true"
-          >
-            {{ $t('common.see_more') }}...
-          </UButton>
-          <UButton
-            v-else
-            variant="ghost"
-            color="primary"
-            size="xs"
-            class="mt-2"
-            @click="artistInfoExpanded = false"
-          >
-            {{ $t('common.see_less') }}
-          </UButton>
-        </div>
-      </UCard>
+        ⚠️ `items-start` : le bloc d'informations est du texte libre, de longueur imprévisible.
+        Sans lui, la grille étire la carte de présence à la hauteur de sa voisine et lui ajoute
+        un grand vide sous ses deux dates.
+
+        📍 LA LARGEUR SUIT LA PRÉSENCE DE LA VOISINE. Le bloc d'informations est facultatif —
+        l'organisation ne le remplit pas toujours. Sans le `col-span-3` de repli, la présence
+        resterait dans son tiers avec deux tiers d'écran vides à sa gauche.
+      -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        <!-- Informations artistes -->
+        <UCard v-if="edition.artistInfo" class="lg:col-span-2">
+          <template #header>
+            <h2 class="text-lg font-semibold flex items-center gap-2">
+              <UIcon name="i-heroicons-information-circle" class="text-blue-500" />
+              {{ $t('artists.artist_info_title') }}
+            </h2>
+          </template>
+
+          <div class="prose prose-sm dark:prose-invert max-w-none">
+            <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <div :class="{ 'line-clamp-4': !artistInfoExpanded }" v-html="artistInfoHtml" />
+            <UButton
+              v-if="!artistInfoExpanded"
+              variant="ghost"
+              color="primary"
+              size="xs"
+              class="mt-2"
+              @click="artistInfoExpanded = true"
+            >
+              {{ $t('common.see_more') }}...
+            </UButton>
+            <UButton
+              v-else
+              variant="ghost"
+              color="primary"
+              size="xs"
+              class="mt-2"
+              @click="artistInfoExpanded = false"
+            >
+              {{ $t('common.see_less') }}
+            </UButton>
+          </div>
+        </UCard>
+
+        <!-- Présence : l'artiste déclare lui-même quand il arrive sur place et quand il repart.
+             C'était jusqu'ici à l'organisateur de le lui demander puis de le ressaisir. -->
+        <UCard data-carte="presence" :class="edition?.artistInfo ? undefined : 'lg:col-span-3'">
+          <template #header>
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-semibold flex items-center gap-2">
+                <UIcon name="i-heroicons-calendar-days" class="text-green-500" />
+                {{ $t('artists.presence_section') }}
+              </h2>
+              <UButton
+                v-if="!editingPresence"
+                icon="i-heroicons-pencil-square"
+                variant="ghost"
+                size="xs"
+                color="neutral"
+                :aria-label="$t('common.edit')"
+                @click="ouvrirEditionPresence"
+              />
+            </div>
+          </template>
+
+          <div class="space-y-3">
+            <div v-if="!editingPresence" class="flex flex-wrap gap-4">
+              <div v-if="artist.arrivalDateTime" class="flex items-center gap-2 text-sm">
+                <UIcon name="i-heroicons-arrow-down-tray" class="text-green-500" />
+                <span class="text-gray-600 dark:text-gray-400">
+                  {{ $t('artists.arrival') }} :
+                  {{ formaterDateHeure(artist.arrivalDateTime, fuseauEdition, locale) }}
+                </span>
+              </div>
+              <div v-if="artist.departureDateTime" class="flex items-center gap-2 text-sm">
+                <UIcon name="i-heroicons-arrow-up-tray" class="text-red-500" />
+                <span class="text-gray-600 dark:text-gray-400">
+                  {{ $t('artists.departure') }} :
+                  {{ formaterDateHeure(artist.departureDateTime, fuseauEdition, locale) }}
+                </span>
+              </div>
+              <p
+                v-if="!artist.arrivalDateTime && !artist.departureDateTime"
+                class="text-sm text-gray-500 italic"
+              >
+                {{ $t('artists.presence_not_declared') }}
+              </p>
+            </div>
+
+            <!--
+              La récupération : la demande de l'artiste ET la réponse de l'organisation.
+
+              ⚠️ UNE SEULE CARTE, PLUS DEUX. « Transport » rendait les deux mêmes lignes, au mot
+              près et sous la même condition, en y ajoutant seulement le responsable et son
+              téléphone. Deux cartes pour une information faisaient lire deux fois la même chose et
+              obligeaient à faire défiler entre la demande et sa réponse. Le responsable est donc
+              remonté ici, et « Transport » a disparu.
+
+              📍 En colonne et non en ligne : cette carte occupe un tiers de la largeur sur grand
+              écran. Un `flex` horizontal y aurait coupé « récupération à la gare » au milieu.
+            -->
+            <div
+              v-if="!editingPresence && (artist.pickupRequired || artist.dropoffRequired)"
+              class="space-y-2 border-t border-gray-100 dark:border-gray-800 pt-3"
+            >
+              <div v-if="artist.pickupRequired" class="flex items-start gap-2 text-sm">
+                <UIcon name="i-heroicons-arrow-down-tray" class="text-green-500 mt-0.5 shrink-0" />
+                <div class="min-w-0">
+                  <p class="text-gray-700 dark:text-gray-300">
+                    {{
+                      artist.pickupLocation
+                        ? $t('artists.pickup_at', { location: artist.pickupLocation })
+                        : $t('artists.pickup_required')
+                    }}
+                  </p>
+                  <p
+                    v-if="artist.pickupResponsible"
+                    class="text-xs text-gray-500 dark:text-gray-400"
+                  >
+                    {{ $t('artists.pickup_responsible') }} :
+                    <span class="font-medium">{{ responsibleName(artist.pickupResponsible) }}</span>
+                    <template v-if="artist.pickupResponsible.phone">
+                      —
+                      <a
+                        :href="`tel:${artist.pickupResponsible.phone}`"
+                        class="text-primary-600 dark:text-primary-400 hover:underline"
+                      >
+                        {{ artist.pickupResponsible.phone }}
+                      </a>
+                    </template>
+                  </p>
+                </div>
+              </div>
+
+              <div v-if="artist.dropoffRequired" class="flex items-start gap-2 text-sm">
+                <UIcon name="i-heroicons-arrow-up-tray" class="text-red-500 mt-0.5 shrink-0" />
+                <div class="min-w-0">
+                  <p class="text-gray-700 dark:text-gray-300">
+                    {{
+                      artist.dropoffLocation
+                        ? $t('artists.dropoff_at', { location: artist.dropoffLocation })
+                        : $t('artists.dropoff_required')
+                    }}
+                  </p>
+                  <p
+                    v-if="artist.dropoffResponsible"
+                    class="text-xs text-gray-500 dark:text-gray-400"
+                  >
+                    {{ $t('artists.dropoff_responsible') }} :
+                    <span class="font-medium">{{
+                      responsibleName(artist.dropoffResponsible)
+                    }}</span>
+                    <template v-if="artist.dropoffResponsible.phone">
+                      —
+                      <a
+                        :href="`tel:${artist.dropoffResponsible.phone}`"
+                        class="text-primary-600 dark:text-primary-400 hover:underline"
+                      >
+                        {{ artist.dropoffResponsible.phone }}
+                      </a>
+                    </template>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!--
+              ⚠️ `v-if="editingPresence"` ET NON `v-else`. Le `v-else` s'accrochait au `v-if`
+              précédent — celui du rappel de récupération, qui porte DEUX conditions :
+              `!editingPresence && (pickupRequired || dropoffRequired)`. Pour un artiste qui n'a
+              demandé ni aller ni retour, cette condition était fausse hors édition, et le
+              formulaire s'affichait donc SOUS le résumé : les dates en lecture, puis les mêmes
+              champs en saisie juste dessous.
+
+              📍 Le défaut ne se voyait que dans ce cas précis. Avec une demande de récupération,
+              le `v-else` tombait juste par accident. C'est ce qui l'a laissé passer.
+            -->
+            <div v-if="editingPresence" class="space-y-3">
+              <UiDateTimePicker
+                v-model="presenceForm.arrivalDateTime"
+                :date-label="$t('artists.arrival_date')"
+                :time-label="$t('artists.arrival_time')"
+                :placeholder="$t('artists.arrival')"
+              />
+              <UiDateTimePicker
+                v-model="presenceForm.departureDateTime"
+                :date-label="$t('artists.departure_date')"
+                :time-label="$t('artists.departure_time')"
+                :placeholder="$t('artists.departure')"
+              />
+
+              <!-- La demande de récupération. Le lieu n'apparaît qu'une fois la demande posée :
+                   seul, il ne voudrait rien dire. -->
+              <div class="border-t border-gray-100 dark:border-gray-800 pt-3 space-y-3">
+                <UFormField :label="$t('artists.pickup_required')">
+                  <USwitch v-model="presenceForm.pickupRequired" />
+                </UFormField>
+                <UFormField
+                  v-if="presenceForm.pickupRequired"
+                  :label="$t('artists.pickup_location')"
+                >
+                  <UInput
+                    v-model="presenceForm.pickupLocation"
+                    :placeholder="$t('artists.pickup_location_placeholder')"
+                    class="w-full"
+                  />
+                </UFormField>
+
+                <UFormField :label="$t('artists.dropoff_required')">
+                  <USwitch v-model="presenceForm.dropoffRequired" />
+                </UFormField>
+                <UFormField
+                  v-if="presenceForm.dropoffRequired"
+                  :label="$t('artists.dropoff_location')"
+                >
+                  <UInput
+                    v-model="presenceForm.dropoffLocation"
+                    :placeholder="$t('artists.dropoff_location_placeholder')"
+                    class="w-full"
+                  />
+                </UFormField>
+              </div>
+
+              <div class="flex justify-end gap-2">
+                <UButton variant="ghost" color="neutral" size="sm" @click="editingPresence = false">
+                  {{ $t('common.cancel') }}
+                </UButton>
+                <UButton size="sm" :loading="savingPresence" @click="savePresence()">
+                  {{ $t('common.save') }}
+                </UButton>
+              </div>
+            </div>
+          </div>
+        </UCard>
+      </div>
 
       <!-- Spectacles -->
       <UCard>
@@ -160,243 +364,274 @@
         </div>
       </UCard>
 
-      <!-- Présence : l'artiste déclare lui-même quand il arrive sur place et quand il repart.
-           C'était jusqu'ici à l'organisateur de le lui demander puis de le ressaisir. -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
+      <!--
+        Les repas et l'hébergement, côte à côte au large : deux cartes courtes qui laissaient
+        chacune une pleine largeur presque vide.
+
+        📍 Les repas sont facultatifs — l'édition peut ne pas les servir, ou l'artiste n'en avoir
+        accepté aucun. D'où le `col-span-2` de repli sur l'hébergement, sans quoi il resterait
+        dans sa moitié d'écran.
+      -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <!-- Repas -->
+        <UCard v-if="repasAffiches">
+          <template #header>
             <h2 class="text-lg font-semibold flex items-center gap-2">
-              <UIcon name="i-heroicons-calendar-days" class="text-green-500" />
-              {{ $t('artists.presence_section') }}
+              <UIcon name="i-heroicons-cake" class="text-orange-500" />
+              {{ $t('artists.my_meals') }}
             </h2>
-            <UButton
-              v-if="!editingPresence"
-              icon="i-heroicons-pencil-square"
-              variant="ghost"
-              size="xs"
-              color="neutral"
-              :aria-label="$t('common.edit')"
-              @click="ouvrirEditionPresence"
-            />
-          </div>
-        </template>
+          </template>
 
-        <div class="space-y-3">
-          <div v-if="!editingPresence" class="flex flex-wrap gap-4">
-            <div v-if="artist.arrivalDateTime" class="flex items-center gap-2 text-sm">
-              <UIcon name="i-heroicons-arrow-down-tray" class="text-green-500" />
-              <span class="text-gray-600 dark:text-gray-400">
-                {{ $t('artists.arrival') }} :
-                {{ formaterDateHeure(artist.arrivalDateTime, fuseauEdition, locale) }}
-              </span>
-            </div>
-            <div v-if="artist.departureDateTime" class="flex items-center gap-2 text-sm">
-              <UIcon name="i-heroicons-arrow-up-tray" class="text-red-500" />
-              <span class="text-gray-600 dark:text-gray-400">
-                {{ $t('artists.departure') }} :
-                {{ formaterDateHeure(artist.departureDateTime, fuseauEdition, locale) }}
-              </span>
-            </div>
-            <p
-              v-if="!artist.arrivalDateTime && !artist.departureDateTime"
-              class="text-sm text-gray-500 italic"
+          <div class="space-y-4">
+            <!-- Régime alimentaire et allergies -->
+            <div
+              class="p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 space-y-2"
             >
-              {{ $t('artists.presence_not_declared') }}
-            </p>
+              <!-- Mode lecture -->
+              <template v-if="!editingDiet">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {{ $t('artists.dietary_preference') }}
+                  </span>
+                  <UButton
+                    icon="i-heroicons-pencil-square"
+                    variant="ghost"
+                    size="xs"
+                    color="neutral"
+                    @click="editingDiet = true"
+                  />
+                </div>
+                <div
+                  v-if="artist.dietaryPreference !== 'NONE'"
+                  class="flex items-center gap-2 text-sm"
+                >
+                  <UIcon name="i-heroicons-heart" class="text-orange-500 shrink-0" />
+                  <span class="text-gray-700 dark:text-gray-300">
+                    <strong>{{ $t(`diet.${artist.dietaryPreference.toLowerCase()}`) }}</strong>
+                  </span>
+                </div>
+                <div v-else class="text-sm text-gray-400">
+                  {{ $t('diet.none') }}
+                </div>
+                <div v-if="artist.allergies" class="flex items-start gap-2 text-sm">
+                  <UIcon
+                    name="i-heroicons-exclamation-triangle"
+                    class="text-orange-500 shrink-0 mt-0.5"
+                  />
+                  <span class="text-gray-700 dark:text-gray-300">
+                    {{ $t('artists.allergies') }} :
+                    <strong>{{ artist.allergies }}</strong>
+                    <UBadge
+                      v-if="artist.allergySeverity"
+                      :color="
+                        getAllergySeverityBadgeColor(artist.allergySeverity as AllergySeverityLevel)
+                      "
+                      variant="soft"
+                      size="md"
+                      class="ml-2"
+                    >
+                      {{
+                        $t(
+                          getAllergySeverityInfo(artist.allergySeverity as AllergySeverityLevel)
+                            .label
+                        )
+                      }}
+                    </UBadge>
+                  </span>
+                </div>
+              </template>
+
+              <!-- Mode édition -->
+              <template v-else>
+                <div class="space-y-3">
+                  <UFormField :label="$t('artists.dietary_preference')">
+                    <USelect
+                      v-model="dietForm.dietaryPreference"
+                      :items="dietaryOptions"
+                      value-key="value"
+                      class="w-full"
+                      :ui="{ content: 'min-w-fit' }"
+                    />
+                  </UFormField>
+
+                  <UFormField :label="$t('artists.allergies')">
+                    <UTextarea
+                      v-model="dietForm.allergies"
+                      :placeholder="$t('artists.allergies')"
+                      :rows="2"
+                      autoresize
+                    />
+                  </UFormField>
+
+                  <UFormField v-if="dietForm.allergies" :label="$t('artists.allergy_severity')">
+                    <USelect
+                      v-model="modeleGraviteAllergie"
+                      :items="allergySeverityOptions"
+                      value-key="value"
+                      class="w-full"
+                      :ui="{ content: 'min-w-fit' }"
+                    />
+                  </UFormField>
+
+                  <div class="flex justify-end gap-2">
+                    <UButton variant="ghost" color="neutral" size="sm" @click="cancelDietEdit">
+                      {{ $t('common.cancel') }}
+                    </UButton>
+                    <UButton
+                      :loading="savingDiet"
+                      :disabled="!dietFormDirty"
+                      icon="i-heroicons-check"
+                      size="sm"
+                      @click="saveDiet"
+                    >
+                      {{ $t('common.save') }}
+                    </UButton>
+                  </div>
+                </div>
+              </template>
+            </div>
+
+            <div v-for="(meals, date) in groupedMeals" :key="date">
+              <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
+                {{ formatDateFull(date) }}
+              </p>
+              <div class="flex flex-wrap gap-3">
+                <div
+                  v-for="meal in meals"
+                  :key="meal.id"
+                  class="flex flex-col items-center gap-1 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50"
+                >
+                  <span class="text-sm font-medium text-gray-900 dark:text-white">
+                    {{ getMealTypeLabel(meal.meal.mealType) }}
+                  </span>
+                  <USwitch
+                    :model-value="editableMeals[meal.id] ?? meal.afterShow"
+                    :loading="savingMealId === meal.id"
+                    :disabled="savingMealId !== null"
+                    size="xs"
+                    :label="$t('artists.meal_after_show')"
+                    @update:model-value="toggleAfterShow(meal, $event)"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
+        </UCard>
 
-          <!-- La DEMANDE de récupération, telle que l'artiste l'a posée. Qui s'en charge est la
-               réponse de l'organisateur, et s'affiche dans la carte « Transport ». -->
-          <div
-            v-if="!editingPresence && (artist.pickupRequired || artist.dropoffRequired)"
-            class="flex flex-wrap gap-4 border-t border-gray-100 dark:border-gray-800 pt-3"
-          >
-            <div v-if="artist.pickupRequired" class="flex items-center gap-2 text-sm">
-              <UIcon name="i-heroicons-map-pin" class="text-green-500" />
-              <span class="text-gray-600 dark:text-gray-400">
-                {{
-                  artist.pickupLocation
-                    ? $t('artists.pickup_at', { location: artist.pickupLocation })
-                    : $t('artists.pickup_required')
-                }}
-              </span>
+        <!-- Hébergement -->
+        <UCard :class="repasAffiches ? undefined : 'lg:col-span-2'">
+          <template #header>
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-semibold flex items-center gap-2">
+                <UIcon name="i-heroicons-home-modern" class="text-blue-500" />
+                {{ $t('artists.my_accommodation') }}
+              </h2>
+              <UButton
+                v-if="!editingAccommodation"
+                icon="i-heroicons-pencil-square"
+                variant="ghost"
+                size="xs"
+                color="neutral"
+                @click="editingAccommodation = true"
+              />
             </div>
-            <div v-if="artist.dropoffRequired" class="flex items-center gap-2 text-sm">
-              <UIcon name="i-heroicons-map-pin" class="text-red-500" />
-              <span class="text-gray-600 dark:text-gray-400">
-                {{
-                  artist.dropoffLocation
-                    ? $t('artists.dropoff_at', { location: artist.dropoffLocation })
-                    : $t('artists.dropoff_required')
-                }}
-              </span>
-            </div>
-          </div>
+          </template>
 
-          <div v-else class="space-y-3">
-            <UiDateTimePicker
-              v-model="presenceForm.arrivalDateTime"
-              :date-label="$t('artists.arrival_date')"
-              :time-label="$t('artists.arrival_time')"
-              :placeholder="$t('artists.arrival')"
-            />
-            <UiDateTimePicker
-              v-model="presenceForm.departureDateTime"
-              :date-label="$t('artists.departure_date')"
-              :time-label="$t('artists.departure_time')"
-              :placeholder="$t('artists.departure')"
-            />
-
-            <!-- La demande de récupération. Le lieu n'apparaît qu'une fois la demande posée :
-                 seul, il ne voudrait rien dire. -->
-            <div class="border-t border-gray-100 dark:border-gray-800 pt-3 space-y-3">
-              <UFormField :label="$t('artists.pickup_required')">
-                <USwitch v-model="presenceForm.pickupRequired" />
-              </UFormField>
-              <UFormField v-if="presenceForm.pickupRequired" :label="$t('artists.pickup_location')">
-                <UInput
-                  v-model="presenceForm.pickupLocation"
-                  :placeholder="$t('artists.pickup_location_placeholder')"
-                  class="w-full"
-                />
-              </UFormField>
-
-              <UFormField :label="$t('artists.dropoff_required')">
-                <USwitch v-model="presenceForm.dropoffRequired" />
-              </UFormField>
-              <UFormField
-                v-if="presenceForm.dropoffRequired"
-                :label="$t('artists.dropoff_location')"
-              >
-                <UInput
-                  v-model="presenceForm.dropoffLocation"
-                  :placeholder="$t('artists.dropoff_location_placeholder')"
-                  class="w-full"
-                />
-              </UFormField>
-            </div>
-
-            <div class="flex justify-end gap-2">
-              <UButton variant="ghost" color="neutral" size="sm" @click="editingPresence = false">
-                {{ $t('common.cancel') }}
-              </UButton>
-              <UButton size="sm" :loading="savingPresence" @click="savePresence()">
-                {{ $t('common.save') }}
-              </UButton>
-            </div>
-          </div>
-        </div>
-      </UCard>
-
-      <!-- Repas -->
-      <UCard v-if="edition?.mealsEnabled && artist.mealSelections.length > 0">
-        <template #header>
-          <h2 class="text-lg font-semibold flex items-center gap-2">
-            <UIcon name="i-heroicons-cake" class="text-orange-500" />
-            {{ $t('artists.my_meals') }}
-          </h2>
-        </template>
-
-        <div class="space-y-4">
-          <!-- Régime alimentaire et allergies -->
-          <div
-            class="p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 space-y-2"
-          >
+          <div class="space-y-3">
             <!-- Mode lecture -->
-            <template v-if="!editingDiet">
-              <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {{ $t('artists.dietary_preference') }}
-                </span>
-                <UButton
-                  icon="i-heroicons-pencil-square"
-                  variant="ghost"
-                  size="xs"
-                  color="neutral"
-                  @click="editingDiet = true"
-                />
-              </div>
-              <div
-                v-if="artist.dietaryPreference !== 'NONE'"
-                class="flex items-center gap-2 text-sm"
-              >
-                <UIcon name="i-heroicons-heart" class="text-orange-500 shrink-0" />
-                <span class="text-gray-700 dark:text-gray-300">
-                  <strong>{{ $t(`diet.${artist.dietaryPreference.toLowerCase()}`) }}</strong>
-                </span>
-              </div>
-              <div v-else class="text-sm text-gray-400">
-                {{ $t('diet.none') }}
-              </div>
-              <div v-if="artist.allergies" class="flex items-start gap-2 text-sm">
+            <template v-if="!editingAccommodation">
+              <div class="flex items-center gap-2">
                 <UIcon
-                  name="i-heroicons-exclamation-triangle"
-                  class="text-orange-500 shrink-0 mt-0.5"
+                  :name="
+                    artist.accommodationAutonomous
+                      ? 'i-heroicons-check-circle'
+                      : 'i-heroicons-x-circle'
+                  "
+                  :class="artist.accommodationAutonomous ? 'text-green-500' : 'text-gray-400'"
                 />
                 <span class="text-gray-700 dark:text-gray-300">
-                  {{ $t('artists.allergies') }} :
-                  <strong>{{ artist.allergies }}</strong>
-                  <UBadge
-                    v-if="artist.allergySeverity"
-                    :color="
-                      getAllergySeverityBadgeColor(artist.allergySeverity as AllergySeverityLevel)
-                    "
-                    variant="soft"
-                    size="md"
-                    class="ml-2"
-                  >
-                    {{
-                      $t(
-                        getAllergySeverityInfo(artist.allergySeverity as AllergySeverityLevel).label
-                      )
-                    }}
-                  </UBadge>
+                  {{
+                    artist.accommodationAutonomous
+                      ? $t('artists.accommodation_autonomous_info')
+                      : $t('artists.accommodation_not_autonomous_info')
+                  }}
                 </span>
+              </div>
+
+              <div
+                v-if="artist.accommodationType"
+                class="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
+              >
+                <div class="flex items-center gap-2 text-sm">
+                  <UIcon name="i-heroicons-home" class="text-blue-500 shrink-0" />
+                  <span class="text-gray-700 dark:text-gray-300">
+                    <strong>{{ accommodationTypeLabel(artist.accommodationType) }}</strong>
+                    <span
+                      v-if="artist.accommodationType === 'OTHER' && artist.accommodationTypeOther"
+                    >
+                      — {{ artist.accommodationTypeOther }}
+                    </span>
+                  </span>
+                </div>
+              </div>
+
+              <div v-if="artist.accommodationProposal" class="space-y-1">
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  {{ $t('artists.accommodation_proposal_info') }}
+                </p>
+                <p
+                  class="text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3"
+                >
+                  {{ artist.accommodationProposal }}
+                </p>
               </div>
             </template>
 
             <!-- Mode édition -->
             <template v-else>
               <div class="space-y-3">
-                <UFormField :label="$t('artists.dietary_preference')">
-                  <USelect
-                    v-model="dietForm.dietaryPreference"
-                    :items="dietaryOptions"
-                    value-key="value"
-                    class="w-full"
-                    :ui="{ content: 'min-w-fit' }"
-                  />
-                </UFormField>
+                <USwitch
+                  v-model="accommodationForm.accommodationAutonomous"
+                  :label="$t('artists.accommodation_autonomous_info')"
+                />
 
-                <UFormField :label="$t('artists.allergies')">
-                  <UTextarea
-                    v-model="dietForm.allergies"
-                    :placeholder="$t('artists.allergies')"
-                    :rows="2"
-                    autoresize
-                  />
-                </UFormField>
+                <template v-if="accommodationForm.accommodationAutonomous">
+                  <UFormField :label="$t('artists.accommodation_type')">
+                    <USelect
+                      v-model="modeleTypeHebergement"
+                      :items="accommodationTypeOptions"
+                      value-key="value"
+                      :placeholder="$t('artists.accommodation_not_specified')"
+                      :ui="{ content: 'min-w-fit' }"
+                    />
+                  </UFormField>
 
-                <UFormField v-if="dietForm.allergies" :label="$t('artists.allergy_severity')">
-                  <USelect
-                    v-model="modeleGraviteAllergie"
-                    :items="allergySeverityOptions"
-                    value-key="value"
-                    class="w-full"
-                    :ui="{ content: 'min-w-fit' }"
-                  />
-                </UFormField>
+                  <UFormField
+                    v-if="accommodationForm.accommodationType === 'OTHER'"
+                    :label="$t('artists.accommodation_type_other')"
+                  >
+                    <UInput
+                      v-model="accommodationForm.accommodationTypeOther"
+                      :placeholder="$t('artists.accommodation_type_other_placeholder')"
+                    />
+                  </UFormField>
+                </template>
 
                 <div class="flex justify-end gap-2">
-                  <UButton variant="ghost" color="neutral" size="sm" @click="cancelDietEdit">
+                  <UButton
+                    variant="ghost"
+                    color="neutral"
+                    size="sm"
+                    @click="cancelAccommodationEdit"
+                  >
                     {{ $t('common.cancel') }}
                   </UButton>
                   <UButton
-                    :loading="savingDiet"
-                    :disabled="!dietFormDirty"
+                    :loading="savingAccommodation"
+                    :disabled="!accommodationFormDirty"
                     icon="i-heroicons-check"
                     size="sm"
-                    @click="saveDiet"
+                    @click="saveAccommodation"
                   >
                     {{ $t('common.save') }}
                   </UButton>
@@ -404,224 +639,11 @@
               </div>
             </template>
           </div>
-
-          <div v-for="(meals, date) in groupedMeals" :key="date">
-            <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
-              {{ formatDateFull(date) }}
-            </p>
-            <div class="flex flex-wrap gap-3">
-              <div
-                v-for="meal in meals"
-                :key="meal.id"
-                class="flex flex-col items-center gap-1 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50"
-              >
-                <span class="text-sm font-medium text-gray-900 dark:text-white">
-                  {{ getMealTypeLabel(meal.meal.mealType) }}
-                </span>
-                <USwitch
-                  :model-value="editableMeals[meal.id] ?? meal.afterShow"
-                  :loading="savingMealId === meal.id"
-                  :disabled="savingMealId !== null"
-                  size="xs"
-                  :label="$t('artists.meal_after_show')"
-                  @update:model-value="toggleAfterShow(meal, $event)"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </UCard>
-
-      <!-- Hébergement -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold flex items-center gap-2">
-              <UIcon name="i-heroicons-home-modern" class="text-blue-500" />
-              {{ $t('artists.my_accommodation') }}
-            </h2>
-            <UButton
-              v-if="!editingAccommodation"
-              icon="i-heroicons-pencil-square"
-              variant="ghost"
-              size="xs"
-              color="neutral"
-              @click="editingAccommodation = true"
-            />
-          </div>
-        </template>
-
-        <div class="space-y-3">
-          <!-- Mode lecture -->
-          <template v-if="!editingAccommodation">
-            <div class="flex items-center gap-2">
-              <UIcon
-                :name="
-                  artist.accommodationAutonomous
-                    ? 'i-heroicons-check-circle'
-                    : 'i-heroicons-x-circle'
-                "
-                :class="artist.accommodationAutonomous ? 'text-green-500' : 'text-gray-400'"
-              />
-              <span class="text-gray-700 dark:text-gray-300">
-                {{
-                  artist.accommodationAutonomous
-                    ? $t('artists.accommodation_autonomous_info')
-                    : $t('artists.accommodation_not_autonomous_info')
-                }}
-              </span>
-            </div>
-
-            <div
-              v-if="artist.accommodationType"
-              class="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
-            >
-              <div class="flex items-center gap-2 text-sm">
-                <UIcon name="i-heroicons-home" class="text-blue-500 shrink-0" />
-                <span class="text-gray-700 dark:text-gray-300">
-                  <strong>{{ accommodationTypeLabel(artist.accommodationType) }}</strong>
-                  <span
-                    v-if="artist.accommodationType === 'OTHER' && artist.accommodationTypeOther"
-                  >
-                    — {{ artist.accommodationTypeOther }}
-                  </span>
-                </span>
-              </div>
-            </div>
-
-            <div v-if="artist.accommodationProposal" class="space-y-1">
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {{ $t('artists.accommodation_proposal_info') }}
-              </p>
-              <p
-                class="text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3"
-              >
-                {{ artist.accommodationProposal }}
-              </p>
-            </div>
-          </template>
-
-          <!-- Mode édition -->
-          <template v-else>
-            <div class="space-y-3">
-              <USwitch
-                v-model="accommodationForm.accommodationAutonomous"
-                :label="$t('artists.accommodation_autonomous_info')"
-              />
-
-              <template v-if="accommodationForm.accommodationAutonomous">
-                <UFormField :label="$t('artists.accommodation_type')">
-                  <USelect
-                    v-model="modeleTypeHebergement"
-                    :items="accommodationTypeOptions"
-                    value-key="value"
-                    :placeholder="$t('artists.accommodation_not_specified')"
-                    :ui="{ content: 'min-w-fit' }"
-                  />
-                </UFormField>
-
-                <UFormField
-                  v-if="accommodationForm.accommodationType === 'OTHER'"
-                  :label="$t('artists.accommodation_type_other')"
-                >
-                  <UInput
-                    v-model="accommodationForm.accommodationTypeOther"
-                    :placeholder="$t('artists.accommodation_type_other_placeholder')"
-                  />
-                </UFormField>
-              </template>
-
-              <div class="flex justify-end gap-2">
-                <UButton variant="ghost" color="neutral" size="sm" @click="cancelAccommodationEdit">
-                  {{ $t('common.cancel') }}
-                </UButton>
-                <UButton
-                  :loading="savingAccommodation"
-                  :disabled="!accommodationFormDirty"
-                  icon="i-heroicons-check"
-                  size="sm"
-                  @click="saveAccommodation"
-                >
-                  {{ $t('common.save') }}
-                </UButton>
-              </div>
-            </div>
-          </template>
-        </div>
-      </UCard>
-
-      <!-- Transport -->
-      <UCard v-if="artist.pickupRequired || artist.dropoffRequired">
-        <template #header>
-          <h2 class="text-lg font-semibold flex items-center gap-2">
-            <UIcon name="i-heroicons-truck" class="text-teal-500" />
-            {{ $t('artists.my_transport') }}
-          </h2>
-        </template>
-
-        <div class="space-y-3">
-          <div v-if="artist.pickupRequired" class="flex items-start gap-2">
-            <UIcon name="i-heroicons-arrow-down-tray" class="text-green-500 mt-0.5 shrink-0" />
-            <div class="space-y-1">
-              <p class="text-gray-700 dark:text-gray-300">
-                {{
-                  artist.pickupLocation
-                    ? $t('artists.pickup_at', { location: artist.pickupLocation })
-                    : $t('artists.pickup_required')
-                }}
-              </p>
-              <p v-if="artist.pickupResponsible" class="text-sm text-gray-500 dark:text-gray-400">
-                {{ $t('artists.pickup_responsible') }} :
-                <span class="font-medium">{{ responsibleName(artist.pickupResponsible) }}</span>
-                <template v-if="artist.pickupResponsible.phone">
-                  —
-                  <a
-                    :href="`tel:${artist.pickupResponsible.phone}`"
-                    class="text-primary-600 dark:text-primary-400 hover:underline"
-                  >
-                    {{ artist.pickupResponsible.phone }}
-                  </a>
-                </template>
-              </p>
-            </div>
-          </div>
-
-          <div v-if="artist.dropoffRequired" class="flex items-start gap-2">
-            <UIcon name="i-heroicons-arrow-up-tray" class="text-red-500 mt-0.5 shrink-0" />
-            <div class="space-y-1">
-              <p class="text-gray-700 dark:text-gray-300">
-                {{
-                  artist.dropoffLocation
-                    ? $t('artists.dropoff_at', { location: artist.dropoffLocation })
-                    : $t('artists.dropoff_required')
-                }}
-              </p>
-              <p v-if="artist.dropoffResponsible" class="text-sm text-gray-500 dark:text-gray-400">
-                {{ $t('artists.dropoff_responsible') }} :
-                <span class="font-medium">{{ responsibleName(artist.dropoffResponsible) }}</span>
-                <template v-if="artist.dropoffResponsible.phone">
-                  —
-                  <a
-                    :href="`tel:${artist.dropoffResponsible.phone}`"
-                    class="text-primary-600 dark:text-primary-400 hover:underline"
-                  >
-                    {{ artist.dropoffResponsible.phone }}
-                  </a>
-                </template>
-              </p>
-            </div>
-          </div>
-        </div>
-      </UCard>
+        </UCard>
+      </div>
 
       <!-- Paiement et remboursements -->
-      <UCard
-        v-if="
-          artist.payment !== null ||
-          artist.reimbursementMax !== null ||
-          artist.consumablesMax !== null
-        "
-      >
+      <UCard v-if="unMontantEstAnnonce">
         <template #header>
           <h2 class="text-lg font-semibold flex items-center gap-2">
             <UIcon name="i-heroicons-banknotes" class="text-emerald-500" />
@@ -662,13 +684,32 @@
                 </span>
               </p>
             </div>
-            <UBadge :color="artist.reimbursementActualPaid ? 'success' : 'warning'" variant="soft">
-              {{
-                artist.reimbursementActualPaid
-                  ? $t('artists.reimbursement_paid')
-                  : $t('artists.reimbursement_pending')
-              }}
-            </UBadge>
+            <div class="flex items-center gap-2 shrink-0">
+              <!--
+                Le justificatif tient à côté de son montant, et non dans un téléverseur en pleine
+                page : un plein champ pour un geste qu'on fait une fois poussait le montant qu'il
+                accompagne hors de vue. Il n'apparaît QUE si un plafond est annoncé — déposer un
+                billet de train sur un défraiement que personne n'a promis n'a pas de sens.
+              -->
+              <ArtistsReceiptField
+                data-justificatif="reimbursement"
+                :edition-id="editionId"
+                :url="artist.reimbursementReceiptUrl"
+                :aide="$t('artists.reimbursement_receipt_help')"
+                :en-cours="savingJustificatif"
+                @change="enregistrerJustificatif('reimbursementReceiptUrl', $event)"
+              />
+              <UBadge
+                :color="artist.reimbursementActualPaid ? 'success' : 'warning'"
+                variant="soft"
+              >
+                {{
+                  artist.reimbursementActualPaid
+                    ? $t('artists.reimbursement_paid')
+                    : $t('artists.reimbursement_pending')
+                }}
+              </UBadge>
+            </div>
           </div>
 
           <!-- Remboursement des consommables -->
@@ -688,13 +729,91 @@
                 </span>
               </p>
             </div>
-            <UBadge :color="artist.consumablesActualPaid ? 'success' : 'warning'" variant="soft">
-              {{
-                artist.consumablesActualPaid
-                  ? $t('artists.consumables_paid')
-                  : $t('artists.consumables_pending')
-              }}
-            </UBadge>
+            <div class="flex items-center gap-2 shrink-0">
+              <ArtistsReceiptField
+                data-justificatif="consumables"
+                :edition-id="editionId"
+                :url="artist.consumablesReceiptUrl"
+                :aide="$t('artists.consumables_receipt_help')"
+                :en-cours="savingJustificatif"
+                @change="enregistrerJustificatif('consumablesReceiptUrl', $event)"
+              />
+              <UBadge :color="artist.consumablesActualPaid ? 'success' : 'warning'" variant="soft">
+                {{
+                  artist.consumablesActualPaid
+                    ? $t('artists.consumables_paid')
+                    : $t('artists.consumables_pending')
+                }}
+              </UBadge>
+            </div>
+          </div>
+          <!--
+            L'IBAN et le BIC, dans la carte des montants et non dans une carte à eux.
+
+            ⚠️ C'EST LE MÊME SUJET : à quoi l'artiste a droit, et par quel compte le lui verser.
+            Les séparer obligeait à faire défiler entre le montant et le moyen de le recevoir, et
+            faisait croire à deux formulaires indépendants.
+
+            📍 L'AVERTISSEMENT NE BLOQUE PAS. Une faute de frappe dans un IBAN ne se voit pas, et la
+            clé de contrôle la voit — mais refuser l'enregistrement priverait de recours un compte
+            hors zone IBAN, ou une forme que notre code ignore. La décision reste à l'artiste, qui a
+            le relevé sous les yeux.
+          -->
+          <USeparator />
+
+          <div class="space-y-4">
+            <div>
+              <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+                {{ $t('artists.bank_section') }}
+              </h3>
+              <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                {{ $t('artists.bank_section_self_help') }}
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <UFormField :label="$t('artists.iban')">
+                <UInput
+                  v-model="coordonneesForm.iban"
+                  :placeholder="$t('artists.iban_placeholder')"
+                  class="w-full font-mono"
+                  autocomplete="off"
+                  @update:model-value="coordonneesTouchees = true"
+                />
+                <template v-if="ibanDouteux" #help>
+                  <span class="text-amber-600 dark:text-amber-400">
+                    {{ $t('artists.iban_suspect') }}
+                  </span>
+                </template>
+              </UFormField>
+
+              <UFormField :label="$t('artists.bic')">
+                <UInput
+                  v-model="coordonneesForm.bic"
+                  :placeholder="$t('artists.bic_placeholder')"
+                  class="w-full font-mono"
+                  autocomplete="off"
+                  @update:model-value="coordonneesTouchees = true"
+                />
+                <template v-if="bicDouteux" #help>
+                  <span class="text-amber-600 dark:text-amber-400">
+                    {{ $t('artists.bic_suspect') }}
+                  </span>
+                </template>
+              </UFormField>
+            </div>
+
+            <div class="flex justify-end">
+              <UButton
+                color="primary"
+                size="sm"
+                :loading="savingCoordonnees"
+                :disabled="!coordonneesFormDirty"
+                @click="saveCoordonnees()"
+              >
+                {{ $t('common.save') }}
+              </UButton>
+            </div>
           </div>
         </div>
       </UCard>
@@ -798,6 +917,12 @@ import {
   markdownToHtml,
 } from '#imports'
 
+import {
+  bicEstPlausible,
+  formaterIbanParGroupes,
+  ibanEstPlausible,
+  normaliserCoordonneeBancaire,
+} from '~~/shared/utils/coordonnees-bancaires'
 import { formaterDateHeure, versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
 
 interface ArtistShowAct {
@@ -858,6 +983,16 @@ interface ArtistInfo {
   consumablesMax: number | null
   consumablesActual: number | null
   consumablesActualPaid: boolean
+  /**
+   * Ce que l'artiste confie lui-même : ses coordonnées bancaires et ses justificatifs.
+   *
+   * Stockés NORMALISÉS par le serveur — majuscules, sans espaces. L'écran les remet en groupes de
+   * quatre pour la relecture, mais la valeur comparable est celle-ci.
+   */
+  iban: string | null
+  bic: string | null
+  reimbursementReceiptUrl: string | null
+  consumablesReceiptUrl: string | null
   accommodationAutonomous: boolean
   accommodationType: string | null
   accommodationTypeOther: string | null
@@ -1049,12 +1184,215 @@ const modeleTypeHebergement = computed({
   },
 })
 
-watch(artist, (newArtist) => {
-  if (newArtist && !editingAccommodation.value) {
-    accommodationForm.accommodationAutonomous = newArtist.accommodationAutonomous
-    accommodationForm.accommodationType = newArtist.accommodationType ?? null
-    accommodationForm.accommodationTypeOther = newArtist.accommodationTypeOther ?? ''
+/**
+ * ⚠️ MÊME DÉFAUT QUE CI-DESSUS, PRÉEXISTANT : sans `immediate`, ce `watch` ne partait pas au
+ * chargement, et le formulaire d'hébergement gardait ses valeurs par défaut. Un artiste autonome
+ * ouvrait « Modifier » et lisait « non autonome » — puis l'enregistrait.
+ *
+ * Il se voyait moins que celui de l'IBAN parce qu'un faux « non » ressemble à un champ qu'on n'a
+ * pas encore rempli, là qu'un IBAN manquant se remarque.
+ */
+watch(
+  artist,
+  (newArtist) => {
+    if (newArtist && !editingAccommodation.value) {
+      accommodationForm.accommodationAutonomous = newArtist.accommodationAutonomous
+      accommodationForm.accommodationType = newArtist.accommodationType ?? null
+      accommodationForm.accommodationTypeOther = newArtist.accommodationTypeOther ?? ''
+    }
+  },
+  { immediate: true }
+)
+
+/**
+ * Les repas sont-ils à afficher.
+ *
+ * ⚠️ EN FACTEUR COMMUN parce que DEUX endroits en dépendent : le `v-if` de la carte des repas, et
+ * la largeur de la carte d'hébergement qui partage sa ligne. Le test recopié aurait fini par
+ * diverger, et l'hébergement serait resté dans sa moitié d'écran avec l'autre moitié vide.
+ */
+const repasAffiches = computed(
+  () => !!edition.value?.mealsEnabled && (artist.value?.mealSelections.length ?? 0) > 0
+)
+
+/**
+ * L'organisation a-t-elle annoncé un montant — cachet, défraiement maximum ou consommables ?
+ *
+ * ⚠️ EN FACTEUR COMMUN, parce que DEUX cartes en dépendent : celle qui affiche les montants et
+ * celle où l'artiste saisit ses coordonnées bancaires. Le test recopié aurait fini par diverger,
+ * et l'on se serait retrouvé avec un champ de saisie sans les montants qu'il sert à encaisser, ou
+ * l'inverse.
+ *
+ * 📍 `!== null` et non une coercition : un cachet de 0 — une prestation offerte, mais annoncée —
+ * est une information, pas une absence.
+ */
+const unMontantEstAnnonce = computed(
+  () =>
+    !!artist.value &&
+    (artist.value.payment !== null ||
+      artist.value.reimbursementMax !== null ||
+      artist.value.consumablesMax !== null)
+)
+
+/**
+ * Seulement l'IBAN et le BIC.
+ *
+ * ⚠️ LES JUSTIFICATIFS N'Y SONT PAS, volontairement : ils s'enregistrent dès qu'on valide leur
+ * modale, sans bouton « Enregistrer » à aller chercher plus bas. Les faire passer par ce
+ * formulaire aurait produit le pire des deux mondes — une modale qu'on valide et qui ne change
+ * rien tant qu'on n'a pas enregistré ailleurs.
+ */
+const coordonneesForm = reactive({
+  iban: '',
+  bic: '',
+})
+
+/**
+ * Douteux, et non invalide : l'enregistrement n'est pas bloqué.
+ *
+ * Une faute de frappe dans un IBAN ne se voit pas — vingt-sept caractères sans signification
+ * apparente — et la clé de contrôle, elle, la voit. Mais refuser la saisie priverait de recours un
+ * compte hors zone IBAN, ou une forme que notre code ignore : la décision reste à l'artiste, qui a
+ * le relevé sous les yeux.
+ */
+const ibanDouteux = computed(() => !ibanEstPlausible(coordonneesForm.iban))
+const bicDouteux = computed(() => !bicEstPlausible(coordonneesForm.bic))
+
+/**
+ * L'artiste a-t-il TOUCHÉ au formulaire depuis le dernier chargement.
+ *
+ * ⚠️ CE DRAPEAU EXISTE PARCE QUE `coordonneesFormDirty` NE POUVAIT PAS JOUER CE RÔLE, et c'est le
+ * défaut qui a fait croire que l'IBAN ne s'enregistrait pas.
+ *
+ * Le rappel d'initialisation commençait par renoncer si le formulaire était « modifié ». Or
+ * « modifié » se mesurait en comparant le champ à la base — et au chargement, le champ est vide
+ * tandis que la base porte un IBAN : la comparaison rendait donc VRAI, et le rappel renonçait
+ * exactement quand il fallait remplir. La garde se déclenchait sur l'état qu'elle devait corriger.
+ *
+ * Une comparaison de valeurs ne sait pas distinguer « la personne a saisi quelque chose » de « le
+ * formulaire n'a jamais été rempli ». Seul un drapeau posé par la SAISIE le sait.
+ */
+const coordonneesTouchees = ref(false)
+
+const coordonneesFormDirty = computed(() => {
+  if (!artist.value) return false
+  // Comparaison sur la valeur NORMALISÉE : la saisie porte ses espaces de recopie, la base non.
+  // Sans cela, le bouton resterait actif juste après un enregistrement réussi.
+  return (
+    normaliserCoordonneeBancaire(coordonneesForm.iban) !== (artist.value.iban ?? '') ||
+    normaliserCoordonneeBancaire(coordonneesForm.bic) !== (artist.value.bic ?? '')
+  )
+})
+
+/**
+ * ⚠️ `immediate: true` EST INDISPENSABLE, ET SON ABSENCE A COÛTÉ UN DÉFAUT GRAVE.
+ *
+ * `artist` vient d'un `await useFetch` : sa valeur est DÉJÀ posée quand ce `watch` s'enregistre,
+ * en navigation comme en hydratation. Sans `immediate`, il ne part donc jamais au chargement, et
+ * le champ IBAN reste vide alors que la base en a un.
+ *
+ * Et le pire n'était pas l'affichage. Le formulaire vide face à une valeur enregistrée rend
+ * `coordonneesFormDirty` VRAI : le bouton « Enregistrer » était actif dès l'arrivée sur la page, et
+ * un clic envoyait `iban: null` — il EFFAÇAIT les coordonnées qu'on venait seulement de regarder.
+ *
+ * 📍 Les formulaires voisins n'ont pas ce défaut parce qu'ils se remplissent À L'OUVERTURE de leur
+ * mode édition (`ouvrirEditionPresence`). Celui-ci est toujours visible : il n'a pas d'ouverture
+ * où se remplir.
+ *
+ * 📍 LA GARDE RESTE, mais sur `coordonneesTouchees` : la fiche est relue après chaque
+ * enregistrement, et sans garde une saisie en cours serait écrasée par la valeur du serveur. Voir
+ * le commentaire de ce drapeau pour la raison du changement.
+ */
+watch(
+  artist,
+  (nouvel) => {
+    if (!nouvel || coordonneesTouchees.value) return
+    // Par groupes de quatre, comme sur un relevé : c'est la seule forme sous laquelle on relit un
+    // IBAN caractère par caractère pour le comparer au papier.
+    coordonneesForm.iban = formaterIbanParGroupes(nouvel.iban)
+    coordonneesForm.bic = nouvel.bic ?? ''
+  },
+  { immediate: true }
+)
+
+type ChampDeJustificatif = 'reimbursementReceiptUrl' | 'consumablesReceiptUrl'
+
+/**
+ * Le justificatif en instance d'enregistrement.
+ *
+ * `useApiAction` construit son corps au moment de l'appel : cette référence est le seul moyen de
+ * lui passer lequel des deux champs change, sans écrire deux actions identiques.
+ */
+const justificatifEnAttente = ref<{ champ: ChampDeJustificatif; url: string | null } | null>(null)
+
+const { execute: envoyerJustificatif, loading: savingJustificatif } = useApiAction<
+  unknown,
+  { reimbursementReceiptUrl: string | null; consumablesReceiptUrl: string | null }
+>(() => `/api/editions/${editionId}/my-payment-info`, {
+  method: 'PUT',
+  /*
+   * ⚠️ UN SEUL CHAMP DANS LE CORPS, et c'est essentiel. Le point d'API n'écrit que les clés
+   * présentes : envoyer les deux justificatifs effacerait l'autre, et envoyer l'IBAN à `null`
+   * effacerait les coordonnées. C'est précisément le contrat pour lequel il a été écrit ainsi.
+   */
+  body: () => ({ [justificatifEnAttente.value!.champ]: justificatifEnAttente.value!.url }),
+  successMessage: { title: t('artists.receipt_saved') },
+  errorMessages: { default: t('artists.receipt_save_error') },
+  onSuccess: (reponse) => {
+    if (!reponse || !artistResponse.value?.artist) return
+    artistResponse.value = {
+      ...artistResponse.value,
+      artist: { ...artistResponse.value.artist, ...reponse },
+    }
+  },
+})
+
+/**
+ * Enregistrer un justificatif dès la validation de sa modale.
+ *
+ * 📍 Pas de bouton « Enregistrer » à aller chercher plus bas : valider la modale DOIT suffire.
+ * Une modale qu'on valide et qui ne change rien tant qu'on n'a pas enregistré ailleurs est le
+ * genre de piège dont on ne se rend compte qu'en perdant son téléversement.
+ */
+async function enregistrerJustificatif(champ: ChampDeJustificatif, url: string | null) {
+  justificatifEnAttente.value = { champ, url }
+  await envoyerJustificatif()
+}
+
+const { execute: saveCoordonnees, loading: savingCoordonnees } = useApiAction<
+  unknown,
+  {
+    iban: string | null
+    bic: string | null
+    reimbursementReceiptUrl: string | null
+    consumablesReceiptUrl: string | null
   }
+>(() => `/api/editions/${editionId}/my-payment-info`, {
+  method: 'PUT',
+  body: () => ({
+    // Les espaces de saisie partent tels quels : c'est le serveur qui normalise, et lui seul.
+    //
+    // ⚠️ LES JUSTIFICATIFS NE SONT PAS DANS CE CORPS, et c'est ce qui les préserve : le point d'API
+    // ne touche que les clés présentes. Les y ajouter à `null` les effacerait à chaque
+    // enregistrement de l'IBAN.
+    iban: coordonneesForm.iban || null,
+    bic: coordonneesForm.bic || null,
+  }),
+  successMessage: { title: t('artists.payment_info_saved') },
+  errorMessages: { default: t('artists.payment_info_save_error') },
+  onSuccess: (reponse) => {
+    // La saisie est enregistrée : le formulaire redevient un reflet du serveur, et se laisse donc
+    // remplir par la valeur NORMALISÉE qui revient — mise en groupes de quatre pour la relecture.
+    coordonneesTouchees.value = false
+    if (!reponse || !artistResponse.value?.artist) return
+    // La fiche locale reçoit ce que le serveur a RETENU — normalisé, et les justificatifs à leur
+    // URL définitive, plus celle du dossier temporaire. Sans cela, le formulaire resterait
+    // « modifié » juste après un enregistrement réussi.
+    artistResponse.value = {
+      ...artistResponse.value,
+      artist: { ...artistResponse.value.artist, ...reponse },
+    }
+  },
 })
 
 const accommodationFormDirty = computed(() => {

@@ -75,6 +75,24 @@ model EditionArtist {
 
   /// Le justificatif des CONSOMMABLES. Même contrat que celui du défraiement ci-dessus.
   consumablesReceiptUrl   String?
+
+  /// Les coordonnées bancaires pour virer le cachet et les défraiements.
+  ///
+  /// ⚠️ PORTÉES PAR L'ARTISTE DE CETTE ÉDITION, et non par son compte. C'est délibéré, et c'est
+  /// une question de confidentialité avant d'être une question de modèle : sur le compte, l'IBAN
+  /// confié aux organisateurs d'une édition serait lisible par ceux de toutes les autres, sans que
+  /// la personne l'ait jamais accepté. Le prix est connu — un artiste invité deux fois le ressaisit
+  /// — et il est moins élevé que celui d'une donnée bancaire qui circule.
+  ///
+  /// 📍 PREMIÈRES DONNÉES BANCAIRES DU DÉPÔT. Elles ne sont lisibles que par qui gère les artistes
+  /// de l'édition (`canManageArtistsById`), comme les montants et les justificatifs du même
+  /// onglet. Aucun autre point d'API ne les rend : tous les autres lecteurs de cette table
+  /// emploient un `select` explicite, seule la liste de gestion est en `include`.
+  ///
+  /// Stockées NORMALISÉES — majuscules, sans espaces — par `shared/utils/coordonnees-bancaires.ts`,
+  /// de sorte que deux saisies du même compte se comparent.
+  iban                    String?            @db.VarChar(34)
+  bic                     String?            @db.VarChar(11)
   organizerNotes          String?            @db.Text
   accommodationAutonomous Boolean            @default(false)
   accommodationType       AccommodationType?

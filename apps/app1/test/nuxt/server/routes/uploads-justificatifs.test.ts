@@ -1,10 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 const canManageTreasuryByIdMock = vi.hoisted(() => vi.fn())
+const canManageArtistsByIdMock = vi.hoisted(() => vi.fn())
 const getAuthSessionMock = vi.hoisted(() => vi.fn())
 
 vi.mock('../../../../server/utils/permissions/edition-permissions', () => ({
   canManageTreasuryById: canManageTreasuryByIdMock,
+  canManageArtistsById: canManageArtistsByIdMock,
 }))
 vi.mock('../../../../server/utils/session-helpers', () => ({
   getAuthSession: getAuthSessionMock,
@@ -38,7 +40,9 @@ const handler = (await import('../../../../server/routes/uploads/[...path].get')
  * s'applique qu'aux chemins de trésorerie. Ce second point se vérifie sans servir aucun fichier —
  * il suffit de constater qu'aucune session n'est même demandée.
  */
-describe('route /uploads/** — les justificatifs de trésorerie', () => {
+const prismaMock = (globalThis as any).prisma
+
+describe('route /uploads/** — les justificatifs', () => {
   const evenement = (path: string) =>
     ({
       context: { params: { path } },
@@ -47,6 +51,8 @@ describe('route /uploads/** — les justificatifs de trésorerie', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    // Par défaut, la personne n'est pas artiste de l'édition : chaque cas pose ce qu'il lui faut.
+    prismaMock.editionArtist.findUnique.mockResolvedValue(null)
   })
 
   describe('le dossier définitif d’une édition', () => {
@@ -115,6 +121,78 @@ describe('route /uploads/** — les justificatifs de trésorerie', () => {
     })
   })
 
+  /**
+   * Les justificatifs d'ARTISTE : billet de train, facture d'essence, ticket de courses.
+   *
+   * ⚠️ CE DOMAINE N'ÉTAIT PAS GARDÉ, et ses fichiers partaient donc sans aucune session — alors que
+   * `treasury-receipt-files.ts` affirme que les deux domaines « obéissent exactement aux mêmes
+   * règles ». C'était vrai de l'écriture, faux de la lecture, et la différence ne se voyait pas :
+   * un billet de train s'affiche très bien quand on triche.
+   *
+   * 📍 DEUX TITRES ouvrent la lecture : gérer les artistes de l'édition, ou être l'artiste de
+   * cette édition. Le second est indispensable depuis que l'artiste dépose et relit ses propres
+   * justificatifs — sans lui, il ne verrait pas ce qu'il vient d'envoyer.
+   */
+  describe('le domaine des artistes', () => {
+    const DEFINITIF = 'conventions/7/editions/21/artists/billet-a1b2c3d4.pdf'
+    const TEMPORAIRE = 'temp/artists/21/billet-a1b2c3d4.pdf'
+
+    it.each([DEFINITIF, TEMPORAIRE])('refuse un visiteur anonyme sur %s', async (chemin) => {
+      getAuthSessionMock.mockResolvedValue(null)
+
+      await expect(handler(evenement(chemin))).rejects.toThrow('File not found')
+      // Comme pour la trésorerie : c'est l'interrogation de la session qui prouve que la garde
+      // s'est appliquée. Le 404 seul ne prouverait rien, le fichier n'existant pas sur le disque.
+      expect(getAuthSessionMock).toHaveBeenCalled()
+    })
+
+    it('refuse un connecté qui n’a ni le droit ni la qualité d’artiste', async () => {
+      getAuthSessionMock.mockResolvedValue({ user: { id: 42 } })
+      canManageArtistsByIdMock.mockResolvedValue(false)
+      prismaMock.editionArtist.findUnique.mockResolvedValue(null)
+
+      await expect(handler(evenement(DEFINITIF))).rejects.toThrow('File not found')
+      // L'édition contrôlée est bien celle du chemin — 21, et non la convention 7.
+      expect(canManageArtistsByIdMock).toHaveBeenCalledWith(21, 42, expect.anything())
+    })
+
+    it('laisse passer qui gère les artistes de l’édition', async () => {
+      getAuthSessionMock.mockResolvedValue({ user: { id: 42 } })
+      canManageArtistsByIdMock.mockResolvedValue(true)
+
+      await handler(evenement(DEFINITIF)).catch(() => undefined)
+
+      expect(canManageArtistsByIdMock).toHaveBeenCalledWith(21, 42, expect.anything())
+      // Le droit suffit : inutile d'aller demander à la base si la personne est artiste.
+      expect(prismaMock.editionArtist.findUnique).not.toHaveBeenCalled()
+    })
+
+    it('⚠️ laisse passer l’artiste de l’édition, qui n’a aucun droit de gestion', async () => {
+      getAuthSessionMock.mockResolvedValue({ user: { id: 9 } })
+      canManageArtistsByIdMock.mockResolvedValue(false)
+      prismaMock.editionArtist.findUnique.mockResolvedValue({ id: 77 })
+
+      await handler(evenement(DEFINITIF)).catch(() => undefined)
+
+      expect(prismaMock.editionArtist.findUnique).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { editionId_userId: { editionId: 21, userId: 9 } },
+        })
+      )
+    })
+
+    it('n’exige PAS le droit de la trésorerie', async () => {
+      // Les deux domaines sont distincts : un organisateur chargé des artistes n'a pas forcément
+      // accès aux comptes, et c'est la raison d'être du point de dépôt séparé.
+      getAuthSessionMock.mockResolvedValue({ user: { id: 42 } })
+      canManageArtistsByIdMock.mockResolvedValue(true)
+
+      await handler(evenement(DEFINITIF)).catch(() => undefined)
+
+      expect(canManageTreasuryByIdMock).not.toHaveBeenCalled()
+    })
+  })
+
   describe('les autres dossiers, qui ne changent pas', () => {
     /*
      * La contrepartie indispensable. Si cette garde débordait, elle casserait toutes les images
@@ -128,9 +206,11 @@ describe('route /uploads/** — les justificatifs de trésorerie', () => {
       'conventions/7/logo-a1b2c3d4.png',
       'shows/12/image-a1b2c3d4.jpg',
       'profiles/42/avatar-a1b2c3d4.jpg',
-      // Un dossier nommé `treasury` ailleurs n'ouvre pas la garde non plus : elle reconnaît une
-      // forme de chemin, elle ne devine pas sur un mot.
+      // Un dossier nommé `treasury` ou `artists` ailleurs n'ouvre pas la garde non plus : elle
+      // reconnaît une forme de chemin, elle ne devine pas sur un mot.
       'treasury/ailleurs/fichier.jpg',
+      'artists/ailleurs/fichier.jpg',
+      'conventions/7/editions/21/artistes/fichier.jpg',
     ]
 
     it.each(cheminsPublics)('ne demande aucune session pour %s', async (chemin) => {
