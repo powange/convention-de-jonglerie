@@ -82,9 +82,9 @@
     "invoice_fee_section": "Счет и гонорар",
     "invoice_not_requested": "Счет не запрошен",
     "invoice_provided": "Счет предоставлен",
-    "invoice_provided_label": "Счет предоставлен артисту",
+    "invoice_provided_label": "Артист предоставил свой счёт",
     "invoice_requested": "Счет запрошен",
-    "invoice_requested_label": "Артист запрашивает счет",
+    "invoice_requested_label": "От артиста требуется счёт",
     "invoice_short": "Счет",
     "list_title": "Управление артистами",
     "manage_artists_description": "Управляйте художниками, приглашенными для участия в этом издании",
@@ -236,6 +236,8 @@
     "to_pay_no_bank": "Банковские данные не указаны",
     "to_pay_title": "Артисты к выплате",
     "to_pay_total": "Осталось выплатить",
-    "to_pay_travel": "компенсации расходов"
+    "to_pay_travel": "компенсации расходов",
+    "invoice_file": "Счёт артиста",
+    "invoice_upload_help": "Принимаются изображения и PDF. Загрузка счёта отмечает его как предоставленный."
   }
 }

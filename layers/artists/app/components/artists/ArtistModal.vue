@@ -585,6 +585,44 @@
                   </UFormField>
                 </div>
 
+                <!--
+                  LA FACTURE ELLE-MÊME, et non seulement son état.
+
+                  📍 Elle n'apparaît QUE si une facture est demandée à l'artiste : déposer une
+                  facture que personne n'a réclamée n'a pas de sens, et le champ encombrerait les
+                  fiches où la question ne se pose pas. Même raison qu'ailleurs sur cet écran — le
+                  justificatif de défraiement suit son plafond.
+
+                  📍 C'est l'ARTISTE qui fournit sa facture : il la dépose depuis son espace, et
+                  ce champ sert à la déposer À SA PLACE — reçue par courriel, remise sur place.
+                  Dans les deux cas le dépôt vaut remise, et la case ci-dessus se cochera d'elle
+                  même : la règle vit côté serveur, dans `remise-de-la-facture.ts`.
+                -->
+                <UFormField
+                  v-if="formData.invoiceRequested"
+                  :label="$t('artists.invoice_file')"
+                  :help="$t('artists.invoice_upload_help')"
+                >
+                  <UiImageUpload
+                    v-model="formData.invoiceUrl"
+                    allow-camera
+                    :endpoint="{ type: 'artist', id: editionId }"
+                    :options="{
+                      validation: {
+                        maxSize: 10 * 1024 * 1024,
+                        allowedTypes: [
+                          'image/jpeg',
+                          'image/png',
+                          'image/webp',
+                          'image/gif',
+                          'application/pdf',
+                        ],
+                        allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.pdf'],
+                      },
+                    }"
+                  />
+                </UFormField>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <UFormField :label="$t('artists.fee_requested')">
                     <UCheckbox
@@ -773,6 +811,7 @@ const formData = ref({
   consumablesActualPaid: false,
   reimbursementReceiptUrl: null as string | null,
   consumablesReceiptUrl: null as string | null,
+  invoiceUrl: null as string | null,
   iban: '',
   bic: '',
   accommodationAutonomous: false,
@@ -1137,6 +1176,7 @@ const buildBasePayload = () => ({
   // Les justificatifs : le serveur les déplace du dossier temporaire avant de les écrire.
   reimbursementReceiptUrl: formData.value.reimbursementReceiptUrl,
   consumablesReceiptUrl: formData.value.consumablesReceiptUrl,
+  invoiceUrl: formData.value.invoiceUrl,
   // Les espaces de saisie partent tels quels : c'est le serveur qui normalise, et lui seul, pour
   // que les trois points d'écriture rangent la même valeur.
   iban: formData.value.iban || null,
@@ -1322,6 +1362,7 @@ watch(
         consumablesActualPaid: newArtist.consumablesActualPaid || false,
         reimbursementReceiptUrl: newArtist.reimbursementReceiptUrl || null,
         consumablesReceiptUrl: newArtist.consumablesReceiptUrl || null,
+        invoiceUrl: newArtist.invoiceUrl || null,
         // Affiché par groupes de quatre, comme sur un relevé : c'est la seule forme sous laquelle
         // on relit un IBAN caractère par caractère pour le comparer au papier.
         iban: formaterIbanParGroupes(newArtist.iban),

@@ -82,9 +82,9 @@
     "invoice_fee_section": "Rechnung und Gage",
     "invoice_not_requested": "Keine Rechnung angefordert",
     "invoice_provided": "Rechnung bereitgestellt",
-    "invoice_provided_label": "Rechnung an Künstler bereitgestellt",
+    "invoice_provided_label": "Der Künstler hat seine Rechnung eingereicht",
     "invoice_requested": "Rechnung angefordert",
-    "invoice_requested_label": "Der Künstler fordert eine Rechnung an",
+    "invoice_requested_label": "Vom Künstler wird eine Rechnung verlangt",
     "invoice_short": "Rechnung",
     "list_title": "Verwaltung von Künstlern",
     "manage_artists_description": "Verwalten Sie die zu dieser Ausgabe eingeladenen Künstler",
@@ -236,6 +236,8 @@
     "to_pay_no_bank": "Keine Bankverbindung angegeben",
     "to_pay_title": "Zu bezahlende Künstler/innen",
     "to_pay_total": "Noch zu zahlen",
-    "to_pay_travel": "an Reisekosten"
+    "to_pay_travel": "an Reisekosten",
+    "invoice_file": "Rechnung des Künstlers",
+    "invoice_upload_help": "Bilder und PDF werden akzeptiert. Mit dem Hochladen gilt die Rechnung als eingereicht."
   }
 }

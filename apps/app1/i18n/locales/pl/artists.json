@@ -82,9 +82,9 @@
     "invoice_fee_section": "Faktura i wynagrodzenie",
     "invoice_not_requested": "Faktura niepożądana",
     "invoice_provided": "Faktura dostarczona",
-    "invoice_provided_label": "Faktura dostarczona artyście",
+    "invoice_provided_label": "Artysta dostarczył swoją fakturę",
     "invoice_requested": "Faktura wymagana",
-    "invoice_requested_label": "Artysta żąda faktury",
+    "invoice_requested_label": "Od artysty wymagana jest faktura",
     "invoice_short": "Faktura",
     "list_title": "Zarządzanie artystami",
     "manage_artists_description": "Zarządzaj artystami zaproszonymi do tej edycji",
@@ -236,6 +236,8 @@
     "to_pay_no_bank": "Nie podano danych bankowych",
     "to_pay_title": "Artyści do zapłaty",
     "to_pay_total": "Pozostaje do wypłaty",
-    "to_pay_travel": "zwrotu kosztów"
+    "to_pay_travel": "zwrotu kosztów",
+    "invoice_file": "Faktura artysty",
+    "invoice_upload_help": "Akceptowane są obrazy i PDF. Wgranie faktury oznacza ją jako dostarczoną."
   }
 }

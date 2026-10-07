@@ -157,6 +157,8 @@ import { useMediaQuery } from '@vueuse/core'
 
 import type { UploadEndpoint, UploadOptions } from '~/types/upload'
 
+import { estUnJustificatifPdf } from '~~/shared/utils/justificatif-pdf'
+
 interface Props {
   /** Valeur actuelle (URL de l'image) */
   modelValue?: string | null
@@ -238,9 +240,7 @@ const serverFiles = ref<any[]>([])
  * n'est connu qu'au moment du dépôt, et la valeur peut venir de la base. C'est suffisant parce que
  * le serveur a déjà croisé type et extension à l'entrée.
  */
-const estUnPdf = computed(
-  () => !!displayImageUrl.value?.toLowerCase().split('?')[0]?.endsWith('.pdf')
-)
+const estUnPdf = computed(() => estUnJustificatifPdf(displayImageUrl.value))
 
 const validation = {
   maxSize: props.options?.validation?.maxSize || 5 * 1024 * 1024,

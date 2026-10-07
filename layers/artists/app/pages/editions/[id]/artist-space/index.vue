@@ -828,17 +828,32 @@
         </template>
 
         <div class="space-y-3">
-          <div v-if="artist.invoiceRequested" class="flex items-center justify-between">
+          <div v-if="artist.invoiceRequested" class="flex items-center justify-between gap-2">
             <span class="text-gray-700 dark:text-gray-300">
               {{ $t('artists.invoice_short') }}
             </span>
-            <UBadge :color="artist.invoiceProvided ? 'success' : 'warning'" variant="soft">
-              {{
-                artist.invoiceProvided
-                  ? $t('artists.invoice_provided')
-                  : $t('artists.invoice_requested')
-              }}
-            </UBadge>
+            <div class="flex items-center gap-2 shrink-0">
+              <!--
+                C'est l'ARTISTE qui fournit sa facture : il la dépose ici, et le dépôt vaut remise
+                — la pastille passe au vert sans qu'un organisateur ait à cocher quoi que ce soit.
+                Le champ n'apparaît QUE si une facture lui est demandée.
+              -->
+              <ArtistsReceiptField
+                data-justificatif="invoice"
+                :edition-id="editionId"
+                :url="artist.invoiceUrl"
+                :aide="$t('artists.invoice_upload_help')"
+                :en-cours="savingJustificatif"
+                @change="enregistrerJustificatif('invoiceUrl', $event)"
+              />
+              <UBadge :color="artist.invoiceProvided ? 'success' : 'warning'" variant="soft">
+                {{
+                  artist.invoiceProvided
+                    ? $t('artists.invoice_provided')
+                    : $t('artists.invoice_requested')
+                }}
+              </UBadge>
+            </div>
           </div>
           <div v-if="artist.feeRequested" class="flex items-center justify-between">
             <span class="text-gray-700 dark:text-gray-300">
@@ -993,6 +1008,7 @@ interface ArtistInfo {
   bic: string | null
   reimbursementReceiptUrl: string | null
   consumablesReceiptUrl: string | null
+  invoiceUrl: string | null
   accommodationAutonomous: boolean
   accommodationType: string | null
   accommodationTypeOther: string | null
@@ -1315,7 +1331,7 @@ watch(
   { immediate: true }
 )
 
-type ChampDeJustificatif = 'reimbursementReceiptUrl' | 'consumablesReceiptUrl'
+type ChampDeJustificatif = 'reimbursementReceiptUrl' | 'consumablesReceiptUrl' | 'invoiceUrl'
 
 /**
  * Le justificatif en instance d'enregistrement.
@@ -1327,7 +1343,17 @@ const justificatifEnAttente = ref<{ champ: ChampDeJustificatif; url: string | nu
 
 const { execute: envoyerJustificatif, loading: savingJustificatif } = useApiAction<
   unknown,
-  { reimbursementReceiptUrl: string | null; consumablesReceiptUrl: string | null }
+  {
+    reimbursementReceiptUrl: string | null
+    consumablesReceiptUrl: string | null
+    invoiceUrl: string | null
+    /*
+     * 📍 RENDU PAR LE SERVEUR, et c'est pour cela que la pastille se met à jour sans rien de plus :
+     * déposer la facture vaut remise, et `onSuccess` fusionne toute la réponse dans la fiche
+     * locale. Le recalculer ici en dupliquerait la règle, qui vit côté serveur.
+     */
+    invoiceProvided: boolean
+  }
 >(() => `/api/editions/${editionId}/my-payment-info`, {
   method: 'PUT',
   /*
@@ -1366,6 +1392,8 @@ const { execute: saveCoordonnees, loading: savingCoordonnees } = useApiAction<
     bic: string | null
     reimbursementReceiptUrl: string | null
     consumablesReceiptUrl: string | null
+    invoiceUrl: string | null
+    invoiceProvided: boolean
   }
 >(() => `/api/editions/${editionId}/my-payment-info`, {
   method: 'PUT',

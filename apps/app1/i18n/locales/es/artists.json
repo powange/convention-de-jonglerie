@@ -82,9 +82,9 @@
     "invoice_fee_section": "Factura y caché",
     "invoice_not_requested": "Factura no solicitada",
     "invoice_provided": "Factura proporcionada",
-    "invoice_provided_label": "Factura proporcionada al artista",
+    "invoice_provided_label": "El artista ha entregado su factura",
     "invoice_requested": "Factura solicitada",
-    "invoice_requested_label": "El artista solicita una factura",
+    "invoice_requested_label": "Se pide una factura al artista",
     "invoice_short": "Factura",
     "list_title": "Gestión de artistas",
     "manage_artists_description": "Gestione los artistas invitados a esta edición",
@@ -236,6 +236,8 @@
     "to_pay_no_bank": "No se han indicado datos bancarios",
     "to_pay_title": "Artistas por pagar",
     "to_pay_total": "Queda por pagar",
-    "to_pay_travel": "de dietas"
+    "to_pay_travel": "de dietas",
+    "invoice_file": "Factura del artista",
+    "invoice_upload_help": "Se aceptan imágenes y PDF. Subir la factura la marca como entregada."
   }
 }

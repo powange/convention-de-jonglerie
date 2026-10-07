@@ -10,6 +10,7 @@ import {
   canManageArtists,
 } from '#server/utils/permissions/edition-permissions'
 import { buildUpdateData } from '#server/utils/prisma-helpers'
+import { remiseDeLaFacture } from '#server/utils/remise-de-la-facture'
 import { deplacerJustificatif, supprimerJustificatif } from '#server/utils/treasury-receipt-files'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 import { schemaAdresseEmail } from '~~/shared/utils/adresse-email'
@@ -46,6 +47,7 @@ const updateArtistSchema = z.object({
    */
   reimbursementReceiptUrl: z.string().max(500).optional().nullable(),
   consumablesReceiptUrl: z.string().max(500).optional().nullable(),
+  invoiceUrl: z.string().max(500).optional().nullable(),
   /**
    * Les coordonnées bancaires, pour virer le cachet et les défraiements.
    *
@@ -321,7 +323,11 @@ export default wrapApiHandler(
     // ferait que la relire, et le compilateur refusait d'ailleurs le doublon de nom.
     const justificatifs: Record<string, string | null> = {}
     const justificatifsASupprimer: string[] = []
-    for (const champ of ['reimbursementReceiptUrl', 'consumablesReceiptUrl'] as const) {
+    for (const champ of [
+      'reimbursementReceiptUrl',
+      'consumablesReceiptUrl',
+      'invoiceUrl',
+    ] as const) {
       if (!(champ in validatedData)) continue
       const recue = validatedData[champ] as string | null | undefined
       const deplacee = await deplacerJustificatif(recue, edition, 'artists')
@@ -368,6 +374,7 @@ export default wrapApiHandler(
             // Écrits à la main juste en dessous, APRÈS déplacement depuis le dossier temporaire.
             'reimbursementReceiptUrl',
             'consumablesReceiptUrl',
+            'invoiceUrl',
             // Écrites à la main juste en dessous, APRÈS normalisation.
             'iban',
             'bic',
@@ -375,6 +382,12 @@ export default wrapApiHandler(
         }),
         // Les justificatifs déplacés, écrits à la main : voir le bloc ci-dessus.
         ...justificatifs,
+        /*
+         * Déposer la facture vaut remise. Placé APRÈS `buildUpdateData` à dessein : un appel qui
+         * envoie à la fois le fichier et `invoiceProvided: false` serait contradictoire, et c'est
+         * le fichier qui tranche. La règle est partagée avec le point de l'artiste.
+         */
+        ...remiseDeLaFacture(justificatifs),
         // Les coordonnées bancaires normalisées. Seules les clés PRÉSENTES dans le corps sont
         // rendues : enregistrer un autre champ de la fiche ne doit pas effacer l'IBAN.
         ...coordonneesBancairesRecues(validatedData),

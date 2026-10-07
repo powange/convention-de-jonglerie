@@ -82,9 +82,9 @@
     "invoice_fee_section": "Factuur en vergoeding",
     "invoice_not_requested": "Factuur niet aangevraagd",
     "invoice_provided": "Factuur verstrekt",
-    "invoice_provided_label": "Factuur verstrekt aan artiest",
+    "invoice_provided_label": "De artiest heeft zijn factuur aangeleverd",
     "invoice_requested": "Factuur aangevraagd",
-    "invoice_requested_label": "De artiest vraagt een factuur",
+    "invoice_requested_label": "Er wordt een factuur van de artiest gevraagd",
     "invoice_short": "Factuur",
     "list_title": "Artiestenmanagement",
     "manage_artists_description": "Beheer de kunstenaars die zijn uitgenodigd voor deze editie",
@@ -236,6 +236,8 @@
     "to_pay_no_bank": "Geen bankgegevens ingevuld",
     "to_pay_title": "Te betalen artiesten",
     "to_pay_total": "Nog te betalen",
-    "to_pay_travel": "aan reiskosten"
+    "to_pay_travel": "aan reiskosten",
+    "invoice_file": "Factuur van de artiest",
+    "invoice_upload_help": "Afbeeldingen en PDF toegestaan. Door de factuur te uploaden wordt die als aangeleverd gemarkeerd."
   }
 }

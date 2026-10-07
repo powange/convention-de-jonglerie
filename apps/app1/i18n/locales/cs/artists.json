@@ -82,9 +82,9 @@
     "invoice_fee_section": "Faktura a honorář",
     "invoice_not_requested": "Faktura nepožadována",
     "invoice_provided": "Faktura poskytnuta",
-    "invoice_provided_label": "Faktura poskytnuta umělci",
+    "invoice_provided_label": "Umělec dodal svou fakturu",
     "invoice_requested": "Faktura požadována",
-    "invoice_requested_label": "Umělec žádá fakturu",
+    "invoice_requested_label": "Po umělci je požadována faktura",
     "invoice_short": "Faktura",
     "list_title": "Správa umělců",
     "manage_artists_description": "Správa umělců pozvaných do tohoto vydání",
@@ -236,6 +236,8 @@
     "to_pay_no_bank": "Nejsou zadány žádné bankovní údaje",
     "to_pay_title": "Umělci k zaplacení",
     "to_pay_total": "Zbývá vyplatit",
-    "to_pay_travel": "na cestovní náhrady"
+    "to_pay_travel": "na cestovní náhrady",
+    "invoice_file": "Faktura umělce",
+    "invoice_upload_help": "Přijímáme obrázky a PDF. Nahrání faktury ji označí jako dodanou."
   }
 }
