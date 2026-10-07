@@ -1150,8 +1150,10 @@
       "plan_title": "Plans comptables français",
       "reimburse_confirm_description": "Les {count} écritures avancées par {nom}, soit {montant}, seront marquées comme remboursées en une fois. Pour revenir en arrière, il faudra rouvrir chaque écriture.",
       "reimburse_confirm_title": "Marquer ces avances comme remboursées ?",
+      "reimbursed_badge": "Remboursé",
       "reimbursed_done": "Avances marquées comme remboursées",
       "reimbursed_error": "Impossible de marquer les avances comme remboursées",
+      "reimbursed_on": "Remboursé le {date}",
       "settled_amount": "dont {amount} réglé",
       "source": {
         "ARTIST_PAYMENT": "Cachets des artistes",

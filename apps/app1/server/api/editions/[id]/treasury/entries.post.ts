@@ -7,6 +7,7 @@ import {
   assertCodeBelongsToEdition,
   assertTarifsRattachables,
   avanceNormalisee,
+  dateDuRemboursement,
 } from '#server/utils/treasury-guards'
 import { deplacerJustificatif } from '#server/utils/treasury-receipt-files'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -125,6 +126,9 @@ export default wrapApiHandler(
         isForecast: data.isForecast ?? false,
         operationDate: dateDOperation(data.operationDate),
         ...avance,
+        // Pas d'état d'avant à la création : une ligne saisie « déjà remboursée » est datée du
+        // jour de la saisie. La règle est partagée avec les deux autres points d'écriture.
+        ...dateDuRemboursement(undefined, avance.reimbursed),
         ...(data.tierIds?.length
           ? { tiers: { create: data.tierIds.map((tierId) => ({ tierId })) } }
           : {}),

@@ -66,6 +66,37 @@ export function avanceNormalisee(saisie: {
 }
 
 /**
+ * La date à écrire sur `reimbursedAt`, d'après la BASCULE du booléen.
+ *
+ * Trois cas, et le troisième est celui qui compte :
+ *
+ * - on vient de rembourser (`false` → `true`) : la date est maintenant ;
+ * - on annule le remboursement (`→ false`) : la date s'efface, sans quoi elle resterait à
+ *   contredire l'état ;
+ * - **c'était déjà remboursé et ça l'est toujours : on ne touche à rien.** Réenregistrer une ligne
+ *   pour en corriger le libellé ne doit pas déplacer la date du versement. C'est pour ce seul cas
+ *   que la fonction a besoin de l'état d'AVANT, et c'est pour cela qu'elle rend parfois un objet
+ *   vide plutôt qu'une valeur.
+ *
+ * ⚠️ NE PAS DÉDUIRE CETTE DATE DE `updatedAt`, qui bouge au moindre changement de libellé : le
+ * chiffre serait faux et parfaitement plausible.
+ *
+ * 📍 Les avances soldées AVANT l'arrivée de cette colonne n'ont pas de date — 45 lignes à la
+ * migration. C'est `reimbursed` qui dit l'état ; `reimbursedAt` ne dit que la date quand on la
+ * connaît, et l'écran n'affiche le survol que s'il en a une.
+ *
+ * @param avant l'état en base, ou `undefined` à la création — il n'y a alors rien à préserver.
+ */
+export function dateDuRemboursement(
+  avant: boolean | undefined,
+  apres: boolean
+): { reimbursedAt?: Date | null } {
+  if (!apres) return { reimbursedAt: null }
+  if (avant) return {}
+  return { reimbursedAt: new Date() }
+}
+
+/**
  * Les tarifs qu'une ligne de trésorerie peut rattacher pour en tirer son montant.
  *
  * Trois refus, et chacun protège d'un compte faux plutôt que d'une saisie malpropre :

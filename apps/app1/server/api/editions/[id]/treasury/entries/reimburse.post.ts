@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTreasuryById } from '#server/utils/permissions/edition-permissions'
+import { dateDuRemboursement } from '#server/utils/treasury-guards'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { cleDuNomAvance } from '~~/shared/utils/avance-nom-libre'
 
@@ -46,10 +47,17 @@ export default wrapApiHandler(
       isForecast: false,
     }
 
+    /*
+     * Toujours une BASCULE ici : le filtre `communes` ne retient que `reimbursed: false`. La règle
+     * est appelée quand même, pour que la date vienne du même endroit que sur les deux autres
+     * points d'écriture — recopiée, elle finirait par ne plus dire la même chose ici.
+     */
+    const dateDuVersement = dateDuRemboursement(false, true)
+
     if (advancedById) {
       const { count } = await prisma.treasuryEntry.updateMany({
         where: { ...communes, advancedById },
-        data: { reimbursed: true },
+        data: { reimbursed: true, ...dateDuVersement },
       })
       return createSuccessResponse({ count })
     }
@@ -74,7 +82,7 @@ export default wrapApiHandler(
 
     const { count } = await prisma.treasuryEntry.updateMany({
       where: { id: { in: ids }, ...communes },
-      data: { reimbursed: true },
+      data: { reimbursed: true, ...dateDuVersement },
     })
 
     return createSuccessResponse({ count })

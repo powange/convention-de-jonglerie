@@ -64,7 +64,12 @@ describe('POST /api/editions/[id]/treasury/entries/reimburse', () => {
         isForecast: false,
         advancedById: 7,
       },
-      data: { reimbursed: true },
+      /*
+       * ⚠️ LA DATE AUSSI, et c'est une assertion et non un relâchement : solder une avance doit
+       * l'HORODATER, sans quoi l'écran ne pourrait pas dire quand le versement a eu lieu. Ce test
+       * exigeait `{ reimbursed: true }` à l'identique, et c'est lui qui a vu la colonne arriver.
+       */
+      data: { reimbursed: true, reimbursedAt: expect.any(Date) },
     })
     // Aucune lecture préalable : le compte se retrouve par égalité, rien à normaliser.
     expect(prismaMock.treasuryEntry.findMany).not.toHaveBeenCalled()
@@ -90,7 +95,7 @@ describe('POST /api/editions/[id]/treasury/entries/reimburse', () => {
     expect(argument.where.id).toEqual({ in: [10, 11, 12] })
     // Camille n'est pas soldée : le regroupement ne déborde pas sur une autre personne.
     expect(argument.where.id.in).not.toContain(13)
-    expect(argument.data).toEqual({ reimbursed: true })
+    expect(argument.data).toEqual({ reimbursed: true, reimbursedAt: expect.any(Date) })
   })
 
   it('accepte la clé déjà normalisée que le panneau envoie', async () => {
