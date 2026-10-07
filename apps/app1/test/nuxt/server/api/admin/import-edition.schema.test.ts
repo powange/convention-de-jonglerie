@@ -117,6 +117,43 @@ describe('fuseau horaire de l’import', () => {
     }
   })
 
+  it('TRADUIT l’abréviation d’heure d’été que l’IA renvoie', () => {
+    /*
+     * Le cas signalé : l'import échouait sur « EDT » avec « Fuseau horaire inconnu », alors que
+     * c'est le cas SÛR — « EDT » ne peut désigner que l'Est nord-américain. Le schéma le normalise
+     * désormais, et c'est la valeur NORMALISÉE qui sort, puisque c'est elle qui ancrera les dates.
+     */
+    const payload = validBase()
+    ;(payload.edition as Record<string, unknown>).timezone = 'EDT'
+    const res = importSchema.safeParse(payload)
+    expect(res.success, JSON.stringify(res.error?.issues)).toBe(true)
+    expect(res.data?.edition.timezone).toBe('America/New_York')
+  })
+
+  describe('⚠️ les abréviations qui passaient la garde et décalaient les dates', () => {
+    /*
+     * Le cœur du correctif. L'ancienne garde s'en remettait à `fuseauUtilisable`, donc à Luxon, qui
+     * ACCEPTE ces valeurs : l'import les enregistrait et ancrait les dates dessus. « BST » vaut +6,
+     * le Bangladesh — six heures d'écart pour une convention britannique, sans alerte. Un décalage
+     * d'une heure déplace déjà la frontière des journées, donc le découpage du programme.
+     */
+    it.each(['EST', 'MST', 'BST', 'IST', 'CST', 'PST', 'CET', 'GMT'])('refuse %s', (tz) => {
+      const payload = validBase()
+      ;(payload.edition as Record<string, unknown>).timezone = tz
+      expect(importSchema.safeParse(payload).success).toBe(false)
+    })
+
+    it('et le message dit quoi écrire', () => {
+      // « Fuseau horaire inconnu » ne nommait pas la forme attendue : rien ne disait quoi corriger.
+      const payload = validBase()
+      ;(payload.edition as Record<string, unknown>).timezone = 'IST'
+      const res = importSchema.safeParse(payload)
+      expect(res.success).toBe(false)
+      const message = res.error?.issues.map((i) => i.message).join(' ') ?? ''
+      expect(message).toContain('Région/Localité')
+    })
+  })
+
   it('ancre l’heure sur le fuseau annoncé', () => {
     // Le 15 juillet, Paris est à +02:00 : minuit sur place vaut 22 h UTC la veille.
     expect(parseDateWithTimezone('2025-07-15', 'Europe/Paris').toISOString()).toBe(
