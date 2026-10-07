@@ -1,6 +1,6 @@
 import { expect, test } from '@nuxt/test-utils/playwright'
 
-import { apiPost, loadState, updateEdition } from '../helpers'
+import { apiDelete, apiPost, loadState, updateEdition } from '../helpers'
 
 const BASE = 'http://localhost:3000'
 
@@ -20,6 +20,16 @@ test.describe.serial('Trésorerie — avances à rembourser', () => {
 
   const MONTANT_A = 4200 // 42,00 €
   const MONTANT_B = 1800 // 18,00 €
+  const MONTANT_C = 1000 // 10,00 €, la seule avance portant un code d'imputation
+  /**
+   * Le total dû, DÉRIVÉ des trois avances.
+   *
+   * ⚠️ Écrit en dur (« 60 »), il obligeait à retoucher trois assertions dès qu'on ajoutait une
+   * avance — ce qui est exactement ce qui vient d'arriver en couvrant le code d'imputation.
+   */
+  const TOTAL_DU = ((MONTANT_A + MONTANT_B + MONTANT_C) / 100).toString()
+  const CODE_IMPUTATION = '6063'
+  const LIBELLE_IMPUTATION = 'Fournitures E2E'
   const creees: number[] = []
   let pseudo = ''
 
@@ -39,6 +49,87 @@ test.describe.serial('Trésorerie — avances à rembourser', () => {
       `aucun candidat à l'avance : ${JSON.stringify(corps).slice(0, 200)}`
     ).toBeTruthy()
     pseudo = utilisateur.pseudo
+
+    /*
+     * ⚠️ REPARTIR D'UN ÉTAT CONNU. Ce fichier n'était pas idempotent : un second passage sur la
+     * même édition recréait les deux avances sans retirer les premières, et la carte annonçait
+     * alors 120 € là où le test en attend 60. L'échec ressemble à une régression du calcul, et
+     * n'en est pas — mesuré, huit lignes résiduelles sur deux éditions d'essai.
+     *
+     * 📍 Le nettoyage final ne suffit pas : il ne tourne pas quand un test échoue avant lui, et
+     * c'est précisément là que les restes s'accumulent.
+     */
+    /*
+     * ⚠️ LE RAPPORT, ET NON `/treasury/entries` — CE POINT D'API N'EXISTE PAS. Ma première version
+     * l'appelait : la requête échouait, `ok()` rendait faux, et le nettoyage ne faisait RIEN sans
+     * rien dire. Le test échouait ensuite sur « 120 € au lieu de 60 », ce qui désigne le calcul
+     * alors que la faute était dans le décor.
+     *
+     * 📍 D'où le `expect` sur la réponse : un nettoyage muet est pire qu'un nettoyage absent.
+     */
+    const rapport = await page.request.get(`${BASE}/api/editions/${editionId}/treasury`)
+    expect(rapport.ok(), `lecture du rapport: ${await rapport.text()}`).toBe(true)
+    const corpsRapport = await rapport.json()
+    for (const ligne of corpsRapport?.data?.lines ?? corpsRapport?.lines ?? []) {
+      if (ligne?.entryId && String(ligne.title ?? '').startsWith('Avance E2E')) {
+        const efface = await apiDelete(
+          page,
+          `${BASE}/api/editions/${editionId}/treasury/entries/${ligne.entryId}`
+        )
+        expect(efface.ok(), `nettoyage de ${ligne.entryId}: ${await efface.text()}`).toBe(true)
+      }
+    }
+
+    /*
+     * ⚠️ VÉRIFIER L'ÉTAT, PAS SEULEMENT LES GESTES. Mon premier `expect` portait sur la LECTURE du
+     * rapport, pas sur les suppressions — un nettoyage pouvait donc échouer sans rien dire, et le
+     * test suivant tombait sur « 120 € au lieu de 60 », ce qui accuse le calcul quand la faute est
+     * dans le décor. Cette assertion-ci est la seule qui ferme vraiment le cas.
+     */
+    const apresNettoyage = await page.request.get(`${BASE}/api/editions/${editionId}/treasury`)
+    const etat = await apresNettoyage.json()
+    expect((etat?.data ?? etat)?.totals?.toReimburse?.total ?? 0).toBe(0)
+
+    /*
+     * ⚠️ UNE AVANCE AVEC UN CODE D'IMPUTATION. Sans elle, les deux autres n'en portant aucun, le
+     * détail n'exerçait que la branche « Sans imputation » — et le `{{ code }} · {{ label }}`, qui
+     * est le cœur de la demande, n'était rendu dans AUCUN test. Une faute d'attribut (`libelle`
+     * au lieu de `label`, les deux cohabitent dans ce dépôt) rendrait une chaîne vide : aucune
+     * erreur, lint et typage muets, et « 606 · » en production.
+     */
+    const reponseCode = await apiPost(page, `${BASE}/api/editions/${editionId}/treasury/codes`, {
+      data: { code: CODE_IMPUTATION, label: LIBELLE_IMPUTATION },
+    })
+    /*
+     * ⚠️ LE RAPPORT PORTE LES CODES — il n'existe AUCUN `GET /treasury/codes`. Mon premier jet
+     * l'appelait, pour la deuxième fois dans ce fichier : la requête échouait, la liste était
+     * vide, et le test devenait instable d'un passage à l'autre selon que le code existait déjà.
+     * Un point d'API supposé rend une liste vide avec le même aplomb qu'un point d'API réel.
+     */
+    let codeId: number | undefined = reponseCode.ok()
+      ? ((await reponseCode.json())?.data?.code ?? {}).id
+      : undefined
+
+    if (!codeId) {
+      const rapportCodes = await page.request.get(`${BASE}/api/editions/${editionId}/treasury`)
+      expect(rapportCodes.ok(), `lecture des codes: ${await rapportCodes.text()}`).toBe(true)
+      const corpsCodes = await rapportCodes.json()
+      const liste = (corpsCodes?.data ?? corpsCodes)?.codes ?? []
+      codeId = liste.find((c: { code: string }) => c.code === CODE_IMPUTATION)?.id
+    }
+    expect(codeId, 'aucun code d’imputation disponible').toBeTruthy()
+
+    const avecCode = await apiPost(page, `${BASE}/api/editions/${editionId}/treasury/entries`, {
+      data: {
+        kind: 'EXPENSE',
+        title: `Avance E2E ${MONTANT_C}`,
+        amount: MONTANT_C / 100,
+        advancedById: utilisateur.id,
+        codeId,
+      },
+    })
+    expect(avecCode.ok(), await avecCode.text()).toBe(true)
+    creees.push(((await avecCode.json())?.data ?? {}).id)
 
     for (const montant of [MONTANT_A, MONTANT_B]) {
       const r = await apiPost(page, `${BASE}/api/editions/${editionId}/treasury/entries`, {
@@ -62,19 +153,75 @@ test.describe.serial('Trésorerie — avances à rembourser', () => {
     await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
     await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
 
-    // 42 + 18 = 60 € dus à la même personne.
+    // Les trois avances, dues à la même personne.
     const carte = page
       .locator('div')
       .filter({ hasText: /^À rembourser/ })
       .last()
-    await expect(carte).toContainText('60', { timeout: 15000 })
+    await expect(carte).toContainText(TOTAL_DU, { timeout: 15000 })
 
     await carte.click()
 
     const modale = page.getByRole('dialog')
     await expect(modale).toBeVisible({ timeout: 10000 })
     await expect(modale).toContainText(pseudo)
-    await expect(modale).toContainText('60')
+    await expect(modale).toContainText(TOTAL_DU)
+  })
+
+  test('⚠️ déplier une personne montre les écritures qui composent sa dette', async ({
+    page,
+    goto,
+  }) => {
+    /*
+     * ⚠️ CE TEST OUVRE LA MODALE LUI-MÊME. Ma première version s'appuyait sur « le test précédent
+     * l'a laissée ouverte » — et quand celui-ci échoue, le dialogue n'existe pas : mon test
+     * échouait alors pour la faute du voisin, en annonçant « element(s) not found », ce qui ne
+     * désigne pas la vraie cause. Un test qui dépend de l'état laissé par un autre ne dit plus
+     * ce qu'il mesure.
+     *
+     * ⚠️ CE QU'ON ÉPROUVE EST QUE LE DÉTAIL MONTRE SES ÉCRITURES, chacune avec son montant. Que
+     * la somme fasse le total est garanti par le test unitaire, qui le vérifie directement. Un détail qui ne somme pas à l'en-tête ne se
+     * remarque qu'en recomptant à la main, et l'on ne sait alors plus lequel des deux croire —
+     * c'est la raison pour laquelle ces lignes sont calculées par le serveur, dans la boucle qui
+     * applique déjà la règle des avances, et non regroupées une seconde fois côté client.
+     */
+    const { editionId } = loadState()
+    await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
+    await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
+
+    await page
+      .locator('div')
+      .filter({ hasText: /^À rembourser/ })
+      .last()
+      .click()
+
+    const modale = page.getByRole('dialog')
+    await expect(modale).toBeVisible({ timeout: 10000 })
+
+    /*
+     * 📍 Le repli DÉMONTE son contenu : replié, les écritures ne sont pas dans le DOM. Mon premier
+     * jet gardait `unmount-on-hide="false"`, ce qui m'avait fait écrire `toBeHidden()` — une
+     * assertion CREUSE, puisqu'elle passe aussi quand l'élément n'existe nulle part. Elle aurait
+     * été verte sans le détail du tout, c'est-à-dire sans la fonctionnalité.
+     */
+    await expect(modale.getByText('Avance E2E 4200')).toHaveCount(0)
+
+    await modale.getByText(pseudo).click()
+
+    // Dépliée : les deux écritures, chacune avec son montant.
+    await expect(modale.getByText('Avance E2E 4200')).toBeVisible()
+    await expect(modale.getByText('Avance E2E 1800')).toBeVisible()
+    await expect(modale).toContainText('42')
+    await expect(modale).toContainText('18')
+
+    // Sans imputation, l'écran le DIT plutôt que d'afficher un code inventé : ces avances ont été
+    // créées sans code, et c'est le cas le plus fréquent d'une dépense saisie dans l'urgence.
+    await expect(modale.getByText('Sans imputation').first()).toBeVisible()
+
+    // ⚠️ ET LA BRANCHE INVERSE : code ET libellé, ce que l'utilisateur a demandé. Sans ce cas,
+    // seule l'absence d'imputation était rendue dans un test.
+    await expect(modale.getByText(`Avance E2E ${MONTANT_C}`)).toBeVisible()
+    await expect(modale.getByText(`${CODE_IMPUTATION} · ${LIBELLE_IMPUTATION}`)).toBeVisible()
   })
 
   test('le bouton « Remboursé » solde les avances de la personne en une fois', async ({ page }) => {
@@ -88,26 +235,42 @@ test.describe.serial('Trésorerie — avances à rembourser', () => {
       .locator('div')
       .filter({ hasText: /^À rembourser/ })
       .last()
-    await expect(carte).toContainText('60', { timeout: 15000 })
+    await expect(carte).toContainText(TOTAL_DU, { timeout: 15000 })
     await carte.click()
 
     const modale = page.getByRole('dialog')
-    await modale.getByRole('button', { name: 'Remboursé' }).first().click()
+    /*
+     * ⚠️ `exact: true`, ET C'EST LE CORRECTIF D'ACCESSIBILITÉ QUI L'EXIGE. Le déclencheur du repli
+     * porte désormais `role="button"` — sans quoi le détail serait inatteignable au clavier — et
+     * son nom accessible est TOUT le texte de la ligne, qui contient « Remboursé ». Or la
+     * correspondance de nom est une SOUS-CHAÎNE par défaut : `.first()` attrapait le déclencheur,
+     * dépliait la personne au lieu de la rembourser, et la modale restait ouverte.
+     */
+    await modale.getByRole('button', { name: 'Remboursé', exact: true }).first().click()
 
     // Les DEUX lignes doivent être soldées d'un coup, pas seulement la première : la carte
     // retombe à zéro et la modale se referme d'elle-même.
     await expect(modale).toBeHidden({ timeout: 15000 })
     await expect(carte).toContainText('0', { timeout: 15000 })
-    await expect(carte).not.toContainText('60')
+    await expect(carte).not.toContainText(TOTAL_DU)
   })
 
   test('nettoyer : retirer les lignes créées', async ({ page }) => {
     const { editionId } = loadState()
+    /*
+     * ⚠️ `apiDelete` ET NON `page.request.delete` : le middleware CSRF exige un jeton sur tout
+     * DELETE, que la requête brute ne porte pas. Chaque suppression rendait donc 403, le
+     * `.catch(() => {})` l'avalait, et ce test était VERT en n'ayant rien supprimé — y compris
+     * quand toute la suite passait. C'est la vraie origine des huit lignes résiduelles mesurées,
+     * et non « le nettoyage ne tourne pas quand un test échoue », qui n'en était que la moitié.
+     */
     for (const id of creees) {
       if (!id) continue
-      await page.request
-        .delete(`${BASE}/api/editions/${editionId}/treasury/entries/${id}`)
-        .catch(() => {})
+      const efface = await apiDelete(
+        page,
+        `${BASE}/api/editions/${editionId}/treasury/entries/${id}`
+      )
+      expect(efface.ok(), `suppression de l'entrée ${id}: ${await efface.text()}`).toBe(true)
     }
     await updateEdition(page, String(editionId), { treasuryEnabled: false })
   })
