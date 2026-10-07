@@ -224,6 +224,18 @@
     "receipt_saved": "Comprovante salvo",
     "receipt_short": "Comprovante",
     "receipt_upload_title": "Adicionar um comprovante",
-    "receipt_view_title": "Comprovante"
+    "receipt_view_title": "Comprovante",
+    "to_pay_consumables": "de consumíveis",
+    "to_pay_count": "{count} artista(s) a pagar",
+    "to_pay_empty": "Está tudo pago",
+    "to_pay_fee": "de cachê",
+    "to_pay_help": "O que falta pagar: o cachê não pago, as ajudas de custo reais e os consumíveis reais não reembolsados. Os limites anunciados não contam.",
+    "to_pay_mark": "Marcar como pago",
+    "to_pay_mark_error": "Não foi possível registar o pagamento",
+    "to_pay_marked": "Pagamento registado",
+    "to_pay_no_bank": "Nenhuns dados bancários indicados",
+    "to_pay_title": "Artistas a pagar",
+    "to_pay_total": "Falta pagar",
+    "to_pay_travel": "de ajudas de custo"
   }
 }

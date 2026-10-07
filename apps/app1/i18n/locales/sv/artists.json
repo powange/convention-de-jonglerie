@@ -224,6 +224,18 @@
     "receipt_saved": "Underlag sparat",
     "receipt_short": "Underlag",
     "receipt_upload_title": "Lägg till underlag",
-    "receipt_view_title": "Underlag"
+    "receipt_view_title": "Underlag",
+    "to_pay_consumables": "i förbrukningsmaterial",
+    "to_pay_count": "{count} artist(er) att betala",
+    "to_pay_empty": "Allt är betalt",
+    "to_pay_fee": "i arvode",
+    "to_pay_help": "Det som återstår att betala: arvode som inte har betalats, faktisk reseersättning och faktiskt förbrukningsmaterial som inte har ersatts. Angivna maxbelopp räknas inte.",
+    "to_pay_mark": "Markera som betald",
+    "to_pay_mark_error": "Betalningen kunde inte sparas",
+    "to_pay_marked": "Betalning sparad",
+    "to_pay_no_bank": "Inga bankuppgifter angivna",
+    "to_pay_title": "Artister att betala",
+    "to_pay_total": "Återstår att betala",
+    "to_pay_travel": "i reseersättning"
   }
 }

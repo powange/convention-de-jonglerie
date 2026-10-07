@@ -224,6 +224,18 @@
     "receipt_saved": "Beleg gespeichert",
     "receipt_short": "Beleg",
     "receipt_upload_title": "Beleg hinzufügen",
-    "receipt_view_title": "Beleg"
+    "receipt_view_title": "Beleg",
+    "to_pay_consumables": "an Verbrauchsmaterial",
+    "to_pay_count": "{count} Künstler/innen zu bezahlen",
+    "to_pay_empty": "Alles ist beglichen",
+    "to_pay_fee": "an Honorar",
+    "to_pay_help": "Was noch zu zahlen ist: nicht gezahltes Honorar, tatsächliche Reisekosten und tatsächliches, nicht erstattetes Verbrauchsmaterial. Angekündigte Obergrenzen zählen nicht.",
+    "to_pay_mark": "Als gezahlt markieren",
+    "to_pay_mark_error": "Die Zahlung konnte nicht gespeichert werden",
+    "to_pay_marked": "Zahlung gespeichert",
+    "to_pay_no_bank": "Keine Bankverbindung angegeben",
+    "to_pay_title": "Zu bezahlende Künstler/innen",
+    "to_pay_total": "Noch zu zahlen",
+    "to_pay_travel": "an Reisekosten"
   }
 }

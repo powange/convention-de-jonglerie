@@ -1151,7 +1151,9 @@
       "filter_state": "Состояние",
       "filter_state_advanced": "Оплачено из своих",
       "filter_state_all": "Все состояния",
-      "filter_state_forecast": "Планируемые"
+      "filter_state_forecast": "Планируемые",
+      "reimburse_confirm_description": "{count} записей, оплаченных {nom} на общую сумму {montant}, будут разом отмечены как возмещённые. Чтобы отменить это, придётся открыть каждую запись заново.",
+      "reimburse_confirm_title": "Отметить эти авансы как возмещённые?"
     },
     "program": {
       "description": "Составьте расписание фестиваля: воркшопы, выступления и другие события.",

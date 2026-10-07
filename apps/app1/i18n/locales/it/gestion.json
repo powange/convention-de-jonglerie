@@ -1151,7 +1151,9 @@
       "filter_state": "Stato",
       "filter_state_advanced": "Anticipate",
       "filter_state_all": "Tutti gli stati",
-      "filter_state_forecast": "Previste"
+      "filter_state_forecast": "Previste",
+      "reimburse_confirm_description": "Le {count} scritture anticipate da {nom}, per un totale di {montant}, saranno segnate come rimborsate in una sola volta. Per tornare indietro bisognerà riaprire ogni scrittura.",
+      "reimburse_confirm_title": "Segnare questi anticipi come rimborsati?"
     },
     "program": {
       "description": "Componi la cronologia dell'edizione: workshop, spettacoli e altri momenti.",

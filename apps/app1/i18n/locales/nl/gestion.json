@@ -1151,7 +1151,9 @@
       "filter_state": "Status",
       "filter_state_advanced": "Voorgeschoten",
       "filter_state_all": "Alle statussen",
-      "filter_state_forecast": "Verwacht"
+      "filter_state_forecast": "Verwacht",
+      "reimburse_confirm_description": "De {count} posten die {nom} heeft voorgeschoten, samen {montant}, worden in één keer als terugbetaald gemarkeerd. Om dit terug te draaien moet je elke post opnieuw openen.",
+      "reimburse_confirm_title": "Deze voorschotten als terugbetaald markeren?"
     },
     "program": {
       "description": "Stel de tijdlijn van de editie samen: workshops, shows en andere momenten.",

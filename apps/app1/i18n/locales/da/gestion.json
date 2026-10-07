@@ -1151,7 +1151,9 @@
       "filter_state": "Status",
       "filter_state_advanced": "Lagt ud",
       "filter_state_all": "Alle statusser",
-      "filter_state_forecast": "Forventede"
+      "filter_state_forecast": "Forventede",
+      "reimburse_confirm_description": "De {count} posteringer, som {nom} har lagt ud for, i alt {montant}, markeres som refunderet på én gang. For at fortryde skal hver postering åbnes igen.",
+      "reimburse_confirm_title": "Markér disse udlæg som refunderet?"
     },
     "program": {
       "description": "Sammensæt udgavens tidslinje: workshops, shows og andre programpunkter.",

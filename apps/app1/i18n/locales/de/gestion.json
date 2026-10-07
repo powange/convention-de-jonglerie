@@ -1151,7 +1151,9 @@
       "filter_state": "Status",
       "filter_state_advanced": "Vorgestreckt",
       "filter_state_all": "Alle Status",
-      "filter_state_forecast": "Geplant"
+      "filter_state_forecast": "Geplant",
+      "reimburse_confirm_description": "Die {count} von {nom} vorgestreckten Buchungen über insgesamt {montant} werden in einem Schritt als erstattet markiert. Um das zurückzunehmen, muss jede Buchung einzeln wieder geöffnet werden.",
+      "reimburse_confirm_title": "Diese Vorschüsse als erstattet markieren?"
     },
     "program": {
       "description": "Stellen Sie den Zeitplan der Ausgabe zusammen: Workshops, Shows und weitere Momente.",

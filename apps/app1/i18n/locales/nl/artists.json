@@ -224,6 +224,18 @@
     "receipt_saved": "Bewijsstuk opgeslagen",
     "receipt_short": "Bewijsstuk",
     "receipt_upload_title": "Bewijsstuk toevoegen",
-    "receipt_view_title": "Bewijsstuk"
+    "receipt_view_title": "Bewijsstuk",
+    "to_pay_consumables": "aan verbruiksmateriaal",
+    "to_pay_count": "{count} artiest(en) te betalen",
+    "to_pay_empty": "Alles is betaald",
+    "to_pay_fee": "aan vergoeding",
+    "to_pay_help": "Wat nog betaald moet worden: de niet-uitbetaalde vergoeding, de werkelijke reiskosten en het werkelijke, niet-vergoede verbruiksmateriaal. Aangekondigde maxima tellen niet mee.",
+    "to_pay_mark": "Als betaald markeren",
+    "to_pay_mark_error": "De betaling kon niet worden opgeslagen",
+    "to_pay_marked": "Betaling opgeslagen",
+    "to_pay_no_bank": "Geen bankgegevens ingevuld",
+    "to_pay_title": "Te betalen artiesten",
+    "to_pay_total": "Nog te betalen",
+    "to_pay_travel": "aan reiskosten"
   }
 }

@@ -111,117 +111,82 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Construire le chemin complet du fichier
-  // nuxt-file-storage stocke dans le mount configuré
-  const uploadDir = process.env.NUXT_FILE_STORAGE_MOUNT || '/uploads'
-  const filePath = join(uploadDir, path)
-
-  // Vérifier que le chemin ne sort pas du dossier uploads
-  if (!filePath.startsWith(uploadDir)) {
-    throw createError({
-      status: 403,
-      message: 'Access denied',
-    })
+  /*
+   * Deux emplacements, essayés dans l'ordre : le mount courant, puis `public/uploads` (ancien
+   * système, antérieur au volume). `localiser` ne couvre QUE la recherche du fichier — la pose des
+   * en-têtes et l'envoi du flux sont hors de tout `try`.
+   *
+   * ⚠️ C'est le point qui compte ici. Un `try` qui englobait aussi la pose des en-têtes a
+   * transformé une variable mal renommée en « File not found » sur TOUS les fichiers déposés,
+   * affiches et avatars compris : l'exception partait dans le `catch`, qui concluait à l'absence du
+   * fichier. Rien ne la distinguait d'un fichier réellement manquant, et le cache de Cloudflare
+   * servait encore les images déjà vues — le défaut est resté invisible en production.
+   */
+  const emplacement = await localiser(path)
+  if (!emplacement) {
+    throw createError({ status: 404, message: 'File not found' })
   }
 
-  // Vérifier que le fichier existe
-  try {
-    const stats = await stat(filePath)
+  setHeader(event, 'Content-Type', typeMime(path))
+  setHeader(event, 'Content-Length', emplacement.taille.toString())
+  // `private` pour ce qui vient d'être mis derrière un droit : un cache partagé le servirait
+  // sinon à quelqu'un qui ne l'a pas.
+  setHeader(
+    event,
+    'Cache-Control',
+    protege ? 'private, max-age=31536000, immutable' : 'public, max-age=31536000, immutable'
+  )
 
-    if (!stats.isFile()) {
-      throw createError({
-        status: 404,
-        message: 'File not found',
-      })
-    }
-
-    // Déterminer le type MIME basé sur l'extension
-    const ext = path.split('.').pop()?.toLowerCase()
-    let contentType = 'application/octet-stream'
-
-    switch (ext) {
-      case 'jpg':
-      case 'jpeg':
-        contentType = 'image/jpeg'
-        break
-      case 'png':
-        contentType = 'image/png'
-        break
-      case 'webp':
-        contentType = 'image/webp'
-        break
-      case 'gif':
-        contentType = 'image/gif'
-        break
-      case 'svg':
-        contentType = 'image/svg+xml'
-        break
-      // Sans ce cas, un justificatif PDF partait en `application/octet-stream` : le navigateur le
-      // téléchargeait au lieu de l'afficher, et la visionneuse de la page de trésorerie restait
-      // vide.
-      case 'pdf':
-        contentType = 'application/pdf'
-        break
-    }
-
-    // Définir les headers
-    setHeader(event, 'Content-Type', contentType)
-    setHeader(event, 'Content-Length', stats.size.toString())
-    // `private` pour ce qui vient d'être mis derrière un droit : un cache partagé le servirait
-    // sinon à quelqu'un qui ne l'a pas.
-    setHeader(
-      event,
-      'Cache-Control',
-      editionAControler !== null
-        ? 'private, max-age=31536000, immutable'
-        : 'public, max-age=31536000, immutable'
-    )
-
-    // Retourner le fichier
-    return sendStream(event, createReadStream(filePath))
-  } catch {
-    // Si le fichier n'existe pas, essayer dans public/uploads (ancien système)
-    try {
-      const publicPath = join(process.cwd(), 'public/uploads', path)
-      const publicUploadsDir = join(process.cwd(), 'public/uploads')
-
-      // Protection path traversal sur le fallback
-      if (!publicPath.startsWith(publicUploadsDir)) {
-        throw createError({ status: 403, message: 'Access denied' })
-      }
-
-      const publicStats = await stat(publicPath)
-
-      if (publicStats.isFile()) {
-        const ext = path.split('.').pop()?.toLowerCase()
-        let contentType = 'application/octet-stream'
-
-        switch (ext) {
-          case 'jpg':
-          case 'jpeg':
-            contentType = 'image/jpeg'
-            break
-          case 'png':
-            contentType = 'image/png'
-            break
-          case 'webp':
-            contentType = 'image/webp'
-            break
-        }
-
-        setHeader(event, 'Content-Type', contentType)
-        setHeader(event, 'Content-Length', publicStats.size.toString())
-        setHeader(event, 'Cache-Control', 'public, max-age=31536000, immutable')
-
-        return sendStream(event, createReadStream(publicPath))
-      }
-    } catch {
-      // Fichier non trouvé
-    }
-
-    throw createError({
-      status: 404,
-      message: 'File not found',
-    })
-  }
+  return sendStream(event, createReadStream(emplacement.chemin))
 })
+
+/** Le type MIME d'un fichier déposé, décidé sur son extension. */
+function typeMime(path: string): string {
+  switch (path.split('.').pop()?.toLowerCase()) {
+    case 'jpg':
+    case 'jpeg':
+      return 'image/jpeg'
+    case 'png':
+      return 'image/png'
+    case 'webp':
+      return 'image/webp'
+    case 'gif':
+      return 'image/gif'
+    case 'svg':
+      return 'image/svg+xml'
+    // Sans ce cas, un justificatif PDF partait en `application/octet-stream` : le navigateur le
+    // téléchargeait au lieu de l'afficher, et la visionneuse de la page de trésorerie restait vide.
+    case 'pdf':
+      return 'application/pdf'
+    default:
+      return 'application/octet-stream'
+  }
+}
+
+/**
+ * Où se trouve le fichier, et sa taille — ou `null` s'il n'est nulle part.
+ *
+ * Le `catch` ne couvre que `stat`, qui échoue quand le fichier n'existe pas : c'est le seul endroit
+ * où une exception veut dire « absent ».
+ */
+async function localiser(path: string): Promise<{ chemin: string; taille: number } | null> {
+  const racines = [
+    process.env.NUXT_FILE_STORAGE_MOUNT || '/uploads',
+    join(process.cwd(), 'public/uploads'),
+  ]
+
+  for (const racine of racines) {
+    const chemin = join(racine, path)
+    // Garde-fou de traversée, racine par racine : `join` normalise, un `..` ressortirait ici.
+    if (!chemin.startsWith(racine)) continue
+
+    try {
+      const stats = await stat(chemin)
+      if (stats.isFile()) return { chemin, taille: stats.size }
+    } catch {
+      // Pas à cet emplacement : essayer le suivant.
+    }
+  }
+
+  return null
+}

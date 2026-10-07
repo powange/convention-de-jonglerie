@@ -224,6 +224,18 @@
     "receipt_saved": "Dokumentation gemt",
     "receipt_short": "Dokumentation",
     "receipt_upload_title": "Tilføj dokumentation",
-    "receipt_view_title": "Dokumentation"
+    "receipt_view_title": "Dokumentation",
+    "to_pay_consumables": "i forbrugsmaterialer",
+    "to_pay_count": "{count} artist(er) at betale",
+    "to_pay_empty": "Alt er betalt",
+    "to_pay_fee": "i honorar",
+    "to_pay_help": "Hvad der mangler at blive udbetalt: honorar der ikke er betalt, faktisk rejsegodtgørelse og faktiske forbrugsmaterialer der ikke er refunderet. Annoncerede maksimumbeløb tæller ikke med.",
+    "to_pay_mark": "Markér som betalt",
+    "to_pay_mark_error": "Betalingen kunne ikke gemmes",
+    "to_pay_marked": "Betaling gemt",
+    "to_pay_no_bank": "Ingen bankoplysninger angivet",
+    "to_pay_title": "Artister der skal betales",
+    "to_pay_total": "Mangler at blive udbetalt",
+    "to_pay_travel": "i rejsegodtgørelse"
   }
 }

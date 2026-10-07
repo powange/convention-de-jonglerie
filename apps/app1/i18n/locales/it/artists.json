@@ -224,6 +224,18 @@
     "receipt_saved": "Giustificativo salvato",
     "receipt_short": "Giustificativo",
     "receipt_upload_title": "Aggiungi un giustificativo",
-    "receipt_view_title": "Giustificativo"
+    "receipt_view_title": "Giustificativo",
+    "to_pay_consumables": "di materiali di consumo",
+    "to_pay_count": "{count} artista/i da pagare",
+    "to_pay_empty": "Tutto è saldato",
+    "to_pay_fee": "di cachet",
+    "to_pay_help": "Quanto resta da versare: il cachet non pagato, il rimborso spese effettivo e i materiali di consumo effettivi non rimborsati. I massimali annunciati non contano.",
+    "to_pay_mark": "Segna come pagato",
+    "to_pay_mark_error": "Impossibile registrare il pagamento",
+    "to_pay_marked": "Pagamento registrato",
+    "to_pay_no_bank": "Nessuna coordinata bancaria indicata",
+    "to_pay_title": "Artisti da pagare",
+    "to_pay_total": "Resta da versare",
+    "to_pay_travel": "di rimborso spese"
   }
 }

@@ -224,6 +224,18 @@
     "receipt_saved": "Doklad uložen",
     "receipt_short": "Doklad",
     "receipt_upload_title": "Přidat doklad",
-    "receipt_view_title": "Doklad"
+    "receipt_view_title": "Doklad",
+    "to_pay_consumables": "na spotřební materiál",
+    "to_pay_count": "{count} umělců k zaplacení",
+    "to_pay_empty": "Vše je vyrovnáno",
+    "to_pay_fee": "na honorář",
+    "to_pay_help": "Co ještě zbývá vyplatit: nevyplacený honorář, skutečné cestovní náhrady a skutečný neuhrazený spotřební materiál. Oznámené limity se nepočítají.",
+    "to_pay_mark": "Označit jako vyplacené",
+    "to_pay_mark_error": "Platbu nelze uložit",
+    "to_pay_marked": "Platba uložena",
+    "to_pay_no_bank": "Nejsou zadány žádné bankovní údaje",
+    "to_pay_title": "Umělci k zaplacení",
+    "to_pay_total": "Zbývá vyplatit",
+    "to_pay_travel": "na cestovní náhrady"
   }
 }
