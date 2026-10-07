@@ -583,6 +583,106 @@ test.describe.serial('Remboursement des consommables des artistes', () => {
     await page.keyboard.press('Escape')
   })
 
+  test('les justificatifs se relisent depuis le tableau, image en grand et PDF dans un onglet', async ({
+    page,
+    goto,
+  }) => {
+    const { editionId, conventionId } = loadState()
+    const dossier = `/uploads/conventions/${conventionId}/editions/${editionId}/artists`
+    const DEFRAIEMENT = `${dossier}/e2e-billet.jpg`
+    const CONSOMMABLES = `${dossier}/e2e-ticket.jpg`
+    const FACTURE = `${dossier}/e2e-facture-tableau.pdf`
+
+    /*
+     * Les URL désignent des fichiers qui n'existent pas, et c'est suffisant : ce parcours éprouve
+     * la PRÉSENCE de l'icône et le chemin qu'elle emprunte, pas la lecture du fichier — celle-ci
+     * est couverte par `test/nuxt/server/routes/uploads-fichier-servi`.
+     *
+     * ⚠️ `invoiceRequested` RESTE FAUX, délibérément. L'icône de la facture est conditionnée au
+     * FICHIER et non à « demandée et fournie » : `invoiceProvided` peut être vrai sans fichier — la
+     * case est cochable seule, pour une facture reçue par courriel. Une icône posée sur cet état-là
+     * serait parfois un clic qui n'ouvre rien. Ce test fige ce choix.
+     */
+    const pose = await apiPut(
+      page,
+      `${BASE_URL}/api/editions/${editionId}/artists/${selfArtistId}`,
+      {
+        data: {
+          reimbursementMax: 150,
+          reimbursementReceiptUrl: DEFRAIEMENT,
+          consumablesMax: 90,
+          consumablesReceiptUrl: CONSOMMABLES,
+          invoiceRequested: false,
+          invoiceUrl: FACTURE,
+        },
+      }
+    )
+    expect(pose.ok(), `pose des justificatifs refusée : ${await pose.text()}`).toBe(true)
+
+    await goto(`/editions/${editionId}/gestion/artists`, { waitUntil: 'hydration' })
+    const { email } = loadCredentials()
+    const ligne = page.locator('tr', { hasText: email }).first()
+    await expect(ligne).toBeVisible({ timeout: 20000 })
+
+    /*
+     * ⚠️ `exact: true` : un nom accessible s'apparie par SOUS-CHAÎNE. « Justificatif » seul
+     * attraperait les trois icônes à la fois, et l'assertion serait vraie sans rien prouver.
+     */
+    const iconeDefraiement = ligne.getByRole('button', {
+      name: 'Justificatif du défraiement',
+      exact: true,
+    })
+    await expect(iconeDefraiement).toBeVisible()
+
+    // Une IMAGE s'ouvre en grand, dans la modale que porte la page — et avec la bonne URL.
+    await iconeDefraiement.click()
+    const apercu = page.getByRole('dialog')
+    await expect(apercu.locator('img')).toHaveAttribute('src', DEFRAIEMENT, { timeout: 10000 })
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+
+    // Les consommables suivent le même chemin, depuis leur propre colonne.
+    const iconeConsommables = ligne.getByRole('button', {
+      name: 'Justificatif des consommables',
+      exact: true,
+    })
+    await expect(iconeConsommables).toBeVisible()
+    await iconeConsommables.click()
+    await expect(page.getByRole('dialog').locator('img')).toHaveAttribute('src', CONSOMMABLES, {
+      timeout: 10000,
+    })
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+
+    /*
+     * LA FACTURE EST UN PDF : un LIEN, pas un bouton — c'est le discriminant, et il tient à `to`.
+     * Elle est là alors qu'aucune facture n'est « demandée » : c'est le fichier qui commande.
+     */
+    const lienFacture = ligne.getByRole('link', { name: "Facture de l'artiste", exact: true })
+    await expect(lienFacture).toBeVisible()
+    await expect(lienFacture).toHaveAttribute('target', '_blank')
+    const [onglet] = await Promise.all([page.waitForEvent('popup'), lienFacture.click()])
+    expect(onglet.url()).toContain('e2e-facture-tableau.pdf')
+    await onglet.close()
+    // La modale est restée fermée : un PDF ne passe pas par elle.
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+
+    /*
+     * LE TÉMOIN NÉGATIF. Sans lui, une icône affichée sur TOUTES les lignes passerait chacune des
+     * assertions ci-dessus. L'autre artiste du parcours n'a aucun justificatif : sa ligne ne doit
+     * porter aucune des trois icônes.
+     */
+    const ligneSansRien = page.locator('tr', { hasText: ARTIST_EMAIL }).first()
+    await expect(ligneSansRien).toBeVisible()
+    for (const nom of [
+      'Justificatif du défraiement',
+      'Justificatif des consommables',
+      "Facture de l'artiste",
+    ]) {
+      await expect(ligneSansRien.getByLabel(nom, { exact: true })).toHaveCount(0)
+    }
+  })
+
   test('nettoyage : supprimer les artistes créés', async ({ page }) => {
     for (const id of [artistId, selfArtistId]) {
       if (!id) continue
