@@ -8,6 +8,9 @@ import {
   getPrefilledJsonPrompt,
 } from '../../lib/import-json-schema'
 import { loadPrompt } from '../../lib/prompt-loader'
+import { formatDeReponseJson, schemaJsonDepuisZod } from '../../lib/schema-json-du-modele'
+
+import { importSchema } from './import-edition.post'
 
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import {
@@ -18,6 +21,7 @@ import {
   serveursLmStudio,
 } from '#server/utils/ai-config'
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { appelerAvecSchemaJsonOuSansLui } from '#server/utils/appel-avec-schema-json'
 import { createTask, runTaskInBackground, updateTaskMetadata } from '#server/utils/async-tasks'
 import {
   extractEditionFeatures,
@@ -303,7 +307,9 @@ export async function generateImportJson(
   console.log(`[GENERATE-IMPORT] Provider IA sélectionné: ${aiProvider}`)
   const dynamicMaxContent = await getMaxContentSizeForProvider(
     aiProvider,
-    effectiveConfig.lmstudioBaseUrl
+    effectiveConfig.lmstudioBaseUrl,
+    // L'identifiant du modèle : sans lui, le contexte était lu sur le PREMIER modèle installé.
+    effectiveConfig.lmstudioModel
   )
   // Réduire si on a déjà un JSON pré-rempli (moins besoin de contenu)
   const totalContentBudget = prefilledJson ? Math.floor(dynamicMaxContent * 0.6) : dynamicMaxContent
@@ -1050,6 +1056,41 @@ async function callAIToCompleteJson(
 /**
  * Appel LM Studio pour compléter un JSON (prompt optimisé)
  */
+/**
+ * Le `response_format` à imposer au modèle local, calculé une fois.
+ *
+ * Dérivé du schéma Zod de l'import — le seul qui fasse foi — et sans champ obligatoire, pour que le
+ * modèle n'invente pas ce que le site ne dit pas. Tout le raisonnement est dans
+ * `server/lib/schema-json-du-modele.ts`.
+ */
+export const FORMAT_JSON_IMPOSE = formatDeReponseJson(schemaJsonDepuisZod(importSchema))
+
+/**
+ * Appelle LM Studio en imposant le schéma JSON, et se replie s'il le refuse.
+ *
+ * La règle du repli vit dans `appel-avec-schema-json.ts`, où elle est testable : elle reçoit son
+ * appelant en paramètre, là où ici le module de bascule est résolu par l'auto-import de Nitro —
+ * qu'un `vi.mock` ne remplace pas.
+ */
+export function appelerLMStudioAvecSchema(
+  serveurs: readonly (string | ServeurModele)[],
+  corps: (serveur: ServeurModele, format: typeof FORMAT_JSON_IMPOSE | null) => RequestInit,
+  timeoutMs: number
+): Promise<Response> {
+  return appelerAvecSchemaJsonOuSansLui(
+    (fabrique) =>
+      fetchLocalModelAvecSecours(
+        serveurs,
+        '/v1/chat/completions',
+        fabrique,
+        timeoutMs,
+        'LM Studio'
+      ),
+    corps,
+    FORMAT_JSON_IMPOSE
+  )
+}
+
 async function callLMStudioComplete(
   serveurs: ServeurModele[],
   userPrompt: string,
@@ -1077,10 +1118,9 @@ async function callLMStudioComplete(
   // message en « Internal Server Error » — l'utilisateur perdrait l'explication du helper.
   let response: Response
   try {
-    response = await fetchLocalModelAvecSecours(
+    response = await appelerLMStudioAvecSchema(
       serveurs,
-      '/v1/chat/completions',
-      (serveur) => ({
+      (serveur, format) => ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1094,10 +1134,12 @@ async function callLMStudioComplete(
           // centaines, et un modèle qui raisonne avant de répondre épuise ce budget en réflexion
           // sans écrire une ligne — la réponse revenait alors vide.
           max_tokens: maxTokens,
+          // Le décodage contraint : le modèle ne peut émettre que des jetons conformes au schéma.
+          // `null` au second essai, si le serveur a refusé — voir `appelerLMStudioAvecSchema`.
+          ...(format ? { response_format: format } : {}),
         }),
       }),
-      timeoutMs,
-      'LM Studio'
+      timeoutMs
     )
   } catch (error: any) {
     throw createError({
@@ -1248,10 +1290,9 @@ async function callLMStudio(
   try {
     // Passe par la bascule : le helper essaie l'adresse de secours si la première est
     // injoignable, et traduit déjà expiration et panne de connexion en messages explicites.
-    response = await fetchLocalModelAvecSecours(
+    response = await appelerLMStudioAvecSchema(
       serveurs,
-      '/v1/chat/completions',
-      (serveur) => ({
+      (serveur, format) => ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1270,10 +1311,10 @@ async function callLMStudio(
           // centaines, et un modèle qui raisonne avant de répondre épuise ce budget en réflexion
           // sans écrire une ligne — la réponse revenait alors vide.
           max_tokens: maxTokens,
+          ...(format ? { response_format: format } : {}),
         }),
       }),
-      timeoutMs,
-      'LM Studio'
+      timeoutMs
     )
   } catch (error: any) {
     throw createError({
