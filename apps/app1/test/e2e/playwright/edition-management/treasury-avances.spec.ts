@@ -248,6 +248,19 @@ test.describe.serial('Trésorerie — avances à rembourser', () => {
      */
     await modale.getByRole('button', { name: 'Remboursé', exact: true }).first().click()
 
+    /*
+     * ⚠️ UNE CONFIRMATION S'INTERPOSE DÉSORMAIS. Le geste solde toutes les avances de la personne
+     * d'un coup, depuis une ligne où l'on vient cliquer pour déplier, et rien ne le défait en bloc.
+     *
+     * 📍 On assère son CONTENU, pas seulement sa présence : elle doit nommer qui et combien, sinon
+     * c'est un « êtes-vous sûr ? » qu'on valide sans lire — et elle ne protégerait de rien.
+     */
+    const confirmation = page.getByRole('dialog').filter({ hasText: 'remboursées ?' })
+    await expect(confirmation).toBeVisible({ timeout: 10000 })
+    await expect(confirmation).toContainText(pseudo)
+    await expect(confirmation).toContainText(TOTAL_DU)
+    await confirmation.getByRole('button', { name: 'Remboursé', exact: true }).click()
+
     // Les DEUX lignes doivent être soldées d'un coup, pas seulement la première : la carte
     // retombe à zéro et la modale se referme d'elle-même.
     await expect(modale).toBeHidden({ timeout: 15000 })

@@ -461,7 +461,7 @@
                       icon="i-lucide-check"
                       :loading="rembourser.isLoading(ligne.cle)"
                       :label="$t('gestion.treasury.mark_reimbursed')"
-                      @click.stop="rembourser.execute(ligne.cle)"
+                      @click.stop="demanderLeRemboursement(ligne)"
                     />
                   </div>
                 </div>
@@ -516,6 +516,35 @@
         </ul>
       </template>
     </UModal>
+
+    <!--
+      ⚠️ UNE CONFIRMATION, PARCE QUE LE GESTE EST GROS ET SILENCIEUX. Un clic marque remboursées
+      TOUTES les avances de la personne d'un coup — c'est ce qui fait sa commodité, et c'est aussi
+      ce qui le rend dangereux à côté du chevron qui déplie, sur une ligne où l'on vient cliquer
+      pour LIRE. Rien ne le défait en bloc : il faudrait rouvrir chaque écriture une par une.
+
+      📍 Elle NOMME ce qu'elle fait — qui, combien, sur combien d'écritures — plutôt qu'un
+      « êtes-vous sûr ? » qu'on valide sans lire.
+    -->
+    <UiConfirmModal
+      v-model="confirmationRemboursement"
+      :title="$t('gestion.treasury.reimburse_confirm_title')"
+      :description="
+        aRembourser
+          ? $t('gestion.treasury.reimburse_confirm_description', {
+              nom: nomDuBeneficiaire(aRembourser),
+              montant: money(aRembourser.montant),
+              count: aRembourser.lignes.length,
+            })
+          : ''
+      "
+      :confirm-label="$t('gestion.treasury.mark_reimbursed')"
+      confirm-color="success"
+      confirm-icon="i-lucide-check"
+      :loading="!!aRembourser && rembourser.isLoading(aRembourser.cle)"
+      @confirm="confirmerLeRemboursement"
+      @cancel="confirmationRemboursement = false"
+    />
 
     <UModal
       :open="!!justificatifOuvert"
@@ -1126,6 +1155,41 @@ const nomsAvanceConnus = computed(() => {
 
 /** Détail des avances par personne, ouvert depuis la carte « à rembourser ». */
 const detailRemboursements = ref(false)
+
+/** Un bénéficiaire du détail, tel que le rapport le rend. */
+type BeneficiaireAvance = NonNullable<
+  NonNullable<typeof data.value>['totals']['toReimburse']
+>['detail'][number]
+
+/**
+ * Le bénéficiaire dont on vient de demander le remboursement, et la confirmation qui l'accompagne.
+ *
+ * ⚠️ IL N'Y EN AVAIT AUCUNE. Un clic soldait toutes les avances de la personne d'un coup — ce qui
+ * fait la commodité du bouton, et aussi son danger : il siège sur une ligne où l'on vient cliquer
+ * pour DÉPLIER, et rien ne défait le geste en bloc. Il faudrait rouvrir chaque écriture.
+ */
+const confirmationRemboursement = ref(false)
+const aRembourser = ref<BeneficiaireAvance | null>(null)
+
+/** Le nom à montrer dans la confirmation : le pseudo du compte, ou le nom saisi librement. */
+const nomDuBeneficiaire = (beneficiaire: BeneficiaireAvance) =>
+  beneficiaire.personne?.pseudo ?? beneficiaire.nomLibre ?? ''
+
+function demanderLeRemboursement(beneficiaire: BeneficiaireAvance) {
+  aRembourser.value = beneficiaire
+  confirmationRemboursement.value = true
+}
+
+async function confirmerLeRemboursement() {
+  const beneficiaire = aRembourser.value
+  if (!beneficiaire) return
+
+  await rembourser.execute(beneficiaire.cle)
+  // Refermée APRÈS l'appel : la quitter d'emblée ferait disparaître l'indicateur d'attente, et
+  // l'on ne saurait plus si le versement a été enregistré.
+  confirmationRemboursement.value = false
+  aRembourser.value = null
+}
 
 /**
  * Solde en une fois toutes les avances d'une personne.
