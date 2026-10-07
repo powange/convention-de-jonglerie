@@ -72,9 +72,6 @@ export const publicRoutes: PublicRoute[] = [
   { path: '/api/__sitemap__/volunteers', methods: ['GET'] },
   { path: '/api/countries', methods: ['GET'] },
 
-  // ====== Fichiers statiques ======
-  { prefix: '/api/uploads/', methods: ['GET'] },
-
   // ====== Éditions en cours géolocalisées ======
   // Publique : un visiteur non connecté a autant besoin d'être orienté vers l'édition où il se
   // trouve. La session est hydratée quand elle existe, pour savoir s'il y est bénévole accepté.

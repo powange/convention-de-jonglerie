@@ -47,6 +47,17 @@ const CHEMINS_SENSIBLES: [string, string][] = [
   ['/api/editions/1/markers', 'POST'],
   ['/api/conventions/1', 'PUT'],
   ['/api/editions', 'POST'],
+  /*
+   * Les fichiers déposés : SERVIS AILLEURS, et derrière une garde.
+   *
+   * `/api/uploads/**` était un SECOND gestionnaire de fichiers, déclaré public ici, sans aucune
+   * garde, et doublant `server/routes/uploads/**` qui exige une session pour un justificatif. Il
+   * ne lisait que `public/uploads`, vide dans l'image — mesuré en production, il rendait 404 là où
+   * l'autre rendait 200 —, si bien que la faille était latente et non active. Il est supprimé.
+   *
+   * Cette ligne est là pour que le préfixe public ne revienne pas avec lui.
+   */
+  ['/api/uploads/profiles/1/photo.jpg', 'GET'],
 ]
 
 /** Quelques routes réellement publiques, une par famille. */
@@ -73,7 +84,6 @@ const CHEMINS_PUBLICS: [string, string][] = [
   ['/api/editions/42/ticketing/tiers/public', 'GET'],
   ['/api/conventions/42', 'GET'],
   ['/api/countries', 'GET'],
-  ['/api/uploads/profiles/1/photo.jpg', 'GET'],
   ['/api/public/error-logs', 'GET'],
 ]
 
