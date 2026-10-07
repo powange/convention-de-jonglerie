@@ -49,6 +49,7 @@ import {
   scrapeJugglingEdgeEvent,
 } from '#server/utils/jugglingedge-scraper'
 import { extractWebContent, formatExtractionForAI } from '#server/utils/web-content-extractor'
+import { fuseauDImport } from '~~/shared/utils/fuseau-depuis-import'
 import { htmlVersTexte } from '~~/shared/utils/html-to-text'
 import { editionDayKeys } from '~~/shared/utils/program-days'
 import { construireElementsDeJournee, type ElementLu } from '~~/shared/utils/program-import'
@@ -493,6 +494,33 @@ export async function generateImportJson(
 
       generatedJson = JSON.stringify(parsedJson, null, 2)
       console.log('[GENERATE-IMPORT] Données Facebook réinjectées (description, dates, timezone)')
+    }
+
+    /*
+     * Le FUSEAU, ramené à un fuseau IANA de localité avant d'être montré.
+     *
+     * L'IA renvoie parfois une abréviation — « EDT » — là où le prompt demande « America/New_York »,
+     * exemples compris. L'import la refusait alors sur « Fuseau horaire inconnu », et il fallait
+     * corriger le JSON à la main. On la traduit ici, pour que ce qui s'affiche soit déjà importable.
+     *
+     * 📍 CECI NE REMPLACE PAS LA GARDE D'IMPORT, qui reste la seule à faire foi : ce JSON est
+     * éditable à l'écran, et un JSON écrit à la main n'est jamais passé ici. La règle est la même
+     * des deux côtés, elle n'est écrite qu'une fois.
+     *
+     * Une valeur irrécupérable — « IST », ambiguë entre l'Inde, l'Irlande et Israël — est LAISSÉE
+     * TELLE QUELLE plutôt que devinée : l'import la refusera, avec un message qui dit quoi écrire.
+     * La deviner ici mettrait les dates à plusieurs heures sans que personne ne le voie.
+     */
+    const fuseauAnnonce = parsedJson.edition?.timezone
+    if (fuseauAnnonce) {
+      const resultat = fuseauDImport(fuseauAnnonce)
+      if (resultat.ok && resultat.corrige && resultat.fuseau) {
+        console.log(
+          `[GENERATE-IMPORT] Fuseau normalisé : "${fuseauAnnonce}" -> "${resultat.fuseau}"`
+        )
+        parsedJson.edition.timezone = resultat.fuseau
+        generatedJson = JSON.stringify(parsedJson, null, 2)
+      }
     }
 
     if (!detecterServices) {

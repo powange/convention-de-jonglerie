@@ -5,7 +5,7 @@ import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { syncEventMetadataFromEdition } from '#server/utils/event-sync'
 import { downloadAndStoreImage } from '#server/utils/file-helpers'
-import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
+import { fuseauDImport, messageDeRefusDuFuseau } from '~~/shared/utils/fuseau-depuis-import'
 
 /**
  * Vrai si la chaîne désigne une date qui EXISTE, et pas seulement qui a la bonne forme.
@@ -125,13 +125,32 @@ export const importSchema = z
       addressLine2: z.string().nullable().optional(),
       city: z.string().min(1),
       region: z.string().nullable().optional(),
-      // Fuseau horaire IANA (ex: "Europe/Paris"). Refusé ici s'il est inconnu, plutôt que de laisser
-      // l'import retomber sur UTC en silence : c'est ce repli qui écrivait des dates fausses.
+      /*
+       * Fuseau IANA de localité (ex: « Europe/Paris »), NORMALISÉ ici.
+       *
+       * Refusé s'il n'en est pas un, plutôt que de laisser l'import retomber sur UTC en silence :
+       * c'est ce repli qui écrivait des dates fausses.
+       *
+       * ⚠️ LA GARDE D'AVANT S'EN REMETTAIT À LUXON, qui refuse « EDT » et ACCEPTE « EST », « BST »,
+       * « IST », « CST ». Elle refusait donc le cas sûr et laissait passer les cas faux — « BST »
+       * vaut +6, le Bangladesh, soit six heures d'écart pour une convention britannique. Le
+       * raisonnement complet et les mesures sont dans `fuseau-depuis-import.ts`.
+       *
+       * 📍 Une abréviation d'heure d'été est TRADUITE plutôt que refusée : « EDT » ne peut désigner
+       * que l'Est nord-américain, et c'est ce que l'IA renvoie en pratique.
+       */
       timezone: z
         .string()
-        .refine((tz) => fuseauUtilisable(tz) !== undefined, 'Fuseau horaire inconnu')
         .nullable()
-        .optional(),
+        .optional()
+        .transform((tz, ctx) => {
+          const resultat = fuseauDImport(tz)
+          if (!resultat.ok) {
+            ctx.addIssue({ code: 'custom', message: messageDeRefusDuFuseau(resultat) })
+            return z.NEVER
+          }
+          return resultat.fuseau
+        }),
       country: z.string().min(1),
       postalCode: z.string().min(1),
       latitude: z.number().nullable().optional(),
