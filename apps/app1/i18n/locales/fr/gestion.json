@@ -1148,6 +1148,8 @@
       "plan_search_placeholder": "Rechercher un compte : « assurance », « 6257 », « cotisations »…",
       "plan_source": "Texte officiel",
       "plan_title": "Plans comptables français",
+      "reimburse_confirm_description": "Les {count} écritures avancées par {nom}, soit {montant}, seront marquées comme remboursées en une fois. Pour revenir en arrière, il faudra rouvrir chaque écriture.",
+      "reimburse_confirm_title": "Marquer ces avances comme remboursées ?",
       "reimbursed_done": "Avances marquées comme remboursées",
       "reimbursed_error": "Impossible de marquer les avances comme remboursées",
       "settled_amount": "dont {amount} réglé",
