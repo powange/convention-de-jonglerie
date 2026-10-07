@@ -437,6 +437,24 @@
                       class="size-4 text-slate-500 dark:text-slate-400 shrink-0"
                     />
                   </UTooltip>
+
+                  <!--
+                    LA FACTURE, quand l'artiste l'a déposée.
+
+                    ⚠️ CONDITIONNÉE AU FICHIER, et non à « facture demandée et fournie ».
+                    `invoiceProvided` peut être vrai SANS fichier — la case est cochable seule, pour
+                    une facture reçue par courriel ou sur papier (décision du lot de la facture).
+                    Une icône posée sur cet état-là serait parfois un clic qui n'ouvre rien ; l'état
+                    « demandée / fournie » a déjà sa colonne.
+
+                    📍 Hors du `v-if` du montant, comme l'IBAN juste au-dessus : une facture peut
+                    arriver avant que le cachet soit fixé.
+                  -->
+                  <ArtistsReceiptIcon
+                    :url="row.original.invoiceUrl"
+                    :libelle="$t('artists.invoice_file')"
+                    @voir="justificatifOuvert = $event"
+                  />
                 </div>
               </template>
 
@@ -486,6 +504,14 @@
                         : $t('artists.reimbursement_not_paid')
                     }}
                   </UBadge>
+                  <!-- Le justificatif se relit d'ici : sans cela, il fallait ouvrir la fiche pour
+                       savoir s'il y en avait un, ce qui est la question qu'on se pose avant de
+                       rembourser. -->
+                  <ArtistsReceiptIcon
+                    :url="row.original.reimbursementReceiptUrl"
+                    :libelle="$t('artists.reimbursement_receipt')"
+                    @voir="justificatifOuvert = $event"
+                  />
                 </div>
                 <span v-else class="text-gray-400">-</span>
               </template>
@@ -536,6 +562,11 @@
                         : $t('artists.consumables_not_paid')
                     }}
                   </UBadge>
+                  <ArtistsReceiptIcon
+                    :url="row.original.consumablesReceiptUrl"
+                    :libelle="$t('artists.consumables_receipt')"
+                    @voir="justificatifOuvert = $event"
+                  />
                 </div>
                 <span v-else class="text-gray-400">-</span>
               </template>
@@ -694,6 +725,31 @@
       :solde-en-cours="soldeEnCours"
       @solder="solderUnArtiste"
     />
+
+    <!--
+      L'APERÇU D'UN JUSTIFICATIF, une seule fois pour tout le tableau.
+
+      Trois colonnes sur plusieurs dizaines de lignes en poseraient autant d'exemplaires pour n'en
+      ouvrir qu'un à la fois : c'est la page qui porte la modale, et les icônes lui disent quoi
+      montrer.
+
+      📍 Seules les IMAGES arrivent ici — un PDF s'ouvre dans un onglet depuis l'icône elle-même.
+    -->
+    <UModal
+      :open="!!justificatifOuvert"
+      size="xl"
+      :title="$t('artists.receipt_view_title')"
+      @update:open="(ouvert: boolean) => !ouvert && (justificatifOuvert = null)"
+    >
+      <template #body>
+        <img
+          v-if="justificatifOuvert"
+          :src="justificatifOuvert"
+          :alt="$t('artists.receipt_view_title')"
+          class="w-full max-h-[70vh] object-contain rounded-lg border border-default"
+        />
+      </template>
+    </UModal>
 
     <ArtistsArtistModal
       v-model="showArtistModal"
@@ -945,6 +1001,14 @@ watch(
 
 // Données
 const artists = ref<any[]>([])
+/**
+ * Le justificatif affiché en grand, ou `null`.
+ *
+ * Une IMAGE seulement : les PDF s'ouvrent dans un onglet depuis `ArtistsReceiptIcon`, qui porte la
+ * distinction. Voir le commentaire de la modale, dans le modèle.
+ */
+const justificatifOuvert = ref<string | null>(null)
+
 const showArtistModal = ref(false)
 const selectedArtist = ref<any>(null)
 const showMealsModal = ref(false)
