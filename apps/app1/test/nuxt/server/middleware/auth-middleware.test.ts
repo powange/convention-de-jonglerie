@@ -188,15 +188,26 @@ describe("Middleware d'authentification", () => {
       })
     })
 
+    /*
+     * ⚠️ `/api/uploads/**` N'EST PLUS PUBLIQUE, ni même existante.
+     *
+     * C'était un SECOND gestionnaire de fichiers, déclaré public, sans aucune garde, doublant
+     * `server/routes/uploads/**` — qui exige, lui, une session et un droit sur l'édition pour
+     * servir un justificatif. Il ne lisait que `public/uploads`, vide dans l'image : mesuré en
+     * production, il rendait 404 là où l'autre rendait 200. La faille était donc latente, et
+     * elle attendait qu'on repeuple ce dossier.
+     *
+     * Les fichiers déposés passent désormais par `/uploads/**`, hors de `/api/` et donc hors de
+     * ce middleware : c'est la route elle-même qui porte la garde.
+     */
     describe('Routes de fichiers statiques', () => {
-      it('devrait autoriser GET /api/uploads/*', async () => {
+      it('ne laisse plus passer GET /api/uploads/* sans session', async () => {
         const event = createMockEvent('/api/uploads/images/test.jpg', 'GET')
-
-        await expect(authMiddleware(event as H3Event)).resolves.toBeUndefined()
-        expect(mockCreateError).not.toHaveBeenCalled()
+        mockGetSession.mockResolvedValue(null)
+        await expect(authMiddleware(event as H3Event)).rejects.toThrow('Unauthorized')
       })
 
-      it('devrait protéger POST /api/uploads/*', async () => {
+      it('ni POST /api/uploads/*', async () => {
         const event = createMockEvent('/api/uploads/images/test.jpg', 'POST')
         mockGetSession.mockResolvedValue(null)
         await expect(authMiddleware(event as H3Event)).rejects.toThrow('Unauthorized')
