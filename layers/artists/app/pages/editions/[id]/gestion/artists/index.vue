@@ -128,8 +128,13 @@
 
       <!-- Totaux financiers. Ils suivent les filtres du tableau : filtrer par spectacle donne
            le budget de ce spectacle, ce qui est plus utile qu'un total figé de l'édition. -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <UCard v-for="total in financialTotals" :key="total.label">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <UCard
+          v-for="total in financialTotals"
+          :key="total.label"
+          :class="total.auClic ? 'cursor-pointer hover:shadow-md transition-shadow' : undefined"
+          @click="total.auClic?.()"
+        >
           <div class="flex items-start gap-3">
             <div class="rounded-lg p-2 shrink-0" :class="total.iconBg">
               <UIcon :name="total.icon" class="size-5" :class="total.iconColor" />
@@ -141,6 +146,15 @@
               </p>
               <p v-if="total.hint" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 {{ total.hint }}
+              </p>
+              <!-- Une invitation explicite : une carte cliquable au milieu de trois qui ne le
+                   sont pas ne se devine pas, et le curseur seul ne le dit qu'au survol. -->
+              <p
+                v-if="total.auClic"
+                class="text-xs text-primary-600 dark:text-primary-400 mt-1 inline-flex items-center gap-1"
+              >
+                {{ $t('artists.to_pay_see_list') }}
+                <UIcon name="i-heroicons-arrow-right" class="size-3" />
               </p>
             </div>
           </div>
@@ -659,6 +673,16 @@
     </div>
 
     <!-- Modal artiste -->
+    <!-- Les artistes qu'il reste à payer. Elle reçoit les artistes FILTRÉS : la liste dit
+         exactement de quoi la carte qu'on vient de cliquer est faite. -->
+    <ArtistsAPayerModal
+      v-model:open="aPayerOuverte"
+      :artistes="filteredArtists"
+      :format-amount="formatAmount"
+      :solde-en-cours="soldeEnCours"
+      @solder="solderUnArtiste"
+    />
+
     <ArtistsArtistModal
       v-model="showArtistModal"
       :artist="selectedArtist"
@@ -772,6 +796,7 @@ import type { Column } from '@tanstack/vue-table'
 import { nomDeFichierCsv, versCsv } from '~~/shared/utils/csv'
 import { formaterDateHeure, formaterJournee } from '~~/shared/utils/fuseau-edition'
 import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
+import { resteAPayer, resteAVerserEnTout } from '~~/shared/utils/reste-a-verser-a-un-artiste'
 
 definePageMeta({
   middleware: ['auth-protected'],
@@ -1045,7 +1070,77 @@ const financialTotals = computed(() => [
     iconBg: 'bg-amber-100 dark:bg-amber-900/40',
     iconColor: 'text-amber-600 dark:text-amber-400',
   },
+  /*
+   * Ce qu'il RESTE à verser — la seule des quatre qui réponde à « que dois-je encore faire ? ».
+   *
+   * ⚠️ LE RÉEL ET NON LE PLAFOND, et seulement les dettes dont le drapeau « versé » n'est pas
+   * posé. La règle vit dans `reste-a-verser-a-un-artiste.ts`, avec ses tests : elle compte trois
+   * dettes indépendantes, chacune ayant son propre drapeau, parce que le cachet se règle souvent
+   * avant l'événement et les frais de trajet après.
+   *
+   * 📍 Elle suit les filtres du tableau, comme ses trois voisines. Un total qui les ignorerait au
+   * milieu de trois qui les suivent ferait lire des chiffres qui ne se comparent pas.
+   */
+  {
+    label: t('artists.to_pay_total'),
+    value: resteAVerserEnTout(filteredArtists.value),
+    hint: t('artists.to_pay_count', { count: nombreAPayer.value }),
+    icon: 'i-heroicons-exclamation-circle',
+    iconBg: 'bg-rose-100 dark:bg-rose-900/40',
+    iconColor: 'text-rose-600 dark:text-rose-400',
+    auClic: () => {
+      aPayerOuverte.value = true
+    },
+  },
 ])
+
+const nombreAPayer = computed(() => filteredArtists.value.filter((a) => resteAPayer(a)).length)
+
+const aPayerOuverte = ref(false)
+
+/**
+ * Les drapeaux à poser, posés avant l'appel.
+ *
+ * `useApiActionById` construit son corps à partir du seul identifiant : cette référence est le
+ * moyen de lui passer QUELS drapeaux, sans écrire trois actions presque identiques.
+ */
+const drapeauxASolder = ref<Record<string, true>>({})
+
+/**
+ * Marquer comme versé tout ce qu'on doit à un artiste.
+ *
+ * ⚠️ AUCUN NOUVEAU POINT D'API : le `PUT` de la fiche accepte déjà les trois drapeaux, et ses
+ * garde-fous croisés retombent sur les valeurs en base quand les montants ne sont pas envoyés. En
+ * écrire un second aurait fait deux chemins d'écriture à tenir en accord — pour la même colonne.
+ */
+const { execute: soldeArtiste, loadingId: soldeEnCours } = useApiActionById<unknown>(
+  (id) => `/api/editions/${editionId.value}/artists/${id}`,
+  {
+    method: 'PUT',
+    body: () => drapeauxASolder.value,
+    successMessage: { title: t('artists.to_pay_marked') },
+    errorMessages: { default: t('artists.to_pay_mark_error') },
+  }
+)
+
+async function solderUnArtiste({
+  artistId,
+  drapeaux,
+}: {
+  artistId: number
+  drapeaux: Record<string, true>
+}) {
+  drapeauxASolder.value = drapeaux
+  const resultat = await soldeArtiste(artistId)
+
+  // ⚠️ `null` — et uniquement `null` — signale l'échec : ne PAS recharger alors, le bandeau
+  // d'erreur a déjà parlé et la liste doit rester telle quelle pour qu'on puisse réessayer.
+  if (resultat === null) return
+
+  // Relire les artistes : la ligne quitte la liste d'elle-même, et les quatre totaux se
+  // recalculent. Sans ce rechargement, la modale continuerait d'afficher une dette réglée.
+  await fetchArtists()
+}
 
 /**
  * Le tableau que l'on a sous les yeux, en PDF.
