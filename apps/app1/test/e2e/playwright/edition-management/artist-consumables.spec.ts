@@ -393,8 +393,16 @@ test.describe.serial('Remboursement des consommables des artistes', () => {
 
     // Le montant est bien la somme des DEUX dettes dues — 400 + 100 —, et non celle des trois.
     await expect(ligne.getByText('500 €')).toBeVisible()
-    // L'e-mail et le détail : de quoi payer sans rouvrir la fiche.
-    await expect(ligne.getByText(ARTIST_EMAIL)).toBeVisible()
+    /*
+     * De quoi payer sans rouvrir la fiche — et de quoi RELANCER sans recopier. On assère le `href`
+     * et non la seule présence du texte : une adresse affichée en texte mort ressemble à un lien
+     * et n'en est pas, ce qui était le cas avant (un `ULink` nu hérite de la couleur de son parent
+     * et ne se distingue de rien).
+     */
+    await expect(ligne.getByRole('link', { name: ARTIST_EMAIL })).toHaveAttribute(
+      'href',
+      `mailto:${ARTIST_EMAIL}`
+    )
     await expect(ligne.getByText('de cachet', { exact: false })).toBeVisible()
 
     await ligne.getByRole('button', { name: 'Marquer comme versé' }).click()

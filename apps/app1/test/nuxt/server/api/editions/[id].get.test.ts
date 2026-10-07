@@ -353,9 +353,20 @@ describe('/api/editions/[id] GET', () => {
       const result = await appeler(true, true, 3)
 
       expect(result.hasMyTasks).toBe(true)
-      expect(prismaMock.taskAssignment.count).toHaveBeenCalledWith({
-        where: { userId: 9, task: { taskGroup: { editionId: 1 } } },
-      })
+      /*
+       * ⚠️ ON N'ASSÈRE PLUS LA FORME DU `where` ICI, ET C'EST UNE LEÇON PAYÉE EN PRODUCTION.
+       *
+       * Cette assertion comparait l'appel à la forme que j'avais moi-même écrite — `taskGroup` au
+       * lieu de `group`, le nom de la clé étrangère pris pour celui de la relation. Un bouchon
+       * accepte n'importe quel objet : le test était VERT, et attestait ma propre faute. Prisma,
+       * lui, refusait à l'exécution, et `/api/editions/[id]` rendait 500.
+       *
+       * 📍 La forme de la requête est désormais garantie par
+       * `test/integration/mes-taches-de-l-edition.db.test.ts`, qui l'exécute contre une vraie base
+       * — la seule chose qui valide un chemin de relation. Ici ne reste que ce qu'un bouchon peut
+       * honnêtement prouver : QUI est compté, et QUAND on ne compte pas du tout.
+       */
+      expect(prismaMock.taskAssignment.count).toHaveBeenCalledOnce()
     })
 
     it('⚠️ n’en annonce aucune quand l’édition en a mais pas elle', async () => {
