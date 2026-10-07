@@ -600,6 +600,85 @@ test.describe.serial("Trésorerie d'une édition", () => {
       .toContain('description')
   })
 
+  test('le justificatif : une image s’ouvre en grand, un PDF dans un onglet', async ({
+    page,
+    goto,
+  }) => {
+    const { editionId, conventionId } = loadState()
+    const dossier = `/uploads/conventions/${conventionId}/editions/${editionId}/treasury`
+
+    /*
+     * Les URL désignent des fichiers qui n'existent pas, et c'est suffisant : ce parcours éprouve
+     * le CHEMIN choisi d'après l'extension, pas la lecture du fichier. Que la route serve bien un
+     * fichier présent est éprouvé ailleurs, dans `test/nuxt/server/routes/uploads-fichier-servi`.
+     *
+     * Le serveur accepte une URL déjà définitive sans vérifier qu'elle pointe sur quelque chose :
+     * seul le dépôt temporaire est contrôlé.
+     */
+    const cree = async (titre: string, imageUrl: string) => {
+      const reponse = await apiPost(page, `${BASE}/api/editions/${editionId}/treasury/entries`, {
+        data: { kind: 'EXPENSE', title: titre, amount: 1200, imageUrl },
+      })
+      expect(reponse.ok(), `création refusée : ${await reponse.text()}`).toBe(true)
+      return (await reponse.json())?.data?.id as number
+    }
+
+    const idImage = await cree('Ticket photographié E2E', `${dossier}/e2e-ticket.jpg`)
+    const idPdf = await cree('Facture PDF E2E', `${dossier}/e2e-facture.pdf`)
+
+    try {
+      await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
+      await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({
+        timeout: 20000,
+      })
+
+      const rangee = (titre: string) => page.locator('tbody tr').filter({ hasText: titre })
+
+      /*
+       * L'image : un BOUTON, qui ouvre la modale. `exact` parce que `getByRole` apparie le nom
+       * accessible par sous-chaîne, et que le libellé « Justificatif » est préfixe d'autres.
+       */
+      const boutonImage = rangee('Ticket photographié E2E').getByRole('button', {
+        name: 'Justificatif',
+        exact: true,
+      })
+      await expect(boutonImage).toBeVisible({ timeout: 15000 })
+      await boutonImage.click()
+
+      const modale = page.getByRole('dialog')
+      // L'image elle-même, et son URL : c'est ce que la modale a pour seul rôle de montrer.
+      await expect(modale.locator('img')).toHaveAttribute('src', `${dossier}/e2e-ticket.jpg`)
+      await page.keyboard.press('Escape')
+      await expect(modale).toBeHidden({ timeout: 10000 })
+
+      /*
+       * Le PDF : un LIEN, pas un bouton — c'est le discriminant, et il tient à `to`. Une `iframe`
+       * dans une modale n'imitait que de loin la visionneuse du navigateur : ni zoom utilisable,
+       * ni pages, ni impression.
+       */
+      const lienPdf = rangee('Facture PDF E2E').getByRole('link', {
+        name: 'Justificatif',
+        exact: true,
+      })
+      await expect(lienPdf).toBeVisible()
+      await expect(lienPdf).toHaveAttribute('target', '_blank')
+
+      // Et le clic ouvre réellement un onglet : l'attribut seul pourrait être inopérant.
+      const [onglet] = await Promise.all([page.waitForEvent('popup'), lienPdf.click()])
+      expect(onglet.url()).toContain('e2e-facture.pdf')
+      await onglet.close()
+
+      // La modale, elle, est restée fermée : le PDF ne passe plus par là.
+      await expect(page.getByRole('dialog')).toHaveCount(0)
+    } finally {
+      // Dans un `finally` : un échec au milieu laisserait sinon deux lignes dans l'édition
+      // partagée, que les parcours suivants compteraient.
+      for (const id of [idImage, idPdf]) {
+        await apiDelete(page, `${BASE}/api/editions/${editionId}/treasury/entries/${id}`)
+      }
+    }
+  })
+
   test('retire les lignes saisies', async ({ page, goto }) => {
     const { editionId } = loadState()
 

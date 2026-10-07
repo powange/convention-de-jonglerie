@@ -224,6 +224,18 @@
     "receipt_saved": "Dokument zapisany",
     "receipt_short": "Dokument",
     "receipt_upload_title": "Dodaj dokument",
-    "receipt_view_title": "Dokument"
+    "receipt_view_title": "Dokument",
+    "to_pay_consumables": "materiałów eksploatacyjnych",
+    "to_pay_count": "{count} artystów do zapłaty",
+    "to_pay_empty": "Wszystko jest rozliczone",
+    "to_pay_fee": "honorarium",
+    "to_pay_help": "Co pozostaje do wypłaty: niewypłacone honorarium, rzeczywisty zwrot kosztów i rzeczywiste niezrefundowane materiały eksploatacyjne. Zapowiedziane limity się nie liczą.",
+    "to_pay_mark": "Oznacz jako wypłacone",
+    "to_pay_mark_error": "Nie udało się zapisać wypłaty",
+    "to_pay_marked": "Wypłata zapisana",
+    "to_pay_no_bank": "Nie podano danych bankowych",
+    "to_pay_title": "Artyści do zapłaty",
+    "to_pay_total": "Pozostaje do wypłaty",
+    "to_pay_travel": "zwrotu kosztów"
   }
 }

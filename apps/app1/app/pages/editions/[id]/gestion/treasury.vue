@@ -220,15 +220,32 @@
               <div class="flex flex-wrap items-center gap-2">
                 <span class="font-medium">{{ lineTitle(row.original) }}</span>
                 <!-- Simple marque de présence : la liste reste dense, et le ticket s'ouvre en
-                   grand d'un clic quand on veut vraiment le relire. -->
-                <UTooltip v-if="row.original.imageUrl" :text="$t('gestion.treasury.entry_receipt')">
+                   grand d'un clic quand on veut vraiment le relire.
+
+                   Une image s'ouvre dans la modale, un PDF dans un onglet — et l'infobulle le dit
+                   avant le clic, sans quoi le changement d'onglet surprendrait. `to` suffit à faire
+                   du bouton un lien : le `click` n'a alors plus rien à ouvrir. -->
+                <UTooltip
+                  v-if="row.original.imageUrl"
+                  :text="
+                    estUnPdf(row.original.imageUrl)
+                      ? $t('gestion.treasury.open_receipt_new_tab')
+                      : $t('gestion.treasury.entry_receipt')
+                  "
+                >
                   <UButton
                     size="xs"
                     color="neutral"
                     variant="ghost"
                     icon="i-lucide-receipt"
                     :aria-label="$t('gestion.treasury.entry_receipt')"
-                    @click="justificatifOuvert = row.original.imageUrl"
+                    :to="estUnPdf(row.original.imageUrl) ? row.original.imageUrl : undefined"
+                    :target="estUnPdf(row.original.imageUrl) ? '_blank' : undefined"
+                    :rel="estUnPdf(row.original.imageUrl) ? 'noopener' : undefined"
+                    @click="
+                      !estUnPdf(row.original.imageUrl) &&
+                      (justificatifOuvert = row.original.imageUrl)
+                    "
                   />
                 </UTooltip>
                 <!-- Deux états qui changent la lecture du montant : l'un dit qu'il n'est pas
@@ -553,21 +570,9 @@
       @update:open="(v: boolean) => !v && (justificatifOuvert = null)"
     >
       <template #body>
-        <!-- Un justificatif peut être un PDF depuis que les factures le sont : l'afficher en `img`
-             ne rendrait qu'une image cassée. L'`iframe` sert la visionneuse du navigateur, et le
-             lien reste pour celui qui n'en a pas. -->
-        <template v-if="justificatifOuvert && justificatifEstUnPdf">
-          <iframe
-            :src="justificatifOuvert"
-            :title="$t('gestion.treasury.entry_receipt')"
-            class="w-full h-[70vh] rounded-lg border border-default"
-          />
-          <ULink :to="justificatifOuvert" target="_blank" class="mt-2 inline-block text-sm">
-            {{ $t('gestion.treasury.open_receipt_new_tab') }}
-          </ULink>
-        </template>
+        <!-- Seules les images arrivent ici : un PDF s'ouvre dans un onglet depuis la liste. -->
         <img
-          v-else-if="justificatifOuvert"
+          v-if="justificatifOuvert"
           :src="justificatifOuvert"
           :alt="$t('gestion.treasury.entry_receipt')"
           class="w-full"
@@ -1221,16 +1226,22 @@ const rembourser = useApiActionById<{ count: number }>(
   }
 )
 
-/** Justificatif affiché en grand, ou `null`. */
+/**
+ * Image affichée en grand, ou `null`.
+ *
+ * Les PDF ne passent pas par là : ils s'ouvrent dans un onglet, où la visionneuse du navigateur
+ * fait tout ce qu'une `iframe` dans une modale ne faisait qu'imiter — zoom, pages, impression,
+ * enregistrement. C'est `estUnPdf` qui sépare les deux chemins, et c'est le seul endroit où la
+ * distinction est écrite.
+ */
 const justificatifOuvert = ref<string | null>(null)
 
 /**
- * Le justificatif ouvert est-il un PDF ? Décidé sur l'extension : c'est la seule information portée
- * par l'URL, et le serveur a déjà croisé type MIME et extension au dépôt.
+ * Ce justificatif est-il un PDF ? Décidé sur l'extension : c'est la seule information portée par
+ * l'URL, et le serveur a déjà croisé type MIME et extension au dépôt.
  */
-const justificatifEstUnPdf = computed(
-  () => !!justificatifOuvert.value?.toLowerCase().split('?')[0]?.endsWith('.pdf')
-)
+const estUnPdf = (url: string | null | undefined) =>
+  !!url?.toLowerCase().split('?')[0]?.endsWith('.pdf')
 
 const entryModalOpen = ref(false)
 const codesModalOpen = ref(false)

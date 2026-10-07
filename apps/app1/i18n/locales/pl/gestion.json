@@ -1151,7 +1151,9 @@
       "filter_state": "Stan",
       "filter_state_advanced": "Zaliczkowane",
       "filter_state_all": "Wszystkie stany",
-      "filter_state_forecast": "Przewidywane"
+      "filter_state_forecast": "Przewidywane",
+      "reimburse_confirm_description": "{count} zapisów opłaconych przez {nom}, łącznie {montant}, zostanie naraz oznaczonych jako zwrócone. Aby to cofnąć, trzeba będzie otworzyć każdy zapis osobno.",
+      "reimburse_confirm_title": "Oznaczyć te zaliczki jako zwrócone?"
     },
     "program": {
       "description": "Ułóż oś czasu edycji: warsztaty, pokazy i inne wydarzenia.",

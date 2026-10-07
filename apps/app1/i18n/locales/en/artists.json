@@ -224,6 +224,18 @@
     "receipt_saved": "Receipt saved",
     "receipt_short": "Receipt",
     "receipt_upload_title": "Add a receipt",
-    "receipt_view_title": "Receipt"
+    "receipt_view_title": "Receipt",
+    "to_pay_consumables": "in consumables",
+    "to_pay_count": "{count} artist(s) to pay",
+    "to_pay_empty": "Everything is settled",
+    "to_pay_fee": "in fees",
+    "to_pay_help": "What is still to be paid: unpaid fees, actual travel expenses and actual unreimbursed consumables. Announced caps do not count.",
+    "to_pay_mark": "Mark as paid",
+    "to_pay_mark_error": "Could not record the payment",
+    "to_pay_marked": "Payment recorded",
+    "to_pay_no_bank": "No bank details provided",
+    "to_pay_title": "Artists to pay",
+    "to_pay_total": "Still to be paid",
+    "to_pay_travel": "in travel expenses"
   }
 }

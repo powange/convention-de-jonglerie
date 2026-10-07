@@ -224,6 +224,18 @@
     "receipt_saved": "Justificante guardado",
     "receipt_short": "Justificante",
     "receipt_upload_title": "Añadir un justificante",
-    "receipt_view_title": "Justificante"
+    "receipt_view_title": "Justificante",
+    "to_pay_consumables": "de consumibles",
+    "to_pay_count": "{count} artista(s) por pagar",
+    "to_pay_empty": "Todo está pagado",
+    "to_pay_fee": "de caché",
+    "to_pay_help": "Lo que queda por pagar: el caché no abonado, las dietas reales y los consumibles reales no reembolsados. Los importes máximos anunciados no cuentan.",
+    "to_pay_mark": "Marcar como pagado",
+    "to_pay_mark_error": "No se ha podido registrar el pago",
+    "to_pay_marked": "Pago registrado",
+    "to_pay_no_bank": "No se han indicado datos bancarios",
+    "to_pay_title": "Artistas por pagar",
+    "to_pay_total": "Queda por pagar",
+    "to_pay_travel": "de dietas"
   }
 }

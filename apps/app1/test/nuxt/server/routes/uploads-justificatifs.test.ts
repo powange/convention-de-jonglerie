@@ -26,19 +26,23 @@ const handler = (await import('../../../../server/routes/uploads/[...path].get')
  * Refus en **404** et non en 403 : un 403 confirmerait l'existence du fichier, donc celle de la
  * pièce, à quelqu'un qui n'a pas à le savoir.
  *
- * ## CE QUE CE FICHIER NE TESTE PAS, ET POURQUOI
+ * ## CE QUE CE FICHIER NE TESTE PAS, ET OÙ C'EST TESTÉ
  *
- * Le cas « le fichier est bien servi » n'y est pas. Il demanderait de remplacer le `stat` de
- * `node:fs/promises`, et ce mock **n'a aucun effet sur cette route** : dans l'environnement Nuxt,
- * elle passe par une transformation serveur où les modules natifs sont externalisés, si bien que le
- * vrai `stat` continue d'être appelé — sur un fichier absent, donc un 404. C'est-à-dire le code que
- * rend aussi un refus de la garde : les deux causes deviennent indistinguables, et un test qui ne
- * sait pas les séparer ne prouve rien. (Constaté : `stat` remplacé côté test, jamais appelé côté
- * route, les deux spécificateurs `fs/promises` et `node:fs/promises` essayés.)
+ * Ici, le REFUS, et le fait que la garde ne s'applique qu'aux chemins de justificatifs — ce second
+ * point se vérifie sans servir aucun fichier : il suffit de constater qu'aucune session n'est même
+ * demandée.
  *
- * Ce qui reste testable est précisément ce qui compte : le REFUS, et le fait que la garde ne
- * s'applique qu'aux chemins de trésorerie. Ce second point se vérifie sans servir aucun fichier —
- * il suffit de constater qu'aucune session n'est même demandée.
+ * Le cas « le fichier est bien servi » est dans `uploads-fichier-servi.test.ts`, et il a coûté
+ * cher d'arriver à l'écrire. Ce fichier-ci affirmait qu'il n'était pas testable, au motif que
+ * remplacer `stat` de `node:fs/promises` n'a aucun effet sur cette route — les modules natifs y
+ * sont externalisés, le vrai `stat` continue d'être appelé. Le constat était juste, la conclusion
+ * fausse : il suffit de ne rien remplacer et d'écrire un VRAI fichier dans un dossier temporaire
+ * vers lequel pointe `NUXT_FILE_STORAGE_MOUNT`.
+ *
+ * Le prix de cette lacune : la route a rendu 404 pour TOUT fichier déposé pendant une journée,
+ * production comprise, sur une variable mal renommée. Les 21 tests de ce fichier sont restés verts
+ * — un refus et un bug rendent le même code. Vérifié par sabotage : en réintroduisant le défaut,
+ * ce fichier ne bronche pas et l'autre tombe.
  */
 const prismaMock = (globalThis as any).prisma
 
