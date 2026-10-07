@@ -36,6 +36,12 @@ const bodySchema = z.object({
  * 📍 TOUT LE RESTE EST PARTAGÉ : la validation du fichier, le dépôt temporaire, et surtout le
  * déplacement à l'enregistrement (`deplacerJustificatif`, domaine `artists`), qui porte les gardes
  * contre la traversée de répertoire. Ce fichier ne recopie que l'enveloppe.
+ *
+ * ## Deux appelants
+ *
+ * Les organisateurs qui gèrent les artistes, ET **l'artiste lui-même** depuis son espace, pour les
+ * justificatifs de son propre défraiement. Voir la garde plus bas : elle les admet tous les deux,
+ * en un seul endroit.
  */
 export default wrapApiHandler(
   async (event) => {
@@ -72,9 +78,31 @@ export default wrapApiHandler(
       throw createError({ status: 404, message: 'Édition introuvable' })
     }
 
-    const allowed = await canManageArtistsById(targetEditionId, user.id, event)
-    if (!allowed) {
-      throw createError({ status: 403, message: 'Droits insuffisants pour gérer les artistes' })
+    /*
+     * Deux sortes d'appelants, une seule garde.
+     *
+     * ⚠️ L'ARTISTE DÉPOSE SES PROPRES JUSTIFICATIFS depuis son espace : c'est lui qui a le billet
+     * de train en main, et le lui faire envoyer par courriel à un organisateur pour qu'il le
+     * reverse ici était un détour que rien ne justifiait.
+     *
+     * 📍 Déposer ne donne RIEN DE PLUS que déposer : le fichier atterrit dans `temp/`, et c'est
+     * l'enregistrement qui décide sur quelle fiche il s'attache. Un artiste ne peut écrire que la
+     * sienne — `my-payment-info.put.ts` résout sa fiche par `editionId_userId`, jamais par un
+     * identifiant reçu.
+     */
+    const estGestionnaire = await canManageArtistsById(targetEditionId, user.id, event)
+    const estArtisteDeLEdition =
+      estGestionnaire ||
+      (await prisma.editionArtist.findUnique({
+        where: { editionId_userId: { editionId: targetEditionId, userId: user.id } },
+        select: { id: true },
+      })) !== null
+
+    if (!estArtisteDeLEdition) {
+      throw createError({
+        status: 403,
+        message: 'Droits insuffisants pour déposer un justificatif sur cette édition',
+      })
     }
 
     /*

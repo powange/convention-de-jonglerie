@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { coordonneesBancairesRecues } from '#server/utils/coordonnees-bancaires-recues'
 import { misesAJourDuProfil } from '#server/utils/infos-personnelles'
 import { createPendingUserAndInvite } from '#server/utils/invitation'
 import {
@@ -52,6 +53,10 @@ const artistSchema = z
     invoiceProvided: z.boolean().optional(),
     feeRequested: z.boolean().optional(),
     feeProvided: z.boolean().optional(),
+    // Normalisées par `coordonneesBancairesRecues` : le plafond porte sur la saisie BRUTE,
+    // espaces de recopie compris.
+    iban: z.string().max(60).optional().nullable(),
+    bic: z.string().max(60).optional().nullable(),
     pickupRequired: z.boolean().optional(),
     pickupLocation: z.string().optional().nullable(),
     pickupResponsibleId: z.number().int().positive().optional().nullable(),
@@ -222,6 +227,9 @@ export default wrapApiHandler(
         dropoffRequired: validatedData.dropoffRequired ?? false,
         dropoffLocation: validatedData.dropoffLocation,
         dropoffResponsibleId: validatedData.dropoffResponsibleId,
+        // Les coordonnées bancaires, normalisées. À la création, un champ absent vaut l'absence
+        // de coordonnées — il n'y a rien à préserver.
+        ...coordonneesBancairesRecues(validatedData),
       },
       include: {
         user: {

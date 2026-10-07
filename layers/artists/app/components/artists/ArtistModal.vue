@@ -601,6 +601,63 @@
                   </UFormField>
                 </div>
               </div>
+
+              <!--
+                Coordonnées bancaires.
+
+                ⚠️ L'AVERTISSEMENT NE BLOQUE PAS L'ENREGISTREMENT, délibérément. Ce qu'on redoute
+                ici n'est pas un plantage mais un virement parti vers un compte qui n'existe pas,
+                découvert des semaines plus tard par un artiste qui n'a pas été payé : la clé de
+                contrôle voit la faute de frappe que l'œil ne voit pas. Mais refuser d'enregistrer
+                retournerait le défaut — un compte hors zone IBAN, ou une forme que notre code
+                ignore, rendrait la fiche impossible à remplir, sans recours. La décision reste à
+                qui saisit : c'est la personne qui a le papier sous les yeux.
+              -->
+              <div class="bg-slate-50 dark:bg-slate-900/30 rounded-lg p-4 space-y-4">
+                <div class="flex items-center gap-2">
+                  <UIcon
+                    name="i-lucide-landmark"
+                    class="size-4 text-slate-600 dark:text-slate-400"
+                  />
+                  <h3 class="text-sm font-medium text-slate-800 dark:text-slate-200">
+                    {{ $t('artists.bank_section') }}
+                  </h3>
+                </div>
+
+                <p class="text-xs text-gray-600 dark:text-gray-400">
+                  {{ $t('artists.bank_section_help') }}
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <UFormField name="iban" :label="$t('artists.iban')">
+                    <UInput
+                      v-model="formData.iban"
+                      :placeholder="$t('artists.iban_placeholder')"
+                      class="w-full font-mono"
+                      autocomplete="off"
+                    />
+                    <template v-if="ibanDouteux" #help>
+                      <span class="text-amber-600 dark:text-amber-400">
+                        {{ $t('artists.iban_suspect') }}
+                      </span>
+                    </template>
+                  </UFormField>
+
+                  <UFormField name="bic" :label="$t('artists.bic')">
+                    <UInput
+                      v-model="formData.bic"
+                      :placeholder="$t('artists.bic_placeholder')"
+                      class="w-full font-mono"
+                      autocomplete="off"
+                    />
+                    <template v-if="bicDouteux" #help>
+                      <span class="text-amber-600 dark:text-amber-400">
+                        {{ $t('artists.bic_suspect') }}
+                      </span>
+                    </template>
+                  </UFormField>
+                </div>
+              </div>
             </div>
           </template>
         </UTabs>
@@ -627,6 +684,11 @@ import type { AllergySeverityLevel } from '~/utils/allergy-severity'
 import { getAccommodationTypeSelectOptions, getAllergySeveritySelectOptions } from '#imports'
 
 import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+import {
+  bicEstPlausible,
+  formaterIbanParGroupes,
+  ibanEstPlausible,
+} from '~~/shared/utils/coordonnees-bancaires'
 import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
 import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
 
@@ -711,6 +773,8 @@ const formData = ref({
   consumablesActualPaid: false,
   reimbursementReceiptUrl: null as string | null,
   consumablesReceiptUrl: null as string | null,
+  iban: '',
+  bic: '',
   accommodationAutonomous: false,
   accommodationType: null as string | null,
   accommodationTypeOther: '',
@@ -726,6 +790,19 @@ const formData = ref({
   dropoffLocation: '',
   dropoffResponsible: null as any,
 })
+
+/**
+ * Les coordonnées bancaires sont-elles douteuses.
+ *
+ * ⚠️ « Douteux » et non « invalide » : l'enregistrement n'est PAS bloqué. Voir le commentaire du
+ * gabarit, au-dessus de la section — refuser la saisie priverait de recours un compte hors zone
+ * IBAN ou une forme que ce code ignore.
+ *
+ * Vide ne vaut pas douteux : la plupart des artistes n'en donnent pas, et faire clignoter un
+ * avertissement sur un champ qu'on n'a pas rempli ne dit rien à personne.
+ */
+const ibanDouteux = computed(() => !ibanEstPlausible(formData.value.iban))
+const bicDouteux = computed(() => !bicEstPlausible(formData.value.bic))
 
 // Vérifier si l'utilisateur est créé manuellement (authProvider = MANUAL)
 const isManualUser = computed(() => {
@@ -1060,6 +1137,10 @@ const buildBasePayload = () => ({
   // Les justificatifs : le serveur les déplace du dossier temporaire avant de les écrire.
   reimbursementReceiptUrl: formData.value.reimbursementReceiptUrl,
   consumablesReceiptUrl: formData.value.consumablesReceiptUrl,
+  // Les espaces de saisie partent tels quels : c'est le serveur qui normalise, et lui seul, pour
+  // que les trois points d'écriture rangent la même valeur.
+  iban: formData.value.iban || null,
+  bic: formData.value.bic || null,
   accommodationAutonomous: formData.value.accommodationAutonomous,
   accommodationType: formData.value.accommodationType || null,
   accommodationTypeOther:
@@ -1183,6 +1264,8 @@ const resetForm = () => {
     consumablesActualPaid: false,
     reimbursementReceiptUrl: null as string | null,
     consumablesReceiptUrl: null as string | null,
+    iban: '',
+    bic: '',
     accommodationAutonomous: false,
     accommodationType: null as string | null,
     accommodationTypeOther: '',
@@ -1239,6 +1322,10 @@ watch(
         consumablesActualPaid: newArtist.consumablesActualPaid || false,
         reimbursementReceiptUrl: newArtist.reimbursementReceiptUrl || null,
         consumablesReceiptUrl: newArtist.consumablesReceiptUrl || null,
+        // Affiché par groupes de quatre, comme sur un relevé : c'est la seule forme sous laquelle
+        // on relit un IBAN caractère par caractère pour le comparer au papier.
+        iban: formaterIbanParGroupes(newArtist.iban),
+        bic: newArtist.bic || '',
         accommodationAutonomous: newArtist.accommodationAutonomous || false,
         accommodationType: newArtist.accommodationType || null,
         accommodationTypeOther: newArtist.accommodationTypeOther || '',

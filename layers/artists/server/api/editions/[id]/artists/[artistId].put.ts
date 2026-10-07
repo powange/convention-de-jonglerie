@@ -3,13 +3,14 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { oublierSessionDuCompte } from '#server/utils/cache-session'
+import { coordonneesBancairesRecues } from '#server/utils/coordonnees-bancaires-recues'
 import { misesAJourDuProfil } from '#server/utils/infos-personnelles'
 import {
   getEditionWithPermissions,
   canManageArtists,
 } from '#server/utils/permissions/edition-permissions'
 import { buildUpdateData } from '#server/utils/prisma-helpers'
-import { deplacerJustificatif } from '#server/utils/treasury-receipt-files'
+import { deplacerJustificatif, supprimerJustificatif } from '#server/utils/treasury-receipt-files'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 import { schemaAdresseEmail } from '~~/shared/utils/adresse-email'
 import { toCents } from '~~/shared/utils/money'
@@ -45,6 +46,18 @@ const updateArtistSchema = z.object({
    */
   reimbursementReceiptUrl: z.string().max(500).optional().nullable(),
   consumablesReceiptUrl: z.string().max(500).optional().nullable(),
+  /**
+   * Les coordonnées bancaires, pour virer le cachet et les défraiements.
+   *
+   * ⚠️ EXCLUES DE `buildUpdateData` COMME LES JUSTIFICATIFS, et pour une raison du même ordre :
+   * recopiées telles quelles, elles arriveraient en base avec les espaces de recopie, et deux
+   * saisies du même compte ne se compareraient plus. `coordonneesBancairesRecues` les normalise.
+   *
+   * 📍 Le plafond est généreux (60) parce qu'il porte sur la saisie BRUTE, espaces compris ; c'est
+   * après normalisation que la longueur de la colonne est vérifiée.
+   */
+  iban: z.string().max(60).optional().nullable(),
+  bic: z.string().max(60).optional().nullable(),
   accommodationAutonomous: z.boolean().optional(),
   accommodationType: z.enum(['TENT', 'VEHICLE', 'HOSTED', 'OTHER']).optional().nullable(),
   accommodationTypeOther: z.string().max(500).optional().nullable(),
@@ -307,13 +320,32 @@ export default wrapApiHandler(
     // 📍 `edition` est déjà chargée plus haut, avec son `conventionId` : une seconde requête ne
     // ferait que la relire, et le compilateur refusait d'ailleurs le doublon de nom.
     const justificatifs: Record<string, string | null> = {}
+    const justificatifsASupprimer: string[] = []
     for (const champ of ['reimbursementReceiptUrl', 'consumablesReceiptUrl'] as const) {
       if (!(champ in validatedData)) continue
-      justificatifs[champ] = await deplacerJustificatif(
-        validatedData[champ] as string | null | undefined,
-        edition,
-        'artists'
-      )
+      const recue = validatedData[champ] as string | null | undefined
+      const deplacee = await deplacerJustificatif(recue, edition, 'artists')
+
+      /*
+       * ⚠️ UN DÉPLACEMENT RATÉ NE DOIT PAS EFFACER CE QUI ÉTAIT LÀ. `deplacerJustificatif` rend
+       * `null` quand le fichier temporaire a disparu — purge, redémarrage, double enregistrement.
+       * Ce compromis se défend pour une ligne comptable qu'on CRÉE ; ici l'écriture ÉCRASE une
+       * valeur existante, et le défaut devient muet et destructeur : l'ancien justificatif part,
+       * le nouveau n'arrive pas, et la modale annonce que c'est enregistré.
+       */
+      if (recue && deplacee === null) {
+        throw createError({
+          status: 409,
+          message: 'Le fichier envoyé n’est plus disponible, merci de le redéposer',
+        })
+      }
+
+      // Le fichier remplacé ou retiré n'est plus référencé : sans cette suppression il resterait
+      // sur le disque indéfiniment, et lisible par qui a vu son URL une fois.
+      const ancienne = (existingArtist as Record<string, unknown>)[champ] as string | null
+      if (ancienne && ancienne !== deplacee) justificatifsASupprimer.push(ancienne)
+
+      justificatifs[champ] = deplacee
     }
 
     // Mettre à jour l'artiste
@@ -336,10 +368,16 @@ export default wrapApiHandler(
             // Écrits à la main juste en dessous, APRÈS déplacement depuis le dossier temporaire.
             'reimbursementReceiptUrl',
             'consumablesReceiptUrl',
+            // Écrites à la main juste en dessous, APRÈS normalisation.
+            'iban',
+            'bic',
           ],
         }),
         // Les justificatifs déplacés, écrits à la main : voir le bloc ci-dessus.
         ...justificatifs,
+        // Les coordonnées bancaires normalisées. Seules les clés PRÉSENTES dans le corps sont
+        // rendues : enregistrer un autre champ de la fiche ne doit pas effacer l'IBAN.
+        ...coordonneesBancairesRecues(validatedData),
       },
       include: {
         user: {
@@ -373,6 +411,12 @@ export default wrapApiHandler(
         },
       },
     })
+
+    // APRÈS l'écriture, et sans la faire échouer : la trace en base est ce qui compte, et un
+    // fichier qui survit à sa référence est un désagrément, pas une perte.
+    for (const ancienne of justificatifsASupprimer) {
+      await supprimerJustificatif(ancienne, edition, 'artists')
+    }
 
     return createSuccessResponse({ artist: updatedArtist })
   },

@@ -368,29 +368,55 @@
 
               <!-- Paiement -->
               <template #payment-cell="{ row }">
-                <div v-if="row.original.payment" class="flex items-center gap-2">
-                  <span class="font-medium">{{ formatAmount(Number(row.original.payment)) }}</span>
-                  <!--
+                <!-- Un seul rang : le montant, son état, et l'indication des coordonnées. Trois
+                     éléments frères sans conteneur retombaient les uns sous les autres. -->
+                <div class="flex items-center gap-2">
+                  <template v-if="row.original.payment">
+                    <span class="font-medium">{{
+                      formatAmount(Number(row.original.payment))
+                    }}</span>
+                    <!--
                     ⚠️ UN LIBELLÉ, PAS UN SYMBOLE. « ✓ » et « ○ » se ressemblent dans une pastille
                     de cette taille, et rien ne disait de quoi ils parlaient : on devait ouvrir la
                     fiche pour en être sûr. L'état se lit maintenant sans décodage.
                   -->
-                  <UBadge
-                    :color="row.original.paymentPaid ? 'success' : 'warning'"
-                    variant="soft"
-                    size="sm"
-                    :icon="
-                      row.original.paymentPaid ? 'i-heroicons-check-circle' : 'i-heroicons-clock'
-                    "
-                  >
-                    {{
-                      row.original.paymentPaid
-                        ? $t('artists.payment_paid')
-                        : $t('artists.payment_not_paid')
-                    }}
-                  </UBadge>
+                    <UBadge
+                      :color="row.original.paymentPaid ? 'success' : 'warning'"
+                      variant="soft"
+                      size="sm"
+                      :icon="
+                        row.original.paymentPaid ? 'i-heroicons-check-circle' : 'i-heroicons-clock'
+                      "
+                    >
+                      {{
+                        row.original.paymentPaid
+                          ? $t('artists.payment_paid')
+                          : $t('artists.payment_not_paid')
+                      }}
+                    </UBadge>
+                  </template>
+                  <span v-else class="text-gray-400">-</span>
+
+                  <!--
+                  ⚠️ UNE TRACE QUE LES COORDONNÉES SONT LÀ, et pas l'IBAN lui-même. Enregistré
+                  depuis la fiche, il ne laissait AUCUNE marque sur cette page : il fallait
+                  réouvrir la modale pour savoir s'il avait été saisi, ce qui est précisément la
+                  question qu'on se pose avant de lancer un virement.
+
+                  📍 L'icône seule, et l'IBAN dans la fiche. L'étaler dans un tableau que l'on
+                  parcourt à plusieurs exposerait vingt comptes bancaires pour répondre à une
+                  question qui est « oui ou non ».
+
+                  📍 Hors du `v-if` du montant, délibérément : un artiste peut confier son IBAN
+                  avant que le cachet soit fixé, et l'indication disparaîtrait alors.
+                -->
+                  <UTooltip v-if="row.original.iban" :text="$t('artists.bank_on_file')">
+                    <UIcon
+                      name="i-lucide-landmark"
+                      class="size-4 text-slate-500 dark:text-slate-400 shrink-0"
+                    />
+                  </UTooltip>
                 </div>
-                <span v-else class="text-gray-400">-</span>
               </template>
 
               <!-- Remboursement -->
