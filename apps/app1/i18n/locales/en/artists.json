@@ -82,9 +82,9 @@
     "invoice_fee_section": "Invoice and fee",
     "invoice_not_requested": "Invoice not requested",
     "invoice_provided": "Invoice provided",
-    "invoice_provided_label": "Invoice provided to the artist",
+    "invoice_provided_label": "The artist has provided their invoice",
     "invoice_requested": "Invoice requested",
-    "invoice_requested_label": "The artist requests an invoice",
+    "invoice_requested_label": "An invoice is required from the artist",
     "invoice_short": "Invoice",
     "list_title": "Artist management",
     "manage_artists_description": "Manage the artists invited to this edition",
@@ -236,6 +236,8 @@
     "to_pay_no_bank": "No bank details provided",
     "to_pay_title": "Artists to pay",
     "to_pay_total": "Still to be paid",
-    "to_pay_travel": "in travel expenses"
+    "to_pay_travel": "in travel expenses",
+    "invoice_file": "Artist's invoice",
+    "invoice_upload_help": "Images and PDFs accepted. Uploading the invoice marks it as provided."
   }
 }

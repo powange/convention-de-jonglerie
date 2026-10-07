@@ -82,9 +82,9 @@
     "invoice_fee_section": "Faktura och arvode",
     "invoice_not_requested": "Faktura ej begärd",
     "invoice_provided": "Faktura tillhandahållen",
-    "invoice_provided_label": "Faktura tillhandahållen artisten",
+    "invoice_provided_label": "Artisten har lämnat in sin faktura",
     "invoice_requested": "Faktura begärd",
-    "invoice_requested_label": "Artisten begär faktura",
+    "invoice_requested_label": "En faktura krävs av artisten",
     "invoice_short": "Faktura",
     "list_title": "Artisthantering",
     "manage_artists_description": "Hantera de inbjudna konstnärerna till denna utgåva",
@@ -236,6 +236,8 @@
     "to_pay_no_bank": "Inga bankuppgifter angivna",
     "to_pay_title": "Artister att betala",
     "to_pay_total": "Återstår att betala",
-    "to_pay_travel": "i reseersättning"
+    "to_pay_travel": "i reseersättning",
+    "invoice_file": "Artistens faktura",
+    "invoice_upload_help": "Bilder och PDF accepteras. Att ladda upp fakturan markerar den som inlämnad."
   }
 }

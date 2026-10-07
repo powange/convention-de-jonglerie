@@ -433,6 +433,156 @@ test.describe.serial('Remboursement des consommables des artistes', () => {
 
   // Le compte E2E est partagé par tous les specs : le laisser inscrit comme artiste
   // ferait apparaître l'espace artiste dans sa navigation et casserait un rerun.
+  test('la facture : demandée, déposée, et la remise cochée d’elle-même', async ({
+    page,
+    goto,
+  }) => {
+    /*
+     * C'est l'ARTISTE qui fournit sa facture : il la remet à la convention, pas l'inverse. Ce
+     * parcours éprouve les trois choses qui en découlent :
+     *
+     *   1. le dépôt n'est proposé QUE si une facture est demandée — déposer une facture que
+     *      personne n'a réclamée n'a pas de sens ;
+     *   2. déposer vaut remise : `invoiceProvided` passe à vrai sans qu'on coche quoi que ce soit ;
+     *   3. retirer le fichier NE décoche PAS — la case vaut aussi pour une facture reçue par
+     *      courriel, et la décocher effacerait ce qu'un organisateur a saisi à la main.
+     *
+     * 📍 L'URL désigne un fichier qui n'existe pas, et c'est suffisant : le serveur accepte d'un
+     * ORGANISATEUR une URL déjà définitive pourvu qu'elle désigne le dossier `artists` de cette
+     * édition. Ce qu'on éprouve est la règle et l'affichage, pas la lecture du fichier.
+     */
+    const { conventionId } = loadState()
+    const facture = `/uploads/conventions/${conventionId}/editions/${editionId}/artists/e2e-facture.pdf`
+
+    const fiche = async () => {
+      const res = await page.request.get(`${BASE_URL}/api/editions/${editionId}/artists`)
+      const body = await res.json()
+      const artists = body.data?.artists || body.artists || []
+      return artists.find((a: any) => a.id === selfArtistId)
+    }
+
+    // --- 1. Aucune facture demandée : rien à déposer ---
+    await apiPut(page, `${BASE_URL}/api/editions/${editionId}/artists/${selfArtistId}`, {
+      data: { invoiceRequested: false, invoiceProvided: false, invoiceUrl: null },
+    })
+    await goto(`/editions/${editionId}/artist-space`, { waitUntil: 'hydration' })
+
+    /*
+     * Témoin : la page est bien rendue, donc l'absence qui suit a du sens.
+     *
+     * ⚠️ LE SOUS-TITRE DE LA PAGE, et non « Consommables maximum ». Ce bloc-là dépend d'un plafond
+     * qu'un parcours précédent de ce `describe.serial` efface : le témoin tombait, et l'échec
+     * désignait un défaut qui n'existait pas. Un témoin doit survivre à ses voisins.
+     *
+     * Et pas le `h1` non plus, qui porte le NOM de l'artiste : ce sous-titre est le seul texte
+     * fixe que l'en-tête rende dès que la fiche est chargée.
+     */
+    await expect(page.getByText('Votre récapitulatif pour cette édition')).toBeVisible({
+      timeout: 20000,
+    })
+    await expect(page.locator('[data-justificatif="invoice"]')).toHaveCount(0)
+
+    // --- 2. Une facture est demandée : le dépôt apparaît ---
+    await apiPut(page, `${BASE_URL}/api/editions/${editionId}/artists/${selfArtistId}`, {
+      data: { invoiceRequested: true },
+    })
+    await goto(`/editions/${editionId}/artist-space`, { waitUntil: 'hydration' })
+
+    const justificatif = page.locator('[data-justificatif="invoice"]')
+    await expect(justificatif).toBeVisible({ timeout: 20000 })
+    /*
+     * ⚠️ `exact: true` : un nom accessible s'apparie par SOUS-CHAÎNE, et « Ajouter un
+     * justificatif » contient « Justificatif ». Sans cela, l'assertion de la pastille trouverait
+     * l'invitation à déposer et ce parcours serait vert sans rien prouver.
+     */
+    await expect(
+      justificatif.getByRole('button', { name: 'Ajouter un justificatif' })
+    ).toBeVisible()
+    await expect(
+      justificatif.getByRole('button', { name: 'Justificatif', exact: true })
+    ).toHaveCount(0)
+    // Et la pastille dit qu'on l'attend encore.
+    await expect(page.getByText('Facture demandée')).toBeVisible()
+
+    // --- 3. Déposée depuis la gestion : la remise se coche d'elle-même ---
+    const depot = await apiPut(
+      page,
+      `${BASE_URL}/api/editions/${editionId}/artists/${selfArtistId}`,
+      { data: { invoiceUrl: facture } }
+    )
+    expect(depot.ok(), `dépôt refusé : ${await depot.text()}`).toBe(true)
+
+    const apresDepot = await fiche()
+    expect(apresDepot.invoiceUrl).toBe(facture)
+    // LA règle du lot : personne n'a coché cette case.
+    expect(apresDepot.invoiceProvided, 'déposer la facture n’a pas valu remise').toBe(true)
+
+    await goto(`/editions/${editionId}/artist-space`, { waitUntil: 'hydration' })
+    await expect(
+      page.locator('[data-justificatif="invoice"]').getByRole('button', {
+        name: 'Justificatif',
+        exact: true,
+      })
+    ).toBeVisible({ timeout: 20000 })
+    await expect(page.getByText('Facture fournie')).toBeVisible()
+
+    // --- 4. Retirée : la case reste cochée, délibérément ---
+    const retrait = await apiPut(
+      page,
+      `${BASE_URL}/api/editions/${editionId}/artists/${selfArtistId}`,
+      { data: { invoiceUrl: null } }
+    )
+    expect(retrait.ok(), `retrait refusé : ${await retrait.text()}`).toBe(true)
+
+    const apresRetrait = await fiche()
+    expect(apresRetrait.invoiceUrl).toBeNull()
+    expect(
+      apresRetrait.invoiceProvided,
+      'le retrait du fichier a décoché la remise, ce qui effacerait une saisie manuelle'
+    ).toBe(true)
+
+    /*
+     * --- 5. La porte, côté GESTION ---
+     *
+     * C'était la demande : « on doit pouvoir déposer la facture si une facture est demandée ». Les
+     * deux artistes de ce parcours donnent la comparaison sans rien modifier — l'un en attend une,
+     * l'autre non. Comparer deux fiches dans le même état de page vaut mieux que basculer un
+     * interrupteur et relire : rien ici ne dépend de l'ordre.
+     */
+    await goto(`/editions/${editionId}/gestion/artists`, { waitUntil: 'hydration' })
+    const { email } = loadCredentials()
+
+    const ouvrirLaFiche = async (courriel: string) => {
+      const ligne = page.locator('tr', { hasText: courriel }).first()
+      await expect(ligne).toBeVisible({ timeout: 20000 })
+      // Nommé pour l'occasion : réduit à son icône, ce bouton n'avait aucun nom accessible et ne
+      // pouvait être visé que par sa position dans la rangée.
+      await ligne.getByRole('button', { name: "Modifier l'artiste" }).click()
+
+      /*
+       * ⚠️ OUVRIR L'ONGLET « PAIEMENT », sans quoi l'assertion de visibilité échoue sur un champ
+       * qui est pourtant là : la modale pose `:unmount-on-hide="false"`, et le panneau inactif
+       * reste donc MONTÉ mais caché. C'est aussi le vrai chemin — la facture vit avec l'argent.
+       */
+      const fiche = page.getByRole('dialog')
+      await fiche.getByRole('tab', { name: 'Paiement' }).click()
+      return fiche
+    }
+
+    // Une facture est demandée à l'artiste « self » : le dépôt est là.
+    const ficheSelf = await ouvrirLaFiche(email)
+    await expect(ficheSelf.getByText("Facture de l'artiste")).toBeVisible({ timeout: 15000 })
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+
+    // L'autre artiste n'en a aucune de demandée : le dépôt n'apparaît pas.
+    const ficheAutre = await ouvrirLaFiche(ARTIST_EMAIL)
+    // Témoin : on est bien dans la section qui l'aurait porté, donc l'absence a du sens.
+    await expect(ficheAutre.getByText('Facture et cachet')).toBeVisible({ timeout: 15000 })
+    await expect(ficheAutre.getByText("Facture de l'artiste")).toHaveCount(0)
+    await page.keyboard.press('Escape')
+  })
+
   test('nettoyage : supprimer les artistes créés', async ({ page }) => {
     for (const id of [artistId, selfArtistId]) {
       if (!id) continue

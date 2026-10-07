@@ -82,9 +82,9 @@
     "invoice_fee_section": "Faktura og gage",
     "invoice_not_requested": "Faktura ikke anmodet",
     "invoice_provided": "Faktura leveret",
-    "invoice_provided_label": "Faktura leveret til kunstneren",
+    "invoice_provided_label": "Artisten har indsendt sin faktura",
     "invoice_requested": "Faktura anmodet",
-    "invoice_requested_label": "Kunstneren anmoder om faktura",
+    "invoice_requested_label": "Der kræves en faktura fra artisten",
     "invoice_short": "Faktura",
     "list_title": "Management af kunstnere",
     "manage_artists_description": "Administrer de kunstnere, der er inviteret til denne udgave",
@@ -236,6 +236,8 @@
     "to_pay_no_bank": "Ingen bankoplysninger angivet",
     "to_pay_title": "Artister der skal betales",
     "to_pay_total": "Mangler at blive udbetalt",
-    "to_pay_travel": "i rejsegodtgørelse"
+    "to_pay_travel": "i rejsegodtgørelse",
+    "invoice_file": "Artistens faktura",
+    "invoice_upload_help": "Billeder og PDF accepteres. Når fakturaen uploades, markeres den som indsendt."
   }
 }

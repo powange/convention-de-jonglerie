@@ -82,9 +82,9 @@
     "invoice_fee_section": "Fattura e compenso",
     "invoice_not_requested": "Fattura non richiesta",
     "invoice_provided": "Fattura fornita",
-    "invoice_provided_label": "Fattura fornita all'artista",
+    "invoice_provided_label": "L'artista ha fornito la sua fattura",
     "invoice_requested": "Fattura richiesta",
-    "invoice_requested_label": "L'artista richiede una fattura",
+    "invoice_requested_label": "All'artista viene richiesta una fattura",
     "invoice_short": "Fattura",
     "list_title": "Gestione degli artisti",
     "manage_artists_description": "Gestisci gli artisti invitati a questa edizione",
@@ -236,6 +236,8 @@
     "to_pay_no_bank": "Nessuna coordinata bancaria indicata",
     "to_pay_title": "Artisti da pagare",
     "to_pay_total": "Resta da versare",
-    "to_pay_travel": "di rimborso spese"
+    "to_pay_travel": "di rimborso spese",
+    "invoice_file": "Fattura dell'artista",
+    "invoice_upload_help": "Immagini e PDF accettati. Caricare la fattura la segna come fornita."
   }
 }

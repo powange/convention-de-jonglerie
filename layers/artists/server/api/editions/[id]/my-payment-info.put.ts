@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { coordonneesBancairesRecues } from '#server/utils/coordonnees-bancaires-recues'
+import { remiseDeLaFacture } from '#server/utils/remise-de-la-facture'
 import { deplacerJustificatif, supprimerJustificatif } from '#server/utils/treasury-receipt-files'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
@@ -21,10 +22,16 @@ const schema = z.object({
   bic: z.string().max(60).optional().nullable(),
   reimbursementReceiptUrl: z.string().max(500).optional().nullable(),
   consumablesReceiptUrl: z.string().max(500).optional().nullable(),
+  invoiceUrl: z.string().max(500).optional().nullable(),
 })
 
-/** Les deux justificatifs que l'artiste dépose, et eux seuls. */
-const JUSTIFICATIFS = ['reimbursementReceiptUrl', 'consumablesReceiptUrl'] as const
+/**
+ * Les trois justificatifs que l'artiste dépose, et eux seuls.
+ *
+ * 📍 `invoiceUrl` en est un à part entière : c'est l'ARTISTE qui fournit sa facture — il la remet à
+ * la convention, pas l'inverse. Les deux autres attestent une dépense qu'il a avancée.
+ */
+const JUSTIFICATIFS = ['reimbursementReceiptUrl', 'consumablesReceiptUrl', 'invoiceUrl'] as const
 
 export default wrapApiHandler(
   async (event) => {
@@ -39,6 +46,7 @@ export default wrapApiHandler(
         id: true,
         reimbursementReceiptUrl: true,
         consumablesReceiptUrl: true,
+        invoiceUrl: true,
         edition: { select: { id: true, conventionId: true } },
       },
     })
@@ -99,12 +107,15 @@ export default wrapApiHandler(
       data: {
         ...coordonneesBancairesRecues(donnees),
         ...justificatifs,
+        ...remiseDeLaFacture(justificatifs),
       },
       select: {
         iban: true,
         bic: true,
         reimbursementReceiptUrl: true,
         consumablesReceiptUrl: true,
+        invoiceUrl: true,
+        invoiceProvided: true,
       },
     })
 

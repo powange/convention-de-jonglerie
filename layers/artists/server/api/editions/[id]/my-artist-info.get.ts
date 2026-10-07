@@ -54,6 +54,7 @@ export default wrapApiHandler(
         bic: true,
         reimbursementReceiptUrl: true,
         consumablesReceiptUrl: true,
+        invoiceUrl: true,
         user: {
           select: {
             prenom: true,
@@ -214,6 +215,7 @@ export default wrapApiHandler(
         bic: artist.bic,
         reimbursementReceiptUrl: artist.reimbursementReceiptUrl,
         consumablesReceiptUrl: artist.consumablesReceiptUrl,
+        invoiceUrl: artist.invoiceUrl,
         shows: groupedShows,
         mealSelections: artist.mealSelections.map((ms) => ({
           id: ms.id,

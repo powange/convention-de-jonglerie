@@ -657,11 +657,15 @@
               <!-- Actions -->
               <template #actions-cell="{ row }">
                 <div class="flex items-center justify-end gap-2">
+                  <!-- Réduits à leur icône, ces deux boutons n'avaient aucun nom accessible :
+                       muets au lecteur d'écran, et impossibles à viser autrement que par leur
+                       position. Les libellés existaient déjà. -->
                   <UButton
                     icon="i-heroicons-pencil"
                     color="primary"
                     variant="ghost"
                     size="sm"
+                    :aria-label="$t('artists.edit_artist')"
                     @click="openEditArtistModal(row.original)"
                   />
                   <UButton
@@ -669,6 +673,7 @@
                     color="error"
                     variant="ghost"
                     size="sm"
+                    :aria-label="$t('artists.delete_artist')"
                     @click="confirmDeleteArtist(row.original)"
                   />
                 </div>

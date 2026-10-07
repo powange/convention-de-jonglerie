@@ -38,26 +38,35 @@
       <template #body>
         <div class="space-y-4">
           <!--
-            Un PDF ne s'affiche pas dans une balise `img`. L'`iframe` le rend là où le navigateur
-            le sait faire, et le lien reste proposé en dessous : sur téléphone, beaucoup de
-            navigateurs refusent d'incorporer un PDF et n'afficheraient qu'un cadre vide.
+            UN PDF S'OUVRE DANS UN ONGLET, où la visionneuse du navigateur fait tout ce qu'une
+            `iframe` ne faisait qu'imiter : zoom, pages, impression, enregistrement. C'est elle qui
+            était là, et son commentaire reconnaissait déjà le défaut — sur téléphone, beaucoup de
+            navigateurs refusent d'incorporer un PDF et n'affichaient qu'un cadre vide.
+
+            Pourquoi la modale subsiste quand même, au prix d'un clic de plus : c'est elle qui porte
+            « Retirer » et « Remplacer ». Ouvrir l'onglet depuis la pastille les rendrait
+            inatteignables — et une facture, elle, est presque toujours un PDF.
           -->
-          <iframe
+          <UButton
             v-if="estUnPdf"
-            :src="url ?? undefined"
-            class="w-full h-[60vh] rounded-lg border border-gray-200 dark:border-gray-700"
-            :title="$t('artists.receipt_view_title')"
-          />
+            :to="url ?? undefined"
+            target="_blank"
+            rel="noopener"
+            icon="i-heroicons-document-text"
+            trailing-icon="i-heroicons-arrow-top-right-on-square"
+            color="primary"
+            variant="soft"
+            block
+            size="lg"
+          >
+            {{ $t('artists.receipt_open_new_tab') }}
+          </UButton>
           <img
             v-else
             :src="url ?? undefined"
             :alt="$t('artists.receipt_view_title')"
             class="w-full max-h-[60vh] object-contain rounded-lg border border-gray-200 dark:border-gray-700"
           />
-
-          <ULink :to="url ?? undefined" target="_blank" rel="noopener" class="text-sm">
-            {{ $t('artists.receipt_open_new_tab') }}
-          </ULink>
         </div>
       </template>
 
@@ -115,6 +124,8 @@
 </template>
 
 <script setup lang="ts">
+import { estUnJustificatifPdf } from '~~/shared/utils/justificatif-pdf'
+
 /**
  * Les types acceptés.
  *
@@ -155,7 +166,7 @@ const brouillon = ref<string | null>(null)
 
 // Le paramètre d'antémémoire est retiré avant de regarder l'extension : `…/billet.pdf?v=12` se
 // termine par des chiffres, pas par « .pdf ».
-const estUnPdf = computed(() => !!props.url?.toLowerCase().split('?')[0]?.endsWith('.pdf'))
+const estUnPdf = computed(() => estUnJustificatifPdf(props.url))
 
 function ouvrirLEnvoi() {
   // Repartir d'un brouillon vide, et non du justificatif en place : on vient remplacer.

@@ -621,6 +621,7 @@ import type { Column } from '@tanstack/vue-table'
 import { cleDuNomAvance } from '~~/shared/utils/avance-nom-libre'
 import { BOM_UTF8 } from '~~/shared/utils/csv'
 import { listeDepuisUrl, texteDepuisUrl } from '~~/shared/utils/filtres-url'
+import { estUnJustificatifPdf } from '~~/shared/utils/justificatif-pdf'
 import { DEFAULT_CURRENCY, formatCents } from '~~/shared/utils/money'
 import { contientTousLesMots } from '~~/shared/utils/recherche-texte'
 
@@ -1236,12 +1237,8 @@ const rembourser = useApiActionById<{ count: number }>(
  */
 const justificatifOuvert = ref<string | null>(null)
 
-/**
- * Ce justificatif est-il un PDF ? Décidé sur l'extension : c'est la seule information portée par
- * l'URL, et le serveur a déjà croisé type MIME et extension au dépôt.
- */
-const estUnPdf = (url: string | null | undefined) =>
-  !!url?.toLowerCase().split('?')[0]?.endsWith('.pdf')
+/** Ce justificatif est-il un PDF ? La règle vit dans `shared/utils/justificatif-pdf.ts`. */
+const estUnPdf = estUnJustificatifPdf
 
 const entryModalOpen = ref(false)
 const codesModalOpen = ref(false)

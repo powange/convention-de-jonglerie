@@ -82,9 +82,9 @@
     "invoice_fee_section": "Рахунок і гонорар",
     "invoice_not_requested": "Рахунок не запитано",
     "invoice_provided": "Рахунок надано",
-    "invoice_provided_label": "Рахунок надано артисту",
+    "invoice_provided_label": "Артист надав свій рахунок",
     "invoice_requested": "Рахунок запитано",
-    "invoice_requested_label": "Артист запитує рахунок",
+    "invoice_requested_label": "Від артиста вимагається рахунок",
     "invoice_short": "Рахунок",
     "list_title": "Менеджмент артистів",
     "manage_artists_description": "Керуйте художниками, запрошеними до цього видання",
@@ -236,6 +236,8 @@
     "to_pay_no_bank": "Банківські дані не вказані",
     "to_pay_title": "Артисти до виплати",
     "to_pay_total": "Залишилося виплатити",
-    "to_pay_travel": "компенсації витрат"
+    "to_pay_travel": "компенсації витрат",
+    "invoice_file": "Рахунок артиста",
+    "invoice_upload_help": "Приймаються зображення та PDF. Завантаження рахунку позначає його як наданий."
   }
 }

@@ -76,6 +76,19 @@ model EditionArtist {
   /// Le justificatif des CONSOMMABLES. Même contrat que celui du défraiement ci-dessus.
   consumablesReceiptUrl   String?
 
+  /// LA FACTURE DE L'ARTISTE. Même contrat de dépôt que les deux justificatifs ci-dessus.
+  ///
+  /// 📍 C'est l'ARTISTE qui fournit sa facture — il la remet à la convention, pas l'inverse.
+  /// `invoiceRequested` dit qu'une facture lui est demandée, `invoiceProvided` qu'il l'a remise.
+  /// Les libellés français disaient l'inverse (« L'artiste demande une facture », « Facture
+  /// fournie à l'artiste ») : ils sont corrigés, aucune donnée n'ayant été saisie sous cette
+  /// lecture.
+  ///
+  /// 📍 Déposer un fichier ici vaut remise : l'écriture passe `invoiceProvided` à vrai. La case
+  /// reste cochable seule, pour une facture reçue par courriel ou sur papier — mais un fichier
+  /// présent et la case décochée serait une contradiction que personne ne saurait trancher.
+  invoiceUrl              String?
+
   /// Les coordonnées bancaires pour virer le cachet et les défraiements.
   ///
   /// ⚠️ PORTÉES PAR L'ARTISTE DE CETTE ÉDITION, et non par son compte. C'est délibéré, et c'est
