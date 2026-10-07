@@ -351,6 +351,78 @@ test.describe.serial('Remboursement des consommables des artistes', () => {
     await expect(page.getByText('Mes spectacles')).toBeVisible()
   })
 
+  test('⚠️ « Reste à verser » liste les artistes à payer, et le bouton solde tout', async ({
+    page,
+    goto,
+  }) => {
+    /*
+     * ⚠️ UN ÉTAT POSÉ PAR CE TEST, ET VISÉ PAR IDENTITÉ. Le total de la carte additionne TOUS les
+     * artistes de l'édition d'essai, que d'autres tests font varier : s'y accrocher produirait un
+     * échec selon l'ordre d'exécution. Ce qu'on éprouve, c'est la ligne de NOTRE artiste et le
+     * geste qui la solde.
+     *
+     * 📍 DEUX DETTES SUR TROIS, ET LA TROISIÈME VIDE MAIS NON MARQUÉE. C'est la construction qui
+     * rend l'assertion finale discriminante : les consommables n'ont aucun montant réel et leur
+     * drapeau est à `false`. Si le bouton posait les trois drapeaux au lieu des seules dettes
+     * dues, il écrirait « remboursé » sur une somme qui n'existe pas — et la fiche annoncerait un
+     * remboursement jamais fait.
+     */
+    const prepare = await apiPut(
+      page,
+      `${BASE_URL}/api/editions/${editionId}/artists/${artistId}`,
+      {
+        data: {
+          payment: 400,
+          paymentPaid: false,
+          reimbursementActual: 100,
+          consumablesActual: null,
+          consumablesActualPaid: false,
+        },
+      }
+    )
+    expect(prepare.ok(), `préparation de l'état: ${await prepare.text()}`).toBe(true)
+
+    await goto(`/editions/${editionId}/gestion/artists`, { waitUntil: 'hydration' })
+
+    // La carte s'annonce comme cliquable, et on la clique.
+    await expect(page.getByText('Reste à verser')).toBeVisible()
+    await page.getByText('Reste à verser').click()
+
+    const ligne = page.locator(`[data-a-payer="${artistId}"]`)
+    await expect(ligne).toBeVisible()
+
+    // Le montant est bien la somme des DEUX dettes dues — 400 + 100 —, et non celle des trois.
+    await expect(ligne.getByText('500 €')).toBeVisible()
+    // L'e-mail et le détail : de quoi payer sans rouvrir la fiche.
+    await expect(ligne.getByText(ARTIST_EMAIL)).toBeVisible()
+    await expect(ligne.getByText('de cachet', { exact: false })).toBeVisible()
+
+    await ligne.getByRole('button', { name: 'Marquer comme versé' }).click()
+
+    // La ligne quitte la liste d'elle-même : la page relit les artistes après l'enregistrement.
+    await expect(ligne).toHaveCount(0)
+
+    /*
+     * Ce que la BASE a retenu. L'écran peut très bien masquer une ligne sans que rien n'ait été
+     * écrit — c'est exactement la différence entre « ça a l'air réglé » et « c'est réglé ».
+     */
+    const relu = await getArtist(page)
+    expect(relu.paymentPaid).toBe(true)
+    expect(relu.reimbursementActualPaid).toBe(true)
+    /*
+     * ⚠️ L'ASSERTION QUI DISCRIMINE : les consommables n'avaient aucun montant réel, leur drapeau
+     * doit donc être resté à `false`. Un bouton qui poserait les trois sans regarder le rendrait
+     * `true` ici, et la fiche annoncerait un remboursement jamais fait.
+     *
+     * 📍 Ma première version attendait `true` sur un drapeau qui l'était DÉJÀ : elle était donc
+     * verte dans les deux cas, tout en prétendant par son commentaire prouver le contraire.
+     */
+    expect(relu.consumablesActualPaid).toBe(false)
+    // Et aucun montant n'a bougé : le bouton solde, il ne réécrit pas les sommes.
+    expect(Number(relu.payment)).toBe(400)
+    expect(Number(relu.reimbursementActual)).toBe(100)
+  })
+
   // Le compte E2E est partagé par tous les specs : le laisser inscrit comme artiste
   // ferait apparaître l'espace artiste dans sa navigation et casserait un rerun.
   test('nettoyage : supprimer les artistes créés', async ({ page }) => {
