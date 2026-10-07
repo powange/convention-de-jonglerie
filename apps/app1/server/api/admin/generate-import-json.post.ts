@@ -309,7 +309,9 @@ export async function generateImportJson(
     aiProvider,
     effectiveConfig.lmstudioBaseUrl,
     // L'identifiant du modèle : sans lui, le contexte était lu sur le PREMIER modèle installé.
-    effectiveConfig.lmstudioModel
+    effectiveConfig.lmstudioModel,
+    // La réponse se prend sur le MÊME contexte : l'ignorer faisait déborder la requête.
+    effectiveConfig.llmMaxTokens
   )
   // Réduire si on a déjà un JSON pré-rempli (moins besoin de contenu)
   const totalContentBudget = prefilledJson ? Math.floor(dynamicMaxContent * 0.6) : dynamicMaxContent

@@ -1,3 +1,4 @@
+import { budgetDeContenu } from './budget-de-contenu'
 import { contexteDuModele, type ModeleLocal } from './contexte-du-modele-local'
 import { loggers } from './logger'
 
@@ -302,20 +303,19 @@ export async function getLMStudioContextLength(
 }
 
 /**
- * Calcule la taille maximale de contenu à envoyer à l'IA
- * basée sur le context length du modèle
+ * La taille maximale de contenu à envoyer à l'IA, en caractères.
  *
- * Règle: on réserve ~1500 tokens pour le prompt système et la réponse
- * et on utilise ~60% du reste pour le contenu (1 token ≈ 4 caractères en français)
+ * ⚠️ `maxTokensReponse` N'EST PAS FACULTATIF PAR COMMODITÉ. La version d'avant réservait 1500
+ * jetons « pour le prompt système ET la réponse » alors que `max_tokens` vaut 4096 : sur un
+ * contexte de 8192, elle accordait 16 060 caractères là où ~6 100 tenaient, et LM Studio refusait
+ * la requête ENTIÈRE sur un « Bad Request » qui ne disait rien de la cause. Le raisonnement et les
+ * mesures sont dans `budget-de-contenu.ts`.
  */
-export function calculateMaxContentSize(contextLength: number): number {
-  const reservedTokens = 1500 // Pour prompt système + réponse
-  const availableTokens = contextLength - reservedTokens
-  const contentTokens = Math.floor(availableTokens * 0.6)
-  const maxChars = contentTokens * 4 // ~4 caractères par token en français
-
-  // Bornes min/max raisonnables
-  return Math.max(1500, Math.min(maxChars, 50000))
+export function calculateMaxContentSize(
+  contextLength: number,
+  maxTokensReponse: number = LIMITE_JETONS_PAR_DEFAUT
+): number {
+  return budgetDeContenu(contextLength, maxTokensReponse).caracteres
 }
 
 /**
@@ -326,23 +326,39 @@ export async function getMaxContentSizeForProvider(
   lmstudioBaseUrl?: string,
   // Sans lui, la détection lisait le contexte du PREMIER modèle installé, pas de celui qu'on
   // interroge : avec plusieurs modèles téléchargés, la valeur venait d'un autre.
-  lmstudioModelId?: string | null
+  lmstudioModelId?: string | null,
+  // La réponse se prend sur le MÊME contexte que le prompt : sans ce paramètre, le budget
+  // accordait au contenu la place réservée à la réponse, et la requête débordait.
+  maxTokensReponse: number = LIMITE_JETONS_PAR_DEFAUT
 ): Promise<number> {
   if (provider === 'lmstudio' && lmstudioBaseUrl) {
     const contextLength = await getLMStudioContextLength(lmstudioBaseUrl, lmstudioModelId)
-    const maxContent = calculateMaxContentSize(contextLength)
-    log.info(`Max content pour LM Studio: ${maxContent} caractères (context: ${contextLength})`)
+    const maxContent = calculateMaxContentSize(contextLength, maxTokensReponse)
+    log.info(
+      `Max content pour LM Studio: ${maxContent} caractères ` +
+        `(contexte: ${contextLength}, réponse: ${maxTokensReponse})`
+    )
+    /*
+     * Le cas où le contexte ne laisse presque rien : le dire, parce que l'extraction sera pauvre
+     * sans que rien n'échoue. Relever le contexte dans LM Studio est le seul vrai remède.
+     */
+    if (maxContent <= 3000) {
+      log.warn(
+        `Contexte trop court pour une extraction utile : ${maxContent} caractères de page. ` +
+          `Relever le contexte du modèle dans LM Studio (32768 recommandé), ou baisser max_tokens.`
+      )
+    }
     return maxContent
   }
 
   if (provider === 'anthropic') {
     // Anthropic a un très grand contexte, on peut être généreux
-    return calculateMaxContentSize(DEFAULT_CONTEXT_LENGTHS.anthropic)
+    return calculateMaxContentSize(DEFAULT_CONTEXT_LENGTHS.anthropic, maxTokensReponse)
   }
 
   if (provider === 'ollama') {
     // Ollama: utiliser la valeur par défaut conservative
-    return calculateMaxContentSize(DEFAULT_CONTEXT_LENGTHS.ollama)
+    return calculateMaxContentSize(DEFAULT_CONTEXT_LENGTHS.ollama, maxTokensReponse)
   }
 
   // Valeur par défaut conservative

@@ -75,8 +75,6 @@ const requestSchema = z.object({
 const MAX_AGENT_ITERATIONS = 8
 
 // Limites par défaut (seront ajustées dynamiquement selon le context length)
-const DEFAULT_MAX_TOTAL_CONTENT_SIZE = 10000
-const DEFAULT_MAX_PAGE_CONTENT_SIZE = 2500
 
 // Type pour le résultat de la génération
 export interface AgentGenerateResult {
@@ -777,17 +775,27 @@ export async function runAgentExploration(
   const dynamicMaxContent = await getMaxContentSizeForProvider(
     aiProvider,
     configToUse.lmstudioBaseUrl,
-    configToUse.lmstudioModel
+    configToUse.lmstudioModel,
+    configToUse.llmMaxTokens
   )
-  // Pour l'agent, on répartit le budget : ~40% par page, ~80% total (on garde de la marge pour les itérations)
-  const maxPageContentSize = Math.max(
-    DEFAULT_MAX_PAGE_CONTENT_SIZE,
-    Math.floor(dynamicMaxContent * 0.4)
-  )
-  const maxTotalContentSize = Math.max(
-    DEFAULT_MAX_TOTAL_CONTENT_SIZE,
-    Math.floor(dynamicMaxContent * 0.8)
-  )
+  /*
+   * L'agent répartit le budget : ~40 % par page, ~80 % au total — il garde de la marge pour les
+   * itérations, le contenu lu restant dans l'historique à chaque tour.
+   *
+   * ⚠️ LE BUDGET COMMANDE, SEUL. Deux constantes servaient de plancher PRIORITAIRE —
+   * `Math.max(10000, budget)` — et imposaient 10 000 caractères là où le budget en autorisait
+   * moins : la requête débordait le contexte, et LM Studio refusait tout sur un « Bad Request »
+   * muet, sans rien dire de la cause.
+   *
+   * Elles sont retirées plutôt que transformées en plafonds, qui auraient été l'erreur inverse :
+   * l'agent ne profiterait plus d'un contexte relevé. Et elles ne protégeaient de rien —
+   * `budgetDeContenu` garantit déjà un plancher de 1500 caractères.
+   *
+   * 📍 Les 80 % NE SONT PAS UNE PRUDENCE VAGUE : le contenu lu reste dans l'historique et repart au
+   * modèle à CHAQUE tour. Sans cette marge, le premier tour passe et le second déborde.
+   */
+  const maxPageContentSize = Math.floor(dynamicMaxContent * 0.4)
+  const maxTotalContentSize = Math.floor(dynamicMaxContent * 0.8)
 
   // Debug: afficher la config IA effective
   console.log(`[AGENT] Config IA effective:`, {
