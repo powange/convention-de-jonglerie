@@ -538,7 +538,10 @@ export function avancesARembourser(lines: TreasuryLine[]): AvancesARembourser {
    * même nom libre se rejoignent toujours. C'est aussi cette clé que le remboursement en lot
    * reçoit — il doit solder EXACTEMENT les lignes totalisées ici.
    */
-  const parBeneficiaire = new Map<string, BeneficiaireAvance & { montant: number }>()
+  const parBeneficiaire = new Map<
+    string,
+    BeneficiaireAvance & { montant: number; lignes: LigneDAvance[] }
+  >()
 
   for (const line of lines) {
     if (line.kind !== 'EXPENSE' || line.reimbursed || !line.settled) continue
@@ -547,9 +550,23 @@ export function avancesARembourser(lines: TreasuryLine[]): AvancesARembourser {
     if (!line.advancedBy && !cleNom) continue
 
     const cle = line.advancedBy ? `u:${line.advancedBy.id}` : `n:${cleNom}`
+    /*
+     * ⚠️ LES LIGNES SONT COLLECTÉES ICI, dans la boucle qui applique déjà la règle — et non
+     * regroupées une seconde fois côté client. Le filtre (charge, réglée, non remboursée) et la
+     * clé d'origine sont subtils : les recopier ailleurs ferait deux règles à tenir en accord, et
+     * un détail qui ne somme pas à son propre total ne se remarque qu'en recomptant à la main.
+     */
+    const ligne: LigneDAvance = {
+      cle: line.key,
+      libelle: line.title,
+      montant: line.settled,
+      code: line.code ? { code: line.code.code, label: line.code.label } : null,
+    }
+
     const deja = parBeneficiaire.get(cle)
     if (deja) {
       deja.montant += line.settled
+      deja.lignes.push(ligne)
       continue
     }
     parBeneficiaire.set(cle, {
@@ -557,11 +574,33 @@ export function avancesARembourser(lines: TreasuryLine[]): AvancesARembourser {
       personne: line.advancedBy ?? null,
       nomLibre: line.advancedBy ? null : (line.advancedByName ?? null),
       montant: line.settled,
+      lignes: [ligne],
     })
   }
 
   const detail = [...parBeneficiaire.values()].sort((a, b) => b.montant - a.montant)
+  // Le même ordre à l'intérieur qu'à l'extérieur : la plus grosse avance d'abord, c'est celle
+  // qu'on vérifie en premier quand on contrôle une somme.
+  for (const beneficiaire of detail) beneficiaire.lignes.sort((a, b) => b.montant - a.montant)
   return { total: detail.reduce((somme, d) => somme + d.montant, 0), detail }
+}
+
+/**
+ * Une écriture qui compose la dette envers quelqu'un.
+ *
+ * ⚠️ LE MONTANT EST LE RÉGLÉ, pas le brut — c'est la même valeur que celle additionnée dans le
+ * total du bénéficiaire, et c'est ce qui garantit que les lignes dépliées somment EXACTEMENT au
+ * montant affiché au-dessus. Prendre le brut ferait un détail qui contredit son propre total, et
+ * personne ne saurait lequel croire.
+ */
+export interface LigneDAvance {
+  /** La clé de la ligne de trésorerie — `entry:12`. */
+  cle: string
+  libelle: string
+  /** En centimes, comme tous les montants de ce module. */
+  montant: number
+  /** Le code d'imputation et son libellé, quand la ligne en porte un. */
+  code: { code: string; label: string } | null
 }
 
 /** À qui l'association doit une avance : un compte, ou un nom saisi librement. */
@@ -576,5 +615,5 @@ export interface AvancesARembourser {
   /** Somme due, en centimes. */
   total: number
   /** Une entrée par bénéficiaire, de la plus grosse avance à la plus petite. */
-  detail: (BeneficiaireAvance & { montant: number })[]
+  detail: (BeneficiaireAvance & { montant: number; lignes: LigneDAvance[] })[]
 }

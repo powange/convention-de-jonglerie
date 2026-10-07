@@ -385,35 +385,133 @@
 
     <!-- Détail des avances : c'est au moment de rembourser qu'on veut savoir qui attend combien,
          et le total seul ne le dit pas. -->
-    <UModal v-model:open="detailRemboursements" :title="$t('gestion.treasury.to_reimburse')">
+    <!-- Plus large que le défaut : chaque ligne porte un libellé, une imputation et un montant,
+         et à la largeur d'origine le libellé mangeait tout. `content` et non `width` — `UModal`
+         n'a pas de part `width`, et une part inventée est muette. -->
+    <UModal
+      v-model:open="detailRemboursements"
+      :ui="{ content: 'sm:max-w-3xl' }"
+      :title="$t('gestion.treasury.to_reimburse')"
+    >
       <template #body>
         <ul class="divide-y divide-gray-100 dark:divide-gray-800">
           <li
             v-for="ligne in data?.totals?.toReimburse?.detail ?? []"
             :key="ligne.cle"
-            class="flex flex-wrap items-center justify-between gap-3 py-2"
+            class="py-2"
           >
-            <UiUserDisplay v-if="ligne.personne" :user="ligne.personne" size="sm" />
-            <!-- Sans compte, il n'y a ni avatar ni pseudo à montrer : le nom saisi suffit, et une
-                 icône dit d'où il vient pour qu'on ne le confonde pas avec un membre. -->
-            <span v-else class="flex items-center gap-2 text-sm">
-              <UIcon name="i-heroicons-user" class="text-gray-400" />
-              {{ ligne.nomLibre }}
-            </span>
-            <div class="flex items-center gap-3">
-              <span class="font-semibold">{{ money(ligne.montant) }}</span>
-              <!-- On rembourse en un versement : pointer les lignes une par une était le geste
-                   le plus fastidieux de la page, et le plus facile à laisser à moitié fait. -->
-              <UButton
-                size="xs"
-                color="success"
-                variant="soft"
-                icon="i-lucide-check"
-                :loading="rembourser.isLoading(ligne.cle)"
-                :label="$t('gestion.treasury.mark_reimbursed')"
-                @click="rembourser.execute(ligne.cle)"
-              />
-            </div>
+            <!--
+              Chaque bénéficiaire se déplie sur les écritures qui composent sa dette. Le total seul
+              dit COMBIEN on doit ; il ne dit pas POURQUOI, et c'est la question qu'on se pose juste
+              avant de virer l'argent.
+
+              ⚠️ Les lignes viennent du SERVEUR, du même calcul qui produit le total. Les regrouper
+              ici aurait recopié un filtre subtil — charge, réglée, non remboursée, clé d'origine —
+              et un détail qui ne somme pas à son propre total ne se remarque qu'en recomptant.
+            -->
+            <!--
+              ⚠️ `role` ET `tabindex` À LA MAIN. `UCollapsible` enveloppe ce bloc dans son
+              déclencheur, lequel ne pose que `aria-expanded`, `aria-controls` et le clic — ni
+              rôle, ni tabulation, ni touches. Sans ces attributs, le détail est **inatteignable
+              au clavier** : un trésorier qui tabule n'atteint que les boutons « Remboursé », et
+              ne peut jamais ouvrir ce qu'il doit vérifier avant de virer l'argent. Et
+              `aria-expanded` sur un élément sans rôle est de l'ARIA invalide.
+
+              📍 Un vrai `<button>` serait préférable, mais `UiUserDisplay` contient des `<p>`,
+              qu'un bouton n'a pas le droit d'héberger.
+
+              📍 Le repli DÉMONTE son contenu (défaut) : il n'y a ici aucun état à préserver — pas
+              de défilement, pas de saisie —, et le garder monterait les écritures de TOUS les
+              bénéficiaires à l'ouverture de la modale.
+            -->
+            <UCollapsible>
+              <template #default="{ open }">
+                <div
+                  role="button"
+                  tabindex="0"
+                  class="flex w-full items-center justify-between gap-3 cursor-pointer"
+                  @keydown.enter.prevent="($event.currentTarget as HTMLElement).click()"
+                  @keydown.space.prevent="($event.currentTarget as HTMLElement).click()"
+                >
+                  <span class="flex items-center gap-2 min-w-0">
+                    <UIcon
+                      name="i-heroicons-chevron-right"
+                      class="size-4 shrink-0 text-gray-400 transition-transform"
+                      :class="open ? 'rotate-90' : ''"
+                    />
+                    <UiUserDisplay v-if="ligne.personne" :user="ligne.personne" size="sm" />
+                    <!-- Sans compte, il n'y a ni avatar ni pseudo à montrer : le nom saisi suffit, et
+                       une icône dit d'où il vient pour qu'on ne le confonde pas avec un membre. -->
+                    <span v-else class="flex items-center gap-2 text-sm">
+                      <UIcon name="i-heroicons-user" class="text-gray-400" />
+                      {{ ligne.nomLibre }}
+                    </span>
+                  </span>
+                  <div class="flex shrink-0 items-center gap-3">
+                    <span class="font-semibold tabular-nums">{{ money(ligne.montant) }}</span>
+                    <!-- On rembourse en un versement : pointer les lignes une par une était le geste
+                       le plus fastidieux de la page, et le plus facile à laisser à moitié fait.
+
+                       ⚠️ `@click.stop` : sans lui, rembourser déplierait aussi la personne — le
+                       bouton vit à l'intérieur du déclencheur du repli. -->
+                    <UButton
+                      size="xs"
+                      color="success"
+                      variant="soft"
+                      icon="i-lucide-check"
+                      :loading="rembourser.isLoading(ligne.cle)"
+                      :label="$t('gestion.treasury.mark_reimbursed')"
+                      @click.stop="rembourser.execute(ligne.cle)"
+                    />
+                  </div>
+                </div>
+              </template>
+
+              <template #content>
+                <!--
+                  ⚠️ `space-y-1` RETIRÉ : un fond alterné sur des lignes séparées par des blancs
+                  fait des bandes flottantes au lieu d'un tableau. Les lignes se touchent, et c'est
+                  leur teinte qui les sépare — ce qui est justement l'intérêt de l'alternance.
+                -->
+                <ul
+                  class="mt-2 ml-6 overflow-hidden rounded-md border-l border-gray-200 pl-4 dark:border-gray-700"
+                >
+                  <li
+                    v-for="ecriture in ligne.lignes"
+                    :key="ecriture.cle"
+                    class="flex items-start justify-between gap-3 px-2 py-1.5 text-sm odd:bg-elevated"
+                  >
+                    <!--
+                      ⚠️ `min-w-0` SUR LA COLONNE DE TEXTE, `shrink-0` SUR LE MONTANT. Sans le
+                      premier, un libellé long refuse de se réduire — sa largeur de base est son
+                      contenu — et pousse le montant hors de vue : exactement ce qu'on ne veut
+                      jamais sur un écran qui sert à payer. Le `truncate` ne suffit pas seul, il
+                      lui faut une boîte qui accepte de rétrécir.
+                    -->
+                    <div class="min-w-0 flex-1">
+                      <p class="truncate text-gray-800 dark:text-gray-200">
+                        {{ ecriture.libelle }}
+                      </p>
+                      <!-- L'imputation sur sa propre ligne : le code ET son libellé, car « 606 »
+                           seul ne dit rien à qui ne connaît pas le plan par cœur — et c'est
+                           justement la personne qui vérifie. -->
+                      <p
+                        v-if="ecriture.code"
+                        class="truncate text-xs text-gray-500 dark:text-gray-400"
+                      >
+                        {{ ecriture.code.code }} · {{ ecriture.code.label }}
+                      </p>
+                      <p v-else class="text-xs text-gray-400 italic">
+                        {{ $t('gestion.treasury.no_code') }}
+                      </p>
+                    </div>
+                    <span class="shrink-0 font-medium tabular-nums">
+                      {{ money(ecriture.montant) }}
+                    </span>
+                  </li>
+                </ul>
+              </template>
+            </UCollapsible>
           </li>
         </ul>
       </template>
@@ -553,6 +651,16 @@ const { data, pending, error, refresh } = await useFetch<{
         personne: PersonneAvance | null
         nomLibre: string | null
         montant: number
+        /**
+         * Les écritures qui composent cette dette, calculées par le serveur dans la boucle qui
+         * applique déjà la règle des avances — voir `avancesARembourser`.
+         */
+        lignes: {
+          cle: string
+          libelle: string
+          montant: number
+          code: { code: string; label: string } | null
+        }[]
       }[]
     }
   }

@@ -190,4 +190,78 @@ describe('avancesARembourser', () => {
 
     expect(r.detail.map((d) => d.montant)).toEqual([5000, 900, 100])
   })
+
+  /**
+   * Le détail dépliable : de quoi la dette d'une personne est faite.
+   *
+   * ⚠️ L'INVARIANT QUI COMPTE EST LA SOMME. Un détail qui ne somme pas à son propre total ne se
+   * remarque qu'en recomptant à la main, et l'on ne sait alors plus lequel des deux croire. C'est
+   * la raison pour laquelle ces lignes sont collectées dans la boucle qui applique DÉJÀ la règle,
+   * et non regroupées une seconde fois ailleurs.
+   */
+  describe('les lignes qui composent chaque dette', () => {
+    it('⚠️ somment exactement au montant annoncé', () => {
+      const r = avancesARembourser([
+        ligne({ key: 'entry:1', advancedByName: 'Jean-Luc', settled: 1234 }),
+        ligne({ key: 'entry:2', advancedByName: 'Jean-Luc', settled: 766 }),
+      ])
+
+      const beneficiaire = r.detail[0]!
+      expect(beneficiaire.montant).toBe(2000)
+      expect(beneficiaire.lignes.reduce((t, l) => t + l.montant, 0)).toBe(beneficiaire.montant)
+    })
+
+    it('porte le libellé, le montant RÉGLÉ et le code d’imputation', () => {
+      const r = avancesARembourser([
+        ligne({
+          key: 'entry:9',
+          title: 'Bâches',
+          advancedByName: 'Jean-Luc',
+          settled: 1500,
+          // Le brut diffère du réglé : c'est le réglé qu'on doit, et lui seul.
+          pending: 500,
+          code: { id: 3, code: '606', label: 'Achats non stockés' },
+        } as never),
+      ])
+
+      expect(r.detail[0]!.lignes).toEqual([
+        {
+          cle: 'entry:9',
+          libelle: 'Bâches',
+          montant: 1500,
+          code: { code: '606', label: 'Achats non stockés' },
+        },
+      ])
+    })
+
+    it('rend un code nul quand la ligne n’en porte pas', () => {
+      // Une avance peut très bien n'avoir jamais été imputée : l'écran doit pouvoir le dire,
+      // plutôt que d'afficher un code inventé.
+      const r = avancesARembourser([ligne({ advancedByName: 'Jean-Luc', settled: 100 })])
+
+      expect(r.detail[0]!.lignes[0]!.code).toBeNull()
+    })
+
+    it('⚠️ n’inclut PAS une ligne que la règle écarte', () => {
+      // Le détail suit exactement le filtre du total : une avance déjà remboursée n'est ni
+      // comptée ni listée. Sans ce cas, une ligne de trop passerait inaperçue — elle gonflerait
+      // le détail sans changer le total, et les deux se contrediraient en silence.
+      const r = avancesARembourser([
+        ligne({ key: 'entry:1', advancedByName: 'Jean-Luc', settled: 100 }),
+        ligne({ key: 'entry:2', advancedByName: 'Jean-Luc', settled: 900, reimbursed: true }),
+      ])
+
+      expect(r.detail[0]!.montant).toBe(100)
+      expect(r.detail[0]!.lignes.map((l) => l.cle)).toEqual(['entry:1'])
+    })
+
+    it('classe les lignes de la plus grosse à la plus petite', () => {
+      const r = avancesARembourser([
+        ligne({ key: 'entry:1', advancedByName: 'Jean-Luc', settled: 100 }),
+        ligne({ key: 'entry:2', advancedByName: 'Jean-Luc', settled: 900 }),
+      ])
+
+      expect(r.detail[0]!.lignes.map((l) => l.montant)).toEqual([900, 100])
+    })
+  })
 })
