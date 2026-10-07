@@ -15,6 +15,13 @@ const BASE = 'http://localhost:3000'
  * tests unitaires, ce qui reste à prouver c'est que la carte affiche la bonne somme et que son
  * clic ouvre bien le détail.
  */
+/*
+ * ⚠️ LE TITRE DE LA PAGE EST « COMPTE DE RÉSULTAT », plus « Trésorerie ».
+ *
+ * « Trésorerie » est devenue la SECTION, qui porte deux pages : le compte de résultat — celle-ci,
+ * où l'on saisit — et la répartition par imputation, qui en est le résumé en lecture seule. Les
+ * assertions de titre ont suivi ; l'URL, elle, n'a pas bougé.
+ */
 test.describe.serial('Trésorerie — avances à rembourser', () => {
   test.describe.configure({ timeout: 120000 })
 
@@ -151,7 +158,9 @@ test.describe.serial('Trésorerie — avances à rembourser', () => {
   }) => {
     const { editionId } = loadState()
     await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
-    await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
+    await expect(page.getByRole('heading', { name: 'Compte de résultat' })).toBeVisible({
+      timeout: 20000,
+    })
 
     // Les trois avances, dues à la même personne.
     const carte = page
@@ -187,7 +196,9 @@ test.describe.serial('Trésorerie — avances à rembourser', () => {
      */
     const { editionId } = loadState()
     await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
-    await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
+    await expect(page.getByRole('heading', { name: 'Compte de résultat' })).toBeVisible({
+      timeout: 20000,
+    })
 
     await page
       .locator('div')
@@ -229,7 +240,9 @@ test.describe.serial('Trésorerie — avances à rembourser', () => {
     // repart d'une page neuve — on la rouvre donc.
     const { editionId } = loadState()
     await page.goto(`${BASE}/editions/${editionId}/gestion/treasury`)
-    await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
+    await expect(page.getByRole('heading', { name: 'Compte de résultat' })).toBeVisible({
+      timeout: 20000,
+    })
 
     const carte = page
       .locator('div')
@@ -294,7 +307,9 @@ test.describe.serial('Trésorerie — avances à rembourser', () => {
     expect(soldee.reimbursedAt, 'le remboursement n’a pas été daté').toBeTruthy()
 
     await page.goto(`${BASE}/editions/${editionId}/gestion/treasury`)
-    await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
+    await expect(page.getByRole('heading', { name: 'Compte de résultat' })).toBeVisible({
+      timeout: 20000,
+    })
 
     const ligne = page.locator('tbody tr').filter({ hasText: `Avance E2E ${MONTANT_A}` })
     await expect(ligne).toBeVisible({ timeout: 20000 })

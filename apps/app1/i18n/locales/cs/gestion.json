@@ -1155,7 +1155,12 @@
       "reimburse_confirm_description": "{count} záznamů, které zaplatil(a) {nom}, celkem {montant}, bude naráz označeno jako proplacené. Vrátit to zpět lze jen tím, že každý záznam otevřete znovu.",
       "reimburse_confirm_title": "Označit tyto zálohy jako proplacené?",
       "reimbursed_badge": "Proplaceno",
-      "reimbursed_on": "Proplaceno {date}"
+      "reimbursed_on": "Proplaceno {date}",
+      "breakdown_codes_count": "Žádný kód | 1 kód | {count} kódů",
+      "breakdown_empty": "Žádné záznamy tohoto druhu.",
+      "breakdown_subtitle": "Součet za každý účetní kód, za celý ročník. Jednotlivé záznamy zůstávají ve výsledovce.",
+      "breakdown_title": "Rozdělení podle účetního kódu",
+      "result_title": "Výsledovka"
     },
     "program": {
       "description": "Sestavte časovou osu ročníku: workshopy, představení a další body programu.",

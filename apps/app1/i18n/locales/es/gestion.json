@@ -1155,7 +1155,12 @@
       "reimburse_confirm_description": "Los {count} apuntes adelantados por {nom}, por un total de {montant}, se marcarán como reembolsados de una sola vez. Para deshacerlo, habrá que volver a abrir cada apunte.",
       "reimburse_confirm_title": "¿Marcar estos adelantos como reembolsados?",
       "reimbursed_badge": "Reembolsado",
-      "reimbursed_on": "Reembolsado el {date}"
+      "reimbursed_on": "Reembolsado el {date}",
+      "breakdown_codes_count": "Ningún código | 1 código | {count} códigos",
+      "breakdown_empty": "No hay apuntes de este tipo.",
+      "breakdown_subtitle": "El total de cada código contable, en toda la edición. El detalle de los apuntes permanece en la cuenta de resultados.",
+      "breakdown_title": "Desglose por código contable",
+      "result_title": "Cuenta de resultados"
     },
     "program": {
       "description": "Componga la cronología de la edición: workshops, espectáculos y otros momentos.",

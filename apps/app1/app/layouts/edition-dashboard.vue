@@ -881,11 +881,35 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   // droit dédié — elle donne à voir l'ensemble des montants, y compris ceux d'artistes que les
   // droits sectoriels ne couvrent pas.
   if (edition.value?.treasuryEnabled && canManageTreasury.value) {
+    /*
+     * « Trésorerie » devient une SECTION à deux pages, et garde son nom.
+     *
+     * Le compte de résultat est la page où l'on saisit ; la répartition par imputation en est le
+     * résumé, en lecture seule. Nommer la section comme sa première page aurait rendu le second
+     * document invisible — et c'est lui qu'on cherche pour une assemblée générale.
+     */
     managementSection.push({
       label: t('gestion.treasury.title'),
       icon: 'i-heroicons-calculator',
-      to: `/editions/${editionId.value}/gestion/treasury`,
-      tooltip: { text: t('gestion.treasury.title') },
+      // Sans `categorie`, l'icône d'une section repliable reste à la couleur du thème pendant que
+      // l'accueil l'affiche en bleu ciel. L'omission n'est pas une erreur en soi — 36 entrées s'en
+      // passent légitimement —, elle ne se voit donc qu'à l'œil. C'est le défaut qu'avait eu
+      // « Stock matériel ».
+      categorie: 'tresorerie',
+      value: 'treasury',
+      popover: {},
+      children: [
+        {
+          label: t('gestion.treasury.result_title'),
+          icon: 'i-heroicons-document-chart-bar',
+          to: `/editions/${editionId.value}/gestion/treasury`,
+        },
+        {
+          label: t('gestion.treasury.breakdown_title'),
+          icon: 'i-heroicons-squares-2x2',
+          to: `/editions/${editionId.value}/gestion/treasury/breakdown`,
+        },
+      ],
     })
   }
 

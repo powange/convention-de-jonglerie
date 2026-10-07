@@ -1155,7 +1155,12 @@
       "reimburse_confirm_description": "De {count} posten die {nom} heeft voorgeschoten, samen {montant}, worden in één keer als terugbetaald gemarkeerd. Om dit terug te draaien moet je elke post opnieuw openen.",
       "reimburse_confirm_title": "Deze voorschotten als terugbetaald markeren?",
       "reimbursed_badge": "Terugbetaald",
-      "reimbursed_on": "Terugbetaald op {date}"
+      "reimbursed_on": "Terugbetaald op {date}",
+      "breakdown_codes_count": "Geen code | 1 code | {count} codes",
+      "breakdown_empty": "Geen posten van deze soort.",
+      "breakdown_subtitle": "Het totaal per grootboekcode, over de hele editie. De afzonderlijke posten blijven op de resultatenrekening staan.",
+      "breakdown_title": "Verdeling per grootboekcode",
+      "result_title": "Resultatenrekening"
     },
     "program": {
       "description": "Stel de tijdlijn van de editie samen: workshops, shows en andere momenten.",

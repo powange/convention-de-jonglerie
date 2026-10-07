@@ -27,6 +27,13 @@ const BASE = 'http://localhost:3000'
  */
 const lignes = (page: Page) => page.locator('tbody tr')
 
+/*
+ * ⚠️ LE TITRE DE LA PAGE EST « COMPTE DE RÉSULTAT », plus « Trésorerie ».
+ *
+ * « Trésorerie » est devenue la SECTION, qui porte deux pages : le compte de résultat — celle-ci,
+ * où l'on saisit — et la répartition par imputation, qui en est le résumé en lecture seule. Les
+ * assertions de titre ont suivi ; l'URL, elle, n'a pas bougé.
+ */
 test.describe.serial("Trésorerie d'une édition", () => {
   test('active la fonctionnalité', async ({ page }) => {
     const { editionId } = loadState()
@@ -49,7 +56,9 @@ test.describe.serial("Trésorerie d'une édition", () => {
     const { editionId } = loadState()
 
     await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
-    await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
+    await expect(page.getByRole('heading', { name: 'Compte de résultat' })).toBeVisible({
+      timeout: 20000,
+    })
 
     // Les lignes calculées sont toujours là, quel que soit leur montant. Leur nombre suit les
     // origines et change quand on en ajoute une — le compter en dur ferait échouer ce parcours
@@ -88,7 +97,9 @@ test.describe.serial("Trésorerie d'une édition", () => {
     const { editionId } = loadState()
 
     await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
-    await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
+    await expect(page.getByRole('heading', { name: 'Compte de résultat' })).toBeVisible({
+      timeout: 20000,
+    })
 
     // L'ancien bouton générique n'existe plus.
     await expect(page.getByRole('button', { name: 'Ajouter une ligne' })).toHaveCount(0)
@@ -348,7 +359,9 @@ test.describe.serial("Trésorerie d'une édition", () => {
     expect(tierId).toBeTruthy()
 
     await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
-    await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
+    await expect(page.getByRole('heading', { name: 'Compte de résultat' })).toBeVisible({
+      timeout: 20000,
+    })
 
     await page.getByRole('button', { name: 'Ajouter un produit' }).click()
     const dialog = page.getByRole('dialog')
@@ -445,7 +458,9 @@ test.describe.serial("Trésorerie d'une édition", () => {
 
     await page.setViewportSize({ width: 1400, height: 900 })
     await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
-    await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
+    await expect(page.getByRole('heading', { name: 'Compte de résultat' })).toBeVisible({
+      timeout: 20000,
+    })
 
     const avant = await lignes(page).count()
     expect(avant, 'aucune ligne : la trésorerie ne charge pas').toBeGreaterThan(0)
@@ -628,7 +643,7 @@ test.describe.serial("Trésorerie d'une édition", () => {
 
     try {
       await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
-      await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({
+      await expect(page.getByRole('heading', { name: 'Compte de résultat' })).toBeVisible({
         timeout: 20000,
       })
 

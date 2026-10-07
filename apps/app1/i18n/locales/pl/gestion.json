@@ -1155,7 +1155,12 @@
       "reimburse_confirm_description": "{count} zapisów opłaconych przez {nom}, łącznie {montant}, zostanie naraz oznaczonych jako zwrócone. Aby to cofnąć, trzeba będzie otworzyć każdy zapis osobno.",
       "reimburse_confirm_title": "Oznaczyć te zaliczki jako zwrócone?",
       "reimbursed_badge": "Zwrócono",
-      "reimbursed_on": "Zwrócono {date}"
+      "reimbursed_on": "Zwrócono {date}",
+      "breakdown_codes_count": "Brak kodu | 1 kod | {count} kodów",
+      "breakdown_empty": "Brak zapisów tego rodzaju.",
+      "breakdown_subtitle": "Suma dla każdego kodu księgowego, dla całej edycji. Szczegóły zapisów pozostają w rachunku wyników.",
+      "breakdown_title": "Podział według kodu księgowego",
+      "result_title": "Rachunek wyników"
     },
     "program": {
       "description": "Ułóż oś czasu edycji: warsztaty, pokazy i inne wydarzenia.",

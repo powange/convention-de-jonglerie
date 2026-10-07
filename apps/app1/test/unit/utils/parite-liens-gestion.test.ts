@@ -132,6 +132,7 @@ describe('les sections repliables du menu sont teintées', () => {
     meals: 'repas',
     ticketing: 'billetterie',
     stock: 'stock',
+    treasury: 'tresorerie',
   } as const
 
   const valeursDuMenu = [

@@ -1063,6 +1063,10 @@
       "amount_from_tiers_help": "Le montant suivra les ventes des tarifs choisis, et quittera la ligne « Billetterie — autres produits » au lieu de s'y ajouter.",
       "balance": "Solde",
       "balance_hint": "Produits moins charges, réglés ou non",
+      "breakdown_codes_count": "Aucun code | 1 code | {count} codes",
+      "breakdown_empty": "Aucune écriture de cette nature.",
+      "breakdown_subtitle": "Le total de chaque code d'imputation, sur l'édition entière. Le détail des écritures reste sur le compte de résultat.",
+      "breakdown_title": "Répartition par imputation",
       "code_create_error": "Impossible de créer le code",
       "code_created": "Code créé",
       "code_delete_confirm": "Les lignes qui l'utilisaient garderont leur montant et perdront seulement leur imputation. Cette action est définitive.",
@@ -1154,6 +1158,7 @@
       "reimbursed_done": "Avances marquées comme remboursées",
       "reimbursed_error": "Impossible de marquer les avances comme remboursées",
       "reimbursed_on": "Remboursé le {date}",
+      "result_title": "Compte de résultat",
       "settled_amount": "dont {amount} réglé",
       "source": {
         "ARTIST_PAYMENT": "Cachets des artistes",
