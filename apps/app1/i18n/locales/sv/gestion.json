@@ -1155,7 +1155,12 @@
       "reimburse_confirm_description": "De {count} posterna som {nom} har lagt ut för, totalt {montant}, markeras som återbetalda på en gång. För att ångra måste varje post öppnas igen.",
       "reimburse_confirm_title": "Markera dessa utlägg som återbetalda?",
       "reimbursed_badge": "Återbetald",
-      "reimbursed_on": "Återbetald den {date}"
+      "reimbursed_on": "Återbetald den {date}",
+      "breakdown_codes_count": "Inget konto | 1 konto | {count} konton",
+      "breakdown_empty": "Inga poster av detta slag.",
+      "breakdown_subtitle": "Summan för varje kontokod, för hela upplagan. De enskilda posterna finns kvar på resultaträkningen.",
+      "breakdown_title": "Fördelning per kontokod",
+      "result_title": "Resultaträkning"
     },
     "program": {
       "description": "Sätt samman upplagans tidslinje: workshops, föreställningar och andra moment.",

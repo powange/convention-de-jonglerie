@@ -4,6 +4,7 @@ import {
   montantPourPdf,
   nomFichierTresorerie,
   preparerTableau,
+  profondeurDuCode,
   regrouperParCode,
   SANS_CODE,
   soldeDe,
@@ -60,6 +61,13 @@ describe('regrouperParCode', () => {
   })
 
   it('range les codes dans l’ordre du plan comptable', () => {
+    /*
+     * ⚠️ UN PLAN COMPTABLE EST UNE HIÉRARCHIE DE PRÉFIXES, pas une suite de nombres.
+     *
+     * 6132 est un sous-compte de 613, donc il précède 618. Ce test attendait l'inverse — l'ordre
+     * NUMÉRIQUE, que produisait `localeCompare(..., { numeric: true })` —, et son intitulé disait
+     * pourtant déjà « l'ordre du plan comptable ». L'attente était fausse, pas le nom.
+     */
     const groupes = regrouperParCode(
       [
         ligne({ code: { code: '6257', label: 'Réceptions' } }),
@@ -69,7 +77,30 @@ describe('regrouperParCode', () => {
       'EXPENSE'
     )
 
-    expect(groupes.map((g) => g.code)).toEqual(['618', '6132', '6257'])
+    expect(groupes.map((g) => g.code)).toEqual(['6132', '618', '6257'])
+  })
+
+  it('⚠️ place un sous-compte juste sous son parent', () => {
+    /*
+     * Le cas signalé sur l'écran de répartition : 60111 se retrouvait derrière 6251, à l'autre bout
+     * de la liste, loin du 6011 dont il dépend — et 4671 était perdu au milieu des 60x. L'ordre
+     * numérique éparpille les codes par LONGUEUR ; celui-ci les enchaîne par préfixe.
+     */
+    const codes = ['6251', '60112', '601', '4671', '6011', '60111', '607']
+    const groupes = regrouperParCode(
+      codes.map((code) => ligne({ code: { code, label: code } })),
+      'EXPENSE'
+    )
+
+    expect(groupes.map((g) => g.code)).toEqual([
+      '4671',
+      '601',
+      '6011',
+      '60111',
+      '60112',
+      '607',
+      '6251',
+    ])
   })
 
   it('met les lignes sans code en dernier, jamais en premier', () => {
@@ -371,5 +402,35 @@ describe('montantPourPdf', () => {
 
   it('laisse intact un montant déjà propre', () => {
     expect(montantPourPdf('483,37 €')).toBe('483,37 €')
+  })
+})
+
+describe('profondeurDuCode', () => {
+  it('indente un sous-compte sous son parent', () => {
+    // Le cas demandé : 601 à gauche, 6011 d'un cran, 60111 de deux.
+    const codes = ['601', '6011', '60111']
+    expect(codes.map((c) => profondeurDuCode(c, codes))).toEqual([0, 1, 2])
+  })
+
+  it('⚠️ ne décale PAS un code dont le parent n’est pas affiché', () => {
+    /*
+     * La profondeur se compte sur les codes PRÉSENTS, pas sur la longueur. Sans 607 dans la liste,
+     * ces trois-là sont au même rang les uns des autres : les décaler tous d'un cran n'indiquerait
+     * rien et ferait perdre de la place à gauche.
+     */
+    const codes = ['6071', '6072', '6073']
+    expect(codes.map((c) => profondeurDuCode(c, codes))).toEqual([0, 0, 0])
+  })
+
+  it('ne prend pas « sans code » pour le parent de tout le monde', () => {
+    // La chaîne vide est préfixe de n'importe quoi : sans garde, chaque compte gagnait un cran.
+    expect(profondeurDuCode('601', ['', '601'])).toBe(0)
+    expect(profondeurDuCode('', ['', '601'])).toBe(0)
+  })
+
+  it('ne confond pas un préfixe de chiffres avec un parent d’une autre branche', () => {
+    // 4671 ne descend de rien ici, et 6011 ne descend pas de 60 (qui n'est pas affiché).
+    const codes = ['4671', '601', '6011', '6251']
+    expect(codes.map((c) => profondeurDuCode(c, codes))).toEqual([0, 0, 1, 0])
   })
 })

@@ -1155,7 +1155,12 @@
       "reimburse_confirm_description": "Le {count} scritture anticipate da {nom}, per un totale di {montant}, saranno segnate come rimborsate in una sola volta. Per tornare indietro bisognerà riaprire ogni scrittura.",
       "reimburse_confirm_title": "Segnare questi anticipi come rimborsati?",
       "reimbursed_badge": "Rimborsato",
-      "reimbursed_on": "Rimborsato il {date}"
+      "reimbursed_on": "Rimborsato il {date}",
+      "breakdown_codes_count": "Nessun codice | 1 codice | {count} codici",
+      "breakdown_empty": "Nessuna scrittura di questo tipo.",
+      "breakdown_subtitle": "Il totale di ogni codice contabile, sull'intera edizione. Il dettaglio delle scritture resta sul conto economico.",
+      "breakdown_title": "Ripartizione per codice contabile",
+      "result_title": "Conto economico"
     },
     "program": {
       "description": "Componi la cronologia dell'edizione: workshop, spettacoli e altri momenti.",

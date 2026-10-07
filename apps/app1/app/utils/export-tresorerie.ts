@@ -107,8 +107,42 @@ export function regrouperParCode<L extends LigneTresorerie>(
     // « Sans code » en dernier, quel que soit le tri : c'est un fourre-tout, pas un compte.
     if (a.code === SANS_CODE) return 1
     if (b.code === SANS_CODE) return -1
-    return a.code.localeCompare(b.code, 'fr', { numeric: true })
+    /*
+     * ⚠️ COMPARAISON DE CHAÎNES, SURTOUT PAS `{ numeric: true }`.
+     *
+     * Un plan comptable est une HIÉRARCHIE DE PRÉFIXES : 60111 est un sous-compte de 6011, qui est
+     * un sous-compte de 601. L'ordre juste les enchaîne donc, chaque compte suivi des siens.
+     *
+     * `{ numeric: true }` comparait les codes comme des NOMBRES, et les éparpillait par longueur :
+     *
+     *   601, 607, 4671, 6011, …, 6251, 60111, 60112, 61351, 62131
+     *
+     * — 4671 perdu au milieu des 60x, et 60111 rejeté derrière 6251, loin du 6011 dont il dépend.
+     * Le commentaire d'en-tête annonçait pourtant « l'ordre du plan comptable » : l'intention était
+     * juste, l'option la trahissait. Le défaut valait aussi pour le CSV et le PDF.
+     */
+    return a.code.localeCompare(b.code, 'fr')
   })
+}
+
+/**
+ * De combien de crans un code est-il un SOUS-compte, parmi ceux qui sont affichés ?
+ *
+ * Un plan comptable est une hiérarchie de préfixes : 60111 dépend de 6011, qui dépend de 601. Les
+ * indenter rend cette dépendance visible, là où une colonne plate laisse croire à vingt comptes de
+ * même rang.
+ *
+ * ⚠️ LA PROFONDEUR SE COMPTE SUR LES CODES PRÉSENTS, et non sur la longueur du code. Une liste qui
+ * ne contiendrait que 6071, 6072 et 6073 — sans 607 — les décalerait tous d'un cran pour rien,
+ * alors qu'ils sont au même rang les uns des autres. Ici, un code sans parent affiché reste à
+ * gauche, quelle que soit sa longueur.
+ *
+ * 📍 `SANS_CODE` est la chaîne vide, préfixe de tout : elle est écartée explicitement, sans quoi
+ * elle passerait pour le parent de chaque compte.
+ */
+export function profondeurDuCode(code: string, tousLesCodes: readonly string[]): number {
+  if (!code) return 0
+  return tousLesCodes.filter((autre) => autre && autre !== code && code.startsWith(autre)).length
 }
 
 /** Ce que totalise une nature entière. */

@@ -1155,7 +1155,12 @@
       "reimburse_confirm_description": "Die {count} von {nom} vorgestreckten Buchungen über insgesamt {montant} werden in einem Schritt als erstattet markiert. Um das zurückzunehmen, muss jede Buchung einzeln wieder geöffnet werden.",
       "reimburse_confirm_title": "Diese Vorschüsse als erstattet markieren?",
       "reimbursed_badge": "Erstattet",
-      "reimbursed_on": "Erstattet am {date}"
+      "reimbursed_on": "Erstattet am {date}",
+      "breakdown_codes_count": "Kein Konto | 1 Konto | {count} Konten",
+      "breakdown_empty": "Keine Buchungen dieser Art.",
+      "breakdown_subtitle": "Die Summe je Buchungskonto, über die gesamte Ausgabe. Die einzelnen Buchungen bleiben in der Gewinn- und Verlustrechnung.",
+      "breakdown_title": "Aufteilung nach Buchungskonto",
+      "result_title": "Gewinn- und Verlustrechnung"
     },
     "program": {
       "description": "Stellen Sie den Zeitplan der Ausgabe zusammen: Workshops, Shows und weitere Momente.",

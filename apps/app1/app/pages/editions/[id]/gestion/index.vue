@@ -671,9 +671,16 @@
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             <ManagementNavigationCard
               :to="`/editions/${edition.id}/gestion/treasury`"
-              icon="i-heroicons-calculator"
-              :title="$t('gestion.treasury.title')"
+              icon="i-heroicons-document-chart-bar"
+              :title="$t('gestion.treasury.result_title')"
               :description="$t('gestion.treasury.subtitle')"
+              color="sky"
+            />
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/treasury/breakdown`"
+              icon="i-heroicons-squares-2x2"
+              :title="$t('gestion.treasury.breakdown_title')"
+              :description="$t('gestion.treasury.breakdown_subtitle')"
               color="sky"
             />
           </div>

@@ -1155,7 +1155,12 @@
       "reimburse_confirm_description": "The {count} entries advanced by {nom}, totalling {montant}, will be marked as reimbursed all at once. To undo this, you will have to reopen each entry.",
       "reimburse_confirm_title": "Mark these advances as reimbursed?",
       "reimbursed_badge": "Reimbursed",
-      "reimbursed_on": "Reimbursed on {date}"
+      "reimbursed_on": "Reimbursed on {date}",
+      "breakdown_codes_count": "No code | 1 code | {count} codes",
+      "breakdown_empty": "No entries of this kind.",
+      "breakdown_subtitle": "The total for each accounting code, across the whole edition. The individual entries stay on the income statement.",
+      "breakdown_title": "Breakdown by accounting code",
+      "result_title": "Income statement"
     },
     "program": {
       "description": "Build the edition's timeline: workshops, shows and other moments.",

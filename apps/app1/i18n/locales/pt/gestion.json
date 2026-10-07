@@ -1155,7 +1155,12 @@
       "reimburse_confirm_description": "Os {count} lançamentos adiantados por {nom}, no total de {montant}, serão marcados como reembolsados de uma só vez. Para voltar atrás, será preciso reabrir cada lançamento.",
       "reimburse_confirm_title": "Marcar estes adiantamentos como reembolsados?",
       "reimbursed_badge": "Reembolsado",
-      "reimbursed_on": "Reembolsado em {date}"
+      "reimbursed_on": "Reembolsado em {date}",
+      "breakdown_codes_count": "Nenhum código | 1 código | {count} códigos",
+      "breakdown_empty": "Não há lançamentos deste tipo.",
+      "breakdown_subtitle": "O total de cada código contabilístico, em toda a edição. O detalhe dos lançamentos fica na demonstração de resultados.",
+      "breakdown_title": "Repartição por código contabilístico",
+      "result_title": "Demonstração de resultados"
     },
     "program": {
       "description": "Componha a cronologia da edição: workshops, espetáculos e outros momentos.",

@@ -12,7 +12,7 @@
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <ManagementPageHeader
-            :titre="$t('gestion.treasury.title')"
+            :titre="$t('gestion.treasury.result_title')"
             :description="$t('gestion.treasury.subtitle')"
           />
         </div>

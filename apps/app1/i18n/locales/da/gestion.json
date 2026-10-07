@@ -1155,7 +1155,12 @@
       "reimburse_confirm_description": "De {count} posteringer, som {nom} har lagt ud for, i alt {montant}, markeres som refunderet på én gang. For at fortryde skal hver postering åbnes igen.",
       "reimburse_confirm_title": "Markér disse udlæg som refunderet?",
       "reimbursed_badge": "Refunderet",
-      "reimbursed_on": "Refunderet den {date}"
+      "reimbursed_on": "Refunderet den {date}",
+      "breakdown_codes_count": "Ingen konto | 1 konto | {count} konti",
+      "breakdown_empty": "Ingen posteringer af denne art.",
+      "breakdown_subtitle": "Totalen for hver kontokode, for hele udgaven. De enkelte posteringer bliver på resultatopgørelsen.",
+      "breakdown_title": "Fordeling pr. kontokode",
+      "result_title": "Resultatopgørelse"
     },
     "program": {
       "description": "Sammensæt udgavens tidslinje: workshops, shows og andre programpunkter.",
