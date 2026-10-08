@@ -68,11 +68,7 @@
             :help="$t('gestion.treasury.cash_float_count_help')"
             class="min-w-60"
           >
-            <UInput v-model="comptage" type="number" step="0.01" min="0" class="w-full">
-              <template #trailing>
-                <span class="text-gray-500 dark:text-gray-400 text-sm">{{ currencySymbol }}</span>
-              </template>
-            </UInput>
+            <UiMoneyInput v-model="comptage" :currency="currency" class="w-full" />
           </UFormField>
           <div class="flex items-center gap-2">
             <UButton
@@ -183,7 +179,7 @@
     <TreasuryCashFloatModal
       v-model:open="modaleOuverte"
       :edition-id="editionId"
-      :currency-symbol="currencySymbol"
+      :currency="currency"
       :apport="apportEnCours"
       @saved="refresh()"
     />
@@ -196,8 +192,6 @@
 import type { ApportSaisissable } from '~/components/treasury/CashFloatModal.vue'
 
 import type { EtatDuFondsDeCaisse, PreteurDeFondsDeCaisse } from '~~/shared/utils/fonds-de-caisse'
-
-import { currencySymbol as symboleDeDevise } from '~~/shared/utils/money'
 
 /**
  * Le fonds de caisse d'une édition : qui a prêté de l'espèce pour rendre la monnaie, ce qu'on leur
@@ -251,7 +245,6 @@ const { data, pending, error, refresh } = await useFetch<ReponseFondsDeCaisse>(
 )
 
 const currency = computed(() => data.value?.currency || DEFAULT_CURRENCY)
-const currencySymbol = computed(() => symboleDeDevise(currency.value, locale.value))
 const money = (cents: number) => formatCents(cents, currency.value, locale.value)
 const apports = computed(() => data.value?.apports ?? [])
 
@@ -315,13 +308,13 @@ const cartes = computed(() => [
 
 /* ------------------------------------------------- le comptage */
 
-const comptage = ref<string | number>('')
+const comptage = ref<number | null>(null)
 // Le champ suit la valeur enregistrée, y compris après un rafraîchissement : sans cela, corriger un
 // apport remettrait le champ à vide et un clic sur « Enregistrer » effacerait le comptage.
 watch(
   () => etat.value.compte,
   (valeur) => {
-    comptage.value = valeur === null ? '' : valeur / 100
+    comptage.value = valeur === null ? null : valeur / 100
   },
   { immediate: true }
 )
@@ -330,7 +323,7 @@ const { execute: envoyerLeComptage, loading: comptageEnCours } = useApiAction<{
   count: number | null
 }>(() => `/api/editions/${editionId.value}/treasury/cash-float-count`, {
   method: 'PUT',
-  body: () => ({ count: comptage.value === '' ? null : Number(comptage.value) }),
+  body: () => ({ count: comptage.value }),
   successMessage: { title: t('gestion.treasury.cash_float_count_saved') },
   errorMessages: { default: t('gestion.treasury.cash_float_count_error') },
   onSuccess: () => refresh(),
@@ -339,7 +332,7 @@ const { execute: envoyerLeComptage, loading: comptageEnCours } = useApiAction<{
 const enregistrerLeComptage = () => envoyerLeComptage()
 
 const effacerLeComptage = () => {
-  comptage.value = ''
+  comptage.value = null
   return envoyerLeComptage()
 }
 

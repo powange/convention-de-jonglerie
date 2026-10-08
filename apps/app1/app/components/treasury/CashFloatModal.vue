@@ -3,11 +3,9 @@
     <template #body>
       <UForm :state="form" :schema="schema" class="space-y-4" @submit="enregistrer">
         <UFormField name="amount" :label="$t('gestion.treasury.cash_float_amount')" required>
-          <UInput v-model="form.amount" type="number" step="0.01" min="0" class="w-full">
-            <template #trailing>
-              <span class="text-gray-500 dark:text-gray-400 text-sm">{{ currencySymbol }}</span>
-            </template>
-          </UInput>
+          <!-- Voir la note de `UiMoneyInput` : un champ `type="number"` AVALE la virgule et
+               déclare pourtant la saisie valide — « 12,50 » y valait 1 250. -->
+          <UiMoneyInput v-model="form.amount" :currency="currency" class="w-full" />
         </UFormField>
 
         <UFormField :label="$t('gestion.treasury.cash_float_lender')">
@@ -50,8 +48,11 @@
           </div>
         </UFormField>
 
+        <!-- Le MÊME sélecteur que la date d'opération d'une entrée (`EntryModal`) : un calendrier,
+             et `clearable` parce que la date est facultative — un champ `type="date"` ne se vide
+             pas et impose la saisie au clavier dans un format que la locale ne dit pas. -->
         <UFormField name="operationDate" :label="$t('gestion.treasury.cash_float_date')">
-          <UInput v-model="form.operationDate" type="date" class="w-full" />
+          <UiDateField v-model="form.operationDate" size="md" clearable class="w-full" />
         </UFormField>
 
         <UFormField name="note" :label="$t('gestion.treasury.cash_float_note')">
@@ -63,11 +64,14 @@
           />
         </UFormField>
 
-        <UFormField :label="$t('gestion.treasury.cash_float_restitution')">
-          <UCheckbox
-            v-model="form.restituted"
-            :label="$t('gestion.treasury.cash_float_restituted')"
-          />
+        <!-- Un interrupteur et non une case : c'est un ÉTAT qui bascule, pas un élément qu'on
+             sélectionne dans une liste — et c'est la forme que `EntryModal` emploie déjà pour ses
+             bascules. Le libellé descriptif passe sur le `UFormField`, qui le place sous le titre. -->
+        <UFormField
+          :label="$t('gestion.treasury.cash_float_restitution')"
+          :description="$t('gestion.treasury.cash_float_restituted')"
+        >
+          <USwitch v-model="form.restituted" />
         </UFormField>
 
         <div class="flex justify-end gap-2 pt-2">
@@ -120,7 +124,8 @@ export interface ApportSaisissable {
 
 const props = defineProps<{
   editionId: number
-  currencySymbol: string
+  /** Le CODE de la devise, pas son symbole : `UiMoneyInput` en déduit l'affichage. */
+  currency: string
   /** L'apport à corriger, ou `null` pour en créer un. */
   apport?: ApportSaisissable | null
 }>()
@@ -137,7 +142,7 @@ const titre = computed(() =>
 )
 
 const form = reactive({
-  amount: '' as string | number,
+  amount: null as number | null,
   operationDate: '' as string,
   note: '' as string,
   restituted: false,
@@ -145,7 +150,7 @@ const form = reactive({
 
 const schema = z.object({
   // Un apport de zéro ne prête rien : il n'encombrerait la liste que pour rien.
-  amount: z.coerce.number().positive().max(10_000_000),
+  amount: z.number().positive().max(10_000_000),
   note: z.string().max(300).optional(),
 })
 
@@ -225,7 +230,7 @@ watch(
   ([estOuvert]) => {
     if (!estOuvert) return
     const a = props.apport
-    form.amount = a ? a.amount / 100 : ''
+    form.amount = a ? a.amount / 100 : null
     // `operationDate` arrive en ISO complet : l'entrée `type="date"` n'accepte que `AAAA-MM-JJ`,
     // et la découpe se fait en UTC — c'est une date civile, elle ne doit pas glisser d'un jour.
     form.operationDate = a?.operationDate ? a.operationDate.slice(0, 10) : ''
@@ -249,7 +254,7 @@ watch(
 )
 
 const corps = () => ({
-  amount: Number(form.amount),
+  amount: form.amount ?? 0,
   lentById: mode.value === 'compte' ? (personne.value?.id ?? null) : null,
   lentByName: mode.value === 'libre' ? nomLibre.value || null : null,
   operationDate: form.operationDate || null,

@@ -60,15 +60,15 @@
           </UFormField>
 
           <UFormField v-else :label="$t('common.amount')" required>
-            <!-- Saisie en unité courante ; le serveur convertit en centimes. `step-snapping`
-                 désactivé, sinon un montant hors du pas serait ramené au multiple le plus proche. -->
-            <UInputNumber
-              v-model="form.amount"
-              :min="0"
-              :step="10"
-              :step-snapping="false"
-              class="w-full"
-            />
+            <!--
+              Saisie en unité courante ; le serveur convertit en centimes.
+
+              ⚠️ `UiMoneyInput` ET NON `UInputNumber`, et ce n'est pas une préférence de style :
+              `UInputNumber` lisait « 12,50 » comme 1 250 — la virgule prise pour un séparateur de
+              milliers, faute de locale. Mesuré, et enregistré tel quel en base. Voir la note du
+              composant.
+            -->
+            <UiMoneyInput v-model="form.amount" :currency="currency" class="w-full" />
           </UFormField>
 
           <!-- La date de l'OPÉRATION : le jour où l'argent a bougé, pas celui où on le note.
@@ -298,7 +298,7 @@ const form = reactive<{
   kind: 'EXPENSE' | 'INCOME'
   title: string
   description: string
-  amount: number
+  amount: number | null
   codeId: number | null
   imageUrl: string | null
   isForecast: boolean
@@ -490,7 +490,7 @@ const montantCalcule = computed(() => form.kind === 'INCOME' && montantDepuisTar
  */
 const isValid = computed(() => {
   if (form.title.trim().length === 0) return false
-  return montantCalcule.value ? tarifsChoisis.value.length > 0 : form.amount > 0
+  return montantCalcule.value ? tarifsChoisis.value.length > 0 : (form.amount ?? 0) > 0
 })
 
 // Repartir des valeurs de la ligne à chaque ouverture : sans cela, une modification garderait la
@@ -559,7 +559,7 @@ const body = () => ({
    * saisir, son corps ne doit donc pas en parler. Le serveur garde ainsi sa garantie pour les
    * lignes saisies à la main.
    */
-  ...(montantCalcule.value ? {} : { amount: form.amount }),
+  ...(montantCalcule.value ? {} : { amount: form.amount ?? 0 }),
   /*
    * ⚠️ `[]` ET NON `undefined` quand l'interrupteur est éteint : le tableau vide DÉTACHE les tarifs
    * côté serveur, là où l'absence du champ ne toucherait à rien. C'est ce qui permet de repasser un

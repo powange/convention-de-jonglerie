@@ -1,4 +1,4 @@
-import { DEFAULT_CURRENCY, formatCents } from '~~/shared/utils/money'
+import { currencySymbol, DEFAULT_CURRENCY, formatCents } from '~~/shared/utils/money'
 
 /**
  * Met en forme un montant dans la devise de l'édition.
@@ -38,11 +38,14 @@ export function useEditionCurrency(editionId?: MaybeRefOrGetter<number | undefin
    * `Intl` n'expose pas de méthode dédiée : on met en forme zéro et on retire chiffres,
    * séparateurs et espaces — y compris l'espace insécable étroit utilisé en français.
    */
-  const symbol = computed(() =>
-    new Intl.NumberFormat(locale.value, { style: 'currency', currency: currency.value })
-      .format(0)
-      .replace(/[\d\s.,\u00a0\u202f]/g, '')
-  )
+  /**
+   * Le seul symbole de la devise.
+   *
+   * 📍 La règle vit dans `money.ts` et nulle part ailleurs : elle était recopiée ici, dans
+   * `ArtistModal` et dans `UiMoneyInput`. Trois copies d'une expression qui retire des espaces
+   * insécables finissent par ne plus retirer les mêmes.
+   */
+  const symbol = computed(() => currencySymbol(currency.value, locale.value))
 
   return { currency, money, symbol }
 }

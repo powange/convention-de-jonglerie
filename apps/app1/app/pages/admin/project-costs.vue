@@ -561,11 +561,10 @@
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <UFormField :label="t('admin.project_costs.rates.amount')" required>
-              <UInput
-                v-model.number="rateForm.amount"
-                type="number"
-                step="0.01"
-                min="0"
+              <!-- Voir `UiMoneyInput` : un champ `type="number"` avale la virgule. -->
+              <UiMoneyInput
+                v-model="rateForm.amount"
+                :currency="rateForm.currency"
                 size="lg"
                 class="w-full"
               />
@@ -996,7 +995,7 @@ const rateExpenseId = ref<number | null>(null)
 const editingRate = ref<Rate | null>(null)
 const savingRate = ref(false)
 const rateForm = ref<{
-  amount: number
+  amount: number | null
   currency: string
   period: string
   note: string

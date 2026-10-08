@@ -712,7 +712,102 @@ test.describe.serial("Trésorerie d'une édition", () => {
     // Les deux saisies partent, les lignes calculées restent.
     await expect(lignes(page)).toHaveCount(before - 2)
   })
+
+  /*
+   * ⚠️ LA VIRGULE, ET LE FACTEUR CENT QU'ELLE PRODUISAIT.
+   *
+   * Mesuré le 08/10/2026 avant correction : « 12,50 » tapé dans ce champ partait en `amount: 1250`
+   * et s'enregistrait 1 250 €. Un champ natif AVALE la virgule tout en déclarant la saisie valide
+   * (`checkValidity()` rend `true`), et `UInputNumber` la lisait comme un séparateur de milliers.
+   * Aucune alerte, un nombre plausible, et le séparateur décimal de tout francophone.
+   *
+   * Ce test est la garde de `UiMoneyInput`. Il éprouve LES DEUX séparateurs, parce que corriger la
+   * virgule en cassant le point n'aurait fait que déplacer le piège — les utilisateurs avaient
+   * justement pris l'habitude du point, faute de mieux.
+   *
+   * 📍 La vérification porte sur ce que la BASE a retenu, en centimes, et non sur l'affichage : un
+   * champ peut montrer « 12,50 » et avoir envoyé autre chose. C'est exactement ce qui arrivait.
+   */
+  test('la virgule et le point désignent le même montant, au centime', async ({ page, goto }) => {
+    const { editionId } = loadState()
+    await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
+
+    const marque = Date.now()
+    const titres = { virgule: `Virgule E2E ${marque}`, point: `Point E2E ${marque}` }
+
+    await addEntryBrut(page, { kind: 'Charge', title: titres.virgule, saisie: '12,50' })
+    await addEntryBrut(page, { kind: 'Charge', title: titres.point, saisie: '12.50' })
+
+    const lire = async () => {
+      const res = await page.request.get(`${BASE}/api/editions/${editionId}/treasury`)
+      expect(res.ok()).toBe(true)
+      const corps = await res.json()
+      return ((corps.data ?? corps).lines ?? []) as {
+        entryId?: number
+        id?: number
+        title?: string
+        settled: number
+        pending?: number
+      }[]
+    }
+
+    const lignes = await lire()
+    const centimes = (titre: string) => {
+      const ligne = lignes.find((l) => l.title === titre)
+      expect(ligne, `ligne « ${titre} » introuvable`).toBeTruthy()
+      return ligne!.settled + (ligne!.pending ?? 0)
+    }
+
+    // 1 250 centimes, soit 12,50 € — et SURTOUT PAS 125 000, qui était le résultat d'avant.
+    expect(centimes(titres.virgule), 'la virgule a été lue comme un séparateur de milliers').toBe(
+      1250
+    )
+    expect(centimes(titres.point)).toBe(1250)
+
+    // Nettoyage, l'ÉTAT vérifié : un échec avalé ne passerait pas pour un succès.
+    for (const titre of Object.values(titres)) {
+      const ligne = lignes.find((l) => l.title === titre)!
+      const suppression = await apiDelete(
+        page,
+        `${BASE}/api/editions/${editionId}/treasury/entries/${ligne.entryId ?? ligne.id}`
+      )
+      expect(suppression.ok(), `suppression de « ${titre} »`).toBe(true)
+    }
+    const restantes = (await lire()).filter((l) => Object.values(titres).includes(l.title ?? ''))
+    expect(restantes).toHaveLength(0)
+  })
 })
+
+/**
+ * Saisir une entrée en tapant le montant TEL QUEL, sans le convertir en nombre au passage.
+ *
+ * `addEntry` prend un `number` : il ne peut donc pas éprouver un séparateur, puisque
+ * `String(12.5)` rend toujours « 12.5 ». Celui-ci prend la chaîne réellement frappée.
+ */
+async function addEntryBrut(
+  page: import('@playwright/test').Page,
+  entry: { kind: 'Charge' | 'Produit'; title: string; saisie: string }
+) {
+  const bouton = entry.kind === 'Charge' ? 'Ajouter une charge' : 'Ajouter un produit'
+  await page.getByRole('button', { name: bouton }).click()
+
+  const dialog = page.getByRole('dialog')
+  await expect(dialog).toBeVisible()
+  await dialog.getByLabel(/intitulé/i).fill(entry.title)
+
+  const amount = dialog.locator('input[inputmode="decimal"]')
+  // `pressSequentially` et non `fill` : on frappe le séparateur touche par touche, comme on le tape
+  // vraiment. Un `fill` contourne la saisie et n'éprouverait pas ce qui nous intéresse.
+  await amount.pressSequentially(entry.saisie, { delay: 20 })
+  await amount.press('Tab')
+
+  const save = dialog.getByRole('button', { name: 'Enregistrer' })
+  await expect(save, 'le formulaire est resté invalide après saisie').toBeEnabled({
+    timeout: 10000,
+  })
+  await save.click()
+  await expect(dialog).toBeHidden({ timeout: 15000 })
+}
 
 /**
  * Lit le solde affiché et le rend en nombre.
@@ -749,11 +844,21 @@ async function addEntry(
   // Et le formulaire est DÉJÀ du bon côté : son titre le nomme, et aucune nature n'est à choisir.
   await expect(dialog.getByText(bouton)).toBeVisible()
   await expect(dialog.getByText('Nature', { exact: true })).toHaveCount(0)
-  await dialog.getByRole('textbox').first().fill(entry.title)
+  /*
+   * ⚠️ L'INTITULÉ PAR SON LIBELLÉ, ET NON PAR `.first()`. Depuis que le montant est un
+   * `UiMoneyInput`, c'est un `type="text"` : il porte donc le rôle `textbox` lui aussi, et viser
+   * le premier des deux revenait à parier sur l'ordre du formulaire.
+   */
+  await dialog.getByLabel(/intitulé/i).fill(entry.title)
 
-  // Le champ numérique ne commet sa valeur qu'à la sortie du champ : sans ce `Tab`, le modèle
-  // reste à zéro et le bouton d'enregistrement demeure désactivé.
-  const amount = dialog.getByRole('spinbutton')
+  /*
+   * Le montant, visé par son `inputmode` — l'identité de `UiMoneyInput`, qui a remplacé un
+   * `UInputNumber` (et son `role="spinbutton"`) parce que celui-ci lisait « 12,50 » comme 1 250.
+   *
+   * Le `Tab` reste nécessaire : le champ ne met sa valeur en forme qu'en sortie de saisie, et
+   * c'est ce reformatage qui rend visible ce qui a été compris.
+   */
+  const amount = dialog.locator('input[inputmode="decimal"]')
   await amount.fill(String(entry.amount))
   await amount.press('Tab')
 

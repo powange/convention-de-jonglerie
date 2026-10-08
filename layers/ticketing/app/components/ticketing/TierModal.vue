@@ -65,12 +65,12 @@
           name="price"
           required
         >
-          <UInput
+          <!-- Voir `UiMoneyInput` : un champ `type="number"` avalait la virgule, et « 12,50 »
+               valait 1 250. Sur un prix public, l'erreur part en caisse. -->
+          <UiMoneyInput
             v-model="form.priceInEuros"
             :disabled="isHelloAssoTier"
-            type="number"
-            step="0.01"
-            min="0"
+            :currency="currency"
             :placeholder="$t('ticketing.tiers.modal.price_placeholder')"
             size="lg"
             class="w-full"
@@ -100,12 +100,10 @@
               name="minAmount"
               help="Peut être à 0 pour permettre la participation gratuite"
             >
-              <UInput
+              <UiMoneyInput
                 v-model="form.minAmountInEuros"
                 :disabled="isHelloAssoTier"
-                type="number"
-                step="0.01"
-                min="0"
+                :currency="currency"
                 :placeholder="$t('ticketing.tiers.modal.min_amount_placeholder')"
                 class="w-full"
               />
@@ -116,12 +114,10 @@
               name="maxAmount"
               help="Laissez vide pour un don sans limite haute"
             >
-              <UInput
+              <UiMoneyInput
                 v-model="form.maxAmountInEuros"
                 :disabled="isHelloAssoTier"
-                type="number"
-                step="0.01"
-                min="0"
+                :currency="currency"
                 :placeholder="$t('ticketing.tiers.modal.max_amount_placeholder')"
                 class="w-full"
               />
@@ -321,6 +317,7 @@ import { entierPositifDuChamp } from '~/utils/champ-numerique'
 import { isFreePrice } from '../../utils/ticketing/tiers'
 
 import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
+import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
 
 interface TicketingTier {
   id: number
@@ -358,6 +355,9 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const editionStore = useEditionStore()
 const edition = computed(() => editionStore.getEditionById(props.editionId))
+
+/** La devise de l'édition, pour que `UiMoneyInput` affiche le bon symbole. */
+const currency = computed(() => edition.value?.currency || DEFAULT_CURRENCY)
 
 const isOpen = computed({
   get: () => props.open,
@@ -417,9 +417,9 @@ const form = ref({
   name: '',
   customName: '',
   description: '',
-  priceInEuros: '0',
-  minAmountInEuros: '',
-  maxAmountInEuros: '',
+  priceInEuros: 0 as number | null,
+  minAmountInEuros: null as number | null,
+  maxAmountInEuros: null as number | null,
   position: 0,
   isActive: true,
   countAsParticipant: true,
@@ -523,11 +523,9 @@ watch(
           name: props.tier.originalName || props.tier.name,
           customName: props.tier.customName || '',
           description: props.tier.description || '',
-          priceInEuros: (props.tier.price / 100).toFixed(2),
-          minAmountInEuros:
-            props.tier.minAmount != null ? (props.tier.minAmount / 100).toFixed(2) : '',
-          maxAmountInEuros:
-            props.tier.maxAmount != null ? (props.tier.maxAmount / 100).toFixed(2) : '',
+          priceInEuros: props.tier.price / 100,
+          minAmountInEuros: props.tier.minAmount != null ? props.tier.minAmount / 100 : null,
+          maxAmountInEuros: props.tier.maxAmount != null ? props.tier.maxAmount / 100 : null,
           position: props.tier.position,
           isActive: props.tier.isActive,
           countAsParticipant: props.tier.countAsParticipant ?? true,
@@ -551,9 +549,9 @@ watch(
           name: '',
           customName: '',
           description: '',
-          priceInEuros: '0',
-          minAmountInEuros: '',
-          maxAmountInEuros: '',
+          priceInEuros: 0,
+          minAmountInEuros: null,
+          maxAmountInEuros: null,
           position: 0,
           isActive: true,
           countAsParticipant: true,
@@ -606,8 +604,8 @@ watch(
   (isFree, wasFree) => {
     if (isFree && !wasFree) {
       // Activation du tarif libre : pré-remplir minAmount avec le prix actuel si > 0
-      const currentPrice = parseFloat(form.value.priceInEuros)
-      if (currentPrice > 0 && !form.value.minAmountInEuros) {
+      const currentPrice = form.value.priceInEuros ?? 0
+      if (currentPrice > 0 && form.value.minAmountInEuros == null) {
         form.value.minAmountInEuros = form.value.priceInEuros
       }
     }
@@ -653,10 +651,10 @@ const finalValidUntil = computed(() =>
 const buildFormData = () => {
   // En mode tarif libre, utiliser minAmount comme prix de référence (ou 0 si non défini)
   const priceValue = form.value.isFree
-    ? form.value.minAmountInEuros
-      ? Math.round(parseFloat(form.value.minAmountInEuros) * 100)
+    ? form.value.minAmountInEuros != null
+      ? Math.round(form.value.minAmountInEuros * 100)
       : 0
-    : Math.round(parseFloat(form.value.priceInEuros) * 100)
+    : Math.round((form.value.priceInEuros ?? 0) * 100)
 
   return {
     name: form.value.name.trim(),
@@ -664,12 +662,12 @@ const buildFormData = () => {
     description: form.value.description.trim() || null,
     price: priceValue,
     minAmount:
-      form.value.isFree && form.value.minAmountInEuros != null && form.value.minAmountInEuros !== ''
-        ? Math.round(parseFloat(form.value.minAmountInEuros) * 100)
+      form.value.isFree && form.value.minAmountInEuros != null
+        ? Math.round(form.value.minAmountInEuros * 100)
         : null,
     maxAmount:
-      form.value.isFree && form.value.maxAmountInEuros != null && form.value.maxAmountInEuros !== ''
-        ? Math.round(parseFloat(form.value.maxAmountInEuros) * 100)
+      form.value.isFree && form.value.maxAmountInEuros != null
+        ? Math.round(form.value.maxAmountInEuros * 100)
         : null,
     // Vider le champ ne doit pas faire échouer l'enregistrement.
     //
