@@ -66,6 +66,27 @@ export function avanceNormalisee(saisie: {
 }
 
 /**
+ * Le prêteur d'un apport au fonds de caisse : un compte OU un nom libre, jamais les deux.
+ *
+ * Le compte l'emporte — il désigne une personne sans ambiguïté, là où un nom se regroupe par
+ * ressemblance. Même règle que `avanceNormalisee` juste au-dessus, dont elle se distingue sur un
+ * seul point : une avance n'a de prêteur que sur une CHARGE, alors qu'un apport en a toujours un.
+ *
+ * Le nom passe par `nomAvanceAEnregistrer`, la fonction partagée — espaces réduits, casse et
+ * accents préservés : on regroupe sans la casse mais on affiche ce qui a été tapé.
+ */
+export function preteurNormalise(saisie: {
+  lentById?: number | null
+  lentByName?: string | null
+}): { lentById: number | null; lentByName: string | null } {
+  const lentById = saisie.lentById ?? null
+  return {
+    lentById,
+    lentByName: lentById ? null : nomAvanceAEnregistrer(saisie.lentByName),
+  }
+}
+
+/**
  * La date à écrire sur `reimbursedAt`, d'après la BASCULE du booléen.
  *
  * Trois cas, et le troisième est celui qui compte :
@@ -91,9 +112,23 @@ export function dateDuRemboursement(
   avant: boolean | undefined,
   apres: boolean
 ): { reimbursedAt?: Date | null } {
-  if (!apres) return { reimbursedAt: null }
-  if (avant) return {}
-  return { reimbursedAt: new Date() }
+  const date = dateDeSolde(avant, apres)
+  return date === undefined ? {} : { reimbursedAt: date }
+}
+
+/**
+ * La règle ci-dessus, détachée de son champ — parce qu'elle sert aussi ailleurs.
+ *
+ * Le fonds de caisse en a besoin pour `restitutedAt`, et la recopier l'aurait fait diverger : une
+ * restitution réenregistrée verrait sa date glisser là où un remboursement garde la sienne, pour
+ * la seule raison que deux fonctions presque identiques auraient vieilli séparément.
+ *
+ * @returns la date à écrire, `null` pour l'effacer, ou **`undefined` pour ne pas y toucher**.
+ */
+export function dateDeSolde(avant: boolean | undefined, apres: boolean): Date | null | undefined {
+  if (!apres) return null
+  if (avant) return undefined
+  return new Date()
 }
 
 /**

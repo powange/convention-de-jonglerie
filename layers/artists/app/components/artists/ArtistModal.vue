@@ -728,7 +728,7 @@ import {
   ibanEstPlausible,
 } from '~~/shared/utils/coordonnees-bancaires'
 import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
-import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
+import { currencySymbol as symboleDeDevise, DEFAULT_CURRENCY } from '~~/shared/utils/money'
 
 const props = defineProps<{
   modelValue: boolean
@@ -765,10 +765,9 @@ const fuseauEdition = computed(
 
 const currencySymbol = computed(() => {
   const edition = editionStore.getEditionById(props.editionId)
-  const code = edition?.currency || DEFAULT_CURRENCY
-  return new Intl.NumberFormat(locale.value, { style: 'currency', currency: code })
-    .format(0)
-    .replace(/[\d\s.,\u00a0\u202f]/g, '')
+  // La règle vit dans `money.ts` : elle sert ici et sur la page du fonds de caisse, et recopiée
+  // elle finirait par laisser passer une espèce que l'autre retire.
+  return symboleDeDevise(edition?.currency || DEFAULT_CURRENCY, locale.value)
 })
 
 const isOpen = computed({

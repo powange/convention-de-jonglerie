@@ -68,6 +68,7 @@ export const prismaMock = {
   // Trésorerie : lignes saisies à la main, codes d'imputation et leurs liaisons par source.
   treasuryEntry: createModelMock(),
   treasuryCode: createModelMock(),
+  treasuryCashFloat: createModelMock(),
   treasurySourceCode: createModelMock(),
   apiErrorLog: createModelMock(),
   feedback: createModelMock(),
