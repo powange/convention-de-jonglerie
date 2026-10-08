@@ -1,5 +1,30 @@
 <template>
   <div class="flex gap-6">
+    <!-- L'easter egg : trois balles, derrière le Konami Code. Fixées à la fenêtre, elles
+         n'appartiennent pas à la colonne — elles sont posées à la racine de la page.
+
+         `v-if` et non `v-show` : le démontage retire chaque balle du registre des collisions et
+         annule sa boucle d'animation. Masquées, elles continueraient de tomber et de se heurter
+         sans que personne les voie. Le rappel du code les fait donc repartir du haut, ce qui est
+         exactement l'effet voulu.
+
+         Le délai n'est pas un ornement : tombées ensemble, deux balles se lisent comme un seul
+         objet qui se dédouble. Décalées, on les compte. -->
+    <template v-if="ballesVisibles">
+      <UiFallingJugglingBall :depart-horizontal="0.08" />
+      <UiFallingJugglingBall
+        :depart-horizontal="0.16"
+        :delai="350"
+        couleur-a="#0ea5e9"
+        couleur-b="#f8fafc"
+      />
+      <UiFallingJugglingBall
+        :depart-horizontal="0.24"
+        :delai="700"
+        couleur-a="#16a34a"
+        couleur-b="#fde047"
+      />
+    </template>
     <!-- Panneau de filtres à gauche -->
     <div class="w-80 flex-shrink-0 hidden lg:block">
       <UCard class="sticky top-4">
@@ -232,10 +257,20 @@ import { useDebounceFn, useIntersectionObserver } from '@vueuse/core'
 import { onMounted, computed, reactive, watch, ref, toRaw } from 'vue'
 
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
+import { useKonamiCode } from '~/composables/useKonamiCode'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { useFavoritesEditionsStore } from '~/stores/favoritesEditions'
 import { getSupportedLocalesCodes } from '~/utils/locales'
+
+/**
+ * L'easter egg : rien à l'arrivée, trois balles de jonglerie au Konami Code, et plus rien si on le
+ * retape. Volontairement éphémère — rien n'est enregistré, un rechargement remet la page au calme.
+ */
+const ballesVisibles = ref(false)
+useKonamiCode(() => {
+  ballesVisibles.value = !ballesVisibles.value
+})
 
 // SEO - Métadonnées de la page d'accueil
 const { t, locale } = useI18n()
