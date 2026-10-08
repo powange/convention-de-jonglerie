@@ -76,3 +76,22 @@ export function formatCents(
 export function sumCents(values: (number | null | undefined)[]): number {
   return values.reduce<number>((total, value) => total + (value ?? 0), 0)
 }
+
+/**
+ * Le seul symbole d'une devise, pour l'accoler à un champ de saisie.
+ *
+ * ⚠️ IL N'EXISTE PAS D'API QUI RENDE UN SYMBOLE SEUL. On formate donc zéro dans la devise visée et
+ * on retire tout ce qui n'est pas le symbole : chiffres, espaces — y compris l'espace insécable et
+ * l'espace fine insécable, que `\s` ne couvre pas en JavaScript —, points et virgules.
+ *
+ * 📍 La locale compte : le même euro s'écrit « 0,00 € » en français et « €0.00 » en anglais, et
+ * certaines devises changent carrément de symbole selon la langue.
+ *
+ * 📍 Pour AFFICHER un montant, utiliser `formatCents` : il place le symbole au bon endroit selon la
+ * locale, ce qu'une concaténation à la main ne fait pas.
+ */
+export function currencySymbol(code: string, locale: string): string {
+  return new Intl.NumberFormat(locale, { style: 'currency', currency: code })
+    .format(0)
+    .replace(/[\d\s.,\u00a0\u202f]/g, '')
+}

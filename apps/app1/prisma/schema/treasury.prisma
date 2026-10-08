@@ -162,3 +162,66 @@ model TreasurySourceCode {
   @@unique([editionId, source])
   @@index([codeId])
 }
+
+/// Un apport au FONDS DE CAISSE d'une édition : de l'espèce prêtée pour pouvoir rendre la monnaie.
+///
+/// ⚠️ CE N'EST PAS UNE `TreasuryEntry`, ET C'EST TOUT L'OBJET DE CETTE TABLE.
+///
+/// Un fonds de caisse est un **stock**, pas un flux : l'argent n'est ni consommé ni gagné, il
+/// change de poche. En écriture double, le constituer donne *débit Caisse / crédit Banque* —
+/// aucun compte de charge ni de produit n'est touché. Il n'a donc rien à faire dans un compte de
+/// résultat ni dans une répartition par imputation.
+///
+/// Le tenir HORS de `TreasuryEntry` fait que les cinq calculs qui dérivent des lignes de
+/// trésorerie — les deux pages, les exports CSV et PDF, le panneau des avances — ne *peuvent pas*
+/// le compter, même par mégarde. Un drapeau d'exclusion sur la ligne aurait exigé d'instruire
+/// chacun d'eux, et d'y penser encore au sixième.
+///
+/// 📍 Un prêteur qui RENONCE à sa restitution fait un don — et un don, lui, est un produit. C'est
+/// alors une vraie ligne de trésorerie créée exprès, avec son code d'imputation. C'est le seul
+/// chemin par lequel un fonds de caisse entre légitimement au résultat, et il est explicite.
+model TreasuryCashFloat {
+  id        Int @id @default(autoincrement())
+  editionId Int
+  /// Montant prêté, en centimes entiers, toujours positif.
+  amount    Int
+
+  /// Le prêteur, quand il a un compte sur le site.
+  ///
+  /// Un compte **ou** un nom libre, jamais les deux — même dualité que les avances
+  /// (`TreasuryEntry.advancedById`), et pour la même raison : beaucoup de ceux qui sortent de
+  /// l'argent sur une convention n'y sont pas inscrits. Le compte l'emporte, car il désigne une
+  /// personne sans ambiguïté là où un nom se regroupe par ressemblance.
+  lentById   Int?
+  /// Le même prêteur quand il n'a pas de compte : son nom, saisi librement.
+  ///
+  /// 📍 Normalisé par `nomAvanceAEnregistrer` et regroupé par `cleDuNomAvance`
+  /// (`shared/utils/avance-nom-libre.ts`) — les mêmes fonctions que les avances, pas une copie.
+  lentByName String? @db.VarChar(150)
+
+  /// Le jour où l'argent a été remis. Date CIVILE comme `TreasuryEntry.operationDate` : le 12 juin
+  /// reste le 12 juin qu'on le lise depuis Paris ou depuis Montréal.
+  operationDate DateTime? @db.Date
+
+  /// QUAND l'argent a été restitué au prêteur. **`NULL` veut dire « pas restitué ».**
+  ///
+  /// ⚠️ AUCUN BOOLÉEN À CÔTÉ, et c'est une leçon payée ailleurs. Sur les avances, `reimbursedAt`
+  /// est arrivé APRÈS `reimbursed` : 45 lignes déjà soldées n'ont pas de date, et `NULL` n'y
+  /// signifie donc pas « non remboursé » — c'est le booléen qui fait foi, la date ne dit que le
+  /// jour quand on le connaît. Sur une table neuve, une seule colonne porte l'état : les deux ne
+  /// peuvent pas se contredire, et il n'y a pas d'historique à ménager.
+  restitutedAt DateTime?
+
+  /// À quoi sert ce prêt, ou toute précision utile. Facultatif.
+  note      String?  @db.VarChar(300)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  edition Edition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  /// `SetNull` et non `Cascade` : un compte supprimé ne doit pas effacer la dette. Le prêt devient
+  /// anonyme, l'association doit toujours cet argent. Même choix que `TreasuryEntry.advancedBy`.
+  lentBy  User?   @relation("TreasuryCashFloatLenders", fields: [lentById], references: [id], onDelete: SetNull)
+
+  @@index([editionId])
+  @@index([lentById])
+}

@@ -909,6 +909,11 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           icon: 'i-heroicons-squares-2x2',
           to: `/editions/${editionId.value}/gestion/treasury/breakdown`,
         },
+        {
+          label: t('gestion.treasury.cash_float_title'),
+          icon: 'i-heroicons-banknotes',
+          to: `/editions/${editionId.value}/gestion/treasury/cash-float`,
+        },
       ],
     })
   }

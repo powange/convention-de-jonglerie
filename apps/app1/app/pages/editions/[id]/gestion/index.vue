@@ -683,6 +683,13 @@
               :description="$t('gestion.treasury.breakdown_subtitle')"
               color="sky"
             />
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/treasury/cash-float`"
+              icon="i-heroicons-banknotes"
+              :title="$t('gestion.treasury.cash_float_title')"
+              :description="$t('gestion.treasury.cash_float_subtitle')"
+              color="sky"
+            />
           </div>
         </ManagementCategorySection>
 

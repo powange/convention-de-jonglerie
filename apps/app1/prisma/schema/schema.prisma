@@ -109,6 +109,7 @@ model User {
   validatedArtistEntries             EditionArtist[]                     @relation("ArtistEntryValidator")
   /// Dépenses de trésorerie avancées de sa poche par cette personne.
   treasuryAdvances                   TreasuryEntry[]                     @relation("TreasuryAdvances")
+  treasuryCashFloatLoans             TreasuryCashFloat[]                 @relation("TreasuryCashFloatLenders")
   artistPickupResponsibilities       EditionArtist[]                     @relation("ArtistPickupResponsible")
   artistDropoffResponsibilities      EditionArtist[]                     @relation("ArtistDropoffResponsible")
   stockPickupResponsibilities        StockItem[]                         @relation("StockPickupResponsible")
@@ -275,6 +276,15 @@ model Edition {
   faqPagePublic                    Boolean                       @default(false)
   treasuryEntries                  TreasuryEntry[]
   treasurySourceCodes              TreasurySourceCode[]
+  treasuryCashFloats               TreasuryCashFloat[]
+  /// Ce qu'on a COMPTÉ dans la caisse à la clôture, en centimes. `NULL` = pas encore compté.
+  ///
+  /// Un montant RELEVÉ, pas calculé : l'écart avec la somme des apports donne les recettes nettes
+  /// en espèces. Le calculer demanderait le moyen de paiement de chaque ligne de trésorerie, que
+  /// `TreasuryEntry` ne porte pas.
+  cashFloatCount                   Int?
+  /// Quand ce comptage a été fait. Distinct de `updatedAt`, qui bouge au moindre autre changement.
+  cashFloatCountedAt               DateTime?
   carpoolOffers                    CarpoolOffer[]
   carpoolRequests                  CarpoolRequest[]
   event                            Event                         @relation(fields: [eventId], references: [id], onDelete: Cascade)

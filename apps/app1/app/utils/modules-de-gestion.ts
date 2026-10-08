@@ -67,6 +67,7 @@ export const MODULES_DE_GESTION: Record<string, ModuleDeGestion> = {
   'ticketing/tiers': { icone: 'i-heroicons-currency-euro', couleur: 'orange' },
   treasury: { icone: 'i-heroicons-calculator', couleur: 'sky' },
   'treasury/breakdown': { icone: 'i-heroicons-squares-2x2', couleur: 'sky' },
+  'treasury/cash-float': { icone: 'i-heroicons-banknotes', couleur: 'sky' },
   'volunteers/applications': { icone: 'i-heroicons-document-text', couleur: 'green' },
   'volunteers/config': { icone: 'i-heroicons-cog-6-tooth', couleur: 'gray' },
   'volunteers/form': { icone: 'i-heroicons-megaphone', couleur: 'blue' },

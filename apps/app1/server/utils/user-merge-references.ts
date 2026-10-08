@@ -198,6 +198,9 @@ export const USER_REFERENCES: UserReference[] = [
   // Une avance de trésorerie porte de l'argent dû à la personne : elle doit suivre le compte
   // conservé, pas disparaître dans le fourre-tout.
   { model: 'treasuryEntry', field: 'advancedById', group: 'treasury' },
+  // Un prêt au fonds de caisse suit son prêteur : fusionner deux comptes ne doit pas laisser
+  // l'association devoir de l'argent à un compte écarté.
+  { model: 'treasuryCashFloat', field: 'lentById', group: 'treasury' },
   // Dernier compte à avoir modifié un compteur de passage. Sans transfert, la fusion laisserait
   // la trace pointer vers le compte écarté : l'écran n'afficherait plus personne, et la question
   // à laquelle ce champ sert à répondre — qui appeler devant un total aberrant — resterait sans
