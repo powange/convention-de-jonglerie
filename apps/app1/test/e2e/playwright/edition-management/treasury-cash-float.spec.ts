@@ -179,7 +179,7 @@ test.describe.serial('Fonds de caisse d’une édition', () => {
     await page.getByRole('button', { name: "Corriger l'apport" }).first().click()
     const modale = page.getByRole('dialog')
     await expect(modale).toBeVisible()
-    await modale.getByRole('checkbox', { name: 'Restitution' }).check()
+    await modale.getByRole('switch', { name: 'Restitution' }).check()
     await modale.getByRole('button', { name: 'Enregistrer' }).click()
     await expect(page.getByRole('dialog')).toHaveCount(0)
 

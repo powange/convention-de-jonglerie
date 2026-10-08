@@ -397,19 +397,11 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <UFormField name="payment" :label="$t('artists.payment_amount')">
-                    <UInput
+                    <UiMoneyInput
                       v-model="formData.payment"
-                      type="number"
-                      step="0.01"
-                      min="0"
+                      :currency="currency"
                       :placeholder="$t('artists.payment_amount_placeholder')"
-                    >
-                      <template #trailing>
-                        <span class="text-gray-500 dark:text-gray-400 text-sm">{{
-                          currencySymbol
-                        }}</span>
-                      </template>
-                    </UInput>
+                    />
                   </UFormField>
 
                   <UFormField :label="$t('artists.payment_status')">
@@ -476,38 +468,22 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <UFormField name="reimbursementMax" :label="$t('artists.reimbursement_max')">
-                    <UInput
+                    <UiMoneyInput
                       v-model="formData.reimbursementMax"
-                      type="number"
-                      step="0.01"
-                      min="0"
+                      :currency="currency"
                       :placeholder="$t('artists.reimbursement_max_placeholder')"
-                    >
-                      <template #trailing>
-                        <span class="text-gray-500 dark:text-gray-400 text-sm">{{
-                          currencySymbol
-                        }}</span>
-                      </template>
-                    </UInput>
+                    />
                   </UFormField>
 
                   <UFormField
                     name="reimbursementActual"
                     :label="$t('artists.reimbursement_actual')"
                   >
-                    <UInput
+                    <UiMoneyInput
                       v-model="formData.reimbursementActual"
-                      type="number"
-                      step="0.01"
-                      min="0"
+                      :currency="currency"
                       :placeholder="$t('artists.reimbursement_actual_placeholder')"
-                    >
-                      <template #trailing>
-                        <span class="text-gray-500 dark:text-gray-400 text-sm">{{
-                          currencySymbol
-                        }}</span>
-                      </template>
-                    </UInput>
+                    />
                   </UFormField>
                 </div>
 
@@ -552,35 +528,19 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <UFormField name="consumablesMax" :label="$t('artists.consumables_max')">
-                    <UInput
+                    <UiMoneyInput
                       v-model="formData.consumablesMax"
-                      type="number"
-                      step="0.01"
-                      min="0"
+                      :currency="currency"
                       :placeholder="$t('artists.consumables_max_placeholder')"
-                    >
-                      <template #trailing>
-                        <span class="text-gray-500 dark:text-gray-400 text-sm">{{
-                          currencySymbol
-                        }}</span>
-                      </template>
-                    </UInput>
+                    />
                   </UFormField>
 
                   <UFormField name="consumablesActual" :label="$t('artists.consumables_actual')">
-                    <UInput
+                    <UiMoneyInput
                       v-model="formData.consumablesActual"
-                      type="number"
-                      step="0.01"
-                      min="0"
+                      :currency="currency"
                       :placeholder="$t('artists.consumables_actual_placeholder')"
-                    >
-                      <template #trailing>
-                        <span class="text-gray-500 dark:text-gray-400 text-sm">{{
-                          currencySymbol
-                        }}</span>
-                      </template>
-                    </UInput>
+                    />
                   </UFormField>
                 </div>
 
@@ -728,7 +688,7 @@ import {
   ibanEstPlausible,
 } from '~~/shared/utils/coordonnees-bancaires'
 import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
-import { currencySymbol as symboleDeDevise, DEFAULT_CURRENCY } from '~~/shared/utils/money'
+import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
 
 const props = defineProps<{
   modelValue: boolean
@@ -741,7 +701,7 @@ const emit = defineEmits<{
   'artist-saved': []
 }>()
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 
 /**
  * Symbole de la devise de l'édition. Un « € » écrit en dur afficherait des euros sur une
@@ -763,12 +723,9 @@ const fuseauEdition = computed(
     (editionStore.getEditionById(props.editionId) as { timezone?: string | null })?.timezone ?? null
 )
 
-const currencySymbol = computed(() => {
-  const edition = editionStore.getEditionById(props.editionId)
-  // La règle vit dans `money.ts` : elle sert ici et sur la page du fonds de caisse, et recopiée
-  // elle finirait par laisser passer une espèce que l'autre retire.
-  return symboleDeDevise(edition?.currency || DEFAULT_CURRENCY, locale.value)
-})
+const currency = computed(
+  () => editionStore.getEditionById(props.editionId)?.currency || DEFAULT_CURRENCY
+)
 
 const isOpen = computed({
   get: () => props.modelValue,
@@ -800,13 +757,13 @@ const formData = ref({
   dietaryPreference: 'NONE',
   allergies: '',
   allergySeverity: null as AllergySeverityLevel | null,
-  payment: '',
+  payment: null as number | null,
   paymentPaid: false,
-  reimbursementMax: '',
-  reimbursementActual: '',
+  reimbursementMax: null as number | null,
+  reimbursementActual: null as number | null,
   reimbursementActualPaid: false,
-  consumablesMax: '',
-  consumablesActual: '',
+  consumablesMax: null as number | null,
+  consumablesActual: null as number | null,
   consumablesActualPaid: false,
   reimbursementReceiptUrl: null as string | null,
   consumablesReceiptUrl: null as string | null,
@@ -1181,18 +1138,20 @@ const buildBasePayload = () => ({
   dietaryPreference: formData.value.dietaryPreference,
   allergies: formData.value.allergies || null,
   allergySeverity: formData.value.allergySeverity,
-  payment: formData.value.payment ? parseFloat(formData.value.payment) : null,
+  payment: hasAmount(formData.value.payment) ? Number(formData.value.payment) : null,
   paymentPaid: formData.value.paymentPaid,
-  reimbursementMax: formData.value.reimbursementMax
-    ? parseFloat(formData.value.reimbursementMax)
+  reimbursementMax: hasAmount(formData.value.reimbursementMax)
+    ? Number(formData.value.reimbursementMax)
     : null,
-  reimbursementActual: formData.value.reimbursementActual
-    ? parseFloat(formData.value.reimbursementActual)
+  reimbursementActual: hasAmount(formData.value.reimbursementActual)
+    ? Number(formData.value.reimbursementActual)
     : null,
   reimbursementActualPaid: formData.value.reimbursementActualPaid,
-  consumablesMax: formData.value.consumablesMax ? parseFloat(formData.value.consumablesMax) : null,
-  consumablesActual: formData.value.consumablesActual
-    ? parseFloat(formData.value.consumablesActual)
+  consumablesMax: hasAmount(formData.value.consumablesMax)
+    ? Number(formData.value.consumablesMax)
+    : null,
+  consumablesActual: hasAmount(formData.value.consumablesActual)
+    ? Number(formData.value.consumablesActual)
     : null,
   consumablesActualPaid: formData.value.consumablesActualPaid,
   // Les justificatifs : le serveur les déplace du dossier temporaire avant de les écrire.
@@ -1316,13 +1275,13 @@ const resetForm = () => {
     dietaryPreference: 'NONE',
     allergies: '',
     allergySeverity: null,
-    payment: '',
+    payment: null,
     paymentPaid: false,
-    reimbursementMax: '',
-    reimbursementActual: '',
+    reimbursementMax: null,
+    reimbursementActual: null,
     reimbursementActualPaid: false,
-    consumablesMax: '',
-    consumablesActual: '',
+    consumablesMax: null,
+    consumablesActual: null,
     consumablesActualPaid: false,
     reimbursementReceiptUrl: null as string | null,
     consumablesReceiptUrl: null as string | null,
@@ -1370,17 +1329,16 @@ watch(
         dietaryPreference: newArtist.dietaryPreference || 'NONE',
         allergies: newArtist.allergies || '',
         allergySeverity: newArtist.allergySeverity || null,
-        payment: newArtist.payment ? newArtist.payment.toString() : '',
+        payment: newArtist.payment != null ? Number(newArtist.payment) : null,
         paymentPaid: newArtist.paymentPaid || false,
-        reimbursementMax: newArtist.reimbursementMax ? newArtist.reimbursementMax.toString() : '',
-        reimbursementActual: newArtist.reimbursementActual
-          ? newArtist.reimbursementActual.toString()
-          : '',
+        reimbursementMax:
+          newArtist.reimbursementMax != null ? Number(newArtist.reimbursementMax) : null,
+        reimbursementActual:
+          newArtist.reimbursementActual != null ? Number(newArtist.reimbursementActual) : null,
         reimbursementActualPaid: newArtist.reimbursementActualPaid || false,
-        consumablesMax: newArtist.consumablesMax ? newArtist.consumablesMax.toString() : '',
-        consumablesActual: newArtist.consumablesActual
-          ? newArtist.consumablesActual.toString()
-          : '',
+        consumablesMax: newArtist.consumablesMax != null ? Number(newArtist.consumablesMax) : null,
+        consumablesActual:
+          newArtist.consumablesActual != null ? Number(newArtist.consumablesActual) : null,
         consumablesActualPaid: newArtist.consumablesActualPaid || false,
         reimbursementReceiptUrl: newArtist.reimbursementReceiptUrl || null,
         consumablesReceiptUrl: newArtist.consumablesReceiptUrl || null,

@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
 
 import EntryModal from '../../../../app/components/treasury/EntryModal.vue'
+import { parseMontantSaisi } from '../../../../shared/utils/money'
 
 /**
  * Rouvrir une ligne PRÉVISIONNELLE pour la modifier.
@@ -44,17 +45,28 @@ describe('EntryModal — une ligne prévisionnelle se rouvre avec son montant', 
    *
    * - `UModal` téléporte son contenu dans `document.body` ; interroger l'arbre du composant ne rend
    *   qu'un commentaire `<!--teleport-->` ;
-   * - `UInputNumber` rend un `type="text"` avec `role="spinbutton"`, pas un `type="number"`.
+   * - le champ est un `UiMoneyInput`, donc un `type="text"` portant `inputmode="decimal"`. Il
+   *   remplace un `UInputNumber`, qui lisait « 12,50 » comme 1 250 faute de locale — et c'est
+   *   `role="spinbutton"` que ce test visait alors.
    *
-   * Visé par son RÔLE, qui est son identité — c'est le seul champ numérique de la modale — et non
+   * Visé par son `inputmode`, qui est son identité — c'est le seul montant de la modale — et non
    * par sa position parmi les `<input>`, qui changerait au premier champ ajouté.
    */
   const champMontant = (): HTMLInputElement => {
-    const trouves = document.body.querySelectorAll<HTMLInputElement>('input[role="spinbutton"]')
+    const trouves = document.body.querySelectorAll<HTMLInputElement>('input[inputmode="decimal"]')
     // Un seul, sans quoi on lirait la modale d'un autre test resté ouvert.
     expect(trouves).toHaveLength(1)
     return trouves[0]!
   }
+
+  /**
+   * Ce que le champ DÉSIGNE, et non le texte qu'il affiche.
+   *
+   * `UiMoneyInput` met le montant en forme selon la locale : « 12.5 » en anglais, « 12,5 » en
+   * français. Un `Number()` sur cette chaîne rendrait `NaN` dès que l'environnement de test
+   * basculerait de langue. On relit donc avec l'analyseur du champ lui-même.
+   */
+  const montantLu = () => parseMontantSaisi(champMontant().value)
 
   it('affiche le montant d’une ligne prévisionnelle, porté par `pending`', async () => {
     composant = await mountSuspended(EntryModal, {
@@ -74,7 +86,7 @@ describe('EntryModal — une ligne prévisionnelle se rouvre avec son montant', 
     })
     await nextTick()
 
-    expect(Number(champMontant().value)).toBe(450)
+    expect(montantLu()).toBe(450)
   })
 
   it('affiche le montant d’une ligne ordinaire, porté par `settled`', async () => {
@@ -96,7 +108,7 @@ describe('EntryModal — une ligne prévisionnelle se rouvre avec son montant', 
     })
     await nextTick()
 
-    expect(Number(champMontant().value)).toBe(123)
+    expect(montantLu()).toBe(123)
   })
 
   it('ouvre une création à zéro', async () => {
@@ -105,7 +117,25 @@ describe('EntryModal — une ligne prévisionnelle se rouvre avec son montant', 
     })
     await nextTick()
 
-    expect(Number(champMontant().value)).toBe(0)
+    expect(montantLu()).toBe(0)
+  })
+
+  /*
+   * ⚠️ UN MONTANT À CENTIMES, qui est tout l'objet du changement de champ. 1 250 centimes doivent
+   * se rouvrir en 12,50 — et non en 1 250, ce que l'ancien champ produisait en relisant sa propre
+   * mise en forme.
+   */
+  it('rouvre un montant à centimes sans le centupler', async () => {
+    composant = await mountSuspended(EntryModal, {
+      props: {
+        ...base,
+        open: true,
+        entry: { entryId: 15, kind: 'EXPENSE', title: 'Gaffer', settled: 1250, pending: 0 },
+      },
+    })
+    await nextTick()
+
+    expect(montantLu()).toBe(12.5)
   })
 
   it('tolère une ligne sans `pending` du tout', async () => {
@@ -120,6 +150,6 @@ describe('EntryModal — une ligne prévisionnelle se rouvre avec son montant', 
     })
     await nextTick()
 
-    expect(Number(champMontant().value)).toBe(50)
+    expect(montantLu()).toBe(50)
   })
 })

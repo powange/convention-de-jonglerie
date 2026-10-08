@@ -230,7 +230,7 @@ Cette commande s'arrête si une étape échoue.
 - **UCard** : Composant de carte pour afficher les éditions
 - **UBadge** : Composant d'étiquette pour afficher les compteurs
 - **UInput** : Composant d'entrée pour les formulaires
-- **UInputNumber** : Composant d'entrée numérique (avec boutons +/-, supporte `:min`, `:max`, `:step` pour les entiers)
+- **UInputNumber** : Composant d'entrée numérique pour des **entiers** (boutons +/-, `:min`, `:max`, `:step`). ⚠️ **Jamais pour un montant** : son analyse dépend de la locale de Nuxt UI, qui n'est pas câblée — « 12,50 » y était lu 1 250. Pour de l'argent, utiliser `UiMoneyInput`, qui accepte la virgule et le point.
 - **USelect** : Composant de sélection déroulante
 - **USelectMenu** : Composant de sélection déroulant avancé avec recherche et saisie libre (`create-item`)
 - **UTextarea** : Composant de zone de texte pour les formulaires
@@ -239,6 +239,7 @@ Cette commande s'arrête si une étape échoue.
 - **UdropdownMenu** : Composant de menu déroulant pour les actions
 - **UTable** : Tableau de données (TanStack) avec slots `#<col>-cell`/`#<col>-header`, tri, visibilité de colonnes (`tableApi`) et `@select` pour le clic ligne
 - **UCheckbox** : Case à cocher pour les formulaires et sélections multiples
+- **USwitch** : Interrupteur pour un état qui bascule (préférer à `UCheckbox` hors sélection dans une liste)
 - **UApp** : Wrapper racine de l'application (toasts, overlays) — englobe `NuxtLayout`/`NuxtPage`
 - **UContainer** : Conteneur centré avec largeur max et padding responsive
 - **UForm** : Formulaire avec validation (`:state`, `:schema` zod) et `@submit`

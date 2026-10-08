@@ -40,20 +40,15 @@
           name="price"
           help="Prix supplémentaire en euros (laisser vide si l'option est gratuite)"
         >
-          <UInput
-            v-model.number="priceInEuros"
+          <!-- Voir `UiMoneyInput` : « 12,50 » valait 1 250 dans un champ `type="number"`. -->
+          <UiMoneyInput
+            v-model="priceInEuros"
             :disabled="isHelloAssoOption"
-            type="number"
-            min="0"
-            step="0.01"
-            placeholder="0.00"
+            :currency="currency"
+            placeholder="0,00"
             size="lg"
             class="w-full"
-          >
-            <template #trailing>
-              <span class="text-gray-500">{{ symbol }}</span>
-            </template>
-          </UInput>
+          />
         </UFormField>
 
         <UFormField :label="$t('ticketing.options.modal.type_label')" name="type" required>
@@ -177,7 +172,7 @@ import { computed, ref, watch } from 'vue'
 import { useEditionStore } from '~/stores/editions'
 import { entierPositifDuChamp } from '~/utils/champ-numerique'
 
-const { symbol } = useEditionCurrency()
+const { currency } = useEditionCurrency()
 
 interface TicketingOption {
   id: number

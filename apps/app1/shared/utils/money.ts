@@ -95,3 +95,86 @@ export function currencySymbol(code: string, locale: string): string {
     .format(0)
     .replace(/[\d\s.,\u00a0\u202f]/g, '')
 }
+
+/**
+ * Les caractères qui servent à GROUPER les milliers, et qu'on retire avant toute analyse.
+ *
+ * L'espace insécable (`U+00A0`) et l'espace fine insécable (`U+202F`) sont ce que produit
+ * `Intl.NumberFormat` en français — recopier un montant affiché par l'application le ramènerait
+ * donc ici. L'apostrophe est le groupement suisse. Aucun de ces caractères ne porte de sens
+ * décimal, dans aucune locale.
+ */
+const CARACTERES_DE_GROUPEMENT = /[\s\u00a0\u202f'\u2019]/g
+
+/**
+ * Le montant qu'une personne a VOULU taper, à partir de ce qu'elle a tapé.
+ *
+ * ## ⚠️ POURQUOI CETTE FONCTION EXISTE : UN FACTEUR CENT, SILENCIEUX
+ *
+ * Mesuré le 08/10/2026, sur `UInput type="number"` comme sur `UInputNumber` :
+ *
+ * | tapé       | obtenu   | enregistré      |
+ * | ---------- | -------- | --------------- |
+ * | `12,50`    | `1250`   | **1 250 €**     |
+ * | `1234,56`  | `123456` | **123 456 €**   |
+ *
+ * Un champ natif `type="number"` **avale** la virgule et déclare pourtant la saisie valide
+ * (`checkValidity()` rend `true`). `UInputNumber`, lui, la lit comme un séparateur de MILLIERS
+ * quand la locale est l'anglais. Dans les deux cas : cent fois trop, sur un nombre plausible, sans
+ * la moindre alerte — et la virgule est le séparateur décimal de tout francophone.
+ *
+ * Câbler la locale française dans Nuxt UI ne suffit pas : mesuré aussi, cela **retourne** le
+ * défaut sur le point (`12.50` devient `1 250`), or c'est l'habitude que les utilisateurs ont
+ * prise faute de mieux. Il faut accepter LES DEUX.
+ *
+ * ## La règle, et ce qu'elle refuse de deviner
+ *
+ * 1. Les caractères de groupement sont retirés (voir ci-dessus).
+ * 2. Si `,` **et** `.` sont présents, **le dernier des deux est le séparateur décimal** et l'autre
+ *    est du groupement : `1.234,56` et `1,234.56` donnent tous deux `1234.56`.
+ * 3. Si un seul des deux apparaît **plusieurs fois**, il ne peut pas être décimal : c'est du
+ *    groupement. `1.234.567` donne `1234567`.
+ * 4. Si un seul apparaît **une seule fois**, il est DÉCIMAL — toujours, quel que soit le nombre de
+ *    chiffres qui suit.
+ *
+ * ⚠️ La règle 4 tranche une ambiguïté réelle : `1.000` peut vouloir dire mille. **On choisit
+ * délibérément de lire `1,00`**, parce que les deux erreurs ne se valent pas. Lire mille quand on
+ * voulait un euro gonfle un compte de résultat en silence ; lire un euro quand on voulait mille
+ * saute aux yeux dès que le champ se reformate en quittant la saisie — et c'est pour cela que
+ * `UiMoneyInput` reformate.
+ *
+ * @returns le montant en unité courante, ou `null` si la saisie ne désigne aucun nombre.
+ */
+export function parseMontantSaisi(saisie: string | number | null | undefined): number | null {
+  if (typeof saisie === 'number') return Number.isFinite(saisie) ? saisie : null
+
+  const brut = (saisie ?? '').replace(CARACTERES_DE_GROUPEMENT, '')
+  if (brut.length === 0) return null
+
+  const derniereVirgule = brut.lastIndexOf(',')
+  const dernierPoint = brut.lastIndexOf('.')
+
+  let normalise: string
+  if (derniereVirgule >= 0 && dernierPoint >= 0) {
+    // Règle 2 : le dernier des deux décide, l'autre est du groupement.
+    const decimal = derniereVirgule > dernierPoint ? ',' : '.'
+    const groupement = decimal === ',' ? '.' : ','
+    normalise = brut.split(groupement).join('').replace(decimal, '.')
+  } else {
+    const separateur = derniereVirgule >= 0 ? ',' : dernierPoint >= 0 ? '.' : null
+    if (!separateur) {
+      normalise = brut
+    } else {
+      const occurrences = brut.split(separateur).length - 1
+      // Règles 3 et 4 : plusieurs occurrences = groupement, une seule = décimal.
+      normalise = occurrences > 1 ? brut.split(separateur).join('') : brut.replace(separateur, '.')
+    }
+  }
+
+  // Tout ce qui n'est pas un nombre signé est refusé : mieux vaut un champ vide qu'un montant
+  // inventé à partir d'une saisie qu'on n'a pas comprise.
+  if (!/^-?\d*\.?\d*$/.test(normalise) || !/\d/.test(normalise)) return null
+
+  const valeur = Number(normalise)
+  return Number.isFinite(valeur) ? valeur : null
+}
