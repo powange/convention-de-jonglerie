@@ -129,7 +129,7 @@
     "payment_amount_value": "{amount} €",
     "payment_paid": "Betaling gedaan",
     "payment_pending": "Betaling in behandeling",
-    "payment_section": "Betaling en vergoedingen",
+    "payment_section": "Betaling",
     "payment_status": "Betalingsstatus",
     "pickup_at": "Ophalen: {location}",
     "pickup_dropoff_section": "Ophalen en terugbrengen",
@@ -238,6 +238,9 @@
     "to_pay_total": "Nog te betalen",
     "to_pay_travel": "aan reiskosten",
     "invoice_file": "Factuur van de artiest",
-    "invoice_upload_help": "Afbeeldingen en PDF toegestaan. Door de factuur te uploaden wordt die als aangeleverd gemarkeerd."
+    "invoice_upload_help": "Afbeeldingen en PDF toegestaan. Door de factuur te uploaden wordt die als aangeleverd gemarkeerd.",
+    "consumables_section": "Verbruiksartikelen",
+    "fee_section": "Vergoeding",
+    "reimbursement_section": "Reiskosten"
   }
 }

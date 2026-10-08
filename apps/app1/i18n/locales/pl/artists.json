@@ -129,7 +129,7 @@
     "payment_amount_value": "{amount} €",
     "payment_paid": "Dokonana płatność",
     "payment_pending": "Płatność oczekuje",
-    "payment_section": "Płatność i zwroty kosztów",
+    "payment_section": "Płatność",
     "payment_status": "Status płatności",
     "pickup_at": "Odbiór: {location}",
     "pickup_dropoff_section": "Odbiór i powrót",
@@ -238,6 +238,9 @@
     "to_pay_total": "Pozostaje do wypłaty",
     "to_pay_travel": "zwrotu kosztów",
     "invoice_file": "Faktura artysty",
-    "invoice_upload_help": "Akceptowane są obrazy i PDF. Wgranie faktury oznacza ją jako dostarczoną."
+    "invoice_upload_help": "Akceptowane są obrazy i PDF. Wgranie faktury oznacza ją jako dostarczoną.",
+    "consumables_section": "Materiały zużywalne",
+    "fee_section": "Wynagrodzenie",
+    "reimbursement_section": "Koszty podróży"
   }
 }

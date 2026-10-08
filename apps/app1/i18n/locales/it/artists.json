@@ -129,7 +129,7 @@
     "payment_amount_value": "{amount} €",
     "payment_paid": "Pagamento effettuato",
     "payment_pending": "Pagamento in attesa",
-    "payment_section": "Pagamento e rimborsi",
+    "payment_section": "Pagamento",
     "payment_status": "Stato del pagamento",
     "pickup_at": "Ritiro: {location}",
     "pickup_dropoff_section": "Ritiro e rientro",
@@ -238,6 +238,9 @@
     "to_pay_total": "Resta da versare",
     "to_pay_travel": "di rimborso spese",
     "invoice_file": "Fattura dell'artista",
-    "invoice_upload_help": "Immagini e PDF accettati. Caricare la fattura la segna come fornita."
+    "invoice_upload_help": "Immagini e PDF accettati. Caricare la fattura la segna come fornita.",
+    "consumables_section": "Materiali di consumo",
+    "fee_section": "Compenso",
+    "reimbursement_section": "Spese di viaggio"
   }
 }

@@ -363,8 +363,28 @@
 
           <template #paiement>
             <div data-onglet="paiement" class="space-y-5 pt-4">
-              <!-- Paiement et défraiement -->
-              <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 space-y-4">
+              <!--
+                QUATRE ENCARTS, UN PAR SUJET — et c'est la forme qui porte la règle.
+
+                Un seul encart empilait auparavant paiement, défraiement et consommables : trois
+                plafonds, trois montants réels, trois cases « payé » et deux justificatifs à la
+                suite, sans rien qui dise lequel va avec lequel. Séparés, chaque dépôt de fichier
+                est sous le montant qu'il justifie, et sa condition d'apparition se lit d'elle-même.
+
+                Chaque dépôt a sa condition, et elle n'est pas la même partout : défraiement et
+                consommables suivent leur PLAFOND, la facture suit la case « facture demandée ».
+
+                ⚠️ `hasAmount` ET NON LA VÉRACITÉ DU CHAMP, là où un montant commande. Un montant
+                de 0 est une valeur : un défraiement plafonné à zéro, des consommables refusés
+                d'avance. `v-if="formData.x"` masquerait le dépôt dans ces cas-là, en lisant « 0 »
+                comme « rien saisi ». C'est le défaut que portaient les cases « payé » ci-dessous.
+              -->
+
+              <!-- Paiement -->
+              <div
+                data-encart="paiement"
+                class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 space-y-4"
+              >
                 <div class="flex items-center gap-2">
                   <UIcon
                     name="i-lucide-banknote"
@@ -395,6 +415,63 @@
                   <UFormField :label="$t('artists.payment_status')">
                     <UCheckbox v-model="formData.paymentPaid" :label="$t('artists.payment_paid')" />
                   </UFormField>
+                </div>
+
+                <!--
+                  LA FACTURE VIT ICI, avec le montant qu'elle réclame.
+
+                  📍 C'est l'ARTISTE qui fournit sa facture : il la dépose depuis son espace, et
+                  ce champ sert à la déposer À SA PLACE — reçue par courriel, remise sur place.
+                  Dans les deux cas le dépôt vaut remise, et la case « fournie » juste au-dessus se
+                  cochera d'elle-même : la règle vit côté serveur, dans `remise-de-la-facture.ts`.
+                  Les trois éléments côte à côte sont précisément ce qui rend ce lien visible.
+
+                  📍 Le dépôt suit la case « facture demandée », et NON le montant du paiement
+                  comme les deux autres encarts suivent leur plafond : déposer une facture que
+                  personne n'a réclamée n'a pas de sens. Ce que le regroupement change, c'est que
+                  la case est maintenant juste au-dessus du champ qu'elle commande — avant, elle
+                  vivait dans un autre encart, et l'on cochait ici pour faire apparaître là.
+                -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <UFormField :label="$t('artists.invoice_requested')">
+                    <UCheckbox
+                      v-model="formData.invoiceRequested"
+                      :label="$t('artists.invoice_requested_label')"
+                    />
+                  </UFormField>
+
+                  <UFormField :label="$t('artists.invoice_provided')">
+                    <UCheckbox
+                      v-model="formData.invoiceProvided"
+                      :label="$t('artists.invoice_provided_label')"
+                    />
+                  </UFormField>
+                </div>
+
+                <UFormField
+                  v-if="formData.invoiceRequested"
+                  :label="$t('artists.invoice_file')"
+                  :help="$t('artists.invoice_upload_help')"
+                >
+                  <UiImageUpload
+                    v-model="formData.invoiceUrl"
+                    allow-camera
+                    :endpoint="{ type: 'artist', id: editionId }"
+                    :options="OPTIONS_JUSTIFICATIF"
+                  />
+                </UFormField>
+              </div>
+
+              <!-- Défraiement de trajet -->
+              <div
+                data-encart="defraiement"
+                class="bg-sky-50 dark:bg-sky-900/20 rounded-lg p-4 space-y-4"
+              >
+                <div class="flex items-center gap-2">
+                  <UIcon name="i-lucide-route" class="size-4 text-sky-600 dark:text-sky-400" />
+                  <h3 class="text-sm font-medium text-sky-800 dark:text-sky-200">
+                    {{ $t('artists.reimbursement_section') }}
+                  </h3>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -435,7 +512,7 @@
                 </div>
 
                 <UFormField
-                  v-if="formData.reimbursementActual"
+                  v-if="hasAmount(formData.reimbursementActual)"
                   :label="$t('artists.reimbursement_status')"
                 >
                   <UCheckbox
@@ -444,17 +521,8 @@
                   />
                 </UFormField>
 
-                <!--
-                Le justificatif, juste sous le montant qu'il justifie.
-
-                ⚠️ IMAGES ET PDF : beaucoup de billets de train n'existent que sous cette forme, et
-                il faudrait sinon en faire une capture d'écran. La même liste est appliquée côté
-                serveur par `ALLOWED_RECEIPT_*` — celle-ci ne cadre que le sélecteur de fichiers.
-
-                📍 Le point d'API est `artist` et non `treasury` : ce dernier exige le droit des
-                comptes, qu'un organisateur chargé des artistes n'a pas forcément.
-              -->
                 <UFormField
+                  v-if="hasAmount(formData.reimbursementMax)"
                   :label="$t('artists.reimbursement_receipt')"
                   :help="$t('artists.reimbursement_receipt_help')"
                 >
@@ -462,21 +530,25 @@
                     v-model="formData.reimbursementReceiptUrl"
                     allow-camera
                     :endpoint="{ type: 'artist', id: editionId }"
-                    :options="{
-                      validation: {
-                        maxSize: 10 * 1024 * 1024,
-                        allowedTypes: [
-                          'image/jpeg',
-                          'image/png',
-                          'image/webp',
-                          'image/gif',
-                          'application/pdf',
-                        ],
-                        allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.pdf'],
-                      },
-                    }"
+                    :options="OPTIONS_JUSTIFICATIF"
                   />
                 </UFormField>
+              </div>
+
+              <!-- Consommables -->
+              <div
+                data-encart="consommables"
+                class="bg-violet-50 dark:bg-violet-900/20 rounded-lg p-4 space-y-4"
+              >
+                <div class="flex items-center gap-2">
+                  <UIcon
+                    name="i-lucide-shopping-basket"
+                    class="size-4 text-violet-600 dark:text-violet-400"
+                  />
+                  <h3 class="text-sm font-medium text-violet-800 dark:text-violet-200">
+                    {{ $t('artists.consumables_section') }}
+                  </h3>
+                </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <UFormField name="consumablesMax" :label="$t('artists.consumables_max')">
@@ -513,7 +585,7 @@
                 </div>
 
                 <UFormField
-                  v-if="formData.consumablesActual"
+                  v-if="hasAmount(formData.consumablesActual)"
                   :label="$t('artists.consumables_status')"
                 >
                   <UCheckbox
@@ -522,17 +594,8 @@
                   />
                 </UFormField>
 
-                <!--
-                Le justificatif, juste sous le montant qu'il justifie.
-
-                ⚠️ IMAGES ET PDF : beaucoup de billets de train n'existent que sous cette forme, et
-                il faudrait sinon en faire une capture d'écran. La même liste est appliquée côté
-                serveur par `ALLOWED_RECEIPT_*` — celle-ci ne cadre que le sélecteur de fichiers.
-
-                📍 Le point d'API est `artist` et non `treasury` : ce dernier exige le droit des
-                comptes, qu'un organisateur chargé des artistes n'a pas forcément.
-              -->
                 <UFormField
+                  v-if="hasAmount(formData.consumablesMax)"
                   :label="$t('artists.consumables_receipt')"
                   :help="$t('artists.consumables_receipt_help')"
                 >
@@ -540,88 +603,25 @@
                     v-model="formData.consumablesReceiptUrl"
                     allow-camera
                     :endpoint="{ type: 'artist', id: editionId }"
-                    :options="{
-                      validation: {
-                        maxSize: 10 * 1024 * 1024,
-                        allowedTypes: [
-                          'image/jpeg',
-                          'image/png',
-                          'image/webp',
-                          'image/gif',
-                          'application/pdf',
-                        ],
-                        allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.pdf'],
-                      },
-                    }"
+                    :options="OPTIONS_JUSTIFICATIF"
                   />
                 </UFormField>
               </div>
 
-              <!-- Facture et cachet -->
-              <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 space-y-4">
+              <!-- Cachet -->
+              <div
+                data-encart="cachet"
+                class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 space-y-4"
+              >
                 <div class="flex items-center gap-2">
                   <UIcon
-                    name="i-lucide-file-text"
+                    name="i-lucide-hand-coins"
                     class="size-4 text-amber-600 dark:text-amber-400"
                   />
                   <h3 class="text-sm font-medium text-amber-800 dark:text-amber-200">
-                    {{ $t('artists.invoice_fee_section') }}
+                    {{ $t('artists.fee_section') }}
                   </h3>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <UFormField :label="$t('artists.invoice_requested')">
-                    <UCheckbox
-                      v-model="formData.invoiceRequested"
-                      :label="$t('artists.invoice_requested_label')"
-                    />
-                  </UFormField>
-
-                  <UFormField :label="$t('artists.invoice_provided')">
-                    <UCheckbox
-                      v-model="formData.invoiceProvided"
-                      :label="$t('artists.invoice_provided_label')"
-                    />
-                  </UFormField>
-                </div>
-
-                <!--
-                  LA FACTURE ELLE-MÊME, et non seulement son état.
-
-                  📍 Elle n'apparaît QUE si une facture est demandée à l'artiste : déposer une
-                  facture que personne n'a réclamée n'a pas de sens, et le champ encombrerait les
-                  fiches où la question ne se pose pas. Même raison qu'ailleurs sur cet écran — le
-                  justificatif de défraiement suit son plafond.
-
-                  📍 C'est l'ARTISTE qui fournit sa facture : il la dépose depuis son espace, et
-                  ce champ sert à la déposer À SA PLACE — reçue par courriel, remise sur place.
-                  Dans les deux cas le dépôt vaut remise, et la case ci-dessus se cochera d'elle
-                  même : la règle vit côté serveur, dans `remise-de-la-facture.ts`.
-                -->
-                <UFormField
-                  v-if="formData.invoiceRequested"
-                  :label="$t('artists.invoice_file')"
-                  :help="$t('artists.invoice_upload_help')"
-                >
-                  <UiImageUpload
-                    v-model="formData.invoiceUrl"
-                    allow-camera
-                    :endpoint="{ type: 'artist', id: editionId }"
-                    :options="{
-                      validation: {
-                        maxSize: 10 * 1024 * 1024,
-                        allowedTypes: [
-                          'image/jpeg',
-                          'image/png',
-                          'image/webp',
-                          'image/gif',
-                          'application/pdf',
-                        ],
-                        allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.pdf'],
-                      },
-                    }"
-                  />
-                </UFormField>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <UFormField :label="$t('artists.fee_requested')">
@@ -866,6 +866,29 @@ const requiresIdentity = computed(() => {
 
 // Un montant est renseigné (ni vide, ni null)
 const hasAmount = (v: unknown) => v !== '' && v !== null && v !== undefined
+
+/**
+ * Ce que le sélecteur de fichiers accepte pour un justificatif — facture, défraiement, consommables.
+ *
+ * ⚠️ IMAGES ET PDF : beaucoup de billets de train n'existent que sous cette forme, et il faudrait
+ * sinon en faire une capture d'écran.
+ *
+ * 📍 UNE SEULE DÉFINITION POUR LES TROIS DÉPÔTS. Elle était recopiée à l'identique trois fois, ce
+ * qui garantissait qu'elle finirait par diverger : un dépôt refusant un fichier que les deux
+ * autres acceptent, sans que rien ne le signale.
+ *
+ * 📍 Ceci ne cadre que le sélecteur. Le serveur applique sa propre liste — `ALLOWED_RECEIPT_*`
+ * dans `server/utils/upload-validation.ts` — qu'un composant de layer ne peut pas importer, et qui
+ * ne s'écrit pas pareil (des extensions sans point). C'est lui qui fait foi : un fichier qui
+ * passerait ici serait quand même refusé là-bas.
+ */
+const OPTIONS_JUSTIFICATIF = {
+  validation: {
+    maxSize: 10 * 1024 * 1024,
+    allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'],
+    allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.pdf'],
+  },
+}
 
 // Schéma de validation côté front, reflet des règles du serveur. UInput type="number" renvoie
 // tantôt une chaîne (champ vide initial), tantôt un nombre (après saisie) : le schéma accepte

@@ -129,7 +129,7 @@
     "payment_amount_value": "{amount} €",
     "payment_paid": "Betaling foretaget",
     "payment_pending": "Betaling afventer",
-    "payment_section": "Betaling og refusioner",
+    "payment_section": "Betaling",
     "payment_status": "Betalingsstatus",
     "pickup_at": "Afhentning: {location}",
     "pickup_dropoff_section": "Afhentning og hjemtransport",
@@ -238,6 +238,9 @@
     "to_pay_total": "Mangler at blive udbetalt",
     "to_pay_travel": "i rejsegodtgørelse",
     "invoice_file": "Artistens faktura",
-    "invoice_upload_help": "Billeder og PDF accepteres. Når fakturaen uploades, markeres den som indsendt."
+    "invoice_upload_help": "Billeder og PDF accepteres. Når fakturaen uploades, markeres den som indsendt.",
+    "consumables_section": "Forbrugsvarer",
+    "fee_section": "Gage",
+    "reimbursement_section": "Rejseudgifter"
   }
 }
