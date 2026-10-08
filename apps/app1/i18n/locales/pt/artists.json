@@ -129,7 +129,7 @@
     "payment_amount_value": "{amount} €",
     "payment_paid": "Pagamento efectuado",
     "payment_pending": "Pagamento pendente",
-    "payment_section": "Pagamento e reembolsos",
+    "payment_section": "Pagamento",
     "payment_status": "Estado do pagamento",
     "pickup_at": "Recolha: {location}",
     "pickup_dropoff_section": "Recolha e devolução",
@@ -238,6 +238,9 @@
     "to_pay_total": "Falta pagar",
     "to_pay_travel": "de ajudas de custo",
     "invoice_file": "Fatura do artista",
-    "invoice_upload_help": "Imagens e PDF aceites. Carregar a fatura marca-a como entregue."
+    "invoice_upload_help": "Imagens e PDF aceites. Carregar a fatura marca-a como entregue.",
+    "consumables_section": "Consumíveis",
+    "fee_section": "Cachê",
+    "reimbursement_section": "Despesas de viagem"
   }
 }

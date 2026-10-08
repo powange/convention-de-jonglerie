@@ -129,7 +129,7 @@
     "payment_amount_value": "{amount} €",
     "payment_paid": "Zahlung erfolgt",
     "payment_pending": "Zahlung ausstehend",
-    "payment_section": "Zahlung und Erstattungen",
+    "payment_section": "Zahlung",
     "payment_status": "Status der Zahlung",
     "pickup_at": "Abholung: {location}",
     "pickup_dropoff_section": "Abholung und Rücktransport",
@@ -238,6 +238,9 @@
     "to_pay_total": "Noch zu zahlen",
     "to_pay_travel": "an Reisekosten",
     "invoice_file": "Rechnung des Künstlers",
-    "invoice_upload_help": "Bilder und PDF werden akzeptiert. Mit dem Hochladen gilt die Rechnung als eingereicht."
+    "invoice_upload_help": "Bilder und PDF werden akzeptiert. Mit dem Hochladen gilt die Rechnung als eingereicht.",
+    "consumables_section": "Verbrauchsmaterial",
+    "fee_section": "Gage",
+    "reimbursement_section": "Fahrtkosten"
   }
 }

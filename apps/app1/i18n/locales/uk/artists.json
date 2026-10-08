@@ -129,7 +129,7 @@
     "payment_amount_value": "{amount} €",
     "payment_paid": "Оплата здійснена",
     "payment_pending": "Оплата очікує",
-    "payment_section": "Оплата та відшкодування",
+    "payment_section": "Оплата",
     "payment_status": "Статус платежу",
     "pickup_at": "Зустріч: {location}",
     "pickup_dropoff_section": "Зустріч і повернення",
@@ -238,6 +238,9 @@
     "to_pay_total": "Залишилося виплатити",
     "to_pay_travel": "компенсації витрат",
     "invoice_file": "Рахунок артиста",
-    "invoice_upload_help": "Приймаються зображення та PDF. Завантаження рахунку позначає його як наданий."
+    "invoice_upload_help": "Приймаються зображення та PDF. Завантаження рахунку позначає його як наданий.",
+    "consumables_section": "Витратні матеріали",
+    "fee_section": "Гонорар",
+    "reimbursement_section": "Дорожні витрати"
   }
 }

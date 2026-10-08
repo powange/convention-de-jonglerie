@@ -129,7 +129,7 @@
     "payment_amount_value": "{amount} €",
     "payment_paid": "Provedená platba",
     "payment_pending": "Platba čeká",
-    "payment_section": "Platba a úhrady",
+    "payment_section": "Platba",
     "payment_status": "Stav platby",
     "pickup_at": "Vyzvednutí: {location}",
     "pickup_dropoff_section": "Vyzvednutí a návrat",
@@ -238,6 +238,9 @@
     "to_pay_total": "Zbývá vyplatit",
     "to_pay_travel": "na cestovní náhrady",
     "invoice_file": "Faktura umělce",
-    "invoice_upload_help": "Přijímáme obrázky a PDF. Nahrání faktury ji označí jako dodanou."
+    "invoice_upload_help": "Přijímáme obrázky a PDF. Nahrání faktury ji označí jako dodanou.",
+    "consumables_section": "Spotřební materiál",
+    "fee_section": "Honorář",
+    "reimbursement_section": "Cestovné"
   }
 }

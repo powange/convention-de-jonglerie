@@ -577,9 +577,18 @@ test.describe.serial('Remboursement des consommables des artistes', () => {
 
     // L'autre artiste n'en a aucune de demandée : le dépôt n'apparaît pas.
     const ficheAutre = await ouvrirLaFiche(ARTIST_EMAIL)
-    // Témoin : on est bien dans la section qui l'aurait porté, donc l'absence a du sens.
-    await expect(ficheAutre.getByText('Facture et cachet')).toBeVisible({ timeout: 15000 })
-    await expect(ficheAutre.getByText("Facture de l'artiste")).toHaveCount(0)
+    /*
+     * TÉMOIN : on est bien dans l'encart qui porterait le dépôt, donc son absence a du sens. Sans
+     * lui, une modale qui ne s'afficherait pas du tout rendrait aussi `toHaveCount(0)`.
+     *
+     * 📍 Le témoin visait auparavant le titre « Facture et cachet ». Depuis le découpage de
+     * l'onglet en quatre encarts, la facture vit dans « Paiement » et l'encart ambre ne porte plus
+     * que le cachet : le titre n'existait plus dans la modale et ce test tombait. Il s'appuie
+     * désormais sur `data-encart`, qui ne dépend d'aucun libellé — donc d'aucune traduction.
+     */
+    const encartPaiement = ficheAutre.locator('[data-encart="paiement"]')
+    await expect(encartPaiement).toBeVisible({ timeout: 15000 })
+    await expect(encartPaiement.getByText("Facture de l'artiste")).toHaveCount(0)
     await page.keyboard.press('Escape')
   })
 

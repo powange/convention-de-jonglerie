@@ -129,7 +129,7 @@
     "payment_amount_value": "{amount} €",
     "payment_paid": "Payment made",
     "payment_pending": "Payment pending",
-    "payment_section": "Payment and reimbursements",
+    "payment_section": "Payment",
     "payment_status": "Payment status",
     "pickup_at": "Pick-up: {location}",
     "pickup_dropoff_section": "Pickup and return",
@@ -238,6 +238,9 @@
     "to_pay_total": "Still to be paid",
     "to_pay_travel": "in travel expenses",
     "invoice_file": "Artist's invoice",
-    "invoice_upload_help": "Images and PDFs accepted. Uploading the invoice marks it as provided."
+    "invoice_upload_help": "Images and PDFs accepted. Uploading the invoice marks it as provided.",
+    "consumables_section": "Consumables",
+    "fee_section": "Fee",
+    "reimbursement_section": "Travel expenses"
   }
 }

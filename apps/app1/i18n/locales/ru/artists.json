@@ -129,7 +129,7 @@
     "payment_amount_value": "{amount} €",
     "payment_paid": "Оплата произведена",
     "payment_pending": "Оплата ожидает",
-    "payment_section": "Оплата и возмещения",
+    "payment_section": "Оплата",
     "payment_status": "Статус платежа",
     "pickup_at": "Встреча: {location}",
     "pickup_dropoff_section": "Встреча и возврат",
@@ -238,6 +238,9 @@
     "to_pay_total": "Осталось выплатить",
     "to_pay_travel": "компенсации расходов",
     "invoice_file": "Счёт артиста",
-    "invoice_upload_help": "Принимаются изображения и PDF. Загрузка счёта отмечает его как предоставленный."
+    "invoice_upload_help": "Принимаются изображения и PDF. Загрузка счёта отмечает его как предоставленный.",
+    "consumables_section": "Расходные материалы",
+    "fee_section": "Гонорар",
+    "reimbursement_section": "Дорожные расходы"
   }
 }

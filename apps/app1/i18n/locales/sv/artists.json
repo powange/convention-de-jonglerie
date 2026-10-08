@@ -129,7 +129,7 @@
     "payment_amount_value": "{amount} €",
     "payment_paid": "Betalning har gjorts",
     "payment_pending": "Betalning väntar",
-    "payment_section": "Betalning och ersättningar",
+    "payment_section": "Betalning",
     "payment_status": "Betalningsstatus",
     "pickup_at": "Upphämtning: {location}",
     "pickup_dropoff_section": "Upphämtning och hemresa",
@@ -238,6 +238,9 @@
     "to_pay_total": "Återstår att betala",
     "to_pay_travel": "i reseersättning",
     "invoice_file": "Artistens faktura",
-    "invoice_upload_help": "Bilder och PDF accepteras. Att ladda upp fakturan markerar den som inlämnad."
+    "invoice_upload_help": "Bilder och PDF accepteras. Att ladda upp fakturan markerar den som inlämnad.",
+    "consumables_section": "Förbrukningsvaror",
+    "fee_section": "Arvode",
+    "reimbursement_section": "Resekostnader"
   }
 }
