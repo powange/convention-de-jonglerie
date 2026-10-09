@@ -158,6 +158,10 @@
       </div>
     </template>
   </UModal>
+
+  <!-- La confirmation de fermeture : elle se superpose à la modale, dont la saisie reste intacte
+       tant qu'on n'a pas confirmé. -->
+  <UiConfirmationDemandee :confirmation="confirmation" />
 </template>
 
 <script setup lang="ts">
@@ -188,9 +192,29 @@ const { t } = useI18n()
 const { getMealTypeLabel } = useMealTypeLabel()
 const { getPhasesLabel } = useMealPhaseLabel()
 
-const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value),
+/*
+ * ⚠️ `isOpen` ET `closeModal` VIENNENT DU MÊME COMPOSABLE, et c'est ce qui referme le défaut.
+ *
+ * `closeModal` n'était appelé que par le bouton « Annuler ». Or cette modale est **contrôlée** :
+ * la touche **Échap** et le **clic à côté** écrivaient directement dans le modèle — donc sans
+ * passer par la garde. Les deux façons les plus naturelles de fermer perdaient la saisie sans un
+ * mot. Le modèle rendu ici refuse lui-même de passer à `false` sans confirmation.
+ */
+const {
+  confirmation,
+  ouvert: isOpen,
+  demanderFermeture: closeModal,
+} = useFermetureProtegee({
+  ouvert: () => props.modelValue,
+  modifie: () => hasUnsavedChanges.value,
+  description: () => t('gestion.organizers.meals.confirm_close_unsaved'),
+  /*
+   * « Confirmer » ne dit pas ce que fait le bouton. `common.leave_without_saving` existe déjà et
+   * est traduit dans les treize langues : employer une clé neuve aurait créé douze `[TODO]` pour
+   * un libellé que le dépôt possédait.
+   */
+  libelleConfirmer: () => t('common.leave_without_saving'),
+  appliquer: (valeur) => emit('update:modelValue', valeur),
 })
 
 const title = computed(() => {
@@ -302,13 +326,6 @@ const { execute: executeSaveMeals, loading: savingMeals } = useApiAction(mealsUr
 const saveMeals = () => {
   if (!props.organizer) return
   executeSaveMeals()
-}
-
-const closeModal = () => {
-  if (hasUnsavedChanges.value && !confirm(t('gestion.organizers.meals.confirm_close_unsaved'))) {
-    return
-  }
-  isOpen.value = false
 }
 
 watch(
