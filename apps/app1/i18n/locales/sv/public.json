@@ -123,7 +123,7 @@
       "browse_conventions": "Bläddra bland konventioner",
       "companion": "Kompanjon",
       "companion_name": "Namn på den medföljande personen",
-      "confirm_withdraw": "Är du säker på att du vill dra tillbaka din kandidatur?",
+      "confirm_withdraw": "[TODO] Är du säker på att du vill dra tillbaka din kandidatur?",
       "contact_organizer": "Kontakta arrangören",
       "contact_organizer_error": "Fel vid skapande av konversationen med arrangörerna",
       "dates": "Datum",
@@ -224,7 +224,8 @@
       "export_pdf_delay": "Försening: {minutes} min",
       "export_pdf_empty": "Inget pass att skriva ut",
       "export_pdf_summary": "{creneaux} pass — {heures} — {equipes} lag",
-      "export_pdf_title": "Volontärschema"
+      "export_pdf_title": "Volontärschema",
+      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
     }
   },
   "seo": {

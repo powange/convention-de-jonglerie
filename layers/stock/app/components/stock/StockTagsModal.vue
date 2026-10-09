@@ -128,6 +128,13 @@
       </div>
     </template>
   </UModal>
+
+  <!--
+    La confirmation se superpose à cette modale, et c'est voulu : supprimer une étiquette est définitif, et
+    `confirm()` — que certains navigateurs permettent de désactiver — rendait alors `true` sans rien
+    demander.
+  -->
+  <UiConfirmationDemandee :confirmation="confirmation" />
 </template>
 
 <script setup lang="ts">
@@ -152,6 +159,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const confirmation = useConfirmation()
 const toast = useToast()
 
 const isOpen = computed({
@@ -246,8 +254,16 @@ async function saveEdit(tag: TagItem) {
   }
 }
 
-async function deleteTag(tag: TagItem) {
-  if (!confirm(t('gestion.stock.tags.confirm_delete', { name: tag.name }))) return
+function deleteTag(tag: TagItem) {
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    description: t('gestion.stock.tags.confirm_delete', { name: tag.name }),
+    libelleConfirmer: t('common.delete'),
+    agir: () => supprimerLEtiquette(tag),
+  })
+}
+
+async function supprimerLEtiquette(tag: TagItem) {
   deletingIds.value.add(tag.id)
   try {
     await $fetch(`/api/editions/${props.editionId}/stock-tags/${tag.id}`, {

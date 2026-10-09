@@ -78,6 +78,13 @@
       </div>
     </UCard>
   </NuxtLink>
+
+  <!--
+    ⚠️ HORS DU `NuxtLink`, volontairement. Toute la carte est un lien : un élément interactif placé
+    à l'intérieur verrait ses clics remonter en navigation. La modale est donc une sœur du lien, pas
+    sa fille.
+  -->
+  <UiConfirmationDemandee :confirmation="confirmation" />
 </template>
 
 <script setup lang="ts">
@@ -141,8 +148,20 @@ const { execute: executeDeleteRequest } = useApiAction(
   }
 )
 
+const confirmation = useConfirmation()
+
 const handleDelete = () => {
-  if (!confirm(t('components.carpool.confirm_delete_request'))) return
-  executeDeleteRequest()
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    /*
+     * La ville est ce qui distingue une demande d'une autre à l'écran — le libellé disait seulement
+     * « cette demande de covoiturage », devant une liste qui en contient plusieurs.
+     */
+    description: t('components.carpool.confirm_delete_request', {
+      city: props.request.locationCity,
+    }),
+    libelleConfirmer: t('common.delete'),
+    agir: () => executeDeleteRequest(),
+  })
 }
 </script>

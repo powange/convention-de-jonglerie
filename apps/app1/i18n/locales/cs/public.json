@@ -123,7 +123,7 @@
       "browse_conventions": "Procházet konvence",
       "companion": "Společník",
       "companion_name": "Jméno doprovázející osoby",
-      "confirm_withdraw": "Jste si jistý, že chcete svou kandidaturu stáhnout?",
+      "confirm_withdraw": "[TODO] Jste si jistý, že chcete svou kandidaturu stáhnout?",
       "contact_organizer": "Kontakt na organizátora",
       "contact_organizer_error": "Chyba při vytváření konverzace s organizátory",
       "dates": "Data",
@@ -224,7 +224,8 @@
       "export_pdf_delay": "Zpoždění: {minutes} min",
       "export_pdf_empty": "Žádná směna k tisku",
       "export_pdf_summary": "{creneaux} směn — {heures} — {equipes} tým(ů)",
-      "export_pdf_title": "Rozpis dobrovolníků"
+      "export_pdf_title": "Rozpis dobrovolníků",
+      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
     }
   },
   "seo": {

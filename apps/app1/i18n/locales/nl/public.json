@@ -123,7 +123,7 @@
       "browse_conventions": "Conventies bekijken",
       "companion": "Begeleider",
       "companion_name": "Naam begeleider",
-      "confirm_withdraw": "Weet je zeker dat je je aanmelding wilt intrekken?",
+      "confirm_withdraw": "[TODO] Weet je zeker dat je je aanmelding wilt intrekken?",
       "contact_organizer": "Contact organisator",
       "contact_organizer_error": "Fout bij het aanmaken van het gesprek met de organisatoren",
       "dates": "Data",
@@ -224,7 +224,8 @@
       "export_pdf_delay": "Vertraging: {minutes} min",
       "export_pdf_empty": "Geen tijdslot om af te drukken",
       "export_pdf_summary": "{creneaux} tijdsloten — {heures} — {equipes} team(s)",
-      "export_pdf_title": "Vrijwilligersplanning"
+      "export_pdf_title": "Vrijwilligersplanning",
+      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
     }
   },
   "seo": {

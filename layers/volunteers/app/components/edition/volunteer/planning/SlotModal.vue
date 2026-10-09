@@ -258,6 +258,9 @@
       </div>
     </template>
   </UModal>
+
+  <!-- Supprimer un créneau retire aussi les bénévoles qui y étaient placés. -->
+  <UiConfirmationDemandee :confirmation="confirmation" />
 </template>
 
 <script setup lang="ts">
@@ -314,6 +317,7 @@ const emit = defineEmits<{
 
 // i18n
 const { t } = useI18n()
+const confirmation = useConfirmation()
 
 // Composable dates
 
@@ -559,17 +563,25 @@ const onSubmit = async () => {
   }
 }
 
-const onDelete = async () => {
+const onDelete = () => {
   if (!formState.value.id) return
 
-  if (confirm(t('volunteers.confirm_delete_slot'))) {
-    try {
-      loading.value = true
-      emit('delete', formState.value.id)
-      close()
-    } finally {
-      loading.value = false
-    }
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    description: t('volunteers.confirm_delete_slot'),
+    libelleConfirmer: t('common.delete'),
+    agir: () => supprimerLeCreneau(),
+  })
+}
+
+const supprimerLeCreneau = () => {
+  if (!formState.value.id) return
+  try {
+    loading.value = true
+    emit('delete', formState.value.id)
+    close()
+  } finally {
+    loading.value = false
   }
 }
 
