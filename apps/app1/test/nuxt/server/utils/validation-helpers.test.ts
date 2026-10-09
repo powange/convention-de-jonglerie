@@ -442,5 +442,91 @@ describe('validation-helpers', () => {
         expect(result.skip).toBe(expectedSkip)
       }
     })
+
+    /*
+     * ⚠️ LE CŒUR DU CORRECTIF. L'écriture précédente — `Math.min(100, Math.max(1, parseInt(…)))` —
+     * avait l'air de borner, et laissait pourtant passer `NaN` : `Math.max` et `Math.min`
+     * PROPAGENT `NaN` au lieu de le remplacer par leur borne. Il partait jusqu'à Prisma en
+     * `skip`/`take`, qui répondait 500. Sans ces cas, le correctif est invisible : les six tests
+     * ci-dessus passaient déjà avant.
+     */
+    it.each([
+      ['limit', 'abc'],
+      ['limit', '12.5'],
+      ['limit', 'Infinity'],
+      ['page', 'abc'],
+      ['page', '1e999'],
+    ])('devrait refuser %s=%s en 400 plutôt que de propager un NaN', (champ, valeur) => {
+      global.getQuery = vi.fn().mockReturnValue({ [champ]: valeur })
+      const event = {} as any
+
+      expect(() => validatePagination(event)).toThrowError()
+      try {
+        validatePagination(event)
+      } catch (error: any) {
+        expect(error.statusCode).toBe(400)
+        expect(error.data?.field).toBe(champ)
+      }
+    })
+
+    it('ne renvoie jamais NaN, quelle que soit la valeur refusée', () => {
+      // La garde qui dit pourquoi les cas ci-dessus lèvent : un NaN qui traverse est un 500.
+      for (const valeur of ['abc', '', '  ', 'null', '[]']) {
+        global.getQuery = vi.fn().mockReturnValue({ limit: valeur, page: valeur })
+        const event = {} as any
+
+        let resultat: ReturnType<typeof validatePagination> | null = null
+        try {
+          resultat = validatePagination(event)
+        } catch {
+          continue // refusé en 400 : c'est l'autre issue acceptable
+        }
+        expect(Number.isNaN(resultat!.take)).toBe(false)
+        expect(Number.isNaN(resultat!.skip)).toBe(false)
+      }
+    })
+
+    it('traite la chaîne vide comme « non fourni », donc par le défaut', () => {
+      global.getQuery = vi.fn().mockReturnValue({ page: '', limit: '' })
+      const event = {} as any
+
+      const result = validatePagination(event)
+
+      expect(result.page).toBe(1)
+      expect(result.limit).toBe(10)
+    })
+
+    it('retient la dernière valeur quand le paramètre est répété', () => {
+      global.getQuery = vi.fn().mockReturnValue({ page: ['1', '4'] })
+      const event = {} as any
+
+      expect(validatePagination(event).page).toBe(4)
+    })
+
+    it('honore le plafond et le défaut demandés par l’appelant', () => {
+      // `/api/editions` passe 1000, parce que son client demande 1000 (MAX_ALL_EDITIONS).
+      global.getQuery = vi.fn().mockReturnValue({ limit: '1000' })
+      const event = {} as any
+
+      expect(validatePagination(event, { max: 1000 }).limit).toBe(1000)
+      expect(validatePagination(event, { max: 1000, defaultLimit: 12 }).limit).toBe(1000)
+
+      global.getQuery = vi.fn().mockReturnValue({})
+      expect(validatePagination(event, { max: 1000, defaultLimit: 12 }).limit).toBe(12)
+    })
+
+    it('plafonne une valeur hors bornes au lieu de la refuser', () => {
+      /*
+       * Délibéré : le plafonnement est le comportement d'aujourd'hui, et onze points d'API sont
+       * déjà en circulation. Refuser `?limit=5000` durcirait le contrat sous les clients ouverts.
+       * Seul ce qui ne désigne AUCUN nombre est refusé — cette saisie-là rend 500 aujourd'hui,
+       * personne ne peut en dépendre.
+       */
+      global.getQuery = vi.fn().mockReturnValue({ limit: '5000' })
+      const event = {} as any
+
+      expect(validatePagination(event).limit).toBe(100)
+      expect(validatePagination(event, { max: 1000 }).limit).toBe(1000)
+    })
   })
 })

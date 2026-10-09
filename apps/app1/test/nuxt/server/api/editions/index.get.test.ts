@@ -403,4 +403,70 @@ describe('/api/editions GET', () => {
 
     expect(avecParametre).toEqual(sansParametre)
   })
+
+  /**
+   * La pagination d'une route PUBLIQUE.
+   *
+   * Deux défauts se tenaient ici, et le handler faisait son propre `parseInt` nu pour les deux :
+   *
+   * - `?limit=100000` rendait toute la table, créateur et convention joints ;
+   * - `?limit=abc` donnait un `NaN` transmis à Prisma en `skip`/`take`, donc un **500**.
+   *
+   * On mesure ce qui part vers Prisma, et non seulement le code de retour : c'est `take` qui dit
+   * si la borne a joué. Un test qui ne regarderait que la réponse serait vert sur un `take` de
+   * 100 000.
+   */
+  describe('bornes de pagination', () => {
+    beforeEach(() => {
+      prismaMock.edition.count.mockResolvedValue(5000)
+      prismaMock.edition.findMany.mockResolvedValue([mockEdition])
+      prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
+    })
+
+    it('plafonne une page démesurée à 1000, sans refuser la requête', async () => {
+      global.getQuery.mockReturnValue({ limit: '100000' })
+
+      const result = await handler({} as any)
+
+      expect(result.pagination.limit).toBe(1000)
+      expect(prismaMock.edition.findMany.mock.calls[0][0].take).toBe(1000)
+    })
+
+    it('laisse passer les 1000 que notre propre client demande', async () => {
+      // `MAX_ALL_EDITIONS` vaut 1000 dans `app/stores/editions.ts` : l'agenda et la carte
+      // chargent la liste entière. Un plafond plus bas les viderait à moitié, sans erreur.
+      global.getQuery.mockReturnValue({ limit: '1000' })
+
+      const result = await handler({} as any)
+
+      expect(result.pagination.limit).toBe(1000)
+      expect(prismaMock.edition.findMany.mock.calls[0][0].take).toBe(1000)
+    })
+
+    it.each(['abc', '12.5', 'Infinity'])(
+      'refuse limit=%s en 400 au lieu de passer un NaN à Prisma',
+      async (valeur) => {
+        global.getQuery.mockReturnValue({ limit: valeur })
+
+        await expect(handler({} as any)).rejects.toMatchObject({ statusCode: 400 })
+        expect(prismaMock.edition.findMany).not.toHaveBeenCalled()
+      }
+    )
+
+    it('refuse page=abc en 400', async () => {
+      global.getQuery.mockReturnValue({ page: 'abc' })
+
+      await expect(handler({} as any)).rejects.toMatchObject({ statusCode: 400 })
+      expect(prismaMock.edition.findMany).not.toHaveBeenCalled()
+    })
+
+    it('ramène page=0 à la première page', async () => {
+      global.getQuery.mockReturnValue({ page: '0' })
+
+      const result = await handler({} as any)
+
+      expect(result.pagination.page).toBe(1)
+      expect(prismaMock.edition.findMany.mock.calls[0][0].skip).toBe(0)
+    })
+  })
 })

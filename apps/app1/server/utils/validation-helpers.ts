@@ -314,13 +314,77 @@ export function validateDateRange(
   }
 }
 
+/** Plafond par défaut d'une page. `validatePagination` l'applique à ses onze appelants. */
+export const LIMITE_PAGE_PAR_DEFAUT = 100
+
 /**
- * Extrait et valide les paramètres de pagination
+ * Un paramètre de pagination, borné — et refusé s'il ne désigne aucun nombre.
+ *
+ * ## ⚠️ POURQUOI `Math.max` NE SUFFISAIT PAS
+ *
+ * L'écriture précédente était `Math.min(100, Math.max(1, parseInt(valeur, 10)))`, qui a l'air
+ * d'encadrer la valeur entre 1 et 100. Elle ne le fait pas :
+ *
+ * ```js
+ * parseInt('abc', 10)                      // NaN
+ * Math.max(1, NaN)                         // NaN  ← et non 1
+ * Math.min(100, Math.max(1, NaN))          // NaN
+ * ```
+ *
+ * `Math.max` et `Math.min` **propagent** `NaN` au lieu de le remplacer par leur borne. Le `NaN`
+ * partait donc jusqu'à Prisma en `skip`/`take`, qui répondait 500 — sur `/api/editions`, une route
+ * **publique**. Mesuré le 09/10/2026 : onze points d'API passaient par ce helper, et
+ * `/api/editions` refaisait le même `parseInt` nu pour son compte, soit douze au total.
+ *
+ * ## Hors bornes et pas un nombre ne se traitent PAS pareil
+ *
+ * - **Hors bornes** (`?limit=5000`) → **ramené à la borne**, comme avant. Refuser casserait les
+ *   appelants déjà en circulation : le plafonnement est le comportement d'aujourd'hui, et un
+ *   contrat d'API ne se durcit pas sous les clients ouverts.
+ * - **Pas un nombre** (`?limit=abc`, `?page=`) → **400**. Personne ne peut en dépendre : cette
+ *   saisie-là rend 500 aujourd'hui.
+ *
+ * `undefined` et la chaîne vide ne sont pas des erreurs : ils valent « non fourni », donc le
+ * défaut. Une liste (`?page=1&page=2`) non plus : `getQuery` rend alors un tableau, et c'est la
+ * dernière valeur qui tranche, comme pour un formulaire.
  */
-export function validatePagination(event: H3Event<EventHandlerRequest>) {
+function entierDePagination(
+  brut: unknown,
+  defaut: number,
+  min: number,
+  max: number,
+  champ: 'page' | 'limit'
+): number {
+  const valeur = Array.isArray(brut) ? brut[brut.length - 1] : brut
+  if (valeur === undefined || valeur === null || valeur === '') return defaut
+
+  const nombre = Number(String(valeur).trim())
+  if (!Number.isInteger(nombre)) {
+    throw createError({
+      status: 400,
+      message: `Le paramètre « ${champ} » doit être un entier`,
+      data: { field: champ },
+    })
+  }
+
+  return Math.min(max, Math.max(min, nombre))
+}
+
+/**
+ * Extrait et valide les paramètres de pagination.
+ *
+ * @param max plafond de `limit`. Le défaut vaut pour les listes d'administration ; `/api/editions`
+ *   passe 1000, parce que son propre client demande 1000 pour l'agenda et la carte
+ *   (`app/stores/editions.ts`, `MAX_ALL_EDITIONS`). Le plafond doit couvrir ce que l'application
+ *   demande, sans quoi la page se vide à moitié sans erreur.
+ */
+export function validatePagination(
+  event: H3Event<EventHandlerRequest>,
+  { defaultLimit = 10, max = LIMITE_PAGE_PAR_DEFAUT }: { defaultLimit?: number; max?: number } = {}
+) {
   const query = getQuery(event)
-  const page = Math.max(1, parseInt(String(query.page || '1'), 10))
-  const limit = Math.min(100, Math.max(1, parseInt(String(query.limit || '10'), 10)))
+  const page = entierDePagination(query.page, 1, 1, Number.MAX_SAFE_INTEGER, 'page')
+  const limit = entierDePagination(query.limit, defaultLimit, 1, max, 'limit')
 
   return {
     page,
