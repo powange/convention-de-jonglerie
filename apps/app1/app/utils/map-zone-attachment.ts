@@ -62,6 +62,75 @@ export function buildMarkerAttachmentHtml(zoneName: string | undefined, label: s
   return `<div style="margin-top:4px;font-size:12px;color:#6b7280">${escapeHtml(label)} ${escapeHtml(zoneName)}</div>`
 }
 
+/** Une entrée de programme, telle qu'un popup la montre. */
+export interface EntreeDePopup {
+  titre: string
+  debut: string
+  source: string
+  duree?: number | null
+}
+
+/** Ce que le composeur ne peut pas deviner : les libellés et le format d'heure de la page. */
+export interface LibellesDePopup {
+  titreDeSource: (source: string) => string
+  formaterHorodatage: (horodatage: string) => string
+}
+
+/**
+ * L'icône de chaque source. L'ordre des clés est celui des sections.
+ *
+ * `element` est l'ajout de ce lot : les éléments LIBRES du programme — un repas, une scène
+ * ouverte, l'ouverture de l'accueil — se rattachent à une zone ou à un repère comme les
+ * spectacles et les ateliers, et n'apparaissaient dans aucun popup.
+ */
+const ICONE_DE_SOURCE = {
+  spectacle: '🎭',
+  workshop: '🎓',
+  element: '📋',
+} as const
+
+/**
+ * Les entrées d'un lieu, groupées par source, pour le corps d'un popup.
+ *
+ * ⚠️ UN COMPOSEUR, PAS TROIS BLOCS. Cette fonction vivait dans `map.vue` et portait DEUX blocs
+ * quasi identiques — un pour les spectacles, un pour les ateliers. Ajouter les éléments libres en
+ * aurait fait un troisième : trois copies d'une mise en forme, donc trois endroits où corriger le
+ * jour où le séparateur change.
+ *
+ * 📍 Elle est sortie de `map.vue` pour une seconde raison : elle y était intestable. Les popups
+ * de cet écran ont déjà connu deux défauts MUETS — un point d'API non public, et une clé de
+ * réponse renommée — qui se lisaient tous deux « popup sans spectacle, sans erreur ». Une
+ * fonction pure se vérifie ; un morceau de 900 lignes de page, non.
+ */
+export function buildItemsPopupHtml(
+  entrees: readonly EntreeDePopup[],
+  libelles: LibellesDePopup
+): string {
+  let html = ''
+
+  for (const source of Object.keys(ICONE_DE_SOURCE) as (keyof typeof ICONE_DE_SOURCE)[]) {
+    const duGroupe = entrees.filter((e) => e.source === source)
+    if (duGroupe.length === 0) continue
+
+    const triees = [...duGroupe].sort(
+      (a, b) => new Date(a.debut).getTime() - new Date(b.debut).getTime()
+    )
+    html += '<hr style="margin: 8px 0; border-color: #e5e7eb;"/>'
+    html += `<div style="margin-top: 4px;"><strong>${ICONE_DE_SOURCE[source]} ${escapeHtml(
+      libelles.titreDeSource(source)
+    )}</strong>`
+    html += '<div style="margin-top: 4px; font-size: 13px;">'
+    for (const entree of triees) {
+      html += `<div style="margin-top: 4px;">• ${escapeHtml(entree.titre)} — ${libelles.formaterHorodatage(entree.debut)}`
+      if (entree.duree) html += ` (${entree.duree} min)`
+      html += '</div>'
+    }
+    html += '</div></div>'
+  }
+
+  return html
+}
+
 /** Le minimum qu'une ligne de légende doit exposer pour être regroupée. */
 export interface GroupableLegendItem {
   id: number

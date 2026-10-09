@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { GroupableLegendItem } from '../../../app/utils/map-zone-attachment'
 import {
+  buildItemsPopupHtml,
   buildMarkerAttachmentHtml,
   buildZoneAttachmentHtml,
   filterLegendGroups,
@@ -214,5 +215,95 @@ describe('valeur du sélecteur de zone', () => {
     for (const zoneId of [null, 1, 42]) {
       expect(fromZoneSelection(toZoneSelection(zoneId))).toBe(zoneId)
     }
+  })
+})
+
+/**
+ * Les TROIS sources dans le popup d'un lieu.
+ *
+ * ⚠️ Le défaut corrigé : les popups listaient les spectacles et les ateliers, mais pas les
+ * ÉLÉMENTS LIBRES du programme — un repas, une scène ouverte, l'ouverture de l'accueil. Ils se
+ * rattachent pourtant à une zone ou à un repère exactement comme les deux autres sources.
+ *
+ * 📍 Ces tests existent aussi parce que cette mise en forme vivait dans `map.vue`, où elle était
+ * intestable. Les popups de cet écran ont connu deux défauts MUETS — un point d'API non public,
+ * une clé de réponse renommée — qui se lisaient tous deux « popup sans spectacle, sans erreur ».
+ */
+describe('buildItemsPopupHtml — les trois sources', () => {
+  const libelles = {
+    titreDeSource: (source: string) =>
+      ({ spectacle: 'Spectacle', workshop: 'Workshop', element: 'Programme' })[source] ?? source,
+    formaterHorodatage: (h: string) => `[${h}]`,
+  }
+
+  const entree = (over: Partial<Parameters<typeof buildItemsPopupHtml>[0][number]> = {}) => ({
+    titre: 'Jonglerie libre',
+    debut: '2026-07-01T14:00:00.000Z',
+    source: 'element',
+    ...over,
+  })
+
+  it('montre un ÉLÉMENT LIBRE du programme — ce que les popups omettaient', () => {
+    const html = buildItemsPopupHtml([entree({ titre: 'Repas du soir' })], libelles)
+
+    expect(html).toContain('Repas du soir')
+    expect(html).toContain('Programme')
+    expect(html).toContain('📋')
+  })
+
+  it('montre les trois sources, chacune sous son titre', () => {
+    const html = buildItemsPopupHtml(
+      [
+        entree({ titre: 'Gala', source: 'spectacle', duree: 90 }),
+        entree({ titre: 'Massues', source: 'workshop' }),
+        entree({ titre: 'Scène ouverte', source: 'element' }),
+      ],
+      libelles
+    )
+
+    for (const attendu of ['Gala', 'Massues', 'Scène ouverte', '🎭', '🎓', '📋']) {
+      expect(html, `« ${attendu} » absent du popup`).toContain(attendu)
+    }
+    // L'ordre des sections est celui de la frise : spectacle, atelier, élément.
+    expect(html.indexOf('Gala')).toBeLessThan(html.indexOf('Massues'))
+    expect(html.indexOf('Massues')).toBeLessThan(html.indexOf('Scène ouverte'))
+  })
+
+  it('n’ouvre une section que si elle a des entrées', () => {
+    // Sans cette règle, un lieu qui n'accueille qu'un atelier afficherait trois titres vides.
+    const html = buildItemsPopupHtml([entree({ source: 'workshop' })], libelles)
+
+    expect(html).toContain('Workshop')
+    expect(html).not.toContain('Spectacle')
+    expect(html).not.toContain('Programme')
+  })
+
+  it('trie par heure DANS chaque section', () => {
+    const html = buildItemsPopupHtml(
+      [
+        entree({ titre: 'Tard', debut: '2026-07-01T20:00:00.000Z' }),
+        entree({ titre: 'Tôt', debut: '2026-07-01T09:00:00.000Z' }),
+      ],
+      libelles
+    )
+
+    expect(html.indexOf('Tôt')).toBeLessThan(html.indexOf('Tard'))
+  })
+
+  it('n’affiche la durée que quand il y en a une', () => {
+    expect(buildItemsPopupHtml([entree({ duree: 90 })], libelles)).toContain('(90 min)')
+    expect(buildItemsPopupHtml([entree({ duree: null })], libelles)).not.toContain('min)')
+    expect(buildItemsPopupHtml([entree()], libelles)).not.toContain('min)')
+  })
+
+  it('échappe le titre, qui vient de l’organisateur et atterrit dans du HTML', () => {
+    const html = buildItemsPopupHtml([entree({ titre: '<img src=x onerror=alert(1)>' })], libelles)
+
+    expect(html).not.toContain('<img')
+    expect(html).toContain('&lt;img')
+  })
+
+  it('rend une chaîne vide sans entrée, pour ne pas poser un séparateur orphelin', () => {
+    expect(buildItemsPopupHtml([], libelles)).toBe('')
   })
 })

@@ -210,17 +210,20 @@ import type { EditionZone } from '~/composables/useEditionZones'
 import { useEditionStore } from '~/stores/editions'
 import { getEditionDisplayName } from '~/utils/editionName'
 import {
+  buildItemsPopupHtml,
   buildMarkerAttachmentHtml,
   buildZoneAttachmentHtml,
   groupMarkersByZone,
   zoneNavigationTarget,
 } from '~/utils/map-zone-attachment'
-import { escapeHtml } from '~/utils/mapMarkers'
 
 import type { ExternalMapProvider } from '~~/shared/utils/external-map'
 
 import { externalMapEmbedUrl as buildExternalMapEmbedUrl } from '~~/shared/utils/external-map'
 import { formaterHeure, formaterJournee } from '~~/shared/utils/fuseau-edition'
+// ⚠️ Import EXPLICITE : les utils de `shared/` ne sont pas auto-importés — `program.vue` importe
+// `estTermine` de la même façon. Sans cette ligne, le filtre lèverait au premier popup.
+import { estTermine } from '~~/shared/utils/program-timeline'
 
 const route = useRoute()
 const { t, locale } = useI18n()
@@ -355,6 +358,7 @@ const {
   showMarker,
   hideMarker,
   fitBoundsToItems,
+  setView,
 } = useLeafletEditable(mapContainerRef, {
   center: computed(() => {
     if (edition.value?.latitude && edition.value?.longitude) {
@@ -366,6 +370,21 @@ const {
   editable: false,
   typeLabel: (type: string) => t(`map.types.${type.toLowerCase()}`),
   popupLabels: { navigate: t('map.popup_navigate') },
+})
+
+/*
+ * ⚠️ Le centre et le zoom passés ci-dessus sont lus UNE SEULE FOIS, au `setup` (`computed(…).value`),
+ * alors que l'édition n'arrive qu'en `onMounted`. À froid, la carte s'ouvrait donc sur la France au
+ * zoom 6. Ce composable la recentre dès que le lieu est connu — et seulement s'il n'y a rien à
+ * cadrer, pour ne pas lutter contre `fitBoundsToItems`.
+ */
+useCadrageSurLEdition({
+  map,
+  latitude: computed(() => edition.value?.latitude),
+  longitude: computed(() => edition.value?.longitude),
+  nombreDElements: computed(() => zones.value.length + markers.value.length),
+  cadrageDejaFait: initialViewSet,
+  setView,
 })
 
 // Passer sur la carte Google démonte celle du site. Au retour, une nouvelle instance est créée :
@@ -469,62 +488,92 @@ watch(
 )
 
 /*
- * Spectacles publics — affichés dans les popups des zones et des marqueurs.
+ * LA FRISE ENTIÈRE, EN UN SEUL APPEL.
  *
- * ⚠️⚠️ CE BLOC NE MONTRAIT RIEN, et pour deux raisons qui se cumulaient sans qu'aucune erreur ne
- * paraisse :
+ * ⚠️ CE BLOC REMPLACE DEUX REQUÊTES — `/shows/public` et `/workshops` — et répare au passage un
+ * manque : les ÉLÉMENTS LIBRES du programme (un repas, une scène ouverte, l'ouverture de
+ * l'accueil) se rattachent à une zone ou à un repère comme les deux autres sources, et
+ * n'apparaissaient dans AUCUN popup.
  *
- * 1. le point d'API n'était pas déclaré public, donc un visiteur anonyme recevait 401 ;
- * 2. le `transform` lisait `payload?.shows`, une clé QUI N'EXISTE PLUS depuis le passage aux
- *    REPRÉSENTATIONS. La réponse porte `{ performances }`. Le tableau était donc toujours vide,
- *    et l'on ne pouvait pas le deviner : pas d'erreur, juste des popups sans spectacle.
+ * `/program` rend les trois sources, chacune sous son propre interrupteur de module et avec le
+ * même filtre `isPublic` pour qui n'édite pas. Une requête de moins, et trois sources au lieu de
+ * deux.
  *
- * ⚠️ ET UNE TROISIÈME, que le constat ne nommait pas : le composeur de popups lit `.title`,
- * `.startDateTime` et `.duration` à plat, et les partage avec les ateliers. Une représentation
- * porte son titre sous `show.title`. Corriger la seule clé de la réponse aurait donné des popups
- * annonçant « undefined » — un défaut plus visible que celui qu'on répare.
+ * ⚠️⚠️ L'HISTOIRE DE CE BLOC COMMANDE LA PRUDENCE SUR LES CLÉS. Une version précédente ne
+ * montrait rien, pour deux raisons cumulées et toutes deux muettes : le point d'API n'était pas
+ * public (401 pour un visiteur), et le `transform` lisait `payload?.shows` là où la réponse porte
+ * `{ performances }` — « pas d'erreur, juste des popups sans spectacle ».
  *
- * On MET DONC À PLAT ici, dans le `transform` : c'est le seul endroit où la forme de l'API et
- * celle du popup se rencontrent, et cela laisse `buildItemsPopupHtml` commun aux deux sources.
+ * Deux vérifications faites AVANT d'écrire ce bloc, précisément pour ne pas ajouter un troisième
+ * épisode :
  *
- * `zoneId` et `markerId` sont portés par la REPRÉSENTATION, pas par le spectacle : un même
- * spectacle peut se jouer à deux endroits.
+ * 1. `construireFriseProgramme` APLATIT le rattachement — `zone: enLieuCarte(a.location?.zone)`
+ *    pour un atelier, dont la zone passe par son lieu. Lire `e.zone` suffit donc pour les trois
+ *    sources ; lire `e.location?.zone` aurait fait disparaître les spectacles, et l'inverse les
+ *    ateliers.
+ * 2. l'API rend `zone`/`repere` comme OBJETS, quand le popup ne travaille qu'avec des
+ *    identifiants — d'où la mise à plat ici, seul endroit où les deux formes se rencontrent.
  */
-const { data: publicShows } = useApiFetch<any[]>(`/api/editions/${editionId.value}/shows/public`, {
-  lazy: true,
-  transform: (payload: any) =>
-    (payload?.performances ?? []).map((representation: any) => ({
-      title: representation.show?.title,
-      startDateTime: representation.startDateTime,
-      duration: representation.show?.duration,
-      zoneId: representation.zoneId,
-      markerId: representation.markerId,
-    })),
+interface EntreeDePopup {
+  titre: string
+  debut: string
+  fin: string | null
+  duree?: number | null
+  source: string
+  zoneId: number | null
+  markerId: number | null
+}
+
+const { data: frise } = useApiFetch<{ entrees: EntreeDePopup[]; fuseau: string | null }>(
+  `/api/editions/${editionId.value}/program`,
+  {
+    lazy: true,
+    transform: (payload: any) => ({
+      entrees: ((payload?.data?.entrees ?? payload?.entrees ?? []) as any[]).map((e) => ({
+        titre: e.titre,
+        debut: e.debut,
+        fin: e.fin ?? null,
+        duree: e.duree ?? e.duration ?? null,
+        source: e.source,
+        zoneId: e.zone?.id ?? null,
+        markerId: e.repere?.id ?? null,
+      })),
+      fuseau: payload?.data?.fuseau ?? payload?.fuseau ?? null,
+    }),
+  }
+)
+
+/**
+ * Ce qui n'est pas encore terminé.
+ *
+ * ⚠️ UN CHANGEMENT ASSUMÉ : les spectacles étaient listés SANS filtre de temps, les ateliers
+ * seulement « à venir ». Les trois sources suivent désormais la même règle. Un popup qui annonce
+ * un spectacle terminé la veille est du bruit, et deux règles pour une même liste faisaient une
+ * incohérence de plus sur un écran qui en comptait déjà.
+ *
+ * Le fuseau vient de l'API et non de l'édition : celle-ci n'est chargée qu'après le montage, si
+ * bien que le premier calcul se ferait dans le fuseau du navigateur.
+ */
+const entreesAVenir = computed(() => {
+  const maintenant = new Date()
+  return (frise.value?.entrees ?? []).filter(
+    (e) => !estTermine(e as never, maintenant, frise.value?.fuseau ?? fuseauDeLEdition.value)
+  )
 })
 
-const showsByZone = computed(() => {
-  const map = new Map<number, any[]>()
-  if (!publicShows.value) return map
-  for (const show of publicShows.value) {
-    if (show.zoneId) {
-      if (!map.has(show.zoneId)) map.set(show.zoneId, [])
-      map.get(show.zoneId)!.push(show)
-    }
+const grouperParLieu = (cle: 'zoneId' | 'markerId') => {
+  const groupes = new Map<number, EntreeDePopup[]>()
+  for (const entree of entreesAVenir.value) {
+    const id = entree[cle]
+    if (!id) continue
+    if (!groupes.has(id)) groupes.set(id, [])
+    groupes.get(id)!.push(entree)
   }
-  return map
-})
+  return groupes
+}
 
-const showsByMarker = computed(() => {
-  const map = new Map<number, any[]>()
-  if (!publicShows.value) return map
-  for (const show of publicShows.value) {
-    if (show.markerId) {
-      if (!map.has(show.markerId)) map.set(show.markerId, [])
-      map.get(show.markerId)!.push(show)
-    }
-  }
-  return map
-})
+const parZone = computed(() => grouperParLieu('zoneId'))
+const parRepere = computed(() => grouperParLieu('markerId'))
 
 /**
  * L'horaire d'un spectacle ou d'un atelier dans un popup, AU FUSEAU DE L'ÉDITION.
@@ -543,6 +592,12 @@ const showsByMarker = computed(() => {
  */
 const fuseauDeLEdition = computed(() => edition.value?.timezone ?? null)
 
+/** Ce que le composeur de popups a besoin de savoir, et qu'il ne peut pas deviner. */
+const libellesDePopup = () => ({
+  titreDeSource: (source: string) => t(`program.source.${source}`),
+  formaterHorodatage: formatPopupDateTime,
+})
+
 const formatPopupDateTime = (dateTimeStr: string) => {
   const jour = formaterJournee(dateTimeStr, fuseauDeLEdition.value, locale.value, {
     weekday: 'short',
@@ -553,101 +608,6 @@ const formatPopupDateTime = (dateTimeStr: string) => {
   return `${jour} ${heure}`
 }
 
-// Workshops — affichés dans les popups des zones/marqueurs.
-// On ne charge les ateliers que si le module est activé pour l'édition : inutile
-// d'appeler l'API (qui renverrait 403) quand la fonctionnalité est désactivée.
-const workshopsEnabled = computed(() => edition.value?.workshopsEnabled === true)
-
-const { data: workshops, execute: loadWorkshops } = useApiFetch<any[]>(
-  `/api/editions/${editionId.value}/workshops`,
-  {
-    lazy: true,
-    immediate: false,
-    transform: (payload: any) => payload?.workshops || payload || [],
-  }
-)
-
-// L'édition est chargée de façon asynchrone (store / onMounted) : on déclenche le
-// fetch dès que le flag d'activation est connu et vrai. `workshopsEnabled` ne
-// repasse jamais à true → false ici, donc l'appel n'est effectué qu'une fois.
-watch(
-  workshopsEnabled,
-  (enabled) => {
-    if (enabled) loadWorkshops()
-  },
-  { immediate: true }
-)
-
-// Filtrer les workshops non terminés
-const upcomingWorkshops = computed(() => {
-  if (!workshops.value) return []
-  const now = new Date()
-  return workshops.value.filter((ws) =>
-    // Sans heure de fin annoncée, c'est le début qui décide : un atelier qui dure ce qu'il dure
-    // reste affiché tant qu'il n'a pas commencé, plutôt que de disparaître de la carte.
-    ws.endDateTime ? new Date(ws.endDateTime) > now : new Date(ws.startDateTime) > now
-  )
-})
-
-const workshopsByZone = computed(() => {
-  const m = new Map<number, any[]>()
-  for (const ws of upcomingWorkshops.value) {
-    const zId = ws.location?.zoneId
-    if (zId) {
-      if (!m.has(zId)) m.set(zId, [])
-      m.get(zId)!.push(ws)
-    }
-  }
-  return m
-})
-
-const workshopsByMarker = computed(() => {
-  const m = new Map<number, any[]>()
-  for (const ws of upcomingWorkshops.value) {
-    const mId = ws.location?.markerId
-    if (mId) {
-      if (!m.has(mId)) m.set(mId, [])
-      m.get(mId)!.push(ws)
-    }
-  }
-  return m
-})
-
-const buildItemsPopupHtml = (shows: any[], wsItems: any[]) => {
-  let html = ''
-
-  if (shows.length > 0) {
-    const sorted = [...shows].sort(
-      (a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime()
-    )
-    html += '<hr style="margin: 8px 0; border-color: #e5e7eb;"/>'
-    html += `<div style="margin-top: 4px;"><strong>🎭 ${escapeHtml(t('edition.public_shows'))}</strong>`
-    html += '<div style="margin-top: 4px; font-size: 13px;">'
-    for (const show of sorted) {
-      html += `<div style="margin-top: 4px;">• ${escapeHtml(show.title)} — ${formatPopupDateTime(show.startDateTime)}`
-      if (show.duration) html += ` (${show.duration} min)`
-      html += '</div>'
-    }
-    html += '</div></div>'
-  }
-
-  if (wsItems.length > 0) {
-    const sorted = [...wsItems].sort(
-      (a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime()
-    )
-    html += '<hr style="margin: 8px 0; border-color: #e5e7eb;"/>'
-    html += `<div style="margin-top: 4px;"><strong>🎓 ${escapeHtml(t('workshops.page_title'))}</strong>`
-    html += '<div style="margin-top: 4px; font-size: 13px;">'
-    for (const ws of sorted) {
-      html += `<div style="margin-top: 4px;">• ${escapeHtml(ws.title)} — ${formatPopupDateTime(ws.startDateTime)}`
-      html += '</div>'
-    }
-    html += '</div></div>'
-  }
-
-  return html
-}
-
 // Mettre à jour les popups quand les spectacles ou workshops sont chargés
 /*
  * ⚠️ `edition` FAIT PARTIE DES SOURCES, et c'est indispensable depuis que les horaires suivent son
@@ -655,7 +615,7 @@ const buildItemsPopupHtml = (shows: any[], wsItems: any[]) => {
  * avec `null` et garderaient l'heure du navigateur jusqu'à ce qu'autre chose les fasse recalculer.
  */
 watch(
-  [publicShows, workshops, zones, markers, map, edition],
+  [entreesAVenir, zones, markers, map, edition],
   () => {
     if (!map.value) return
 
@@ -665,31 +625,29 @@ watch(
     const zoneNameById = new Map(zones.value.map((zone) => [zone.id, zone.name]))
 
     for (const zone of zones.value) {
-      const zoneShows = showsByZone.value.get(zone.id) || []
-      const zoneWorkshops = workshopsByZone.value.get(zone.id) || []
+      const duLieu = parZone.value.get(zone.id) || []
       const attached = attachedByZone.get(zone.id)
       const attachmentHtml = buildZoneAttachmentHtml(attached, t('map.zone_entrances'))
-      if (attachmentHtml || zoneShows.length > 0 || zoneWorkshops.length > 0) {
+      if (attachmentHtml || duLieu.length > 0) {
         setPopupExtra(
           'zone',
           zone.id,
-          attachmentHtml + buildItemsPopupHtml(zoneShows, zoneWorkshops)
+          attachmentHtml + buildItemsPopupHtml(duLieu, libellesDePopup())
         )
       }
       setZoneNavigationTarget(zone.id, zoneNavigationTarget(attached))
     }
 
     for (const marker of markers.value) {
-      const markerShows = showsByMarker.value.get(marker.id) || []
-      const markerWorkshops = workshopsByMarker.value.get(marker.id) || []
+      const duRepere = parRepere.value.get(marker.id) || []
       const attachmentHtml = marker.zoneId
         ? buildMarkerAttachmentHtml(zoneNameById.get(marker.zoneId), t('map.marker_entrance_of'))
         : ''
-      if (attachmentHtml || markerShows.length > 0 || markerWorkshops.length > 0) {
+      if (attachmentHtml || duRepere.length > 0) {
         setPopupExtra(
           'marker',
           marker.id,
-          attachmentHtml + buildItemsPopupHtml(markerShows, markerWorkshops)
+          attachmentHtml + buildItemsPopupHtml(duRepere, libellesDePopup())
         )
       }
     }
