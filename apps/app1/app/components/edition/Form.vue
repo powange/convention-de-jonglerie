@@ -551,6 +551,7 @@ import { estUnLienHttp } from '~/utils/lien-externe'
 import type { StepperItem } from '@nuxt/ui'
 
 import { premierJourDeSemaine } from '~~/shared/utils/semaine'
+import { servicesDepuisEdition } from '~~/shared/utils/services-d-edition'
 
 // La semaine commence le lundi en France, le dimanche ailleurs : la valeur suit la langue de qui
 // regarde plutôt que d'être figée. Sans elle, `UCalendar` démarre toujours le dimanche.
@@ -682,29 +683,16 @@ const state = reactive({
   officialWebsiteUrl: props.initialData?.officialWebsiteUrl || '',
   facebookUrl: props.initialData?.facebookUrl || '',
   instagramUrl: props.initialData?.instagramUrl || '',
-  hasFoodTrucks: props.initialData?.hasFoodTrucks || false,
-  hasKidsZone: props.initialData?.hasKidsZone || false,
-  acceptsPets: props.initialData?.acceptsPets || false,
-  hasTentCamping: props.initialData?.hasTentCamping || false,
-  hasTruckCamping: props.initialData?.hasTruckCamping || false,
-  hasFamilyCamping: props.initialData?.hasFamilyCamping || false,
-  hasSleepingRoom: props.initialData?.hasSleepingRoom || false,
-  hasGym: props.initialData?.hasGym || false,
-  hasFireSpace: props.initialData?.hasFireSpace || false,
-  hasGala: props.initialData?.hasGala || false,
-  hasOpenStage: props.initialData?.hasOpenStage || false,
-  hasConcert: props.initialData?.hasConcert || false,
-  hasCantine: props.initialData?.hasCantine || false,
-  hasAerialSpace: props.initialData?.hasAerialSpace || false,
-  hasSlacklineSpace: props.initialData?.hasSlacklineSpace || false,
-  hasToilets: props.initialData?.hasToilets || false,
-  hasShowers: props.initialData?.hasShowers || false,
-  hasPrmAccess: props.initialData?.hasPrmAccess || false,
-  hasSignLanguage: props.initialData?.hasSignLanguage || false,
-  hasWorkshops: props.initialData?.hasWorkshops || false,
-  hasCashPayment: props.initialData?.hasCashPayment || false,
-  hasCreditCardPayment: props.initialData?.hasCreditCardPayment || false,
-  hasAfjTokenPayment: props.initialData?.hasAfjTokenPayment || false,
+  /*
+   * Les services dérivent de `CLES_SERVICES_EDITION` et ne sont plus énumérés ici.
+   *
+   * ⚠️ Cette énumération en portait 23 sur 26 : `hasUnicycleSpace`, `hasLongShow` et `hasATM`
+   * manquaient. Ils étaient pourtant proposés comme FILTRES sur l'accueil et modifiables depuis
+   * la page Services de la gestion — donc invisibles ici seulement, ce qui ne se voit pas en
+   * relisant ce fichier. `test/unit/utils/services-d-edition.test.ts` compare désormais la liste
+   * aux colonnes du schéma Prisma.
+   */
+  ...servicesDepuisEdition(props.initialData),
 })
 
 // Date formatter pour l'affichage

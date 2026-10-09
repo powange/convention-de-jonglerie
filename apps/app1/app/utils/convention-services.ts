@@ -1,10 +1,16 @@
 /**
- * Source unique de vérité pour les services/caractéristiques d'une édition.
+ * La DESCRIPTION des services d'une édition : icône, couleur, catégorie, clé i18n.
+ *
+ * ⚠️ La liste des clés, elle, vit dans `~~/shared/utils/services-d-edition` — ce fichier décrit
+ * des services, il ne décide plus lesquels existent. La distinction compte : cinq surfaces
+ * énuméraient les clés à la main, et deux avaient dérivé (le formulaire d'édition et le handler
+ * de création en portaient 23 sur 26).
  *
  * Ajouter un nouveau service :
  *   1. Ajouter la colonne booléenne dans `prisma/schema/schema.prisma` (Edition)
- *   2. Ajouter le champ dans `editionSchema` + `updateEditionSchema`
- *      (server/utils/validation-schemas.ts)
+ *   2. Ajouter la clé dans `CLES_SERVICES_EDITION`
+ *      (`shared/utils/services-d-edition.ts`) — le formulaire, le schéma zod et l'écriture en
+ *      dérivent, il n'y a donc rien à faire de plus de ces trois côtés
  *   3. Ajouter le champ dans le helper `editionListInclude` ou équivalent
  *      (server/utils/prisma-select-helpers.ts) si besoin de l'exposer
  *   4. Ajouter une entrée dans la constante `conventionServices` ci-dessous
@@ -12,9 +18,12 @@
  *   5. Ajouter la clé i18n correspondante dans tous les fichiers de
  *      `i18n/locales/{langue}/public.json` (sous `services.*`)
  *
- * Le test test/unit/utils/conventionServices.test.ts garantit que les clés
- * de cette liste correspondent aux colonnes Prisma (filet de sécurité).
+ * Deux tests ferment la boucle : `test/unit/utils/services-d-edition.test.ts` compare les clés
+ * aux colonnes Prisma, et `test/unit/utils/convention-services.test.ts` vérifie que chaque clé a
+ * sa description ici.
  */
+
+import type { ServicesEdition } from '~~/shared/utils/services-d-edition'
 
 export type ConventionServiceCategory =
   | 'accommodation'
@@ -42,34 +51,14 @@ export interface ConventionService {
   importLabel?: string
 }
 
-export interface ConventionServiceKeys {
-  hasFoodTrucks: boolean
-  hasKidsZone: boolean
-  acceptsPets: boolean
-  hasTentCamping: boolean
-  hasTruckCamping: boolean
-  hasFamilyCamping: boolean
-  hasSleepingRoom: boolean
-  hasGym: boolean
-  hasFireSpace: boolean
-  hasGala: boolean
-  hasOpenStage: boolean
-  hasConcert: boolean
-  hasCantine: boolean
-  hasAerialSpace: boolean
-  hasSlacklineSpace: boolean
-  hasUnicycleSpace: boolean
-  hasToilets: boolean
-  hasShowers: boolean
-  hasPrmAccess: boolean
-  hasSignLanguage: boolean
-  hasWorkshops: boolean
-  hasCashPayment: boolean
-  hasCreditCardPayment: boolean
-  hasAfjTokenPayment: boolean
-  hasLongShow: boolean
-  hasATM: boolean
-}
+/**
+ * Les services, tirés de la liste partagée.
+ *
+ * ⚠️ Ce type ÉTAIT une énumération écrite à la main, et c'est l'une des cinq copies qui avaient
+ * divergé — voir `~~/shared/utils/services-d-edition` pour le relevé. Il reste exporté sous ce
+ * nom parce que `ConventionService.key` et plusieurs écrans s'y réfèrent.
+ */
+export type ConventionServiceKeys = ServicesEdition
 
 export const conventionServices: ConventionService[] = [
   // ── Hébergement ──

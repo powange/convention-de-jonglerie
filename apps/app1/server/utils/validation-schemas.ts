@@ -6,6 +6,7 @@ import { isValidPronoun } from '~/utils/pronouns'
 
 import { SUPPORTED_CURRENCIES } from '~~/shared/utils/money'
 import { schemaMotDePasse } from '~~/shared/utils/regles-mot-de-passe'
+import { CLES_SERVICES_EDITION, type CleServiceEdition } from '~~/shared/utils/services-d-edition'
 
 /**
  * Validation d'un numéro de téléphone international.
@@ -162,6 +163,24 @@ export const conventionSchema = z.object({
 
 export const updateConventionSchema = conventionSchema.partial()
 
+/**
+ * La forme zod des services d'une édition, tirée de `CLES_SERVICES_EDITION`.
+ *
+ * ⚠️ Les 26 services étaient énumérés ici DEUX fois — `editionSchema` et `updateEditionSchema` —
+ * en deux morceaux chacun, séparés par les drapeaux de modules (`mealsEnabled`, `faqEnabled`…).
+ * Cette découpe en quatre blocs est précisément ce qui a laissé passer la dérive ailleurs : on
+ * ajoutait un service au bout d'un bloc sans voir qu'une autre surface ne l'avait pas.
+ *
+ * `.optional()` et non `.default(false)` : un corps de mise à jour partielle ne doit pas éteindre
+ * les services qu'il ne mentionne pas. C'est à l'écriture de décider — `servicesPourEcriture` le
+ * fait pour la création, et la mise à jour n'applique que les champs reçus.
+ */
+function schemaDesServices() {
+  return Object.fromEntries(
+    CLES_SERVICES_EDITION.map((cle) => [cle, z.boolean().optional()])
+  ) as Record<CleServiceEdition, z.ZodOptional<z.ZodBoolean>>
+}
+
 // Schémas d'édition
 export const editionSchema = z
   .object({
@@ -208,28 +227,8 @@ export const editionSchema = z
     facebookUrl: urlSchema,
     instagramUrl: urlSchema,
     jugglingEdgeUrl: urlSchema,
-    // Services booléens
-    hasFoodTrucks: z.boolean().optional(),
-    hasKidsZone: z.boolean().optional(),
-    acceptsPets: z.boolean().optional(),
-    hasTentCamping: z.boolean().optional(),
-    hasTruckCamping: z.boolean().optional(),
-    hasFamilyCamping: z.boolean().optional(),
-    hasSleepingRoom: z.boolean().optional(),
-    hasGym: z.boolean().optional(),
-    hasFireSpace: z.boolean().optional(),
-    hasGala: z.boolean().optional(),
-    hasOpenStage: z.boolean().optional(),
-    hasConcert: z.boolean().optional(),
-    hasCantine: z.boolean().optional(),
-    hasAerialSpace: z.boolean().optional(),
-    hasSlacklineSpace: z.boolean().optional(),
-    hasUnicycleSpace: z.boolean().optional(),
-    hasToilets: z.boolean().optional(),
-    hasShowers: z.boolean().optional(),
-    hasPrmAccess: z.boolean().optional(),
-    hasSignLanguage: z.boolean().optional(),
-    hasWorkshops: z.boolean().optional(),
+    // Les services booléens, tirés de `CLES_SERVICES_EDITION` : voir `schemaDesServices()`.
+    ...schemaDesServices(),
     mealsEnabled: z.boolean().optional(),
     volunteersEnabled: z.boolean().optional(),
     artistsEnabled: z.boolean().optional(),
@@ -244,11 +243,6 @@ export const editionSchema = z
     treasuryEnabled: z.boolean().optional(),
     faqPagePublic: z.boolean().optional(),
     programPagePublic: z.boolean().optional(),
-    hasCashPayment: z.boolean().optional(),
-    hasCreditCardPayment: z.boolean().optional(),
-    hasAfjTokenPayment: z.boolean().optional(),
-    hasLongShow: z.boolean().optional(),
-    hasATM: z.boolean().optional(),
   })
   .refine(
     (data) => {
@@ -311,28 +305,8 @@ export const updateEditionSchema = z
     facebookUrl: urlSchema,
     instagramUrl: urlSchema,
     jugglingEdgeUrl: urlSchema,
-    // Services booléens
-    hasFoodTrucks: z.boolean().optional(),
-    hasKidsZone: z.boolean().optional(),
-    acceptsPets: z.boolean().optional(),
-    hasTentCamping: z.boolean().optional(),
-    hasTruckCamping: z.boolean().optional(),
-    hasFamilyCamping: z.boolean().optional(),
-    hasSleepingRoom: z.boolean().optional(),
-    hasGym: z.boolean().optional(),
-    hasFireSpace: z.boolean().optional(),
-    hasGala: z.boolean().optional(),
-    hasOpenStage: z.boolean().optional(),
-    hasConcert: z.boolean().optional(),
-    hasCantine: z.boolean().optional(),
-    hasAerialSpace: z.boolean().optional(),
-    hasSlacklineSpace: z.boolean().optional(),
-    hasUnicycleSpace: z.boolean().optional(),
-    hasToilets: z.boolean().optional(),
-    hasShowers: z.boolean().optional(),
-    hasPrmAccess: z.boolean().optional(),
-    hasSignLanguage: z.boolean().optional(),
-    hasWorkshops: z.boolean().optional(),
+    // Les services booléens, tirés de `CLES_SERVICES_EDITION`.
+    ...schemaDesServices(),
     mealsEnabled: z.boolean().optional(),
     volunteersEnabled: z.boolean().optional(),
     artistsEnabled: z.boolean().optional(),
@@ -347,11 +321,6 @@ export const updateEditionSchema = z
     treasuryEnabled: z.boolean().optional(),
     faqPagePublic: z.boolean().optional(),
     programPagePublic: z.boolean().optional(),
-    hasCashPayment: z.boolean().optional(),
-    hasCreditCardPayment: z.boolean().optional(),
-    hasAfjTokenPayment: z.boolean().optional(),
-    hasLongShow: z.boolean().optional(),
-    hasATM: z.boolean().optional(),
   })
   .refine(
     (data) => {
