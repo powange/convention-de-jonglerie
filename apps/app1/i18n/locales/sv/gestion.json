@@ -294,7 +294,7 @@
       "can_delete": "Ta bort",
       "can_edit": "Redigera",
       "can_manage_volunteers": "Hantera volontärer",
-      "confirm_remove": "Är du säker på att du vill ta bort denna arrangör från konventionen?",
+      "confirm_remove": "[TODO] Är du säker på att du vill ta bort denna arrangör från konventionen?",
       "confirm_remove_from_edition": "Är du säker på att du vill ta bort denna arrangör från utgåvan?",
       "edit_organizer": "Redigera arrangör",
       "edit_organizer_description": "Konfigurera åtkomsträttigheter och titel för denna arrangör för att hantera deras behörigheter på konventionen och dess utgåvor.",
@@ -494,7 +494,8 @@
       "type": "Typ av föreställning",
       "type_cabaret": "Kabaré",
       "type_hint": "En kabaré består av nummer, vart och ett med egna artister.",
-      "type_standard": "Föreställning"
+      "type_standard": "Föreställning",
+      "act_title_required": "[TODO] Chaque numéro doit avoir un titre"
     },
     "stock": {
       "available_now": "{available}/{total} tillgängliga",
@@ -1249,7 +1250,8 @@
       "edit_place": "Ändra plats",
       "place_error": "Platsen kunde inte sparas.",
       "page_public": "Offentlig sida",
-      "page_public_help": "Gör programmet synligt för alla. Så länge det är avstängt når bara arrangörer det, och fliken förblir dold för allmänheten."
+      "page_public_help": "Gör programmet synligt för alla. Så länge det är avstängt når bara arrangörer det, och fliken förblir dold för allmänheten.",
+      "overlap": "[TODO] Chevauchement"
     },
     "convention": {
       "card_description": "Redigera konventets namn, beskrivning, logotyp och e-post",

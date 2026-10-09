@@ -26,6 +26,11 @@
         "action": "Переглянути відкриті конкурси",
         "message": "Конкурс \"{showCallName}\" для \"{editionName}\" відкритий. Подайте свій виступ!",
         "title": "Новий конкурс виступів 🎭"
+      },
+      "application_withdrawn": {
+        "title": "[TODO] Candidature retirée",
+        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
+        "action": "[TODO] Voir les candidatures"
       }
     },
     "carpool": {

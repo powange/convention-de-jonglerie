@@ -95,7 +95,22 @@
       "map_tab": "Mapa",
       "map_tab_short": "Mapa",
       "map_without_point": "Anúncios sem posição",
-      "map_without_point_hint": "Não foi possível localizar a cidade no mapa: estão listados aqui para não se perderem."
+      "map_without_point_hint": "Não foi possível localizar a cidade no mapa: estão listados aqui para não se perderem.",
+      "bookings": "[TODO] Réservations",
+      "delete_comment": "[TODO] Supprimer mon commentaire",
+      "delete_comment_confirm": "[TODO] Ce commentaire sera retiré de la discussion. Cette action est définitive.",
+      "filters": {
+        "city": "[TODO] Ville",
+        "city_placeholder": "[TODO] Nom d'une ville",
+        "direction_any": "[TODO] Les deux sens",
+        "none_matching": "[TODO] Aucune annonce ne correspond",
+        "none_matching_help": "[TODO] Élargissez la recherche, ou réinitialisez les filtres.",
+        "reset": "[TODO] Réinitialiser",
+        "with_seats": "[TODO] Offres avec des places libres"
+      },
+      "no_bookings": "[TODO] Aucune réservation",
+      "past_trip": "[TODO] Trajet passé",
+      "phone_after_acceptance": "[TODO] Numéro visible une fois votre réservation acceptée"
     },
     "convention_form": {
       "click_to_select_image": "Clique para seleccionar uma imagem",

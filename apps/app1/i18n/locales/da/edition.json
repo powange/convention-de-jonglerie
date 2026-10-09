@@ -38,7 +38,8 @@
       "edit_description": "Rediger detaljerne i dit samkørselstilbud",
       "seats_description": "Antal ledige pladser i dit køretøj",
       "seats_placeholder": "fx 3",
-      "updated": "Samkørselstilbud opdateret"
+      "updated": "Samkørselstilbud opdateret",
+      "seats_minimum": "[TODO] Vous avez déjà accordé {count} place(s) : vous ne pouvez pas descendre en dessous sans retirer d'abord une réservation."
     },
     "pets_allowed": "Kæledyr tilladt",
     "pets_description": "Du accepterer kæledyr eller rejser med kæledyr",
@@ -104,7 +105,7 @@
       "verification_success_description": "Du er nu ejer af denne konvention.",
       "verify": "Verificer"
     },
-    "confirm_delete_convention": "Er du sikker på, at du vil slette denne konvention?",
+    "confirm_delete_convention": "[TODO] Er du sikker på, at du vil slette denne konvention?",
     "convention_deleted": "Konvention slettet",
     "convention_deleted_success": "Konventionen blev slettet med succes",
     "convention_not_found": "Konvention ikke fundet",
@@ -155,7 +156,8 @@
     "status_control": "Synlighedskontrol",
     "status_control_desc": "Publicer eller afpublicér dine udgaver efter deres fremskridtstilstand",
     "delete_edition_irreversible": "Advarsel: denne handling kan ikke fortrydes",
-    "delete_edition_confirm_description": "Er du sikker på, at du vil slette denne udgave? Alle tilknyttede data (frivillige, kommentarer, glemte sager osv.) mistes permanent."
+    "delete_edition_confirm_description": "Er du sikker på, at du vil slette denne udgave? Alle tilknyttede data (frivillige, kommentarer, glemte sager osv.) mistes permanent.",
+    "confirm_delete_convention_unnamed": "[TODO] Cette convention sera supprimée, avec ses éditions et toutes leurs données."
   },
   "diet": {
     "none": "Ingen",

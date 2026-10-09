@@ -294,7 +294,7 @@
       "can_delete": "Verwijderen",
       "can_edit": "Bewerken",
       "can_manage_volunteers": "Vrijwilligers beheren",
-      "confirm_remove": "Weet u zeker dat u deze organisator van de conventie wilt verwijderen?",
+      "confirm_remove": "[TODO] Weet u zeker dat u deze organisator van de conventie wilt verwijderen?",
       "confirm_remove_from_edition": "Weet u zeker dat u deze organisator van de editie wilt verwijderen?",
       "edit_organizer": "Organisator bewerken",
       "edit_organizer_description": "Configureer de toegangsrechten en titel van deze organisator om hun rechten op de conventie en haar edities te beheren.",
@@ -494,7 +494,8 @@
       "type": "Type voorstelling",
       "type_cabaret": "Cabaret",
       "type_hint": "Een cabaret bestaat uit nummers, elk met eigen artiesten.",
-      "type_standard": "Voorstelling"
+      "type_standard": "Voorstelling",
+      "act_title_required": "[TODO] Chaque numéro doit avoir un titre"
     },
     "stock": {
       "available_now": "{available}/{total} beschikbaar",
@@ -1249,7 +1250,8 @@
       "edit_place": "Locatie wijzigen",
       "place_error": "De locatie kon niet worden opgeslagen.",
       "page_public": "Openbare pagina",
-      "page_public_help": "Maakt het programma voor iedereen zichtbaar. Zolang dit uit staat, kunnen alleen organisatoren erbij en blijft het tabblad verborgen voor het publiek."
+      "page_public_help": "Maakt het programma voor iedereen zichtbaar. Zolang dit uit staat, kunnen alleen organisatoren erbij en blijft het tabblad verborgen voor het publiek.",
+      "overlap": "[TODO] Chevauchement"
     },
     "convention": {
       "card_description": "Naam, beschrijving, logo en e-mailadres van de conventie bewerken",

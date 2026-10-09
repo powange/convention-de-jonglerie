@@ -69,7 +69,8 @@
       "marker_zone": "Gekoppelde zone",
       "marker_zone_help": "Koppel dit punt aan een zone waarvan het de ingang of toegang is.",
       "marker_no_zone": "Geen zone",
-      "import_dep_program": "{n} programmaonderdeel | {n} programmaonderdelen"
+      "import_dep_program": "{n} programmaonderdeel | {n} programmaonderdelen",
+      "import_layer_partial": "[TODO] {importes} importés, {echecs} en échec"
     }
   }
 }

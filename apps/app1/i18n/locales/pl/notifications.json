@@ -26,6 +26,11 @@
         "action": "Zobacz otwarte nabory",
         "message": "Nabór \"{showCallName}\" na \"{editionName}\" jest otwarty. Zgłoś swój spektakl!",
         "title": "Nowy nabór na spektakle 🎭"
+      },
+      "application_withdrawn": {
+        "title": "[TODO] Candidature retirée",
+        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
+        "action": "[TODO] Voir les candidatures"
       }
     },
     "carpool": {

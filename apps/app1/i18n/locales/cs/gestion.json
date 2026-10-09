@@ -294,7 +294,7 @@
       "can_delete": "Odstranit",
       "can_edit": "Upravit",
       "can_manage_volunteers": "Spravovat dobrovolníky",
-      "confirm_remove": "Opravdu chcete odebrat tohoto organizátora z konference?",
+      "confirm_remove": "[TODO] Opravdu chcete odebrat tohoto organizátora z konference?",
       "confirm_remove_from_edition": "Opravdu chcete odebrat tohoto organizátora z edice?",
       "edit_organizer": "Upravit organizátora",
       "edit_organizer_description": "Nakonfigurujte přístupová práva a titul tohoto organizátora pro správu jeho oprávnění na konvenci a jejích edicích.",
@@ -494,7 +494,8 @@
       "type": "Typ představení",
       "type_cabaret": "Kabaret",
       "type_hint": "Kabaret se skládá z čísel, každé má vlastní účinkující.",
-      "type_standard": "Představení"
+      "type_standard": "Představení",
+      "act_title_required": "[TODO] Chaque numéro doit avoir un titre"
     },
     "stock": {
       "available_now": "{available}/{total} dostupných",
@@ -1249,7 +1250,8 @@
       "edit_place": "Změnit místo",
       "place_error": "Místo se nepodařilo uložit.",
       "page_public": "Veřejná stránka",
-      "page_public_help": "Zpřístupní program všem. Dokud je vypnuto, dostanou se na něj jen organizátoři a záložka zůstává veřejnosti skrytá."
+      "page_public_help": "Zpřístupní program všem. Dokud je vypnuto, dostanou se na něj jen organizátoři a záložka zůstává veřejnosti skrytá.",
+      "overlap": "[TODO] Chevauchement"
     },
     "convention": {
       "card_description": "Upravit název, popis, logo a e-mail konvence",

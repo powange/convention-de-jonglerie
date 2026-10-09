@@ -294,7 +294,7 @@
       "can_delete": "Excluir",
       "can_edit": "Editar",
       "can_manage_volunteers": "Gerenciar voluntários",
-      "confirm_remove": "Tem certeza de que deseja remover este organizador da convenção?",
+      "confirm_remove": "[TODO] Tem certeza de que deseja remover este organizador da convenção?",
       "confirm_remove_from_edition": "Tem certeza de que deseja remover este organizador da edição?",
       "edit_organizer": "Editar organizador",
       "edit_organizer_description": "Configure os direitos de acesso e o título deste organizador para gerir as suas permissões na convenção e nas suas edições.",
@@ -494,7 +494,8 @@
       "type": "Tipo de espetáculo",
       "type_cabaret": "Cabaré",
       "type_hint": "Um cabaré é composto por números, cada um com os seus artistas.",
-      "type_standard": "Espetáculo"
+      "type_standard": "Espetáculo",
+      "act_title_required": "[TODO] Chaque numéro doit avoir un titre"
     },
     "stock": {
       "available_now": "{available}/{total} disponível(eis)",
@@ -1249,7 +1250,8 @@
       "edit_place": "Alterar o local",
       "place_error": "Não foi possível guardar o local.",
       "page_public": "Página pública",
-      "page_public_help": "Torna o programa visível para todos. Enquanto estiver desativado, apenas os organizadores lhe acedem e o separador permanece oculto ao público."
+      "page_public_help": "Torna o programa visível para todos. Enquanto estiver desativado, apenas os organizadores lhe acedem e o separador permanece oculto ao público.",
+      "overlap": "[TODO] Chevauchement"
     },
     "convention": {
       "card_description": "Editar o nome, a descrição, o logotipo e o e-mail da convenção",

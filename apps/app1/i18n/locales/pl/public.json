@@ -74,7 +74,12 @@
       "rejected": "Odrzucone",
       "show_title": "Spektakl",
       "view_edition": "Zobacz edycję",
-      "view_edition_short": "Zobacz"
+      "view_edition_short": "Zobacz",
+      "withdraw": "[TODO] Retirer ma candidature",
+      "withdraw_confirm": "[TODO] Votre candidature « {title} » sera retirée, ainsi que la discussion que vous avez eue avec les organisateurs. Cette action est définitive.",
+      "withdraw_error": "[TODO] Le retrait a échoué",
+      "withdraw_short": "[TODO] Retirer",
+      "withdrawn": "[TODO] Candidature retirée"
     },
     "comments": {
       "be_first_to_comment": "Bądź pierwszy, który podzieli się doświadczeniem!",

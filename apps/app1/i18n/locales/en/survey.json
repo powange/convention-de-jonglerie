@@ -38,6 +38,8 @@
     "vote_error": "Error saving vote",
     "vote_saved": "Vote saved",
     "votes_count": "{count} vote | {count} votes",
-    "your_vote": "Your rating"
+    "your_vote": "Your rating",
+    "own_application_hidden": "[TODO] Votre candidature n'apparaît pas dans cette liste",
+    "own_application_hidden_description": "[TODO] On ne note pas sa propre candidature. Les autres membres du jury, eux, la voient et peuvent la noter."
   }
 }

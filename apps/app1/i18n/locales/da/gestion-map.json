@@ -69,7 +69,8 @@
       "marker_zone": "Tilknyttet zone",
       "marker_zone_help": "Tilknyt dette punkt til en zone, som det er indgangen eller adgangen til.",
       "marker_no_zone": "Ingen zone",
-      "import_dep_program": "{n} programpunkt | {n} programpunkter"
+      "import_dep_program": "{n} programpunkt | {n} programpunkter",
+      "import_layer_partial": "[TODO] {importes} importés, {echecs} en échec"
     }
   }
 }

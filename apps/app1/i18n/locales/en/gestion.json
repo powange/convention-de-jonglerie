@@ -294,7 +294,7 @@
       "can_delete": "Delete",
       "can_edit": "Edit",
       "can_manage_volunteers": "Manage volunteers",
-      "confirm_remove": "Are you sure you want to remove this organizer from the convention?",
+      "confirm_remove": "[TODO] Are you sure you want to remove this organizer from the convention?",
       "confirm_remove_from_edition": "Are you sure you want to remove this organizer from the edition?",
       "edit_organizer": "Edit organizer",
       "edit_organizer_description": "Configure the access rights and title of this organizer to manage their permissions on the convention and its editions.",
@@ -494,7 +494,8 @@
       "type": "Show type",
       "type_cabaret": "Cabaret",
       "type_hint": "A cabaret is made up of acts, each with its own performers.",
-      "type_standard": "Show"
+      "type_standard": "Show",
+      "act_title_required": "[TODO] Chaque numéro doit avoir un titre"
     },
     "stock": {
       "available_now": "{available}/{total} available",
@@ -1249,7 +1250,8 @@
       "edit_place": "Change the place",
       "place_error": "The place could not be saved.",
       "page_public": "Public page",
-      "page_public_help": "Makes the schedule visible to everyone. While it is off, only organisers can reach it and the tab stays hidden from the public."
+      "page_public_help": "Makes the schedule visible to everyone. While it is off, only organisers can reach it and the tab stays hidden from the public.",
+      "overlap": "[TODO] Chevauchement"
     },
     "convention": {
       "card_description": "Edit the convention's name, description, logo and email",

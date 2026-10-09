@@ -38,6 +38,8 @@
     "vote_error": "Errore durante il salvataggio del voto",
     "vote_saved": "Voto salvato",
     "votes_count": "{count} voto | {count} voti",
-    "your_vote": "La tua valutazione"
+    "your_vote": "La tua valutazione",
+    "own_application_hidden": "[TODO] Votre candidature n'apparaît pas dans cette liste",
+    "own_application_hidden_description": "[TODO] On ne note pas sa propre candidature. Les autres membres du jury, eux, la voient et peuvent la noter."
   }
 }
