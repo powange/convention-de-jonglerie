@@ -17,10 +17,28 @@
     <!-- Liste des commentaires -->
     <div v-else-if="comments.length > 0" class="space-y-3">
       <UCard v-for="comment in comments" :key="comment.id" variant="subtle">
-        <div class="mb-2">
+        <div class="mb-2 flex items-start justify-between gap-2">
           <UiUserDisplay :user="comment.user" :datetime="comment.createdAt" size="sm" />
+          <!-- ⚠️ SES PROPRES COMMENTAIRES SEULEMENT. La garde n'est pas ici : c'est
+               `deleteCommentForEntity` qui compare l'auteur à la session et refuse en 403. Ce
+               `v-if` ne fait que ne pas proposer un geste qui serait refusé — un commentaire posté
+               par erreur était jusqu'ici DÉFINITIF pour son auteur. -->
+          <UTooltip
+            v-if="comment.user?.id === authStore.user?.id"
+            :text="$t('components.carpool.delete_comment')"
+          >
+            <UButton
+              color="error"
+              variant="ghost"
+              size="xs"
+              icon="i-heroicons-trash"
+              :loading="suppressionEnCours(comment.id)"
+              :aria-label="$t('components.carpool.delete_comment')"
+              @click="demanderLaSuppression(comment)"
+            />
+          </UTooltip>
         </div>
-        <p class="text-sm">{{ comment.content }}</p>
+        <p class="text-sm whitespace-pre-line break-words">{{ comment.content }}</p>
       </UCard>
     </div>
 
@@ -74,6 +92,8 @@
         {{ $t('components.carpool.to_add_comment') }}
       </p>
     </div>
+    <!-- La suppression est définitive : le commentaire n'est pas archivé. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -138,6 +158,49 @@ const { execute: executeAddComment, loading: isAddingComment } = useApiAction(
     },
   }
 )
+
+const confirmation = useConfirmation()
+
+/**
+ * Retirer son propre commentaire.
+ *
+ * ## ⚠️ POURQUOI CE GESTE N'EXISTAIT PAS
+ *
+ * `deleteCommentForEntity` était écrite — garde d'auteur comprise — et **n'avait aucun appelant** :
+ * les quatre points d'API du module étaient deux `.get` et deux `.post`. Un commentaire posté par
+ * erreur était donc **définitif pour son auteur**.
+ *
+ * 📍 Second cas du même motif dans ce seul constat, avec `commentSchema` : du code qui porte sa
+ * logique ET ses tests sans être atteint donne la couverture d'une fonctionnalité sans la
+ * fonctionnalité.
+ */
+const { execute: executerSuppression, isLoading: suppressionEnCours } = useApiActionById(
+  (commentId) =>
+    props.type === 'offer'
+      ? `/api/carpool-offers/${props.id}/comments/${commentId}`
+      : `/api/carpool-requests/${props.id}/comments/${commentId}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('messages.comment_deleted') },
+    errorMessages: { default: t('errors.cannot_delete_comment') },
+    onSuccess: async () => {
+      await loadComments()
+      // Le compte des commentaires est affiché par la carte de l'annonce : sans cet événement, il
+      // resterait sur sa valeur d'avant jusqu'au prochain chargement de page.
+      emit('comment-added')
+    },
+  }
+)
+
+function demanderLaSuppression(comment: { id: number }) {
+  confirmation.demanderConfirmation({
+    titre: t('components.carpool.delete_comment'),
+    description: t('components.carpool.delete_comment_confirm'),
+    libelleConfirmer: t('common.delete'),
+    couleurConfirmer: 'error',
+    agir: () => executerSuppression(comment.id),
+  })
+}
 
 onMounted(async () => {
   await loadComments()

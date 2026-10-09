@@ -127,7 +127,8 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
     prismaMock.carpoolOffer.findUnique.mockResolvedValue({ id: 1 })
     global.readBody.mockResolvedValue(emptyBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Le contenu du commentaire est requis')
+    await expect(handler(mockEvent as any)).rejects.toMatchObject({ statusCode: 400 })
+    expect(prismaMock.carpoolComment.create).not.toHaveBeenCalled()
   })
 
   it("devrait valider que le contenu n'est pas seulement des espaces", async () => {
@@ -139,7 +140,8 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
     prismaMock.carpoolOffer.findUnique.mockResolvedValue({ id: 1 })
     global.readBody.mockResolvedValue(whitespaceBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Le contenu du commentaire est requis')
+    await expect(handler(mockEvent as any)).rejects.toMatchObject({ statusCode: 400 })
+    expect(prismaMock.carpoolComment.create).not.toHaveBeenCalled()
   })
 
   it('devrait valider que le contenu existe', async () => {
@@ -149,7 +151,8 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
     prismaMock.carpoolOffer.findUnique.mockResolvedValue({ id: 1 })
     global.readBody.mockResolvedValue(noContentBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Le contenu du commentaire est requis')
+    await expect(handler(mockEvent as any)).rejects.toMatchObject({ statusCode: 400 })
+    expect(prismaMock.carpoolComment.create).not.toHaveBeenCalled()
   })
 
   it('devrait rejeter si offre de covoiturage non trouvée', async () => {
@@ -196,8 +199,18 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
     )
   })
 
-  it('devrait accepter un commentaire long', async () => {
-    const longContent = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'.repeat(20)
+  it('devrait accepter un commentaire de 1 000 caractères', async () => {
+    /*
+     * ⚠️ CE TEST CONSACRAIT LE DÉFAUT. Il s'appelait « accepte un commentaire long » et employait
+     * 1 120 caractères, vérifiant qu'ils passaient — c'est-à-dire **l'absence de borne**. La
+     * colonne est un `TEXT` : on pouvait y déposer 64 Ko, que chaque chargement de la liste
+     * retransportait ensuite.
+     *
+     * `commentSchema` borne à 1 000 depuis toujours ; il n'était simplement branché nulle part. Ce
+     * cas garde la borne par le bas — un refus de TOUT commentaire long le satisferait sinon — et
+     * le cas suivant la garde par le haut. Un seul des deux ne dirait pas OÙ elle est.
+     */
+    const longContent = 'a'.repeat(1000)
     const requestBody = {
       content: longContent,
     }
@@ -219,6 +232,23 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
         }),
       })
     )
+  })
+
+  it('devrait refuser un commentaire de plus de 1 000 caractères', async () => {
+    /*
+     * ⚠️ LE SECOND CÔTÉ DE LA BORNE, ET LE CODE QUI LA DIT.
+     *
+     * Sans ce cas, le test précédent serait satisfait par l'ABSENCE de borne — c'est exactement ce
+     * qu'il mesurait avant. Et le `statusCode` compte autant que le refus : la `ZodError` levée par
+     * le schéma était attrapée puis convertie en **500** par le `catch` du handler partagé. Brancher
+     * le schéma sans faire remonter l'erreur aurait transformé une saisie trop longue en panne
+     * serveur — un défaut déplacé, pas refermé.
+     */
+    prismaMock.carpoolOffer.findUnique.mockResolvedValue({ id: 1, editionId: 1, userId: 2 })
+    global.readBody.mockResolvedValue({ content: 'a'.repeat(1001) })
+
+    await expect(handler(mockEvent as any)).rejects.toMatchObject({ statusCode: 400 })
+    expect(prismaMock.carpoolComment.create).not.toHaveBeenCalled()
   })
 
   it("devrait permettre à l'auteur de l'offre de commenter sa propre offre", async () => {

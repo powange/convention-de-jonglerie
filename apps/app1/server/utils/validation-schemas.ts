@@ -528,8 +528,20 @@ export const updateCarpoolRequestSchema = z.object({
 
 // Schémas de commentaires
 export const commentSchema = z.object({
+  /*
+   * ⚠️ `.trim()` AVANT `.min(1)`, ET L'ORDRE EST TOUT.
+   *
+   * Sans lui, un commentaire de trois espaces franchit `min(1)` — trois caractères — puis
+   * `sanitizeUserContent` le ramène à une chaîne vide : on enregistre un commentaire **invisible**,
+   * qui occupe une ligne dans la discussion sans rien dire.
+   *
+   * Le handler s'en gardait jusqu'ici à la main (`!body.content.trim()`), et brancher le schéma
+   * sans cette ligne aurait REMPLACÉ une garde qui marchait par une qui laisse passer. Une
+   * validation qu'on centralise doit couvrir au moins ce que couvrait le code qu'elle remplace.
+   */
   content: z
     .string()
+    .trim()
     .min(1, 'Le commentaire ne peut pas être vide')
     .max(1000, 'Le commentaire ne peut pas dépasser 1000 caractères'),
 })
