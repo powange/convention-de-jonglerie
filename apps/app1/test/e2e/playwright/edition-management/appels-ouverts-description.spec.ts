@@ -122,8 +122,17 @@ test.describe.serial('Appels ouverts — description sans balisage', () => {
      * ⚠️ LE TÉMOIN NÉGATIF. Interpoler la description brute contiendrait AUSSI « Scène ouverte » :
      * sans ces assertions, le test passerait au-dessus du défaut qu'il doit attraper. La portée
      * est la PAGE entière — c'est une liste d'appels, rien d'autre n'y porterait ces marqueurs.
+     *
+     * ⚠️⚠️ `innerText` ET SURTOUT PAS `textContent`, et c'est la CI qui l'a dit : `textContent`
+     * d'un `<body>` inclut le texte des `<script>`, donc **la charge d'hydratation de Nuxt** — où
+     * la description figure forcément à l'état BRUT, puisque c'est la page qui la met en forme.
+     * Le test échouait donc sur `**` alors que l'écran, lui, était correct : il mesurait le
+     * payload et non le rendu.
+     *
+     * `innerText` ne rend que le texte EFFECTIVEMENT AFFICHÉ. C'est la distinction déjà fichée
+     * entre le HTML rendu et la charge d'hydratation, payée ici une fois de plus.
      */
-    const texte = (await page.locator('body').textContent()) ?? ''
+    const texte = (await page.locator('body').innerText()) ?? ''
     expect(texte, 'le gras markdown ne doit pas être servi tel quel').not.toContain('**')
     expect(texte, 'le titre de niveau 2 ne doit pas être servi tel quel').not.toContain('##')
     expect(texte, "le raccourci d'emoji doit être converti").not.toContain(':performing_arts:')
