@@ -2,6 +2,7 @@ import type { Prisma } from '#server/types/prisma'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { nonLusParCandidature } from '#server/utils/non-lus-de-candidature'
 import {
   getEditionWithPermissions,
   canManageArtists,
@@ -134,11 +135,25 @@ export default wrapApiHandler(
             title: true,
           },
         },
+        /*
+         * L'identifiant de la conversation, pour y rattacher le compte de non-lus ci-dessous.
+         * `Conversation.showApplicationId` est unique : la relation est au plus à une.
+         */
+        conversation: {
+          select: {
+            id: true,
+          },
+        },
       },
     })
 
+    const nonLus = await nonLusParCandidature(applications, user.id)
+
     return {
-      applications,
+      applications: applications.map((candidature) => ({
+        ...candidature,
+        unreadMessages: nonLus.get(candidature.id) ?? 0,
+      })),
       showCall: {
         id: showCall.id,
         name: showCall.name,

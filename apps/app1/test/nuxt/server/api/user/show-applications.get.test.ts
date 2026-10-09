@@ -64,6 +64,9 @@ describe('/api/user/show-applications GET', () => {
     // renvoie plus. Le laisser ici décrirait une forme qui n'existe pas.
     decidedAt: null,
     showCall: mockShowCall,
+    // La conversation, que le `select` du handler demande désormais pour rattacher le compte de
+    // non-lus. `null` quand aucune discussion n'a été ouverte — le cas le plus courant.
+    conversation: { id: 'conv-1' },
   }
 
   beforeEach(() => {
@@ -315,6 +318,100 @@ describe('/api/user/show-applications GET', () => {
       prismaMock.showApplication.findMany.mockRejectedValue(new Error('Database error'))
 
       await expect(handler(mockEvent as any)).rejects.toThrow()
+    })
+  })
+  /**
+   * Les messages en attente de chaque candidature.
+   *
+   * ## Le défaut que ces cas ferment
+   *
+   * Il existait `GET /api/show-applications/[id]/unread-count`, que **personne n'appelait**, et
+   * aucun écran ne signalait qu'une discussion attendait une réponse : il fallait ouvrir chaque
+   * fiche pour le savoir.
+   *
+   * ⚠️ Le point d'API mort était aussi **divergent** — il comptait depuis `lastReadMessageId` et
+   * **n'excluait pas les messages de la personne elle-même**, là où le service partagé emploie
+   * `lastReadAt` et les exclut. Il aurait donc annoncé à l'organisateur ses propres messages comme
+   * non lus : une pastille qui ne s'éteint jamais, puisque répondre l'aurait fait monter.
+   *
+   * 📍 `$queryRaw` existe dans le mock central mais rend `undefined` par défaut : un test qui
+   * oublie de le garnir lève sur `.map`. C'est un échec utile — il ne peut pas se lire comme un
+   * zéro — mais il faut le savoir avant de conclure que ce point d'API n'est pas testable.
+   */
+  describe('messages non lus', () => {
+    it('rend le compte de la conversation de chaque candidature', async () => {
+      const mockEvent = { context: { user: mockUser } }
+      prismaMock.showApplication.findMany.mockResolvedValue([mockApplication])
+      prismaMock.$queryRaw.mockResolvedValue([{ conversationId: 'conv-1', nonLus: 3 }])
+
+      const result: any = await handler(mockEvent as any)
+      expect(result[0].unreadMessages).toBe(3)
+    })
+
+    it('rend 0 quand la conversation n’a aucun message non lu', async () => {
+      /*
+       * ⚠️ Le service ne rend QUE les conversations qui ont au moins un non-lu : l'absence de la
+       * ligne est le cas NORMAL, pas une anomalie. L'appelant doit donc lire `?? 0`, et non
+       * supposer que toute conversation a son entrée.
+       */
+      const mockEvent = { context: { user: mockUser } }
+      prismaMock.showApplication.findMany.mockResolvedValue([mockApplication])
+      prismaMock.$queryRaw.mockResolvedValue([])
+
+      const result: any = await handler(mockEvent as any)
+      expect(result[0].unreadMessages).toBe(0)
+    })
+
+    it('rend 0 pour une candidature sans conversation', async () => {
+      const mockEvent = { context: { user: mockUser } }
+      prismaMock.showApplication.findMany.mockResolvedValue([
+        { ...mockApplication, conversation: null },
+      ])
+      prismaMock.$queryRaw.mockResolvedValue([{ conversationId: 'conv-1', nonLus: 3 }])
+
+      const result: any = await handler(mockEvent as any)
+      expect(result[0].unreadMessages).toBe(0)
+    })
+
+    it('n’interroge pas la base quand aucune candidature n’a de conversation', async () => {
+      // Une requête qui n'aurait rien à compter : sur une liste de candidatures sans discussion,
+      // c'est le cas le plus fréquent.
+      const mockEvent = { context: { user: mockUser } }
+      prismaMock.showApplication.findMany.mockResolvedValue([
+        { ...mockApplication, conversation: null },
+      ])
+
+      await handler(mockEvent as any)
+      expect(prismaMock.$queryRaw).not.toHaveBeenCalled()
+    })
+
+    it('demande la conversation dans le select', async () => {
+      /*
+       * ⚠️ L'ASSERTION QUI N'EST PAS CREUSE. Le mock central IGNORE le `select` : il rend ce qu'on
+       * lui a dit de rendre, donc tous les cas ci-dessus resteraient VERTS si le handler cessait de
+       * demander la conversation — et en production le compte retomberait silencieusement à 0.
+       */
+      const mockEvent = { context: { user: mockUser } }
+      prismaMock.showApplication.findMany.mockResolvedValue([])
+
+      await handler(mockEvent as any)
+      expect(prismaMock.showApplication.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          select: expect.objectContaining({ conversation: { select: { id: true } } }),
+        })
+      )
+    })
+
+    it('ne compte que pour la personne qui demande', async () => {
+      // Le `userId` passé au service est celui de la session, jamais un identifiant du corps ou de
+      // l'URL : sinon on afficherait les non-lus de quelqu'un d'autre.
+      const mockEvent = { context: { user: mockUser } }
+      prismaMock.showApplication.findMany.mockResolvedValue([mockApplication])
+      prismaMock.$queryRaw.mockResolvedValue([])
+
+      await handler(mockEvent as any)
+      const appel = prismaMock.$queryRaw.mock.calls[0]
+      expect(JSON.stringify(appel)).toContain(String(mockUser.id))
     })
   })
 })

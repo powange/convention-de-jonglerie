@@ -256,6 +256,17 @@
                 @click="openChatModal(application.id)"
               >
                 {{ $t('pages.artists.open_discussion') }}
+                <!-- Le compte des messages en attente, sur le bouton lui-même : c'est le seul
+                     endroit de cette page qui mène à la discussion. -->
+                <UBadge
+                  v-if="(application.unreadMessages ?? 0) > 0"
+                  color="primary"
+                  variant="solid"
+                  size="sm"
+                  class="ml-1"
+                >
+                  {{ application.unreadMessages }}
+                </UBadge>
               </UButton>
 
               <!-- Statut de l'appel -->

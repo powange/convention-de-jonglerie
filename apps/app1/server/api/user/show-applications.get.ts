@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { nonLusParCandidature } from '#server/utils/non-lus-de-candidature'
 
 export default wrapApiHandler(
   async (event) => {
@@ -52,13 +53,27 @@ export default wrapApiHandler(
             },
           },
         },
+        /*
+         * L'identifiant de la conversation, pour y rattacher le compte de non-lus.
+         * `Conversation.showApplicationId` est unique : la relation est au plus à une.
+         */
+        conversation: {
+          select: {
+            id: true,
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',
       },
     })
 
-    return applications
+    const nonLus = await nonLusParCandidature(applications, user.id)
+
+    return applications.map((candidature) => ({
+      ...candidature,
+      unreadMessages: nonLus.get(candidature.id) ?? 0,
+    }))
   },
   { operationName: 'GetUserShowApplications' }
 )
