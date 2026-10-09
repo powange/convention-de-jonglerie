@@ -176,8 +176,35 @@ export const useLeafletEditable = (
         return
       }
 
+      /*
+       * ⚠️ `integrity` ET `crossOrigin`, COMME LEAFLET TROIS LIGNES PLUS HAUT.
+       *
+       * Ce greffon s'exécute sur toutes les pages de gestion de la carte, donc avec les droits de
+       * la session d'un organisateur. Il était chargé depuis un CDN SANS aucun contrôle, alors que
+       * `loadLeaflet`, dans ce même fichier, pose les deux attributs sur la feuille de style et sur
+       * le script de Leaflet. Le motif existait, était appliqué juste à côté, et ce chargement-ci
+       * l'avait sauté.
+       *
+       * 📍 `crossOrigin` est INDISPENSABLE avec `integrity` : sans requête CORS, le navigateur
+       * n'obtient pas le corps de la réponse en clair pour en vérifier l'empreinte, et il REFUSE
+       * alors le script. Omettre l'un des deux ne laisse pas le chargement « non vérifié » — il le
+       * casse. C'est pourquoi les deux vont toujours ensemble, ici comme pour Leaflet.
+       *
+       * ## L'empreinte, et comment elle a été établie
+       *
+       * `sha256` du fichier EXACT servi par cette URL, téléchargé le 09/10/2026 et confronté à une
+       * SECONDE source indépendante : unpkg et jsDelivr servent le même fichier de 74 768 octets,
+       * identique octet pour octet, et rendent donc la même empreinte. Un seul téléchargement
+       * n'aurait prouvé que ce qu'un CDN a bien voulu servir ce jour-là.
+       *
+       * ⚠️ L'empreinte est liée à la VERSION ÉPINGLÉE (1.2.0). Monter la version sans la
+       * recalculer fait refuser le script par le navigateur : la carte de gestion s'ouvrirait sans
+       * outils de dessin, avec pour seule trace un refus dans la console.
+       */
       const script = document.createElement('script')
       script.src = 'https://unpkg.com/leaflet-editable@1.2.0/src/Leaflet.Editable.js'
+      script.integrity = 'sha256-Mx8aiCT4w9DBEUBJiX5eq9Ocy+6E3C9wLAik+dgOLY4='
+      script.crossOrigin = ''
       script.async = true
 
       script.onload = () => {
