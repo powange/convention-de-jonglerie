@@ -3,12 +3,46 @@
 
 import { NotificationHelpers, safeNotify } from './notification-service'
 
+import type { PartialOrganizerPermissions } from '#server/constants/permissions'
 import type {
   OrganizerPermissionSnapshot,
   OrganizerRemovalSnapshot,
   PrismaTransaction,
 } from '../types/prisma-helpers'
 import type { H3Event } from 'h3'
+
+import { CONVENTION_RIGHTS } from '~~/shared/utils/organizer-rights'
+
+/**
+ * L'instantané des droits d'un organisateur, pour l'historique des permissions.
+ *
+ * ## ⚠️ POURQUOI CETTE FONCTION EXISTE : L'HISTORIQUE PERDAIT HUIT DROITS SUR QUINZE
+ *
+ * Les deux écritures d'historique — `CREATED` et `REMOVED` — énuméraient les droits à la main, et
+ * s'arrêtaient toutes deux aux **sept premiers** : convention, organisateurs, éditions et
+ * bénévoles. Les **huit droits par module** manquaient : artistes, repas, billetterie, tâches,
+ * stock, ateliers, FAQ et trésorerie.
+ *
+ * Conséquence : retirer quelqu'un qui gérait la billetterie et la trésorerie laissait un
+ * historique disant qu'il n'avait aucun de ces droits. L'historique existe précisément pour
+ * répondre à « qui avait accès à quoi, et quand » — il répondait faux, sans rien signaler.
+ *
+ * 📍 Ce qui rend le défaut difficile à voir : les deux **écritures** de droits, aux lignes 315 et
+ * 619 du même fichier, portent bien les quinze. Seuls les instantanés étaient courts. Lire le
+ * fichier en diagonale donne donc l'impression que tout est complet.
+ *
+ * La liste vient de `CONVENTION_RIGHTS`, déjà comparée au schéma Prisma par
+ * `test/unit/guide/permissions-sync.test.ts` : ajouter une colonne sans l'ajouter à la liste fait
+ * tomber ce test-là, et l'instantané suit sans qu'on y pense.
+ */
+function instantaneDesDroits(organisateur: Record<string, unknown>): PartialOrganizerPermissions {
+  return Object.fromEntries(
+    CONVENTION_RIGHTS.map((droit) => {
+      const colonne = `can${droit[0]!.toUpperCase()}${droit.slice(1)}`
+      return [colonne, organisateur[colonne] === true]
+    })
+  ) as PartialOrganizerPermissions
+}
 
 /**
  * Vérifie si un utilisateur a les droits d'admin ET que le mode admin est activé
@@ -388,15 +422,7 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
     // Historique CREATED
     const snapshot: OrganizerPermissionSnapshot = {
       title: withPerEdition.title,
-      rights: {
-        canEditConvention: withPerEdition.canEditConvention,
-        canDeleteConvention: withPerEdition.canDeleteConvention,
-        canManageOrganizers: withPerEdition.canManageOrganizers,
-        canAddEdition: withPerEdition.canAddEdition,
-        canEditAllEditions: withPerEdition.canEditAllEditions,
-        canDeleteAllEditions: withPerEdition.canDeleteAllEditions,
-        canManageVolunteers: withPerEdition.canManageVolunteers,
-      },
+      rights: instantaneDesDroits(withPerEdition),
       perEdition: (withPerEdition.perEditionPermissions || []).map((p) => ({
         editionId: p.editionId,
         canEdit: p.canEdit,
@@ -499,15 +525,7 @@ export async function deleteConventionOrganizer(
   const before: OrganizerPermissionSnapshot = {
     // On n'enregistre plus les infos user redondantes (pseudo / id) car targetUserId suffit
     title: organizer.title,
-    rights: {
-      canEditConvention: organizer.canEditConvention,
-      canDeleteConvention: organizer.canDeleteConvention,
-      canManageOrganizers: organizer.canManageOrganizers,
-      canAddEdition: organizer.canAddEdition,
-      canEditAllEditions: organizer.canEditAllEditions,
-      canDeleteAllEditions: organizer.canDeleteAllEditions,
-      canManageVolunteers: organizer.canManageVolunteers,
-    },
+    rights: instantaneDesDroits(organizer),
   }
 
   const after: OrganizerRemovalSnapshot = {
