@@ -452,6 +452,18 @@ export interface ShowApplication {
   // Relations (optionnelles selon le contexte)
   user?: PublicUser
   decidedBy?: PublicUser | null
+
+  /**
+   * Messages en attente dans la discussion de cette candidature, pour la personne qui demande.
+   *
+   * ⚠️ Rendu par les DEUX listes — celle de la gestion et « Mes candidatures » — et par elles
+   * seules : la fiche détaillée ne le porte pas. D'où `?`, et un `?? 0` chez l'appelant plutôt
+   * qu'une valeur par défaut qui laisserait croire qu'on connaît toujours ce nombre.
+   *
+   * 📍 Vaut 0 pour qui n'est pas inscrit à la conversation. Voir
+   * `server/utils/non-lus-de-candidature.ts` : une pastille fausse est pire qu'une absente.
+   */
+  unreadMessages?: number
 }
 
 // Formulaire de configuration de l'appel à spectacles

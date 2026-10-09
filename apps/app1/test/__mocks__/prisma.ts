@@ -177,7 +177,19 @@ export const prismaMock = {
   $transaction: vi.fn((arg: unknown) =>
     Array.isArray(arg) ? Promise.all(arg) : (arg as (tx: unknown) => unknown)(prismaMock)
   ),
-  $queryRaw: vi.fn(),
+  /*
+   * ⚠️ UN TABLEAU VIDE PAR DÉFAUT, et non `undefined` — même raison que `$queryRawUnsafe` plus bas.
+   *
+   * `vi.fn()` nu rend `undefined`, et tout appelant qui fait `lignes.map(…)` lève alors sur une
+   * ligne qui n'a rien à voir avec ce qu'il teste. C'est arrivé le 09/10 : brancher le compte de
+   * messages non lus sur `compterNonLusParConversation` a fait tomber **douze tests** du point
+   * d'API des candidatures, aucun ne parlant de messagerie — un diagnostic coûteux pour une cause
+   * qui n'est pas dans le code mesuré.
+   *
+   * Le tableau vide est la forme d'un `SELECT` sans résultat : le défaut honnête, celui qui ne
+   * fait rien faire au code appelant. Un test qui a besoin de lignes les pose explicitement.
+   */
+  $queryRaw: vi.fn(async () => [] as unknown[]),
   $executeRaw: vi.fn(),
   $executeRawUnsafe: vi.fn(),
   /*

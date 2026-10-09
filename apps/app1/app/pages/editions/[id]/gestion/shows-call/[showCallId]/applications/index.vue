@@ -240,6 +240,17 @@
                   <UBadge :color="getStatusColor(application.status)" variant="soft" size="sm">
                     {{ $t(`shows_call.status_${application.status.toLowerCase()}`) }}
                   </UBadge>
+                  <!-- Les messages en attente : jusqu'ici il fallait ouvrir chaque fiche pour
+                       savoir qu'une discussion attendait une réponse. -->
+                  <UBadge
+                    v-if="(application.unreadMessages ?? 0) > 0"
+                    color="primary"
+                    variant="solid"
+                    size="sm"
+                    icon="i-heroicons-chat-bubble-left-right"
+                  >
+                    {{ application.unreadMessages }}
+                  </UBadge>
                 </div>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   {{ $t('gestion.shows_call.by_artist') }}
