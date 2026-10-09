@@ -498,6 +498,7 @@ const {
   fitBoundsToItems,
   setPopupExtra,
   setZoneNavigationTarget,
+  setView,
 } = useLeafletEditable(mapContainerRef, {
   center: computed(() => {
     if (edition.value?.latitude && edition.value?.longitude) {
@@ -599,6 +600,21 @@ watch(
 
 // Flag pour ne centrer la carte qu'une seule fois
 const initialViewSet = ref(false)
+
+/*
+ * ⚠️ Le centre et le zoom passés ci-dessus sont lus UNE SEULE FOIS, au `setup` (`computed(…).value`),
+ * alors que l'édition n'arrive qu'en `onMounted`. À froid, la carte s'ouvrait donc sur la France au
+ * zoom 6. Ce composable la recentre dès que le lieu est connu — et seulement s'il n'y a rien à
+ * cadrer, pour ne pas lutter contre `fitBoundsToItems`.
+ */
+useCadrageSurLEdition({
+  map,
+  latitude: computed(() => edition.value?.latitude),
+  longitude: computed(() => edition.value?.longitude),
+  nombreDElements: computed(() => zones.value.length + markers.value.length),
+  cadrageDejaFait: initialViewSet,
+  setView,
+})
 
 // Charger l'édition si nécessaire
 onMounted(async () => {
