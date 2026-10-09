@@ -62,9 +62,19 @@ test.describe.serial('Programme — chevauchements au même lieu', () => {
       },
     })
     expect(zone.ok(), await zone.text()).toBe(true)
+    /*
+     * ⚠️ L'IDENTIFIANT EST SOUS `data.zone.id`, et non `data.id` : le point d'API répond
+     * `createSuccessResponse({ zone })`. Ma première version lisait `data.id`, et la CI l'a dit —
+     * la zone était bien créée, mais l'identifiant restait nul.
+     *
+     * 📍 La spécification voisine `carte-menu-empilement.spec.ts` portait la MÊME lecture fausse,
+     * et comme elle ne s'en sert que pour son nettoyage, celui-ci ne supprimait RIEN : elle
+     * laissait une zone derrière elle à chaque passage de CI, sans que rien ne le dise. Corrigée
+     * dans le même lot.
+     */
     const corpsZone = await zone.json()
-    zoneId = (corpsZone?.data ?? corpsZone)?.id ?? null
-    expect(zoneId).toBeTruthy()
+    zoneId = (corpsZone?.data?.zone ?? corpsZone?.zone ?? corpsZone?.data ?? corpsZone)?.id ?? null
+    expect(zoneId, JSON.stringify(corpsZone).slice(0, 200)).toBeTruthy()
 
     for (const [titre, debut, fin] of [
       ['Atelier qui chevauche', demainA(10), demainA(12)],
