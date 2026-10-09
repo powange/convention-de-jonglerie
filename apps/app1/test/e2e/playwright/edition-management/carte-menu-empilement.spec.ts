@@ -74,7 +74,14 @@ test.describe.serial('Carte du site — empilement des menus', () => {
       },
     })
     expect(r.ok(), await r.text()).toBe(true)
-    zoneId = ((await r.json())?.data ?? (await r.json()))?.id ?? null
+    /*
+     * ⚠️ `data.zone.id` — le point d'API répond `createSuccessResponse({ zone })`. La lecture
+     * d'origine visait `data.id` et rendait donc TOUJOURS `null` : le nettoyage ci-dessous ne
+     * supprimait rien, et cette spécification laissait une zone derrière elle à chaque passage.
+     * Un nettoyage muet est pire qu'absent — on croit la base propre.
+     */
+    const corps = await r.json()
+    zoneId = (corps?.data?.zone ?? corps?.zone ?? corps?.data ?? corps)?.id ?? null
 
     await goto(`/editions/${editionId}/gestion/map`, { waitUntil: 'hydration' })
     await expect(page.locator('h1').first()).toBeVisible({ timeout: 20000 })
