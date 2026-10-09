@@ -69,7 +69,8 @@
       "marker_zone": "Powiązana strefa",
       "marker_zone_help": "Powiąż ten punkt ze strefą, której jest wejściem lub dojściem.",
       "marker_no_zone": "Brak strefy",
-      "import_dep_program": "{n} punkt programu | {n} punkty programu"
+      "import_dep_program": "{n} punkt programu | {n} punkty programu",
+      "import_layer_partial": "[TODO] {importes} importés, {echecs} en échec"
     }
   }
 }

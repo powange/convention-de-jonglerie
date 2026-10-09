@@ -651,6 +651,10 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Supprimer une dépense emporte TOUS ses tarifs : la modale nomme laquelle, ce que la boîte
+         native ne faisait pas — et qu'un navigateur pouvait avoir désactivée. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -690,6 +694,7 @@ interface Expense {
 }
 
 const { t, locale } = useI18n()
+const confirmation = useConfirmation()
 const toast = useToast()
 
 const expenses = ref<Expense[]>([])
@@ -978,8 +983,16 @@ const saveExpense = async () => {
   }
 }
 
-const confirmDeleteExpense = async (expense: Expense) => {
-  if (!confirm(t('admin.project_costs.confirm_delete_expense'))) return
+const confirmDeleteExpense = (expense: Expense) => {
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    description: t('admin.project_costs.confirm_delete_expense', { name: expense.name }),
+    libelleConfirmer: t('common.delete'),
+    agir: () => supprimerLaDepense(expense),
+  })
+}
+
+const supprimerLaDepense = async (expense: Expense) => {
   try {
     await $fetch(`/api/admin/project-costs/${expense.id}`, { method: 'DELETE' })
     toast.add({ title: t('admin.project_costs.success.deleted'), color: 'success' })
@@ -1083,8 +1096,21 @@ const saveRate = async () => {
   }
 }
 
-const confirmDeleteRate = async (expenseId: number, rate: Rate) => {
-  if (!confirm(t('admin.project_costs.rates.confirm_delete'))) return
+const confirmDeleteRate = (expenseId: number, rate: Rate) => {
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    /*
+     * Un tarif n'a pas de nom : son montant est ce qui l'identifie à l'écran, et `formatAmount` est
+     * le formateur que la page emploie DÉJÀ dans son tableau. Nommer l'objet est tout l'intérêt de
+     * cette modale — « ce tarif », devant une liste qui en contient plusieurs, ne dit pas lequel.
+     */
+    description: t('admin.project_costs.rates.confirm_delete', { amount: formatAmount(rate) }),
+    libelleConfirmer: t('common.delete'),
+    agir: () => supprimerLeTarif(expenseId, rate),
+  })
+}
+
+const supprimerLeTarif = async (expenseId: number, rate: Rate) => {
   try {
     await $fetch(`/api/admin/project-costs/${expenseId}/rates/${rate.id}`, { method: 'DELETE' })
     toast.add({ title: t('admin.project_costs.success.rate_deleted'), color: 'success' })

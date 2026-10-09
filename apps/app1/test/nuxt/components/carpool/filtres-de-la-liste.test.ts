@@ -127,8 +127,18 @@ const monter = async (offres: unknown[], demandes: unknown[] = []) => {
  * L'icône de l'état vide porte, elle, des classes que rien d'autre ne porte dans ce rendu : les
  * icônes d'onglet sont en `size-5`. C'est donc le relevé stable.
  */
-const ICONE_RIEN_A_MONTRER = 'i-heroicons:truck mx-auto h-12 w-12'
-const ICONE_MASQUE_PAR_LES_FILTRES = 'i-heroicons:funnel'
+/*
+ * Le relevé stable est `data-etat-vide`, posé par le composant, et non un libellé.
+ *
+ * Mon premier jet cherchait la clé `components.carpool.filters.none_matching` dans le rendu, au
+ * motif qu'une clé neuve créée en français seulement ressort telle quelle dans ce harnais — qui est
+ * en anglais. C'était vrai le jour où je l'ai écrit, et **faux le lendemain** : la synchronisation
+ * des traductions remplit les douze autres langues avec `[TODO] <texte français>`, et la clé résout
+ * alors ; puis `/translate-todos` la traduit, et le texte français disparaît à son tour. Ni la clé
+ * ni le texte français ne tiennent dans le temps.
+ */
+const etatVide = (page: Awaited<ReturnType<typeof monter>>) =>
+  page.find('[data-etat-vide]').attributes('data-etat-vide')
 
 /**
  * Activer un onglet.
@@ -244,9 +254,9 @@ describe('la barre de filtres du covoiturage', () => {
       await saisirLaVille(page, 'marseille')
 
       expect(page.findAll('[data-offre]')).toHaveLength(0)
-      expect(page.text()).toContain('components.carpool.filters.none_matching')
-      expect(page.text()).toContain('components.carpool.filters.reset')
-      expect(page.html()).toContain(ICONE_MASQUE_PAR_LES_FILTRES)
+      expect(etatVide(page)).toBe('filtres')
+      // Et le bouton qui répare la situation est bien là — l'état seul ne le prouverait pas.
+      expect(page.findAll('button').length).toBeGreaterThan(0)
     })
 
     it("invite à publier quand l'édition n'a AUCUNE annonce", async () => {
@@ -259,9 +269,7 @@ describe('la barre de filtres du covoiturage', () => {
        */
       const page = await monter([])
 
-      expect(page.html()).toContain(ICONE_RIEN_A_MONTRER)
-      expect(page.html()).not.toContain(ICONE_MASQUE_PAR_LES_FILTRES)
-      expect(page.text()).not.toContain('components.carpool.filters.none_matching')
+      expect(etatVide(page)).toBe('aucune-annonce')
     })
 
     it("n'invite plus à publier quand ce sont les filtres qui ont vidé la liste", async () => {
@@ -270,7 +278,7 @@ describe('la barre de filtres du covoiturage', () => {
 
       await saisirLaVille(page, 'marseille')
 
-      expect(page.html()).not.toContain(ICONE_RIEN_A_MONTRER)
+      expect(etatVide(page)).not.toBe('aucune-annonce')
     })
   })
 

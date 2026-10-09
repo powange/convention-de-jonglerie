@@ -26,6 +26,11 @@
         "action": "View open calls",
         "message": "The call \"{showCallName}\" for \"{editionName}\" is now open. Submit your show!",
         "title": "New call for shows 🎭"
+      },
+      "application_withdrawn": {
+        "title": "[TODO] Candidature retirée",
+        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
+        "action": "[TODO] Voir les candidatures"
       }
     },
     "carpool": {

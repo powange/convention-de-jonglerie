@@ -38,7 +38,8 @@
       "edit_description": "Edit your carpool offer details",
       "seats_description": "Number of available seats in your vehicle",
       "seats_placeholder": "e.g., 3",
-      "updated": "Carpool offer updated"
+      "updated": "Carpool offer updated",
+      "seats_minimum": "[TODO] Vous avez déjà accordé {count} place(s) : vous ne pouvez pas descendre en dessous sans retirer d'abord une réservation."
     },
     "pets_allowed": "Pets allowed",
     "pets_description": "You accept pets or travel with animals",
@@ -104,7 +105,7 @@
       "verification_success_description": "You are now the owner of this convention.",
       "verify": "Verify"
     },
-    "confirm_delete_convention": "Are you sure you want to delete this convention?",
+    "confirm_delete_convention": "[TODO] Are you sure you want to delete this convention?",
     "convention_deleted": "Convention deleted",
     "convention_deleted_success": "The convention has been successfully deleted",
     "convention_not_found": "Convention not found",
@@ -155,7 +156,8 @@
     "status_control": "Visibility control",
     "status_control_desc": "Publish or unpublish your editions according to their progress",
     "delete_edition_irreversible": "Warning: this action cannot be undone",
-    "delete_edition_confirm_description": "Are you sure you want to delete this edition? All related data (volunteers, comments, lost property, etc.) will be permanently lost."
+    "delete_edition_confirm_description": "Are you sure you want to delete this edition? All related data (volunteers, comments, lost property, etc.) will be permanently lost.",
+    "confirm_delete_convention_unnamed": "[TODO] Cette convention sera supprimée, avec ses éditions et toutes leurs données."
   },
   "diet": {
     "none": "None",

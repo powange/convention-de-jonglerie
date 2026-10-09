@@ -38,7 +38,8 @@
       "edit_description": "Úprava podrobností nabídky sdílení automobilů",
       "seats_description": "Počet volných míst ve vozidle",
       "seats_placeholder": "Ex: 3",
-      "updated": "Aktualizovaná nabídka spolujízdy"
+      "updated": "Aktualizovaná nabídka spolujízdy",
+      "seats_minimum": "[TODO] Vous avez déjà accordé {count} place(s) : vous ne pouvez pas descendre en dessous sans retirer d'abord une réservation."
     },
     "pets_allowed": "Domácí zvířata povolena",
     "pets_description": "Přijímáte domácí zvířata nebo s nimi cestujete",
@@ -104,7 +105,7 @@
       "verification_success_description": "Nyní jste vlastníkem této smlouvy.",
       "verify": "Podívejte se na stránky ."
     },
-    "confirm_delete_convention": "Jste si jistí, že chcete tuto dohodu zrušit?",
+    "confirm_delete_convention": "[TODO] Jste si jistí, že chcete tuto dohodu zrušit?",
     "convention_deleted": "Odvolání dohody",
     "convention_deleted_success": "Dohoda byla úspěšně ukončena",
     "convention_not_found": "Konvence nebyla nalezena",
@@ -155,7 +156,8 @@
     "status_control": "Kontrola viditelnosti",
     "status_control_desc": "Publikovat nebo zrušit publikování svých edic podle jejich průběhu",
     "delete_edition_irreversible": "Pozor: tuto akci nelze vzít zpět",
-    "delete_edition_confirm_description": "Opravdu chcete smazat tento ročník? Všechna související data (dobrovolníci, komentáře, nalezené předměty atd.) budou nenávratně ztracena."
+    "delete_edition_confirm_description": "Opravdu chcete smazat tento ročník? Všechna související data (dobrovolníci, komentáře, nalezené předměty atd.) budou nenávratně ztracena.",
+    "confirm_delete_convention_unnamed": "[TODO] Cette convention sera supprimée, avec ses éditions et toutes leurs données."
   },
   "diet": {
     "none": "Ne",

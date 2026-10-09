@@ -279,6 +279,10 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Supprimer un jeton d'API coupe aussitôt les appels qui s'en servent : `confirm()`, qu'un
+         navigateur peut avoir désactivé, le faisait partir sans question. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -413,10 +417,15 @@ const { execute: doDelete, isLoading: isDeleting } = useApiActionById(
   }
 )
 
+const confirmation = useConfirmation()
+
 const confirmDelete = (token: ApiTokenItem) => {
-  if (window.confirm(t('admin.api_tokens.delete_confirm', { name: token.name }))) {
-    doDelete(token.id)
-  }
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    description: t('admin.api_tokens.delete_confirm', { name: token.name }),
+    libelleConfirmer: t('common.delete'),
+    agir: () => doDelete(token.id),
+  })
 }
 
 // Copie du token

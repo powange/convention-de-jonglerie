@@ -194,7 +194,18 @@
             Le discriminant est donc « la liste complète n'est pas vide », pas « un filtre est
             posé » : c'est le seul qui distingue « rien à montrer » de « rien ici ».
           -->
-          <div v-else class="text-center py-8 text-gray-500">
+          <!--
+            `data-etat-vide` nomme LEQUEL des deux états vides est rendu. Un test qui viserait le
+            libellé serait condamné : une clé neuve, créée en français seulement, ressort telle
+            quelle tant que les autres langues ne sont pas synchronisées — puis elle résout en
+            `[TODO] <français>`, puis elle est traduite. Ni la clé ni le texte français ne tiennent
+            dans le temps ; l'état, lui, ne change pas de nom.
+          -->
+          <div
+            v-else
+            class="text-center py-8 text-gray-500"
+            :data-etat-vide="offresMasqueesParLesFiltres ? 'filtres' : 'aucune-annonce'"
+          >
             <UIcon
               :name="offresMasqueesParLesFiltres ? 'i-heroicons-funnel' : 'i-heroicons-truck'"
               class="mx-auto h-12 w-12 text-gray-300 mb-4"
@@ -246,7 +257,18 @@
             Le discriminant est donc « la liste complète n'est pas vide », pas « un filtre est
             posé » : c'est le seul qui distingue « rien à montrer » de « rien ici ».
           -->
-          <div v-else class="text-center py-8 text-gray-500">
+          <!--
+            `data-etat-vide` nomme LEQUEL des deux états vides est rendu. Un test qui viserait le
+            libellé serait condamné : une clé neuve, créée en français seulement, ressort telle
+            quelle tant que les autres langues ne sont pas synchronisées — puis elle résout en
+            `[TODO] <français>`, puis elle est traduite. Ni la clé ni le texte français ne tiennent
+            dans le temps ; l'état, lui, ne change pas de nom.
+          -->
+          <div
+            v-else
+            class="text-center py-8 text-gray-500"
+            :data-etat-vide="demandesMasqueesParLesFiltres ? 'filtres' : 'aucune-annonce'"
+          >
             <UIcon
               :name="
                 demandesMasqueesParLesFiltres

@@ -38,7 +38,8 @@
       "edit_description": "Bewerk de details van je carpool aanbod",
       "seats_description": "Aantal vrije plaatsen in je voertuig",
       "seats_placeholder": "bijv. 3",
-      "updated": "Carpoolaanbod bijgewerkt"
+      "updated": "Carpoolaanbod bijgewerkt",
+      "seats_minimum": "[TODO] Vous avez déjà accordé {count} place(s) : vous ne pouvez pas descendre en dessous sans retirer d'abord une réservation."
     },
     "pets_allowed": "Huisdieren toegestaan",
     "pets_description": "Je accepteert huisdieren of reist met huisdieren",
@@ -104,7 +105,7 @@
       "verification_success_description": "Je bent nu eigenaar van deze conventie.",
       "verify": "Verifiëren"
     },
-    "confirm_delete_convention": "Weet je zeker dat je deze conventie wilt verwijderen?",
+    "confirm_delete_convention": "[TODO] Weet je zeker dat je deze conventie wilt verwijderen?",
     "convention_deleted": "Conventie verwijderd",
     "convention_deleted_success": "De conventie is succesvol verwijderd",
     "convention_not_found": "Conventie niet gevonden",
@@ -155,7 +156,8 @@
     "status_control": "Zichtbaarheidscontrole",
     "status_control_desc": "Publiceer of verberg je edities volgens hun voortgang",
     "delete_edition_irreversible": "Let op: deze actie kan niet worden teruggedraaid",
-    "delete_edition_confirm_description": "Weet je zeker dat je deze editie wilt verwijderen? Alle bijbehorende gegevens (vrijwilligers, reacties, gevonden voorwerpen, enz.) gaan definitief verloren."
+    "delete_edition_confirm_description": "Weet je zeker dat je deze editie wilt verwijderen? Alle bijbehorende gegevens (vrijwilligers, reacties, gevonden voorwerpen, enz.) gaan definitief verloren.",
+    "confirm_delete_convention_unnamed": "[TODO] Cette convention sera supprimée, avec ses éditions et toutes leurs données."
   },
   "diet": {
     "none": "Geen",

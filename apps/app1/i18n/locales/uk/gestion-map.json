@@ -69,7 +69,8 @@
       "marker_zone": "Пов’язана зона",
       "marker_zone_help": "Пов’яжіть цю точку із зоною, входом або доступом до якої вона є.",
       "marker_no_zone": "Без зони",
-      "import_dep_program": "{n} пункт програми | {n} пунктів програми"
+      "import_dep_program": "{n} пункт програми | {n} пунктів програми",
+      "import_layer_partial": "[TODO] {importes} importés, {echecs} en échec"
     }
   }
 }

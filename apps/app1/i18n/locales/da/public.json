@@ -74,7 +74,12 @@
       "rejected": "Afviste",
       "show_title": "Forestilling",
       "view_edition": "Se arrangement",
-      "view_edition_short": "Se"
+      "view_edition_short": "Se",
+      "withdraw": "[TODO] Retirer ma candidature",
+      "withdraw_confirm": "[TODO] Votre candidature « {title} » sera retirée, ainsi que la discussion que vous avez eue avec les organisateurs. Cette action est définitive.",
+      "withdraw_error": "[TODO] Le retrait a échoué",
+      "withdraw_short": "[TODO] Retirer",
+      "withdrawn": "[TODO] Candidature retirée"
     },
     "comments": {
       "be_first_to_comment": "Vær den første til at dele din oplevelse!",

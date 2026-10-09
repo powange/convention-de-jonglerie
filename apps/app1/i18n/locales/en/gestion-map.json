@@ -69,7 +69,8 @@
       "marker_zone": "Attached zone",
       "marker_zone_help": "Attach this point to a zone it serves as an entrance or access to.",
       "marker_no_zone": "No zone",
-      "import_dep_program": "{n} programme item | {n} programme items"
+      "import_dep_program": "{n} programme item | {n} programme items",
+      "import_layer_partial": "[TODO] {importes} importés, {echecs} en échec"
     }
   }
 }

@@ -26,6 +26,11 @@
         "action": "Ver convocatórias abertas",
         "message": "A convocatória \"{showCallName}\" para \"{editionName}\" está aberta. Proponha o seu espetáculo!",
         "title": "Nova convocatória de espetáculos 🎭"
+      },
+      "application_withdrawn": {
+        "title": "[TODO] Candidature retirée",
+        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
+        "action": "[TODO] Voir les candidatures"
       }
     },
     "carpool": {

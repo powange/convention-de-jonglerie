@@ -69,7 +69,8 @@
       "marker_zone": "Связанная зона",
       "marker_zone_help": "Свяжите эту точку с зоной, входом или проходом в которую она является.",
       "marker_no_zone": "Без зоны",
-      "import_dep_program": "{n} пункт программы | {n} пунктов программы"
+      "import_dep_program": "{n} пункт программы | {n} пунктов программы",
+      "import_layer_partial": "[TODO] {importes} importés, {echecs} en échec"
     }
   }
 }

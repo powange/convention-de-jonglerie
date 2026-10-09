@@ -26,6 +26,11 @@
         "action": "Ver convocatorias abiertas",
         "message": "La convocatoria \"{showCallName}\" para \"{editionName}\" está abierta. ¡Proponga su espectáculo!",
         "title": "Nueva convocatoria de espectáculos 🎭"
+      },
+      "application_withdrawn": {
+        "title": "[TODO] Candidature retirée",
+        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
+        "action": "[TODO] Voir les candidatures"
       }
     },
     "carpool": {

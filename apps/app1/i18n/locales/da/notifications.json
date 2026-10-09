@@ -26,6 +26,11 @@
         "action": "Se åbne opslag",
         "message": "Opslaget \"{showCallName}\" til \"{editionName}\" er åbent. Indsend dit show!",
         "title": "Nyt opslag for shows 🎭"
+      },
+      "application_withdrawn": {
+        "title": "[TODO] Candidature retirée",
+        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
+        "action": "[TODO] Voir les candidatures"
       }
     },
     "carpool": {

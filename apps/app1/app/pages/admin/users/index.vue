@@ -202,6 +202,16 @@
       v-model:open="showDuplicatesModal"
       @merge="ouvrirFusionDepuisDoublon"
     />
+
+    <!--
+      UNE seule modale pour les cinq confirmations de cet écran.
+
+      `confirm()` bloquait la page, laissait ses boutons dans la langue du NAVIGATEUR et non dans
+      celle choisie, et certains navigateurs permettent de la désactiver : elle rend alors `true`
+      sans rien demander — ici, cela promouvait un administrateur ou invalidait un courriel tout
+      seul.
+    -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -911,15 +921,24 @@ const { execute: executeImpersonate } = useApiAction(
   }
 )
 
-const impersonateUser = (user: AdminUserWithConnection) => {
-  const confirmMessage = t('admin.confirm_impersonate', {
-    name: `${user.prenom} ${user.nom}`,
-  })
+const confirmation = useConfirmation()
 
-  if (confirm(confirmMessage)) {
-    impersonateTargetUser.value = user
-    executeImpersonate()
-  }
+const impersonateUser = (user: AdminUserWithConnection) => {
+  confirmation.demanderConfirmation({
+    titre: t('admin.impersonate_user'),
+    description: t('admin.confirm_impersonate', { name: `${user.prenom} ${user.nom}` }),
+    /*
+     * Pas `admin.impersonate_user` ici : il vaut « Se connecter en tant que… », et ses points de
+     * suspension annoncent qu'une question va suivre. Sur le bouton qui ENGAGE l'action, cette
+     * promesse est fausse — c'est le dernier clic. Le titre, lui, le garde à juste titre.
+     */
+    libelleConfirmer: t('common.confirm'),
+    couleurConfirmer: 'warning',
+    agir: () => {
+      impersonateTargetUser.value = user
+      executeImpersonate()
+    },
+  })
 }
 
 // Fonctions d'action - userId cible pour les actions admin
@@ -945,13 +964,16 @@ const { execute: executePromote } = useApiAction(
 )
 
 const promoteToAdmin = (user: AdminUserWithConnection) => {
-  const confirmMessage = t('admin.confirm_promote_to_admin', {
-    name: `${user.prenom} ${user.nom}`,
+  confirmation.demanderConfirmation({
+    titre: t('admin.promote_to_admin'),
+    description: t('admin.confirm_promote_to_admin', { name: `${user.prenom} ${user.nom}` }),
+    libelleConfirmer: t('admin.promote_to_admin'),
+    couleurConfirmer: 'warning',
+    agir: () => {
+      actionTargetUserId.value = user.id
+      executePromote()
+    },
   })
-  if (confirm(confirmMessage)) {
-    actionTargetUserId.value = user.id
-    executePromote()
-  }
 }
 
 const { execute: executeDemote } = useApiAction(
@@ -974,13 +996,16 @@ const { execute: executeDemote } = useApiAction(
 )
 
 const demoteFromAdmin = (user: AdminUserWithConnection) => {
-  const confirmMessage = t('admin.confirm_demote_from_admin', {
-    name: `${user.prenom} ${user.nom}`,
+  confirmation.demanderConfirmation({
+    titre: t('admin.demote'),
+    description: t('admin.confirm_demote_from_admin', { name: `${user.prenom} ${user.nom}` }),
+    libelleConfirmer: t('admin.demote'),
+    couleurConfirmer: 'warning',
+    agir: () => {
+      actionTargetUserId.value = user.id
+      executeDemote()
+    },
   })
-  if (confirm(confirmMessage)) {
-    actionTargetUserId.value = user.id
-    executeDemote()
-  }
 }
 
 // Fonction pour invalider l'email d'un utilisateur
@@ -1006,13 +1031,16 @@ const { execute: executeInvalidateEmail } = useApiAction(
 )
 
 const invalidateUserEmail = (user: AdminUserWithConnection) => {
-  const confirmMessage = t('admin.confirm_invalidate_email', {
-    name: `${user.prenom} ${user.nom}`,
+  confirmation.demanderConfirmation({
+    titre: t('admin.invalidate_email'),
+    description: t('admin.confirm_invalidate_email', { name: `${user.prenom} ${user.nom}` }),
+    libelleConfirmer: t('admin.invalidate_email'),
+    couleurConfirmer: 'warning',
+    agir: () => {
+      actionTargetUserId.value = user.id
+      executeInvalidateEmail()
+    },
   })
-  if (confirm(confirmMessage)) {
-    actionTargetUserId.value = user.id
-    executeInvalidateEmail()
-  }
 }
 
 // Fonction pour valider manuellement l'email d'un utilisateur
@@ -1038,13 +1066,16 @@ const { execute: executeValidateEmail } = useApiAction(
 )
 
 const validateUserEmail = (user: AdminUserWithConnection) => {
-  const confirmMessage = t('admin.confirm_validate_email', {
-    name: `${user.prenom} ${user.nom}`,
+  confirmation.demanderConfirmation({
+    titre: t('admin.validate_email'),
+    description: t('admin.confirm_validate_email', { name: `${user.prenom} ${user.nom}` }),
+    libelleConfirmer: t('admin.validate_email'),
+    couleurConfirmer: 'primary',
+    agir: () => {
+      actionTargetUserId.value = user.id
+      executeValidateEmail()
+    },
   })
-  if (confirm(confirmMessage)) {
-    actionTargetUserId.value = user.id
-    executeValidateEmail()
-  }
 }
 
 // Fonction pour ouvrir le modal de suppression

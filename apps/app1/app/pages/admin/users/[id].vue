@@ -494,6 +494,10 @@
       :user="userToDelete"
       @deleted="onUserDeleted"
     />
+
+    <!-- Promouvoir et rétrograder : `confirm()` pouvait être désactivé par le navigateur, et
+         l'élévation de droits partait alors sans question. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -891,13 +895,18 @@ const { execute: executePromote } = useApiAction(() => `/api/admin/users/${userI
   refreshOnSuccess: () => refresh(),
 })
 
+const confirmation = useConfirmation()
+
 const promoteToAdmin = (targetUser: UserProfile) => {
-  const confirmMessage = t('admin.confirm_promote_to_admin', {
-    name: `${targetUser.prenom} ${targetUser.nom}`,
+  confirmation.demanderConfirmation({
+    titre: t('admin.promote_to_admin'),
+    description: t('admin.confirm_promote_to_admin', {
+      name: `${targetUser.prenom} ${targetUser.nom}`,
+    }),
+    libelleConfirmer: t('admin.promote_to_admin'),
+    couleurConfirmer: 'warning',
+    agir: () => executePromote(),
   })
-  if (confirm(confirmMessage)) {
-    executePromote()
-  }
 }
 
 const { execute: executeDemote } = useApiAction(() => `/api/admin/users/${userId}/promote`, {
@@ -909,12 +918,15 @@ const { execute: executeDemote } = useApiAction(() => `/api/admin/users/${userId
 })
 
 const demoteFromAdmin = (targetUser: UserProfile) => {
-  const confirmMessage = t('admin.confirm_demote_from_admin', {
-    name: `${targetUser.prenom} ${targetUser.nom}`,
+  confirmation.demanderConfirmation({
+    titre: t('admin.demote'),
+    description: t('admin.confirm_demote_from_admin', {
+      name: `${targetUser.prenom} ${targetUser.nom}`,
+    }),
+    libelleConfirmer: t('admin.demote'),
+    couleurConfirmer: 'warning',
+    agir: () => executeDemote(),
   })
-  if (confirm(confirmMessage)) {
-    executeDemote()
-  }
 }
 
 const openDeletionModal = (user: UserProfile) => {

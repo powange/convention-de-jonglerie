@@ -137,18 +137,40 @@ describe('BookingsList — le message du passager', () => {
     })
   })
 
-  it('intitule la liste « Réservations », et non « Réservations en attente »', async () => {
-    /*
-     * La liste montre AUSSI les acceptées et les refusées, badge compris : le titre promettait une
-     * liste filtrée qui n'existe pas.
-     */
+  /*
+   * ⚠️ CES DEUX CAS N'ASSERTENT PLUS UNE CLÉ, ET C'EST LE FOND DU SUJET.
+   *
+   * Ils cherchaient `components.carpool.bookings` dans le rendu, au motif qu'une clé **neuve**,
+   * créée en français seulement, ressort telle quelle dans ce harnais — qui est en anglais. C'était
+   * vrai, et c'est devenu faux : la synchronisation des traductions
+   * (`check-translations --fill-mode todo`) remplit les douze autres langues avec
+   * `[TODO] <texte français>`, et la clé **résout** alors. Puis `/translate-todos` la traduit, et le
+   * texte français disparaît à son tour.
+   *
+   * Autrement dit, « la clé ressort telle quelle » est un état **transitoire** qui dure jusqu'à la
+   * prochaine synchronisation. Ni la clé ni le texte français ne font donc une assertion stable.
+   *
+   * Ce qui est stable, c'est le DÉFAUT : le titre promettait « Réservations EN ATTENTE » pour une
+   * liste qui montre aussi les acceptées et les refusées. L'absence de ce mot se mesure dans
+   * n'importe quelle langue — l'ancienne clé valait « Pending bookings » en anglais.
+   */
+  it('intitule la liste sans promettre une liste filtrée', async () => {
     const composant = await monter([reservation({ status: 'ACCEPTED' })])
-    expect(composant.text()).toContain('components.carpool.bookings')
-    expect(composant.text()).not.toContain('components.carpool.pending_bookings')
+    const titre = composant.find('h3, h2, [data-titre]')
+
+    expect(titre.exists()).toBe(true)
+    // Un titre VIDE satisferait l'assertion suivante : on vérifie d'abord qu'il dit quelque chose.
+    expect(titre.text().trim().length).toBeGreaterThan(0)
+    expect(titre.text()).not.toMatch(/attente|pending/i)
   })
 
   it('annonce l’absence de réservation sans parler d’attente', async () => {
     const composant = await monter([])
-    expect(composant.text()).toContain('components.carpool.no_bookings')
+    const texte = composant.text()
+
+    // La liste est vide ET elle le dit : sans la seconde moitié, un rendu muet passerait.
+    expect(composant.findAll('[data-reservation]')).toHaveLength(0)
+    expect(texte.replace(/\[TODO\]/g, '').trim().length).toBeGreaterThan(0)
+    expect(texte).not.toMatch(/attente|pending/i)
   })
 })

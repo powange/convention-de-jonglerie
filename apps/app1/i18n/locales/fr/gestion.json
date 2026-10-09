@@ -305,7 +305,7 @@
       "can_delete": "Supprimer",
       "can_edit": "Modifier",
       "can_manage_volunteers": "Gérer les bénévoles",
-      "confirm_remove": "Êtes-vous sûr de vouloir retirer cet organisateur de la convention ?",
+      "confirm_remove": "{name} ne sera plus organisateur de « {convention} » et perdra tous ses droits sur elle.",
       "confirm_remove_from_edition": "Êtes-vous sûr de vouloir retirer cet organisateur de l'édition ?",
       "edit_organizer": "Modifier l'organisateur",
       "edit_organizer_description": "Configurez les droits d'accès et le titre de cet organisateur pour gérer ses permissions sur la convention et ses éditions.",

@@ -38,6 +38,8 @@
     "vote_error": "Помилка при збереженні голосу",
     "vote_saved": "Голос збережено",
     "votes_count": "{count} голос | {count} голосів",
-    "your_vote": "Ваша оцінка"
+    "your_vote": "Ваша оцінка",
+    "own_application_hidden": "[TODO] Votre candidature n'apparaît pas dans cette liste",
+    "own_application_hidden_description": "[TODO] On ne note pas sa propre candidature. Les autres membres du jury, eux, la voient et peuvent la noter."
   }
 }

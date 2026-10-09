@@ -294,7 +294,7 @@
       "can_delete": "Slet",
       "can_edit": "Rediger",
       "can_manage_volunteers": "Administrer frivillige",
-      "confirm_remove": "Er du sikker på, at du vil fjerne denne organisator fra konventionen?",
+      "confirm_remove": "[TODO] Er du sikker på, at du vil fjerne denne organisator fra konventionen?",
       "confirm_remove_from_edition": "Er du sikker på, at du vil fjerne denne organisator fra udgaven?",
       "edit_organizer": "Rediger organisator",
       "edit_organizer_description": "Konfigurer adgangsrettigheder og titel for denne arrangør for at administrere deres tilladelser på konventionen og dens udgaver.",
@@ -494,7 +494,8 @@
       "type": "Type forestilling",
       "type_cabaret": "Kabaret",
       "type_hint": "En kabaret består af numre, hvert med sine egne artister.",
-      "type_standard": "Forestilling"
+      "type_standard": "Forestilling",
+      "act_title_required": "[TODO] Chaque numéro doit avoir un titre"
     },
     "stock": {
       "available_now": "{available}/{total} tilgængelige",
@@ -1249,7 +1250,8 @@
       "edit_place": "Skift sted",
       "place_error": "Stedet kunne ikke gemmes.",
       "page_public": "Offentlig side",
-      "page_public_help": "Gør programmet synligt for alle. Så længe det er slået fra, har kun arrangører adgang, og fanen forbliver skjult for offentligheden."
+      "page_public_help": "Gør programmet synligt for alle. Så længe det er slået fra, har kun arrangører adgang, og fanen forbliver skjult for offentligheden.",
+      "overlap": "[TODO] Chevauchement"
     },
     "convention": {
       "card_description": "Rediger konventets navn, beskrivelse, logo og e-mail",

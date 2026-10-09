@@ -26,6 +26,11 @@
         "action": "Offene Ausschreibungen ansehen",
         "message": "Die Ausschreibung \"{showCallName}\" für \"{editionName}\" ist eröffnet. Reichen Sie Ihre Show ein!",
         "title": "Neue Show-Ausschreibung 🎭"
+      },
+      "application_withdrawn": {
+        "title": "[TODO] Candidature retirée",
+        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
+        "action": "[TODO] Voir les candidatures"
       }
     },
     "carpool": {

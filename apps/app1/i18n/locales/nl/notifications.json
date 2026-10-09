@@ -26,6 +26,11 @@
         "action": "Open oproepen bekijken",
         "message": "De oproep \"{showCallName}\" voor \"{editionName}\" is geopend. Dien uw voorstelling in!",
         "title": "Nieuwe oproep voor voorstellingen 🎭"
+      },
+      "application_withdrawn": {
+        "title": "[TODO] Candidature retirée",
+        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
+        "action": "[TODO] Voir les candidatures"
       }
     },
     "carpool": {

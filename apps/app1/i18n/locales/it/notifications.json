@@ -26,6 +26,11 @@
         "action": "Vedi i bandi aperti",
         "message": "Il bando \"{showCallName}\" per \"{editionName}\" è aperto. Proponi il tuo spettacolo!",
         "title": "Nuovo bando per spettacoli 🎭"
+      },
+      "application_withdrawn": {
+        "title": "[TODO] Candidature retirée",
+        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
+        "action": "[TODO] Voir les candidatures"
       }
     },
     "carpool": {

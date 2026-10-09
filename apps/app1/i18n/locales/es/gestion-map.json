@@ -69,7 +69,8 @@
       "marker_zone": "Zona asociada",
       "marker_zone_help": "Asocie este punto a una zona de la que sea la entrada o el acceso.",
       "marker_no_zone": "Ninguna zona",
-      "import_dep_program": "{n} elemento del programa | {n} elementos del programa"
+      "import_dep_program": "{n} elemento del programa | {n} elementos del programa",
+      "import_layer_partial": "[TODO] {importes} importés, {echecs} en échec"
     }
   }
 }

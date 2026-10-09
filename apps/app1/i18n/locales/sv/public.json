@@ -74,7 +74,12 @@
       "rejected": "Avslagna",
       "show_title": "Föreställning",
       "view_edition": "Visa evenemang",
-      "view_edition_short": "Visa"
+      "view_edition_short": "Visa",
+      "withdraw": "[TODO] Retirer ma candidature",
+      "withdraw_confirm": "[TODO] Votre candidature « {title} » sera retirée, ainsi que la discussion que vous avez eue avec les organisateurs. Cette action est définitive.",
+      "withdraw_error": "[TODO] Le retrait a échoué",
+      "withdraw_short": "[TODO] Retirer",
+      "withdrawn": "[TODO] Candidature retirée"
     },
     "comments": {
       "be_first_to_comment": "Bli först med att dela med dig av dina erfarenheter!",

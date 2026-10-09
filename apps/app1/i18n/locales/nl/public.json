@@ -74,7 +74,12 @@
       "rejected": "Afgewezen",
       "show_title": "Show",
       "view_edition": "Bekijk editie",
-      "view_edition_short": "Bekijk"
+      "view_edition_short": "Bekijk",
+      "withdraw": "[TODO] Retirer ma candidature",
+      "withdraw_confirm": "[TODO] Votre candidature « {title} » sera retirée, ainsi que la discussion que vous avez eue avec les organisateurs. Cette action est définitive.",
+      "withdraw_error": "[TODO] Le retrait a échoué",
+      "withdraw_short": "[TODO] Retirer",
+      "withdrawn": "[TODO] Candidature retirée"
     },
     "comments": {
       "be_first_to_comment": "Wees de eerste om je ervaring te delen!",

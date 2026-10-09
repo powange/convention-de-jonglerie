@@ -105,7 +105,8 @@
       "verification_success_description": "Vous êtes maintenant propriétaire de cette convention.",
       "verify": "Vérifier"
     },
-    "confirm_delete_convention": "Êtes-vous sûr de vouloir supprimer cette convention ?",
+    "confirm_delete_convention": "« {name} » sera supprimée, avec ses éditions et toutes leurs données.",
+    "confirm_delete_convention_unnamed": "Cette convention sera supprimée, avec ses éditions et toutes leurs données.",
     "convention_deleted": "Convention supprimée",
     "convention_deleted_success": "La convention a été supprimée avec succès",
     "convention_not_found": "Convention introuvable",
@@ -116,6 +117,8 @@
     "create_first_convention": "Créer ma première convention",
     "created_at": "Créé le",
     "delete": "Supprimer la convention",
+    "delete_edition_confirm_description": "Êtes-vous sûr de vouloir supprimer cette édition ? Toutes les données associées (bénévoles, commentaires, objets trouvés, etc.) seront définitivement perdues.",
+    "delete_edition_irreversible": "Attention : cette action est irréversible",
     "duplicate_edition": "Dupliquer",
     "duplication_error": "Erreur lors de la duplication de l'édition",
     "edit": "Modifier la convention",
@@ -154,9 +157,7 @@
     "organizers": "Organisateurs",
     "select_user": "Entrer l'adresse email",
     "status_control": "Contrôle de visibilité",
-    "status_control_desc": "Publier ou dépublier vos éditions selon leur avancement",
-    "delete_edition_irreversible": "Attention : cette action est irréversible",
-    "delete_edition_confirm_description": "Êtes-vous sûr de vouloir supprimer cette édition ? Toutes les données associées (bénévoles, commentaires, objets trouvés, etc.) seront définitivement perdues."
+    "status_control_desc": "Publier ou dépublier vos éditions selon leur avancement"
   },
   "diet": {
     "none": "Aucun",

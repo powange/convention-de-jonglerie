@@ -26,6 +26,11 @@
         "action": "Visa öppna utlysningar",
         "message": "Utlysningen \"{showCallName}\" för \"{editionName}\" är öppen. Skicka in din föreställning!",
         "title": "Ny utlysning för föreställningar 🎭"
+      },
+      "application_withdrawn": {
+        "title": "[TODO] Candidature retirée",
+        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
+        "action": "[TODO] Voir les candidatures"
       }
     },
     "carpool": {

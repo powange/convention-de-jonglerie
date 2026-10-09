@@ -228,6 +228,13 @@
         </div>
       </template>
     </UModal>
+
+    <!--
+      Retirer un organisateur et supprimer une convention : les deux actions les plus lourdes de
+      cet écran passaient par `confirm()`, qui ne nommait NI la personne, NI la convention — et
+      qu'un navigateur peut avoir désactivé, auquel cas la suppression partait sans question.
+    -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -338,6 +345,7 @@ watch(selectedConventionId, async (id) => {
 // Modal d'édition de organisateur
 const editOrganizerModalOpen = ref(false)
 const selectedOrganizerForEdit = ref<DashboardOrganizer | null>(null)
+const confirmation = useConfirmation()
 // Modal d'ajout de organisateur
 const addOrganizerModalOpen = ref(false)
 
@@ -518,9 +526,15 @@ const { execute: executeRemoveOrganizer } = useApiAction(
 
 const removeOrganizer = () => {
   if (!selectedOrganizerForEdit.value || !selectedListItem.value) return
-  if (confirm(t('gestion.organizers.confirm_remove'))) {
-    executeRemoveOrganizer()
-  }
+  confirmation.demanderConfirmation({
+    titre: t('common.remove'),
+    description: t('gestion.organizers.confirm_remove', {
+      name: selectedOrganizerForEdit.value.user.pseudo,
+      convention: selectedListItem.value.name,
+    }),
+    libelleConfirmer: t('common.remove'),
+    agir: () => executeRemoveOrganizer(),
+  })
 }
 
 const openAddOrganizerModal = () => {
@@ -681,10 +695,23 @@ const { execute: executeDeleteConvention } = useApiAction(
 )
 
 const deleteConvention = (id: number) => {
-  if (confirm(t('conventions.confirm_delete_convention'))) {
-    deleteConventionId.value = id
-    executeDeleteConvention()
-  }
+  /*
+   * Le nom vient de la LISTE et non d'un argument : ce point d'appel ne reçoit qu'un identifiant.
+   * Le chercher là plutôt qu'élargir la signature évite de toucher les appelants — et s'il
+   * manquait, la description resterait générique au lieu d'afficher « undefined ».
+   */
+  const convention = myConventions.value.find((c) => c.id === id)
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    description: convention
+      ? t('conventions.confirm_delete_convention', { name: convention.name })
+      : t('conventions.confirm_delete_convention_unnamed'),
+    libelleConfirmer: t('common.delete'),
+    agir: () => {
+      deleteConventionId.value = id
+      executeDeleteConvention()
+    },
+  })
 }
 
 // Helpers de droits (utilise currentUserRights du serveur)
