@@ -451,9 +451,48 @@ export const carpoolRequestSchema = z.object({
   phoneNumber: phoneSchema,
 })
 
-// Schémas de mise à jour de covoiturage
+/**
+ * Le téléphone d'une annonce de covoiturage : format international, et borné en longueur.
+ *
+ * ⚠️ Écrit explicitement plutôt que composé par `phoneSchema.and(…)` : une intersection de deux
+ * schémas tous deux `nullable().optional()` se raisonne mal, et un schéma de validation dont on
+ * n'est pas sûr de ce qu'il accepte ne vaut pas mieux que pas de schéma. Les deux règles sont donc
+ * énoncées côte à côte.
+ *
+ * 📍 La borne de longueur est conservée en plus du format : `isValidPhoneNumber` ne garantit pas
+ * une taille de colonne.
+ */
+export const carpoolPhoneSchema = z
+  .string()
+  .max(20, 'Numéro de téléphone trop long')
+  .nullable()
+  .optional()
+  .refine((val) => !val || isInternationalPhoneValid(val), 'Numéro de téléphone invalide')
+
+/*
+ * Schémas de mise à jour de covoiturage.
+ *
+ * ## ⚠️ ILS NE VALIDAIENT NI LA DATE NI LE TÉLÉPHONE
+ *
+ * À la CRÉATION, `tripDate` passe par `dateSchema` et `phoneNumber` par `phoneSchema`. À la MISE À
+ * JOUR, les deux se contentaient de `z.string().optional()` et `max(20)`.
+ *
+ * Conséquences, sur l'offre comme sur la demande :
+ *
+ * - `new Date('demain')` donne un `Invalid Date` que le handler écrit tel quel — Prisma le rejette,
+ *   et la réponse est un **500**. Une saisie fautive du client doit rendre 400 ;
+ * - un numéro **non international** était enregistré, alors que le lien `tel:` de l'écran suppose
+ *   le format `+…`. Le client validait, mais l'API est publique.
+ *
+ * ## 📍 POURQUOI `optionalDateSchema` ET NON `tripDateSchema`
+ *
+ * `tripDateSchema` refuse en plus une date **déjà passée** — ce qui est juste à la création. À la
+ * mise à jour, ce serait un défaut : le formulaire renvoie TOUS ses champs, date comprise, donc
+ * corriger la description d'un trajet déjà parti deviendrait impossible. On vérifie ici que la date
+ * s'analyse, et c'est précisément le défaut nommé par le constat.
+ */
 export const updateCarpoolOfferSchema = z.object({
-  tripDate: z.string().optional(),
+  tripDate: optionalDateSchema,
   locationCity: z.string().min(1, 'La ville de départ est requise').optional(),
   latitude: carpoolLatitudeSchema,
   longitude: carpoolLongitudeSchema,
@@ -465,14 +504,15 @@ export const updateCarpoolOfferSchema = z.object({
     .max(8, 'Maximum 8 places')
     .optional(),
   description: z.string().max(500, 'Description trop longue (500 caractères max)').optional(),
-  phoneNumber: z.string().max(20, 'Numéro de téléphone trop long').optional().nullable(),
+  phoneNumber: carpoolPhoneSchema,
   smokingAllowed: z.boolean().optional(),
   petsAllowed: z.boolean().optional(),
   musicAllowed: z.boolean().optional(),
 })
 
 export const updateCarpoolRequestSchema = z.object({
-  tripDate: z.string().optional(),
+  // Même raisonnement que pour l'offre juste au-dessus : l'analyse, pas l'antériorité.
+  tripDate: optionalDateSchema,
   locationCity: z.string().min(1, 'La ville de départ est requise').optional(),
   latitude: carpoolLatitudeSchema,
   longitude: carpoolLongitudeSchema,
@@ -483,7 +523,7 @@ export const updateCarpoolRequestSchema = z.object({
     .max(8, 'Maximum 8 places')
     .optional(),
   description: z.string().max(500, 'Description trop longue (500 caractères max)').optional(),
-  phoneNumber: z.string().max(20, 'Numéro de téléphone trop long').optional().nullable(),
+  phoneNumber: carpoolPhoneSchema,
 })
 
 // Schémas de commentaires

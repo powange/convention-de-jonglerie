@@ -130,25 +130,33 @@ describe('/api/carpool-offers/[id] PUT', () => {
   })
 
   it('devrait permettre de modifier le numéro de téléphone', async () => {
-    const updateData = { phoneNumber: '0612345678' }
+    /*
+     * ⚠️ UN NUMÉRO INTERNATIONAL, et ce test CONSACRAIT le défaut.
+     *
+     * Il employait `'0612345678'` — un numéro national — et vérifiait qu'il était accepté. C'était
+     * précisément le défaut : la mise à jour ne validait pas le format, alors que la CRÉATION
+     * l'exige et que le lien `tel:` de l'écran suppose le `+…`. Le test ne décrivait pas une
+     * tolérance, il figeait l'absence de règle.
+     */
+    const updateData = { phoneNumber: '+33612345678' }
 
     global.readBody.mockResolvedValue(updateData)
     prismaMock.carpoolOffer.findUnique.mockResolvedValue(mockCarpoolOffer)
     prismaMock.carpoolOffer.update.mockResolvedValue({
       ...mockCarpoolOffer,
-      phoneNumber: '0612345678',
+      phoneNumber: '+33612345678',
     })
 
     const result = await handler(mockEvent as any)
 
-    expect(result.data.phoneNumber).toBe('0612345678')
+    expect(result.data.phoneNumber).toBe('+33612345678')
   })
 
   it('devrait permettre de supprimer le numéro de téléphone (null)', async () => {
     global.readBody.mockResolvedValue({ phoneNumber: null })
     prismaMock.carpoolOffer.findUnique.mockResolvedValue({
       ...mockCarpoolOffer,
-      phoneNumber: '0612345678',
+      phoneNumber: '+33612345678',
     })
     prismaMock.carpoolOffer.update.mockResolvedValue({
       ...mockCarpoolOffer,
@@ -313,6 +321,35 @@ describe('/api/carpool-offers/[id] PUT', () => {
           where: { carpoolOfferId: 1, status: 'ACCEPTED' },
         })
       )
+    })
+  })
+  /**
+   * Une date invalide doit rendre 400, et non 500.
+   *
+   * ⚠️ POURQUOI CE CAS EXISTE EN PLUS DES TESTS DE SCHÉMA. Éprouver `updateCarpoolOfferSchema`
+   * prouve que la règle est juste ; il ne prouve PAS qu'elle est branchée sur ce point d'API. Et
+   * c'est exactement le défaut d'origine : la règle existait à la création, pas à la mise à jour.
+   *
+   * Le handler faisait `new Date(val)` sans contrôle. `new Date('demain')` donne un `Invalid Date`
+   * que Prisma rejette — et la réponse était un **500**, c'est-à-dire « le serveur a un problème »
+   * là où le client avait simplement mal saisi.
+   */
+  describe('date invalide', () => {
+    it('rend 400 et non 500', async () => {
+      global.readBody.mockResolvedValue({ tripDate: 'demain' })
+      prismaMock.carpoolOffer.findUnique.mockResolvedValue(mockCarpoolOffer)
+
+      await expect(handler(mockEvent as any)).rejects.toMatchObject({ statusCode: 400 })
+      // Rien n'est écrit : le refus vient de la validation, avant toute requête.
+      expect(prismaMock.carpoolOffer.update).not.toHaveBeenCalled()
+    })
+
+    it('rend 400 sur un numéro non international', async () => {
+      global.readBody.mockResolvedValue({ phoneNumber: '0612345678' })
+      prismaMock.carpoolOffer.findUnique.mockResolvedValue(mockCarpoolOffer)
+
+      await expect(handler(mockEvent as any)).rejects.toMatchObject({ statusCode: 400 })
+      expect(prismaMock.carpoolOffer.update).not.toHaveBeenCalled()
     })
   })
 })
