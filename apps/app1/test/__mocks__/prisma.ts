@@ -122,6 +122,17 @@ export const prismaMock = {
 
   // Modèles appel à spectacles
   editionShowCall: createModelMock(),
+  /*
+   * ⚠️ `showCallSurveyVote` MANQUAIT, et c'est POURQUOI les deux points d'API du sondage n'avaient
+   * aucun test : une méthode absente de ce mock ne rend pas `undefined`, elle fait lever
+   * « n'est pas une fonction » au premier appel, AVANT toute assertion. Le code devient
+   * intestable, ce qui se lit à tort comme une absence de tests.
+   *
+   * C'est la sixième fois que ce harnais bloque un test de cette façon — après `editionProgramItem`,
+   * `volunteerSwapRequest`, `$queryRawUnsafe`, `$queryRaw` et les auto-imports. Quand un point
+   * d'API n'a aucun test, regarder d'abord ce fichier.
+   */
+  showCallSurveyVote: createModelMock(),
   showApplication: createModelMock(),
 
   // Modèles spectacles
