@@ -3,7 +3,11 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTreasuryById } from '#server/utils/permissions/edition-permissions'
-import { dateDeSolde, preteurNormalise } from '#server/utils/treasury-guards'
+import {
+  assertPersonneRattacheeALEdition,
+  dateDeSolde,
+  preteurNormalise,
+} from '#server/utils/treasury-guards'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { toCents } from '~~/shared/utils/money'
 
@@ -45,6 +49,8 @@ export default wrapApiHandler(
     }
 
     const data = bodySchema.parse(await readBody(event))
+    // Même règle que l'avance d'une dépense : le prêteur est choisi dans la même liste.
+    await assertPersonneRattacheeALEdition(editionId, data.lentById)
 
     const edition = await prisma.edition.findUnique({
       where: { id: editionId },

@@ -4,6 +4,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTreasuryById } from '#server/utils/permissions/edition-permissions'
 import { userWithProfileAndGravatarSelect } from '#server/utils/prisma-select-helpers'
+import { clausesDesPersonnesRattachees } from '#server/utils/treasury-guards'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**
@@ -40,17 +41,26 @@ export default wrapApiHandler(
       throw createError({ status: 404, message: 'Édition introuvable' })
     }
 
+    /*
+     * ⚠️ LES MÊMES CLAUSES QUE LA GARDE D'ÉCRITURE, et pas une seconde écriture de la règle.
+     *
+     * Cette liste était le SEUL endroit du dépôt où le périmètre existait ; les quatre points qui
+     * enregistrent ne vérifiaient rien. Les faire consommer une définition commune est tout
+     * l'objet du lot : une liste et une garde qui répondent autrement à « qui peut avoir avancé
+     * cet argent ? » reproduiraient le défaut d'un cran plus loin, et en silence.
+     */
+    const clauses = clausesDesPersonnesRattachees(editionId, edition.conventionId)
     const [organisateurs, benevoles, artistes] = await Promise.all([
       prisma.conventionOrganizer.findMany({
-        where: { conventionId: edition.conventionId },
+        where: clauses.organisateurs,
         select: { user: { select: userWithProfileAndGravatarSelect } },
       }),
       prisma.editionVolunteerApplication.findMany({
-        where: { eventId: editionId, status: 'ACCEPTED' },
+        where: clauses.benevoles,
         select: { user: { select: userWithProfileAndGravatarSelect } },
       }),
       prisma.editionArtist.findMany({
-        where: { editionId },
+        where: clauses.artistes,
         select: { user: { select: userWithProfileAndGravatarSelect } },
       }),
     ])

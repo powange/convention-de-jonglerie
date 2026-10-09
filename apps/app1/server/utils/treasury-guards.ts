@@ -30,6 +30,88 @@ export async function assertCodeBelongsToEdition(
 }
 
 /**
+ * Les trois appartenances qui font qu'on peut désigner quelqu'un comme ayant sorti l'argent de sa
+ * poche : organisateur de la convention, bénévole ACCEPTÉ, artiste programmé.
+ *
+ * ## ⚠️ POURQUOI CETTE FONCTION EXISTE PLUTÔT QU'UNE LISTE RECOPIÉE
+ *
+ * La règle vivait dans `advance-candidates.get.ts`, le point d'API qui PROPOSE la liste — et
+ * nulle part ailleurs. Les quatre points qui ENREGISTRENT ne validaient l'identifiant que comme
+ * entier positif. Le contrat d'API laissait donc rattacher une avance, ou un apport au fonds de
+ * caisse, à **n'importe quel compte du site**.
+ *
+ * Le périmètre n'est pas une commodité d'affichage : il est là pour la confidentialité. La
+ * recherche d'utilisateurs ouverte aux non-administrateurs n'accepte qu'un email EXACT,
+ * délibérément ; proposer les personnes de l'édition n'ouvre rien, puisque le trésorier les voit
+ * déjà ailleurs dans la gestion. Enregistrer hors de ce périmètre, en revanche, inscrit dans la
+ * trésorerie d'une édition le nom de quelqu'un qui n'a rien à y voir.
+ *
+ * Les clauses sont RENDUES plutôt qu'appliquées, pour que la liste et la garde consomment
+ * littéralement la même définition. Faire porter la vérification par une seconde requête écrite à
+ * la main les aurait laissées vieillir séparément — c'est exactement ainsi que le défaut est né.
+ */
+export function clausesDesPersonnesRattachees(editionId: number, conventionId: number) {
+  return {
+    organisateurs: { conventionId },
+    benevoles: { eventId: editionId, status: 'ACCEPTED' as const },
+    artistes: { editionId },
+  }
+}
+
+/**
+ * Refuse en 400 une personne qui n'est pas rattachée à l'édition.
+ *
+ * `null` et `undefined` sont acceptés : une dépense que personne n'a avancée est le cas courant,
+ * et un apport peut être porté par un nom libre plutôt que par un compte.
+ *
+ * ⚠️ SANS CETTE GARDE, UN IDENTIFIANT INEXISTANT RENDAIT 500 : Prisma rejetait l'écriture sur une
+ * violation de clé étrangère (P2003), c'est-à-dire une erreur de serveur là où une saisie fautive
+ * du client mérite un 400 qui dise quoi. Et un identifiant EXISTANT mais étranger à l'édition
+ * passait sans rien dire du tout — c'était la moitié silencieuse du défaut.
+ *
+ * 📍 La convention est relue ici plutôt que reçue en paramètre : deux des quatre appelants ne la
+ * connaissent pas à cet endroit, et leur faire chercher une donnée dont ils n'ont pas besoin
+ * aurait donné quatre variantes d'appel pour une seule règle.
+ */
+export async function assertPersonneRattacheeALEdition(
+  editionId: number,
+  userId: number | null | undefined
+): Promise<void> {
+  if (userId === null || userId === undefined) return
+
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    select: { conventionId: true },
+  })
+  if (!edition) {
+    throw createError({ status: 404, message: 'Édition introuvable' })
+  }
+
+  const clauses = clausesDesPersonnesRattachees(editionId, edition.conventionId)
+  const [organisateur, benevole, artiste] = await Promise.all([
+    prisma.conventionOrganizer.findFirst({
+      where: { ...clauses.organisateurs, userId },
+      select: { userId: true },
+    }),
+    prisma.editionVolunteerApplication.findFirst({
+      where: { ...clauses.benevoles, userId },
+      select: { userId: true },
+    }),
+    prisma.editionArtist.findFirst({
+      where: { ...clauses.artistes, userId },
+      select: { userId: true },
+    }),
+  ])
+
+  if (!organisateur && !benevole && !artiste) {
+    throw createError({
+      status: 400,
+      message: "Cette personne n'est pas rattachée à cette édition",
+    })
+  }
+}
+
+/**
  * L'avance et son remboursement n'ont de sens que sur une DÉPENSE avancée par quelqu'un.
  *
  * Normalisé plutôt que refusé : un formulaire qui bascule de dépense à recette laisse traîner les
