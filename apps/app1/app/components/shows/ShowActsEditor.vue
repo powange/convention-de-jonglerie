@@ -123,7 +123,15 @@
       <div v-show="estDeplie(act)" class="space-y-4 p-4 sm:p-6">
         <!-- Titre + Durée -->
         <div class="flex flex-col gap-4 sm:flex-row">
-          <UFormField :label="$t('gestion.shows.act_title')" required class="flex-1">
+          <!-- `:error` seulement APRÈS une tentative d'enregistrement : marquer les champs en
+               rouge dès l'ajout d'un numéro reprocherait à l'organisateur de ne pas avoir encore
+               tapé ce qu'il vient d'ouvrir. -->
+          <UFormField
+            :label="$t('gestion.shows.act_title')"
+            required
+            class="flex-1"
+            :error="erreurDeTitre(act)"
+          >
             <UInput
               v-model="act.title"
               :placeholder="$t('gestion.shows.act_title_placeholder')"
@@ -264,7 +272,20 @@ const acts = defineModel<ActInput[]>({ required: true })
 
 const props = defineProps<{
   artists: any[]
+  /**
+   * Vrai dès qu'un enregistrement a été TENTÉ, et seulement alors.
+   *
+   * ⚠️ UN BOOLÉEN PLUTÔT QUE LA LISTE DES NUMÉROS FAUTIFS, et ce n'est pas un raccourci : les
+   * numéros se réordonnent et se suppriment, donc ni leur rang ni une liste figée ne les désignent
+   * de façon stable — c'est déjà la raison pour laquelle `estDeplie` les reconnaît par l'objet
+   * lui-même. L'éditeur recalcule donc la condition, et l'appelant ne lui dit que QUAND la montrer.
+   */
+  validationDemandee?: boolean
 }>()
+
+/** Le message d'erreur du titre, ou `undefined` — jamais une chaîne vide, qui afficherait un vide. */
+const erreurDeTitre = (act: ActInput) =>
+  props.validationDemandee && !act.title.trim() ? t('gestion.shows.act_title_required') : undefined
 
 const artistOptions = computed(() =>
   props.artists.map((artist) => ({
@@ -291,6 +312,25 @@ const artistsOf = (act: ActInput) => props.artists.filter((a) => act.artistIds.i
 const deplies = ref(new Set<object>())
 
 const estDeplie = (act: ActInput) => deplies.value.has(toRaw(act))
+
+/*
+ * ⚠️ UNE ERREUR DANS UN BLOC REPLIÉ EST INVISIBLE. Sur un cabaret de dix numéros tous repliés,
+ * marquer un champ en rouge sans ouvrir son numéro signalerait une faute que personne ne peut
+ * voir, et l'organisateur chercherait pourquoi l'enregistrement est refusé.
+ *
+ * Dès qu'une validation est demandée, les numéros sans titre s'ouvrent donc d'eux-mêmes. Rien
+ * n'est REFERMÉ au passage : l'organisateur a peut-être déplié d'autres numéros pour travailler,
+ * et les refermer sous ses yeux lui ferait perdre sa place.
+ */
+watch(
+  () => props.validationDemandee,
+  (demandee) => {
+    if (!demandee) return
+    for (const act of acts.value) {
+      if (!act.title.trim()) deplies.value.add(toRaw(act))
+    }
+  }
+)
 
 const basculer = (act: ActInput) => {
   const cle = toRaw(act)
