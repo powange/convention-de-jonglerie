@@ -46,17 +46,9 @@ import { describe, it, expect } from 'vitest'
  */
 const DETTE: Record<string, number> = {
   'apps/app1/app/components/organizers/MealsModal.vue': 1,
-  'apps/app1/app/pages/profile/mes-candidatures-benevole.vue': 1,
   'layers/artists/app/components/artists/MealsModal.vue': 1,
-  'layers/carpool/app/components/edition/carpool/RequestCard.vue': 1,
-  'layers/carpool/app/components/edition/carpool/RequestDetail.vue': 1,
-  'layers/stock/app/components/stock/StockGroupModal.vue': 1,
-  'layers/stock/app/components/stock/StockTagsModal.vue': 1,
   'layers/stock/app/pages/editions/[id]/gestion/stock/[groupId].vue': 1,
-  'layers/volunteers/app/components/edition/volunteer/AutoAssignmentPanel.vue': 1,
-  'layers/volunteers/app/components/edition/volunteer/planning/SlotModal.vue': 1,
   'layers/volunteers/app/components/volunteers/MealsModal.vue': 1,
-  'layers/workshops/app/pages/editions/[id]/workshops/index.vue': 1,
 }
 
 /** `confirm(` ou `window.confirm(`, jamais une propriété (`.confirm(`). */

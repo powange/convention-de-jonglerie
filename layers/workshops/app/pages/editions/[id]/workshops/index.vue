@@ -393,6 +393,10 @@
         </div>
       </template>
     </UModal>
+
+    <!-- La confirmation de suppression. Elle passait par `confirm()` avec une question écrite en
+         FRANÇAIS EN DUR, lue telle quelle par un utilisateur anglophone. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -413,6 +417,7 @@ const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
 const { t: $t } = useI18n()
+const confirmation = useConfirmation()
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
@@ -868,10 +873,23 @@ const { execute: executeDeleteWorkshop } = useApiActionById(
 )
 
 const deleteWorkshop = (workshopId: number) => {
-  if (!confirm('Êtes-vous sûr de vouloir supprimer ce workshop ?')) {
-    return
-  }
-  executeDeleteWorkshop(workshopId)
+  /*
+   * ⚠️ CE MESSAGE ÉTAIT UNE CHAÎNE FRANÇAISE EN DUR, et `check-i18n` ne la signalait pas : son
+   * balayage des textes codés en dur ne lit que les gabarits, pas les chaînes passées à une
+   * fonction. Un utilisateur anglophone lisait donc une question en français avant de supprimer.
+   *
+   * Le titre vient de la liste et non d'un argument — ce point d'appel ne reçoit qu'un identifiant.
+   * S'il manquait, la description reste générique au lieu d'afficher « undefined ».
+   */
+  const atelier = workshops.value.find((w) => w.id === workshopId)
+  confirmation.demanderConfirmation({
+    titre: $t('workshops.delete_workshop'),
+    description: atelier?.title
+      ? $t('workshops.confirm_delete_workshop', { title: atelier.title })
+      : $t('workshops.confirm_delete_workshop_unnamed'),
+    libelleConfirmer: $t('workshops.delete_workshop'),
+    agir: () => executeDeleteWorkshop(workshopId),
+  })
 }
 
 // Toggle favori - update optimiste avec rollback en cas d'erreur

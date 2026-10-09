@@ -734,6 +734,10 @@
         </div>
       </template>
     </UModal>
+
+    <!-- L'annulation du dernier calcul. Elle employait encore `confirm()` alors que la modale
+         ci-dessus l'avait abandonné : la même règle n'était appliquée que d'un côté. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </UCollapsible>
 </template>
 
@@ -1186,8 +1190,12 @@ const { execute: executeUndo, loading: undoLoading } = useApiAction(
 
 const annulerLeCalcul = () => {
   if (!dernierCalcul.value) return
-  if (!confirm(t('volunteers.auto_assignment.undo_confirm'))) return
-  executeUndo()
+  confirmation.demanderConfirmation({
+    titre: t('volunteers.auto_assignment.undo_title'),
+    description: t('volunteers.auto_assignment.undo_confirm'),
+    libelleConfirmer: t('volunteers.auto_assignment.undo_action'),
+    agir: () => executeUndo(),
+  })
 }
 
 /**
@@ -1372,7 +1380,19 @@ const pourcentage = (valeur: number | undefined) =>
 const heuresArrondies = (valeur: number | undefined) =>
   valeur === undefined ? '—' : `${valeur.toFixed(1)} h`
 
+/*
+ * ⚠️ DEUX DISPOSITIFS DE CONFIRMATION DANS CE FICHIER, ET IL NE FAUT PAS LES UNIFIER.
+ *
+ * `confirmationOuverte` gouverne la modale écrite à la main plus haut : son corps DÉCRIT le mode
+ * réellement choisi — plusieurs paragraphes et des valeurs calculées —, ce que la `description`
+ * d'une `DemandeDeConfirmation`, qui est une simple chaîne, ne peut pas porter. Elle reste donc.
+ *
+ * `confirmation` sert l'ANNULATION du dernier calcul, qui n'a qu'une phrase à dire. Elle employait
+ * encore `confirm()` : l'écran avait abandonné la boîte native d'un côté et l'avait gardée de
+ * l'autre — une règle appliquée d'un seul côté, ce que cet audit passe son temps à refermer.
+ */
 const confirmationOuverte = ref(false)
+const confirmation = useConfirmation()
 
 /**
  * Ce que la confirmation annonce dépend du MODE réellement choisi.

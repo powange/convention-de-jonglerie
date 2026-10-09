@@ -111,6 +111,9 @@
         @comment-added="emit('comment-added')"
       />
     </UCard>
+
+    <!-- Supprimer une demande est définitif, et `confirm()` pouvait être désactivé. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -159,8 +162,20 @@ const { execute: executeDeleteRequest } = useApiAction(
   }
 )
 
+const confirmation = useConfirmation()
+
 const handleDelete = () => {
-  if (!confirm(t('components.carpool.confirm_delete_request'))) return
-  executeDeleteRequest()
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    /*
+     * La ville est ce qui distingue une demande d'une autre à l'écran — le libellé disait seulement
+     * « cette demande de covoiturage », devant une liste qui en contient plusieurs.
+     */
+    description: t('components.carpool.confirm_delete_request', {
+      city: props.request.locationCity,
+    }),
+    libelleConfirmer: t('common.delete'),
+    agir: () => executeDeleteRequest(),
+  })
 }
 </script>

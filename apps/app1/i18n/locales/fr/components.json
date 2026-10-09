@@ -30,7 +30,7 @@
       "confirm_delete_offer_passengers_hint": "Ils recevront une notification leur indiquant que le trajet n'a plus lieu, et devront chercher un autre covoiturage. Les demandes encore en attente sont prévenues aussi.",
       "confirm_delete_offer_title": "Supprimer cette offre ?",
       "confirm_delete_offer_with_passengers": "Cette offre a des passagers confirmés. La supprimer est définitif.",
-      "confirm_delete_request": "Êtes-vous sûr de vouloir supprimer cette demande de covoiturage ?",
+      "confirm_delete_request": "Votre demande de covoiturage depuis « {city} » sera supprimée.",
       "confirmed_passengers": "Covoitureurs confirmés",
       "contact": "Contact",
       "contact_user": "Contacter {name}",

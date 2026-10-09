@@ -64,6 +64,13 @@
       </div>
     </template>
   </UModal>
+
+  <!--
+    La confirmation se superpose à cette modale, et c'est voulu : supprimer un groupe de matériel est définitif, et
+    `confirm()` — que certains navigateurs permettent de désactiver — rendait alors `true` sans rien
+    demander.
+  -->
+  <UiConfirmationDemandee :confirmation="confirmation" />
 </template>
 
 <script setup lang="ts">
@@ -87,6 +94,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const confirmation = useConfirmation()
 const isOpen = computed({
   get: () => props.open,
   set: (v) => emit('update:open', v),
@@ -172,9 +180,18 @@ async function handleSubmit() {
   }
 }
 
-async function handleDelete() {
+function handleDelete() {
   if (!props.group) return
-  if (!confirm(t('gestion.stock.confirm_delete_group_simple', { name: props.group.name }))) return
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    description: t('gestion.stock.confirm_delete_group_simple', { name: props.group.name }),
+    libelleConfirmer: t('common.delete'),
+    agir: () => supprimerLeGroupe(),
+  })
+}
+
+async function supprimerLeGroupe() {
+  if (!props.group) return
   deleting.value = true
   try {
     await $fetch(`/api/editions/${props.editionId}/stock-groups/${props.group.id}`, {

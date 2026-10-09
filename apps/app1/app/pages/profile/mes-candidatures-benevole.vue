@@ -480,6 +480,10 @@
       v-model:open="qrCodeModalOpen"
       :application="selectedApplicationForQrCode"
     />
+
+    <!-- Le retrait d'une candidature est définitif : il faut recandidater. La boîte native ne
+         disait pas DE QUELLE édition il s'agissait, sur un écran qui en liste plusieurs. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -536,6 +540,7 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+const confirmation = useConfirmation()
 const { getImageUrl } = useImageUrl()
 const toast = useToast()
 const { user } = useUserSession()
@@ -785,11 +790,29 @@ const getTimeSlotsFromAssignments = (assignments: any[]) => {
 }
 
 // Fonction pour retirer une candidature
-const withdrawApplication = async (applicationId: number) => {
-  if (!confirm(t('pages.volunteers.confirm_withdraw'))) {
-    return
-  }
+const withdrawApplication = (applicationId: number) => {
+  /*
+   * ⚠️ NOMMER L'ÉDITION, et c'est tout l'intérêt de cette modale. Cet écran liste les candidatures
+   * de PLUSIEURS éditions : « Êtes-vous sûr de vouloir retirer votre candidature ? » ne disait pas
+   * laquelle, et le retrait est définitif — il faut recandidater.
+   *
+   * `getEditionDisplayName` est la fonction que la page emploie DÉJÀ pour chaque carte : l'intitulé
+   * de la modale et celui de la liste ne peuvent donc pas diverger.
+   */
+  const candidature = applications.value?.find((app) => app.id === applicationId)
+  confirmation.demanderConfirmation({
+    titre: t('pages.volunteers.withdraw'),
+    description: candidature
+      ? t('pages.volunteers.confirm_withdraw', {
+          edition: getEditionDisplayName(candidature.edition),
+        })
+      : t('pages.volunteers.confirm_withdraw_unnamed'),
+    libelleConfirmer: t('pages.volunteers.withdraw'),
+    agir: () => retirerLaCandidature(applicationId),
+  })
+}
 
+const retirerLaCandidature = async (applicationId: number) => {
   try {
     // Utiliser l'utilitaire pour retirer la candidature
     const editionId = applications.value?.find((app) => app.id === applicationId)?.edition.id
