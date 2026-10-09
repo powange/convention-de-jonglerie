@@ -1154,11 +1154,24 @@ const openConfigModal = () => {
 }
 
 // Gestion de la sauvegarde depuis la modal
-const handleConfigSave = async (config: any) => {
-  try {
-    await $fetch(`/api/editions/${editionId}/ticketing/external`, {
-      method: 'POST',
-      body: {
+const configHelloAsso = ref<any>(null)
+
+/*
+ * ⚠️ `useApiAction` n'a PAS de crochet `finally` : `setSaving(false)` doit donc figurer dans
+ * `onSuccess` ET dans `onError`. L'oublier sur l'un des deux chemins laisserait le bouton de la
+ * modale tourner indéfiniment — un défaut qui ne se voit qu'au moment où l'appel échoue.
+ *
+ * 📍 Les libellés sont repris TELS QUELS, français en dur compris (« Erreur », « Impossible de
+ * sauvegarder la configuration »). Les traduire changerait un texte visible dans treize langues,
+ * ce qui ne relève pas de ce remaniement — à ficher à part.
+ */
+const { execute: executerEnregistrementHelloAsso } = useApiAction(
+  `/api/editions/${editionId}/ticketing/external`,
+  {
+    method: 'POST',
+    body: () => {
+      const config = configHelloAsso.value
+      return {
         provider: 'HELLOASSO',
         helloAsso: {
           clientId: config.clientId,
@@ -1167,73 +1180,65 @@ const handleConfigSave = async (config: any) => {
           formType: config.formType,
           formSlug: config.formSlug,
         },
-      },
-    })
-
-    // Mettre à jour les valeurs locales
-    helloAssoClientId.value = config.clientId
-    helloAssoOrganizationSlug.value = config.organizationSlug
-    helloAssoFormType.value = config.formType
-    helloAssoFormSlug.value = config.formSlug
-    helloAssoClientSecret.value = ''
-
-    hasExistingConfig.value = true
-
-    toast.add({
-      title: 'Configuration enregistrée',
-      description: `HelloAsso configuré pour ${config.organizationSlug}`,
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    // Fermer la modal
-    showConfigModal.value = false
-  } catch (error: any) {
-    console.error('Failed to save config:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de sauvegarder la configuration',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    configModalRef.value?.setSaving(false)
+      }
+    },
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: 'Erreur' },
+    onSuccess: () => {
+      const config = configHelloAsso.value
+      // Mettre à jour les valeurs locales
+      helloAssoClientId.value = config.clientId
+      helloAssoOrganizationSlug.value = config.organizationSlug
+      helloAssoFormType.value = config.formType
+      helloAssoFormSlug.value = config.formSlug
+      hasHelloAssoConfig.value = true
+      configModalRef.value?.setSaving(false)
+      // Fermer la modal
+      showConfigModal.value = false
+    },
+    onError: () => {
+      configModalRef.value?.setSaving(false)
+    },
   }
+)
+
+const handleConfigSave = async (config: any) => {
+  configHelloAsso.value = config
+  await executerEnregistrementHelloAsso()
 }
 
 // Gestion du test de connexion depuis la modal
-const handleConfigTest = async (config: any) => {
-  try {
-    const body: Record<string, string> = {
-      clientId: config.clientId,
-      organizationSlug: config.organizationSlug,
-      formType: config.formType,
-      formSlug: config.formSlug,
-    }
-    if (config.clientSecret) body.clientSecret = config.clientSecret
+const configTestHelloAsso = ref<any>(null)
 
-    const result = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/test`, {
-      method: 'POST',
-      body,
-    })
-
-    toast.add({
+const { execute: executerTestHelloAsso } = useApiAction<unknown, any>(
+  `/api/editions/${editionId}/ticketing/helloasso/test`,
+  {
+    method: 'POST',
+    body: () => {
+      const config = configTestHelloAsso.value
+      const corps: Record<string, string> = {
+        clientId: config.clientId,
+        organizationSlug: config.organizationSlug,
+        formType: config.formType,
+        formSlug: config.formSlug,
+      }
+      if (config.clientSecret) corps.clientSecret = config.clientSecret
+      return corps
+    },
+    // La description cite le formulaire TROUVÉ : d'où la forme fonction, qui reçoit la réponse.
+    successMessage: (resultat) => ({
       title: 'Connexion réussie !',
-      description: `Formulaire trouvé : ${(result as any).data.form.name} (${(result as any).data.form.organizationName})`,
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error('Test connection error:', error)
-    toast.add({
-      title: 'Échec de la connexion',
-      description: error.data?.message || 'Impossible de se connecter à HelloAsso',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    configModalRef.value?.setTesting(false)
+      description: `Formulaire trouvé : ${resultat.form.name} (${resultat.form.organizationName})`,
+    }),
+    errorMessages: { default: 'Échec de la connexion' },
+    onSuccess: () => configModalRef.value?.setTesting(false),
+    onError: () => configModalRef.value?.setTesting(false),
   }
+)
+
+const handleConfigTest = async (config: any) => {
+  configTestHelloAsso.value = config
+  await executerTestHelloAsso()
 }
 
 // ─── Infomaniak ──────────────────────────────────────────────
@@ -1242,11 +1247,15 @@ const openInfomaniakConfigModal = () => {
   showInfomaniakConfigModal.value = true
 }
 
-const handleInfomaniakConfigSave = async (config: InfomaniakConfig) => {
-  try {
-    await $fetch(`/api/editions/${editionId}/ticketing/external`, {
-      method: 'POST',
-      body: {
+const configInfomaniak = ref<InfomaniakConfig | null>(null)
+
+const { execute: executerEnregistrementInfomaniak } = useApiAction(
+  `/api/editions/${editionId}/ticketing/external`,
+  {
+    method: 'POST',
+    body: () => {
+      const config = configInfomaniak.value!
+      return {
         provider: 'INFOMANIAK',
         infomaniak: {
           apiKey: config.apiKey,
@@ -1256,65 +1265,58 @@ const handleInfomaniakConfigSave = async (config: InfomaniakConfig) => {
           eventId: config.eventId,
           eventName: config.eventName,
         },
-      },
-    })
-
-    infomaniakCurrency.value = config.currency
-    infomaniakEventId.value = config.eventId
-    infomaniakEventName.value = config.eventName
-    hasInfomaniakConfig.value = true
-
-    toast.add({
-      title: t('common.saved'),
-      description: t('gestion.ticketing.infomaniak_config_saved'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    showInfomaniakConfigModal.value = false
-  } catch (error: any) {
-    console.error('Failed to save Infomaniak config:', error)
-    toast.add({
-      title: t('common.error'),
-      description: error.data?.message || t('gestion.ticketing.infomaniak_config_error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    infomaniakConfigModalRef.value?.setSaving(false)
+      }
+    },
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('gestion.ticketing.infomaniak_config_error') },
+    onSuccess: () => {
+      const config = configInfomaniak.value!
+      infomaniakCurrency.value = config.currency
+      infomaniakEventId.value = config.eventId
+      infomaniakEventName.value = config.eventName
+      hasInfomaniakConfig.value = true
+      infomaniakHasGuichetKey.value = !!config.apiKeyGuichet
+      infomaniakHasApplicationPassword.value = !!config.applicationPassword
+      infomaniakConfigModalRef.value?.setSaving(false)
+      showInfomaniakConfigModal.value = false
+    },
+    onError: () => infomaniakConfigModalRef.value?.setSaving(false),
   }
+)
+
+const handleInfomaniakConfigSave = async (config: InfomaniakConfig) => {
+  configInfomaniak.value = config
+  await executerEnregistrementInfomaniak()
 }
 
-const handleInfomaniakConfigTest = async (config: { apiKey: string; currency: string }) => {
-  try {
-    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/infomaniak/test`, {
-      method: 'POST',
-      body: {
-        apiKey: config.apiKey,
-        currency: config.currency,
-      },
-    })
+const configTestInfomaniak = ref<{ apiKey: string; currency: string } | null>(null)
 
-    const events = result.data?.events || []
-    infomaniakConfigModalRef.value?.setEvents(events)
-
-    toast.add({
+const { execute: executerTestInfomaniak } = useApiAction<unknown, any>(
+  `/api/editions/${editionId}/ticketing/infomaniak/test`,
+  {
+    method: 'POST',
+    body: () => ({
+      apiKey: configTestInfomaniak.value!.apiKey,
+      currency: configTestInfomaniak.value!.currency,
+    }),
+    successMessage: (resultat) => ({
       title: t('gestion.ticketing.infomaniak_test_success'),
-      description: t('gestion.ticketing.infomaniak_connection_ok', { count: events.length }),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error('Infomaniak test error:', error)
-    toast.add({
-      title: t('gestion.ticketing.infomaniak_test_failed'),
-      description: error.data?.message || t('gestion.ticketing.infomaniak_config_error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    infomaniakConfigModalRef.value?.setTesting(false)
+      description: t('gestion.ticketing.infomaniak_connection_ok', {
+        count: (resultat?.events || []).length,
+      }),
+    }),
+    errorMessages: { default: t('common.error') },
+    onSuccess: (resultat) => {
+      infomaniakConfigModalRef.value?.setEvents(resultat?.events || [])
+      infomaniakConfigModalRef.value?.setTesting(false)
+    },
+    onError: () => infomaniakConfigModalRef.value?.setTesting(false),
   }
+)
+
+const handleInfomaniakConfigTest = async (config: { apiKey: string; currency: string }) => {
+  configTestInfomaniak.value = config
+  await executerTestInfomaniak()
 }
 
 // La base est en cascade : la configuration emporte ses tarifs, ses options et ses commandes, et
@@ -1334,41 +1336,29 @@ const questionDeconnexionInfomaniak = computed(() => {
 })
 
 const showInfomaniakDisconnectModal = ref(false)
-const disconnectingInfomaniak = ref(false)
 
-const disconnectInfomaniak = async () => {
-  disconnectingInfomaniak.value = true
-  try {
-    await $fetch(`/api/editions/${editionId}/ticketing/external`, {
-      method: 'DELETE',
-    })
-
-    hasInfomaniakConfig.value = false
-    infomaniakCurrency.value = '2'
-    infomaniakEventId.value = undefined
-    infomaniakEventName.value = undefined
-
-    showInfomaniakDisconnectModal.value = false
-
-    toast.add({
+const { execute: disconnectInfomaniak, loading: disconnectingInfomaniak } = useApiAction(
+  `/api/editions/${editionId}/ticketing/external`,
+  {
+    method: 'DELETE',
+    successMessage: {
       title: t('common.saved'),
       description: t('gestion.ticketing.infomaniak_disconnected'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
-    // La modale reste ouverte sur échec : la refermer laisserait croire que la déconnexion a eu
-    // lieu, alors que la configuration est toujours là.
-    toast.add({
-      title: t('common.error'),
-      description: error.data?.message || t('common.error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    disconnectingInfomaniak.value = false
+    },
+    errorMessages: { default: t('common.error') },
+    /*
+     * La fermeture vit dans `onSuccess`, et nulle part ailleurs : la modale RESTE OUVERTE sur
+     * échec. La refermer laisserait croire que la déconnexion a eu lieu.
+     */
+    onSuccess: () => {
+      hasInfomaniakConfig.value = false
+      infomaniakCurrency.value = '2'
+      infomaniakEventId.value = undefined
+      infomaniakEventName.value = undefined
+      showInfomaniakDisconnectModal.value = false
+    },
   }
-}
+)
 
 // JSON brut Infomaniak
 const showInfomaniakRawJsonModal = ref(false)

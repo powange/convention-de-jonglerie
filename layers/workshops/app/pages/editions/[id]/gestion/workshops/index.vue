@@ -224,23 +224,34 @@ const isMapItemAlreadyAdded = (item: { type: 'zone' | 'marker'; id: number }) =>
   )
 }
 
-const addingFromMap = ref(false)
-const addLocationFromMap = async (item: { type: 'zone' | 'marker'; id: number; name: string }) => {
-  addingFromMap.value = true
-  try {
-    const body: Record<string, unknown> = { name: item.name }
-    if (item.type === 'zone') body.zoneId = item.id
-    else body.markerId = item.id
-    await $fetch(`/api/editions/${editionId}/workshops/locations`, {
-      method: 'POST',
-      body,
-    })
-    await fetchWorkshopLocations()
-  } catch {
-    // Erreur silencieuse
-  } finally {
-    addingFromMap.value = false
+const lieuDepuisLaCarte = ref<{ type: 'zone' | 'marker'; id: number; name: string } | null>(null)
+
+/*
+ * ⚠️ `silentError: true` reproduit DÉLIBÉRÉMENT le `catch {}` d'origine, qui portait le
+ * commentaire « Erreur silencieuse ». Le rendre bavard serait une décision d'ergonomie — un clic
+ * sans effet ni message est un défaut réel, mais c'en est un qui a été choisi, et le corriger ne
+ * relève pas de ce remaniement.
+ */
+const { execute: executerAjoutLieuDepuisLaCarte, loading: addingFromMap } = useApiAction(
+  () => `/api/editions/${editionId}/workshops/locations`,
+  {
+    method: 'POST',
+    body: () => {
+      const item = lieuDepuisLaCarte.value!
+      return {
+        name: item.name,
+        ...(item.type === 'zone' ? { zoneId: item.id } : { markerId: item.id }),
+      }
+    },
+    silentSuccess: true,
+    silentError: true,
+    onSuccess: () => fetchWorkshopLocations(),
   }
+)
+
+const addLocationFromMap = async (item: { type: 'zone' | 'marker'; id: number; name: string }) => {
+  lieuDepuisLaCarte.value = item
+  await executerAjoutLieuDepuisLaCarte()
 }
 
 const fetchWorkshopLocations = async () => {

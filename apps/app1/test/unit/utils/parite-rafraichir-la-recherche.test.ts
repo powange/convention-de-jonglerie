@@ -51,6 +51,37 @@ function fonctions(script: string): string[] {
   return script.split(/^(?=(?:const \w+ = (?:async )?\(|(?:async )?function \w+\())/m)
 }
 
+/**
+ * Le rafraîchissement est-il appelé — directement, ou par qui déclenche ce bloc ?
+ *
+ * ## ⚠️ POURQUOI L'INDIRECTION DOIT ÊTRE SUIVIE
+ *
+ * Ce test exigeait que le point d'API et le rafraîchissement vivent dans la MÊME fonction. C'était
+ * vrai des parcours écrits à la main : `$fetch`, puis le toast, puis `rafraichirLaRecherche()`.
+ *
+ * Avec `useApiAction`, le point d'API vit dans une DÉCLARATION (`const { execute: … } =
+ * useApiAction('…/validate-entry', …)`) et le rafraîchissement dans la fonction qui appelle cet
+ * `execute`, ou dans l'`onSuccess` du bloc. Les deux sont alors dans des blocs différents, et
+ * l'ancienne règle rendait un faux positif — vérifié : le rafraîchissement était bien appelé.
+ *
+ * On suit donc le nom de l'`execute` jusqu'à son appelant. L'exigence est inchangée : un parcours
+ * qui périme les listes doit les rafraîchir. Seul le chemin pour le constater a changé.
+ */
+function rafraichitDirectementOuParSonAppelant(script: string, bloc: string): boolean {
+  // Cas 1 : dans le bloc même — un parcours encore écrit à la main, ou un `onSuccess` qui le fait.
+  if (bloc.includes(LE_RAFRAICHISSEMENT)) return true
+
+  // Cas 2 : le bloc déclare un `execute` ; c'est son appelant qui rafraîchit.
+  const alias = [...bloc.matchAll(/execute:\s*(\w+)/g)].map((m) => m[1]!)
+  if (alias.length === 0) return false
+
+  return alias.some((nom) =>
+    fonctions(script).some(
+      (autre) => autre !== bloc && autre.includes(`${nom}(`) && autre.includes(LE_RAFRAICHISSEMENT)
+    )
+  )
+}
+
 describe('rafraîchir les listes après un changement d’état', () => {
   it('le helper existe, et porte bien ce nom', () => {
     // Sans quoi les assertions suivantes seraient vraies pour la mauvaise raison : aucune
@@ -61,16 +92,18 @@ describe('rafraîchir les listes après un changement d’état', () => {
   })
 
   it.each(APPELS_QUI_PERIMENT)('le parcours qui appelle « %s » rafraîchit la liste', (appel) => {
-    const concernees = fonctions(scriptSansCommentaires()).filter((f) => f.includes(appel))
+    const script = scriptSansCommentaires()
+    const concernees = fonctions(script).filter((f) => f.includes(appel))
 
     // Au moins une : si l'appel disparaît du fichier, ce test doit le dire plutôt que passer.
     expect(concernees.length, `aucune fonction n'appelle « ${appel} »`).toBeGreaterThan(0)
 
     for (const fonction of concernees) {
       const nom = fonction.match(/(?:const|function) (\w+)/)?.[1] ?? '(anonyme)'
-      expect(fonction, `« ${nom} » appelle ${appel} sans rafraîchir la liste`).toContain(
-        LE_RAFRAICHISSEMENT
-      )
+      expect(
+        rafraichitDirectementOuParSonAppelant(script, fonction),
+        `« ${nom} » appelle ${appel} sans rafraîchir la liste`
+      ).toBe(true)
     }
   })
 })

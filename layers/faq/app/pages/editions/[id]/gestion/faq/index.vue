@@ -253,10 +253,8 @@ const editionStore = useEditionStore()
 
 const entries = ref<FaqEntry[]>([])
 const loading = ref(true)
-const togglingId = ref<number | null>(null)
 const answerHtmlCache = ref<Record<number, string>>({})
 const faqPagePublicLocal = ref(false)
-const savingPagePublic = ref(false)
 
 // La page est accessible aux organisateurs et bénévoles avec accès gestion
 // (le menu latéral filtre déjà la visibilité du lien) pour consultation. Seuls
@@ -324,29 +322,22 @@ async function fetchEntries() {
   }
 }
 
-async function handleTogglePagePublic(value: boolean) {
-  savingPagePublic.value = true
-  try {
-    await $fetch(`/api/editions/${editionId}`, {
-      method: 'PUT',
-      body: { faqPagePublic: value },
-    })
-    useToast().add({
-      title: t('common.saved'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (e: any) {
-    faqPagePublicLocal.value = !value
-    useToast().add({
-      title: e?.data?.message || t('common.error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    savingPagePublic.value = false
+const { execute: executerBasculePagePublic, loading: savingPagePublic } = useApiAction(
+  `/api/editions/${editionId}`,
+  {
+    method: 'PUT',
+    body: () => ({ faqPagePublic: faqPagePublicLocal.value }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    // L'interrupteur est déjà basculé à l'écran : un échec doit le REMETTRE, sans quoi il
+    // afficherait un état que la base ne porte pas.
+    onError: () => {
+      faqPagePublicLocal.value = !faqPagePublicLocal.value
+    },
   }
-}
+)
+
+const handleTogglePagePublic = () => executerBasculePagePublic()
 
 async function renderAnswer(entry: FaqEntry) {
   answerHtmlCache.value[entry.id] = await markdownToHtml(entry.answer)
@@ -493,42 +484,60 @@ function deleteEntry(entry: FaqEntry) {
   })
 }
 
-async function performDeleteEntry(entry: FaqEntry) {
-  try {
-    await $fetch(`/api/editions/${editionId}/faq/${entry.id}`, { method: 'DELETE' })
-    useToast().add({
-      title: t('common.deleted'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-    await fetchEntries()
-  } catch (e: any) {
-    useToast().add({
-      title: e?.data?.message || t('common.error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
+const { execute: executerSuppressionEntree } = useApiActionById(
+  (id) => `/api/editions/${editionId}/faq/${id}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('common.deleted') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: () => fetchEntries(),
   }
-}
+)
+
+const performDeleteEntry = (entry: FaqEntry) => executerSuppressionEntree(entry.id)
+
+/*
+ * `useApiActionById` porte son propre `loadingId` : c'est exactement ce que `togglingId` faisait
+ * à la main, et l'écran s'en sert pour n'animer QUE la ligne touchée.
+ */
+const entreeABasculer = ref<FaqEntry | null>(null)
+
+const { execute: executerBasculeVisibilite, loadingId: togglingId } = useApiActionById(
+  (id) => `/api/editions/${editionId}/faq/${id}`,
+  {
+    method: 'PUT',
+    body: () => ({ isPublic: !entreeABasculer.value?.isPublic }),
+    silentSuccess: true,
+    errorMessages: { default: t('common.error') },
+    // On ne reporte le changement à l'écran qu'APRÈS le succès : l'inverse afficherait une
+    // visibilité que le serveur a refusée.
+    onSuccess: () => {
+      const entree = entreeABasculer.value
+      if (entree) entree.isPublic = !entree.isPublic
+    },
+  }
+)
 
 async function toggleVisibility(entry: FaqEntry) {
-  togglingId.value = entry.id
-  try {
-    await $fetch(`/api/editions/${editionId}/faq/${entry.id}`, {
-      method: 'PUT',
-      body: { isPublic: !entry.isPublic },
-    })
-    entry.isPublic = !entry.isPublic
-  } catch (e: any) {
-    useToast().add({
-      title: e?.data?.message || t('common.error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    togglingId.value = null
-  }
+  entreeABasculer.value = entry
+  await executerBasculeVisibilite(entry.id)
 }
+
+/*
+ * Le réordonnancement est OPTIMISTE : `entries.value` est déjà réarrangé à l'écran quand l'appel
+ * part. L'échec doit donc défaire, et c'est le rechargement qui s'en charge — pas un `onError`
+ * qui tenterait de recalculer l'ordre d'avant.
+ */
+const { execute: executerReordonnancement } = useApiAction(
+  `/api/editions/${editionId}/faq/reorder`,
+  {
+    method: 'PUT',
+    body: () => ({ orderedIds: entries.value.map((x) => x.id) }),
+    silentSuccess: true,
+    errorMessages: { default: t('common.error') },
+    onError: () => fetchEntries(),
+  }
+)
 
 // --- Drag & drop pour réordonner ---
 const draggedId = ref<number | null>(null)
@@ -567,18 +576,6 @@ async function onDrop(target: FaqEntry, e: DragEvent) {
   if (!moved) return
   next.splice(targetIdx, 0, moved)
   entries.value = next
-  try {
-    await $fetch(`/api/editions/${editionId}/faq/reorder`, {
-      method: 'PUT',
-      body: { orderedIds: next.map((x) => x.id) },
-    })
-  } catch (err: any) {
-    useToast().add({
-      title: err?.data?.message || t('common.error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-    await fetchEntries()
-  }
+  await executerReordonnancement()
 }
 </script>

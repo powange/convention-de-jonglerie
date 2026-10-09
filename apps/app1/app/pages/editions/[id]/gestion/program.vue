@@ -371,7 +371,6 @@ const {
  * comme il était, plutôt que de laisser l'écran affirmer une publication qui n'a pas eu lieu.
  */
 const pagePubliqueLocale = ref(false)
-const enregistrementVisibilite = ref(false)
 
 watch(
   () => edition.value?.programPagePublic,
@@ -381,34 +380,28 @@ watch(
   { immediate: true }
 )
 
-const basculerVisibilitePublique = async (valeur: boolean) => {
-  enregistrementVisibilite.value = true
-  try {
-    await $fetch(`/api/editions/${editionId.value}`, {
-      method: 'PUT',
-      body: { programPagePublic: valeur },
-    })
-    // Le store porte l'édition consultée par l'en-tête : sans cette mise à jour, l'onglet
-    // public resterait dans son état précédent jusqu'au prochain chargement.
-    if (edition.value) {
-      editionStore.setEdition({ ...edition.value, programPagePublic: valeur })
-    }
-    useToast().add({
-      title: t('common.saved'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (e: any) {
-    pagePubliqueLocale.value = !valeur
-    useToast().add({
-      title: e?.data?.message || t('common.error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    enregistrementVisibilite.value = false
+const { execute: executerBasculeVisibilite, loading: enregistrementVisibilite } = useApiAction(
+  () => `/api/editions/${editionId.value}`,
+  {
+    method: 'PUT',
+    body: () => ({ programPagePublic: pagePubliqueLocale.value }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: () => {
+      // Le store porte l'édition consultée par l'en-tête : sans cette mise à jour, l'onglet
+      // public resterait dans son état précédent jusqu'au prochain chargement.
+      if (edition.value) {
+        editionStore.setEdition({ ...edition.value, programPagePublic: pagePubliqueLocale.value })
+      }
+    },
+    // L'interrupteur est déjà basculé à l'écran : un échec doit le remettre.
+    onError: () => {
+      pagePubliqueLocale.value = !pagePubliqueLocale.value
+    },
   }
-}
+)
+
+const basculerVisibilitePublique = () => executerBasculeVisibilite()
 
 /**
  * Fuseau de la convention. Il gouverne aussi bien l'affichage que la saisie : un organisateur qui

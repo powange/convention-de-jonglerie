@@ -917,7 +917,6 @@ const ongletActif = computed<Onglet>({
 
 /** Les saisies de la séance en cours, non encore enregistrées. Clé : identifiant de l'objet. */
 const saisies = ref<Record<number, number | null>>({})
-const comptageEnCours = ref(false)
 
 /**
  * La sélection est celle du TABLEAU, pas une liste tenue à part.
@@ -1760,33 +1759,31 @@ async function remettreACompter() {
   }
 }
 
+const comptageAEnvoyer = ref<ReturnType<typeof comptagesAEnvoyer>>([])
+
+const { execute: executerComptage, loading: comptageEnCours } = useApiAction(
+  () => `/api/editions/${editionId}/stock-items/bulk`,
+  {
+    method: 'PATCH',
+    body: () => ({
+      itemIds: comptageAEnvoyer.value.map((entree) => entree.id),
+      comptage: comptageAEnvoyer.value,
+    }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      saisies.value = {}
+      // Les listes aussi : une quantité y est relue sur l'objet, et un comptage vient de la changer.
+      await Promise.all([chargerObjets(), chargerListes()])
+    },
+  }
+)
+
 async function enregistrerComptage() {
   const comptage = comptagesAEnvoyer(lignes.value as LigneComptage[])
   if (comptage.length === 0) return
-
-  comptageEnCours.value = true
-  try {
-    await $fetch(`/api/editions/${editionId}/stock-items/bulk`, {
-      method: 'PATCH',
-      body: { itemIds: comptage.map((entree) => entree.id), comptage },
-    })
-    useToast().add({
-      title: t('common.saved'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-    saisies.value = {}
-    // Les listes aussi : une quantité y est relue sur l'objet, et un comptage vient de la changer.
-    await Promise.all([chargerObjets(), chargerListes()])
-  } catch (e: any) {
-    useToast().add({
-      title: e?.data?.message || t('common.error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    comptageEnCours.value = false
-  }
+  comptageAEnvoyer.value = comptage
+  await executerComptage()
 }
 
 async function chargerObjets() {

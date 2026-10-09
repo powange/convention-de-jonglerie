@@ -1074,45 +1074,73 @@ const nomDeLaPersonne = (participant: any): string => {
   return [personne.firstName, personne.lastName].filter(Boolean).join(' ')
 }
 
-const handleScan = async (code: string) => {
-  try {
-    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/verify`, {
-      method: 'POST',
-      body: {
-        qrCode: code,
-      },
-    })
+const lotAValider = ref<{ lot: any; paymentInfo: any } | null>(null)
 
-    if (result.data.found && result.data.participant) {
-      // Afficher la modal avec les détails du participant
-      selectedParticipant.value = result.data.participant
-      participantType.value = result.data.type || 'ticket'
-      isRefundedOrder.value = result.data.isRefunded || false
-      participantModalOpen.value = true
-
-      toast.add({
-        title: titreDeDecouverte(result.data.type),
-        description: nomDeLaPersonne(result.data.participant),
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-    } else {
-      toast.add({
-        title: t('ticketing.access_control.no_ticket_found'),
-        description: motifDeRefus(result.data.raison),
-        icon: 'i-heroicons-exclamation-triangle',
-        color: 'warning',
-      })
-    }
-  } catch (error: unknown) {
-    const err = error as { data?: { message?: string } }
-    toast.add({
-      title: t('ticketing.access_control.error_title'),
-      description: err.data?.message || t('ticketing.access_control.verify_error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
+const { execute: executerValidationDEntree, error: erreurValidation } = useApiAction<unknown, any>(
+  `/api/editions/${editionId}/ticketing/validate-entry`,
+  {
+    method: 'POST',
+    body: () => {
+      const { lot, paymentInfo } = lotAValider.value!
+      return {
+        participantIds: lot.ids,
+        type: lot.type,
+        paymentMethod: paymentInfo?.paymentMethod,
+        checkNumber: paymentInfo?.checkNumber,
+        userInfo: lot.userInfo,
+      }
+    },
+    silent: true,
   }
+)
+
+const codeScanne = ref('')
+
+/*
+ * ⚠️ `silentSuccess` et deux toasts à la main, et ce n'est PAS un contournement par paresse : un
+ * appel réussi peut dire « trouvé » ou « pas trouvé », et les deux cas diffèrent par l'icône et
+ * la COULEUR — `success` contre `warning`. `successMessage` ne porte que titre et description ;
+ * l'icône et la couleur sont fixées dans le composable. La forme fonction ne suffirait donc pas.
+ *
+ * Ce que la migration apporte quand même, et c'est l'essentiel du constat : le chemin d'ERREUR,
+ * qui décidait seul d'afficher le message du serveur ou un texte générique.
+ */
+const { execute: executerVerification } = useApiAction<unknown, any>(
+  `/api/editions/${editionId}/ticketing/verify`,
+  {
+    method: 'POST',
+    body: () => ({ qrCode: codeScanne.value }),
+    silentSuccess: true,
+    errorMessages: { default: t('ticketing.access_control.verify_error') },
+    onSuccess: (resultat) => {
+      if (resultat?.found && resultat.participant) {
+        // Afficher la modal avec les détails du participant
+        selectedParticipant.value = resultat.participant
+        participantType.value = resultat.type || 'ticket'
+        isRefundedOrder.value = resultat.isRefunded || false
+        participantModalOpen.value = true
+
+        toast.add({
+          title: titreDeDecouverte(resultat.type),
+          description: nomDeLaPersonne(resultat.participant),
+          icon: 'i-heroicons-check-circle',
+          color: 'success',
+        })
+      } else {
+        toast.add({
+          title: t('ticketing.access_control.no_ticket_found'),
+          description: motifDeRefus(resultat?.raison),
+          icon: 'i-heroicons-exclamation-triangle',
+          color: 'warning',
+        })
+      }
+    },
+  }
+)
+
+const handleScan = async (code: string) => {
+  codeScanne.value = code
+  await executerVerification()
 }
 
 /**
@@ -1345,26 +1373,25 @@ const handleValidateParticipants = async (
   const echecs: string[] = []
 
   for (const lot of lots) {
-    try {
-      const result: any = await $fetch(`/api/editions/${editionId}/ticketing/validate-entry`, {
-        method: 'POST',
-        body: {
-          participantIds: lot.ids,
-          type: lot.type,
-          paymentMethod: paymentInfo?.paymentMethod,
-          checkNumber: paymentInfo?.checkNumber,
-          userInfo: lot.userInfo,
-        },
-      })
-      valides += lot.ids.length
-      // Le compte rendu détaillé du serveur ne vaut que pour un lot unique ; au-delà, on résume.
-      if (lots.length === 1) toast.add(compteRenduDeValidation(result?.data, lot.ids.length))
-    } catch (error: unknown) {
-      const err = error as { data?: { message?: string } }
+    /*
+     * ⚠️ `silent: true` est indispensable ici : un toast par lot en afficherait jusqu'à quatre
+     * pour un seul geste, alors que le compte rendu part une fois en bas de boucle.
+     *
+     * Et `execute` rend `null` sur un échec SANS LEVER — c'est ce qui permet de poursuivre la
+     * boucle, comme le faisait le `try/catch` par lot : « un échec partiel doit laisser intact ce
+     * qui est déjà passé ».
+     */
+    lotAValider.value = { lot, paymentInfo }
+    const resultat = await executerValidationDEntree()
+    if (resultat === null) {
       echecs.push(
-        `${lot.type} : ${err.data?.message ?? t('ticketing.access_control.validate_error')}`
+        `${lot.type} : ${erreurValidation.value?.data?.message ?? t('ticketing.access_control.validate_error')}`
       )
+      continue
     }
+    valides += lot.ids.length
+    // Le compte rendu détaillé du serveur ne vaut que pour un lot unique ; au-delà, on résume.
+    if (lots.length === 1) toast.add(compteRenduDeValidation(resultat, lot.ids.length))
   }
 
   if (lots.length > 1 || echecs.length) {
@@ -1398,29 +1425,29 @@ const handleValidateParticipants = async (
    */
 }
 
-const reloadParticipant = async (
-  identifier: number | string,
-  type: 'ticket' | 'volunteer' | 'artist' | 'organizer'
-) => {
-  try {
-    // Une relecture, pas un scan : on rouvre une fiche déjà affichée, dont l'identifiant vient
-    // de la réponse précédente du serveur. On le dit tel quel plutôt que de refabriquer un faux
-    // QR code sans jeton — c'est cette contrefaçon qui obligeait le scan à accepter la forme
-    // `volunteer-{id}`, et donc à laisser entrer qui la tapait à la main.
-    const body =
-      type === 'ticket' ? { qrCode: identifier as string } : { type, id: identifier as number }
+const corpsDeRelecture = ref<Record<string, unknown>>({})
 
-    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/verify`, {
-      method: 'POST',
-      body,
-    })
+/*
+ * ⚠️ `silent: true` reproduit DÉLIBÉRÉMENT le `catch {}` d'origine, annoté « Erreur silencieuse
+ * lors du rechargement du participant ». C'est un rafraîchissement d'affichage : échouer ne doit
+ * pas couvrir d'un toast le geste qui vient de réussir.
+ */
+const { execute: executerRelectureParticipant } = useApiAction<unknown, any>(
+  `/api/editions/${editionId}/ticketing/verify`,
+  { method: 'POST', body: () => corpsDeRelecture.value, silent: true }
+)
 
-    if (result.data.found) {
-      selectedParticipant.value = result.data.participant
-    }
-  } catch {
-    // Erreur silencieuse lors du rechargement du participant
-  }
+const reloadParticipant = async (identifier: string | number, type: string) => {
+  /*
+   * ⚠️ Un bénévole est relu par SON IDENTIFIANT et non par un QR code reconstruit : la forme
+   * `volunteer-{id}` permettait de fabriquer un faux QR code sans jeton — c'est cette contrefaçon
+   * qui obligeait le scan à l'accepter, et donc à laisser entrer qui la tapait à la main.
+   */
+  corpsDeRelecture.value =
+    type === 'ticket' ? { qrCode: identifier as string } : { type, id: identifier as number }
+
+  const resultat = await executerRelectureParticipant()
+  if (resultat?.found) selectedParticipant.value = resultat.participant
 }
 
 /**
@@ -1431,86 +1458,80 @@ const reloadParticipant = async (
  * d'entrée, et elle ne solde pas la même somme que l'annulation — d'où deux colonnes et deux
  * routes. Les confondre rendrait deux fois le même argent, en espèces, sans rattrapage.
  */
-const handleRemiseRendue = async (itemId: number, rendue: boolean) => {
-  try {
-    await $fetch(`/api/editions/${editionId}/ticketing/order-items/${itemId}/discount-paid-back`, {
-      method: 'PATCH',
-      body: { paidBack: rendue },
-    })
+const remiseRendue = ref(false)
 
-    toast.add({
-      title: rendue
+const { execute: executerRemiseRendue } = useApiActionById(
+  (itemId) => `/api/editions/${editionId}/ticketing/order-items/${itemId}/discount-paid-back`,
+  {
+    method: 'PATCH',
+    body: () => ({ paidBack: remiseRendue.value }),
+    // Le titre dit le SENS du geste : forme fonction, résolue à l'appel.
+    successMessage: () => ({
+      title: remiseRendue.value
         ? t('edition.ticketing.discount_mark_done')
         : t('edition.ticketing.discount_already_done'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    await Promise.all([loadStats(), loadRecentValidations()])
-    // Comme les quatre autres parcours : la liste derrière porte la dette, elle se périme ici.
-    rafraichirLaRecherche()
-
-    if (selectedParticipant.value?.ticket?.qrCode) {
-      await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
-    }
-  } catch (error: unknown) {
-    const err = error as { data?: { message?: string } }
-    toast.add({
-      title: t('ticketing.access_control.error_title'),
-      description: err.data?.message || t('ticketing.access_control.validate_error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
+    }),
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      await Promise.all([loadStats(), loadRecentValidations()])
+      // Comme les quatre autres parcours : la liste derrière porte la dette, elle se périme ici.
+      rafraichirLaRecherche()
+      if (selectedParticipant.value?.ticket?.qrCode) {
+        await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
+      }
+    },
   }
+)
+
+const handleRemiseRendue = async (itemId: number, rendue: boolean) => {
+  remiseRendue.value = rendue
+  await executerRemiseRendue(itemId)
 }
 
-const handleInvalidateEntry = async (type: string, participantId: number) => {
-  try {
-    /*
-     * ⚠️ LA NATURE VIENT DE LA MODALE, plus de `participantType`. Cet état global désignait le
-     * titre par lequel on était entré ; avec plusieurs titres empilés, dévalider le second
-     * s'adressait à la table du premier.
-     */
-    await $fetch(`/api/editions/${editionId}/ticketing/invalidate-entry`, {
-      method: 'POST',
-      body: {
-        participantId,
-        type,
-      },
-    })
+const natureAInvalider = ref<string>('')
 
-    toast.add({
+const { execute: executerInvalidation } = useApiActionById(
+  () => `/api/editions/${editionId}/ticketing/invalidate-entry`,
+  {
+    method: 'POST',
+    body: (participantId) => ({ participantId, type: natureAInvalider.value }),
+    successMessage: {
       title: t('ticketing.access_control.entry_invalidated_title'),
       description: t('ticketing.access_control.entry_invalidated_description'),
-      icon: 'i-heroicons-x-circle',
-      color: 'success',
-    })
+    },
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      // Recharger les statistiques et les dernières validations
+      await Promise.all([loadStats(), loadRecentValidations()])
 
-    // Recharger les statistiques et les dernières validations
-    await Promise.all([loadStats(), loadRecentValidations()])
+      // Et les listes de résultats, qui restaient figées sur l'état d'avant.
+      rafraichirLaRecherche()
 
-    // Et les listes de résultats, qui restaient figées sur l'état d'avant.
-    rafraichirLaRecherche()
-
-    // Recharger le participant pour afficher le nouveau statut
-    if (participantType.value === 'volunteer' && selectedParticipant.value?.volunteer?.id) {
-      await reloadParticipant(selectedParticipant.value.volunteer.id, 'volunteer')
-    } else if (participantType.value === 'artist' && selectedParticipant.value?.artist?.id) {
-      await reloadParticipant(selectedParticipant.value.artist.id, 'artist')
-    } else if (participantType.value === 'organizer' && selectedParticipant.value?.organizer?.id) {
-      await reloadParticipant(selectedParticipant.value.organizer.id, 'organizer')
-    } else if (participantType.value === 'ticket' && selectedParticipant.value?.ticket?.qrCode) {
-      await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
-    }
-  } catch (error: unknown) {
-    const err = error as { data?: { message?: string } }
-    toast.add({
-      title: t('ticketing.access_control.error_title'),
-      description: err.data?.message || t('ticketing.access_control.invalidate_error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
+      // Recharger le participant pour afficher le nouveau statut
+      if (participantType.value === 'volunteer' && selectedParticipant.value?.volunteer?.id) {
+        await reloadParticipant(selectedParticipant.value.volunteer.id, 'volunteer')
+      } else if (participantType.value === 'artist' && selectedParticipant.value?.artist?.id) {
+        await reloadParticipant(selectedParticipant.value.artist.id, 'artist')
+      } else if (
+        participantType.value === 'organizer' &&
+        selectedParticipant.value?.organizer?.id
+      ) {
+        await reloadParticipant(selectedParticipant.value.organizer.id, 'organizer')
+      } else if (participantType.value === 'ticket' && selectedParticipant.value?.ticket?.qrCode) {
+        await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
+      }
+    },
   }
+)
+
+const handleInvalidateEntry = async (type: string, participantId: number) => {
+  /*
+   * ⚠️ LA NATURE VIENT DE LA MODALE, plus de `participantType`. Cet état global désignait le
+   * titre par lequel on était entré ; avec plusieurs titres empilés, dévalider le second
+   * s'adressait à la table du premier.
+   */
+  natureAInvalider.value = type
+  await executerInvalidation(participantId)
 }
 
 /**
@@ -1521,46 +1542,46 @@ const handleInvalidateEntry = async (type: string, participantId: number) => {
  *
  * L'entrée reste refusée : on solde une dette, on ne rouvre pas un droit.
  */
+const remboursementDemande = ref<{ refunded: boolean; portee: 'billet' | 'commande' }>({
+  refunded: false,
+  portee: 'billet',
+})
+
+const { execute: executerRemboursement } = useApiActionById(
+  (itemId) => `/api/editions/${editionId}/ticketing/order-items/${itemId}/refund`,
+  {
+    method: 'PATCH',
+    body: () => remboursementDemande.value,
+    // Le titre dit le SENS du geste : forme fonction, résolue à l'appel.
+    successMessage: () => ({
+      title: remboursementDemande.value.refunded
+        ? t('ticketing.access_control.refund_recorded')
+        : t('ticketing.access_control.refund_undone'),
+    }),
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      // Recharger le billet pour que la fiche montre la dette soldée plutôt que la somme due.
+      if (selectedParticipant.value?.ticket?.qrCode) {
+        await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
+      }
+      // Et la liste derrière, qui porte elle aussi l'état « remboursé ».
+      rafraichirLaRecherche()
+    },
+  }
+)
+
 const handleRefund = async (
   itemId: number,
   refunded: boolean,
-  /**
-   * Ce que le geste solde. La fiche envoie « commande » quand toute la dette revient à la même
-   * personne : on rend l'argent une fois, pas ligne par ligne. Elle retombe sur « billet » dès que
-   * les lignes dues portent des noms différents — voir `nomsMultiples` dans `remboursement-du.ts`.
+  /*
+   * ⚠️ La portée vaut « commande » quand toute la dette revient à la même personne : on rend
+   * l'argent une fois, pas ligne par ligne. Elle retombe sur « billet » dès que les lignes dues
+   * portent des noms différents — voir `nomsMultiples` dans `remboursement-du.ts`.
    */
   portee: 'billet' | 'commande' = 'billet'
 ) => {
-  try {
-    await $fetch(`/api/editions/${editionId}/ticketing/order-items/${itemId}/refund`, {
-      method: 'PATCH',
-      body: { refunded, portee },
-    })
-
-    toast.add({
-      title: refunded
-        ? t('ticketing.access_control.refund_recorded')
-        : t('ticketing.access_control.refund_undone'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    // Recharger le billet pour que la fiche montre la dette soldée plutôt que la somme due.
-    if (selectedParticipant.value?.ticket?.qrCode) {
-      await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
-    }
-
-    // Et la liste derrière, qui porte elle aussi l'état « remboursé ».
-    rafraichirLaRecherche()
-  } catch (error: unknown) {
-    const err = error as { data?: { message?: string } }
-    toast.add({
-      title: t('ticketing.access_control.error_title'),
-      description: err.data?.message || t('ticketing.access_control.refund_error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  }
+  remboursementDemande.value = { refunded, portee }
+  await executerRemboursement(itemId)
 }
 
 /**
@@ -1569,6 +1590,13 @@ const handleRefund = async (
  * Extrait de `handleOrderCreated` parce qu'un second appelant la demande : l'encart qui signale,
  * dans la modale d'ajout, qu'un billet existe déjà pour cette adresse. Recopier la séquence
  * aurait fait diverger les deux au premier champ ajouté à la fiche.
+ */
+/*
+ * ⚠️ RESTE UN `$fetch` NU, DÉLIBÉRÉMENT. Cette fonction n'a ni `try/catch`, ni toast, ni booléen
+ * de chargement : le constat d'audit — « chaque copie décide seule si elle affiche l'erreur du
+ * serveur ou un texte générique » — ne la concerne pas. Son contrat est de LEVER, parce que c'est
+ * son appelant (`handleOrderCreated`) qui tient le `try/catch` et le message. La passer à
+ * `useApiAction`, qui ne lève pas, ferait disparaître ce message sans que rien ne le signale.
  */
 const ouvrirFicheDuBillet = async (qrCode: string): Promise<boolean> => {
   const result: any = await $fetch(`/api/editions/${editionId}/ticketing/verify`, {

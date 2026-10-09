@@ -634,7 +634,6 @@ watch(
 // URL JugglingEdge (séparée car éditable)
 const jugglingEdgeUrlInput = ref(edition.value?.jugglingEdgeUrl || '')
 const jugglingEdgeSelected = ref(!!edition.value?.jugglingEdgeUrl)
-const savingJugglingEdgeUrl = ref(false)
 
 watch(edition, (ed) => {
   if (ed) {
@@ -643,21 +642,16 @@ watch(edition, (ed) => {
   }
 })
 
-const saveJugglingEdgeUrl = async () => {
-  savingJugglingEdgeUrl.value = true
-  try {
-    await $fetch(`/api/editions/${editionId}`, {
-      method: 'PUT',
-      body: { jugglingEdgeUrl: jugglingEdgeUrlInput.value.trim() || null },
-    })
-    await editionStore.fetchEditionById(editionId, { force: true })
-    useToast().add({ title: t('common.saved'), color: 'success' })
-  } catch {
-    useToast().add({ title: t('common.error'), color: 'error' })
-  } finally {
-    savingJugglingEdgeUrl.value = false
+const { execute: saveJugglingEdgeUrl, loading: savingJugglingEdgeUrl } = useApiAction(
+  `/api/editions/${editionId}`,
+  {
+    method: 'PUT',
+    body: () => ({ jugglingEdgeUrl: jugglingEdgeUrlInput.value.trim() || null }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: () => editionStore.fetchEditionById(editionId, { force: true }),
   }
-}
+)
 
 const selectedUrls = computed(() => {
   const urls = externalUrls.value.filter((l) => l.selected).map((l) => l.url)
@@ -738,6 +732,35 @@ const afficherValeur = (champ: string, valeur: string | null) => {
   return formaterDateHeure(valeur, fuseauProgramme.value, locale.value)
 }
 
+const corpsDeLElement = ref<Record<string, unknown>>({})
+const champsDEditionAAppliquer = ref<Record<string, unknown>>({})
+
+const { execute: appliquerChampsDEdition, error: erreurChampsDEdition } = useApiAction(
+  `/api/editions/${editionId}`,
+  { method: 'PUT', body: () => champsDEditionAAppliquer.value, silent: true }
+)
+
+const { execute: creerElementDeProgramme, error: erreurCreation } = useApiAction(
+  `/api/editions/${editionId}/program-items`,
+  {
+    method: 'POST',
+    // Les créations arrivent en brouillon : voir la note de `appliquerProgramme`.
+    body: () => ({ ...corpsDeLElement.value, isPublic: false }),
+    silent: true,
+  }
+)
+
+const { execute: mettreAJourElementDeProgramme, error: erreurMiseAJour } = useApiActionById(
+  (id) => `/api/editions/${editionId}/program-items/${id}`,
+  {
+    method: 'PUT',
+    // `isPublic` est volontairement absent : corriger un horaire ne doit pas dépublier un
+    // élément que l'organisateur avait déjà rendu visible.
+    body: () => corpsDeLElement.value,
+    silent: true,
+  }
+)
+
 /**
  * Applique les éléments retenus : création ou correction, un appel par élément.
  *
@@ -759,23 +782,24 @@ const appliquerProgramme = async () => {
         endDateTime: action.propose.fin ?? null,
         locationName: action.propose.lieu ?? null,
       }
-      try {
-        if (action.action === 'creer') {
-          await $fetch(`/api/editions/${editionId}/program-items`, {
-            method: 'POST',
-            body: { ...corps, isPublic: false },
-          })
-        } else if (action.action === 'mettre_a_jour') {
-          // `isPublic` est volontairement absent : corriger un horaire ne doit pas dépublier un
-          // élément que l'organisateur avait déjà rendu visible.
-          await $fetch(`/api/editions/${editionId}/program-items/${action.existantId}`, {
-            method: 'PUT',
-            body: corps,
-          })
-        }
-      } catch (error: any) {
-        // Un élément refusé ne doit pas emporter les suivants : on poursuit et on récapitule.
-        echecs.push(`${action.propose.titre} — ${error?.data?.message || error?.message || ''}`)
+      /*
+       * ⚠️ `silent: true` sur les deux actions, et c'est essentiel : un lot de trente éléments
+       * dont la moitié échoue produirait quinze toasts. Un seul récapitulatif part en bas de
+       * boucle.
+       *
+       * `execute` rend `null` sur un échec SANS LEVER — c'est ce qui permet de poursuivre la
+       * boucle : un élément refusé ne doit pas emporter les suivants.
+       */
+      corpsDeLElement.value = corps
+      const resultat =
+        action.action === 'creer'
+          ? await creerElementDeProgramme()
+          : action.action === 'mettre_a_jour'
+            ? await mettreAJourElementDeProgramme(action.existantId!)
+            : undefined
+      if (resultat === null) {
+        const erreur = action.action === 'creer' ? erreurCreation.value : erreurMiseAJour.value
+        echecs.push(`${action.propose.titre} — ${erreur?.data?.message || erreur?.message || ''}`)
       }
     }
 
@@ -1187,10 +1211,10 @@ const applyUpdates = async () => {
 
     // Appliquer les mises à jour de l'édition
     if (Object.keys(editionUpdates).length > 0) {
-      await $fetch(`/api/editions/${editionId}`, {
-        method: 'PUT',
-        body: editionUpdates,
-      })
+      // `silent` : le toast récapitulatif part plus bas, une fois l'édition ET la convention
+      // traitées. Un toast par appel en afficherait deux pour un seul geste.
+      champsDEditionAAppliquer.value = editionUpdates
+      if ((await appliquerChampsDEdition()) === null) throw erreurChampsDEdition.value
     }
 
     // Rafraîchir les données

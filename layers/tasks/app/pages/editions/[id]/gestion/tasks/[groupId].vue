@@ -743,34 +743,85 @@ const groupActions = computed(() => [
   ],
 ])
 
+const ordreDeTachesPrecedent = ref<TaskItem[]>([])
+const idsDeLaColonneDeposee = ref<number[]>([])
+
+/*
+ * Le réordonnancement est OPTIMISTE : les cartes sont déjà replacées quand l'appel part. L'échec
+ * restaure l'ordre d'avant plutôt que de recharger — recharger ferait revenir la carte à sa place
+ * après un aller-retour visible, sous le doigt.
+ */
+const { execute: executerReordonnancementTaches } = useApiAction(
+  () => `/api/editions/${editionId}/task-groups/${groupId.value}/reorder`,
+  {
+    method: 'POST',
+    body: () => ({ taskIds: idsDeLaColonneDeposee.value }),
+    silentSuccess: true,
+    errorMessages: { default: t('errors.generic') },
+    onError: () => {
+      const taches = group.value?.tasks
+      if (!taches) return
+      taches.length = 0
+      taches.push(...ordreDeTachesPrecedent.value)
+    },
+  }
+)
+
+const tacheDontLeStatutChange = ref<{
+  task: TaskItem
+  fromStatus: TaskStatus
+  newStatus: TaskStatus
+} | null>(null)
+
+const { execute: executerChangementDeStatut } = useApiActionById(
+  (id) => `/api/editions/${editionId}/tasks/${id}`,
+  {
+    method: 'PUT',
+    body: () => ({ status: tacheDontLeStatutChange.value?.newStatus }),
+    silentSuccess: true,
+    errorMessages: { default: t('errors.generic') },
+    onSuccess: async () => {
+      /*
+       * Clore une tâche en retard, ou en rouvrir une, change la pastille du menu. Ce chemin ne
+       * recharge rien — la mise à jour est optimiste —, il doit donc le signaler lui-même.
+       *
+       * ⚠️ L'appel isole ses propres erreurs : il ne peut pas déclencher le retour en arrière
+       * d'`onError`. C'est pour cela qu'il vit dans `onSuccess` et non à la suite de l'appel.
+       */
+      await rafraichirCompteurs('taches-en-retard')
+    },
+    onError: () => {
+      const enCours = tacheDontLeStatutChange.value
+      if (enCours) enCours.task.status = enCours.fromStatus
+    },
+  }
+)
+
 const confirmationGroupeOuverte = ref(false)
-const suppressionGroupeEnCours = ref(false)
 
 function deleteGroup() {
   if (!group.value) return
   confirmationGroupeOuverte.value = true
 }
 
+const { execute: executerSuppressionGroupe, loading: suppressionGroupeEnCours } = useApiActionById(
+  (id) => `/api/editions/${editionId}/task-groups/${id}`,
+  {
+    method: 'DELETE',
+    silentSuccess: true,
+    errorMessages: { default: t('errors.generic') },
+    // Le succès quitte la page : refermer la modale serait sans objet.
+    onSuccess: () => {
+      router.push(`/editions/${editionId}/gestion/tasks`)
+    },
+  }
+)
+
 async function supprimerGroupe() {
-  // `UiConfirmModal` n'émet que `confirm` et `cancel` : la refermer revient à l'appelant. Ici,
-  // le succès quitte la page — la refermer serait de toute façon sans objet.
+  // `UiConfirmModal` n'émet que `confirm` et `cancel` : la refermer revient à l'appelant.
   const groupe = group.value
   if (!groupe) return
-
-  suppressionGroupeEnCours.value = true
-  try {
-    await $fetch(`/api/editions/${editionId}/task-groups/${groupe.id}`, { method: 'DELETE' })
-    router.push(`/editions/${editionId}/gestion/tasks`)
-  } catch (e: unknown) {
-    const err = e as { data?: { message?: string } }
-    useToast().add({
-      title: err?.data?.message || t('errors.generic'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    suppressionGroupeEnCours.value = false
-  }
+  await executerSuppressionGroupe(groupe.id)
 }
 
 async function handleGroupSaved() {
@@ -891,21 +942,9 @@ const reordre = useReordonnancementTactile<TaskItem>({
     taches.length = 0
     taches.push(...autres, ...ordreFinal)
 
-    try {
-      await $fetch(`/api/editions/${editionId}/task-groups/${groupId.value}/reorder`, {
-        method: 'POST',
-        body: { taskIds: ordreFinal.map((t) => t.id) },
-      })
-    } catch (e: unknown) {
-      taches.length = 0
-      taches.push(...ordrePrecedent)
-      const err = e as { data?: { message?: string } }
-      useToast().add({
-        title: err?.data?.message || t('errors.generic'),
-        icon: 'i-heroicons-exclamation-circle',
-        color: 'error',
-      })
-    }
+    ordreDeTachesPrecedent.value = ordrePrecedent
+    idsDeLaColonneDeposee.value = ordreFinal.map((t) => t.id)
+    await executerReordonnancementTaches()
   },
 })
 
@@ -921,25 +960,8 @@ async function changeTaskStatus(taskId: number, fromStatus: TaskStatus, newStatu
   if (!task) return
   // Mise à jour optimiste
   task.status = newStatus
-  try {
-    await $fetch(`/api/editions/${editionId}/tasks/${taskId}`, {
-      method: 'PUT',
-      body: { status: newStatus },
-    })
-    // Clore une tâche en retard, ou en rouvrir une, change la pastille du menu. Ce chemin ne
-    // recharge rien — la mise à jour est optimiste —, il doit donc le signaler lui-même. L'appel
-    // isole ses propres erreurs : il ne peut pas déclencher le retour en arrière ci-dessous.
-    await rafraichirCompteurs('taches-en-retard')
-  } catch (e: unknown) {
-    // Revert en cas d'erreur API
-    task.status = fromStatus
-    const err = e as { data?: { message?: string } }
-    useToast().add({
-      title: err?.data?.message || t('errors.generic'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  }
+  tacheDontLeStatutChange.value = { task, fromStatus, newStatus }
+  await executerChangementDeStatut(taskId)
 }
 
 function formatDeadline(d: string | null): string {
