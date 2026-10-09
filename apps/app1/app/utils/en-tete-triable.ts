@@ -1,4 +1,6 @@
-import { h, resolveComponent } from 'vue'
+import { h } from 'vue'
+
+import { UButton } from '#components'
 
 import type { Column } from '@tanstack/vue-table'
 
@@ -45,7 +47,23 @@ import type { Column } from '@tanstack/vue-table'
 export function enTeteTriable(column: Column<never>, libelle: string) {
   const sens = column.getIsSorted()
 
-  return h(resolveComponent('UButton'), {
+  /*
+   * ⚠️ `UButton` IMPORTÉ DEPUIS `#components`, ET SURTOUT PAS `resolveComponent('UButton')`.
+   *
+   * Les cinq copies d'origine employaient `resolveComponent`, et cela marchait — parce qu'elles
+   * vivaient dans des `.vue`, où le module `components` de Nuxt RÉÉCRIT cet appel en import
+   * statique à la compilation. Dans un `.ts`, cette réécriture n'a pas lieu : `resolveComponent`
+   * s'exécute alors à l'exécution, hors contexte de rendu, et rend la CHAÎNE « UButton ».
+   *
+   * Le résultat, constaté en CI : les en-têtes se rendaient VIDES. Pas d'erreur, pas de page
+   * blanche — seulement des colonnes sans titre et sans bouton, à côté desquelles les en-têtes
+   * restés de simples chaînes s'affichaient normalement. L'instantané Playwright le disait d'un
+   * coup d'œil :
+   *
+   *     - columnheader [ref=e185]        ← enTeteTriable, vide
+   *     - columnheader "Tags" [ref=e187] ← chaîne simple, intacte
+   */
+  return h(UButton, {
     color: 'neutral',
     variant: 'ghost',
     label: libelle,
