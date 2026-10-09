@@ -1118,6 +1118,39 @@ export const NotificationHelpers = {
   },
 
   /**
+   * Notification quand un artiste RETIRE sa candidature (pour les organisateurs).
+   *
+   * ⚠️ Le type est `WARNING` et non `INFO` : quelque chose qui était dans les compteurs et dans le
+   * sondage vient d'en sortir. L'organisateur qui composait sa programmation autour de cette
+   * candidature doit s'en apercevoir, pas la découvrir en comptant.
+   *
+   * 📍 Pas d'`actionUrl` vers la candidature : elle n'existe plus. Le lien mène à la LISTE des
+   * candidatures de l'appel, qui est l'écran où l'absence se constate.
+   */
+  async showApplicationWithdrawn(
+    userId: number,
+    artistName: string,
+    showTitle: string,
+    editionName: string,
+    editionId: number,
+    showCallId: number
+  ) {
+    return await NotificationService.create({
+      userId,
+      type: 'WARNING',
+      titleKey: 'notifications.artist.application_withdrawn.title',
+      messageKey: 'notifications.artist.application_withdrawn.message',
+      translationParams: { artistName, showTitle, editionName },
+      actionTextKey: 'notifications.artist.application_withdrawn.action',
+      category: 'artist',
+      entityType: 'Edition',
+      entityId: editionId.toString(),
+      actionUrl: `/editions/${editionId}/gestion/shows-call/${showCallId}/applications`,
+      notificationType: 'show_application_withdrawn',
+    })
+  },
+
+  /**
    * Notification quand une candidature artiste est acceptée (pour l'artiste)
    */
   async showApplicationAccepted(

@@ -16,6 +16,11 @@
         "message": "{artistName} a soumis le spectacle \"{showTitle}\" pour \"{editionName}\".",
         "title": "Nouvelle candidature artiste 🎪"
       },
+      "application_withdrawn": {
+        "title": "Candidature retirée",
+        "message": "{artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
+        "action": "Voir les candidatures"
+      },
       "arrival": {
         "action": "Voir les artistes",
         "message": "{artistName} vient de scanner son billet et est arrivé sur la convention.",

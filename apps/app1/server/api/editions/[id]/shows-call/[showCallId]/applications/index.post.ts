@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
+import { organisateursHabilitesSurLesArtistes } from '#server/utils/organisateurs-des-artistes'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import {
   createShowApplicationSchema,
@@ -208,30 +209,19 @@ export default wrapApiHandler(
       },
     })
 
-    // Notifier les organisateurs ayant le droit de gérer les artistes
-    const convention = await prisma.convention.findFirst({
-      where: { editions: { some: { id: editionId } } },
-      select: {
-        authorId: true,
-        organizers: {
-          where: { canManageArtists: true },
-          select: { userId: true },
-        },
-      },
-    })
-
-    const organizerIds = new Set<number>()
-    if (convention) {
-      organizerIds.add(convention.authorId)
-      convention.organizers.forEach((o) => organizerIds.add(o.userId))
-    }
-
-    // Vérifier aussi les permissions per-edition
-    const editionPerms = await prisma.editionOrganizerPermission.findMany({
-      where: { editionId, canManageArtists: true },
-      select: { organizer: { select: { userId: true } } },
-    })
-    editionPerms.forEach((p) => organizerIds.add(p.organizer.userId))
+    /*
+     * Les organisateurs à prévenir, par la fonction PARTAGÉE.
+     *
+     * ⚠️ Ces vingt-cinq lignes étaient écrites ici à la main, et elles DIVERGEAIENT de celle qui
+     * inscrit les participants à la conversation d'une candidature : elles oubliaient
+     * `edition.creatorId`. L'organisateur qui avait CRÉÉ une édition sans détenir
+     * `canManageArtists` recevait donc les messages de la conversation sans jamais être prévenu
+     * qu'une candidature était arrivée.
+     *
+     * Deux énumérations d'un même ensemble finissent toujours par diverger — déjà payé sur le
+     * bénévolat. Il n'y en a plus qu'une : `organisateurs-des-artistes.ts`.
+     */
+    const organizerIds = new Set(await organisateursHabilitesSurLesArtistes(editionId))
 
     const editionName = edition.name || ''
 

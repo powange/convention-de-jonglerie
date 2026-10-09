@@ -179,22 +179,44 @@
                   {{ formatDate(app.createdAt) }}
                 </p>
               </div>
-              <!-- Bouton modifier si candidature en attente -->
-              <UButton
-                v-if="canEditApplication(app)"
-                :to="`/editions/${editionId}/shows-call/${app.showCallId}/apply`"
-                color="primary"
-                variant="soft"
-                size="sm"
-                icon="i-heroicons-pencil-square"
-              >
-                {{ t('shows_call.edit_application') }}
-              </UButton>
+              <div class="flex flex-wrap items-center gap-2">
+                <!-- Bouton modifier si candidature en attente -->
+                <UButton
+                  v-if="canEditApplication(app)"
+                  :to="`/editions/${editionId}/shows-call/${app.showCallId}/apply`"
+                  color="primary"
+                  variant="soft"
+                  size="sm"
+                  icon="i-heroicons-pencil-square"
+                >
+                  {{ t('shows_call.edit_application') }}
+                </UButton>
+
+                <!-- ⚠️ `status === 'PENDING'` et NON `canEditApplication` : le serveur n'exige que
+                     l'attente pour un retrait, là où la modification demande aussi un appel encore
+                     ouvert et une date limite non dépassée. Partager la condition ferait
+                     disparaître le bouton sur un appel clos — alors que le serveur l'accepte, et
+                     que c'est précisément là qu'un artiste empêché en a besoin. -->
+                <UButton
+                  v-if="app.status === 'PENDING'"
+                  color="error"
+                  variant="soft"
+                  size="sm"
+                  icon="i-heroicons-x-mark"
+                  :loading="retraitEnCours === app.id"
+                  @click="demanderLeRetrait(app)"
+                >
+                  {{ t('pages.artists.withdraw_short') }}
+                </UButton>
+              </div>
             </div>
           </div>
         </UCard>
       </ClientOnly>
     </div>
+
+    <!-- Le retrait est définitif : la candidature et ses échanges partent ensemble. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -269,6 +291,49 @@ async function loadMyApplications() {
     myApplications.value = response.applications
   } catch {
     // Silencieux - les candidatures ne sont pas critiques
+  }
+}
+
+const confirmation = useConfirmation()
+const { succes, erreur } = useNotificateur()
+const retraitEnCours = ref<number | null>(null)
+
+/**
+ * Retirer une candidature en attente.
+ *
+ * ⚠️ La confirmation dit ce qui part, et pas « Êtes-vous sûr ? » : le retrait emporte la
+ * candidature **et ses échanges** (`Conversation.showApplicationId` porte `onDelete: Cascade`).
+ * Sans le dire, l'artiste découvrirait après coup que sa discussion avec les organisateurs a
+ * disparu.
+ *
+ * 📍 Ici, contrairement à la page de profil, le compteur de la barre latérale PEUT être rafraîchi :
+ * nous sommes dans le contexte d'une édition, et `appels-spectacles` compte précisément les
+ * candidatures qu'un organisateur doit trancher — il vient d'en perdre une.
+ */
+function demanderLeRetrait(app: { id: number; showTitle: string; showCallId: number }) {
+  confirmation.demanderConfirmation({
+    titre: t('pages.artists.withdraw'),
+    description: t('pages.artists.withdraw_confirm', { title: app.showTitle }),
+    libelleConfirmer: t('pages.artists.withdraw'),
+    couleurConfirmer: 'error',
+    agir: () => retirer(app),
+  })
+}
+
+async function retirer(app: { id: number; showCallId: number }) {
+  retraitEnCours.value = app.id
+  try {
+    await $fetch(`/api/editions/${editionId}/shows-call/${app.showCallId}/my-application`, {
+      method: 'DELETE',
+    })
+    succes(t('pages.artists.withdrawn'))
+    await loadMyApplications()
+    await rafraichirCompteurs('appels-spectacles')
+  } catch (e) {
+    erreur(t('pages.artists.withdraw_error'), { description: messageDErreurServeur(e) })
+  } finally {
+    // Dans les DEUX chemins : un indicateur laissé allumé sur l'échec fige le bouton pour toujours.
+    retraitEnCours.value = null
   }
 }
 
