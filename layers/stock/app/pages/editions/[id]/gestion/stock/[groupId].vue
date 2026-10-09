@@ -1685,27 +1685,6 @@ async function enregistrerComptage() {
   await executerComptage()
 }
 
-/*
- * Quitter la page avec des comptages non enregistrés, c'est perdre une séance de relevé.
- *
- * ⚠️ POURQUOI CE CAS NE SE MIGRAIT PAS MÉCANIQUEMENT, et pourquoi il a été gardé pour la fin.
- *
- * `onBeforeRouteLeave` attend un booléen, et `window.confirm` en rendait un **tout de suite** :
- * `return window.confirm(…)` suffisait. Une modale, elle, répond plus tard. Remplacer l'un par
- * l'autre ligne à ligne aurait rendu une valeur vraie — un objet — donc autorisé la navigation
- * **sans attendre la réponse**, et perdu le comptage en silence tout en ayant l'air de demander.
- *
- * `useGardeDeSortie` résout cela en rendant au routeur une **promesse**, résolue dans les DEUX
- * sens : sans le `renoncer`, refuser laisserait la navigation en suspens pour toujours et la page
- * deviendrait inquittable.
- *
- * La description reste celle de cet écran : « Des comptages ne sont pas enregistrés » dit ce qui
- * disparaît, là où le message générique parle de « modifications ».
- */
-useGardeDeSortie(() => enAttente.value > 0, confirmation, {
-  description: () => t('gestion.stock.count_leave_warning'),
-})
-
 const viewModeItems = computed(() => [
   { label: t('gestion.stock.list_view'), value: 'list', icon: 'i-heroicons-list-bullet' },
   // Le comptage n'est proposé qu'à qui peut écrire : une vue de saisie sans droit d'enregistrer
@@ -2119,6 +2098,35 @@ const groupActions = computed(() => [
 ])
 
 const confirmation = useConfirmation()
+
+/*
+ * Quitter la page avec des comptages non enregistrés, c'est perdre une séance de relevé.
+ *
+ * ⚠️ POURQUOI CE CAS NE SE MIGRAIT PAS MÉCANIQUEMENT, et pourquoi il a été gardé pour la fin.
+ *
+ * `onBeforeRouteLeave` attend un booléen, et `window.confirm` en rendait un **tout de suite** :
+ * `return window.confirm(…)` suffisait. Une modale, elle, répond plus tard. Remplacer l'un par
+ * l'autre ligne à ligne aurait rendu une valeur vraie — un objet — donc autorisé la navigation
+ * **sans attendre la réponse**, et perdu le comptage en silence tout en ayant l'air de demander.
+ *
+ * `useGardeDeSortie` résout cela en rendant au routeur une **promesse**, résolue dans les DEUX
+ * sens : sans le `renoncer`, refuser laisserait la navigation en suspens pour toujours et la page
+ * deviendrait inquittable.
+ *
+ * ⚠️ ET LA GARDE VIT SOUS `confirmation`, PAS À CÔTÉ DU CALCUL QU'ELLE SURVEILLE.
+ *
+ * Posée plus haut — près de `enAttente`, là où elle se lit le mieux —, elle référençait une `const`
+ * déclarée 400 lignes plus bas : **zone morte temporelle**. Le `setup` levait un `ReferenceError`
+ * et la page ne rendait plus rien. Ni le lint (`no-use-before-define` est désactivé sous
+ * TypeScript) ni les 4 163 tests unitaires ne le voyaient — aucun ne monte cette page. **Seul
+ * Playwright l'a attrapé**, sur un item qui n'apparaissait plus dans sa liste.
+ *
+ * La description reste celle de cet écran : « Des comptages ne sont pas enregistrés » dit ce qui
+ * disparaît, là où le message générique parle de « modifications ».
+ */
+useGardeDeSortie(() => enAttente.value > 0, confirmation, {
+  description: () => t('gestion.stock.count_leave_warning'),
+})
 
 const { execute: executerSuppressionGroupe } = useApiActionById(
   (id) => `/api/editions/${editionId}/stock-groups/${id}`,
