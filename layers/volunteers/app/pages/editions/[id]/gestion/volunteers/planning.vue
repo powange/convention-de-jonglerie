@@ -461,7 +461,10 @@ const handleSlotSave = async (slotData: any) => {
         recurrence: slotData.recurrence,
       })
       const crees = timeSlots.value.length - avant
-      succes(None)
+      // Une répétition crée plusieurs créneaux d'un coup : le dire évite d'avoir à les compter.
+      succes(
+        crees > 1 ? t('volunteers.slots_created', { count: crees }) : t('volunteers.slot_created')
+      )
     }
   } catch (error: unknown) {
     const err = error as { data?: { message?: string }; message?: string; statusText?: string }
