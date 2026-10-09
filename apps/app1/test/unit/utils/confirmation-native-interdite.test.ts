@@ -68,7 +68,24 @@ function sansCommentaires(src: string): string {
     .replace(/<!--[\s\S]*?-->/g, '')
 }
 
+/**
+ * Combien de fichiers le parcours a-t-il réellement lus&nbsp;?
+ *
+ * ⚠️ POURQUOI CE COMPTEUR EXISTE, et c'est le piège que ce test a lui-même failli tendre.
+ *
+ * La « garde de la garde » exigeait auparavant **plus de cinq entrées dans la dette** pour prouver
+ * que le parcours fonctionne. C'était un indicateur emprunté : la dette est faite pour **descendre
+ * à zéro**, et elle y arrivait en faisant échouer le test — on aurait alors supprimé le garde-fou
+ * en croyant qu'il était périmé, alors qu'il devenait seulement mal mesuré. Elle est tombée à 4 au
+ * deuxième lot, soit deux lots avant la fin.
+ *
+ * Le nombre de fichiers lus, lui, ne dépend pas de la dette : il reste vrai quand elle vaut zéro,
+ * ce qui est précisément l'état qu'on veut pouvoir garder.
+ */
+let fichiersLus = 0
+
 function appelsParFichier(): Record<string, number> {
+  fichiersLus = 0
   const racineDepot = path.resolve(__dirname, '../../../../..')
   const racines = [
     path.resolve(racineDepot, 'apps/app1/app'),
@@ -87,6 +104,7 @@ function appelsParFichier(): Record<string, number> {
         if (entree.name === 'node_modules' || entree.name === '.nuxt') continue
         parcours(complet)
       } else if (/\.(vue|ts)$/.test(entree.name)) {
+        fichiersLus += 1
         const n = (sansCommentaires(fs.readFileSync(complet, 'utf8')).match(APPEL_NATIF) ?? [])
           .length
         if (n > 0) {
@@ -102,10 +120,17 @@ function appelsParFichier(): Record<string, number> {
 describe('confirmation native — la dette ne doit que descendre', () => {
   const reels = appelsParFichier()
 
-  it('le parcours trouve bien du code', () => {
-    // La garde de la garde : un parcours qui ne rendrait rien laisserait tout le reste vert en ne
-    // vérifiant rien — le piège de la mesure satisfaite par des zéros.
-    expect(Object.keys(reels).length).toBeGreaterThan(5)
+  it('le parcours lit bien les fichiers du dépôt', () => {
+    /*
+     * La garde de la garde : un parcours qui ne rendrait rien laisserait tout le reste vert en ne
+     * vérifiant rien — le piège de la mesure satisfaite par des zéros.
+     *
+     * Elle porte sur les fichiers LUS et non sur les infractions trouvées : le dépôt en compte
+     * plusieurs centaines, et ce nombre ne baisse pas quand la dette se referme. L'ancienne version
+     * exigeait « plus de cinq entrées dans la dette » et serait tombée au dernier lot, en accusant
+     * le travail qui l'avait vidée.
+     */
+    expect(fichiersLus).toBeGreaterThan(200)
   })
 
   it('aucun fichier n’emploie `confirm()` hors de la dette recensée', () => {
