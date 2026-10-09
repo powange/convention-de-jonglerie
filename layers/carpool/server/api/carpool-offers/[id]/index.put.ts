@@ -36,6 +36,40 @@ export default wrapApiHandler(
       errorMessage: "Vous n'avez pas les droits pour modifier cette offre",
     })
 
+    /*
+     * ⚠️ ON NE DESCEND PAS SOUS LES PLACES DÉJÀ ACCORDÉES.
+     *
+     * La mise à jour acceptait n'importe quel `availableSeats` entre 1 et 8 sans le comparer aux
+     * réservations ACCEPTÉES. Un conducteur ayant accordé trois places pouvait passer à une :
+     * `carpool-transform.ts` ramène alors `remainingSeats` à 0 par un `Math.max`, **l'écran reste
+     * parfaitement plausible**, et trois passagers gardent une réservation confirmée pour une seule
+     * place. Personne n'est prévenu, et rien dans la donnée ne dit que le compte est faux.
+     *
+     * 📍 LA GARDE MANQUAIT D'UN SEUL CÔTÉ : l'acceptation d'une réservation vérifie bien la
+     * capacité (`bookings/[bookingId].put.ts`). Une capacité se contrôle aux DEUX bouts — on peut
+     * la dépasser en ajoutant des passagers, ou en retirant des places.
+     *
+     * ⚠️ La comparaison est `<` et non `<=` : ramener les places EXACTEMENT au nombre déjà accordé
+     * est légitime — c'est ce que fait un conducteur dont la voiture est pleine et qui veut fermer
+     * son offre aux demandes suivantes. Le refuser l'obligerait à supprimer l'offre, ce qui
+     * prévient tout le monde.
+     */
+    if (validatedData.availableSeats !== undefined) {
+      const reservationsAcceptees = await prisma.carpoolBooking.findMany({
+        where: { carpoolOfferId: offerId, status: 'ACCEPTED' },
+        select: { seats: true },
+      })
+      const placesAccordees = reservationsAcceptees.reduce((somme, r) => somme + (r.seats || 0), 0)
+
+      if (validatedData.availableSeats < placesAccordees) {
+        throw createError({
+          status: 400,
+          message: `Vous avez déjà accordé ${placesAccordees} place(s) : vous ne pouvez pas descendre en dessous. Retirez d'abord une réservation.`,
+          data: { field: 'availableSeats', minimum: placesAccordees },
+        })
+      }
+    }
+
     // Construire les données de mise à jour
     const updateData = buildUpdateData(validatedData, {
       trimStrings: true,

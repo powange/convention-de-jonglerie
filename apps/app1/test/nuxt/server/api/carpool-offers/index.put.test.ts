@@ -220,4 +220,99 @@ describe('/api/carpool-offers/[id] PUT', () => {
 
     await expect(handler(mockEvent as any)).rejects.toEqual(httpError)
   })
+  /**
+   * On ne descend pas les places sous ce qui a déjà été accordé.
+   *
+   * ## Le défaut
+   *
+   * La mise à jour acceptait n'importe quel `availableSeats` entre 1 et 8 **sans le comparer aux
+   * réservations acceptées**. Un conducteur ayant accordé trois places pouvait passer à une :
+   * `carpool-transform.ts` ramène alors `remainingSeats` à 0 par un `Math.max`, **l'écran reste
+   * parfaitement plausible**, et trois passagers gardent une réservation confirmée pour une seule
+   * place. Personne n'est prévenu, et rien dans la donnée ne dit que le compte est faux.
+   *
+   * 📍 LA GARDE MANQUAIT D'UN SEUL CÔTÉ : l'acceptation d'une réservation vérifie bien la capacité.
+   * Une capacité se contrôle aux DEUX bouts — on peut la dépasser en ajoutant des passagers, ou en
+   * retirant des places.
+   */
+  describe('places et réservations déjà accordées', () => {
+    const avecPlacesAccordees = (places: number[]) => {
+      prismaMock.carpoolOffer.findUnique.mockResolvedValue(mockCarpoolOffer)
+      prismaMock.carpoolBooking.findMany.mockResolvedValue(places.map((seats) => ({ seats })))
+      prismaMock.carpoolOffer.update.mockResolvedValue(mockCarpoolOffer)
+    }
+
+    it('refuse de descendre sous la somme des places accordées, et dit laquelle', async () => {
+      global.readBody.mockResolvedValue({ availableSeats: 1 })
+      avecPlacesAccordees([2, 1])
+
+      await expect(handler(mockEvent as any)).rejects.toMatchObject({
+        statusCode: 400,
+        message: expect.stringContaining('3 place'),
+        data: { field: 'availableSeats', minimum: 3 },
+      })
+      // Rien n'est écrit : le refus précède l'`update`.
+      expect(prismaMock.carpoolOffer.update).not.toHaveBeenCalled()
+    })
+
+    it('accepte de ramener les places EXACTEMENT au nombre accordé', async () => {
+      /*
+       * ⚠️ `<` et non `<=` : c'est ce que fait un conducteur dont la voiture est pleine et qui veut
+       * fermer son offre aux demandes suivantes. Le refuser l'obligerait à supprimer l'offre, ce
+       * qui prévient tout le monde pour n'empêcher que de nouvelles demandes.
+       */
+      global.readBody.mockResolvedValue({ availableSeats: 3 })
+      avecPlacesAccordees([2, 1])
+
+      await handler(mockEvent as any)
+      expect(prismaMock.carpoolOffer.update).toHaveBeenCalled()
+    })
+
+    it('accepte d’augmenter les places', async () => {
+      global.readBody.mockResolvedValue({ availableSeats: 6 })
+      avecPlacesAccordees([2, 1])
+
+      await handler(mockEvent as any)
+      expect(prismaMock.carpoolOffer.update).toHaveBeenCalled()
+    })
+
+    it('accepte quand aucune réservation n’est accordée', async () => {
+      global.readBody.mockResolvedValue({ availableSeats: 1 })
+      avecPlacesAccordees([])
+
+      await handler(mockEvent as any)
+      expect(prismaMock.carpoolOffer.update).toHaveBeenCalled()
+    })
+
+    it('n’interroge pas les réservations quand les places ne changent pas', async () => {
+      /*
+       * Le cas de très loin le plus fréquent — on modifie une description, un téléphone. Payer une
+       * requête pour une garde qui n'a rien à garder serait un coût pour rien.
+       */
+      global.readBody.mockResolvedValue({ description: 'Autre texte' })
+      prismaMock.carpoolOffer.findUnique.mockResolvedValue(mockCarpoolOffer)
+      prismaMock.carpoolOffer.update.mockResolvedValue(mockCarpoolOffer)
+
+      await handler(mockEvent as any)
+      expect(prismaMock.carpoolBooking.findMany).not.toHaveBeenCalled()
+    })
+
+    it('ne compte QUE les réservations acceptées', async () => {
+      /*
+       * ⚠️ L'ASSERTION QUI N'EST PAS CREUSE. Le mock central IGNORE le `where` : tous les cas
+       * ci-dessus resteraient VERTS si la garde comptait aussi les réservations en attente ou
+       * annulées — et un conducteur se verrait alors refuser une réduction à cause de demandes
+       * qu'il n'a jamais acceptées.
+       */
+      global.readBody.mockResolvedValue({ availableSeats: 3 })
+      avecPlacesAccordees([2, 1])
+
+      await handler(mockEvent as any)
+      expect(prismaMock.carpoolBooking.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { carpoolOfferId: 1, status: 'ACCEPTED' },
+        })
+      )
+    })
+  })
 })

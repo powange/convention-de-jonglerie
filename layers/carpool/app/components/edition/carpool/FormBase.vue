@@ -137,18 +137,25 @@
           </UFormField>
 
           <!-- Nombre de places pour les offres (sur ligne séparée) -->
+          <!-- En modification, la description dit la BORNE RÉELLE : le serveur refuse de
+               descendre sous les places déjà accordées, et sans l'annoncer le conducteur
+               découvrirait le refus après avoir enregistré. -->
           <UFormField
             v-if="formType === 'offer'"
             :label="$t('carpool.offer.available_seats')"
             name="availableSeats"
             :required="true"
-            :description="$t('carpool.offer.seats_description')"
+            :description="
+              placesDejaAccordees > 0
+                ? $t('carpool.offer.seats_minimum', { count: placesDejaAccordees })
+                : $t('carpool.offer.seats_description')
+            "
             class="mt-4"
           >
             <UInput
               v-model.number="form.availableSeats"
               type="number"
-              min="1"
+              :min="Math.max(1, placesDejaAccordees)"
               max="8"
               :placeholder="$t('carpool.offer.seats_placeholder')"
               icon="i-heroicons-user-group"
@@ -299,6 +306,37 @@ interface Props {
 
 const props = defineProps<Props>()
 const emit = defineEmits(['success', 'cancel'])
+
+/**
+ * Les places déjà accordées à des passagers, et donc le plancher du champ.
+ *
+ * ## ⚠️ POURQUOI CETTE BORNE EST ANNONCÉE
+ *
+ * Le serveur refuse désormais de descendre `availableSeats` sous la somme des réservations
+ * ACCEPTÉES. Sans l'annoncer, le conducteur découvrirait le refus **après avoir enregistré** —
+ * et un `min="1"` qui n'est pas le vrai minimum est pire que pas de borne : il affirme qu'une
+ * valeur est permise alors qu'elle sera refusée.
+ *
+ * ## 📍 AUCUNE REQUÊTE AJOUTÉE
+ *
+ * `carpoolOfferListInclude` charge déjà les réservations de l'offre **filtrées sur `ACCEPTED`** —
+ * c'est ainsi que la carte calcule ses places restantes. Les recompter ici ne coûte donc rien.
+ *
+ * ⚠️ Le filtre `status` est quand même réappliqué : si l'include changeait un jour pour charger
+ * toutes les réservations, se fier à son filtrage compterait les demandes en attente et
+ * annoncerait un plancher trop haut. Le serveur, lui, ne compte que les acceptées — les deux
+ * doivent dire la même chose.
+ */
+const placesDejaAccordees = computed(() => {
+  if (!props.isEditing) return 0
+  const reservations = (props.initialData?.bookings ?? []) as {
+    status?: string
+    seats?: number | null
+  }[]
+  return reservations
+    .filter((r) => !r.status || r.status === 'ACCEPTED')
+    .reduce((somme, r) => somme + (r.seats || 0), 0)
+})
 
 const { t, locale } = useI18n()
 
