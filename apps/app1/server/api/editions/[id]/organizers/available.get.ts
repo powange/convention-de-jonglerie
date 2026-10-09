@@ -1,10 +1,10 @@
+import { requireAuth } from '#server/utils/auth-utils'
 import { canManageEditionOrganizers } from '#server/utils/permissions/edition-permissions'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 
 export default wrapApiHandler(
   async (event) => {
-    const session = await requireUserSession(event)
-    const user = session.user
+    const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
     // Récupérer l'édition avec permissions
