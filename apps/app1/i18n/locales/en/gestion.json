@@ -1237,7 +1237,8 @@
         "title": "Title",
         "source": "Type",
         "place": "Location",
-        "visibility": "Visibility"
+        "visibility": "Visibility",
+        "day": "Day"
       },
       "local_times": "Times shown in the convention's local time ({fuseau}), including when entering them.",
       "convert": "Convert",

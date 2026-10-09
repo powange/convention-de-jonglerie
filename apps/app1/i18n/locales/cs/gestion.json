@@ -1237,7 +1237,8 @@
         "title": "Název",
         "source": "Typ",
         "place": "Místo",
-        "visibility": "Viditelnost"
+        "visibility": "Viditelnost",
+        "day": "Den"
       },
       "local_times": "Časy v místním čase konventu ({fuseau}), a to i při zadávání.",
       "convert": "Převést",

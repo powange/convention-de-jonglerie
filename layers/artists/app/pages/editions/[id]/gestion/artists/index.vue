@@ -859,7 +859,6 @@ import {
 import { filtresDepuisUrl, requeteArtistes } from '../../../../../utils/filtres-artistes-url'
 
 import type { TableColumn } from '@nuxt/ui'
-import type { Column } from '@tanstack/vue-table'
 
 import { nomDeFichierCsv, versCsv } from '~~/shared/utils/csv'
 import { formaterDateHeure, formaterJournee } from '~~/shared/utils/fuseau-edition'
@@ -1407,23 +1406,6 @@ const resetFilters = () => {
   sorting.value = []
 }
 
-// Helper pour les en-têtes triables
-function getSortableHeader(column: Column<any>, label: string) {
-  const isSorted = column.getIsSorted()
-  return h(resolveComponent('UButton'), {
-    color: 'neutral',
-    variant: 'ghost',
-    label,
-    icon: isSorted
-      ? isSorted === 'asc'
-        ? 'i-lucide-arrow-up-narrow-wide'
-        : 'i-lucide-arrow-down-wide-narrow'
-      : 'i-lucide-arrow-up-down',
-    class: '-mx-2.5',
-    onClick: () => column.toggleSorting(isSorted === 'asc'),
-  })
-}
-
 // Labels des colonnes pour le sélecteur de visibilité
 const getColumnLabel = (columnId: string): string => {
   const labels: Record<string, string> = {
@@ -1451,13 +1433,13 @@ const columns = computed((): TableColumn<any>[] => [
   {
     id: 'name',
     accessorFn: (row: any) => `${row.user?.prenom} ${row.user?.nom}`,
-    header: ({ column }) => getSortableHeader(column, t('common.name')),
+    header: ({ column }) => enTeteTriable(column, t('common.name')),
     enableHiding: false,
   },
   {
     id: 'email',
     accessorFn: (row: any) => row.user?.email,
-    header: ({ column }) => getSortableHeader(column, t('common.email')),
+    header: ({ column }) => enTeteTriable(column, t('common.email')),
   },
   {
     id: 'phone',
@@ -1468,12 +1450,12 @@ const columns = computed((): TableColumn<any>[] => [
   {
     id: 'arrival',
     accessorKey: 'arrivalDateTime',
-    header: ({ column }) => getSortableHeader(column, t('artists.arrival')),
+    header: ({ column }) => enTeteTriable(column, t('artists.arrival')),
   },
   {
     id: 'departure',
     accessorKey: 'departureDateTime',
-    header: ({ column }) => getSortableHeader(column, t('artists.departure')),
+    header: ({ column }) => enTeteTriable(column, t('artists.departure')),
   },
   ...(edition.value?.mealsEnabled
     ? [
@@ -1488,22 +1470,22 @@ const columns = computed((): TableColumn<any>[] => [
   {
     id: 'shows',
     accessorFn: (row: any) => row.shows?.map((sa: any) => sa.show.title).join(', ') || '',
-    header: ({ column }) => getSortableHeader(column, t('artists.shows')),
+    header: ({ column }) => enTeteTriable(column, t('artists.shows')),
   },
   {
     id: 'payment',
     accessorKey: 'payment',
-    header: ({ column }) => getSortableHeader(column, t('artists.payment_amount')),
+    header: ({ column }) => enTeteTriable(column, t('artists.payment_amount')),
   },
   {
     id: 'reimbursement',
     accessorFn: (row: any) => row.reimbursementMax || row.reimbursementActual || 0,
-    header: ({ column }) => getSortableHeader(column, t('artists.reimbursement_max_actual')),
+    header: ({ column }) => enTeteTriable(column, t('artists.reimbursement_max_actual')),
   },
   {
     id: 'consumables',
     accessorFn: (row: any) => row.consumablesMax || row.consumablesActual || 0,
-    header: ({ column }) => getSortableHeader(column, t('artists.consumables_max_actual')),
+    header: ({ column }) => enTeteTriable(column, t('artists.consumables_max_actual')),
   },
   {
     id: 'accommodation',

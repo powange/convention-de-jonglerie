@@ -806,7 +806,6 @@ import {
 import { filtrerParLieuEmprunt, filtrerParNom } from '../../../../../utils/recherche-materiel'
 
 import type { TableColumn } from '@nuxt/ui'
-import type { Column } from '@tanstack/vue-table'
 
 import { versCsv } from '~~/shared/utils/csv'
 
@@ -885,22 +884,6 @@ function libelleColonne(id: string): string {
 }
 
 /** En-tête cliquable, avec la flèche qui dit le sens du tri en cours. */
-function enTeteTriable(column: Column<any>, libelle: string) {
-  const trie = column.getIsSorted()
-  return h(resolveComponent('UButton'), {
-    color: 'neutral',
-    variant: 'ghost',
-    label: libelle,
-    icon: trie
-      ? trie === 'asc'
-        ? 'i-lucide-arrow-up-narrow-wide'
-        : 'i-lucide-arrow-down-wide-narrow'
-      : 'i-lucide-arrow-up-down',
-    class: '-mx-2.5',
-    onClick: () => column.toggleSorting(trie === 'asc'),
-  })
-}
-
 /**
  * Les colonnes du tableau.
  *

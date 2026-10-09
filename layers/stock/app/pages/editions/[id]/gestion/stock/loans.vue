@@ -184,10 +184,29 @@
             {{ t(action.cle, { count: nbSelection }, nbSelection) }}
           </UButton>
         </div>
+
+        <!-- Choisir ses colonnes, puis les emporter : les deux répondent à la même question, et
+             l'export reprend EXACTEMENT ce que le tableau montre. -->
+        <div class="flex items-center gap-2">
+          <UiColumnsMenu
+            size="xs"
+            variant="ghost"
+            :table-api="tableauEmprunts?.tableApi"
+            :libelle="libelleDeColonne"
+          />
+          <UiExportMenu
+            v-if="lignes.length > 0"
+            size="xs"
+            :on-csv="exporterCsv"
+            :on-pdf="exporterPdf"
+          />
+        </div>
       </div>
 
       <UTable
+        ref="tableauEmprunts"
         v-model:sorting="tri"
+        v-model:column-visibility="colonnesVisibles"
         v-model:row-selection="selection"
         :get-row-id="(ligne: any) => String(ligne.id)"
         :data="lignes"
@@ -450,6 +469,134 @@ const compteChoisi = computed(
 )
 
 /** Les lignes affichées. Le tri par colonne prend ensuite le relais. */
+/*
+ * Les colonnes masquables, et le choix retenu dans l'URL.
+ *
+ * ⚠️ La liste est LITTÉRALE et non dérivée de `colonnes` : `useColonnesDansUrl` la lit pendant le
+ * `setup`, avant que le `computed` des colonnes n'ait été évalué une première fois.
+ */
+const COLONNES_MASQUABLES = [
+  'etatTableau',
+  'groupe',
+  'name',
+  'quantite',
+  'tags',
+  'returnDueAt',
+  'lieu',
+  'qui',
+  'ownerContact',
+]
+
+const tableauEmprunts = useTemplateRef<{ tableApi?: unknown }>('tableauEmprunts')
+const { visibilite: colonnesVisibles } = useColonnesDansUrl(COLONNES_MASQUABLES)
+
+/** Le menu des colonnes affiche des libellés, pas des identifiants techniques. */
+const libelleDeColonne = (id: string) =>
+  ({
+    etatTableau: t('gestion.stock.loan_state'),
+    groupe: t('gestion.stock.item_group'),
+    name: t('gestion.stock.item_name'),
+    quantite: t('gestion.stock.item_quantity'),
+    tags: t('gestion.stock.tags.field_label'),
+    returnDueAt: t('gestion.stock.return_due_at'),
+    lieu: t('gestion.stock.loan_place'),
+    qui: t('gestion.stock.loan_responsible'),
+    ownerContact: t('gestion.stock.owner_contact'),
+  })[id] ?? id
+
+/**
+ * Ce que l'export emporte : les mêmes colonnes, dans le même ordre, avec les mêmes valeurs que
+ * celles qu'on lit à l'écran. Les descripteurs lient en-tête et valeur, pour qu'une colonne
+ * masquée ne puisse pas décaler les suivantes d'un cran.
+ */
+function colonnesExportables(): ColonneExportable<EmpruntTableau & { etatTableau: string }>[] {
+  return [
+    {
+      id: 'etatTableau',
+      entete: t('gestion.stock.loan_state'),
+      valeur: (l) => t(LIBELLES[l.etatTableau as EtatTableau]),
+    },
+    { id: 'groupe', entete: t('gestion.stock.item_group'), valeur: (l) => l.group?.name ?? '' },
+    { id: 'name', entete: t('gestion.stock.item_name'), valeur: (l) => l.name },
+    {
+      id: 'quantite',
+      entete: t('gestion.stock.item_quantity'),
+      valeur: (l) => String(l.quantity),
+    },
+    {
+      id: 'tags',
+      entete: t('gestion.stock.tags.field_label'),
+      valeur: (l) => (l.tags ?? []).map((a) => a.tag.name).join(', '),
+    },
+    {
+      id: 'returnDueAt',
+      entete: t('gestion.stock.return_due_at'),
+      valeur: (l) => (l.returnDueAt ? formatDate(l.returnDueAt) : ''),
+    },
+    {
+      id: 'lieu',
+      entete: t('gestion.stock.loan_place'),
+      valeur: (l) => prochaineEtapeEmprunt(l)?.lieu ?? '',
+    },
+    {
+      id: 'qui',
+      entete: t('gestion.stock.loan_responsible'),
+      valeur: (l) => prochaineEtapeEmprunt(l)?.qui ?? '',
+    },
+    {
+      id: 'ownerContact',
+      entete: t('gestion.stock.owner_contact'),
+      valeur: (l) => l.ownerContact ?? '',
+    },
+  ]
+}
+
+/*
+ * ⚠️ PAS DE NOM D'ÉDITION ICI. Cet écran ne charge pas l'édition — il n'en a jamais eu besoin.
+ * Le nom du fichier porte donc l'identifiant, qui suffit à distinguer deux exports et ne demande
+ * pas une requête de plus pour un libellé.
+ *
+ * 📍 `nomFichier` est SANS extension : `exporterTableauEnPdf` l'ajoute lui-même.
+ */
+const nomDuFichierDEmprunts = `emprunts-edition-${editionId}`
+
+function exporterCsv() {
+  const { entetes, lignes: rangees } = tableauAExporter(
+    colonnesExportables(),
+    colonnesVisibles.value,
+    lignes.value as never[]
+  )
+  telechargerFichier(
+    `${nomDuFichierDEmprunts}.csv`,
+    versCsv(entetes, rangees),
+    'text/csv;charset=utf-8'
+  )
+  useToast().add({
+    title: t('common.export_success'),
+    icon: 'i-heroicons-check-circle',
+    color: 'success',
+  })
+}
+
+async function exporterPdf() {
+  const { entetes, lignes: rangees } = tableauAExporter(
+    colonnesExportables(),
+    colonnesVisibles.value,
+    lignes.value as never[]
+  )
+  await exporterTableauEnPdf({
+    nomFichier: nomDuFichierDEmprunts,
+    titre: t('gestion.stock.loans_title'),
+    entetes,
+    lignes: rangees,
+  })
+  useToast().add({
+    title: t('common.export_success'),
+    icon: 'i-heroicons-check-circle',
+    color: 'success',
+  })
+}
+
 const lignes = computed(() => {
   const parLieu = filtrerParEtape(lignesOngletOuvert.value, 'lieu', lieuChoisi.value)
   const parPersonne = filtrerParEtape(parLieu, 'qui', personneChoisie.value)
@@ -568,17 +715,31 @@ async function appliquer(action: ActionEmprunt) {
   await executerActionEmprunt(action.cle)
 }
 
+/*
+ * ⚠️ L'ÉTAT DU TRI ÉTAIT DÉJÀ LÀ — `v-model:sorting`, lu et écrit dans l'URL par `triDepuisUrl` /
+ * `triVersUrl` — mais AUCUN EN-TÊTE N'ÉTAIT CLIQUABLE. Autrement dit : un lien partagé conservait
+ * le tri, et la seule façon de le POSER était de modifier l'adresse à la main. C'est le troisième
+ * visage de l'hétérogénéité relevée : non pas « le tri manque », mais « le tri existe sans porte ».
+ */
 const colonnes = computed((): TableColumn<any>[] => [
   { id: 'select', enableSorting: false },
-  { id: 'etatTableau', accessorKey: 'etatTableau', header: t('gestion.stock.loan_state') },
+  {
+    id: 'etatTableau',
+    accessorKey: 'etatTableau',
+    header: ({ column }: any) => enTeteTriable(column, t('gestion.stock.loan_state')),
+  },
   // Le groupe avant le nom : c'est lui qui situe l'objet quand on prépare une tournée, et il se
   // trie — on rassemble alors tout ce qui vient du même rangement.
   {
     id: 'groupe',
     accessorFn: (ligne: any) => ligne.group?.name ?? '',
-    header: t('gestion.stock.item_group'),
+    header: ({ column }: any) => enTeteTriable(column, t('gestion.stock.item_group')),
   },
-  { id: 'name', accessorKey: 'name', header: t('gestion.stock.item_name') },
+  {
+    id: 'name',
+    accessorKey: 'name',
+    header: ({ column }: any) => enTeteTriable(column, t('gestion.stock.item_name')),
+  },
   // La quantité juste après le nom : elle qualifie l'objet, et c'est ce qu'on lit en même temps
   // que lui — « six barres », pas « des barres ». Sans elle, une tournée de récupération se
   // préparait sans savoir combien de choses rapporter.
@@ -588,7 +749,7 @@ const colonnes = computed((): TableColumn<any>[] => [
   {
     id: 'quantite',
     accessorKey: 'quantity',
-    header: t('gestion.stock.item_quantity'),
+    header: ({ column }: any) => enTeteTriable(column, t('gestion.stock.item_quantity')),
     meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap tabular-nums' } },
   },
   // Les tags après le nom : ils décrivent l'objet, pas son rangement. La colonne n'apparaît que
@@ -617,24 +778,24 @@ const colonnes = computed((): TableColumn<any>[] => [
         {
           id: 'returnDueAt',
           accessorKey: 'returnDueAt',
-          header: t('gestion.stock.return_due_at'),
+          header: ({ column }: any) => enTeteTriable(column, t('gestion.stock.return_due_at')),
         },
       ]
     : []),
   {
     id: 'lieu',
     accessorFn: (ligne: any) => prochaineEtapeEmprunt(ligne)?.lieu ?? '',
-    header: t('gestion.stock.loan_place'),
+    header: ({ column }: any) => enTeteTriable(column, t('gestion.stock.loan_place')),
   },
   {
     id: 'qui',
     accessorFn: (ligne: any) => prochaineEtapeEmprunt(ligne)?.qui ?? '',
-    header: t('gestion.stock.loan_responsible'),
+    header: ({ column }: any) => enTeteTriable(column, t('gestion.stock.loan_responsible')),
   },
   {
     id: 'ownerContact',
     accessorKey: 'ownerContact',
-    header: t('gestion.stock.owner_contact'),
+    header: ({ column }: any) => enTeteTriable(column, t('gestion.stock.owner_contact')),
   },
   { id: 'actions', enableSorting: false },
 ])

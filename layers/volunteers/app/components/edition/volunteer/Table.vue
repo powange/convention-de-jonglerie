@@ -649,7 +649,6 @@ import {
 } from '../../../utils/parametres-candidatures'
 
 import type { ContextMenuItem, TableColumn, TableRow } from '@nuxt/ui'
-import type { Column } from '@tanstack/vue-table'
 
 import { nomDeFichierCsv } from '~~/shared/utils/csv'
 
@@ -1014,22 +1013,6 @@ const formatDate = (iso: string) => {
   } catch {
     return iso
   }
-}
-
-function getSortableHeader(column: Column<any>, label: string) {
-  const isSorted = column.getIsSorted()
-  return h(resolveComponent('UButton'), {
-    color: 'neutral',
-    variant: 'ghost',
-    label,
-    icon: isSorted
-      ? isSorted === 'asc'
-        ? 'i-lucide-arrow-up-narrow-wide'
-        : 'i-lucide-arrow-down-wide-narrow'
-      : 'i-lucide-arrow-up-down',
-    class: '-mx-2.5',
-    onClick: () => column.toggleSorting(isSorted === 'asc'),
-  })
 }
 
 const volunteerStatusColor = (s: string) =>
@@ -1430,14 +1413,14 @@ const columns = computed((): TableColumn<any>[] => [
   // ID en tout premier
   {
     accessorKey: 'id',
-    header: ({ column }) => getSortableHeader(column, 'ID'),
+    header: ({ column }) => enTeteTriable(column, 'ID'),
     cell: ({ row }) => row.original.id,
     size: 80,
   },
   // Etat en deuxième
   {
     accessorKey: 'status',
-    header: ({ column }) => getSortableHeader(column, t('common.status')),
+    header: ({ column }) => enTeteTriable(column, t('common.status')),
     cell: ({ row }) => {
       const status = row.original.status
       const acceptanceNote = row.original.acceptanceNote
@@ -1479,23 +1462,23 @@ const columns = computed((): TableColumn<any>[] => [
   // Date juste après l'état
   {
     accessorKey: 'createdAt',
-    header: ({ column }) => getSortableHeader(column, t('common.date')),
+    header: ({ column }) => enTeteTriable(column, t('common.date')),
     cell: ({ row }) => formatDate(row.original.createdAt),
   },
   // Infos utilisateur
   {
     accessorKey: 'pseudo',
-    header: ({ column }) => getSortableHeader(column, t('volunteers.table_user')),
+    header: ({ column }) => enTeteTriable(column, t('volunteers.table_user')),
   },
   // Colonnes Prénom et Nom
   {
     accessorKey: 'prenom',
-    header: ({ column }) => getSortableHeader(column, t('volunteers.table_first_name')),
+    header: ({ column }) => enTeteTriable(column, t('volunteers.table_first_name')),
     cell: ({ row }) => row.original.user.prenom || '—',
   },
   {
     accessorKey: 'nom',
-    header: ({ column }) => getSortableHeader(column, t('volunteers.table_last_name')),
+    header: ({ column }) => enTeteTriable(column, t('volunteers.table_last_name')),
     cell: ({ row }) => row.original.user.nom || '—',
   },
   // Colonne présence
@@ -1614,7 +1597,7 @@ const columns = computed((): TableColumn<any>[] => [
   // Colonne Date d'arrivée
   {
     accessorKey: 'arrivalDateTime',
-    header: ({ column }) => getSortableHeader(column, t('volunteers.table_arrival')),
+    header: ({ column }) => enTeteTriable(column, t('volunteers.table_arrival')),
     enableSorting: true,
     sortingFn: (rowA: any, rowB: any, _columnId: string) => {
       const dateA = rowA.original.arrivalDateTime
@@ -1657,7 +1640,7 @@ const columns = computed((): TableColumn<any>[] => [
   // Colonne Date de départ
   {
     accessorKey: 'departureDateTime',
-    header: ({ column }) => getSortableHeader(column, t('volunteers.table_departure')),
+    header: ({ column }) => enTeteTriable(column, t('volunteers.table_departure')),
     enableSorting: true,
     sortingFn: (rowA: any, rowB: any, _columnId: string) => {
       const dateA = rowA.original.departureDateTime
@@ -1800,7 +1783,7 @@ const columns = computed((): TableColumn<any>[] => [
     ? [
         {
           accessorKey: 'allergies',
-          header: ({ column }: any) => getSortableHeader(column, t('volunteers.table_allergies')),
+          header: ({ column }: any) => enTeteTriable(column, t('volunteers.table_allergies')),
           cell: ({ row }: any) => {
             if (!row.original.allergies) return '—'
 
