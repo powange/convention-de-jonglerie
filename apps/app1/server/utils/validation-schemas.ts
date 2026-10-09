@@ -70,6 +70,32 @@ export const optionalDateSchema = z
   .optional()
   .refine((val) => !val || !isNaN(Date.parse(val)), 'Date invalide')
 
+/**
+ * Une heure de trajet de covoiturage : une date valide, et pas déjà passée.
+ *
+ * ## ⚠️ POURQUOI UNE DATE PASSÉE ÉTAIT UN PROBLÈME SILENCIEUX
+ *
+ * `dateSchema` ne vérifie que l'analyse. Une offre datée d'hier était donc acceptée par l'API —
+ * puis **disparaissait aussitôt de la liste**, qui filtre sur `tripDate >= now`. Aucun message :
+ * l'auteur voyait sa création réussir et son annonce introuvable.
+ *
+ * ## 📍 UNE HEURE DE TOLÉRANCE, ET ELLE N'EST PAS DE LA COMPLAISANCE
+ *
+ * Publier un trajet « ce matin 8 h » à 8 h 20 est un usage normal : on part, on pense au
+ * covoiturage en chargeant la voiture. Refuser à la minute obligerait à mentir sur l'heure pour
+ * passer la validation — et c'est l'heure annoncée aux passagers qui en souffrirait.
+ *
+ * ⚠️ La RÉSERVATION, elle, n'a aucune tolérance : demander une place sur un trajet dont l'heure est
+ * passée n'a plus d'objet, c'est au conducteur qu'il faut écrire. Les deux règles diffèrent parce
+ * que les deux gestes diffèrent — ne pas les « harmoniser ».
+ */
+export const TOLERANCE_TRAJET_PASSE_MS = 60 * 60 * 1000
+
+export const tripDateSchema = dateSchema.refine(
+  (val) => Date.parse(val) >= Date.now() - TOLERANCE_TRAJET_PASSE_MS,
+  'Cette date est déjà passée'
+)
+
 // Schémas d'authentification
 export const loginSchema = z.object({
   email: emailSchema,
@@ -386,7 +412,7 @@ export const carpoolOfferSchema = z.object({
     .string()
     .min(1, 'Adresse requise')
     .max(200, "L'adresse ne peut pas dépasser 200 caractères"),
-  tripDate: dateSchema,
+  tripDate: tripDateSchema,
   availableSeats: z.coerce
     .number()
     .int()
@@ -413,7 +439,7 @@ export const carpoolRequestSchema = z.object({
   locationCity: carpoolLocationCitySchema,
   latitude: carpoolLatitudeSchema,
   longitude: carpoolLongitudeSchema,
-  tripDate: dateSchema,
+  tripDate: tripDateSchema,
   seatsNeeded: z.coerce
     .number()
     .int()

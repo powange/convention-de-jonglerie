@@ -10,6 +10,19 @@ vi.mock('#imports', () => ({
 // Import des schémas et fonctions après les mocks
 const schemas = await import('../../../../server/utils/validation-schemas')
 
+/**
+ * Une date de trajet À VENIR, et relative au jour du test.
+ *
+ * ⚠️ Les fixtures de ce fichier employaient `'2024-06-01'`, une date FIGÉE. Elle est devenue
+ * passée, et `tripDateSchema` refuse désormais le passé : six tests sont tombés d'un coup. Ils ne
+ * décrivaient plus « une offre valide » mais « une offre valide en juin 2024 ».
+ *
+ * Une date en dur dans un test est une bombe à retardement, indépendamment de ce lot : ce dépôt a
+ * déjà perdu des spécifications qui échouaient chaque lundi pour la même raison.
+ */
+const DATE_DE_TRAJET = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+const JOUR_DE_TRAJET = DATE_DE_TRAJET.slice(0, 10)
+
 describe('Validation Schemas', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -314,7 +327,7 @@ describe('Validation Schemas', () => {
         const validOffer = {
           locationCity: 'Paris',
           locationAddress: '123 rue de la Gare',
-          tripDate: '2024-06-01T10:00:00Z',
+          tripDate: DATE_DE_TRAJET,
           availableSeats: 3,
           direction: 'TO_EVENT',
         }
@@ -326,7 +339,7 @@ describe('Validation Schemas', () => {
         const fullOffer = {
           locationCity: 'Paris',
           locationAddress: '123 rue de la Gare',
-          tripDate: '2024-06-01T10:00:00Z',
+          tripDate: DATE_DE_TRAJET,
           availableSeats: 3,
           direction: 'FROM_EVENT',
           description: 'Départ depuis la gare',
@@ -340,7 +353,7 @@ describe('Validation Schemas', () => {
         const invalidSeats = {
           locationCity: 'Paris',
           locationAddress: '123 rue de la Gare',
-          tripDate: '2024-06-01T10:00:00Z',
+          tripDate: DATE_DE_TRAJET,
           availableSeats: 0, // Minimum 1
           direction: 'TO_EVENT',
         }
@@ -362,7 +375,7 @@ describe('Validation Schemas', () => {
         const offre = schemas.carpoolOfferSchema.parse({
           locationCity: 'Paris',
           locationAddress: '123 rue de la Gare',
-          tripDate: '2024-06-01T10:00:00Z',
+          tripDate: DATE_DE_TRAJET,
           availableSeats: 3,
           direction: 'TO_EVENT',
           smokingAllowed: true,
@@ -383,7 +396,7 @@ describe('Validation Schemas', () => {
         const offre = schemas.carpoolOfferSchema.parse({
           locationCity: 'Paris',
           locationAddress: '123 rue de la Gare',
-          tripDate: '2024-06-01T10:00:00Z',
+          tripDate: DATE_DE_TRAJET,
           availableSeats: 3,
           direction: 'TO_EVENT',
         })
@@ -400,7 +413,7 @@ describe('Validation Schemas', () => {
           schemas.carpoolOfferSchema.parse({
             locationCity: 'Paris',
             locationAddress: '123 rue de la Gare',
-            tripDate: '2024-06-01T10:00:00Z',
+            tripDate: DATE_DE_TRAJET,
             availableSeats: 3,
             direction: 'TO_EVENT',
             smokingAllowed: 'oui',
@@ -413,7 +426,7 @@ describe('Validation Schemas', () => {
       it('devrait valider une demande de covoiturage valide', () => {
         const validRequest = {
           locationCity: 'Lyon',
-          tripDate: '2024-06-01',
+          tripDate: JOUR_DE_TRAJET,
           direction: 'TO_EVENT',
         }
 
@@ -424,7 +437,7 @@ describe('Validation Schemas', () => {
       it('devrait valider avec tous les champs', () => {
         const fullRequest = {
           locationCity: 'Lyon',
-          tripDate: '2024-06-01',
+          tripDate: JOUR_DE_TRAJET,
           direction: 'FROM_EVENT',
           seatsNeeded: 2,
           description: 'Recherche covoiturage',
@@ -596,6 +609,95 @@ describe('Validation Schemas', () => {
       // Chaîne vide et valeurs nulles toujours acceptées
       expect(() => schemas.urlSchema.parse('')).not.toThrow()
       expect(() => schemas.urlSchema.parse(null)).not.toThrow()
+    })
+  })
+})
+
+/**
+ * L'heure d'un trajet de covoiturage : une date valide, et pas déjà passée.
+ *
+ * ## Le défaut
+ *
+ * `dateSchema` ne vérifie que l'analyse. Une offre datée d'hier était donc **acceptée** par l'API
+ * — puis **disparaissait aussitôt de la liste**, qui filtre sur `tripDate >= now`. Aucun message :
+ * l'auteur voyait sa création réussir et son annonce introuvable.
+ */
+describe('tripDateSchema — une date de trajet', () => {
+  const dans = (ms: number) => new Date(Date.now() + ms).toISOString()
+
+  it('accepte une date à venir', () => {
+    expect(() => schemas.tripDateSchema.parse(dans(24 * 60 * 60 * 1000))).not.toThrow()
+  })
+
+  it('refuse une date d’hier', () => {
+    expect(() => schemas.tripDateSchema.parse(dans(-24 * 60 * 60 * 1000))).toThrow()
+  })
+
+  it('refuse une chaîne qui n’est pas une date', () => {
+    // La règle de `dateSchema` est conservée, pas remplacée : `new Date('demain')` donne un
+    // `Invalid Date` que Prisma rejette en 500.
+    expect(() => schemas.tripDateSchema.parse('demain')).toThrow()
+    expect(() => schemas.tripDateSchema.parse('')).toThrow()
+  })
+
+  describe('la tolérance d’une heure', () => {
+    /*
+     * ⚠️ ELLE N'EST PAS DE LA COMPLAISANCE. Publier un trajet « ce matin 8 h » à 8 h 20 est un
+     * usage normal : on part, on pense au covoiturage en chargeant la voiture. Refuser à la minute
+     * obligerait à mentir sur l'heure pour passer la validation — et c'est l'heure annoncée aux
+     * passagers qui en souffrirait.
+     *
+     * Les deux cas mesurent la FRONTIÈRE, et c'est ce qui rend la tolérance vérifiable : une
+     * tolérance dont on ne teste qu'un côté pourrait valoir une seconde comme une semaine.
+     */
+    it('accepte un trajet parti il y a dix minutes', () => {
+      expect(() => schemas.tripDateSchema.parse(dans(-10 * 60 * 1000))).not.toThrow()
+    })
+
+    it('refuse un trajet parti il y a deux heures', () => {
+      expect(() => schemas.tripDateSchema.parse(dans(-2 * 60 * 60 * 1000))).toThrow()
+    })
+
+    it('la borne est dérivée de la constante, et non recopiée', () => {
+      // Recopier 3 600 000 ici ferait un test qui reste vert quand la constante change.
+      expect(() =>
+        schemas.tripDateSchema.parse(dans(-schemas.TOLERANCE_TRAJET_PASSE_MS + 5000))
+      ).not.toThrow()
+      expect(() =>
+        schemas.tripDateSchema.parse(dans(-schemas.TOLERANCE_TRAJET_PASSE_MS - 5000))
+      ).toThrow()
+    })
+  })
+
+  describe('les deux schémas de création l’emploient', () => {
+    /*
+     * ⚠️ LA MOITIÉ QUI COMPTE. Éprouver la règle sans vérifier qu'elle est BRANCHÉE laisserait
+     * passer exactement le défaut d'origine — un util écrit, testé, et jamais appelé. Ce dépôt a
+     * déjà payé cette forme.
+     */
+    const hier = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+
+    it('une offre datée d’hier est refusée', () => {
+      expect(() =>
+        schemas.carpoolOfferSchema.parse({
+          locationCity: 'Lyon',
+          locationAddress: '1 rue de la Gare',
+          tripDate: hier,
+          availableSeats: 2,
+          direction: 'TO_EVENT',
+        })
+      ).toThrow()
+    })
+
+    it('une demande datée d’hier est refusée', () => {
+      expect(() =>
+        schemas.carpoolRequestSchema.parse({
+          locationCity: 'Lyon',
+          tripDate: hier,
+          seatsNeeded: 1,
+          direction: 'TO_EVENT',
+        })
+      ).toThrow()
     })
   })
 })

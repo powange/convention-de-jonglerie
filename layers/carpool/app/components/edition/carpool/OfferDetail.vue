@@ -72,6 +72,11 @@
           <UBadge :color="remainingSeats > 0 ? 'primary' : 'neutral'" variant="soft" size="md">
             {{ $t('components.carpool.seats_available', { count: remainingSeats }) }}
           </UBadge>
+          <!-- Dire POURQUOI il n'y a pas de formulaire. Sans ce badge, l'offre d'hier s'affiche
+               comme une autre et son absence de bouton passe pour un défaut. -->
+          <UBadge v-if="trajetPasse" color="neutral" variant="soft">
+            {{ $t('components.carpool.past_trip') }}
+          </UBadge>
           <template v-if="offer.hasPhoneNumber && authStore.isAuthenticated">
             <div v-if="phoneRevealed && offer.phoneNumber" class="flex items-center gap-2 text-sm">
               <UIcon name="i-heroicons-phone" class="text-gray-400" />
@@ -190,11 +195,16 @@
       </div>
     </UCard>
 
-    <!-- Réserver des places -->
+    <!-- ⚠️ `trajetPasse` DANS LA CONDITION : la liste filtre bien sur la date, mais l'option
+         « Afficher tout » ramène les offres passées. Le formulaire n'était gardé que par les places
+         restantes, si bien qu'une offre d'hier restait réservable — et le conducteur recevait une
+         notification pour un trajet terminé. Le serveur refuse désormais ; l'écran ne doit pas
+         proposer un geste qui sera refusé. -->
     <UCard
       v-if="
         authStore.isAuthenticated &&
         !canEdit &&
+        !trajetPasse &&
         remainingSeats > 0 &&
         (!myBooking || myBooking.status === 'REJECTED' || myBooking.status === 'CANCELLED')
       "
@@ -304,6 +314,19 @@ const { t, locale } = useI18n()
 const router = useRouter()
 
 const canEdit = computed(() => authStore.user?.id === props.offer.user?.id)
+
+/**
+ * Le trajet est-il déjà parti ?
+ *
+ * ⚠️ `Number.isFinite` et non un test de vérité : une date illisible donne `NaN`, et **toute
+ * comparaison avec `NaN` est fausse**. Le trajet serait alors tenu pour à venir — pas d'erreur, pas
+ * de badge, un formulaire proposé pour un geste que le serveur refusera. Même famille de piège que
+ * `Math.max(1, NaN)`, déjà payée ici.
+ */
+const trajetPasse = computed(() => {
+  const instant = new Date(props.offer.tripDate).getTime()
+  return Number.isFinite(instant) && instant < Date.now()
+})
 const phoneRevealed = ref(false)
 
 const remainingSeats = computed(() => {

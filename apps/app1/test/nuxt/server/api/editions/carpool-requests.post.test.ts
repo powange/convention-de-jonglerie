@@ -12,6 +12,18 @@ vi.mock('#server/utils/geocoding', () => ({ geocodeVille: mockGeocodeVille }))
 import handler from '../../../../../../../layers/carpool/server/api/editions/[id]/carpool-requests/index.post'
 import { global } from '../../../globales-nitro'
 
+/**
+ * Une date de trajet À VENIR, relative au jour du test.
+ *
+ * ⚠️ Ce fichier employait `'2024-07-15T08:00:00.000Z'`, une date FIGÉE — devenue passée. Depuis que
+ * `tripDateSchema` refuse une date déjà passée, ces fixtures ne décrivaient plus « une offre
+ * valide » mais « une offre valide en juillet 2024 ».
+ *
+ * Une date en dur dans un test est une bombe à retardement, indépendamment de ce lot : ce dépôt a
+ * déjà perdu des spécifications qui échouaient chaque lundi pour la même raison.
+ */
+const DATE_DE_TRAJET = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
 
@@ -39,7 +51,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
   it('devrait créer une demande de covoiturage avec succès', async () => {
     const requestBody = {
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationCity: 'Lyon',
       direction: 'TO_EVENT',
       seatsNeeded: 2,
@@ -146,7 +158,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
   it('devrait valider les données obligatoires - locationCity manquante', async () => {
     const incompleteBody = {
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       seatsNeeded: 2,
     }
 
@@ -157,7 +169,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
   it('devrait rejeter si édition non trouvée', async () => {
     const requestBody = {
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationCity: 'Lyon',
       direction: 'FROM_EVENT',
     }
@@ -170,7 +182,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
   it('devrait gérer les erreurs de base de données', async () => {
     const requestBody = {
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationCity: 'Lyon',
       direction: 'TO_EVENT',
     }
@@ -183,7 +195,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
   it('devrait créer une demande avec seatsNeeded par défaut à 1', async () => {
     const requestBodyMinimal = {
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationCity: 'Lyon',
       direction: 'TO_EVENT',
       // seatsNeeded omis
@@ -218,7 +230,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
   it('devrait créer une demande avec données optionnelles null', async () => {
     const requestBodyMinimal = {
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationCity: 'Lyon',
       direction: 'FROM_EVENT',
       // description et phoneNumber omis
@@ -256,7 +268,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
   it('devrait accepter seatsNeeded personnalisé', async () => {
     const requestBody = {
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationCity: 'Lyon',
       direction: 'FROM_EVENT',
       seatsNeeded: 3, // Valeur personnalisée

@@ -34,6 +34,25 @@ export default wrapApiHandler(
       throw createError({ status: 404, message: 'Offre de covoiturage introuvable' })
     }
 
+    /*
+     * ⚠️ ON NE RÉSERVE PAS UN TRAJET DÉJÀ PARTI.
+     *
+     * Le handler ne regardait pas `tripDate`. La liste des offres filtre bien sur `tripDate >= now`,
+     * mais l'option « Afficher tout » les ramène : une offre passée restait donc **réservable**, le
+     * formulaire n'étant gardé que par les places restantes. Le conducteur recevait une
+     * notification pour un trajet terminé, et le passager croyait avoir réservé.
+     *
+     * 📍 Pas de tolérance ici, contrairement à la CRÉATION d'une offre : on peut légitimement
+     * publier un trajet qui part dans l'heure, mais demander une place sur un trajet dont l'heure
+     * est passée n'a plus d'objet — c'est au conducteur qu'il faut écrire.
+     */
+    if (offer.tripDate.getTime() < Date.now()) {
+      throw createError({
+        status: 400,
+        message: 'Ce trajet est déjà passé : vous ne pouvez plus y réserver de place.',
+      })
+    }
+
     // Le créateur ne peut pas réserver sur sa propre offre
     if (offer.userId === user.id) {
       throw createError({
@@ -61,12 +80,33 @@ export default wrapApiHandler(
       throw createError({ status: 400, message: 'Plus assez de places disponibles' })
     }
 
-    // Option: éviter multi-PENDING du même utilisateur sur la même offre
-    const existingPending = await prisma.carpoolBooking.findFirst({
-      where: { carpoolOfferId: offerId, requesterId: user.id, status: 'PENDING' },
+    /*
+     * ⚠️ UNE SEULE RÉSERVATION VIVANTE PAR PASSAGER, EN ATTENTE **OU** ACCEPTÉE.
+     *
+     * La garde ne regardait que `PENDING` : un passager déjà ACCEPTÉ pouvait en déposer une
+     * seconde, et il comptait alors DEUX FOIS dans les places du conducteur — une place accordée
+     * plus une demande en attente pour la même personne.
+     *
+     * 📍 `REJECTED` et `CANCELLED` ne bloquent pas, et c'est voulu : une demande refusée ou annulée
+     * n'occupe rien, et il est légitime de redemander — le conducteur a peut-être libéré une place
+     * depuis, ou le passager s'était désisté puis se ravise.
+     */
+    const reservationVivante = await prisma.carpoolBooking.findFirst({
+      where: {
+        carpoolOfferId: offerId,
+        requesterId: user.id,
+        status: { in: ['PENDING', 'ACCEPTED'] },
+      },
+      select: { id: true, status: true },
     })
-    if (existingPending) {
-      throw createError({ status: 400, message: 'Une réservation en attente existe déjà' })
+    if (reservationVivante) {
+      throw createError({
+        status: 400,
+        message:
+          reservationVivante.status === 'ACCEPTED'
+            ? 'Vous avez déjà une place sur ce trajet'
+            : 'Une réservation en attente existe déjà',
+      })
     }
 
     const booking = await prisma.carpoolBooking.create({

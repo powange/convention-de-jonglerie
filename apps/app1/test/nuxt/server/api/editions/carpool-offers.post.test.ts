@@ -12,6 +12,18 @@ vi.mock('#server/utils/geocoding', () => ({ geocodeVille: mockGeocodeVille }))
 import handler from '../../../../../../../layers/carpool/server/api/editions/[id]/carpool-offers/index.post'
 import { global } from '../../../globales-nitro'
 
+/**
+ * Une date de trajet À VENIR, relative au jour du test.
+ *
+ * ⚠️ Ce fichier employait `'2024-07-15T08:00:00.000Z'`, une date FIGÉE — devenue passée. Depuis que
+ * `tripDateSchema` refuse une date déjà passée, ces fixtures ne décrivaient plus « une offre
+ * valide » mais « une offre valide en juillet 2024 ».
+ *
+ * Une date en dur dans un test est une bombe à retardement, indépendamment de ce lot : ce dépôt a
+ * déjà perdu des spécifications qui échouaient chaque lundi pour la même raison.
+ */
+const DATE_DE_TRAJET = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
 
@@ -39,7 +51,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
   it('devrait créer une offre de covoiturage avec succès', async () => {
     const requestBody = {
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationCity: 'Paris',
       locationAddress: '123 Rue de la Paix',
       availableSeats: 3,
@@ -156,7 +168,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
   it('devrait valider les données obligatoires - locationCity manquante', async () => {
     const incompleteBody = {
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationAddress: '123 Rue de la Paix',
       availableSeats: 3,
     }
@@ -168,7 +180,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
   it('devrait valider les données obligatoires - locationAddress manquante', async () => {
     const incompleteBody = {
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationCity: 'Paris',
       availableSeats: 3,
     }
@@ -180,7 +192,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
   it('devrait valider les données obligatoires - availableSeats manquant', async () => {
     const incompleteBody = {
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationCity: 'Paris',
       locationAddress: '123 Rue de la Paix',
     }
@@ -192,7 +204,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
   it('devrait rejeter si édition non trouvée', async () => {
     const requestBody = {
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationCity: 'Paris',
       locationAddress: '123 Rue de la Paix',
       availableSeats: 3,
@@ -207,7 +219,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
   it('devrait gérer les erreurs de base de données', async () => {
     const requestBody = {
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationCity: 'Paris',
       locationAddress: '123 Rue de la Paix',
       availableSeats: 3,
@@ -222,7 +234,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
   it('devrait créer une offre avec données optionnelles null', async () => {
     const requestBodyMinimal = {
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationCity: 'Paris',
       locationAddress: '123 Rue de la Paix',
       availableSeats: 2,
@@ -261,7 +273,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
   it('devrait convertir availableSeats en entier', async () => {
     const requestBody = {
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationCity: 'Paris',
       locationAddress: '123 Rue de la Paix',
       availableSeats: '4', // String au lieu d'entier
@@ -300,7 +312,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
    */
   it('enregistre les trois préférences du trajet quand elles sont cochées', async () => {
     global.readBody.mockResolvedValue({
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationCity: 'Paris',
       locationAddress: '123 Rue de la Paix',
       availableSeats: 3,
@@ -330,7 +342,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
     // par défaut — mais les deux doivent ARRIVER jusqu'à `create`, sans quoi on ne saurait pas
     // distinguer « le schéma les laisse passer » de « le schéma les efface toutes ».
     global.readBody.mockResolvedValue({
-      tripDate: '2024-07-15T08:00:00.000Z',
+      tripDate: DATE_DE_TRAJET,
       locationCity: 'Paris',
       locationAddress: '123 Rue de la Paix',
       availableSeats: 3,
