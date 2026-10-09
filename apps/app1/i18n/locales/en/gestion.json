@@ -377,7 +377,12 @@
         "not_declared": "Not declared",
         "not_declared_short": "To be filled in",
         "title": "{name}'s presence at the edition"
-      }
+      },
+      "select_user": "Select a user",
+      "organizer_rights": "Organizer permissions",
+      "not_authorized_title": "Action not allowed",
+      "not_authorized_description": "You do not have permission to edit this organizer",
+      "add_error": "Error while adding"
     },
     "overview": "Overview",
     "services": {

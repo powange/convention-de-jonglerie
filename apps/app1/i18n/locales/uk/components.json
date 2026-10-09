@@ -113,7 +113,10 @@
       "loading_error_title": "Помилка завантаження",
       "logo_preview": "Попередній перегляд логотипу:",
       "logo_url_description": "URL зображення логотипу конвенції",
-      "upload_file": "Завантажити файл"
+      "upload_file": "Завантажити файл",
+      "image_uploaded_description": "Зображення завантажено",
+      "image_deleted_description": "Зображення видалено",
+      "logo_url_invalid": "Посилання на логотип недійсне"
     },
     "country_multi_select": {
       "placeholder": "Вибрати країни..."
@@ -158,7 +161,13 @@
       "program_link": "Посилання на програму",
       "program_section_title": "Програма",
       "program_section_description": "Якщо ваша програма розміщена в іншому місці, вкажіть сторінку з її описом",
-      "dates_timezone": "Час за місцевим часом локації ({timezone})"
+      "dates_timezone": "Час за місцевим часом локації ({timezone})",
+      "name_help": "Якщо назву не вказано, буде використано назву конвенції",
+      "address_placeholder": "вул. Жонглерська, 123",
+      "step_services_description": "Доступні послуги",
+      "incomplete_form_title": "Форму заповнено не повністю",
+      "incomplete_form_description": "Заповніть усі обов'язкові поля",
+      "invalid_dates_title": "Неправильні дати"
     },
     "favorites_map": {
       "all_favorites": "Всі улюблені",

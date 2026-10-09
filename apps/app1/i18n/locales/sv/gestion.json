@@ -377,7 +377,12 @@
         "not_declared": "Inte angivet",
         "not_declared_short": "Ska fyllas i",
         "title": "{name}s närvaro på upplagan"
-      }
+      },
+      "select_user": "Välj en användare",
+      "organizer_rights": "Arrangörens behörigheter",
+      "not_authorized_title": "Åtgärden är inte tillåten",
+      "not_authorized_description": "Du har inte behörighet att ändra den här arrangören",
+      "add_error": "Fel vid tillägg"
     },
     "overview": "Översikt",
     "services": {

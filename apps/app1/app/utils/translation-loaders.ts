@@ -157,6 +157,24 @@ export function getTranslationsToLoad(path: string): string[] {
       pattern: /^\/editions\/\d+\/workshops/,
       translations: ['workshops'],
     },
+    /*
+     * « Mes conventions » gère des conventions, leurs éditions ET leurs organisateurs : elle
+     * emploie donc `conventions.*` (domaine `edition`) et `gestion.organizers.*` (domaine
+     * `gestion`), qu'aucune règle ne chargeait.
+     *
+     * ⚠️ MESURÉ LE 09/10/2026 : 25 de ses 39 clés `t()` sortaient des domaines chargés sur
+     * `/profile` (15 d'`edition`, 10 de `gestion`). Elles s'affichaient donc BRUTES —
+     * « conventions.add_organizer » au lieu du libellé — et sans la moindre erreur.
+     *
+     * Pourquoi personne ne l'avait vu : le middleware CUMULE les domaines sur la session. Qui
+     * passe par une page d'édition ou de gestion avant d'ouvrir « Mes conventions » voit les
+     * libellés corrects. Le défaut n'apparaît qu'à l'ouverture DIRECTE — un favori, un
+     * rechargement, un premier clic depuis le menu du profil.
+     */
+    {
+      pattern: /^\/profile\/mes-conventions/,
+      translations: ['edition', 'gestion'],
+    },
   ]
 
   // Vérifier les routes dynamiques

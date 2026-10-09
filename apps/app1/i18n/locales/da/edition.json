@@ -153,7 +153,9 @@
     "organizers": "Arrangører",
     "select_user": "Vælg en bruger",
     "status_control": "Synlighedskontrol",
-    "status_control_desc": "Publicer eller afpublicér dine udgaver efter deres fremskridtstilstand"
+    "status_control_desc": "Publicer eller afpublicér dine udgaver efter deres fremskridtstilstand",
+    "delete_edition_irreversible": "Advarsel: denne handling kan ikke fortrydes",
+    "delete_edition_confirm_description": "Er du sikker på, at du vil slette denne udgave? Alle tilknyttede data (frivillige, kommentarer, glemte sager osv.) mistes permanent."
   },
   "diet": {
     "none": "Ingen",

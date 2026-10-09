@@ -113,7 +113,10 @@
       "loading_error_title": "Erreur de chargement",
       "logo_preview": "Aperçu du logo :",
       "logo_url_description": "URL vers l'image du logo de la convention",
-      "upload_file": "Upload fichier"
+      "upload_file": "Upload fichier",
+      "image_uploaded_description": "L'image a été uploadée avec succès",
+      "image_deleted_description": "L'image a été supprimée avec succès",
+      "logo_url_invalid": "L'URL du logo n'est pas valide"
     },
     "country_multi_select": {
       "placeholder": "Sélectionner des pays..."
@@ -158,7 +161,13 @@
       "ticketing_link": "Lien de la billetterie",
       "ticketing_section_description": "Informations pour l'achat de billets",
       "ticketing_section_title": "Billetterie",
-      "timezone_description": "Les dates et heures seront affichées dans ce fuseau horaire"
+      "timezone_description": "Les dates et heures seront affichées dans ce fuseau horaire",
+      "name_help": "Si aucun nom n'est spécifié, le nom de la convention sera utilisé",
+      "address_placeholder": "123 rue de la Jonglerie",
+      "step_services_description": "Services proposés",
+      "incomplete_form_title": "Formulaire incomplet",
+      "incomplete_form_description": "Veuillez remplir tous les champs obligatoires",
+      "invalid_dates_title": "Dates invalides"
     },
     "favorites_map": {
       "all_favorites": "Toutes sont favorites",

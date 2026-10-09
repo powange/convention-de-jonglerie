@@ -377,7 +377,12 @@
         "not_declared": "Ikke angivet",
         "not_declared_short": "Skal udfyldes",
         "title": "{name}s tilstedeværelse på udgaven"
-      }
+      },
+      "select_user": "Vælg en bruger",
+      "organizer_rights": "Arrangørens rettigheder",
+      "not_authorized_title": "Handlingen er ikke tilladt",
+      "not_authorized_description": "Du har ikke rettigheder til at redigere denne arrangør",
+      "add_error": "Fejl ved tilføjelse"
     },
     "overview": "Oversigt",
     "services": {

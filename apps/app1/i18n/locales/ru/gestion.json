@@ -377,7 +377,12 @@
         "not_declared": "Не указано",
         "not_declared_short": "Заполнить",
         "title": "Присутствие {name} на выпуске"
-      }
+      },
+      "select_user": "Выберите пользователя",
+      "organizer_rights": "Права организатора",
+      "not_authorized_title": "Действие запрещено",
+      "not_authorized_description": "У вас нет прав на изменение этого организатора",
+      "add_error": "Ошибка при добавлении"
     },
     "overview": "Обзор",
     "services": {

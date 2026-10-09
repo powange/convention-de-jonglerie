@@ -153,7 +153,9 @@
     "organizers": "Organizadores",
     "select_user": "Seleccionar un usuario",
     "status_control": "Control de visibilidad",
-    "status_control_desc": "Publica o despublica tus ediciones según su progreso"
+    "status_control_desc": "Publica o despublica tus ediciones según su progreso",
+    "delete_edition_irreversible": "Atención: esta acción es irreversible",
+    "delete_edition_confirm_description": "¿Seguro que quieres eliminar esta edición? Todos los datos asociados (voluntariado, comentarios, objetos perdidos, etc.) se perderán definitivamente."
   },
   "diet": {
     "none": "Ninguno",

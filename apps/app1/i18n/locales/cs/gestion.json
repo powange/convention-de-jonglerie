@@ -377,7 +377,12 @@
         "not_declared": "Neuvedeno",
         "not_declared_short": "K doplnění",
         "title": "Přítomnost osoby {name} na ročníku"
-      }
+      },
+      "select_user": "Vyberte uživatele",
+      "organizer_rights": "Oprávnění organizátora",
+      "not_authorized_title": "Akce není povolena",
+      "not_authorized_description": "Nemáte oprávnění upravovat tohoto organizátora",
+      "add_error": "Chyba při přidávání"
     },
     "overview": "Přehled",
     "services": {

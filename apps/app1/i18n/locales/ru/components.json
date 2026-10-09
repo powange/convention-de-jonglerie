@@ -113,7 +113,10 @@
       "loading_error_title": "Ошибка загрузки",
       "logo_preview": "Предварительный просмотр логотипа:",
       "logo_url_description": "URL изображения логотипа конвенции",
-      "upload_file": "Загрузить файл"
+      "upload_file": "Загрузить файл",
+      "image_uploaded_description": "Изображение загружено",
+      "image_deleted_description": "Изображение удалено",
+      "logo_url_invalid": "Ссылка на логотип недействительна"
     },
     "country_multi_select": {
       "placeholder": "Выбрать страны..."
@@ -158,7 +161,13 @@
       "program_link": "Ссылка на программу",
       "program_section_title": "Программа",
       "program_section_description": "Если программа размещена в другом месте, укажите страницу с её описанием",
-      "dates_timezone": "Время по местному времени площадки ({timezone})"
+      "dates_timezone": "Время по местному времени площадки ({timezone})",
+      "name_help": "Если название не указано, будет использовано название конвенции",
+      "address_placeholder": "ул. Жонглёрская, 123",
+      "step_services_description": "Доступные услуги",
+      "incomplete_form_title": "Форма заполнена не полностью",
+      "incomplete_form_description": "Заполните все обязательные поля",
+      "invalid_dates_title": "Неверные даты"
     },
     "favorites_map": {
       "all_favorites": "Все избранные",

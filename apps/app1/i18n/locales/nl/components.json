@@ -113,7 +113,10 @@
       "loading_error_title": "Laadfout",
       "logo_preview": "Logo voorbeeld:",
       "logo_url_description": "URL van het conventielogo-afbeelding",
-      "upload_file": "Bestand uploaden"
+      "upload_file": "Bestand uploaden",
+      "image_uploaded_description": "De afbeelding is geüpload",
+      "image_deleted_description": "De afbeelding is verwijderd",
+      "logo_url_invalid": "De logo-URL is niet geldig"
     },
     "country_multi_select": {
       "placeholder": "Landen selecteren..."
@@ -158,7 +161,13 @@
       "program_link": "Link naar het programma",
       "program_section_title": "Programma",
       "program_section_description": "Houdt u uw programma elders bij, geef dan de pagina op die het beschrijft",
-      "dates_timezone": "Tijden in de plaatselijke tijd van de locatie ({timezone})"
+      "dates_timezone": "Tijden in de plaatselijke tijd van de locatie ({timezone})",
+      "name_help": "Als er geen naam wordt opgegeven, wordt de naam van de conventie gebruikt",
+      "address_placeholder": "Jongleerstraat 123",
+      "step_services_description": "Beschikbare voorzieningen",
+      "incomplete_form_title": "Formulier onvolledig",
+      "incomplete_form_description": "Vul alle verplichte velden in",
+      "invalid_dates_title": "Ongeldige data"
     },
     "favorites_map": {
       "all_favorites": "Alle zijn favorieten",

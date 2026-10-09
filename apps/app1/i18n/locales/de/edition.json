@@ -153,7 +153,9 @@
     "organizers": "Organisatoren",
     "select_user": "Benutzer auswählen",
     "status_control": "Sichtbarkeitskontrolle",
-    "status_control_desc": "Veröffentlichen oder verstecken Sie Ihre Auflagen je nach Fortschritt"
+    "status_control_desc": "Veröffentlichen oder verstecken Sie Ihre Auflagen je nach Fortschritt",
+    "delete_edition_irreversible": "Achtung: Diese Aktion kann nicht rückgängig gemacht werden",
+    "delete_edition_confirm_description": "Möchten Sie diese Ausgabe wirklich löschen? Alle zugehörigen Daten (Helfende, Kommentare, Fundsachen usw.) gehen unwiderruflich verloren."
   },
   "diet": {
     "none": "Keine",
