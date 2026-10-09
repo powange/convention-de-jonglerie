@@ -192,7 +192,7 @@
               icon="i-heroicons-cog-6-tooth"
               :to="`/editions/${edition?.id}/gestion`"
             >
-              {{ t('common.manage') || 'Gérer' }}
+              {{ t('common.manage') }}
             </UButton>
           </div>
         </template>
@@ -243,7 +243,7 @@
                       icon="i-heroicons-list-bullet"
                       :to="'/profile/mes-candidatures-benevole'"
                     >
-                      {{ t('volunteers.view_all_applications') || 'Voir mes candidatures' }}
+                      {{ t('volunteers.view_all_applications') }}
                     </UButton>
                     <UButton
                       v-if="myApplication.status === 'ACCEPTED'"

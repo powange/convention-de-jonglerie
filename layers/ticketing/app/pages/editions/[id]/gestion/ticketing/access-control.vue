@@ -798,7 +798,7 @@ import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
+const { avertir, erreur, notifier, succes } = useNotificateur()
 const { t, locale } = useI18n()
 const { getParticipantTypeConfig } = useParticipantTypes()
 
@@ -1120,18 +1120,12 @@ const { execute: executerVerification } = useApiAction<unknown, any>(
         isRefundedOrder.value = resultat.isRefunded || false
         participantModalOpen.value = true
 
-        toast.add({
-          title: titreDeDecouverte(resultat.type),
+        succes(titreDeDecouverte(resultat.type), {
           description: nomDeLaPersonne(resultat.participant),
-          icon: 'i-heroicons-check-circle',
-          color: 'success',
         })
       } else {
-        toast.add({
-          title: t('ticketing.access_control.no_ticket_found'),
+        avertir(t('ticketing.access_control.no_ticket_found'), {
           description: motifDeRefus(resultat?.raison),
-          icon: 'i-heroicons-exclamation-triangle',
-          color: 'warning',
         })
       }
     },
@@ -1161,24 +1155,29 @@ const compteRenduDeValidation = (donnees: any, demandes: number) => {
 
   if (validees === 0 && deja.length > 0) {
     return {
-      title: t('ticketing.access_control.entry_already_validated_title'),
+      type: 'avertissement' as const,
+      titre: t('ticketing.access_control.entry_already_validated_title'),
       description: deja.length === 1 ? circonstanceDe(deja[0]!) : nombreDejaValidees(deja.length),
-      icon: 'i-heroicons-exclamation-triangle',
-      color: 'warning' as const,
     }
   }
 
   return {
-    title: t('ticketing.access_control.entry_validated_title'),
+    type: 'succes' as const,
+    titre: t('ticketing.access_control.entry_validated_title'),
     // Le compte rendu porte ce que le SERVEUR a réellement validé, et non ce qu'on lui avait
     // demandé : une ligne déjà validée entre-temps ne l'est pas deux fois.
     description:
       t('ticketing.access_control.entry_validated_count', { count: validees }) +
       (deja.length > 0 ? ' · ' + nombreDejaValidees(deja.length) : ''),
-    icon: 'i-heroicons-check-circle',
-    color: 'success' as const,
   }
 }
+
+/** Affiche un compte rendu, en laissant `useNotificateur` décider de la couleur et de l'icône. */
+const annoncerLeCompteRendu = (rendu: {
+  type: 'succes' | 'avertissement'
+  titre: string
+  description?: string
+}) => notifier(rendu.type, rendu.titre, { description: rendu.description })
 
 const nombreDejaValidees = (nombre: number) =>
   t('ticketing.access_control.entry_already_validated_count', { count: nombre })
@@ -1391,24 +1390,15 @@ const handleValidateParticipants = async (
     }
     valides += lot.ids.length
     // Le compte rendu détaillé du serveur ne vaut que pour un lot unique ; au-delà, on résume.
-    if (lots.length === 1) toast.add(compteRenduDeValidation(resultat, lot.ids.length))
+    if (lots.length === 1) annoncerLeCompteRendu(compteRenduDeValidation(resultat, lot.ids.length))
   }
 
   if (lots.length > 1 || echecs.length) {
-    toast.add(
-      echecs.length
-        ? {
-            title: t('ticketing.access_control.group_partial'),
-            description: echecs.join(' · '),
-            icon: 'i-heroicons-exclamation-triangle',
-            color: 'warning' as const,
-          }
-        : {
-            title: t('ticketing.access_control.group_validated', { count: valides }),
-            icon: 'i-heroicons-check-circle',
-            color: 'success' as const,
-          }
-    )
+    if (echecs.length) {
+      avertir(t('ticketing.access_control.group_partial'), { description: echecs.join(' · ') })
+    } else {
+      succes(t('ticketing.access_control.group_validated', { count: valides }))
+    }
   }
 
   await Promise.all([loadStats(), loadRecentValidations()])
@@ -1615,11 +1605,8 @@ const ouvrirFicheDuBillet = async (qrCode: string): Promise<boolean> => {
 const handleOrderCreated = async (qrCode: string) => {
   try {
     if (await ouvrirFicheDuBillet(qrCode)) {
-      toast.add({
-        title: t('ticketing.access_control.order_created_title'),
+      succes(t('ticketing.access_control.order_created_title'), {
         description: t('ticketing.access_control.order_created_description'),
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
       })
 
       // Recharger les statistiques et les dernières validations
@@ -1627,11 +1614,8 @@ const handleOrderCreated = async (qrCode: string) => {
     }
   } catch (error: unknown) {
     const err = error as { data?: { message?: string } }
-    toast.add({
-      title: t('ticketing.access_control.error_title'),
+    erreur(t('ticketing.access_control.error_title'), {
       description: err.data?.message || t('ticketing.access_control.load_order_error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
     })
   }
 }
@@ -1649,11 +1633,8 @@ const ouvrirBilletExistant = async (qrCode: string) => {
     await ouvrirFicheDuBillet(qrCode)
   } catch (error: unknown) {
     const err = error as { data?: { message?: string } }
-    toast.add({
-      title: t('ticketing.access_control.error_title'),
+    erreur(t('ticketing.access_control.error_title'), {
       description: err.data?.message || t('ticketing.access_control.load_order_error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
     })
   }
 }
@@ -1848,13 +1829,10 @@ const { execute: syncHelloAsso, loading: syncingHelloAsso } = useApiAction<
   onSuccess: async (result) => {
     if (result.success) {
       const totalParticipants = result.stats?.totalItems || 0
-      toast.add({
-        title: t('ticketing.access_control.sync_helloasso_success_title'),
+      succes(t('ticketing.access_control.sync_helloasso_success_title'), {
         description: t('ticketing.access_control.sync_helloasso_success_count', {
           count: totalParticipants,
         }),
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
       })
       await Promise.all([loadStats(), loadRecentValidations()])
     }

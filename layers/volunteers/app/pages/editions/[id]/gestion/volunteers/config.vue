@@ -212,11 +212,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                   <UBadge :color="volunteersPagePublicLocal ? 'success' : 'neutral'" variant="soft">
-                    {{
-                      volunteersPagePublicLocal
-                        ? $t('common.visible') || 'Visible'
-                        : $t('common.hidden') || 'Masquée'
-                    }}
+                    {{ volunteersPagePublicLocal ? $t('common.visible') : $t('common.hidden') }}
                   </UBadge>
                 </div>
               </div>
@@ -257,11 +253,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                   <UBadge :color="volunteersOpenLocal ? 'success' : 'neutral'" variant="soft">
-                    {{
-                      volunteersOpenLocal
-                        ? $t('common.active') || 'Actif'
-                        : $t('common.inactive') || 'Inactif'
-                    }}
+                    {{ volunteersOpenLocal ? $t('common.active') : $t('common.inactive') }}
                   </UBadge>
                 </div>
               </div>
@@ -411,7 +403,7 @@ definePageMeta({
 const route = useRoute()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
-const toast = useToast()
+const { erreur, succes } = useNotificateur()
 const { t } = useI18n()
 
 const editionId = Number(route.params.id)
@@ -464,8 +456,8 @@ const setupStartDateLocal = shallowRef<DateValue | undefined>(undefined)
 const teardownEndDateLocal = shallowRef<DateValue | undefined>(undefined)
 
 const volunteerModeItems = computed(() => [
-  { value: 'INTERNAL', label: t('gestion.volunteers.mode_internal') || 'Interne' },
-  { value: 'EXTERNAL', label: t('gestion.volunteers.mode_external') || 'Externe' },
+  { value: 'INTERNAL', label: t('gestion.volunteers.mode_internal') },
+  { value: 'EXTERNAL', label: t('gestion.volunteers.mode_external') },
 ])
 
 // Permissions calculées
@@ -565,18 +557,10 @@ const persistDateSettings = async (data: Record<string, unknown>) => {
     const updatedSettings = await updateSettings(data)
     if (updatedSettings) {
       volunteersUpdatedAt.value = new Date()
-      toast.add({
-        title: t('common.saved') || 'Sauvegardé',
-        color: 'success',
-        icon: 'i-heroicons-check-circle',
-      })
+      succes(t('common.saved'))
     }
   } catch (error: any) {
-    toast.add({
-      title: error?.data?.message || error?.message || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(error?.data?.message || error?.message || t('common.error'))
   }
 }
 
@@ -589,19 +573,11 @@ const handleTogglePagePublic = async (val: boolean) => {
     if (updatedSettings) {
       volunteersUpdatedAt.value = new Date()
       await editionStore.fetchEditionById(editionId, { force: true })
-      toast.add({
-        title: t('common.saved') || 'Sauvegardé',
-        color: 'success',
-        icon: 'i-heroicons-check-circle',
-      })
+      succes(t('common.saved'))
     }
   } catch (e: any) {
     volunteersPagePublicLocal.value = previous
-    toast.add({
-      title: e?.data?.message || e?.message || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(e?.data?.message || e?.message || t('common.error'))
   }
 }
 
@@ -619,19 +595,11 @@ const handleToggleSwaps = async (val: boolean) => {
     if (updatedSettings) {
       volunteersUpdatedAt.value = new Date()
       await editionStore.fetchEditionById(editionId, { force: true })
-      toast.add({
-        title: t('common.saved'),
-        color: 'success',
-        icon: 'i-heroicons-check-circle',
-      })
+      succes(t('common.saved'))
     }
   } catch (e: any) {
     volunteersSwapsLocal.value = previous
-    toast.add({
-      title: e?.data?.message || e?.message || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(e?.data?.message || e?.message || t('common.error'))
   }
 }
 
@@ -647,19 +615,11 @@ const handleToggleOrganizersInTeams = async (val: boolean) => {
     if (updatedSettings) {
       volunteersUpdatedAt.value = new Date()
       await editionStore.fetchEditionById(editionId, { force: true })
-      toast.add({
-        title: t('common.saved'),
-        color: 'success',
-        icon: 'i-heroicons-check-circle',
-      })
+      succes(t('common.saved'))
     }
   } catch (e: any) {
     volunteersOrganizersInTeamsLocal.value = previous
-    toast.add({
-      title: e?.data?.message || e?.message || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(e?.data?.message || e?.message || t('common.error'))
   }
 }
 
@@ -674,19 +634,11 @@ const handleToggleOpen = async (val: boolean) => {
     if (updatedSettings) {
       volunteersUpdatedAt.value = new Date()
       await editionStore.fetchEditionById(editionId, { force: true })
-      toast.add({
-        title: t('common.saved') || 'Sauvegardé',
-        color: 'success',
-        icon: 'i-heroicons-check-circle',
-      })
+      succes(t('common.saved'))
     }
   } catch (e: any) {
     volunteersOpenLocal.value = previous
-    toast.add({
-      title: e?.data?.message || e?.message || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(e?.data?.message || e?.message || t('common.error'))
   }
 }
 
@@ -733,26 +685,15 @@ const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {})
         await editionStore.fetchEditionById(editionId, { force: true })
       }
 
-      toast.add({
-        title: t('common.saved') || 'Sauvegardé',
-        color: 'success',
-        icon: 'i-heroicons-check-circle',
-      })
+      succes(t('common.saved'))
     }
   } catch (error: any) {
     if (fieldErrors.value && Object.keys(fieldErrors.value).length > 0) {
-      toast.add({
-        title: 'Erreurs de validation',
+      erreur('Erreurs de validation', {
         description: 'Veuillez corriger les erreurs dans le formulaire',
-        color: 'error',
-        icon: 'i-heroicons-x-circle',
       })
     } else {
-      toast.add({
-        title: error?.data?.message || error?.message || t('common.error'),
-        color: 'error',
-        icon: 'i-heroicons-x-circle',
-      })
+      erreur(error?.data?.message || error?.message || t('common.error'))
     }
   }
 }

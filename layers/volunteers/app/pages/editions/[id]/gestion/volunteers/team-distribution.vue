@@ -367,7 +367,7 @@ const volunteerConfig = getParticipantTypeConfig('volunteer')
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
+const { succes } = useNotificateur()
 const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
@@ -659,11 +659,8 @@ const { execute: executeUnassign } = useApiAction(
       if (volunteerTableRef.value?.refreshApplications) {
         await volunteerTableRef.value.refreshApplications()
       }
-      toast.add({
-        title: 'Bénévole désassigné',
+      succes('Bénévole désassigné', {
         description: `${unassignMeta.value.volunteerName} a été retiré de ${unassignMeta.value.teamName}`,
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
       })
     },
   }
@@ -711,16 +708,17 @@ const { execute: executeToggleLeader } = useApiAction(
       await fetchTeamAssignments()
       await fetchVolunteersInfo()
       const { volunteerName, teamName, wasLeader } = leaderMeta.value
-      toast.add({
-        title: wasLeader
+      succes(
+        wasLeader
           ? t('pages.volunteers.team_distribution.leader_removed')
           : t('pages.volunteers.team_distribution.leader_added'),
-        description: wasLeader
-          ? `${volunteerName} n'est plus responsable de ${teamName}`
-          : `${volunteerName} est maintenant responsable de ${teamName}`,
-        icon: 'i-heroicons-star',
-        color: 'success',
-      })
+        {
+          description: wasLeader
+            ? `${volunteerName} n'est plus responsable de ${teamName}`
+            : `${volunteerName} est maintenant responsable de ${teamName}`,
+          icone: 'i-heroicons-star',
+        }
+      )
     },
   }
 )

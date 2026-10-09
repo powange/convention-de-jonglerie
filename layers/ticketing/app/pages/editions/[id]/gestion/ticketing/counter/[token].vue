@@ -333,7 +333,7 @@ const route = useRoute()
 const router = useRouter()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
+const { erreur, succes } = useNotificateur()
 const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
@@ -414,11 +414,7 @@ const handleDecrement = async () => {
 const handleReset = async () => {
   try {
     await reset()
-    toast.add({
-      title: t('common.success'),
-      description: t('ticketing.counters.counter_reset'),
-      color: 'success',
-    })
+    succes(t('common.success'), { description: t('ticketing.counters.counter_reset') })
     showResetModal.value = false
   } catch {
     // L'erreur est déjà affichée dans le composable
@@ -428,17 +424,9 @@ const handleReset = async () => {
 const copyUrl = async () => {
   try {
     await navigator.clipboard.writeText(counterUrl.value)
-    toast.add({
-      title: t('common.success'),
-      description: t('common.link_copied'),
-      color: 'success',
-    })
+    succes(t('common.success'), { description: t('common.link_copied') })
   } catch {
-    toast.add({
-      title: t('common.error'),
-      description: t('common.copy_error'),
-      color: 'error',
-    })
+    erreur(t('common.error'), { description: t('common.copy_error') })
   }
 }
 
@@ -472,10 +460,8 @@ const { execute: handleRegenerateToken, loading: isRegenerating } = useApiAction
       // Déconnecter la connexion SSE actuelle avant de changer d'URL
       disconnect()
 
-      toast.add({
-        title: t('common.success'),
+      succes(t('common.success'), {
         description: t('ticketing.counters.token_regenerated'),
-        color: 'success',
       })
 
       showRegenerateModal.value = false

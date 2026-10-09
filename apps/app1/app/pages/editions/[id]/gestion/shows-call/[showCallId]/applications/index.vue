@@ -302,7 +302,7 @@ definePageMeta({
 const route = useRoute()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
-const toast = useToast()
+const { erreur, info, succes } = useNotificateur()
 const { t, locale } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
@@ -430,10 +430,7 @@ const fetchApplications = async () => {
     stats.value = response.stats
   } catch (error) {
     console.error('Error fetching applications:', error)
-    toast.add({
-      title: t('common.error'),
-      color: 'error',
-    })
+    erreur(t('common.error'))
   } finally {
     loadingApplications.value = false
   }
@@ -557,9 +554,9 @@ const toggleSurveyStatus = () => executeToggleStatus()
 const copySurveyLink = async () => {
   try {
     await navigator.clipboard.writeText(surveyUrl.value)
-    toast.add({ title: t('survey.manage.link_copied'), color: 'success' })
+    succes(t('survey.manage.link_copied'))
   } catch {
-    toast.add({ title: t('survey.manage.link_copied'), color: 'info' })
+    info(t('survey.manage.link_copied'))
   }
 }
 

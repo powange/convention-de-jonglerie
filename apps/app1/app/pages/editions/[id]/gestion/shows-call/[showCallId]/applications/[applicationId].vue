@@ -569,7 +569,7 @@ definePageMeta({
 const route = useRoute()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
-const toast = useToast()
+const { erreur } = useNotificateur()
 const { t, locale } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
@@ -1102,10 +1102,7 @@ const fetchApplication = async (id: number) => {
     console.error('Error fetching application:', error)
     application.value = null
     if (error?.statusCode !== 404 && error?.status !== 404) {
-      toast.add({
-        title: t('common.error'),
-        color: 'error',
-      })
+      erreur(t('common.error'))
     }
   } finally {
     loadingApplication.value = false

@@ -110,7 +110,7 @@ import { useVolunteerSettings } from '#imports'
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
+const { erreur, succes } = useNotificateur()
 const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
@@ -163,18 +163,10 @@ const saveVolunteerDescription = async () => {
 
     if (updatedSettings) {
       volunteersDescriptionOriginal.value = volunteersDescriptionLocal.value
-      toast.add({
-        title: t('common.saved') || 'Sauvegardé',
-        color: 'success',
-        icon: 'i-heroicons-check-circle',
-      })
+      succes(t('common.saved'))
     }
   } catch (e: any) {
-    toast.add({
-      title: e?.data?.message || e?.message || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(e?.data?.message || e?.message || t('common.error'))
   }
 }
 

@@ -220,7 +220,7 @@ definePageMeta({
 const route = useRoute()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
-const toast = useToast()
+const { erreur } = useNotificateur()
 const { t, locale } = useI18n()
 
 const editionId = Number(route.params.id)
@@ -261,10 +261,7 @@ const fetchShowCalls = async () => {
     showCalls.value = response.showCalls
   } catch (error) {
     console.error('Error fetching show calls:', error)
-    toast.add({
-      title: t('common.error'),
-      color: 'error',
-    })
+    erreur(t('common.error'))
   } finally {
     showCallsLoading.value = false
   }

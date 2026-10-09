@@ -1,5 +1,14 @@
 import { computed, ref, readonly, type Ref } from 'vue'
 
+/*
+ * ⚠️ IMPORT EXPLICITE, et non auto-import. Les tests du projet `unit` tournent SANS Nuxt : ils
+ * simulent les auto-imports par `vi.stubGlobal`. Un `useNotificateur()` compté sur l'auto-import
+ * y est donc introuvable, et c'est 58 tests qui tombent d'un coup — sur `useApiAction`, mais
+ * aussi sur `useEditionMarkers` et `useEditionZones`, qui en dépendent. L'import rend la
+ * dépendance visible et résoluble partout.
+ */
+import { useNotificateur } from './useNotificateur'
+
 /**
  * Structure d'erreur API normalisée
  */
@@ -266,7 +275,12 @@ export function useApiAction<TData = unknown, TResult = unknown>(
   endpoint: string | (() => string),
   options: ApiActionOptions<TData, TResult> = {}
 ): ApiActionReturn<TResult> {
-  const toast = useToast()
+  /*
+   * La forme des toasts vient de `useNotificateur` : couleur et icône par type, écrites une seule
+   * fois. `useApiAction` était l'un des endroits qui les recopiait — or c'est lui qui en émet le
+   * plus, et la fiche demandait précisément qu'il s'appuie sur le même helper.
+   */
+  const { succes, erreur } = useNotificateur()
   const { t } = useI18n()
 
   const loading = ref(false)
@@ -319,12 +333,7 @@ export function useApiAction<TData = unknown, TResult = unknown>(
       if (!silent && !silentSuccess && successMessage) {
         const message =
           typeof successMessage === 'function' ? successMessage(unwrapped) : successMessage
-        toast.add({
-          title: message.title,
-          description: message.description,
-          icon: 'i-heroicons-check-circle',
-          color: 'success',
-        })
+        succes(message.title, { description: message.description })
       }
 
       // Actions post-succès
@@ -347,11 +356,7 @@ export function useApiAction<TData = unknown, TResult = unknown>(
 
       // Toast d'erreur
       if (!silent && !silentError) {
-        toast.add({
-          title: resolveErrorMessage(apiError),
-          icon: 'i-heroicons-x-circle',
-          color: 'error',
-        })
+        erreur(resolveErrorMessage(apiError))
       }
 
       // Callback d'erreur
@@ -428,7 +433,12 @@ export function useApiActionById<TResult = unknown>(
   endpointFactory: (id: string | number) => string,
   options: ApiActionByIdOptions<TResult> = {}
 ): ApiActionByIdReturn<TResult> {
-  const toast = useToast()
+  /*
+   * La forme des toasts vient de `useNotificateur` : couleur et icône par type, écrites une seule
+   * fois. `useApiAction` était l'un des endroits qui les recopiait — or c'est lui qui en émet le
+   * plus, et la fiche demandait précisément qu'il s'appuie sur le même helper.
+   */
+  const { succes, erreur } = useNotificateur()
   const { t } = useI18n()
 
   const loadingId = ref<string | number | null>(null)
@@ -490,12 +500,7 @@ export function useApiActionById<TResult = unknown>(
       if (!silent && !silentSuccess && successMessage) {
         const message =
           typeof successMessage === 'function' ? successMessage(unwrapped) : successMessage
-        toast.add({
-          title: message.title,
-          description: message.description,
-          icon: 'i-heroicons-check-circle',
-          color: 'success',
-        })
+        succes(message.title, { description: message.description })
       }
 
       // Actions post-succès (on passe l'ID à la callback)
@@ -518,11 +523,7 @@ export function useApiActionById<TResult = unknown>(
 
       // Toast d'erreur
       if (!silent && !silentError) {
-        toast.add({
-          title: resolveErrorMessage(apiError),
-          icon: 'i-heroicons-x-circle',
-          color: 'error',
-        })
+        erreur(resolveErrorMessage(apiError))
       }
 
       // Callback d'erreur

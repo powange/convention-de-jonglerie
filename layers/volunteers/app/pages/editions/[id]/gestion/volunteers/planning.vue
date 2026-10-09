@@ -196,7 +196,7 @@ const { t } = useI18n()
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
+const { erreur, neutre, succes } = useNotificateur()
 const editionId = parseInt(route.params.id as string)
 
 /**
@@ -231,19 +231,18 @@ const basculerPublication = async (publier: boolean) => {
     // changé induirait en erreur.
     if (!enregistre) return
 
-    toast.add({
-      title: publier
-        ? t('volunteers.planning_published_toast')
-        : t('volunteers.planning_unpublished_toast'),
-      color: publier ? 'success' : 'neutral',
-      icon: publier ? 'i-heroicons-eye' : 'i-heroicons-eye-slash',
-    })
+    /*
+     * La seule notification du dépôt dont la COULEUR porte un sens : publier est un succès,
+     * dépublier n'en est pas un — c'est un retrait, et l'annoncer en vert dirait « tant mieux »
+     * quand on vient de masquer ce que les bénévoles voyaient. D'où deux types, et deux icônes.
+     */
+    if (publier) {
+      succes(t('volunteers.planning_published_toast'), { icone: 'i-heroicons-eye' })
+    } else {
+      neutre(t('volunteers.planning_unpublished_toast'), { icone: 'i-heroicons-eye-slash' })
+    }
   } catch (e: any) {
-    toast.add({
-      title: e?.data?.message || e?.message || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(e?.data?.message || e?.message || t('common.error'))
   }
 }
 
@@ -401,19 +400,12 @@ const handleSlotUpdate = async (data: {
       endDateTime: data.endDateTime,
       maxVolunteers: data.maxVolunteers,
     })
-    toast.add({
-      title: t('volunteers.slot_updated'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
+    succes(t('volunteers.slot_updated'))
   } catch (error: unknown) {
     const err = error as { data?: { message?: string }; message?: string; statusText?: string }
-    toast.add({
-      title: t('errors.error_occurred'),
+    erreur(t('errors.error_occurred'), {
       description:
         err.data?.message || err.message || err.statusText || 'Erreur lors de la mise à jour',
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
     })
   }
 }
@@ -432,19 +424,12 @@ const handleSlotDelete = (slotId: string) => {
 const performSlotDelete = async (slotId: string) => {
   try {
     await deleteTimeSlot(slotId)
-    toast.add({
-      title: t('volunteers.slot_deleted'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
+    succes(t('volunteers.slot_deleted'))
   } catch (error: unknown) {
     const err = error as { data?: { message?: string }; message?: string; statusText?: string }
-    toast.add({
-      title: t('errors.error_occurred'),
+    erreur(t('errors.error_occurred'), {
       description:
         err.data?.message || err.message || err.statusText || 'Erreur lors de la suppression',
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
     })
   }
 }
@@ -462,11 +447,7 @@ const handleSlotSave = async (slotData: any) => {
         endDateTime: slotData.end,
         maxVolunteers: slotData.maxVolunteers,
       })
-      toast.add({
-        title: t('volunteers.slot_updated'),
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
+      succes(t('volunteers.slot_updated'))
     } else {
       // Création d'un nouveau créneau, éventuellement répété sur chaque journée
       const avant = timeSlots.value.length
@@ -480,24 +461,13 @@ const handleSlotSave = async (slotData: any) => {
         recurrence: slotData.recurrence,
       })
       const crees = timeSlots.value.length - avant
-      toast.add({
-        // Une répétition crée plusieurs créneaux d'un coup : le dire évite d'avoir à les compter
-        title:
-          crees > 1
-            ? t('volunteers.slots_created', { count: crees })
-            : t('volunteers.slot_created'),
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
+      succes(None)
     }
   } catch (error: unknown) {
     const err = error as { data?: { message?: string }; message?: string; statusText?: string }
-    toast.add({
-      title: t('errors.error_occurred'),
+    erreur(t('errors.error_occurred'), {
       description:
         err.data?.message || err.message || err.statusText || 'Erreur lors de la sauvegarde',
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
     })
   }
   slotModalData.value = null
@@ -514,11 +484,8 @@ const refreshData = async () => {
       fetchSpectacles(),
     ])
   } catch {
-    toast.add({
-      title: t('errors.error_occurred'),
+    erreur(t('errors.error_occurred'), {
       description: 'Erreur lors du rechargement des données',
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
     })
   } finally {
     refreshing.value = false
@@ -1029,12 +996,7 @@ onMounted(async () => {
       chargerReglagesBenevoles(),
     ])
   } catch {
-    toast.add({
-      title: t('errors.error_occurred'),
-      description: t('volunteers.loading_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
+    erreur(t('errors.error_occurred'), { description: t('volunteers.loading_error') })
   } finally {
     initialLoading.value = false
   }

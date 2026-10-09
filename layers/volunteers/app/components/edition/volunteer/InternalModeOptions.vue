@@ -279,7 +279,7 @@
     <!-- Indicateur de sauvegarde -->
     <div v-if="saving" class="flex gap-2 text-xs text-gray-500 items-center">
       <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
-      {{ $t('common.saving') || 'Enregistrement...' }}
+      {{ $t('common.saving') }}
     </div>
   </div>
 </template>
@@ -369,7 +369,7 @@ const persistSettings = async (data: any) => {
       emit('updated', updatedSettings)
 
       toast.add({
-        title: t('common.saved') || 'Sauvegardé',
+        title: t('common.saved'),
         color: 'success',
         icon: 'i-heroicons-check-circle',
       })

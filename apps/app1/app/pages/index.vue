@@ -83,7 +83,7 @@
             size="sm"
             @click="changeViewMode('agenda')"
           >
-            {{ $t('homepage.agenda') || 'Agenda' }}
+            {{ $t('homepage.agenda') }}
           </UButton>
           <UButton
             :color="viewMode === 'map' ? 'primary' : 'neutral'"

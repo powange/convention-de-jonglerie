@@ -98,7 +98,7 @@
             <!-- Indicateur de sauvegarde -->
             <div v-if="savingMeals" class="flex gap-2 text-xs text-gray-500 items-center">
               <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
-              {{ $t('common.saving') || 'Enregistrement...' }}
+              {{ $t('common.saving') }}
             </div>
           </div>
         </UCard>
@@ -121,7 +121,7 @@ const { t } = useI18n()
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
+const { erreur } = useNotificateur()
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
@@ -173,11 +173,7 @@ const fetchVolunteerMeals = async () => {
     }
   } catch (error) {
     console.error('Failed to fetch volunteer meals:', error)
-    toast.add({
-      title: t('common.error'),
-      description: t('gestion.meals.error_loading_meals'),
-      color: 'error',
-    })
+    erreur(t('common.error'), { description: t('gestion.meals.error_loading_meals') })
   } finally {
     loadingMeals.value = false
   }

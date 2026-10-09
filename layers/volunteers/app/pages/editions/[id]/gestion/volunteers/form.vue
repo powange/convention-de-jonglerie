@@ -46,7 +46,7 @@
             <div v-if="savingVolunteers" class="flex gap-2">
               <span class="text-xs text-gray-500 flex items-center gap-1">
                 <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
-                {{ $t('common.saving') || 'Enregistrement...' }}
+                {{ $t('common.saving') }}
               </span>
             </div>
           </div>
@@ -110,7 +110,7 @@ import { useVolunteerSettings } from '#imports'
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
+const { erreur, succes } = useNotificateur()
 const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
@@ -154,17 +154,9 @@ const handleVolunteerInternalOptionsUpdated = async (_settings: any) => {
 
   // Gérer les erreurs de rechargement
   if (settingsError.value) {
-    toast.add({
-      title: t('common.error'),
-      description: settingsError.value,
-      color: 'error',
-    })
+    erreur(t('common.error'), { description: settingsError.value })
   } else {
-    toast.add({
-      title: t('common.saved') || 'Sauvegardé',
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
+    succes(t('common.saved'))
   }
 }
 
@@ -184,11 +176,7 @@ onMounted(async () => {
 
   // Afficher les erreurs de chargement si nécessaire
   if (settingsError.value) {
-    toast.add({
-      title: t('common.error'),
-      description: settingsError.value,
-      color: 'error',
-    })
+    erreur(t('common.error'), { description: settingsError.value })
   }
 })
 

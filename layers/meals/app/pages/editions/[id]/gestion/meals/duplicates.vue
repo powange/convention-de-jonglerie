@@ -266,7 +266,7 @@ interface RepasDeLEdition {
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
+const { erreur } = useNotificateur()
 const { t } = useI18n()
 const { getMealTypeLabel } = useMealTypeLabel()
 
@@ -341,10 +341,8 @@ const charger = async () => {
     permissions.value = reponse.data.permissions
   } catch (error) {
     console.error('Erreur lors du chargement des doublons de repas:', error)
-    toast.add({
-      title: t('common.error'),
+    erreur(t('common.error'), {
       description: t('gestion.meals.duplicates.load_error'),
-      color: 'error',
     })
   } finally {
     chargement.value = false

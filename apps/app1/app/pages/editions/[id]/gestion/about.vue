@@ -87,7 +87,7 @@ definePageMeta({
 
 const route = useRoute()
 const { t } = useI18n()
-const toast = useToast()
+const { erreur, succes } = useNotificateur()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 
@@ -130,28 +130,18 @@ const onImageUploaded = (result: { imageUrl?: string; edition?: { imageUrl?: str
   if (newImageUrl) {
     imageUrl.value = newImageUrl
   }
-  toast.add({
-    title: t('upload.success_message'),
-    icon: 'i-heroicons-check-circle',
-    color: 'success',
-  })
+  succes(t('upload.success_message'))
 }
 
 const onImageDeleted = () => {
   imageUrl.value = null
-  toast.add({
-    title: t('upload.delete_message'),
-    icon: 'i-heroicons-check-circle',
-    color: 'success',
-  })
+  succes(t('upload.delete_message'))
 }
 
 const onImageError = (error: string) => {
-  toast.add({
-    title: t('upload.error_message'),
+  erreur(t('upload.error_message'), {
     description: error,
-    icon: 'i-heroicons-exclamation-triangle',
-    color: 'error',
+    icone: 'i-heroicons-exclamation-triangle',
   })
 }
 
@@ -177,7 +167,7 @@ const { execute: saveEdition, loading: savingEdition } = useApiAction(
 const saving = savingEdition
 
 const save = async () => {
-  if (await saveEdition()) toast.add({ title: t('gestion.about.save_success'), color: 'success' })
+  if (await saveEdition()) succes(t('gestion.about.save_success'))
 }
 
 // Charger l'édition

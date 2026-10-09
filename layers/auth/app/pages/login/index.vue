@@ -156,7 +156,7 @@
               size="xs"
               class="ml-2"
               @click="step = 'email'"
-              >{{ $t('common.edit') || 'Modifier' }}</UButton
+              >{{ $t('common.edit') }}</UButton
             >
           </div>
           <UForm
@@ -225,7 +225,7 @@
               size="xs"
               class="ml-2"
               @click="step = 'email'"
-              >{{ $t('common.edit') || 'Modifier' }}</UButton
+              >{{ $t('common.edit') }}</UButton
             >
           </div>
 

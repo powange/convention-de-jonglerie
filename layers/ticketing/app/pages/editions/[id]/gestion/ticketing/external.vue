@@ -941,7 +941,7 @@ const route = useRoute()
 const router = useRouter()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
+const { erreur, succes } = useNotificateur()
 const { t } = useI18n()
 
 // Titre de l'onglet : « Lier une billetterie externe - Billetterie », cohérent avec la section.
@@ -1066,15 +1066,12 @@ const { execute: executeLoadTiers, loading: loadingTiers } = useApiAction<
     ongletActif.value = 'tarifs'
     resultatsOuverts.value = true
 
-    toast.add({
-      title: $t('ticketing.external.tiers_loaded'),
+    succes($t('ticketing.external.tiers_loaded'), {
       description: $t('ticketing.external.tiers_loaded_description', {
         tiers: response.tiers?.length || 0,
         options: response.options?.length || 0,
         fields: loadedCustomFields.value.length,
       }),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
     })
   },
 })
@@ -1387,11 +1384,8 @@ const loadInfomaniakRawJson = async () => {
     }
     showInfomaniakRawJsonModal.value = true
   } catch (error: any) {
-    toast.add({
-      title: t('common.error'),
+    erreur(t('common.error'), {
       description: error.data?.message || 'Erreur lors du chargement',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
     })
   } finally {
     loadingInfomaniakRawJson.value = false
@@ -1421,13 +1415,10 @@ const { execute: executeSaveConfig, loading: saving } = useApiAction(
     silentSuccess: true, // Message dynamique
     errorMessages: { default: $t('ticketing.external.config_save_error') },
     onSuccess: () => {
-      toast.add({
-        title: $t('ticketing.external.config_saved'),
+      succes($t('ticketing.external.config_saved'), {
         description: $t('ticketing.external.config_saved_description', {
           org: helloAssoOrganizationSlug.value,
         }),
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
       })
       hasExistingConfig.value = true
       helloAssoClientSecret.value = ''
@@ -1456,22 +1447,16 @@ const { execute: executeTestConnection, loading: testing } = useApiAction<
   silentSuccess: true, // Message dynamique
   silentError: true, // Message personnalisé
   onSuccess: (result) => {
-    toast.add({
-      title: $t('ticketing.external.connection_success'),
+    succes($t('ticketing.external.connection_success'), {
       description: $t('ticketing.external.connection_success_description', {
         name: result.form.name,
         org: result.form.organizationName,
       }),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
     })
   },
   onError: (error) => {
-    toast.add({
-      title: $t('ticketing.external.connection_failed'),
+    erreur($t('ticketing.external.connection_failed'), {
       description: error.data?.message || $t('ticketing.external.connection_error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
     })
   },
 })
@@ -1538,14 +1523,11 @@ const { execute: executeLoadOrders, loading: loadingOrders } = useApiAction<
     ongletActif.value = 'participants'
     resultatsOuverts.value = true
 
-    toast.add({
-      title: $t('ticketing.external.participants_loaded'),
+    succes($t('ticketing.external.participants_loaded'), {
       description: $t('ticketing.external.participants_loaded_description', {
         orders: response.stats?.totalOrders || 0,
         items: response.stats?.totalItems || 0,
       }),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
     })
   },
 })
