@@ -554,80 +554,43 @@ const loanBadgeLabel = computed(() => {
   if (loanIsOverdue.value) return t('gestion.stock.loan_overdue')
   return t('gestion.stock.loan_to_return')
 })
-const loanActionLoading = ref(false)
+/*
+ * Les trois gestes d'emprunt — récupéré, rendu, non rendu — ne différaient que par le CORPS
+ * envoyé. Ils étaient écrits trois fois : même URL, même toast, même rechargement, même
+ * rafraîchissement de pastille, même `try/catch/finally`. Un seul appel suffit, le corps étant
+ * posé juste avant.
+ */
+const changementDEmprunt = ref<Record<string, string | null>>({})
+
+const { execute: executerChangementDEmprunt, loading: loanActionLoading } = useApiAction(
+  () => `/api/editions/${editionId}/stock-items/${item.value?.id}`,
+  {
+    method: 'PUT',
+    body: () => changementDEmprunt.value,
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      await fetchItem()
+      // La pastille du menu compte les retards : marquer un emprunt récupéré ou rendu la change.
+      // Le menu ne recalcule qu'au montage, c'est donc ici qu'il faut le lui dire.
+      await rafraichirCompteursNavigation({ editionId }, ['stock-emprunts'])
+    },
+  }
+)
+
+const appliquerChangementDEmprunt = async (champs: Record<string, string | null>) => {
+  if (!item.value) return
+  changementDEmprunt.value = champs
+  await executerChangementDEmprunt()
+}
 
 /** Pose ou retire la date de récupération. */
-async function marquerRecupere(recupere: boolean) {
-  if (!item.value) return
-  loanActionLoading.value = true
-  try {
-    await $fetch(`/api/editions/${editionId}/stock-items/${item.value.id}`, {
-      method: 'PUT',
-      body: { pickedUpAt: recupere ? new Date().toISOString() : null },
-    })
-    useToast().add({ title: t('common.saved'), icon: 'i-heroicons-check-circle', color: 'success' })
-    await fetchItem()
-    // La pastille du menu compte les retards : marquer un emprunt récupéré ou rendu la change.
-    // Le menu ne recalcule qu'au montage, c'est donc ici qu'il faut le lui dire.
-    await rafraichirCompteursNavigation({ editionId }, ['stock-emprunts'])
-  } catch (e: any) {
-    useToast().add({
-      title: e?.data?.message || t('common.error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    loanActionLoading.value = false
-  }
-}
+const marquerRecupere = (recupere: boolean) =>
+  appliquerChangementDEmprunt({ pickedUpAt: recupere ? new Date().toISOString() : null })
 
-async function markLoanReturned() {
-  if (!item.value) return
-  loanActionLoading.value = true
-  try {
-    await $fetch(`/api/editions/${editionId}/stock-items/${item.value.id}`, {
-      method: 'PUT',
-      body: { returnedAt: new Date().toISOString() },
-    })
-    useToast().add({ title: t('common.saved'), icon: 'i-heroicons-check-circle', color: 'success' })
-    await fetchItem()
-    // La pastille du menu compte les retards : marquer un emprunt récupéré ou rendu la change.
-    // Le menu ne recalcule qu'au montage, c'est donc ici qu'il faut le lui dire.
-    await rafraichirCompteursNavigation({ editionId }, ['stock-emprunts'])
-  } catch (e: any) {
-    useToast().add({
-      title: e?.data?.message || t('common.error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    loanActionLoading.value = false
-  }
-}
+const markLoanReturned = () => appliquerChangementDEmprunt({ returnedAt: new Date().toISOString() })
 
-async function markLoanNotReturned() {
-  if (!item.value) return
-  loanActionLoading.value = true
-  try {
-    await $fetch(`/api/editions/${editionId}/stock-items/${item.value.id}`, {
-      method: 'PUT',
-      body: { returnedAt: null },
-    })
-    useToast().add({ title: t('common.saved'), icon: 'i-heroicons-check-circle', color: 'success' })
-    await fetchItem()
-    // La pastille du menu compte les retards : marquer un emprunt récupéré ou rendu la change.
-    // Le menu ne recalcule qu'au montage, c'est donc ici qu'il faut le lui dire.
-    await rafraichirCompteursNavigation({ editionId }, ['stock-emprunts'])
-  } catch (e: any) {
-    useToast().add({
-      title: e?.data?.message || t('common.error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    loanActionLoading.value = false
-  }
-}
+const markLoanNotReturned = () => appliquerChangementDEmprunt({ returnedAt: null })
 
 function formatDate(iso: string): string {
   try {
@@ -730,6 +693,21 @@ const itemActions = computed(() => [
 
 const confirmation = useConfirmation()
 
+const { execute: executerSuppressionObjet } = useApiActionById(
+  (id) => `/api/editions/${editionId}/stock-items/${id}`,
+  { method: 'DELETE', silentSuccess: true, errorMessages: { default: t('common.error') } }
+)
+
+const { execute: executerSuppressionReservation } = useApiActionById(
+  (id) => `/api/editions/${editionId}/stock-reservations/${id}`,
+  {
+    method: 'DELETE',
+    silentSuccess: true,
+    errorMessages: { default: t('common.error') },
+    onSuccess: () => fetchItem(),
+  }
+)
+
 function deleteItem() {
   const objet = item.value
   if (!objet) return
@@ -737,9 +715,15 @@ function deleteItem() {
     titre: t('common.delete'),
     description: t('gestion.stock.confirm_delete_item', { name: objet.name }),
     libelleConfirmer: t('common.delete'),
+    /*
+     * ⚠️ C'était un `$fetch` NU. `useConfirmation` laisse remonter un rejet de `agir` — et son
+     * propre commentaire dit à qui revient le message : « À l'appelant de dire l'erreur ; c'est
+     * ce que fait `useApiAction`, qui ne lève pas ». Un échec de suppression produisait donc un
+     * REJET NON GÉRÉ, sans rien afficher.
+     */
     agir: async () => {
       const groupId = objet.group.id
-      await $fetch(`/api/editions/${editionId}/stock-items/${objet.id}`, { method: 'DELETE' })
+      if ((await executerSuppressionObjet(objet.id)) === null) return
       router.push(`/editions/${editionId}/gestion/stock/${groupId}`)
     },
   })
@@ -790,10 +774,8 @@ function deleteReservation(r: StockReservation) {
     titre: t('common.delete'),
     description: t('gestion.stock.confirm_delete_reservation'),
     libelleConfirmer: t('common.delete'),
-    agir: async () => {
-      await $fetch(`/api/editions/${editionId}/stock-reservations/${r.id}`, { method: 'DELETE' })
-      await fetchItem()
-    },
+    // Même correction que pour l'objet : un `$fetch` nu ici laissait l'échec sans message.
+    agir: () => executerSuppressionReservation(r.id),
   })
 }
 
@@ -808,27 +790,24 @@ function cancelReservation(r: StockReservation) {
   })
 }
 
-async function performCancelReservation(r: StockReservation) {
-  try {
-    await $fetch(`/api/editions/${editionId}/stock-reservations/${r.id}`, {
-      method: 'PUT',
-      body: { status: 'CANCELLED' },
-    })
-    useToast().add({
-      title: t('common.saved'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
+const reservationAAnnuler = ref<number | null>(null)
+
+const { execute: executerAnnulationReservation } = useApiAction(
+  () => `/api/editions/${editionId}/stock-reservations/${reservationAAnnuler.value}`,
+  {
+    method: 'PUT',
+    body: { status: 'CANCELLED' },
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
     // Pas de rafraîchissement du compteur ici : annuler une réservation ne touche pas à l'état
     // d'un emprunt, et donc pas au nombre de retards.
-    await fetchItem()
-  } catch (e: any) {
-    useToast().add({
-      title: e?.data?.message || t('common.error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
+    onSuccess: () => fetchItem(),
   }
+)
+
+const performCancelReservation = async (r: StockReservation) => {
+  reservationAAnnuler.value = r.id
+  await executerAnnulationReservation()
 }
 
 function statusColor(s: StockReservationStatus): 'neutral' | 'info' | 'success' | 'error' {

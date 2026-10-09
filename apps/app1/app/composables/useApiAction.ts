@@ -40,11 +40,21 @@ export interface ApiActionOptions<TData = unknown, TResult = unknown> {
   /** En-têtes HTTP additionnels - peut être une fonction pour valeurs dynamiques */
   headers?: Record<string, string> | (() => Record<string, string>)
 
-  /** Messages toast en cas de succès */
-  successMessage?: {
-    title: string
-    description?: string
-  }
+  /**
+   * Messages toast en cas de succès.
+   *
+   * ⚠️ **Une fonction quand le message dépend du résultat ou de l'état au moment de l'appel.**
+   * L'objet est lu une seule fois, au `setup` : un titre conditionnel écrit sous cette forme se
+   * figerait sur la valeur qu'il avait au montage. C'est ce qui obligeait sept écrans de gestion
+   * à garder leur `toast.add` à la main — « marqué comme rendu » / « marqué comme non rendu »,
+   * « responsable ajouté » / « responsable retiré » —, et donc à garder aussi le `try/catch` et le
+   * booléen de chargement qui allaient avec.
+   *
+   * La fonction reçoit la charge utile déballée de la réponse, pour les cas où le message la cite.
+   */
+  successMessage?:
+    | { title: string; description?: string }
+    | ((result: TResult) => { title: string; description?: string })
 
   /** Messages d'erreur par code HTTP ou message par défaut */
   errorMessages?: ErrorMessages
@@ -305,11 +315,13 @@ export function useApiAction<TData = unknown, TResult = unknown>(
       const unwrapped = unwrapApiResponse(result)
       data.value = unwrapped
 
-      // Toast de succès
+      // Toast de succès — résolu À L'APPEL, pour qu'un titre conditionnel dise la vérité.
       if (!silent && !silentSuccess && successMessage) {
+        const message =
+          typeof successMessage === 'function' ? successMessage(unwrapped) : successMessage
         toast.add({
-          title: successMessage.title,
-          description: successMessage.description,
+          title: message.title,
+          description: message.description,
           icon: 'i-heroicons-check-circle',
           color: 'success',
         })
@@ -474,11 +486,13 @@ export function useApiActionById<TResult = unknown>(
       // Unwrap createSuccessResponse avant tout traitement
       const unwrapped = unwrapApiResponse(result)
 
-      // Toast de succès
+      // Toast de succès — résolu À L'APPEL, pour qu'un titre conditionnel dise la vérité.
       if (!silent && !silentSuccess && successMessage) {
+        const message =
+          typeof successMessage === 'function' ? successMessage(unwrapped) : successMessage
         toast.add({
-          title: successMessage.title,
-          description: successMessage.description,
+          title: message.title,
+          description: message.description,
           icon: 'i-heroicons-check-circle',
           color: 'success',
         })

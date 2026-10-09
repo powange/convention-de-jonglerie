@@ -930,7 +930,6 @@ type AdditionalPerformer = {
 }
 
 const showImportPerformerModal = ref(false)
-const importingPerformerIndex = ref<number | null>(null)
 const pendingImportIndex = ref<number | null>(null)
 // Toggle dans la modale : appliquer les infos de la candidature à l'EditionArtist
 // (accommodationAutonomous + append organizerNotes avec préférences artiste + ville)
@@ -996,34 +995,29 @@ const cancelImportPerformer = () => {
   pendingImportIndex.value = null
 }
 
+/*
+ * `loadingId` porte l'INDICE de l'interprète : l'écran n'anime que son bouton, c'est ce que
+ * `importingPerformerIndex` faisait à la main.
+ */
+const { execute: executerImportInterprete, loadingId: importingPerformerIndex } = useApiActionById(
+  () =>
+    `/api/editions/${editionId}/shows-call/${showCallId}/applications/${application.value?.id}/import-performer`,
+  {
+    method: 'POST',
+    body: (index) => ({ performerIndex: index, applyApplicationData: applyApplicationData.value }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    // Rafraîchir la liste locale pour basculer le bouton en badge « Déjà importé »
+    onSuccess: () => fetchEditionArtistEmails(),
+  }
+)
+
 const executeImportPerformer = async () => {
   if (pendingImportIndex.value === null || !application.value) return
   const index = pendingImportIndex.value
-  importingPerformerIndex.value = index
   showImportPerformerModal.value = false
-  try {
-    await $fetch(
-      `/api/editions/${editionId}/shows-call/${showCallId}/applications/${application.value.id}/import-performer`,
-      {
-        method: 'POST',
-        body: { performerIndex: index, applyApplicationData: applyApplicationData.value },
-      }
-    )
-    // Rafraîchir la liste locale pour basculer le bouton en badge "Déjà importé"
-    await fetchEditionArtistEmails()
-    toast.add({
-      title: t('common.saved'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
-    const message =
-      error?.data?.message || error?.statusMessage || error?.message || t('common.error')
-    toast.add({ title: message, icon: 'i-heroicons-x-circle', color: 'error' })
-  } finally {
-    importingPerformerIndex.value = null
-    pendingImportIndex.value = null
-  }
+  await executerImportInterprete(index)
+  pendingImportIndex.value = null
 }
 
 // Charger les spectacles de l'édition (pour le select "linked show")

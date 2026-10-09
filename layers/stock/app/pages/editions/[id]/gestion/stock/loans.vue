@@ -479,7 +479,6 @@ const onglets = computed(() =>
 const tri = ref<ColonneTriee[]>(triDepuisUrl(route.query.tri))
 const selection = ref<Record<string, boolean>>({})
 /** La clé de l'action en cours, pour n'animer que son bouton. */
-const enregistrement = ref<string | null>(null)
 
 const nbSelection = computed(() => Object.values(selection.value).filter(Boolean).length)
 
@@ -534,44 +533,39 @@ watch([ongletActif, lieuChoisi, personneChoisie, tri], ([onglet, lieu, personne]
   })
 })
 
+const corpsDeLAction = ref<Record<string, string | null>>({})
+
+/*
+ * `useApiActionById` plutôt que `useApiAction` : l'écran doit savoir LAQUELLE des actions tourne,
+ * pour n'animer que son bouton. Son `loadingId` porte donc la clé de l'action — c'est exactement
+ * ce que `enregistrement` faisait à la main, et l'identifiant n'a pas à être numérique.
+ */
+const { execute: executerActionEmprunt, loadingId: enregistrement } = useApiActionById(
+  () => `/api/editions/${editionId}/stock-items/bulk`,
+  {
+    method: 'PATCH',
+    body: () => ({ itemIds: idsSelectionnes.value, ...corpsDeLAction.value }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      selection.value = {}
+      await charger()
+      // La pastille du menu compte les retards : elle vient de changer. Le menu ne recalcule qu'au
+      // montage — c'est à qui modifie les données de le signaler, sans quoi le compteur reste sur
+      // sa valeur d'arrivée jusqu'au prochain chargement de page.
+      //
+      // `rafraichirCompteurs` et non `rafraichirCompteursNavigation` : la seconde prend la liste de
+    },
+  }
+)
+
 async function appliquer(action: ActionEmprunt) {
   if (idsSelectionnes.value.length === 0) return
 
   // Poser le jalon le date de maintenant ; l'annuler l'efface. Le serveur refuse l'ordre
   // impossible — rendre ce qu'on n'a pas récupéré —, objet par objet.
-  const corps = { [action.champ]: action.pose ? new Date().toISOString() : null }
-
-  enregistrement.value = action.cle
-  try {
-    await $fetch(`/api/editions/${editionId}/stock-items/bulk`, {
-      method: 'PATCH',
-      body: { itemIds: idsSelectionnes.value, ...corps },
-    })
-    useToast().add({
-      title: t('common.saved'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-    selection.value = {}
-    await charger()
-    // La pastille du menu compte les retards : elle vient de changer. Le menu ne recalcule qu'au
-    // montage — c'est à qui modifie les données de le signaler, sans quoi le compteur reste sur
-    // sa valeur d'arrivée jusqu'au prochain chargement de page.
-    //
-    // `rafraichirCompteurs` et non `rafraichirCompteursNavigation` : la seconde prend la liste de
-    // tout ce qui est visible et efface le reste. Lui passer cette seule clé effaçait donc les
-    // pastilles des autres modules — sans conséquence tant que le stock était seul, visible dès
-    // qu'il y en a eu d'autres.
-    await rafraichirCompteurs('stock-emprunts')
-  } catch (e: any) {
-    useToast().add({
-      title: e?.data?.message || t('common.error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    enregistrement.value = null
-  }
+  corpsDeLAction.value = { [action.champ]: action.pose ? new Date().toISOString() : null }
+  await executerActionEmprunt(action.cle)
 }
 
 const colonnes = computed((): TableColumn<any>[] => [

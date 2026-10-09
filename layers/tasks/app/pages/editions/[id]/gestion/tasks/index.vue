@@ -203,22 +203,11 @@ const reordre = useReordonnancementTactile<TaskGroupItem>({
   cle: (g) => g.id,
   desactive: () => groups.value.length < 2,
   auDepot: async (ordreFinal) => {
-    const ordrePrecedent = groups.value
+    // L'ordre d'AVANT est mémorisé pour que l'échec le remette : on ne recharge pas, parce que
+    // la carte reviendrait alors à sa place après un aller-retour visible.
+    ordreDeGroupesPrecedent.value = groups.value
     groups.value = ordreFinal
-    try {
-      await $fetch(`/api/editions/${editionId}/task-groups/reorder`, {
-        method: 'PUT',
-        body: { orderedIds: ordreFinal.map((g) => g.id) },
-      })
-    } catch (e: unknown) {
-      groups.value = ordrePrecedent
-      const err = e as { data?: { message?: string } }
-      useToast().add({
-        title: err?.data?.message || t('errors.generic'),
-        icon: 'i-heroicons-exclamation-circle',
-        color: 'error',
-      })
-    }
+    await executerReordonnancementGroupes()
   },
 })
 
@@ -239,37 +228,52 @@ const getGroupActions = (group: TaskGroupItem) => [
 ]
 
 const confirmationOuverte = ref(false)
+const ordreDeGroupesPrecedent = ref<TaskGroupItem[]>([])
+
+const { execute: executerReordonnancementGroupes } = useApiAction(
+  () => `/api/editions/${editionId}/task-groups/reorder`,
+  {
+    method: 'PUT',
+    body: () => ({ orderedIds: groups.value.map((g) => g.id) }),
+    silentSuccess: true,
+    errorMessages: { default: t('errors.generic') },
+    onError: () => {
+      groups.value = ordreDeGroupesPrecedent.value
+    },
+  }
+)
+
 const groupeASupprimer = ref<TaskGroupItem | null>(null)
-const suppressionEnCours = ref(false)
 
 function deleteGroup(group: TaskGroupItem) {
   groupeASupprimer.value = group
   confirmationOuverte.value = true
 }
 
+/*
+ * La fermeture de la modale vit dans `onSuccess`, et nulle part ailleurs : c'est ainsi qu'elle
+ * RESTE OUVERTE sur un échec — l'erreur se lit là où le geste a été fait, et l'on peut réessayer
+ * sans reprendre la navigation depuis le menu.
+ */
+const { execute: executerSuppressionGroupe, loading: suppressionEnCours } = useApiActionById(
+  (id) => `/api/editions/${editionId}/task-groups/${id}`,
+  {
+    method: 'DELETE',
+    silentSuccess: true,
+    errorMessages: { default: t('errors.generic') },
+    onSuccess: async () => {
+      await fetchGroups()
+      confirmationOuverte.value = false
+      groupeASupprimer.value = null
+    },
+  }
+)
+
 async function supprimerGroupe() {
   // `UiConfirmModal` n'émet que `confirm` et `cancel` : la refermer revient à l'appelant.
   const groupe = groupeASupprimer.value
   if (!groupe) return
-
-  suppressionEnCours.value = true
-  try {
-    await $fetch(`/api/editions/${editionId}/task-groups/${groupe.id}`, { method: 'DELETE' })
-    await fetchGroups()
-    confirmationOuverte.value = false
-    groupeASupprimer.value = null
-  } catch (e: unknown) {
-    // La modale reste ouverte : l'échec se lit là où le geste a été fait, et l'on peut réessayer
-    // sans reprendre la navigation depuis le menu.
-    const err = e as { data?: { message?: string } }
-    useToast().add({
-      title: err?.data?.message || t('errors.generic'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    suppressionEnCours.value = false
-  }
+  await executerSuppressionGroupe(groupe.id)
 }
 
 async function handleGroupSaved() {

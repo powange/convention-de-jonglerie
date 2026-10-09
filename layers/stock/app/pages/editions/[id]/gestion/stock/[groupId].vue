@@ -1362,8 +1362,6 @@ const actionsSansReordonnancement = computed(() =>
     : undefined
 )
 
-const reordonnancementEnCours = ref(false)
-
 /**
  * Enregistre l'ordre après un déplacement.
  *
@@ -1375,25 +1373,27 @@ const reordonnancementEnCours = ref(false)
  * On recharge ensuite depuis le serveur plutôt que de réécrire la liste locale : la source de
  * vérité reste unique, et un refus se voit immédiatement au lieu de laisser l'écran mentir.
  */
-async function enregistrerOrdre(itemIds: number[]) {
-  if (reordonnancementEnCours.value) return
-  reordonnancementEnCours.value = true
-  try {
-    await $fetch(`/api/editions/${editionId}/stock-groups/${groupId.value}/items/reorder`, {
-      method: 'PUT',
-      body: { itemIds },
-    })
-    await fetchAll()
-  } catch (error: any) {
-    useToast().add({
-      title: t('gestion.stock.reorder_error'),
-      description: error?.data?.message,
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    reordonnancementEnCours.value = false
+const idsAReordonner = ref<number[]>([])
+
+const { execute: executerReordonnancement, loading: reordonnancementEnCours } = useApiAction(
+  () => `/api/editions/${editionId}/stock-groups/${groupId.value}/items/reorder`,
+  {
+    method: 'PUT',
+    body: () => ({ itemIds: idsAReordonner.value }),
+    silentSuccess: true,
+    // Le titre reste celui du domaine ; `useApiAction` place le message du serveur en description
+    // quand il y en a un, comme le faisait le `catch`.
+    errorMessages: { default: t('gestion.stock.reorder_error') },
+    onSuccess: () => fetchAll(),
   }
+)
+
+async function enregistrerOrdre(itemIds: number[]) {
+  // La garde de réentrance est conservée : deux dépôts rapprochés enverraient deux ordres
+  // concurrents, et c'est le dernier arrivé qui gagnerait — pas le dernier voulu.
+  if (reordonnancementEnCours.value) return
+  idsAReordonner.value = itemIds
+  await executerReordonnancement()
 }
 
 /**
@@ -1616,7 +1616,6 @@ const planningReservationContext = ref<{
  * ce qui efface le comptage ; un nombre — le compte du jour.
  */
 const saisies = ref<Record<number, number | null>>({})
-const comptageEnCours = ref(false)
 
 /** Les objets du groupe, augmentés de ce que la séance a saisi. */
 const lignesComptage = computed<LigneComptage[]>(() =>
@@ -1677,32 +1676,30 @@ function annulerComptage() {
   saisies.value = {}
 }
 
+const comptageAEnvoyer = ref<ReturnType<typeof comptagesAEnvoyer>>([])
+
+const { execute: executerComptage, loading: comptageEnCours } = useApiAction(
+  () => `/api/editions/${editionId}/stock-items/bulk`,
+  {
+    method: 'PATCH',
+    body: () => ({
+      itemIds: comptageAEnvoyer.value.map((entree) => entree.id),
+      comptage: comptageAEnvoyer.value,
+    }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      saisies.value = {}
+      await fetchAll()
+    },
+  }
+)
+
 async function enregistrerComptage() {
   const comptage = comptagesAEnvoyer(lignesComptage.value)
   if (comptage.length === 0) return
-
-  comptageEnCours.value = true
-  try {
-    await $fetch(`/api/editions/${editionId}/stock-items/bulk`, {
-      method: 'PATCH',
-      body: { itemIds: comptage.map((entree) => entree.id), comptage },
-    })
-    useToast().add({
-      title: t('common.saved'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-    saisies.value = {}
-    await fetchAll()
-  } catch (e: any) {
-    useToast().add({
-      title: e?.data?.message || t('common.error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    comptageEnCours.value = false
-  }
+  comptageAEnvoyer.value = comptage
+  await executerComptage()
 }
 
 // Quitter la page avec des saisies non enregistrées, c'est perdre une séance de comptage. On
@@ -2126,6 +2123,11 @@ const groupActions = computed(() => [
 
 const confirmation = useConfirmation()
 
+const { execute: executerSuppressionGroupe } = useApiActionById(
+  (id) => `/api/editions/${editionId}/stock-groups/${id}`,
+  { method: 'DELETE', silentSuccess: true, errorMessages: { default: t('common.error') } }
+)
+
 function deleteGroup() {
   const groupe = group.value
   if (!groupe) return
@@ -2136,8 +2138,10 @@ function deleteGroup() {
       count: groupe.items.length,
     }),
     libelleConfirmer: t('common.delete'),
+    // ⚠️ C'était un `$fetch` nu : `useConfirmation` laisse remonter le rejet, et son commentaire
+    // renvoie à `useApiAction` « qui ne lève pas ». Un échec ne disait rien.
     agir: async () => {
-      await $fetch(`/api/editions/${editionId}/stock-groups/${groupe.id}`, { method: 'DELETE' })
+      if ((await executerSuppressionGroupe(groupe.id)) === null) return
       router.push(`/editions/${editionId}/gestion/stock`)
     },
   })

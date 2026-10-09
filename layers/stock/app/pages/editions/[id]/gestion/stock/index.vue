@@ -197,6 +197,16 @@ const getGroupActions = (group: StockGroupItem) => [
 
 const confirmation = useConfirmation()
 
+const { execute: executerSuppressionGroupe } = useApiActionById(
+  (id) => `/api/editions/${editionId}/stock-groups/${id}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('common.deleted') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: () => fetchGroups(),
+  }
+)
+
 function deleteGroup(group: StockGroupItem) {
   // La base est en cascade : le groupe emporte ses objets, et chaque objet ses réservations. La
   // confirmation ne disait que les objets — or ce sont les réservations qui font mal, puisqu'elles
@@ -211,10 +221,9 @@ function deleteGroup(group: StockGroupItem) {
     titre: t('common.delete'),
     description: message,
     libelleConfirmer: t('common.delete'),
-    agir: async () => {
-      await $fetch(`/api/editions/${editionId}/stock-groups/${group.id}`, { method: 'DELETE' })
-      await fetchGroups()
-    },
+    // ⚠️ C'était un `$fetch` nu : `useConfirmation` laisse remonter le rejet, et son propre
+    // commentaire renvoie à `useApiAction` « qui ne lève pas ». Un échec ne disait rien.
+    agir: () => executerSuppressionGroupe(group.id),
   })
 }
 

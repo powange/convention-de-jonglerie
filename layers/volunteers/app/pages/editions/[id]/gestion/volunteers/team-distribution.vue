@@ -485,31 +485,42 @@ const organisateursParEquipe = computed(() => {
  * Ce n'est pas qu'une étiquette : le statut tient lieu du droit « gestion des bénévoles » sur
  * le périmètre de l'équipe. D'où le rechargement derrière, pour que l'écran dise la vérité.
  */
+/*
+ * Les deux paramètres du geste, portés par des refs : `useApiAction` se déclare au `setup`, donc
+ * son point d'API et son corps se lisent à l'appel et non à la déclaration.
+ */
+const responsableOrganisateurEnCours = ref<{ editionOrganizerId: string; teamId: string } | null>(
+  null
+)
+const responsableOrganisateurDevient = ref(false)
+
+const { execute: executerBasculeResponsableOrganisateur } = useApiAction(
+  () =>
+    `/api/editions/${editionId}/organizers/edition-organizers/${responsableOrganisateurEnCours.value?.editionOrganizerId}/teams/${responsableOrganisateurEnCours.value?.teamId}/leader`,
+  {
+    method: 'PATCH',
+    body: () => ({ isLeader: responsableOrganisateurDevient.value }),
+    // Le titre dépend du sens de la bascule : d'où la forme FONCTION, résolue à l'appel.
+    successMessage: () => ({
+      title: responsableOrganisateurDevient.value
+        ? t('pages.volunteers.team_distribution.leader_added')
+        : t('pages.volunteers.team_distribution.leader_removed'),
+    }),
+    errorMessages: { default: t('errors.error_occurred') },
+    refreshOnSuccess: () => chargerOrganisateursEquipes(),
+  }
+)
+
 const basculerResponsableOrganisateur = async (
   organisateur: OrganisateurBenevolat,
   teamId: string
 ) => {
-  const devientResponsable = !organisateur.leaderTeamIds.includes(teamId)
-  try {
-    await $fetch(
-      `/api/editions/${editionId}/organizers/edition-organizers/${organisateur.editionOrganizerId}/teams/${teamId}/leader`,
-      { method: 'PATCH', body: { isLeader: devientResponsable } }
-    )
-    await chargerOrganisateursEquipes()
-    toast.add({
-      title: devientResponsable
-        ? t('pages.volunteers.team_distribution.leader_added')
-        : t('pages.volunteers.team_distribution.leader_removed'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
-  } catch (error: any) {
-    toast.add({
-      title: error?.data?.message || t('errors.error_occurred'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+  responsableOrganisateurEnCours.value = {
+    editionOrganizerId: String(organisateur.editionOrganizerId),
+    teamId,
   }
+  responsableOrganisateurDevient.value = !organisateur.leaderTeamIds.includes(teamId)
+  await executerBasculeResponsableOrganisateur()
 }
 
 const chargerOrganisateursEquipes = async () => {
