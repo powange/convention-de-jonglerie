@@ -110,7 +110,24 @@ export function useSaisieNonEnregistree(
  * routeur sait attendre une promesse ; il faut seulement la résoudre dans les DEUX cas, sans quoi
  * renoncer laisse la navigation en suspens pour toujours — et la page devient inquittable.
  */
-export function useGardeDeSortie(modifie: () => boolean, confirmationExistante?: Confirmation) {
+export function useGardeDeSortie(
+  modifie: () => boolean,
+  confirmationExistante?: Confirmation,
+  /**
+   * De quoi dire ce que l'écran a de particulier à perdre.
+   *
+   * ⚠️ POURQUOI CE TROISIÈME PARAMÈTRE EXISTE. Le message générique — « Vous avez des modifications
+   * qui n'ont pas été enregistrées » — convient à un formulaire. Il ne convient PAS à une séance de
+   * comptage de matériel, où ce qui disparaît est un relevé qu'il faudra refaire allée par allée.
+   * L'écran du stock avait d'ailleurs sa propre formulation (`gestion.stock.count_leave_warning`),
+   * et la lui retirer en branchant cette garde aurait appauvri l'avertissement au passage : un
+   * remplacement qui fait perdre ce que couvrait le code remplacé.
+   *
+   * Des fonctions et non des chaînes : la langue courante est relue au moment où la question se
+   * pose, pas à l'installation de la garde.
+   */
+  options: { titre?: () => string; description?: () => string } = {}
+) {
   const { t } = useI18n()
   const confirmation = confirmationExistante ?? useConfirmation()
 
@@ -118,8 +135,8 @@ export function useGardeDeSortie(modifie: () => boolean, confirmationExistante?:
     if (!modifie()) return true
     return new Promise<boolean>((resoudre) => {
       confirmation.demanderConfirmation({
-        titre: t('common.unsaved_changes'),
-        description: t('common.unsaved_changes_warning'),
+        titre: options.titre?.() ?? t('common.unsaved_changes'),
+        description: options.description?.() ?? t('common.unsaved_changes_warning'),
         libelleConfirmer: t('common.leave_without_saving'),
         agir: () => resoudre(true),
         renoncer: () => resoudre(false),
