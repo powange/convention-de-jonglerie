@@ -45,10 +45,7 @@ import { describe, it, expect } from 'vitest'
  * ajoute fait tomber le test. Ne jamais monter un nombre pour faire passer la suite.
  */
 const DETTE: Record<string, number> = {
-  'apps/app1/app/components/organizers/MealsModal.vue': 1,
-  'layers/artists/app/components/artists/MealsModal.vue': 1,
   'layers/stock/app/pages/editions/[id]/gestion/stock/[groupId].vue': 1,
-  'layers/volunteers/app/components/volunteers/MealsModal.vue': 1,
 }
 
 /** `confirm(` ou `window.confirm(`, jamais une propriété (`.confirm(`). */
