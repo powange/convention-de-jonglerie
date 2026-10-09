@@ -270,6 +270,134 @@ export function estTermine(
 }
 
 /**
+ * Durée prêtée à un moment qui n'annonce pas de fin, **pour la seule détection de chevauchement**.
+ *
+ * ⚠️⚠️ CETTE CONVENTION DIFFÈRE DE CELLE D'`estTermine`, ET C'EST DÉLIBÉRÉ — ne pas « harmoniser »
+ * les deux. `estTermine` tient un moment sans fin pour terminé à la **fin de sa journée de
+ * programme**, parce que faire disparaître du programme public une scène ouverte dès son ouverture
+ * serait le contraire du service rendu.
+ *
+ * Reprendre cette règle ici produirait l'effet inverse de celui qu'on cherche : un accueil qui
+ * ouvre à 9 h serait déclaré en conflit avec **tout** ce qui se tient au même endroit jusqu'à la
+ * fin de la journée. La pastille deviendrait du bruit, et un organisateur qui voit une alerte
+ * partout cesse de les lire — on aurait donc rendu l'écran moins sûr qu'avant.
+ */
+const DUREE_PRESUMEE_MS = 60 * 60 * 1000
+
+/** `[debut, fin[` en millisecondes, ou `null` quand la date ne s'analyse pas. */
+function intervalle(entree: EntreeProgramme): [number, number] | null {
+  const debut = new Date(entree.debut).getTime()
+  /*
+   * ⚠️ `Number.isFinite` et non un test de vérité : une date qui ne s'analyse pas donne `NaN`, et
+   * **toute comparaison avec `NaN` est fausse**. L'entrée ne serait alors jamais signalée — pas
+   * d'erreur, pas de pastille, un résultat faux et parfaitement plausible. Même famille de piège
+   * que `Math.max(1, NaN)`, déjà payée sur la pagination.
+   */
+  if (!Number.isFinite(debut)) return null
+
+  const finAnnoncee = entree.fin ? new Date(entree.fin).getTime() : NaN
+  if (!Number.isFinite(finAnnoncee)) return [debut, debut + DUREE_PRESUMEE_MS]
+  // Une fin antérieure au début n'est pas exploitable : on retombe sur la durée présumée plutôt
+  // que de manipuler un intervalle à l'envers, qui ne recouvrirait jamais rien.
+  return finAnnoncee > debut ? [debut, finAnnoncee] : [debut, debut + DUREE_PRESUMEE_MS]
+}
+
+/**
+ * Les lieux de la CARTE auxquels une entrée se rattache.
+ *
+ * ⚠️ UNE ZONE ET UN REPÈRE SONT DEUX LIEUX DISTINCTS, même quand le repère est l'entrée de la
+ * zone. Les confondre signalerait un conflit entre « atelier dans le chapiteau » et « accueil à la
+ * porte du chapiteau », qui n'en est pas un — et une entrée peut porter les deux à la fois.
+ *
+ * 📍 `lieuTexte` est VOLONTAIREMENT EXCLU. C'est une précision libre (« côté buvette ») : deux
+ * organisateurs écrivent « Grand chapiteau » et « grand chapiteau », et rapprocher des chaînes par
+ * ressemblance inventerait des conflits autant qu'il en trouverait. On ne compare que ce qui porte
+ * un identifiant.
+ */
+function lieuxDeLEntree(entree: EntreeProgramme): string[] {
+  const lieux: string[] = []
+  if (entree.zone) lieux.push(`zone:${entree.zone.id}`)
+  if (entree.repere) lieux.push(`repere:${entree.repere.id}`)
+  return lieux
+}
+
+/**
+ * Les entrées qui se disputent le même lieu de la carte au même moment.
+ *
+ * ## À quoi cela sert
+ *
+ * La frise de gestion réunit ateliers, spectacles et éléments libres, mais **rien n'indiquait**
+ * qu'un atelier et une scène ouverte occupaient la même salle à la même heure, ni qu'un créneau
+ * avait été saisi deux fois. La validation à l'enregistrement ne vérifie que « fin après début ».
+ * Pour qui compose un programme sur des semaines, c'est la double réservation d'une salle qui se
+ * découvre le jour même.
+ *
+ * ## ⚠️ UN SIGNAL, PAS UNE RÈGLE
+ *
+ * Rien n'est bloqué à l'enregistrement, et ce n'est pas une facilité : deux moments au même endroit
+ * sont parfois **voulus** — un atelier d'initiation pendant qu'une scène ouverte continue à côté,
+ * dans la même grande zone. Refuser la saisie obligerait à contourner l'outil ; le signaler laisse
+ * l'organisateur décider.
+ *
+ * ## Deux détails qui font toute la différence entre un signal utile et du bruit
+ *
+ * 1. **Deux moments qui se TOUCHENT ne se chevauchent pas.** 10 h–11 h et 11 h–12 h dans la même
+ *    salle, c'est un enchaînement — le cas le plus ordinaire d'un programme. La comparaison est
+ *    donc STRICTE : avec `<=`, chaque paire consécutive d'une salle serait signalée, et la
+ *    pastille ne voudrait plus rien dire.
+ * 2. **Une entrée sans fin ne dure pas jusqu'au soir** : voir `DUREE_PRESUMEE_MS`.
+ *
+ * @returns pour chaque clé d'entrée en conflit, les clés des autres entrées concernées, triées.
+ *   Une entrée sans conflit **n'est pas présente** dans la Map — l'appelant teste la présence, il
+ *   n'a pas à distinguer « absente » de « tableau vide ».
+ */
+export function detecterChevauchements(entrees: EntreeProgramme[]): Map<string, string[]> {
+  /** Les entrées regroupées par lieu de la carte, avec leur intervalle déjà calculé. */
+  const parLieu = new Map<string, { cle: string; debut: number; fin: number }[]>()
+
+  for (const entree of entrees) {
+    const bornes = intervalle(entree)
+    if (!bornes) continue
+    for (const lieu of lieuxDeLEntree(entree)) {
+      const liste = parLieu.get(lieu) ?? []
+      liste.push({ cle: entree.cle, debut: bornes[0], fin: bornes[1] })
+      parLieu.set(lieu, liste)
+    }
+  }
+
+  const conflits = new Map<string, Set<string>>()
+  const noter = (a: string, b: string) => {
+    if (a === b) return
+    const dejaVus = conflits.get(a) ?? new Set<string>()
+    dejaVus.add(b)
+    conflits.set(a, dejaVus)
+  }
+
+  for (const liste of parLieu.values()) {
+    if (liste.length < 2) continue
+    /*
+     * Trié par début, ce qui permet de s'arrêter dès qu'un voisin commence après la fin de
+     * l'entrée courante : les suivants commencent encore plus tard. Sur une salle qui porte
+     * quarante créneaux de la journée, cela évite de comparer les quarante à tous les autres.
+     */
+    const ordonnee = [...liste].sort((x, y) => x.debut - y.debut)
+    for (let i = 0; i < ordonnee.length; i++) {
+      const courante = ordonnee[i]!
+      for (let j = i + 1; j < ordonnee.length; j++) {
+        const voisine = ordonnee[j]!
+        if (voisine.debut >= courante.fin) break
+        noter(courante.cle, voisine.cle)
+        noter(voisine.cle, courante.cle)
+      }
+    }
+  }
+
+  // Trié pour que l'affichage soit stable d'un rendu à l'autre : une liste dont l'ordre bouge
+  // ferait clignoter l'infobulle sans qu'aucune donnée n'ait changé.
+  return new Map([...conflits].map(([cle, autres]) => [cle, [...autres].sort()]))
+}
+
+/**
  * Regroupe la frise par journée, pour un affichage jour par jour.
  *
  * La clé est la journée **de programme** sur place, au format `AAAA-MM-JJ` : une soirée appartient

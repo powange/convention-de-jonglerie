@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   construireFriseProgramme,
+  detecterChevauchements,
   estTermine,
   grouperParJournee,
   nomDuLieu,
@@ -562,5 +563,378 @@ describe('représentations multiples', () => {
 
     expect(frise[0]?.fin).toBe('2026-09-26T21:30:00.000Z')
     expect(frise[1]?.fin).toBe('2026-09-27T19:30:00.000Z')
+  })
+})
+
+/**
+ * Les entrées qui se disputent le même lieu de la carte au même moment.
+ *
+ * ## Ce que ces cas protègent
+ *
+ * La frise réunissait trois sources sans jamais signaler qu'un atelier et une scène ouverte
+ * occupaient la même salle à la même heure. Mais un détecteur trop bavard est pire qu'aucun : un
+ * organisateur qui voit une alerte partout cesse de les lire. **Les cas « ne signale PAS » sont
+ * donc aussi importants que les autres**, et c'est sur eux que portent la moitié des sabotages.
+ */
+describe('detecterChevauchements', () => {
+  const ZONE = { id: 5, nom: 'Chapiteau', couleur: null }
+  const AUTRE_ZONE = { id: 6, nom: 'Salle B', couleur: null }
+  const REPERE = { id: 12, nom: 'Accueil', couleur: null }
+
+  const entree = (
+    p: Partial<EntreeProgramme> & { cle: string; debut: string }
+  ): EntreeProgramme => ({
+    source: 'element',
+    sourceId: 1,
+    titre: p.cle,
+    description: null,
+    fin: null,
+    lieuTexte: null,
+    zone: null,
+    repere: null,
+    publie: true,
+    ...p,
+  })
+
+  describe('ce qui est signalé', () => {
+    it('signale deux moments qui se recouvrent dans la même zone, des deux côtés', () => {
+      const conflits = detecterChevauchements([
+        entree({
+          cle: 'a',
+          debut: '2026-09-26T10:00:00.000Z',
+          fin: '2026-09-26T12:00:00.000Z',
+          zone: ZONE,
+        }),
+        entree({
+          cle: 'b',
+          debut: '2026-09-26T11:00:00.000Z',
+          fin: '2026-09-26T13:00:00.000Z',
+          zone: ZONE,
+        }),
+      ])
+      // Des DEUX côtés : la pastille doit s'afficher sur chacune des deux lignes, pas seulement
+      // sur la seconde.
+      expect(conflits.get('a')).toEqual(['b'])
+      expect(conflits.get('b')).toEqual(['a'])
+    })
+
+    it('signale un créneau saisi deux fois à l’identique', () => {
+      // Le cas le plus courant, et le plus facile à ne pas voir à l'œil sur une longue frise.
+      const conflits = detecterChevauchements([
+        entree({
+          cle: 'a',
+          debut: '2026-09-26T10:00:00.000Z',
+          fin: '2026-09-26T11:00:00.000Z',
+          zone: ZONE,
+        }),
+        entree({
+          cle: 'b',
+          debut: '2026-09-26T10:00:00.000Z',
+          fin: '2026-09-26T11:00:00.000Z',
+          zone: ZONE,
+        }),
+      ])
+      expect(conflits.get('a')).toEqual(['b'])
+    })
+
+    it('signale un moment entièrement contenu dans un autre', () => {
+      // Un intervalle inclus ne commence ni ne finit « à l'intérieur » d'une comparaison naïve
+      // bord à bord : c'est le cas qu'un test d'égalité de bornes raterait.
+      const conflits = detecterChevauchements([
+        entree({
+          cle: 'long',
+          debut: '2026-09-26T09:00:00.000Z',
+          fin: '2026-09-26T18:00:00.000Z',
+          zone: ZONE,
+        }),
+        entree({
+          cle: 'court',
+          debut: '2026-09-26T14:00:00.000Z',
+          fin: '2026-09-26T15:00:00.000Z',
+          zone: ZONE,
+        }),
+      ])
+      expect(conflits.get('court')).toEqual(['long'])
+    })
+
+    it('signale sur un repère comme sur une zone', () => {
+      const conflits = detecterChevauchements([
+        entree({
+          cle: 'a',
+          debut: '2026-09-26T10:00:00.000Z',
+          fin: '2026-09-26T12:00:00.000Z',
+          repere: REPERE,
+        }),
+        entree({
+          cle: 'b',
+          debut: '2026-09-26T11:00:00.000Z',
+          fin: '2026-09-26T13:00:00.000Z',
+          repere: REPERE,
+        }),
+      ])
+      expect(conflits.get('a')).toEqual(['b'])
+    })
+
+    it('nomme tous les voisins en conflit, triés', () => {
+      const conflits = detecterChevauchements([
+        entree({
+          cle: 'a',
+          debut: '2026-09-26T10:00:00.000Z',
+          fin: '2026-09-26T16:00:00.000Z',
+          zone: ZONE,
+        }),
+        entree({
+          cle: 'c',
+          debut: '2026-09-26T11:00:00.000Z',
+          fin: '2026-09-26T12:00:00.000Z',
+          zone: ZONE,
+        }),
+        entree({
+          cle: 'b',
+          debut: '2026-09-26T13:00:00.000Z',
+          fin: '2026-09-26T14:00:00.000Z',
+          zone: ZONE,
+        }),
+      ])
+      // Trié : une liste dont l'ordre bouge ferait clignoter l'infobulle sans qu'aucune donnée
+      // n'ait changé.
+      expect(conflits.get('a')).toEqual(['b', 'c'])
+    })
+
+    it('signale un brouillon contre un moment publié', () => {
+      // L'organisateur est en train de composer : c'est précisément le moment où l'alerte sert.
+      const conflits = detecterChevauchements([
+        entree({
+          cle: 'publie',
+          debut: '2026-09-26T10:00:00.000Z',
+          fin: '2026-09-26T12:00:00.000Z',
+          zone: ZONE,
+        }),
+        entree({
+          cle: 'brouillon',
+          debut: '2026-09-26T11:00:00.000Z',
+          fin: '2026-09-26T13:00:00.000Z',
+          zone: ZONE,
+          publie: false,
+        }),
+      ])
+      expect(conflits.get('brouillon')).toEqual(['publie'])
+    })
+  })
+
+  describe('ce qui n’est PAS signalé — la moitié qui rend la pastille lisible', () => {
+    it('ne signale pas deux moments qui se TOUCHENT', () => {
+      /*
+       * ⚠️ LE CAS LE PLUS IMPORTANT DU FICHIER. 10 h–11 h puis 11 h–12 h dans la même salle, c'est
+       * un enchaînement — le cas le plus ordinaire d'un programme. Avec une comparaison `<=`,
+       * CHAQUE paire consécutive d'une salle serait signalée et la pastille ne voudrait plus rien
+       * dire.
+       */
+      const conflits = detecterChevauchements([
+        entree({
+          cle: 'a',
+          debut: '2026-09-26T10:00:00.000Z',
+          fin: '2026-09-26T11:00:00.000Z',
+          zone: ZONE,
+        }),
+        entree({
+          cle: 'b',
+          debut: '2026-09-26T11:00:00.000Z',
+          fin: '2026-09-26T12:00:00.000Z',
+          zone: ZONE,
+        }),
+      ])
+      expect(conflits.size).toBe(0)
+    })
+
+    it('ne signale pas deux zones différentes', () => {
+      const conflits = detecterChevauchements([
+        entree({
+          cle: 'a',
+          debut: '2026-09-26T10:00:00.000Z',
+          fin: '2026-09-26T12:00:00.000Z',
+          zone: ZONE,
+        }),
+        entree({
+          cle: 'b',
+          debut: '2026-09-26T10:00:00.000Z',
+          fin: '2026-09-26T12:00:00.000Z',
+          zone: AUTRE_ZONE,
+        }),
+      ])
+      expect(conflits.size).toBe(0)
+    })
+
+    it('ne confond pas une zone avec un repère PORTANT LE MÊME IDENTIFIANT', () => {
+      /*
+       * ⚠️ Un repère est souvent l'ENTRÉE d'une zone. Les confondre signalerait un conflit entre
+       * « atelier dans le chapiteau » et « accueil à la porte du chapiteau », qui n'en est pas un.
+       *
+       * ⚠️⚠️ LE REPÈRE PORTE ICI LE MÊME IDENTIFIANT QUE LA ZONE (5), et ce n'est pas une
+       * coquetterie : `EditionZone` et `EditionMarker` ont des séquences SÉPARÉES, donc la zone 5
+       * et le repère 5 coexistent dans n'importe quelle édition. Ma première version de ce test
+       * employait 5 et 12 — un sabotage qui préfixait les repères en `zone:` est alors passé
+       * INAPERÇU, parce que `zone:12` ne heurtait aucune zone. Le test était vert au-dessus du
+       * défaut qu'il devait attraper.
+       */
+      const conflits = detecterChevauchements([
+        entree({
+          cle: 'zone',
+          debut: '2026-09-26T10:00:00.000Z',
+          fin: '2026-09-26T12:00:00.000Z',
+          zone: ZONE,
+        }),
+        entree({
+          cle: 'repere',
+          debut: '2026-09-26T10:00:00.000Z',
+          fin: '2026-09-26T12:00:00.000Z',
+          repere: { id: ZONE.id, nom: 'Porte du chapiteau', couleur: null },
+        }),
+      ])
+      expect(conflits.size).toBe(0)
+    })
+
+    it('ne rapproche pas deux lieux saisis en texte libre', () => {
+      /*
+       * 📍 `lieuTexte` est volontairement exclu : deux organisateurs écrivent « Grand chapiteau »
+       * et « grand chapiteau », et rapprocher des chaînes par ressemblance inventerait des
+       * conflits autant qu'il en trouverait. On ne compare que ce qui porte un identifiant.
+       */
+      const conflits = detecterChevauchements([
+        entree({
+          cle: 'a',
+          debut: '2026-09-26T10:00:00.000Z',
+          fin: '2026-09-26T12:00:00.000Z',
+          lieuTexte: 'Grand chapiteau',
+        }),
+        entree({
+          cle: 'b',
+          debut: '2026-09-26T10:00:00.000Z',
+          fin: '2026-09-26T12:00:00.000Z',
+          lieuTexte: 'Grand chapiteau',
+        }),
+      ])
+      expect(conflits.size).toBe(0)
+    })
+
+    it('ne signale rien pour une entrée sans aucun lieu de carte', () => {
+      const conflits = detecterChevauchements([
+        entree({ cle: 'a', debut: '2026-09-26T10:00:00.000Z', fin: '2026-09-26T12:00:00.000Z' }),
+        entree({ cle: 'b', debut: '2026-09-26T10:00:00.000Z', fin: '2026-09-26T12:00:00.000Z' }),
+      ])
+      expect(conflits.size).toBe(0)
+    })
+
+    it('n’inscrit pas les entrées sans conflit dans la Map', () => {
+      // L'appelant teste la PRÉSENCE : il n'a pas à distinguer « absente » de « tableau vide ».
+      const conflits = detecterChevauchements([
+        entree({
+          cle: 'a',
+          debut: '2026-09-26T10:00:00.000Z',
+          fin: '2026-09-26T11:00:00.000Z',
+          zone: ZONE,
+        }),
+        entree({
+          cle: 'seule',
+          debut: '2026-09-27T10:00:00.000Z',
+          fin: '2026-09-27T11:00:00.000Z',
+          zone: ZONE,
+        }),
+      ])
+      expect(conflits.has('seule')).toBe(false)
+    })
+  })
+
+  describe('les moments sans heure de fin', () => {
+    it('leur prête une heure, et pas la fin de la journée', () => {
+      /*
+       * ⚠️ CONVENTION DIFFÉRENTE DE CELLE D'`estTermine`, ET DÉLIBÉRÉE. Si l'on tenait un moment
+       * sans fin pour occupé jusqu'au soir, un accueil ouvrant à 9 h serait en conflit avec TOUT
+       * ce qui se tient au même endroit dans la journée.
+       *
+       * Les deux cas ci-dessous mesurent précisément la frontière : à 9 h 30 ça se chevauche, à
+       * 11 h non.
+       */
+      const dansLHeure = detecterChevauchements([
+        entree({ cle: 'ouverture', debut: '2026-09-26T09:00:00.000Z', zone: ZONE }),
+        entree({
+          cle: 'atelier',
+          debut: '2026-09-26T09:30:00.000Z',
+          fin: '2026-09-26T10:30:00.000Z',
+          zone: ZONE,
+        }),
+      ])
+      expect(dansLHeure.get('ouverture')).toEqual(['atelier'])
+
+      const apres = detecterChevauchements([
+        entree({ cle: 'ouverture', debut: '2026-09-26T09:00:00.000Z', zone: ZONE }),
+        entree({
+          cle: 'atelier',
+          debut: '2026-09-26T11:00:00.000Z',
+          fin: '2026-09-26T12:00:00.000Z',
+          zone: ZONE,
+        }),
+      ])
+      expect(apres.size).toBe(0)
+    })
+
+    it('retombe sur la durée présumée quand la fin précède le début', () => {
+      // Un intervalle à l'envers ne recouvrirait jamais rien : l'entrée disparaîtrait du détecteur
+      // au lieu d'y être signalée.
+      const conflits = detecterChevauchements([
+        entree({
+          cle: 'inverse',
+          debut: '2026-09-26T10:00:00.000Z',
+          fin: '2026-09-26T08:00:00.000Z',
+          zone: ZONE,
+        }),
+        entree({
+          cle: 'autre',
+          debut: '2026-09-26T10:30:00.000Z',
+          fin: '2026-09-26T11:30:00.000Z',
+          zone: ZONE,
+        }),
+      ])
+      expect(conflits.get('inverse')).toEqual(['autre'])
+    })
+  })
+
+  it('écarte une date illisible au lieu de la comparer à NaN', () => {
+    /*
+     * ⚠️ `Number.isFinite` et non un test de vérité : toute comparaison avec `NaN` est FAUSSE,
+     * donc une entrée à date illisible ne serait jamais signalée — pas d'erreur, pas de pastille,
+     * un résultat faux et parfaitement plausible.
+     */
+    const conflits = detecterChevauchements([
+      entree({ cle: 'illisible', debut: 'pas une date', zone: ZONE }),
+      entree({
+        cle: 'valide',
+        debut: '2026-09-26T10:00:00.000Z',
+        fin: '2026-09-26T12:00:00.000Z',
+        zone: ZONE,
+      }),
+    ])
+    expect(conflits.size).toBe(0)
+  })
+
+  it('traite les deux lieux d’une entrée qui porte une zone ET un repère', () => {
+    // Un atelier dont le lieu porte à la fois une zone et un repère appartient aux deux : un
+    // conflit sur l'un des deux doit le signaler.
+    const conflits = detecterChevauchements([
+      entree({
+        cle: 'double',
+        debut: '2026-09-26T10:00:00.000Z',
+        fin: '2026-09-26T12:00:00.000Z',
+        zone: ZONE,
+        repere: REPERE,
+      }),
+      entree({
+        cle: 'surLeRepere',
+        debut: '2026-09-26T11:00:00.000Z',
+        fin: '2026-09-26T13:00:00.000Z',
+        repere: REPERE,
+      }),
+    ])
+    expect(conflits.get('double')).toEqual(['surLeRepere'])
   })
 })

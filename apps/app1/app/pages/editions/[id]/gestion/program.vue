@@ -128,7 +128,25 @@
           </template>
 
           <template #titre-cell="{ row }">
-            <span class="font-medium">{{ row.original.titre }}</span>
+            <div class="flex items-center gap-2">
+              <span class="font-medium">{{ row.original.titre }}</span>
+              <!-- Un avertissement et non une erreur : deux moments au même endroit sont parfois
+                   voulus. L'infobulle nomme les entrées en cause, sans quoi la pastille dirait
+                   qu'il y a un problème sans dire lequel. -->
+              <UTooltip
+                v-if="chevauchements.has(row.original.cle)"
+                :text="titresEnConflit(row.original)"
+              >
+                <UBadge
+                  color="warning"
+                  variant="subtle"
+                  size="sm"
+                  icon="i-heroicons-exclamation-triangle"
+                >
+                  {{ $t('gestion.program.overlap') }}
+                </UBadge>
+              </UTooltip>
+            </div>
           </template>
 
           <template #source-cell="{ row }">
@@ -347,7 +365,11 @@ import {
   versChampLocal,
   versInstant,
 } from '~~/shared/utils/fuseau-edition'
-import { grouperParJournee, type EntreeProgramme } from '~~/shared/utils/program-timeline'
+import {
+  detecterChevauchements,
+  grouperParJournee,
+  type EntreeProgramme,
+} from '~~/shared/utils/program-timeline'
 
 const { succes } = useNotificateur()
 
@@ -526,6 +548,37 @@ async function exporterPdf() {
 const journees = computed(() =>
   grouperParJournee(donneesFrise.value?.data?.entrees ?? [], fuseau.value)
 )
+
+/**
+ * Les entrées qui se disputent le même lieu de la carte au même moment.
+ *
+ * ⚠️ CALCULÉ SUR LA FRISE ENTIÈRE, et non journée par journée : un moment peut déborder sur le
+ * lendemain — une scène ouverte annoncée à 23 h, par exemple —, et un calcul par journée ne verrait
+ * pas le chevauchement avec ce qui suit minuit.
+ *
+ * 📍 C'est un SIGNAL, pas une règle : rien n'est bloqué à l'enregistrement. Deux moments au même
+ * endroit sont parfois voulus — un atelier d'initiation pendant qu'une scène ouverte continue à
+ * côté dans la même grande zone. Refuser la saisie obligerait à contourner l'outil.
+ */
+const chevauchements = computed(() =>
+  detecterChevauchements(donneesFrise.value?.data?.entrees ?? [])
+)
+
+/** Les titres des entrées en conflit avec celle-ci, pour l'infobulle de la pastille. */
+function titresEnConflit(entree: EntreeProgramme): string {
+  const cles = chevauchements.value.get(entree.cle)
+  if (!cles?.length) return ''
+  const parCle = new Map((donneesFrise.value?.data?.entrees ?? []).map((e) => [e.cle, e]))
+  return cles
+    .map((cle) => {
+      const autre = parCle.get(cle)
+      if (!autre) return cle
+      // L'heure autant que le titre : « Cabaret » seul ne dit pas en quoi il gêne, alors que
+      // « Cabaret (20:00) » se recoupe visiblement avec la ligne qu'on regarde.
+      return `${autre.titre} (${plageHoraire(autre)})`
+    })
+    .join(' · ')
+}
 
 /** Signalé seulement si la pendule de l'organisateur dira autre chose que la frise. */
 const fuseauADire = computed(
