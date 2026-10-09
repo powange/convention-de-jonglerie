@@ -25,10 +25,29 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
     isArtist: false,
   }
 
+  /**
+   * L'édition, telle que le handler l'interroge.
+   *
+   * ⚠️ `convention` et `organizerPermissions` sont INDISPENSABLES depuis que les destinataires des
+   * notifications passent par `organisateursHabilitesSurLesArtistes` : cette fonction lit
+   * `edition.convention.authorId`, et un objet sans `convention` fait lever
+   * « Cannot read properties of undefined » — huit tests de ce fichier d'un coup, aucun ne parlant
+   * de notifications.
+   *
+   * 📍 Aucune garde défensive n'a été ajoutée côté code, et c'est volontaire : `Edition.conventionId`
+   * est `Int` NON NULLABLE, donc la relation résout toujours en production. Un `?.` ne rendrait pas
+   * le code plus sûr, il masquerait une vraie erreur de requête.
+   */
   const mockEdition = {
     id: 1,
     name: 'Convention Test 2024',
     status: 'PUBLISHED',
+    creatorId: 50,
+    convention: {
+      authorId: 51,
+      organizers: [{ userId: 52 }],
+    },
+    organizerPermissions: [{ organizer: { userId: 53 } }],
   }
 
   const mockShowCall = {

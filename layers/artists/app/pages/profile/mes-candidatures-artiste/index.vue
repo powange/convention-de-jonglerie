@@ -325,6 +325,26 @@
                     <span class="hidden sm:inline">{{ $t('pages.artists.edit_application') }}</span>
                     <span class="sm:hidden">{{ $t('pages.artists.edit_application_short') }}</span>
                   </UButton>
+
+                  <!-- ⚠️ `status === 'PENDING'` et NON `peutModifier` : le serveur n'exige que
+                       l'attente pour un retrait, là où la modification demande aussi un appel
+                       encore ouvert et une date limite non dépassée. Employer la même condition
+                       pour les deux ferait disparaître le bouton de retrait sur un appel clos —
+                       alors que le serveur l'accepte, et que c'est précisément là qu'un artiste
+                       empêché en a besoin. -->
+                  <UButton
+                    v-if="application.status === 'PENDING'"
+                    size="sm"
+                    color="error"
+                    variant="outline"
+                    icon="i-heroicons-x-mark"
+                    :loading="retraitEnCours === application.id"
+                    class="flex-1 sm:flex-none"
+                    @click="demanderLeRetrait(application)"
+                  >
+                    <span class="hidden sm:inline">{{ $t('pages.artists.withdraw') }}</span>
+                    <span class="sm:hidden">{{ $t('pages.artists.withdraw_short') }}</span>
+                  </UButton>
                 </div>
               </div>
             </template>
@@ -472,6 +492,10 @@
         />
       </template>
     </UModal>
+
+    <!-- Une seule modale pour les confirmations de l'écran. Le retrait est définitif : la
+         candidature et ses échanges partent ensemble. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -527,7 +551,64 @@ const {
   data: applications,
   pending: isLoading,
   error: hasError,
+  refresh: rechargerLesCandidatures,
 } = await useFetch('/api/user/show-applications')
+
+const confirmation = useConfirmation()
+const { succes, erreur } = useNotificateur()
+const retraitEnCours = ref<number | null>(null)
+
+/**
+ * Retirer une candidature en attente.
+ *
+ * ## ⚠️ LA CONFIRMATION DIT CE QUI PART, PAS « ÊTES-VOUS SÛR ? »
+ *
+ * Le retrait emporte la candidature **et ses échanges** : `Conversation.showApplicationId` porte
+ * `onDelete: Cascade`. Une confirmation qui ne nommerait pas cette seconde perte laisserait
+ * l'artiste découvrir que sa discussion avec les organisateurs a disparu avec elle.
+ *
+ * ## 📍 CE QUI EST RAFRAÎCHI, ET CE QUI NE L'EST PAS
+ *
+ * La liste de la page, et elle seule. L'énoncé du constat demandait aussi
+ * `rafraichirCompteurs('appels-spectacles')` — **cet appel ne ferait rien ici**, et il valait mieux
+ * le vérifier que l'écrire : ce compteur est celui de la barre latérale d'une ÉDITION (il exige
+ * `contexte.editionId` et compte les candidatures qu'un ORGANISATEUR doit trancher). Sur une page
+ * de profil il n'y a pas de contexte d'édition, et `rafraichirCompteurs` sort alors en silence.
+ */
+function demanderLeRetrait(application: {
+  id: number
+  showTitle: string
+  showCall: { id: number; edition: { id: number } }
+}) {
+  confirmation.demanderConfirmation({
+    titre: t('pages.artists.withdraw'),
+    description: t('pages.artists.withdraw_confirm', { title: application.showTitle }),
+    libelleConfirmer: t('pages.artists.withdraw'),
+    couleurConfirmer: 'error',
+    agir: () => retirer(application),
+  })
+}
+
+async function retirer(application: {
+  id: number
+  showCall: { id: number; edition: { id: number } }
+}) {
+  retraitEnCours.value = application.id
+  try {
+    await $fetch(
+      `/api/editions/${application.showCall.edition.id}/shows-call/${application.showCall.id}/my-application`,
+      { method: 'DELETE' }
+    )
+    succes(t('pages.artists.withdrawn'))
+    await rechargerLesCandidatures()
+  } catch (e) {
+    erreur(t('pages.artists.withdraw_error'), { description: messageDErreurServeur(e) })
+  } finally {
+    // Dans les DEUX chemins : `useApiAction` n'a pas de crochet `finally`, et un indicateur laissé
+    // allumé sur l'échec fige le bouton pour toujours.
+    retraitEnCours.value = null
+  }
+}
 
 // Applications filtrées selon l'onglet actif
 const filteredApplications = computed(() => {

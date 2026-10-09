@@ -1,6 +1,7 @@
 import type { PrismaTransaction } from '#server/types/prisma-helpers'
 
 import { utilisateursResponsablesDeLEquipe } from '#server/utils/editions/volunteers/responsables-equipe'
+import { organisateursHabilitesSurLesArtistes } from '#server/utils/organisateurs-des-artistes'
 
 /** Un fil privé avec les responsables, réduit à ce qui sert à le reconnaître. */
 type FilDeResponsables = {
@@ -839,41 +840,6 @@ export async function addShowApplicationParticipantIfNeeded(
  * et la candidature d'un artiste : ce sont les mêmes destinataires, et deux listes auraient fini
  * par divulguer.
  */
-async function organisateursHabilitesSurLesArtistes(
-  editionId: number,
-  client: PrismaTransaction | typeof prisma
-): Promise<number[]> {
-  const edition = await client.edition.findUnique({
-    where: { id: editionId },
-    select: {
-      creatorId: true,
-      convention: {
-        select: {
-          authorId: true,
-          organizers: { where: { canManageArtists: true }, select: { userId: true } },
-        },
-      },
-      organizerPermissions: {
-        where: { canManageArtists: true },
-        select: { organizer: { select: { userId: true } } },
-      },
-    },
-  })
-
-  if (!edition) {
-    throw new Error('Édition introuvable')
-  }
-
-  return [
-    ...new Set<number>([
-      edition.creatorId,
-      edition.convention.authorId,
-      ...edition.convention.organizers.map((o) => o.userId),
-      ...edition.organizerPermissions.map((p) => p.organizer.userId),
-    ]),
-  ]
-}
-
 /**
  * Les utilisateurs qui composent le groupe d'un spectacle : sa distribution, et les
  * organisateurs habilités sur les artistes.
