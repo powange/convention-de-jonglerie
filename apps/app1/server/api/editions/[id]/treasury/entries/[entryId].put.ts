@@ -5,6 +5,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTreasuryById } from '#server/utils/permissions/edition-permissions'
 import {
   assertCodeBelongsToEdition,
+  assertPersonneRattacheeALEdition,
   assertTarifsRattachables,
   avanceNormalisee,
   dateDuRemboursement,
@@ -91,6 +92,13 @@ export default wrapApiHandler(
 
     const data = bodySchema.parse(await readBody(event))
     await assertCodeBelongsToEdition(editionId, data.codeId)
+    /*
+     * ⚠️ SUR LA VALEUR REÇUE, ET SEULEMENT SI LE CHAMP EST FOURNI. Une modification partielle qui
+     * ne parle pas de l'avance conserve celle d'avant : la vérifier alors ferait échouer en 400 la
+     * correction d'un libellé, pour une personne qui a quitté l'édition depuis. On garde ce qui est
+     * déjà enregistré, on contrôle ce qu'on écrit.
+     */
+    await assertPersonneRattacheeALEdition(editionId, data.advancedById)
 
     /*
      * ⚠️ APRÈS la lecture du corps, et ce n'est pas un détail de style : placée au-dessus — juste

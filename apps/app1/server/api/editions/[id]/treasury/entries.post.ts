@@ -5,6 +5,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTreasuryById } from '#server/utils/permissions/edition-permissions'
 import {
   assertCodeBelongsToEdition,
+  assertPersonneRattacheeALEdition,
   assertTarifsRattachables,
   avanceNormalisee,
   dateDuRemboursement,
@@ -96,6 +97,13 @@ export default wrapApiHandler(
     const data = bodySchema.parse(await readBody(event))
     await assertCodeBelongsToEdition(editionId, data.codeId)
     await assertTarifsRattachables(editionId, data.kind, data.tierIds)
+    /*
+     * ⚠️ AVANT la normalisation, et sur la valeur REÇUE. `avanceNormalisee` efface l'identifiant
+     * sur un produit : garder la garde après elle laisserait passer sans contrôle une charge
+     * requalifiée en produit puis reconvertie, et surtout ne dirait rien au client qui s'est
+     * trompé de personne — son choix serait simplement ignoré.
+     */
+    await assertPersonneRattacheeALEdition(editionId, data.advancedById)
 
     const edition = await prisma.edition.findUnique({
       where: { id: editionId },
