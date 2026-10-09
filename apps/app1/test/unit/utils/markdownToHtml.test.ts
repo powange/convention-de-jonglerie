@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'vitest'
 
 // Import statique pour optimiser les performances
-import { convertirRaccourcisEmoji, markdownToHtml } from '../../../app/utils/markdown'
+import {
+  convertirRaccourcisEmoji,
+  markdownEnTexte,
+  markdownToHtml,
+} from '../../../app/utils/markdown'
 
 describe('markdownToHtml', () => {
   it('rend du HTML simple', async () => {
@@ -122,5 +126,72 @@ describe('soulignement', () => {
     // Limite assumée : la conversion opère sur un nœud de texte, et `++**gras**++` en occupe
     // trois. Le cas ne vient pas de l'éditeur, qui écrit l'ordre inverse.
     expect(await markdownToHtml('++**gras**++')).toContain('++<strong>gras</strong>++')
+  })
+})
+
+/**
+ * L'extrait TEXTE d'un markdown, pour une vignette de deux lignes.
+ *
+ * ## Le défaut que ces cas ferment
+ *
+ * La page centralisée des appels ouverts interpolait la description **telle quelle** : l'artiste y
+ * lisait `**Scène ouverte**`, `## Conditions` ou `:performing_arts:`, alors que les pages d'une
+ * édition la rendent proprement.
+ *
+ * 📍 Un extrait texte plutôt que le HTML rendu : la carte n'affiche que deux lignes
+ * (`line-clamp-2`), où un titre de niveau 2 entrerait à sa taille normale et où `line-clamp` ne
+ * borne pas de façon fiable une suite d'éléments de bloc.
+ */
+describe('markdownEnTexte', () => {
+  it('rend une chaîne vide pour une absence', async () => {
+    expect(await markdownEnTexte('')).toBe('')
+  })
+
+  it('retire le gras, l’italique et le code inline', async () => {
+    expect(await markdownEnTexte('**Scène ouverte** en *juillet*, voir `README`')).toBe(
+      'Scène ouverte en juillet, voir README'
+    )
+  })
+
+  it('sépare les blocs de premier niveau par un point médian', async () => {
+    /*
+     * ⚠️ SANS SÉPARATEUR, « ## Conditions » suivi d'un paragraphe donnerait « Conditions Les
+     * artistes doivent… », qui se lit comme une phrase mal formée. C'est le symptôme exact du
+     * constat, déplacé plutôt que corrigé.
+     */
+    expect(await markdownEnTexte('## Conditions\n\nLes artistes doivent postuler.')).toBe(
+      'Conditions · Les artistes doivent postuler.'
+    )
+  })
+
+  it('aplatit une liste en gardant chaque entrée', async () => {
+    expect(await markdownEnTexte('- un\n- deux\n- trois')).toBe('un deux trois')
+  })
+
+  it('garde le libellé d’un lien, pas son adresse', async () => {
+    // Une URL dans un aperçu de deux lignes mange la place sans rien dire de plus.
+    expect(await markdownEnTexte('Voir [le règlement](https://exemple.test/tres/longue/url)')).toBe(
+      'Voir le règlement'
+    )
+  })
+
+  it('écarte le texte alternatif d’une image', async () => {
+    // Dans un aperçu, il décrit quelque chose que le lecteur ne voit pas.
+    expect(await markdownEnTexte('![affiche de la convention](/a.png)')).toBe('')
+  })
+
+  it('convertit les raccourcis d’emoji', async () => {
+    // `:performing_arts:` brut dans une vignette est l'un des trois symptômes du constat.
+    expect(await markdownEnTexte('Spectacle :performing_arts:')).toBe('Spectacle 🎭')
+  })
+
+  it('réduit les espaces et les sauts de ligne internes', async () => {
+    expect(await markdownEnTexte('Une ligne\nqui continue')).toBe('Une ligne qui continue')
+  })
+
+  it('n’émet aucun séparateur pour un markdown qui ne contient que du balisage', async () => {
+    // `---` est une règle horizontale : aucun texte, donc aucun bloc à joindre. Sans le filtre
+    // sur les blocs vides, on obtiendrait « · · ».
+    expect(await markdownEnTexte('---\n\n---')).toBe('')
   })
 })
