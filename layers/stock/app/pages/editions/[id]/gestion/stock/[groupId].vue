@@ -1685,11 +1685,25 @@ async function enregistrerComptage() {
   await executerComptage()
 }
 
-// Quitter la page avec des saisies non enregistrées, c'est perdre une séance de comptage. On
-// prévient — le navigateur se charge du reste.
-onBeforeRouteLeave(() => {
-  if (enAttente.value === 0) return true
-  return window.confirm(t('gestion.stock.count_leave_warning'))
+/*
+ * Quitter la page avec des comptages non enregistrés, c'est perdre une séance de relevé.
+ *
+ * ⚠️ POURQUOI CE CAS NE SE MIGRAIT PAS MÉCANIQUEMENT, et pourquoi il a été gardé pour la fin.
+ *
+ * `onBeforeRouteLeave` attend un booléen, et `window.confirm` en rendait un **tout de suite** :
+ * `return window.confirm(…)` suffisait. Une modale, elle, répond plus tard. Remplacer l'un par
+ * l'autre ligne à ligne aurait rendu une valeur vraie — un objet — donc autorisé la navigation
+ * **sans attendre la réponse**, et perdu le comptage en silence tout en ayant l'air de demander.
+ *
+ * `useGardeDeSortie` résout cela en rendant au routeur une **promesse**, résolue dans les DEUX
+ * sens : sans le `renoncer`, refuser laisserait la navigation en suspens pour toujours et la page
+ * deviendrait inquittable.
+ *
+ * La description reste celle de cet écran : « Des comptages ne sont pas enregistrés » dit ce qui
+ * disparaît, là où le message générique parle de « modifications ».
+ */
+useGardeDeSortie(() => enAttente.value > 0, confirmation, {
+  description: () => t('gestion.stock.count_leave_warning'),
 })
 
 const viewModeItems = computed(() => [

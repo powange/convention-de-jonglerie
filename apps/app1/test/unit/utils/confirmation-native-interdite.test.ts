@@ -26,27 +26,31 @@ import { describe, it, expect } from 'vitest'
  * le problème **huit fois plus grand** derrière lui — et surtout, rien n'aurait empêché le
  * vingt-septième. Ce test fige la dette, nommée fichier par fichier, et refuse toute addition.
  *
- * ## Ce que ce test NE fait pas
+ * ## ✅ LA DETTE EST À ZÉRO DEPUIS LE 10/10/2026
  *
- * Il ne migre rien. La dette restante est présentée à l'utilisateur avec son décompte pour qu'il
- * décide de l'ordre : les suppressions définitives — un compte d'utilisateur, une convention, un
- * jeton d'API, une sauvegarde — ne pèsent pas comme un avertissement de saisie non enregistrée.
+ * Les 26 appels ont été migrés en quatre lots, par gravité décroissante : les treize qui touchaient
+ * des droits ou détruisaient définitivement, les huit suppressions d'une donnée d'édition, les
+ * trois avertissements de saisie non enregistrée, puis la garde de sortie du comptage de stock.
  *
- * 📍 Un cas se distingue des autres et ne se migre PAS mécaniquement :
- * `layers/stock/…/[groupId].vue` fait `return window.confirm(…)` dans une garde de sortie, qui
- * attend un booléen **synchrone**. C'est exactement le problème que `useGardeDeSortie` a résolu
- * ailleurs en attendant la réponse d'une modale ; ce fichier devra passer par elle.
+ * Ce test devient donc une **interdiction** : `DETTE` est vide, et tout nouvel appel tombe sur le
+ * cas « aucun fichier n'emploie `confirm()` hors de la dette recensée ». **Ne pas y réinscrire un
+ * fichier pour faire passer la suite** — la liste existait pour laisser la dette descendre, pas
+ * pour l'autoriser à remonter.
+ *
+ * 📍 Le dernier cas ne se migrait pas mécaniquement, et la raison vaut d'être retenue :
+ * `layers/stock/…/[groupId].vue` faisait `return window.confirm(…)` dans une garde de sortie, qui
+ * attend un booléen **synchrone**. Rendre une modale à sa place aurait rendu un objet — donc une
+ * valeur vraie —, autorisant la navigation **sans attendre la réponse**. `useGardeDeSortie` rend au
+ * routeur une promesse, résolue dans les deux sens.
  */
 
 /**
- * La dette au 09/10/2026, après la migration de la suppression d'un spectacle enregistré.
+ * La dette : **vide** depuis le 10/10/2026.
  *
- * ⚠️ Ces nombres ne doivent que DESCENDRE. Un fichier migré sort de la liste ; un fichier qui en
- * ajoute fait tomber le test. Ne jamais monter un nombre pour faire passer la suite.
+ * ⚠️ Ces nombres ne doivent que DESCENDRE. Elle est à zéro : toute entrée ajoutée ici serait une
+ * REMONTÉE, c'est-à-dire l'autorisation d'un appel natif de plus. Migrer l'écran, pas la liste.
  */
-const DETTE: Record<string, number> = {
-  'layers/stock/app/pages/editions/[id]/gestion/stock/[groupId].vue': 1,
-}
+const DETTE: Record<string, number> = {}
 
 /** `confirm(` ou `window.confirm(`, jamais une propriété (`.confirm(`). */
 const APPEL_NATIF = /(?<![\w.])(?:window\.)?confirm\s*\(/g
