@@ -123,7 +123,7 @@
       "browse_conventions": "Sfoglia convention",
       "companion": "Compagno",
       "companion_name": "Nome del compagno",
-      "confirm_withdraw": "Sei sicuro di voler ritirare la tua candidatura?",
+      "confirm_withdraw": "[TODO] Sei sicuro di voler ritirare la tua candidatura?",
       "contact_organizer": "Contatta organizzatore",
       "contact_organizer_error": "Errore durante la creazione della conversazione con gli organizzatori",
       "dates": "Date",
@@ -224,7 +224,8 @@
       "export_pdf_delay": "Ritardo: {minutes} min",
       "export_pdf_empty": "Nessuna fascia oraria da stampare",
       "export_pdf_summary": "{creneaux} fasce orarie — {heures} — {equipes} squadra/e",
-      "export_pdf_title": "Planning volontari"
+      "export_pdf_title": "Planning volontari",
+      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
     }
   },
   "seo": {

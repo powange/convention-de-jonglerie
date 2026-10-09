@@ -123,7 +123,7 @@
       "browse_conventions": "Gennemse konventioner",
       "companion": "Ledsager",
       "companion_name": "Ledsagernavn",
-      "confirm_withdraw": "Er du sikker på, at du vil trække din ansøgning tilbage?",
+      "confirm_withdraw": "[TODO] Er du sikker på, at du vil trække din ansøgning tilbage?",
       "contact_organizer": "Kontakt arrangør",
       "contact_organizer_error": "Fejl ved oprettelse af samtalen med arrangørerne",
       "dates": "Datoer",
@@ -224,7 +224,8 @@
       "export_pdf_delay": "Forsinkelse: {minutes} min",
       "export_pdf_empty": "Ingen vagt at udskrive",
       "export_pdf_summary": "{creneaux} vagter — {heures} — {equipes} hold",
-      "export_pdf_title": "Frivilligplan"
+      "export_pdf_title": "Frivilligplan",
+      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
     }
   },
   "seo": {

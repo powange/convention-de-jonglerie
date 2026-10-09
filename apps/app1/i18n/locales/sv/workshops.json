@@ -78,6 +78,8 @@
     "import_forced_day": "Dag i upplagan",
     "import_forced_day_description": "Om fotot inte anger något datum, välj den dag som workshopparna ska placeras på. Deras tider behålls.",
     "import_forced_day_none": "Använd datumen som lästs på fotot",
-    "max_people": "Max {count} personer"
+    "max_people": "Max {count} personer",
+    "confirm_delete_workshop": "[TODO] L'atelier « {title} » sera supprimé.",
+    "confirm_delete_workshop_unnamed": "[TODO] Cet atelier sera supprimé."
   }
 }

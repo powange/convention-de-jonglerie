@@ -123,7 +123,7 @@
       "browse_conventions": "Conventions durchsuchen",
       "companion": "Begleitung",
       "companion_name": "Name der Begleitung",
-      "confirm_withdraw": "Sind Sie sicher, dass Sie Ihre Bewerbung zurückziehen möchten?",
+      "confirm_withdraw": "[TODO] Sind Sie sicher, dass Sie Ihre Bewerbung zurückziehen möchten?",
       "contact_organizer": "Organisator kontaktieren",
       "contact_organizer_error": "Fehler beim Erstellen der Unterhaltung mit den Organisatoren",
       "dates": "Termine",
@@ -224,7 +224,8 @@
       "export_pdf_delay": "Verspätung: {minutes} Min.",
       "export_pdf_empty": "Kein Zeitfenster zum Drucken",
       "export_pdf_summary": "{creneaux} Zeitfenster — {heures} — {equipes} Team(s)",
-      "export_pdf_title": "Helferplan"
+      "export_pdf_title": "Helferplan",
+      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
     }
   },
   "seo": {

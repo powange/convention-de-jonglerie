@@ -123,7 +123,7 @@
       "browse_conventions": "Переглянути конвенції",
       "companion": "Компаньйон",
       "companion_name": "Ім'я компаньйона",
-      "confirm_withdraw": "Ви впевнені, що хочете відкликати свою заявку?",
+      "confirm_withdraw": "[TODO] Ви впевнені, що хочете відкликати свою заявку?",
       "contact_organizer": "Зв'язатися з організатором",
       "contact_organizer_error": "Помилка під час створення розмови з організаторами",
       "dates": "Дати",
@@ -224,7 +224,8 @@
       "export_pdf_delay": "Затримка: {minutes} хв",
       "export_pdf_empty": "Немає змін для друку",
       "export_pdf_summary": "{creneaux} змін — {heures} — {equipes} команд(а)",
-      "export_pdf_title": "Розклад волонтерів"
+      "export_pdf_title": "Розклад волонтерів",
+      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
     }
   },
   "seo": {

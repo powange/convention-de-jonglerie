@@ -123,7 +123,7 @@
       "browse_conventions": "Explorar convenções",
       "companion": "Companheiro",
       "companion_name": "Nome do companheiro",
-      "confirm_withdraw": "Tem certeza de que quer retirar a sua candidatura?",
+      "confirm_withdraw": "[TODO] Tem certeza de que quer retirar a sua candidatura?",
       "contact_organizer": "Entrar em contato com organizador",
       "contact_organizer_error": "Erro ao criar a conversa com os organizadores",
       "dates": "Datas",
@@ -224,7 +224,8 @@
       "export_pdf_delay": "Atraso: {minutes} min",
       "export_pdf_empty": "Nenhum turno para imprimir",
       "export_pdf_summary": "{creneaux} turnos — {heures} — {equipes} equipa(s)",
-      "export_pdf_title": "Planeamento de voluntários"
+      "export_pdf_title": "Planeamento de voluntários",
+      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
     }
   },
   "seo": {
