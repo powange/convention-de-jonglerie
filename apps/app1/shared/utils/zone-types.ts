@@ -110,6 +110,15 @@ export const ZONE_LIMITS = {
   MAX_ZONES_PER_EDITION: 50,
   MAX_MARKERS_PER_EDITION: 100,
   MAX_NAME_LENGTH: 100,
+  /**
+   * Longueur d'une description d'objet de carte.
+   *
+   * ⚠️ Elle vit ici, à côté de la longueur du nom, parce que DEUX endroits doivent s'accorder : le
+   * schéma du point d'import et la troncature faite par le parseur de la carte Google. Tant que la
+   * limite n'était écrite qu'en dur dans le schéma, le parseur ne pouvait pas la respecter — et un
+   * dépassement faisait refuser l'objet entier en 400, sans en dire la cause.
+   */
+  MAX_DESCRIPTION_LENGTH: 2000,
   MIN_POLYGON_POINTS: 3,
 } as const
 

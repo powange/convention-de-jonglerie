@@ -5,7 +5,9 @@ import {
   parseGoogleMyMapsKml,
   parseGoogleMyMapsFeatureIds,
   attachFeatureIds,
+  descriptionDePlacemark,
 } from '../../../server/utils/google-my-maps-import'
+import { ZONE_LIMITS } from '../../../shared/utils/zone-types'
 
 const KML = `<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
@@ -164,5 +166,114 @@ describe('attachFeatureIds', () => {
 
   it('n’apparie rien quand le payload est vide', () => {
     expect(attachFeatureIds(objects, []).every((o) => o.externalId === null)).toBe(true)
+  })
+})
+
+/**
+ * La description d'un placemark, normalisée.
+ *
+ * ## Les deux défauts que ces cas ferment
+ *
+ * **Le balisage arrivait tel quel en base**, et s'affichait ÉCHAPPÉ dans le popup de la carte :
+ * l'organisateur lisait « Accueil&lt;br&gt;Ouvert dès 9 h » au lieu de deux lignes.
+ *
+ * **Un dépassement de longueur faisait refuser l'objet ENTIER**, en 400, et l'écran n'affichait
+ * qu'« Impossible d'importer cet objet » : ni la cause, ni la possibilité de tronquer.
+ */
+describe('descriptionDePlacemark', () => {
+  it('rend null pour une absence, et pour un balisage qui ne contenait aucun texte', () => {
+    // `<div></div>` n'est pas une description vide « par erreur » : c'est ce que Google produit
+    // pour un placemark dont on a effacé la note. L'enregistrer ferait un popup avec une section
+    // vide.
+    expect(descriptionDePlacemark(null)).toBeNull()
+    expect(descriptionDePlacemark('<div></div>')).toBeNull()
+    expect(descriptionDePlacemark('   ')).toBeNull()
+  })
+
+  it('remplace les balises de bloc par des sauts de ligne', () => {
+    // Les retirer sèchement collerait deux paragraphes en une phrase qui n'a plus de sens.
+    expect(descriptionDePlacemark('Accueil<br>Ouvert dès 9 h')).toBe('Accueil\nOuvert dès 9 h')
+    /*
+     * 📍 DEUX sauts pour deux paragraphes, et c'est voulu : `</p>` ferme le premier, `<p>` ouvre
+     * le second. Un paragraphe se sépare du suivant par une ligne vide — c'est ce que l'auteur a
+     * écrit dans Google, et l'aplatir sur un seul saut rendrait sa note moins lisible que son
+     * original. Ma première attente disait l'inverse ; c'est elle qui avait tort.
+     */
+    expect(descriptionDePlacemark('<p>Un</p><p>Deux</p>')).toBe('Un\n\nDeux')
+  })
+
+  it('retire les autres balises sans laisser de trace', () => {
+    expect(descriptionDePlacemark('Le <b>grand</b> chapiteau')).toBe('Le grand chapiteau')
+  })
+
+  it('décode les entités courantes', () => {
+    expect(descriptionDePlacemark('Bar &amp; grill')).toBe('Bar & grill')
+    expect(descriptionDePlacemark('Tarif&nbsp;: 5&nbsp;€')).toBe('Tarif : 5 €')
+  })
+
+  it('retire aussi les balises révélées par le décodage', () => {
+    /*
+     * ⚠️ LE SECOND PASSAGE. Un export doublement échappé livre `&lt;br&gt;` : le premier balayage
+     * de balises ne voit rien, et c'est le décodage qui fait apparaître le `<br>`. Sans ce second
+     * passage, la balise serait enregistrée telle quelle — exactement le défaut qu'on répare.
+     */
+    expect(descriptionDePlacemark('Accueil&lt;br&gt;Ouvert')).toBe('Accueil\nOuvert')
+    expect(descriptionDePlacemark('Un &lt;b&gt;mot&lt;/b&gt;')).toBe('Un mot')
+  })
+
+  it('tronque à la limite partagée avec le schéma du point d’import', () => {
+    // La limite est lue dans ZONE_LIMITS et non recopiée : c'est tout l'objet du lot que les deux
+    // endroits ne puissent plus diverger.
+    const long = 'a'.repeat(ZONE_LIMITS.MAX_DESCRIPTION_LENGTH + 500)
+    expect(descriptionDePlacemark(long)).toHaveLength(ZONE_LIMITS.MAX_DESCRIPTION_LENGTH)
+  })
+
+  it('tronque APRÈS le décodage, jamais avant', () => {
+    /*
+     * ⚠️ L'ORDRE COMPTE. Couper d'abord laisserait une fin de texte en « &nb », et le texte
+     * tronqué ne vaudrait pas la limite : une entité de six caractères n'en vaut qu'un une fois
+     * décodée. Ce cas mesure donc que la troncature s'applique au texte FINAL.
+     */
+    const brut = '&amp;'.repeat(ZONE_LIMITS.MAX_DESCRIPTION_LENGTH)
+    const sortie = descriptionDePlacemark(brut)!
+    expect(sortie).toHaveLength(ZONE_LIMITS.MAX_DESCRIPTION_LENGTH)
+    expect(sortie).not.toContain('&amp;')
+    expect(sortie.startsWith('&&&')).toBe(true)
+  })
+
+  it('réduit les sauts de ligne en excès, que les balises de bloc produisent facilement', () => {
+    expect(descriptionDePlacemark('<p>Un</p><br><br><br><p>Deux</p>')).toBe('Un\n\nDeux')
+  })
+})
+
+/**
+ * Le placemark lui-même, borné.
+ *
+ * ⚠️ Ces deux cas sont le POINT DE JONCTION avec le défaut : le parseur rendait nom et description
+ * tels que lus chez Google, alors que le schéma du point d'import les borne. C'est ce désaccord qui
+ * faisait répondre 400 — et l'écran n'en disait pas la cause.
+ */
+describe('readPlacemark : les longueurs du schéma sont respectées à la lecture', () => {
+  const kmlAvec = (nom: string, description: string) => `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Carte</name>
+    <Placemark>
+      <name>${nom}</name>
+      <description>${description}</description>
+      <Point><coordinates>2.35,48.85,0</coordinates></Point>
+    </Placemark>
+  </Document>
+</kml>`
+
+  it('tronque un nom trop long au lieu de le laisser faire refuser l’objet', () => {
+    const { objects } = parseGoogleMyMapsKml(kmlAvec('N'.repeat(300), 'ok'))
+    expect(objects).toHaveLength(1)
+    expect(objects[0]!.name).toHaveLength(ZONE_LIMITS.MAX_NAME_LENGTH)
+  })
+
+  it('normalise la description du placemark, balises comprises', () => {
+    const { objects } = parseGoogleMyMapsKml(kmlAvec('Accueil', 'Ligne 1&lt;br&gt;Ligne 2'))
+    expect(objects[0]!.description).toBe('Ligne 1\nLigne 2')
   })
 })

@@ -21,6 +21,8 @@
 
 import { XMLParser } from 'fast-xml-parser'
 
+import { ZONE_LIMITS } from '~~/shared/utils/zone-types'
+
 /** Nature géométrique d'un objet de la carte. */
 export type ExternalMapObjectKind = 'polygon' | 'point' | 'line'
 
@@ -128,6 +130,89 @@ function buildStyleColors(document: Record<string, any>): Map<string, string> {
   return resolved
 }
 
+/**
+ * Le texte d'une description de placemark, débarrassé de son balisage et borné.
+ *
+ * ## ⚠️ POURQUOI CE TRAITEMENT EXISTE
+ *
+ * Deux défauts se cumulaient, et aucun des deux ne se voyait depuis l'écran d'import.
+ *
+ * **1. Le balisage arrivait tel quel en base.** Google exporte volontiers une description annotée
+ * en HTML. Elle s'affichait ensuite ÉCHAPPÉE dans le popup de la carte — l'organisateur y lisait
+ * « Accueil&lt;br&gt;Ouvert dès 9 h » au lieu de deux lignes.
+ *
+ * **2. Un dépassement de longueur faisait refuser l'objet ENTIER**, en 400, et l'écran n'affichait
+ * qu'« Impossible d'importer cet objet » : ni la cause, ni la possibilité de tronquer. Une
+ * description longue est pourtant la chose la plus ordinaire sur une carte annotée.
+ *
+ * Tronquer ici plutôt que refuser là-bas est le bon endroit : le parseur est le seul point où la
+ * carte du fournisseur rencontre nos contraintes, et c'est ce qui rend l'import des DEUX surfaces
+ * — un objet ou un calque entier — tolérant du même coup.
+ *
+ * ## L'ordre des opérations, qui n'est pas indifférent
+ *
+ * `balisage → entités → balisage`, et chacune des trois étapes a sa raison :
+ *
+ * 1. **les balises d'abord**, parce qu'elles arrivent RÉELLES dans les deux formes d'export : en
+ *    CDATA le parseur rend le contenu brut, et hors CDATA il décode `&lt;br&gt;` lui-même. Les
+ *    deux chemins nous livrent donc un vrai `<br>` ;
+ * 2. **les entités ensuite**, pour le `&amp;` d'un « Bar &amp; grill » que le double échappement
+ *    laisse passer ;
+ * 3. **les balises une seconde fois**, parce que l'étape 2 peut en révéler. Un SECOND passage,
+ *    borné, et pas une boucle : le texte vient d'un fichier que nous n'écrivons pas, et une
+ *    boucle « tant qu'il reste des balises » sur une entrée qu'on ne contrôle pas se termine mal.
+ *
+ * ⚠️ ET LA TRONCATURE EN DERNIER, jamais avant le décodage : couper au milieu d'une entité
+ * donnerait une fin de texte en « &amp;nb ».
+ */
+const ENTITES: Record<string, string> = {
+  '&nbsp;': ' ',
+  '&amp;': '&',
+  '&lt;': '<',
+  '&gt;': '>',
+  '&quot;': '"',
+  '&#39;': "'",
+  '&apos;': "'",
+}
+
+function sansBalises(valeur: string): string {
+  return (
+    valeur
+      // Les balises de BLOC deviennent des sauts de ligne : les retirer sèchement collerait deux
+      // paragraphes en une phrase qui n'a plus de sens.
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/p\s*>/gi, '\n')
+      .replace(/<p\b[^>]*>/gi, '\n')
+      .replace(/<\/div\s*>/gi, '\n')
+      .replace(/<li\b[^>]*>/gi, '\n')
+      // Tout le reste part sans laisser de trace : une balise `<b>` n'ajoute rien à du texte.
+      .replace(/<[^>]*>/g, '')
+  )
+}
+
+export function descriptionDePlacemark(brut: string | null): string | null {
+  if (brut === null) return null
+
+  let texte = sansBalises(brut)
+  texte = texte.replace(
+    /&(?:nbsp|amp|lt|gt|quot|#39|apos);/gi,
+    (e) => ENTITES[e.toLowerCase()] ?? e
+  )
+  texte = sansBalises(texte)
+
+  texte = texte
+    // Trois sauts de ligne ou plus n'apportent rien : les balises de bloc en produisent
+    // facilement deux par paragraphe.
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+
+  if (texte.length === 0) return null
+  return texte.length > ZONE_LIMITS.MAX_DESCRIPTION_LENGTH
+    ? texte.slice(0, ZONE_LIMITS.MAX_DESCRIPTION_LENGTH)
+    : texte
+}
+
 function readPlacemark(
   placemark: Record<string, any>,
   layer: string | null,
@@ -155,10 +240,18 @@ function readPlacemark(
 
   const styleId = String(text(placemark.styleUrl) ?? '').replace(/^#/, '')
 
+  /*
+   * ⚠️ NOM ET DESCRIPTION SONT BORNÉS ICI, aux mêmes longueurs que le schéma du point d'import.
+   * Les envoyer tels que lus chez Google faisait refuser l'objet entier en 400 — voir
+   * `descriptionDePlacemark` pour ce que ce refus coûtait à l'écran.
+   */
+  const nom = text(placemark.name) ?? ''
+
   return {
     externalId: null,
-    name: text(placemark.name) ?? '',
-    description: text(placemark.description),
+    name:
+      nom.length > ZONE_LIMITS.MAX_NAME_LENGTH ? nom.slice(0, ZONE_LIMITS.MAX_NAME_LENGTH) : nom,
+    description: descriptionDePlacemark(text(placemark.description)),
     layer,
     kind,
     coordinates,

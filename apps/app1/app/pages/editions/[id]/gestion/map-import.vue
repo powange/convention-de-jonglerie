@@ -604,13 +604,29 @@ function importBodyFor(key: string | number) {
   }
 }
 
+const { succes, erreur, avertir } = useNotificateur()
+
 const importAction = useApiActionById<{ item: unknown; alreadyImported: boolean }>(
   () => `/api/editions/${editionId.value}/external-map/import`,
   {
     method: 'POST',
     body: (key) => importBodyFor(key),
     silentSuccess: true,
-    errorMessages: { default: t('gestion.map.import_error') },
+    /*
+     * ⚠️ `silentError` ET un toast écrit ici, plutôt que `errorMessages.default`.
+     *
+     * `createErrorMessageResolver` fait passer `errorMessages.default` AVANT le message de l'API :
+     * le libellé générique MASQUAIT donc la cause. L'organisateur lisait « Impossible d'importer
+     * cet objet » sans savoir si c'était une longueur, une couleur ou un droit — et devait
+     * essayer les objets un par un pour le deviner.
+     *
+     * La forme suit la règle de `useNotificateur` : titre TRADUIT, message du serveur en
+     * DESCRIPTION. Le serveur répond souvent en français en dur, et en faire le titre l'imposerait
+     * à un lecteur anglophone.
+     */
+    silentError: true,
+    onError: (e) =>
+      erreur(t('gestion.map.import_error'), { description: messageDErreurServeur(e) }),
   }
 )
 
@@ -671,15 +687,24 @@ function applyImportedItem(row: ViewRow, item: Record<string, any>) {
   )
 }
 
-async function importRow(row: ViewRow): Promise<boolean> {
+/**
+ * Trois issues, et non deux.
+ *
+ * ⚠️ Un booléen les confondait, et c'est ce qui rendait le compte d'un import de calque faux :
+ * un tracé (`line`) n'a pas d'équivalent sur la carte du site et n'est PAS un échec — l'annoncer
+ * comme tel ferait croire à une panne là où l'objet n'était simplement pas importable.
+ */
+type IssueDImport = 'importe' | 'echec' | 'ignore'
+
+async function importRow(row: ViewRow): Promise<IssueDImport> {
   const object = row.object
-  if (!draft[row.key] || !object || object.kind === 'line') return false
+  if (!draft[row.key] || !object || object.kind === 'line') return 'ignore'
 
   const result = await importAction.execute(row.key)
-  if (!result) return false
+  if (!result) return 'echec'
 
   applyImportedItem(row, (result as { item: Record<string, any> }).item)
-  return true
+  return 'importe'
 }
 
 const layerImporting = ref<string | null>(null)
@@ -690,21 +715,35 @@ const layerImporting = ref<string | null>(null)
  */
 async function importLayer(layer: LayerGroup) {
   layerImporting.value = layer.key
-  let imported = 0
+  let importes = 0
+  let echecs = 0
   try {
+    /*
+     * ⚠️ LA BOUCLE NE S'ARRÊTE PLUS AU PREMIER REFUS. Elle faisait `if (!ok) break`, puis
+     * n'annonçait que le nombre d'objets importés : ce qui restait n'était pas nommé, et
+     * l'organisateur ne pouvait pas savoir que le calque était à moitié importé ni pourquoi.
+     *
+     * Un seul objet mal formé — une description trop longue suffisait — emportait donc tous les
+     * suivants. Chaque objet s'écrit immédiatement et indépendamment : il n'y a aucune raison
+     * d'abandonner le calque parce que l'un d'eux a été refusé.
+     */
     for (const row of [...layer.pending]) {
-      const ok = await importRow(row)
-      if (!ok) break
-      imported++
+      const issue = await importRow(row)
+      if (issue === 'importe') importes++
+      else if (issue === 'echec') echecs++
     }
   } finally {
     layerImporting.value = null
-    if (imported > 0) {
-      useToast().add({
-        title: t('gestion.map.import_layer_done', imported),
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
+    /*
+     * ⚠️ UN COMPTE RENDU QUI NOMME LES DEUX NOMBRES dès qu'il y a un échec, et un seul toast.
+     * Dire « 12 objets importés » après trois refus serait exact et trompeur : c'est la phrase que
+     * l'écran affichait, et c'est précisément ce qui laissait un calque incomplet passer pour
+     * terminé. Les toasts d'erreur de chaque objet ont déjà dit les causes, un par un.
+     */
+    if (echecs > 0) {
+      avertir(t('gestion.map.import_layer_partial', { importes, echecs }))
+    } else if (importes > 0) {
+      succes(t('gestion.map.import_layer_done', importes))
     }
   }
 }
