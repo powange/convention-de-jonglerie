@@ -294,7 +294,7 @@
       "can_delete": "Elimina",
       "can_edit": "Modifica",
       "can_manage_volunteers": "Gestisci volontari",
-      "confirm_remove": "[TODO] Sei sicuro di voler rimuovere questo organizzatore dalla convention?",
+      "confirm_remove": "{name} non sarà più organizzatore di «{convention}» e perderà tutti i diritti su di essa.",
       "confirm_remove_from_edition": "Sei sicuro di voler rimuovere questo organizzatore dall'edizione?",
       "edit_organizer": "Modifica organizzatore",
       "edit_organizer_description": "Configura i diritti di accesso e il titolo di questo organizzatore per gestire i suoi permessi sulla convention e le sue edizioni.",
@@ -495,7 +495,7 @@
       "type_cabaret": "Cabaret",
       "type_hint": "Un cabaret è composto da numeri, ognuno con i propri artisti.",
       "type_standard": "Spettacolo",
-      "act_title_required": "[TODO] Chaque numéro doit avoir un titre"
+      "act_title_required": "Ogni numero deve avere un titolo"
     },
     "stock": {
       "available_now": "{available}/{total} disponibile/i",
@@ -1251,7 +1251,7 @@
       "place_error": "Non è stato possibile salvare il luogo.",
       "page_public": "Pagina pubblica",
       "page_public_help": "Rende il programma visibile a tutti. Finché è disattivato, solo gli organizzatori possono accedervi e la scheda resta nascosta al pubblico.",
-      "overlap": "[TODO] Chevauchement"
+      "overlap": "Sovrapposizione"
     },
     "convention": {
       "card_description": "Modificare nome, descrizione, logo ed e-mail della convention",

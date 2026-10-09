@@ -75,11 +75,11 @@
       "show_title": "Spettacolo",
       "view_edition": "Vedi edizione",
       "view_edition_short": "Vedi",
-      "withdraw": "[TODO] Retirer ma candidature",
-      "withdraw_confirm": "[TODO] Votre candidature « {title} » sera retirée, ainsi que la discussion que vous avez eue avec les organisateurs. Cette action est définitive.",
-      "withdraw_error": "[TODO] Le retrait a échoué",
-      "withdraw_short": "[TODO] Retirer",
-      "withdrawn": "[TODO] Candidature retirée"
+      "withdraw": "Ritira la mia candidatura",
+      "withdraw_confirm": "La tua candidatura «{title}» sarà ritirata, così come la discussione avuta con gli organizzatori. L'azione è definitiva.",
+      "withdraw_error": "Il ritiro non è riuscito",
+      "withdraw_short": "Ritira",
+      "withdrawn": "Candidatura ritirata"
     },
     "comments": {
       "be_first_to_comment": "Sii il primo a condividere la tua esperienza!",
@@ -123,7 +123,7 @@
       "browse_conventions": "Sfoglia convention",
       "companion": "Compagno",
       "companion_name": "Nome del compagno",
-      "confirm_withdraw": "[TODO] Sei sicuro di voler ritirare la tua candidatura?",
+      "confirm_withdraw": "La tua candidatura per «{edition}» sarà ritirata. Dovrai candidarti di nuovo.",
       "contact_organizer": "Contatta organizzatore",
       "contact_organizer_error": "Errore durante la creazione della conversazione con gli organizzatori",
       "dates": "Date",
@@ -225,7 +225,7 @@
       "export_pdf_empty": "Nessuna fascia oraria da stampare",
       "export_pdf_summary": "{creneaux} fasce orarie — {heures} — {equipes} squadra/e",
       "export_pdf_title": "Planning volontari",
-      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
+      "confirm_withdraw_unnamed": "La tua candidatura sarà ritirata. Dovrai candidarti di nuovo."
     }
   },
   "seo": {

@@ -28,9 +28,9 @@
         "title": "Nuovo bando per spettacoli 🎭"
       },
       "application_withdrawn": {
-        "title": "[TODO] Candidature retirée",
-        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
-        "action": "[TODO] Voir les candidatures"
+        "title": "Candidatura ritirata",
+        "message": "{artistName} ha ritirato la candidatura «{showTitle}» per {editionName}.",
+        "action": "Vedi le candidature"
       }
     },
     "carpool": {

@@ -294,7 +294,7 @@
       "can_delete": "Видалити",
       "can_edit": "Редагувати",
       "can_manage_volunteers": "Керувати волонтерами",
-      "confirm_remove": "[TODO] Ви впевнені, що бажаєте видалити цього організатора з конференції?",
+      "confirm_remove": "{name} більше не буде організатором «{convention}» і втратить усі права на нього.",
       "confirm_remove_from_edition": "Ви впевнені, що бажаєте видалити цього організатора з видання?",
       "edit_organizer": "Редагувати організатора",
       "edit_organizer_description": "Налаштуйте права доступу та посаду цього організатора для управління його дозволами на конвенції та її виданнях.",
@@ -495,7 +495,7 @@
       "type_cabaret": "Кабаре",
       "type_hint": "Кабаре складається з номерів, кожен зі своїми артистами.",
       "type_standard": "Вистава",
-      "act_title_required": "[TODO] Chaque numéro doit avoir un titre"
+      "act_title_required": "Кожен номер повинен мати назву"
     },
     "stock": {
       "available_now": "{available}/{total} доступно",
@@ -1251,7 +1251,7 @@
       "place_error": "Не вдалося зберегти місце.",
       "page_public": "Публічна сторінка",
       "page_public_help": "Робить програму видимою для всіх. Доки вимкнено, доступ мають лише організатори, а вкладка прихована від відвідувачів.",
-      "overlap": "[TODO] Chevauchement"
+      "overlap": "Накладання"
     },
     "convention": {
       "card_description": "Змінити назву, опис, логотип і e-mail конвенції",

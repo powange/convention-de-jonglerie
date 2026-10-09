@@ -24,7 +24,7 @@
       "comments": "Comments",
       "confirm_booking": "Confirm booking",
       "confirm_delete_offer": "Are you sure you want to delete this carpool offer?",
-      "confirm_delete_request": "[TODO] Are you sure you want to delete this carpool request?",
+      "confirm_delete_request": "Your carpool request from “{city}” will be deleted.",
       "confirmed_passengers": "Confirmed passengers",
       "contact": "Contact",
       "contact_user": "Contact {name}",
@@ -96,21 +96,21 @@
       "map_tab_short": "Map",
       "map_without_point": "Listings without a position",
       "map_without_point_hint": "Their city could not be located on the map: they are listed here so they are not lost.",
-      "bookings": "[TODO] Réservations",
-      "delete_comment": "[TODO] Supprimer mon commentaire",
-      "delete_comment_confirm": "[TODO] Ce commentaire sera retiré de la discussion. Cette action est définitive.",
+      "bookings": "Bookings",
+      "delete_comment": "Delete my comment",
+      "delete_comment_confirm": "This comment will be removed from the discussion. This action is permanent.",
       "filters": {
-        "city": "[TODO] Ville",
-        "city_placeholder": "[TODO] Nom d'une ville",
-        "direction_any": "[TODO] Les deux sens",
-        "none_matching": "[TODO] Aucune annonce ne correspond",
-        "none_matching_help": "[TODO] Élargissez la recherche, ou réinitialisez les filtres.",
-        "reset": "[TODO] Réinitialiser",
-        "with_seats": "[TODO] Offres avec des places libres"
+        "city": "City",
+        "city_placeholder": "A city name",
+        "direction_any": "Both directions",
+        "none_matching": "No listing matches",
+        "none_matching_help": "Broaden your search, or reset the filters.",
+        "reset": "Reset",
+        "with_seats": "Offers with free seats"
       },
-      "no_bookings": "[TODO] Aucune réservation",
-      "past_trip": "[TODO] Trajet passé",
-      "phone_after_acceptance": "[TODO] Numéro visible une fois votre réservation acceptée"
+      "no_bookings": "No bookings",
+      "past_trip": "Past trip",
+      "phone_after_acceptance": "Number visible once your booking is accepted"
     },
     "convention_form": {
       "click_to_select_image": "Click to select an image",

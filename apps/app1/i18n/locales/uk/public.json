@@ -75,11 +75,11 @@
       "show_title": "Виступ",
       "view_edition": "Переглянути захід",
       "view_edition_short": "Переглянути",
-      "withdraw": "[TODO] Retirer ma candidature",
-      "withdraw_confirm": "[TODO] Votre candidature « {title} » sera retirée, ainsi que la discussion que vous avez eue avec les organisateurs. Cette action est définitive.",
-      "withdraw_error": "[TODO] Le retrait a échoué",
-      "withdraw_short": "[TODO] Retirer",
-      "withdrawn": "[TODO] Candidature retirée"
+      "withdraw": "Відкликати мою заявку",
+      "withdraw_confirm": "Вашу заявку «{title}» буде відкликано разом з обговоренням, яке ви мали з організаторами. Дія безповоротна.",
+      "withdraw_error": "Не вдалося відкликати заявку",
+      "withdraw_short": "Відкликати",
+      "withdrawn": "Заявку відкликано"
     },
     "comments": {
       "be_first_to_comment": "Будьте першим, хто поділиться своїм досвідом!",
@@ -123,7 +123,7 @@
       "browse_conventions": "Переглянути конвенції",
       "companion": "Компаньйон",
       "companion_name": "Ім'я компаньйона",
-      "confirm_withdraw": "[TODO] Ви впевнені, що хочете відкликати свою заявку?",
+      "confirm_withdraw": "Вашу заявку на «{edition}» буде відкликано. Доведеться подати її знову.",
       "contact_organizer": "Зв'язатися з організатором",
       "contact_organizer_error": "Помилка під час створення розмови з організаторами",
       "dates": "Дати",
@@ -225,7 +225,7 @@
       "export_pdf_empty": "Немає змін для друку",
       "export_pdf_summary": "{creneaux} змін — {heures} — {equipes} команд(а)",
       "export_pdf_title": "Розклад волонтерів",
-      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
+      "confirm_withdraw_unnamed": "Вашу заявку буде відкликано. Доведеться подати її знову."
     }
   },
   "seo": {

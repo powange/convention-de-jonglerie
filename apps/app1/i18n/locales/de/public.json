@@ -75,11 +75,11 @@
       "show_title": "Show",
       "view_edition": "Ausgabe anzeigen",
       "view_edition_short": "Anzeigen",
-      "withdraw": "[TODO] Retirer ma candidature",
-      "withdraw_confirm": "[TODO] Votre candidature « {title} » sera retirée, ainsi que la discussion que vous avez eue avec les organisateurs. Cette action est définitive.",
-      "withdraw_error": "[TODO] Le retrait a échoué",
-      "withdraw_short": "[TODO] Retirer",
-      "withdrawn": "[TODO] Candidature retirée"
+      "withdraw": "Meine Bewerbung zurückziehen",
+      "withdraw_confirm": "Ihre Bewerbung „{title}“ wird zurückgezogen, ebenso die Unterhaltung mit den Organisatoren. Diese Aktion ist endgültig.",
+      "withdraw_error": "Das Zurückziehen ist fehlgeschlagen",
+      "withdraw_short": "Zurückziehen",
+      "withdrawn": "Bewerbung zurückgezogen"
     },
     "comments": {
       "be_first_to_comment": "Sei der erste, der seine Erfahrung teilt!",
@@ -123,7 +123,7 @@
       "browse_conventions": "Conventions durchsuchen",
       "companion": "Begleitung",
       "companion_name": "Name der Begleitung",
-      "confirm_withdraw": "[TODO] Sind Sie sicher, dass Sie Ihre Bewerbung zurückziehen möchten?",
+      "confirm_withdraw": "Ihre Bewerbung für „{edition}“ wird zurückgezogen. Sie müssen sich erneut bewerben.",
       "contact_organizer": "Organisator kontaktieren",
       "contact_organizer_error": "Fehler beim Erstellen der Unterhaltung mit den Organisatoren",
       "dates": "Termine",
@@ -225,7 +225,7 @@
       "export_pdf_empty": "Kein Zeitfenster zum Drucken",
       "export_pdf_summary": "{creneaux} Zeitfenster — {heures} — {equipes} Team(s)",
       "export_pdf_title": "Helferplan",
-      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
+      "confirm_withdraw_unnamed": "Ihre Bewerbung wird zurückgezogen. Sie müssen sich erneut bewerben."
     }
   },
   "seo": {

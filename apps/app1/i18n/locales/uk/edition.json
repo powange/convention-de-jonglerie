@@ -39,7 +39,7 @@
       "seats_description": "Кількість вільних місць у вашому автомобілі",
       "seats_placeholder": "напр., 3",
       "updated": "Пропозицію спільної поїздки оновлено",
-      "seats_minimum": "[TODO] Vous avez déjà accordé {count} place(s) : vous ne pouvez pas descendre en dessous sans retirer d'abord une réservation."
+      "seats_minimum": "Ви вже надали {count} місц(ь): не можна опуститися нижче, не вилучивши спершу бронювання."
     },
     "pets_allowed": "Домашні тварини дозволені",
     "pets_description": "Ви приймаєте домашніх тварин або подорожуєте з ними",
@@ -105,7 +105,7 @@
       "verification_success_description": "Тепер ви власник цієї конвенції.",
       "verify": "Перевірити"
     },
-    "confirm_delete_convention": "[TODO] Ви впевнені, що хочете видалити цю конвенцію?",
+    "confirm_delete_convention": "«{name}» буде видалено разом з усіма випусками та їхніми даними.",
     "convention_deleted": "Конвенцію видалено",
     "convention_deleted_success": "Конвенцію успішно видалено",
     "convention_not_found": "Конвенцію не знайдено",
@@ -157,7 +157,7 @@
     "status_control_desc": "Публікуйте або скасовуйте публікацію ваших видань відповідно до їх стану готовності",
     "delete_edition_irreversible": "Увага: цю дію не можна скасувати",
     "delete_edition_confirm_description": "Видалити цей випуск? Усі пов'язані дані (волонтери, коментарі, знайдені речі тощо) буде втрачено безповоротно.",
-    "confirm_delete_convention_unnamed": "[TODO] Cette convention sera supprimée, avec ses éditions et toutes leurs données."
+    "confirm_delete_convention_unnamed": "Цей конвент буде видалено разом з усіма випусками та їхніми даними."
   },
   "diet": {
     "none": "Немає",

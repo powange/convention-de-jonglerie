@@ -24,7 +24,7 @@
       "comments": "Opmerkingen",
       "confirm_booking": "Reservering bevestigen",
       "confirm_delete_offer": "Weet je zeker dat je deze meerijdaanbieding wilt verwijderen?",
-      "confirm_delete_request": "[TODO] Weet je zeker dat je dit meerijdverzoek wilt verwijderen?",
+      "confirm_delete_request": "Je carpoolverzoek vanuit ‘{city}’ wordt verwijderd.",
       "confirmed_passengers": "Bevestigde passagiers",
       "contact": "Contact",
       "contact_user": "Contact {name}",
@@ -96,21 +96,21 @@
       "map_tab_short": "Kaart",
       "map_without_point": "Advertenties zonder positie",
       "map_without_point_hint": "Hun stad kon niet op de kaart gevonden worden: ze staan hier zodat ze niet verloren gaan.",
-      "bookings": "[TODO] Réservations",
-      "delete_comment": "[TODO] Supprimer mon commentaire",
-      "delete_comment_confirm": "[TODO] Ce commentaire sera retiré de la discussion. Cette action est définitive.",
+      "bookings": "Boekingen",
+      "delete_comment": "Mijn reactie verwijderen",
+      "delete_comment_confirm": "Deze reactie wordt uit de discussie gehaald. Deze actie is definitief.",
       "filters": {
-        "city": "[TODO] Ville",
-        "city_placeholder": "[TODO] Nom d'une ville",
-        "direction_any": "[TODO] Les deux sens",
-        "none_matching": "[TODO] Aucune annonce ne correspond",
-        "none_matching_help": "[TODO] Élargissez la recherche, ou réinitialisez les filtres.",
-        "reset": "[TODO] Réinitialiser",
-        "with_seats": "[TODO] Offres avec des places libres"
+        "city": "Stad",
+        "city_placeholder": "Naam van een stad",
+        "direction_any": "Beide richtingen",
+        "none_matching": "Geen enkele advertentie komt overeen",
+        "none_matching_help": "Verbreed je zoekopdracht of stel de filters opnieuw in.",
+        "reset": "Opnieuw instellen",
+        "with_seats": "Aanbiedingen met vrije plaatsen"
       },
-      "no_bookings": "[TODO] Aucune réservation",
-      "past_trip": "[TODO] Trajet passé",
-      "phone_after_acceptance": "[TODO] Numéro visible une fois votre réservation acceptée"
+      "no_bookings": "Geen boekingen",
+      "past_trip": "Verstreken rit",
+      "phone_after_acceptance": "Nummer zichtbaar zodra je boeking is geaccepteerd"
     },
     "convention_form": {
       "click_to_select_image": "Klik om een afbeelding te selecteren",

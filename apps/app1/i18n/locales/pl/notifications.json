@@ -28,9 +28,9 @@
         "title": "Nowy nabór na spektakle 🎭"
       },
       "application_withdrawn": {
-        "title": "[TODO] Candidature retirée",
-        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
-        "action": "[TODO] Voir les candidatures"
+        "title": "Zgłoszenie wycofane",
+        "message": "{artistName} wycofał zgłoszenie „{showTitle}” na {editionName}.",
+        "action": "Zobacz zgłoszenia"
       }
     },
     "carpool": {

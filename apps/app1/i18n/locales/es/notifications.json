@@ -28,9 +28,9 @@
         "title": "Nueva convocatoria de espectáculos 🎭"
       },
       "application_withdrawn": {
-        "title": "[TODO] Candidature retirée",
-        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
-        "action": "[TODO] Voir les candidatures"
+        "title": "Candidatura retirada",
+        "message": "{artistName} ha retirado su candidatura «{showTitle}» para {editionName}.",
+        "action": "Ver las candidaturas"
       }
     },
     "carpool": {

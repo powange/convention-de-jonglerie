@@ -75,11 +75,11 @@
       "show_title": "Föreställning",
       "view_edition": "Visa evenemang",
       "view_edition_short": "Visa",
-      "withdraw": "[TODO] Retirer ma candidature",
-      "withdraw_confirm": "[TODO] Votre candidature « {title} » sera retirée, ainsi que la discussion que vous avez eue avec les organisateurs. Cette action est définitive.",
-      "withdraw_error": "[TODO] Le retrait a échoué",
-      "withdraw_short": "[TODO] Retirer",
-      "withdrawn": "[TODO] Candidature retirée"
+      "withdraw": "Dra tillbaka min ansökan",
+      "withdraw_confirm": "Din ansökan ”{title}” dras tillbaka, liksom samtalet du har haft med arrangörerna. Åtgärden är slutgiltig.",
+      "withdraw_error": "Tillbakadragandet misslyckades",
+      "withdraw_short": "Dra tillbaka",
+      "withdrawn": "Ansökan tillbakadragen"
     },
     "comments": {
       "be_first_to_comment": "Bli först med att dela med dig av dina erfarenheter!",
@@ -123,7 +123,7 @@
       "browse_conventions": "Bläddra bland konventioner",
       "companion": "Kompanjon",
       "companion_name": "Namn på den medföljande personen",
-      "confirm_withdraw": "[TODO] Är du säker på att du vill dra tillbaka din kandidatur?",
+      "confirm_withdraw": "Din ansökan till ”{edition}” dras tillbaka. Du måste ansöka igen.",
       "contact_organizer": "Kontakta arrangören",
       "contact_organizer_error": "Fel vid skapande av konversationen med arrangörerna",
       "dates": "Datum",
@@ -225,7 +225,7 @@
       "export_pdf_empty": "Inget pass att skriva ut",
       "export_pdf_summary": "{creneaux} pass — {heures} — {equipes} lag",
       "export_pdf_title": "Volontärschema",
-      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
+      "confirm_withdraw_unnamed": "Din ansökan dras tillbaka. Du måste ansöka igen."
     }
   },
   "seo": {

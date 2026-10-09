@@ -28,9 +28,9 @@
         "title": "Ny utlysning för föreställningar 🎭"
       },
       "application_withdrawn": {
-        "title": "[TODO] Candidature retirée",
-        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
-        "action": "[TODO] Voir les candidatures"
+        "title": "Ansökan tillbakadragen",
+        "message": "{artistName} har dragit tillbaka ansökan ”{showTitle}” till {editionName}.",
+        "action": "Se ansökningarna"
       }
     },
     "carpool": {

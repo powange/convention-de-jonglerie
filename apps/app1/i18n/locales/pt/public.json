@@ -75,11 +75,11 @@
       "show_title": "Espetáculo",
       "view_edition": "Ver edição",
       "view_edition_short": "Ver",
-      "withdraw": "[TODO] Retirer ma candidature",
-      "withdraw_confirm": "[TODO] Votre candidature « {title} » sera retirée, ainsi que la discussion que vous avez eue avec les organisateurs. Cette action est définitive.",
-      "withdraw_error": "[TODO] Le retrait a échoué",
-      "withdraw_short": "[TODO] Retirer",
-      "withdrawn": "[TODO] Candidature retirée"
+      "withdraw": "Retirar a minha candidatura",
+      "withdraw_confirm": "A sua candidatura «{title}» será retirada, bem como a conversa que teve com os organizadores. Esta ação é definitiva.",
+      "withdraw_error": "A retirada falhou",
+      "withdraw_short": "Retirar",
+      "withdrawn": "Candidatura retirada"
     },
     "comments": {
       "be_first_to_comment": "Seja o primeiro a partilhar a sua experiência!",
@@ -123,7 +123,7 @@
       "browse_conventions": "Explorar convenções",
       "companion": "Companheiro",
       "companion_name": "Nome do companheiro",
-      "confirm_withdraw": "[TODO] Tem certeza de que quer retirar a sua candidatura?",
+      "confirm_withdraw": "A sua candidatura para «{edition}» será retirada. Terá de se candidatar de novo.",
       "contact_organizer": "Entrar em contato com organizador",
       "contact_organizer_error": "Erro ao criar a conversa com os organizadores",
       "dates": "Datas",
@@ -225,7 +225,7 @@
       "export_pdf_empty": "Nenhum turno para imprimir",
       "export_pdf_summary": "{creneaux} turnos — {heures} — {equipes} equipa(s)",
       "export_pdf_title": "Planeamento de voluntários",
-      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
+      "confirm_withdraw_unnamed": "A sua candidatura será retirada. Terá de se candidatar de novo."
     }
   },
   "seo": {

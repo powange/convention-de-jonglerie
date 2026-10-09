@@ -28,9 +28,9 @@
         "title": "Nová výzva pro představení 🎭"
       },
       "application_withdrawn": {
-        "title": "[TODO] Candidature retirée",
-        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
-        "action": "[TODO] Voir les candidatures"
+        "title": "Přihláška stažena",
+        "message": "{artistName} stáhl přihlášku „{showTitle}“ na {editionName}.",
+        "action": "Zobrazit přihlášky"
       }
     },
     "carpool": {

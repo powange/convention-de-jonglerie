@@ -28,9 +28,9 @@
         "title": "New call for shows 🎭"
       },
       "application_withdrawn": {
-        "title": "[TODO] Candidature retirée",
-        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
-        "action": "[TODO] Voir les candidatures"
+        "title": "Application withdrawn",
+        "message": "{artistName} has withdrawn their application “{showTitle}” for {editionName}.",
+        "action": "View applications"
       }
     },
     "carpool": {

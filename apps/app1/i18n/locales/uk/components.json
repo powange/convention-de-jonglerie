@@ -24,7 +24,7 @@
       "comments": "Коментарі",
       "confirm_booking": "Підтвердити бронювання",
       "confirm_delete_offer": "Ви впевнені, що хочете видалити цю пропозицію сумісної поїздки?",
-      "confirm_delete_request": "[TODO] Ви впевнені, що хочете видалити цей запит сумісної поїздки?",
+      "confirm_delete_request": "Ваш запит на поїздку з «{city}» буде видалено.",
       "confirmed_passengers": "Підтверджені пасажири",
       "contact": "Контакт",
       "contact_user": "Зв'язатися з {name}",
@@ -96,21 +96,21 @@
       "map_tab_short": "Карта",
       "map_without_point": "Оголошення без координат",
       "map_without_point_hint": "Їхнє місто не вдалося знайти на карті: вони перелічені тут, щоб не загубитися.",
-      "bookings": "[TODO] Réservations",
-      "delete_comment": "[TODO] Supprimer mon commentaire",
-      "delete_comment_confirm": "[TODO] Ce commentaire sera retiré de la discussion. Cette action est définitive.",
+      "bookings": "Бронювання",
+      "delete_comment": "Видалити мій коментар",
+      "delete_comment_confirm": "Цей коментар буде вилучено з обговорення. Дія безповоротна.",
       "filters": {
-        "city": "[TODO] Ville",
-        "city_placeholder": "[TODO] Nom d'une ville",
-        "direction_any": "[TODO] Les deux sens",
-        "none_matching": "[TODO] Aucune annonce ne correspond",
-        "none_matching_help": "[TODO] Élargissez la recherche, ou réinitialisez les filtres.",
-        "reset": "[TODO] Réinitialiser",
-        "with_seats": "[TODO] Offres avec des places libres"
+        "city": "Місто",
+        "city_placeholder": "Назва міста",
+        "direction_any": "Обидва напрямки",
+        "none_matching": "Немає відповідних оголошень",
+        "none_matching_help": "Розширте пошук або скиньте фільтри.",
+        "reset": "Скинути",
+        "with_seats": "Пропозиції з вільними місцями"
       },
-      "no_bookings": "[TODO] Aucune réservation",
-      "past_trip": "[TODO] Trajet passé",
-      "phone_after_acceptance": "[TODO] Numéro visible une fois votre réservation acceptée"
+      "no_bookings": "Немає бронювань",
+      "past_trip": "Минула поїздка",
+      "phone_after_acceptance": "Номер буде видно, коли ваше бронювання приймуть"
     },
     "convention_form": {
       "click_to_select_image": "Натисніть, щоб вибрати зображення",

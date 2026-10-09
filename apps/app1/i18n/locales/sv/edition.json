@@ -39,7 +39,7 @@
       "seats_description": "Antal lediga platser i ditt fordon",
       "seats_placeholder": "Ex: 3",
       "updated": "Uppdaterat erbjudande om bilpool",
-      "seats_minimum": "[TODO] Vous avez déjà accordé {count} place(s) : vous ne pouvez pas descendre en dessous sans retirer d'abord une réservation."
+      "seats_minimum": "Du har redan beviljat {count} plats(er): du kan inte gå under det utan att först ta bort en bokning."
     },
     "pets_allowed": "Husdjur tillåtna",
     "pets_description": "Du accepterar husdjur eller reser med husdjur",
@@ -105,7 +105,7 @@
       "verification_success_description": "Du är nu ägare till detta avtal.",
       "verify": "Kontrollera"
     },
-    "confirm_delete_convention": "[TODO] Är du säker på att du vill skrota det här avtalet?",
+    "confirm_delete_convention": "”{name}” tas bort, tillsammans med sina upplagor och all deras data.",
     "convention_deleted": "Avtalet återkallat",
     "convention_deleted_success": "Avtalet avslutades framgångsrikt",
     "convention_not_found": "Konventionen hittades inte",
@@ -157,7 +157,7 @@
     "status_control_desc": "Publicera eller avpublicera dina utgåvor allteftersom de utvecklas",
     "delete_edition_irreversible": "Varning: den här åtgärden kan inte ångras",
     "delete_edition_confirm_description": "Är du säker på att du vill ta bort den här upplagan? All tillhörande data (volontärer, kommentarer, kvarglömda saker m.m.) försvinner permanent.",
-    "confirm_delete_convention_unnamed": "[TODO] Cette convention sera supprimée, avec ses éditions et toutes leurs données."
+    "confirm_delete_convention_unnamed": "Den här konventet tas bort, tillsammans med sina upplagor och all deras data."
   },
   "diet": {
     "none": "Nej",

@@ -39,7 +39,7 @@
     "vote_saved": "Röst sparad",
     "votes_count": "{count} röst | {count} röster",
     "your_vote": "Ditt betyg",
-    "own_application_hidden": "[TODO] Votre candidature n'apparaît pas dans cette liste",
-    "own_application_hidden_description": "[TODO] On ne note pas sa propre candidature. Les autres membres du jury, eux, la voient et peuvent la noter."
+    "own_application_hidden": "Din egen ansökan syns inte i den här listan",
+    "own_application_hidden_description": "Man betygsätter inte sin egen ansökan. De övriga jurymedlemmarna ser den och kan betygsätta den."
   }
 }

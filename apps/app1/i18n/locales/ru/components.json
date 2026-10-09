@@ -24,7 +24,7 @@
       "comments": "Комментарии",
       "confirm_booking": "Подтвердить бронирование",
       "confirm_delete_offer": "Вы уверены, что хотите удалить это предложение совместной поездки?",
-      "confirm_delete_request": "[TODO] Вы уверены, что хотите удалить этот запрос совместной поездки?",
+      "confirm_delete_request": "Ваш запрос на поездку из «{city}» будет удалён.",
       "confirmed_passengers": "Подтвержденные пассажиры",
       "contact": "Контакт",
       "contact_user": "Связаться с {name}",
@@ -96,21 +96,21 @@
       "map_tab_short": "Карта",
       "map_without_point": "Объявления без координат",
       "map_without_point_hint": "Их город не удалось найти на карте: они перечислены здесь, чтобы не потеряться.",
-      "bookings": "[TODO] Réservations",
-      "delete_comment": "[TODO] Supprimer mon commentaire",
-      "delete_comment_confirm": "[TODO] Ce commentaire sera retiré de la discussion. Cette action est définitive.",
+      "bookings": "Бронирования",
+      "delete_comment": "Удалить мой коментарий",
+      "delete_comment_confirm": "Этот коментарий будет удалён из обсуждения. Действие необратимо.",
       "filters": {
-        "city": "[TODO] Ville",
-        "city_placeholder": "[TODO] Nom d'une ville",
-        "direction_any": "[TODO] Les deux sens",
-        "none_matching": "[TODO] Aucune annonce ne correspond",
-        "none_matching_help": "[TODO] Élargissez la recherche, ou réinitialisez les filtres.",
-        "reset": "[TODO] Réinitialiser",
-        "with_seats": "[TODO] Offres avec des places libres"
+        "city": "Город",
+        "city_placeholder": "Название города",
+        "direction_any": "Оба направления",
+        "none_matching": "Нет подходящих объявлений",
+        "none_matching_help": "Расширьте поиск или сбросьте фильтры.",
+        "reset": "Сбросить",
+        "with_seats": "Предложения со свободными местами"
       },
-      "no_bookings": "[TODO] Aucune réservation",
-      "past_trip": "[TODO] Trajet passé",
-      "phone_after_acceptance": "[TODO] Numéro visible une fois votre réservation acceptée"
+      "no_bookings": "Нет бронирований",
+      "past_trip": "Прошедшая поездка",
+      "phone_after_acceptance": "Номер появится, когда ваше бронирование будет принято"
     },
     "convention_form": {
       "click_to_select_image": "Нажмите, чтобы выбрать изображение",

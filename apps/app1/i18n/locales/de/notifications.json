@@ -28,9 +28,9 @@
         "title": "Neue Show-Ausschreibung 🎭"
       },
       "application_withdrawn": {
-        "title": "[TODO] Candidature retirée",
-        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
-        "action": "[TODO] Voir les candidatures"
+        "title": "Bewerbung zurückgezogen",
+        "message": "{artistName} hat die Bewerbung „{showTitle}“ für {editionName} zurückgezogen.",
+        "action": "Bewerbungen ansehen"
       }
     },
     "carpool": {

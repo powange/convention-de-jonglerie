@@ -75,11 +75,11 @@
       "show_title": "Forestilling",
       "view_edition": "Se arrangement",
       "view_edition_short": "Se",
-      "withdraw": "[TODO] Retirer ma candidature",
-      "withdraw_confirm": "[TODO] Votre candidature « {title} » sera retirée, ainsi que la discussion que vous avez eue avec les organisateurs. Cette action est définitive.",
-      "withdraw_error": "[TODO] Le retrait a échoué",
-      "withdraw_short": "[TODO] Retirer",
-      "withdrawn": "[TODO] Candidature retirée"
+      "withdraw": "Træk min ansøgning tilbage",
+      "withdraw_confirm": "Din ansøgning “{title}” bliver trukket tilbage sammen med den samtale, du har haft med arrangørerne. Handlingen er endelig.",
+      "withdraw_error": "Tilbagetrækningen mislykkedes",
+      "withdraw_short": "Træk tilbage",
+      "withdrawn": "Ansøgning trukket tilbage"
     },
     "comments": {
       "be_first_to_comment": "Vær den første til at dele din oplevelse!",
@@ -123,7 +123,7 @@
       "browse_conventions": "Gennemse konventioner",
       "companion": "Ledsager",
       "companion_name": "Ledsagernavn",
-      "confirm_withdraw": "[TODO] Er du sikker på, at du vil trække din ansøgning tilbage?",
+      "confirm_withdraw": "Din ansøgning til “{edition}” bliver trukket tilbage. Du skal ansøge igen.",
       "contact_organizer": "Kontakt arrangør",
       "contact_organizer_error": "Fejl ved oprettelse af samtalen med arrangørerne",
       "dates": "Datoer",
@@ -225,7 +225,7 @@
       "export_pdf_empty": "Ingen vagt at udskrive",
       "export_pdf_summary": "{creneaux} vagter — {heures} — {equipes} hold",
       "export_pdf_title": "Frivilligplan",
-      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
+      "confirm_withdraw_unnamed": "Din ansøgning bliver trukket tilbage. Du skal ansøge igen."
     }
   },
   "seo": {

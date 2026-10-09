@@ -79,7 +79,7 @@
     "import_forced_day_description": "If the photo gives no date, choose the day on which to place the workshops. Their times are kept.",
     "import_forced_day_none": "Use the dates read from the photo",
     "max_people": "Max {count} people",
-    "confirm_delete_workshop": "[TODO] L'atelier « {title} » sera supprimé.",
-    "confirm_delete_workshop_unnamed": "[TODO] Cet atelier sera supprimé."
+    "confirm_delete_workshop": "The workshop “{title}” will be deleted.",
+    "confirm_delete_workshop_unnamed": "This workshop will be deleted."
   }
 }

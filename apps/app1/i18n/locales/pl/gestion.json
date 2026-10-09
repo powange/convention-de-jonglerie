@@ -294,7 +294,7 @@
       "can_delete": "Usuń",
       "can_edit": "Edytuj",
       "can_manage_volunteers": "Zarządzaj wolontariuszami",
-      "confirm_remove": "[TODO] Czy na pewno chcesz usunąć tego organizatora z konwencji?",
+      "confirm_remove": "{name} przestanie być organizatorem „{convention}” i straci wszystkie uprawnienia do niej.",
       "confirm_remove_from_edition": "Czy na pewno chcesz usunąć tego organizatora z edycji?",
       "edit_organizer": "Edytuj organizatora",
       "edit_organizer_description": "Skonfiguruj prawa dostępu i tytuł tego organizatora, aby zarządzać jego uprawnieniami do konwencji i jej edycji.",
@@ -495,7 +495,7 @@
       "type_cabaret": "Kabaret",
       "type_hint": "Kabaret składa się z numerów, każdy z własnymi artystami.",
       "type_standard": "Spektakl",
-      "act_title_required": "[TODO] Chaque numéro doit avoir un titre"
+      "act_title_required": "Każdy numer musi mieć tytuł"
     },
     "stock": {
       "available_now": "{available}/{total} dostępnych",
@@ -1251,7 +1251,7 @@
       "place_error": "Nie udało się zapisać miejsca.",
       "page_public": "Strona publiczna",
       "page_public_help": "Udostępnia harmonogram wszystkim. Dopóki jest wyłączone, dostęp mają tylko organizatorzy, a zakładka pozostaje ukryta dla publiczności.",
-      "overlap": "[TODO] Chevauchement"
+      "overlap": "Nakładanie się"
     },
     "convention": {
       "card_description": "Edytuj nazwę, opis, logo i adres e-mail konwencji",

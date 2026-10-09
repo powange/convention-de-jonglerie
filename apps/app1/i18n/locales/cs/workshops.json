@@ -79,7 +79,7 @@
     "import_forced_day_description": "Pokud fotografie neuvádí datum, zvolte den, na který se workshopy umístí. Jejich časy zůstanou zachovány.",
     "import_forced_day_none": "Použít data přečtená z fotografie",
     "max_people": "Max. {count} osob",
-    "confirm_delete_workshop": "[TODO] L'atelier « {title} » sera supprimé.",
-    "confirm_delete_workshop_unnamed": "[TODO] Cet atelier sera supprimé."
+    "confirm_delete_workshop": "Workshop „{title}“ bude smazán.",
+    "confirm_delete_workshop_unnamed": "Tento workshop bude smazán."
   }
 }

@@ -70,7 +70,7 @@
       "marker_zone_help": "Koppla den här punkten till en zon som den är ingång eller entré till.",
       "marker_no_zone": "Ingen zon",
       "import_dep_program": "{n} programpunkt | {n} programpunkter",
-      "import_layer_partial": "[TODO] {importes} importés, {echecs} en échec"
+      "import_layer_partial": "{importes} importerade, {echecs} misslyckades"
     }
   }
 }

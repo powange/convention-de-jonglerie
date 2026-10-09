@@ -70,7 +70,7 @@
       "marker_zone_help": "Ordnen Sie diesen Punkt einem Bereich zu, dessen Eingang oder Zugang er ist.",
       "marker_no_zone": "Kein Bereich",
       "import_dep_program": "{n} Programmpunkt | {n} Programmpunkte",
-      "import_layer_partial": "[TODO] {importes} importés, {echecs} en échec"
+      "import_layer_partial": "{importes} importiert, {echecs} fehlgeschlagen"
     }
   }
 }
