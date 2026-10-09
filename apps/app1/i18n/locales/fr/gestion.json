@@ -422,6 +422,7 @@
       "act_technical_needs_placeholder": "Scène 4×4 m, sono, 2 douches de lumière...",
       "act_title": "Titre du numéro",
       "act_title_placeholder": "Ex : Duo de massues",
+      "act_title_required": "Chaque numéro doit avoir un titre",
       "act_toggle": "Afficher ou masquer le détail du numéro",
       "act_untitled": "Numéro sans titre",
       "acts": "Numéros",

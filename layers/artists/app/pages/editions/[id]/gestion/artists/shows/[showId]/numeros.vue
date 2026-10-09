@@ -1,5 +1,8 @@
 <template>
   <div>
+    <!-- La garde de sortie, comme sur « nouveau spectacle » et « modifier ». -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
+
     <div v-if="!edition || loadingShow">
       <p>{{ $t('edition.loading_details') }}</p>
     </div>
@@ -31,7 +34,11 @@
         </ManagementPageHeader>
       </div>
 
-      <ShowsShowActsEditor v-model="acts" :artists="artists" />
+      <ShowsShowActsEditor
+        v-model="acts"
+        :artists="artists"
+        :validation-demandee="validationDemandee"
+      />
 
       <!-- Barre d'enregistrement collante -->
       <div class="sticky bottom-4 mt-6 flex justify-end">
@@ -58,6 +65,7 @@ const route = useRoute()
 const { t } = useI18n()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
+const { avertir } = useNotificateur()
 
 const editionId = computed(() => parseInt(route.params.id as string))
 const showId = computed(() => parseInt(route.params.showId as string))
@@ -109,7 +117,11 @@ const { execute: fetchShow } = useApiAction(
     errorMessages: { default: t('gestion.shows.error_loading') },
     onSuccess: (result: any) => {
       show.value = result?.show ?? null
-      if (show.value) acts.value = mapActsFromShow(show.value)
+      if (show.value) {
+        acts.value = mapActsFromShow(show.value)
+        // L'état de référence de la garde de sortie : ce que porte la base, à cet instant.
+        empreinteEnregistree.value = empreinteDuDeroule(acts.value)
+      }
     },
   }
 )
@@ -125,35 +137,85 @@ const fetchArtists = async () => {
   }
 }
 
+/**
+ * Vrai dès qu'un enregistrement a été TENTÉ : c'est ce qui autorise l'éditeur à marquer en rouge
+ * les titres manquants. Avant cela, un numéro qu'on vient d'ajouter n'est pas « en faute ».
+ */
+const validationDemandee = ref(false)
+
+/**
+ * L'empreinte du déroulé au dernier état CONNU DE LA BASE.
+ *
+ * Posée au chargement et après chaque enregistrement réussi — la page se resynchronise alors
+ * depuis la base, donc l'état de référence change aussi.
+ */
+const empreinteEnregistree = ref('')
+
+const derouleModifie = () => empreinteDuDeroule(acts.value) !== empreinteEnregistree.value
+
+/*
+ * ⚠️ LA GARDE DE SORTIE MANQUAIT SUR CETTE SEULE PAGE. « Nouveau spectacle » et « modifier » la
+ * posent ; celle du déroulé, non — quitter avec des numéros modifiés ne demandait rien, et le
+ * travail partait sans un mot. C'est d'autant plus sensible ici que la saisie d'un cabaret est
+ * longue : plusieurs numéros, leurs artistes, leurs besoins techniques.
+ */
+const { confirmation } = useGardeDeSortie(derouleModifie)
+
 // Enregistre UNIQUEMENT les numéros : le PUT partiel recompose la composition du cabaret
 // (numéros + leurs artistes) sans toucher au reste du spectacle (titre, dates, etc.).
-const { execute: save, loading: saving } = useApiAction(
+const { execute: enregistrer, loading: saving } = useApiAction(
   () => `/api/editions/${editionId.value}/shows/${showId.value}`,
   {
     method: 'PUT',
     body: () => ({
-      acts: acts.value
-        .filter((a) => a.title.trim().length > 0)
-        .map((a) => ({
-          id: a.id,
-          title: a.title.trim(),
-          // ⚠️ Indispensable : la recomposition côté serveur écrit `companyName` à chaque
-          // enregistrement. Omettre ce champ ici l'y poserait à `null` — et effacerait, au premier
-          // enregistrement, le nom que l'import venait de reprendre de la candidature.
-          companyName: a.companyName.trim() || null,
-          duration: a.duration ? Number(a.duration) : null,
-          description: a.description || null,
-          technicalNeeds: a.technicalNeeds || null,
-          stageSetup: a.stageSetup || null,
-          artistIds: a.artistIds,
-        })),
+      /*
+       * ⚠️ PLUS DE `.filter()` ICI, ET C'EST TOUT L'OBJET DU LOT. Il écartait les numéros sans
+       * titre — et comme le serveur REMPLACE l'ensemble du déroulé, les numéros absents du corps
+       * étaient SUPPRIMÉS. Un titre effacé par mégarde, ou un numéro renseigné avant d'être nommé,
+       * disparaissait pendant que l'écran annonçait « spectacle mis à jour ».
+       *
+       * Le refus se fait désormais AVANT l'envoi, dans `save` ci-dessous.
+       */
+      acts: acts.value.map((a) => ({
+        id: a.id,
+        title: a.title.trim(),
+        // ⚠️ Indispensable : la recomposition côté serveur écrit `companyName` à chaque
+        // enregistrement. Omettre ce champ ici l'y poserait à `null` — et effacerait, au premier
+        // enregistrement, le nom que l'import venait de reprendre de la candidature.
+        companyName: a.companyName.trim() || null,
+        duration: a.duration ? Number(a.duration) : null,
+        description: a.description || null,
+        technicalNeeds: a.technicalNeeds || null,
+        stageSetup: a.stageSetup || null,
+        artistIds: a.artistIds,
+      })),
     }),
     successMessage: { title: t('gestion.shows.show_updated') },
     errorMessages: { default: t('gestion.shows.error_update') },
-    // On reste sur la page ; on resynchronise depuis la base.
-    onSuccess: () => fetchShow(),
+    // On reste sur la page ; on resynchronise depuis la base. `fetchShow` repose l'empreinte,
+    // donc la garde de sortie ne réclame plus rien après un enregistrement réussi.
+    onSuccess: async () => {
+      validationDemandee.value = false
+      await fetchShow()
+    },
   }
 )
+
+/**
+ * Refuse l'enregistrement tant qu'un numéro n'est pas nommé, au lieu de le faire disparaître.
+ *
+ * 📍 Le numéro fautif est DÉPLIÉ et amené à l'écran : sur un cabaret de dix numéros tous repliés,
+ * marquer le champ en rouge sans l'ouvrir reviendrait à signaler une erreur invisible.
+ */
+const save = async () => {
+  validationDemandee.value = true
+  const fautifs = numerosSansTitre(acts.value)
+  if (fautifs.length > 0) {
+    avertir(t('gestion.shows.act_title_required'))
+    return
+  }
+  await enregistrer()
+}
 
 onMounted(async () => {
   if (!edition.value || edition.value.id !== editionId.value) {
