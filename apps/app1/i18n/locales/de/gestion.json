@@ -294,7 +294,7 @@
       "can_delete": "Löschen",
       "can_edit": "Bearbeiten",
       "can_manage_volunteers": "Freiwillige verwalten",
-      "confirm_remove": "[TODO] Sind Sie sicher, dass Sie diesen Organisator von der Konferenz entfernen möchten?",
+      "confirm_remove": "{name} ist nicht mehr Organisator von „{convention}“ und verliert alle Rechte daran.",
       "confirm_remove_from_edition": "Sind Sie sicher, dass Sie diesen Organisator von der Edition entfernen möchten?",
       "edit_organizer": "Organisator bearbeiten",
       "edit_organizer_description": "Konfigurieren Sie die Zugriffsrechte und den Titel dieses Organisators, um seine Berechtigungen für die Convention und ihre Ausgaben zu verwalten.",
@@ -495,7 +495,7 @@
       "type_cabaret": "Varieté",
       "type_hint": "Ein Varieté besteht aus Nummern mit jeweils eigenen Künstlern.",
       "type_standard": "Show",
-      "act_title_required": "[TODO] Chaque numéro doit avoir un titre"
+      "act_title_required": "Jede Nummer muss einen Titel haben"
     },
     "stock": {
       "available_now": "{available}/{total} verfügbar",
@@ -1251,7 +1251,7 @@
       "place_error": "Der Ort konnte nicht gespeichert werden.",
       "page_public": "Öffentliche Seite",
       "page_public_help": "Macht den Zeitplan für alle sichtbar. Solange dies aus ist, kommen nur Organisatoren hinein und der Reiter bleibt öffentlich verborgen.",
-      "overlap": "[TODO] Chevauchement"
+      "overlap": "Überschneidung"
     },
     "convention": {
       "card_description": "Name, Beschreibung, Logo und E-Mail der Convention bearbeiten",

@@ -77,8 +77,18 @@
           <UBadge v-if="trajetPasse" color="neutral" variant="soft">
             {{ $t('components.carpool.past_trip') }}
           </UBadge>
+          <!--
+            ⚠️ `data-telephone` NOMME LA BRANCHE RENDUE, pour que les tests mesurent l'état et non
+            le libellé. Les trois branches sont exclusives ; un test qui viserait la clé i18n ou son
+            texte français serait condamné — la clé résout dès que les autres langues la portent,
+            puis le français disparaît à la traduction. C'est arrivé trois fois dans ce dépôt.
+          -->
           <template v-if="offer.hasPhoneNumber && authStore.isAuthenticated">
-            <div v-if="phoneRevealed && offer.phoneNumber" class="flex items-center gap-2 text-sm">
+            <div
+              v-if="phoneRevealed && offer.phoneNumber"
+              class="flex items-center gap-2 text-sm"
+              data-telephone="numero"
+            >
               <UIcon name="i-heroicons-phone" class="text-gray-400" />
               <span>{{ offer.phoneNumber }}</span>
               <UButton
@@ -95,6 +105,7 @@
               size="sm"
               variant="soft"
               icon="i-heroicons-phone"
+              data-telephone="bouton"
               @click="phoneRevealed = true"
             >
               {{ $t('components.carpool.reveal_contact') }}
@@ -106,7 +117,11 @@
                  vous » — puis ses deux branches exigeaient le numéro et ne rendaient RIEN : ni
                  bouton, ni explication. Le passager ne savait pas s'il devait attendre ou
                  commenter. La condition testait la bonne information et la jetait. -->
-            <div v-else class="flex items-center gap-2 text-sm text-gray-500">
+            <div
+              v-else
+              class="flex items-center gap-2 text-sm text-gray-500"
+              data-telephone="apres-acceptation"
+            >
               <UIcon name="i-heroicons-phone" />
               <span>{{ $t('components.carpool.phone_after_acceptance') }}</span>
             </div>

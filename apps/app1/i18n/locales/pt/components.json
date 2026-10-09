@@ -24,7 +24,7 @@
       "comments": "Comentários",
       "confirm_booking": "Confirmar reserva",
       "confirm_delete_offer": "Tem a certeza de que quer eliminar esta oferta de boleia?",
-      "confirm_delete_request": "[TODO] Tem a certeza de que quer eliminar este pedido de boleia?",
+      "confirm_delete_request": "O seu pedido de partilha de carro a partir de «{city}» será eliminado.",
       "confirmed_passengers": "Passageiros confirmados",
       "contact": "Contacto",
       "contact_user": "Contactar {name}",
@@ -96,21 +96,21 @@
       "map_tab_short": "Mapa",
       "map_without_point": "Anúncios sem posição",
       "map_without_point_hint": "Não foi possível localizar a cidade no mapa: estão listados aqui para não se perderem.",
-      "bookings": "[TODO] Réservations",
-      "delete_comment": "[TODO] Supprimer mon commentaire",
-      "delete_comment_confirm": "[TODO] Ce commentaire sera retiré de la discussion. Cette action est définitive.",
+      "bookings": "Reservas",
+      "delete_comment": "Eliminar o meu comentário",
+      "delete_comment_confirm": "Este comentário será retirado da discussão. Esta ação é definitiva.",
       "filters": {
-        "city": "[TODO] Ville",
-        "city_placeholder": "[TODO] Nom d'une ville",
-        "direction_any": "[TODO] Les deux sens",
-        "none_matching": "[TODO] Aucune annonce ne correspond",
-        "none_matching_help": "[TODO] Élargissez la recherche, ou réinitialisez les filtres.",
-        "reset": "[TODO] Réinitialiser",
-        "with_seats": "[TODO] Offres avec des places libres"
+        "city": "Cidade",
+        "city_placeholder": "Nome de uma cidade",
+        "direction_any": "Ambos os sentidos",
+        "none_matching": "Nenhum anúncio corresponde",
+        "none_matching_help": "Amplie a pesquisa ou reinicie os filtros.",
+        "reset": "Reiniciar",
+        "with_seats": "Ofertas com lugares livres"
       },
-      "no_bookings": "[TODO] Aucune réservation",
-      "past_trip": "[TODO] Trajet passé",
-      "phone_after_acceptance": "[TODO] Numéro visible une fois votre réservation acceptée"
+      "no_bookings": "Nenhuma reserva",
+      "past_trip": "Viagem passada",
+      "phone_after_acceptance": "Número visível assim que a sua reserva for aceite"
     },
     "convention_form": {
       "click_to_select_image": "Clique para seleccionar uma imagem",

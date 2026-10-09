@@ -24,7 +24,7 @@
       "comments": "Kommentare",
       "confirm_booking": "Buchung bestätigen",
       "confirm_delete_offer": "Bist du sicher, dass du dieses Fahrgemeinschafts-Angebot löschen möchtest?",
-      "confirm_delete_request": "[TODO] Bist du sicher, dass du diese Fahrgemeinschafts-Anfrage löschen möchtest?",
+      "confirm_delete_request": "Ihre Mitfahrgesuch ab „{city}“ wird gelöscht.",
       "confirmed_passengers": "Bestätigte Mitfahrer",
       "contact": "Kontakt",
       "contact_user": "{name} kontaktieren",
@@ -96,21 +96,21 @@
       "map_tab_short": "Karte",
       "map_without_point": "Anzeigen ohne Position",
       "map_without_point_hint": "Ihre Stadt konnte auf der Karte nicht verortet werden: sie sind hier aufgeführt, damit sie nicht verloren gehen.",
-      "bookings": "[TODO] Réservations",
-      "delete_comment": "[TODO] Supprimer mon commentaire",
-      "delete_comment_confirm": "[TODO] Ce commentaire sera retiré de la discussion. Cette action est définitive.",
+      "bookings": "Buchungen",
+      "delete_comment": "Meinen Kommentar löschen",
+      "delete_comment_confirm": "Dieser Kommentar wird aus der Diskussion entfernt. Diese Aktion ist endgültig.",
       "filters": {
-        "city": "[TODO] Ville",
-        "city_placeholder": "[TODO] Nom d'une ville",
-        "direction_any": "[TODO] Les deux sens",
-        "none_matching": "[TODO] Aucune annonce ne correspond",
-        "none_matching_help": "[TODO] Élargissez la recherche, ou réinitialisez les filtres.",
-        "reset": "[TODO] Réinitialiser",
-        "with_seats": "[TODO] Offres avec des places libres"
+        "city": "Stadt",
+        "city_placeholder": "Name einer Stadt",
+        "direction_any": "Beide Richtungen",
+        "none_matching": "Keine Anzeige passt",
+        "none_matching_help": "Erweitern Sie die Suche oder setzen Sie die Filter zurück.",
+        "reset": "Zurücksetzen",
+        "with_seats": "Angebote mit freien Plätzen"
       },
-      "no_bookings": "[TODO] Aucune réservation",
-      "past_trip": "[TODO] Trajet passé",
-      "phone_after_acceptance": "[TODO] Numéro visible une fois votre réservation acceptée"
+      "no_bookings": "Keine Buchungen",
+      "past_trip": "Vergangene Fahrt",
+      "phone_after_acceptance": "Nummer sichtbar, sobald Ihre Buchung angenommen wurde"
     },
     "convention_form": {
       "click_to_select_image": "Klicken, um ein Bild auszuwählen",

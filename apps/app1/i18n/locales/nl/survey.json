@@ -39,7 +39,7 @@
     "vote_saved": "Stem opgeslagen",
     "votes_count": "{count} stem | {count} stemmen",
     "your_vote": "Uw beoordeling",
-    "own_application_hidden": "[TODO] Votre candidature n'apparaît pas dans cette liste",
-    "own_application_hidden_description": "[TODO] On ne note pas sa propre candidature. Les autres membres du jury, eux, la voient et peuvent la noter."
+    "own_application_hidden": "Je eigen aanmelding staat niet in deze lijst",
+    "own_application_hidden_description": "Je beoordeelt je eigen aanmelding niet. De andere juryleden zien die wel en kunnen die beoordelen."
   }
 }

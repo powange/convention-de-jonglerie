@@ -75,11 +75,11 @@
       "show_title": "Spektakl",
       "view_edition": "Zobacz edycję",
       "view_edition_short": "Zobacz",
-      "withdraw": "[TODO] Retirer ma candidature",
-      "withdraw_confirm": "[TODO] Votre candidature « {title} » sera retirée, ainsi que la discussion que vous avez eue avec les organisateurs. Cette action est définitive.",
-      "withdraw_error": "[TODO] Le retrait a échoué",
-      "withdraw_short": "[TODO] Retirer",
-      "withdrawn": "[TODO] Candidature retirée"
+      "withdraw": "Wycofaj moje zgłoszenie",
+      "withdraw_confirm": "Twoje zgłoszenie „{title}” zostanie wycofane, podobnie jak rozmowa, którą prowadziłeś z organizatorami. Ta czynność jest nieodwracalna.",
+      "withdraw_error": "Wycofanie nie udało się",
+      "withdraw_short": "Wycofaj",
+      "withdrawn": "Zgłoszenie wycofane"
     },
     "comments": {
       "be_first_to_comment": "Bądź pierwszy, który podzieli się doświadczeniem!",
@@ -123,7 +123,7 @@
       "browse_conventions": "Przeglądaj konwenty",
       "companion": "Towarzysz",
       "companion_name": "Imię towarzysza",
-      "confirm_withdraw": "[TODO] Czy na pewno chcesz wycofać swoje zgłoszenie?",
+      "confirm_withdraw": "Twoje zgłoszenie na „{edition}” zostanie wycofane. Będziesz musiał zgłosić się ponownie.",
       "contact_organizer": "Skontaktuj się z organizatorem",
       "contact_organizer_error": "Błąd podczas tworzenia konwersacji z organizatorami",
       "dates": "Daty",
@@ -225,7 +225,7 @@
       "export_pdf_empty": "Brak zmian do wydrukowania",
       "export_pdf_summary": "{creneaux} zmian — {heures} — {equipes} zespół(ów)",
       "export_pdf_title": "Grafik wolontariuszy",
-      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
+      "confirm_withdraw_unnamed": "Twoje zgłoszenie zostanie wycofane. Będziesz musiał zgłosić się ponownie."
     }
   },
   "seo": {

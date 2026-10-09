@@ -39,7 +39,7 @@
     "vote_saved": "Abstimmung gespeichert",
     "votes_count": "{count} Stimme | {count} Stimmen",
     "your_vote": "Ihre Bewertung",
-    "own_application_hidden": "[TODO] Votre candidature n'apparaît pas dans cette liste",
-    "own_application_hidden_description": "[TODO] On ne note pas sa propre candidature. Les autres membres du jury, eux, la voient et peuvent la noter."
+    "own_application_hidden": "Ihre Bewerbung erscheint nicht in dieser Liste",
+    "own_application_hidden_description": "Man bewertet seine eigene Bewerbung nicht. Die anderen Jurymitglieder sehen sie und können sie bewerten."
   }
 }

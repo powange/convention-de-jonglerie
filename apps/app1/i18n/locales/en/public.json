@@ -75,11 +75,11 @@
       "show_title": "Show",
       "view_edition": "View edition",
       "view_edition_short": "View",
-      "withdraw": "[TODO] Retirer ma candidature",
-      "withdraw_confirm": "[TODO] Votre candidature « {title} » sera retirée, ainsi que la discussion que vous avez eue avec les organisateurs. Cette action est définitive.",
-      "withdraw_error": "[TODO] Le retrait a échoué",
-      "withdraw_short": "[TODO] Retirer",
-      "withdrawn": "[TODO] Candidature retirée"
+      "withdraw": "Withdraw my application",
+      "withdraw_confirm": "Your application “{title}” will be withdrawn, along with the discussion you had with the organizers. This action is permanent.",
+      "withdraw_error": "Withdrawal failed",
+      "withdraw_short": "Withdraw",
+      "withdrawn": "Application withdrawn"
     },
     "comments": {
       "be_first_to_comment": "Be the first to share your experience!",
@@ -123,7 +123,7 @@
       "browse_conventions": "Browse conventions",
       "companion": "Companion",
       "companion_name": "Companion name",
-      "confirm_withdraw": "[TODO] Are you sure you want to withdraw your application?",
+      "confirm_withdraw": "Your application for “{edition}” will be withdrawn. You will have to apply again.",
       "contact_organizer": "Contact organizer",
       "contact_organizer_error": "Error creating the conversation with the organizers",
       "dates": "Dates",
@@ -225,7 +225,7 @@
       "export_pdf_empty": "No slot to print",
       "export_pdf_summary": "{creneaux} slots — {heures} — {equipes} team(s)",
       "export_pdf_title": "Volunteer schedule",
-      "confirm_withdraw_unnamed": "[TODO] Votre candidature sera retirée. Il faudra candidater à nouveau."
+      "confirm_withdraw_unnamed": "Your application will be withdrawn. You will have to apply again."
     }
   },
   "seo": {

@@ -28,9 +28,9 @@
         "title": "Новый конкурс выступлений 🎭"
       },
       "application_withdrawn": {
-        "title": "[TODO] Candidature retirée",
-        "message": "[TODO] {artistName} a retiré sa candidature « {showTitle} » pour {editionName}.",
-        "action": "[TODO] Voir les candidatures"
+        "title": "Заявка отозвана",
+        "message": "{artistName} отозвал заявку «{showTitle}» на {editionName}.",
+        "action": "Посмотреть заявки"
       }
     },
     "carpool": {

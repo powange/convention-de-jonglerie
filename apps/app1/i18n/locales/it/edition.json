@@ -39,7 +39,7 @@
       "seats_description": "Numero di posti liberi nel tuo veicolo",
       "seats_placeholder": "es. 3",
       "updated": "Offerta di carpooling aggiornata",
-      "seats_minimum": "[TODO] Vous avez déjà accordé {count} place(s) : vous ne pouvez pas descendre en dessous sans retirer d'abord une réservation."
+      "seats_minimum": "Hai già concesso {count} posto/i: non puoi scendere sotto senza prima rimuovere una prenotazione."
     },
     "pets_allowed": "Animali ammessi",
     "pets_description": "Accetti animali domestici o viaggi con animali",
@@ -105,7 +105,7 @@
       "verification_success_description": "Ora sei il proprietario di questa convenzione.",
       "verify": "Verifica"
     },
-    "confirm_delete_convention": "[TODO] Sei sicuro di voler eliminare questo convegno?",
+    "confirm_delete_convention": "«{name}» sarà eliminata, con le sue edizioni e tutti i loro dati.",
     "convention_deleted": "Convegno eliminato",
     "convention_deleted_success": "Il convegno è stato eliminato con successo",
     "convention_not_found": "Convegno non trovato",
@@ -157,7 +157,7 @@
     "status_control_desc": "Pubblica o nascondi le tue edizioni secondo il loro progresso",
     "delete_edition_irreversible": "Attenzione: questa azione è irreversibile",
     "delete_edition_confirm_description": "Vuoi davvero eliminare questa edizione? Tutti i dati associati (volontari, commenti, oggetti smarriti, ecc.) andranno perduti definitivamente.",
-    "confirm_delete_convention_unnamed": "[TODO] Cette convention sera supprimée, avec ses éditions et toutes leurs données."
+    "confirm_delete_convention_unnamed": "Questa convention sarà eliminata, con le sue edizioni e tutti i loro dati."
   },
   "diet": {
     "none": "Nessuno",

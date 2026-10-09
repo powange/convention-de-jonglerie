@@ -60,12 +60,33 @@ const offre = (p: Record<string, unknown> = {}) => ({
 const monter = (p: Record<string, unknown> = {}) =>
   mountSuspended(OfferDetail, { props: { offer: offre(p) as never, editionId: 1 } })
 
+/*
+ * ⚠️ POURQUOI CES CAS NE VISENT PLUS NI LA CLÉ NI LE TEXTE FRANÇAIS.
+ *
+ * Ma première version cherchait la clé `phone_after_acceptance` ou son libellé français, au motif
+ * qu'une clé NEUVE — créée en français seulement, comme le veut la règle du dépôt — ressort telle
+ * quelle dans ce harnais, qui est en anglais. C'était vrai le jour où je l'ai écrite, et **faux dès
+ * que les traductions ont été faites** : `$t` rend désormais « Number visible once your booking is
+ * accepted », et ni la clé ni le français n'apparaissent plus. Troisième test du dépôt à tomber
+ * pour cette raison.
+ *
+ * Le relevé stable est `data-telephone`, posé par le composant, qui nomme la BRANCHE rendue. Les
+ * trois branches sont exclusives, et c'est cela qu'on mesure — pas les mots qui les habillent.
+ */
+const brancheTelephone = (composant: Awaited<ReturnType<typeof monter>>) => {
+  // ⚠️ `exists()` d'abord : `attributes()` LÈVE sur un wrapper vide au lieu de rendre `undefined`,
+  // et le cas « aucune branche rendue » — le plus intéressant des trois — passe par là.
+  const branche = composant.find('[data-telephone]')
+  return branche.exists() ? (branche.attributes('data-telephone') ?? null) : null
+}
+
 describe('OfferDetail — le téléphone du conducteur', () => {
   it('annonce que le numéro apparaîtra après acceptation', async () => {
     const composant = await monter({ hasPhoneNumber: true, phoneNumber: null })
-    // La clé est NEUVE donc créée en français seulement : dans l'environnement de test, en
-    // anglais, `$t` la rend telle quelle. Voir la note du lot sur `message-du-passager`.
-    expect(composant.text()).toMatch(/phone_after_acceptance|Numéro visible/)
+
+    expect(brancheTelephone(composant)).toBe('apres-acceptation')
+    // Et la mention dit quelque chose : un bloc vide satisferait l'assertion ci-dessus.
+    expect(composant.find('[data-telephone]').text().trim().length).toBeGreaterThan(0)
   })
 
   it('propose le bouton quand le numéro est fourni, et n’annonce plus l’attente', async () => {
@@ -81,15 +102,14 @@ describe('OfferDetail — le téléphone du conducteur', () => {
      * cherchait « Afficher » et tombait sur la traduction — l'assertion était fausse, pas le code.
      * Un sélecteur sur l'action est de toute façon plus solide qu'un sélecteur sur des mots.
      */
-    expect(composant.find('button').exists()).toBe(true)
-    expect(composant.text()).not.toMatch(/phone_after_acceptance|Numéro visible/)
+    expect(brancheTelephone(composant)).toBe('bouton')
   })
 
   it('n’annonce rien quand le conducteur n’a pas donné de numéro', async () => {
     // `hasPhoneNumber: false` : il n'y a rien à attendre, et promettre un numéro qui n'existe pas
     // serait pire que le silence d'origine.
     const composant = await monter({ hasPhoneNumber: false, phoneNumber: null })
-    expect(composant.text()).not.toMatch(/phone_after_acceptance|Numéro visible/)
-    expect(composant.text()).not.toMatch(/reveal_contact|Show phone|Afficher le num/)
+    // Aucune des trois branches : ni numéro, ni bouton, ni mention d'attente.
+    expect(brancheTelephone(composant)).toBeNull()
   })
 })

@@ -70,7 +70,7 @@
       "marker_zone_help": "Associa questo punto a una zona di cui è l'ingresso o l'accesso.",
       "marker_no_zone": "Nessuna zona",
       "import_dep_program": "{n} elemento del programma | {n} elementi del programma",
-      "import_layer_partial": "[TODO] {importes} importés, {echecs} en échec"
+      "import_layer_partial": "{importes} importati, {echecs} non riusciti"
     }
   }
 }
