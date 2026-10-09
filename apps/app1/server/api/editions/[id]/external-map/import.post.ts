@@ -44,7 +44,7 @@ const bodySchema = z.object({
   externalId: z.string().max(64).nullable(),
   kind: z.enum(['polygon', 'point']),
   name: z.string().min(1).max(ZONE_LIMITS.MAX_NAME_LENGTH),
-  description: z.string().max(2000).nullable().optional(),
+  description: z.string().max(ZONE_LIMITS.MAX_DESCRIPTION_LENGTH).nullable().optional(),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Couleur invalide (format #RRGGBB)'),
   types: zoneTypesArraySchema,
   coordinates: z.array(z.tuple([z.number().min(-90).max(90), z.number().min(-180).max(180)])),

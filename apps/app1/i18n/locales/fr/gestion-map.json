@@ -31,6 +31,7 @@
       "import_layer_all": "Tout importer ({count})",
       "import_layer_apply": "Appliquer au calque",
       "import_layer_done": "{n} objet importé | {n} objets importés",
+      "import_layer_partial": "{importes} importés, {echecs} en échec",
       "import_layer_types": "Catégories du calque",
       "import_no_ids_help": "Les identifiants des objets n'ont pas pu être récupérés. L'import fonctionne, mais lors d'un prochain passage un objet déplacé pourra être pris pour un objet supprimé.",
       "import_no_ids_title": "Réimport approximatif",
