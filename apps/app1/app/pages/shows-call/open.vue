@@ -114,11 +114,14 @@
               </div>
 
               <!-- Description -->
+              <!-- Un EXTRAIT TEXTE et non le HTML rendu : la carte n'affiche que deux lignes,
+                   où un titre de niveau 2 entrerait à sa taille normale et où `line-clamp` ne
+                   borne pas de façon fiable une suite d'éléments de bloc. -->
               <p
-                v-if="call.description"
+                v-if="extraitDe(call)"
                 class="line-clamp-2 text-sm text-gray-600 dark:text-gray-400"
               >
-                {{ call.description }}
+                {{ extraitDe(call) }}
               </p>
 
               <!-- Date limite -->
@@ -218,6 +221,8 @@
 </template>
 
 <script setup lang="ts">
+import { markdownEnTexte } from '~/utils/markdown'
+
 import { formaterDateHeure, fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
 
 const { t, locale } = useI18n()
@@ -255,6 +260,52 @@ const hasAppliedToCall = (callId: number) => appliedCallIds.value.has(callId)
 const getEditionDisplayName = (edition: any) => {
   return edition.name || edition.convention.name
 }
+
+/**
+ * Les aperçus de description, débarrassés de leur balisage markdown.
+ *
+ * ## ⚠️ POURQUOI UN `ref` ALIMENTÉ PAR UN WATCHER, ET NON UN `computed`
+ *
+ * `markdownEnTexte` est **asynchrone** — elle charge à la demande la table des raccourcis d'emoji.
+ * Un `computed` ne peut pas attendre une promesse : il rendrait l'objet `Promise`, que le gabarit
+ * afficherait sous la forme « [object Promise] ».
+ *
+ * ## ⚠️⚠️ ET POURQUOI LE `.catch` N'EST PAS DÉCORATIF
+ *
+ * Un rejet non rattrapé dans un watcher **interrompt l'hydratation** de la page — défaut déjà payé
+ * dans ce dépôt, et dont le symptôme est une page figée sans aucune erreur visible. La fonction
+ * porte déjà son propre repli ; celui-ci est la seconde ceinture, pour tout ce qui pourrait mal
+ * tourner autour.
+ *
+ * 📍 Une description sans aperçu disponible n'affiche **rien** plutôt que son markdown brut :
+ * revenir au texte source rétablirait silencieusement le défaut qu'on répare.
+ */
+const extraits = ref(new Map<number, string>())
+
+watch(
+  openCalls,
+  async (calls) => {
+    const aCalculer = calls.filter(
+      (c: { id: number; description?: string | null }) => c.description
+    )
+    if (!aCalculer.length) return
+    try {
+      const resolus = await Promise.all(
+        aCalculer.map(async (c: { id: number; description?: string | null }) => {
+          const texte = await markdownEnTexte(c.description ?? '')
+          return [c.id, texte] as const
+        })
+      )
+      // Une nouvelle Map plutôt qu'une mutation : `ref` sur une Map ne réagit pas à `set`.
+      extraits.value = new Map([...extraits.value, ...resolus])
+    } catch {
+      // Volontairement muet : l'absence d'aperçu n'empêche rien, et la carte reste lisible.
+    }
+  },
+  { immediate: true }
+)
+
+const extraitDe = (call: { id: number }) => extraits.value.get(call.id) ?? ''
 
 /**
  * La date limite, dans le fuseau de la convention et avec son heure.

@@ -62,6 +62,7 @@
     "ticketing-external-config.spec.ts"
   ],
   "gestion-3a": [
+    "appels-ouverts-description.spec.ts",
     "cabaret-numeros-repliables.spec.ts",
     "carpool-coordonnees.spec.ts",
     "controle-acces-cartes-largeur.spec.ts",

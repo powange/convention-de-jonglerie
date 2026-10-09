@@ -163,3 +163,98 @@ export async function markdownToHtml(md: string): Promise<string> {
   const file = await processor.process(preprocessed)
   return String(file)
 }
+
+/**
+ * Les nœuds mdast dont les enfants sont des BLOCS distincts, et qu'il faut donc séparer.
+ *
+ * Tout le reste est en ligne et se recolle sans espace.
+ */
+const CONTENEURS_DE_BLOCS = new Set([
+  'list',
+  'listItem',
+  'blockquote',
+  'table',
+  'tableRow',
+  'tableCell',
+  'footnoteDefinition',
+])
+
+/** Les nœuds qui portent du texte lisible, dans l'arbre mdast. */
+type NoeudTexte = { type: string; value?: string; children?: NoeudTexte[] }
+
+/**
+ * Le texte d'un markdown, sans son balisage — pour un APERÇU, jamais pour un affichage complet.
+ *
+ * ## ⚠️ POURQUOI UN EXTRAIT TEXTE ET NON LE HTML RENDU
+ *
+ * Les pages d'une édition rendent la description d'un appel à spectacles avec `markdownToHtml`,
+ * dans un conteneur `prose`. La page centralisée des appels ouverts, elle, l'interpolait **telle
+ * quelle** : l'artiste y lisait `**Scène ouverte**`, `## Conditions` ou `:performing_arts:`.
+ *
+ * Mais cette page n'affiche pas la description — elle en montre une **vignette de deux lignes**
+ * (`line-clamp-2`) dans une grille de cartes. Y rendre le HTML y ferait entrer un titre de niveau
+ * 2 à sa taille normale, et `line-clamp` ne borne pas de façon fiable une suite d'éléments de
+ * bloc. L'extrait texte dit la même chose et tient dans la carte.
+ *
+ * ## L'ARBRE, ET PAS UNE EXPRESSION RÉGULIÈRE
+ *
+ * Le texte est extrait de l'arbre **mdast** produit par le même analyseur que `markdownToHtml`,
+ * et non par une suite de `replace`. Retirer du balisage à coups d'expressions régulières est
+ * exactement la famille de défauts que l'import de carte vient de payer : il reste toujours une
+ * forme imbriquée à laquelle on n'avait pas pensé, et le résultat est faux sans être signalé.
+ * L'analyseur, lui, sait déjà ce qui est du balisage.
+ *
+ * ## Les choix d'affichage, et leurs raisons
+ *
+ * - les blocs de premier niveau sont joints par ` · ` et non par une espace : sans séparateur,
+ *   « ## Conditions » suivi d'un paragraphe donnerait « Conditions Les artistes doivent… », qui se
+ *   lit comme une phrase mal formée ;
+ * - les raccourcis d'emoji sont convertis, comme le fait l'affichage complet — `:performing_arts:`
+ *   brut dans une vignette est précisément l'un des trois symptômes du constat ;
+ * - le texte alternatif d'une image est écarté : dans un aperçu de deux lignes, il décrit quelque
+ *   chose que le lecteur ne voit pas.
+ */
+export async function markdownEnTexte(md: string): Promise<string> {
+  if (!md) return ''
+
+  const arbre = unified().use(remarkParse).use(remarkGfm).parse(md) as unknown as NoeudTexte
+
+  const texteDu = (noeud: NoeudTexte): string => {
+    // `image` porte un `alt` mais pas de `value` exploitable ici : écarté, voir l'en-tête.
+    if (noeud.type === 'image') return ''
+    if (typeof noeud.value === 'string') return noeud.value
+    /*
+     * ⚠️ UN SÉPARATEUR POUR LES CONTENEURS DE BLOCS, rien pour les nœuds en ligne.
+     *
+     * Les enfants d'un nœud EN LIGNE se recollent sans espace — c'est ce qui fait que
+     * « **Scène** ouverte » rend « Scène ouverte » et non « Scène  ouverte ». Mais une LISTE a
+     * pour enfants des éléments distincts : les joindre de la même façon rendait « un deux
+     * trois » sous la forme « undeuxtrois ».
+     *
+     * Défaut réel, attrapé par son test et non par la relecture.
+     */
+    const separateur = CONTENEURS_DE_BLOCS.has(noeud.type) ? ' ' : ''
+    return (noeud.children ?? []).map(texteDu).join(separateur)
+  }
+
+  const blocs = (arbre.children ?? [])
+    .map((bloc) => texteDu(bloc).replace(/\s+/g, ' ').trim())
+    .filter((bloc) => bloc.length > 0)
+
+  const texte = blocs.join(' · ')
+
+  /*
+   * ⚠️ LA CONVERSION DES EMOJIS NE DOIT PAS POUVOIR FAIRE ÉCHOUER L'APERÇU. Elle importe une
+   * table de 55 Ko à la demande, donc elle dépend du réseau. Un rejet non rattrapé dans le
+   * watcher appelant **interromprait l'hydratation** de la page — défaut déjà payé ici, et dont
+   * le symptôme est une page figée sans aucune erreur visible.
+   *
+   * Le repli rend le texte SANS les emojis convertis : un `:performing_arts:` résiduel est un
+   * défaut d'affichage mineur, là où une page figée n'en est pas un.
+   */
+  try {
+    return await convertirRaccourcisEmoji(texte)
+  } catch {
+    return texte
+  }
+}
