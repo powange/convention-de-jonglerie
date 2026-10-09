@@ -4,6 +4,7 @@ import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpe
 import { getCountryVariants } from '#server/utils/countries'
 import { editionListSelect } from '#server/utils/prisma-select-helpers'
 import { conditionsMotsCles, motsClesDeLaRequete } from '#server/utils/recherche-mots-cles'
+import { validatePagination } from '#server/utils/validation-helpers'
 import { filtreStatutEdition, type StatutEdition } from '~~/shared/utils/visibilite-edition'
 
 export default wrapApiHandler<GetEditionsResponse>(
@@ -48,12 +49,20 @@ export default wrapApiHandler<GetEditionsResponse>(
       hasLongShow,
       hasATM,
       sort,
-      page = '1',
-      limit = '12',
     } = query
 
-    const pageNumber = parseInt(page as string, 10)
-    const limitNumber = parseInt(limit as string, 10)
+    /*
+     * Le plafond est 1000 parce que c'est ce que notre propre client demande : `MAX_ALL_EDITIONS`
+     * dans `app/stores/editions.ts` vaut 1000 pour l'agenda et la carte, qui ont besoin de la
+     * liste entière. Un plafond plus bas viderait ces deux écrans à moitié, sans erreur.
+     *
+     * ⚠️ Cette route est PUBLIQUE : sans borne, `?limit=100000` rendait toute la table, créateur
+     * et convention joints. Et `?limit=abc` donnait un `NaN` jusqu'à Prisma, donc un 500.
+     */
+    const { page: pageNumber, limit: limitNumber } = validatePagination(event, {
+      defaultLimit: 12,
+      max: 1000,
+    })
 
     const where: {
       name?: { contains: string }
