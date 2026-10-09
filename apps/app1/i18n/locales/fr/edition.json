@@ -37,6 +37,7 @@
       "created": "Offre de covoiturage créée",
       "edit_description": "Modifiez les détails de votre offre de covoiturage",
       "seats_description": "Nombre de places libres dans votre véhicule",
+      "seats_minimum": "Vous avez déjà accordé {count} place(s) : vous ne pouvez pas descendre en dessous sans retirer d'abord une réservation.",
       "seats_placeholder": "Ex: 3",
       "updated": "Offre de covoiturage mise à jour"
     },
