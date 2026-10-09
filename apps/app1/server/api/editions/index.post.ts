@@ -8,6 +8,7 @@ import { moveTempImageToEdition, moveTempImageFromPlaceholder } from '#server/ut
 import { getConventionForEditionCreation } from '#server/utils/permissions/convention-permissions'
 import { editionWithFavoritesInclude } from '#server/utils/prisma-select-helpers'
 import { editionSchema } from '#server/utils/validation-schemas'
+import { servicesPourEcriture } from '~~/shared/utils/services-d-edition'
 
 export default wrapApiHandler(
   async (event) => {
@@ -37,30 +38,22 @@ export default wrapApiHandler(
       programUrl,
       facebookUrl,
       instagramUrl,
-      hasFoodTrucks,
-      hasKidsZone,
-      acceptsPets,
-      hasTentCamping,
-      hasTruckCamping,
-      hasFamilyCamping,
-      hasSleepingRoom,
-      hasGym,
-      hasFireSpace,
-      hasGala,
-      hasOpenStage,
-      hasConcert,
-      hasCantine,
-      hasAerialSpace,
-      hasSlacklineSpace,
-      hasToilets,
-      hasShowers,
-      hasPrmAccess,
-      hasSignLanguage,
-      hasWorkshops,
-      hasCashPayment,
-      hasCreditCardPayment,
-      hasAfjTokenPayment,
+      jugglingEdgeUrl,
+      currency,
     } = validatedData
+
+    /*
+     * Les services ne sont plus destructurés un par un.
+     *
+     * ⚠️ Cette destructuration en nommait 23 sur 26. Les trois manquants — `hasUnicycleSpace`,
+     * `hasLongShow`, `hasATM` — étaient acceptés par `editionSchema`, donc présents dans
+     * `validatedData`, et perdus ici : le `create` n'écrit que ce qui a été destructuré. Un
+     * service pouvait ainsi être filtrable sur l'accueil, cochable dans la page Services, et
+     * silencieusement non enregistré à la création.
+     *
+     * `jugglingEdgeUrl` et `currency` étaient dans le même cas, et sont repris ci-dessus.
+     */
+    const services = servicesPourEcriture(validatedData)
 
     // Vérifier les permissions pour créer une édition
     await getConventionForEditionCreation(conventionId, user)
@@ -104,29 +97,10 @@ export default wrapApiHandler(
           programUrl,
           facebookUrl,
           instagramUrl,
-          hasFoodTrucks: hasFoodTrucks || false,
-          hasKidsZone: hasKidsZone || false,
-          acceptsPets: acceptsPets || false,
-          hasTentCamping: hasTentCamping || false,
-          hasTruckCamping: hasTruckCamping || false,
-          hasFamilyCamping: hasFamilyCamping || false,
-          hasSleepingRoom: hasSleepingRoom || false,
-          hasGym: hasGym || false,
-          hasFireSpace: hasFireSpace || false,
-          hasGala: hasGala || false,
-          hasOpenStage: hasOpenStage || false,
-          hasConcert: hasConcert || false,
-          hasCantine: hasCantine || false,
-          hasAerialSpace: hasAerialSpace || false,
-          hasSlacklineSpace: hasSlacklineSpace || false,
-          hasToilets: hasToilets || false,
-          hasShowers: hasShowers || false,
-          hasPrmAccess: hasPrmAccess || false,
-          hasSignLanguage: hasSignLanguage || false,
-          hasWorkshops: hasWorkshops || false,
-          hasCashPayment: hasCashPayment || false,
-          hasCreditCardPayment: hasCreditCardPayment || false,
-          hasAfjTokenPayment: hasAfjTokenPayment || false,
+          jugglingEdgeUrl,
+          // `currency` porte un défaut en base (« EUR ») : ne pas écrire `undefined` dessus.
+          ...(currency ? { currency } : {}),
+          ...services,
           creatorId: user.id,
           status: 'OFFLINE', // Nouvelle édition créée hors ligne par défaut
         },

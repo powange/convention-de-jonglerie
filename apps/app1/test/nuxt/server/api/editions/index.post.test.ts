@@ -16,6 +16,7 @@ import {
 } from '../../../../../server/utils/move-temp-image'
 import handler from '../../../../../server/api/editions/index.post'
 import { global } from '../../../globales-nitro'
+import { CLES_SERVICES_EDITION } from '../../../../../shared/utils/services-d-edition'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -324,29 +325,93 @@ describe('/api/editions POST', () => {
 
     const createCall = prismaMock.edition.create.mock.calls[0][0]
 
-    // Vérifier que tous les services ont des valeurs par défaut à false
-    expect(createCall.data.hasFoodTrucks).toBe(false)
-    expect(createCall.data.hasKidsZone).toBe(false)
-    expect(createCall.data.acceptsPets).toBe(false)
-    expect(createCall.data.hasTentCamping).toBe(false)
-    expect(createCall.data.hasTruckCamping).toBe(false)
-    expect(createCall.data.hasFamilyCamping).toBe(false)
-    expect(createCall.data.hasSleepingRoom).toBe(false)
-    expect(createCall.data.hasGym).toBe(false)
-    expect(createCall.data.hasFireSpace).toBe(false)
-    expect(createCall.data.hasGala).toBe(false)
-    expect(createCall.data.hasOpenStage).toBe(false)
-    expect(createCall.data.hasConcert).toBe(false)
-    expect(createCall.data.hasCantine).toBe(false)
-    expect(createCall.data.hasAerialSpace).toBe(false)
-    expect(createCall.data.hasSlacklineSpace).toBe(false)
-    expect(createCall.data.hasToilets).toBe(false)
-    expect(createCall.data.hasShowers).toBe(false)
-    expect(createCall.data.hasPrmAccess).toBe(false)
-    expect(createCall.data.hasWorkshops).toBe(false)
-    expect(createCall.data.hasCashPayment).toBe(false)
-    expect(createCall.data.hasCreditCardPayment).toBe(false)
-    expect(createCall.data.hasAfjTokenPayment).toBe(false)
+    /*
+     * ⚠️ CE TEST ÉNUMÉRAIT LES SERVICES À LA MAIN — les 23 mêmes que le handler, et donc PAS
+     * `hasUnicycleSpace`, `hasLongShow` ni `hasATM`. Il avait été écrit en recopiant la liste du
+     * code qu'il devait éprouver : il ne pouvait structurellement pas attraper l'oubli, et il
+     * était vert pendant toute la durée du défaut.
+     *
+     * Il boucle désormais sur la source unique. Un service ajouté au schéma Prisma et à
+     * `CLES_SERVICES_EDITION` est couvert ici sans qu'on y pense.
+     */
+    for (const cle of CLES_SERVICES_EDITION) {
+      expect(createCall.data[cle], `${cle} devrait partir à false`).toBe(false)
+    }
+    expect(Object.keys(createCall.data)).toEqual(expect.arrayContaining([...CLES_SERVICES_EDITION]))
+  })
+
+  it('écrit les trois services que la destructuration perdait', async () => {
+    /*
+     * Le cœur du correctif. `hasUnicycleSpace`, `hasLongShow` et `hasATM` étaient acceptés par
+     * `editionSchema`, donc présents dans les données validées — et perdus parce que le handler
+     * ne les destructurait pas. Envoyés à `true`, ils doivent arriver à `true` dans le `create`.
+     */
+    prismaMock.convention.findUnique.mockResolvedValue(mockConvention)
+    prismaMock.edition.create.mockResolvedValue(mockEdition)
+    global.readBody.mockResolvedValue({
+      conventionId: 1,
+      name: 'Edition 2024',
+      startDate: '2024-06-01',
+      endDate: '2024-06-03',
+      addressLine1: '123 rue Test',
+      postalCode: '75001',
+      city: 'Paris',
+      country: 'France',
+      hasUnicycleSpace: true,
+      hasLongShow: true,
+      hasATM: true,
+    })
+
+    await handler({ context: { user: mockUser } } as any)
+
+    const { data } = prismaMock.edition.create.mock.calls[0][0]
+    expect(data.hasUnicycleSpace).toBe(true)
+    expect(data.hasLongShow).toBe(true)
+    expect(data.hasATM).toBe(true)
+  })
+
+  it('écrit jugglingEdgeUrl et currency, que la destructuration perdait aussi', async () => {
+    prismaMock.convention.findUnique.mockResolvedValue(mockConvention)
+    prismaMock.edition.create.mockResolvedValue(mockEdition)
+    global.readBody.mockResolvedValue({
+      conventionId: 1,
+      name: 'Edition 2024',
+      startDate: '2024-06-01',
+      endDate: '2024-06-03',
+      addressLine1: '123 rue Test',
+      postalCode: '75001',
+      city: 'Paris',
+      country: 'France',
+      jugglingEdgeUrl: 'https://www.jugglingedge.com/festival.php?FestID=1',
+      currency: 'CHF',
+    })
+
+    await handler({ context: { user: mockUser } } as any)
+
+    const { data } = prismaMock.edition.create.mock.calls[0][0]
+    expect(data.jugglingEdgeUrl).toBe('https://www.jugglingedge.com/festival.php?FestID=1')
+    expect(data.currency).toBe('CHF')
+  })
+
+  it('laisse la devise au défaut de la base quand elle n’est pas fournie', async () => {
+    // `currency` porte `@default("EUR")` : écrire `undefined` dessus n'aurait pas d'effet
+    // aujourd'hui, mais cesserait d'être anodin au premier défaut non nul.
+    prismaMock.convention.findUnique.mockResolvedValue(mockConvention)
+    prismaMock.edition.create.mockResolvedValue(mockEdition)
+    global.readBody.mockResolvedValue({
+      conventionId: 1,
+      name: 'Edition 2024',
+      startDate: '2024-06-01',
+      endDate: '2024-06-03',
+      addressLine1: '123 rue Test',
+      postalCode: '75001',
+      city: 'Paris',
+      country: 'France',
+    })
+
+    await handler({ context: { user: mockUser } } as any)
+
+    expect(prismaMock.edition.create.mock.calls[0][0].data).not.toHaveProperty('currency')
   })
 
   it('devrait gérer les erreurs de géocodage', async () => {
