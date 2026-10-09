@@ -5,7 +5,9 @@
       <!-- « Réservations » et non « Réservations en attente » : la liste montre AUSSI les
            acceptées et les refusées, badge compris. Le titre promettait une liste filtrée qui
            n'existe pas. -->
-      <span class="font-medium">{{ $t('components.carpool.bookings') }}</span>
+      <!-- `data-titre` : un point d'accroche pour le test, qui doit viser CE titre et non l'une des
+           autres lignes en `font-medium` (le pseudo d'un passager en porte une aussi). -->
+      <span class="font-medium" data-titre>{{ $t('components.carpool.bookings') }}</span>
     </div>
     <div v-if="bookings.length === 0" class="text-sm text-gray-500">
       <!-- « Aucune réservation » : la liste n'est pas filtrée, donc un vide signifie qu'il n'y en

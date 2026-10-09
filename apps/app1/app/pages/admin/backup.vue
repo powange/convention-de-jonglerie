@@ -355,6 +355,10 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Supprimer une sauvegarde est définitif : `confirm()`, qu'un navigateur peut avoir désactivé,
+         le faisait partir sans question. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -846,11 +850,15 @@ const { execute: executeDeleteBackup, isLoading: isDeletingBackup } = useApiActi
   }
 )
 
+const confirmation = useConfirmation()
+
 const deleteBackup = (filename: string) => {
-  if (!confirm(t('admin.backup_delete_confirm', { filename }))) {
-    return
-  }
-  executeDeleteBackup(filename)
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    description: t('admin.backup_delete_confirm', { filename }),
+    libelleConfirmer: t('common.delete'),
+    agir: () => executeDeleteBackup(filename),
+  })
 }
 
 // Charger les données au montage

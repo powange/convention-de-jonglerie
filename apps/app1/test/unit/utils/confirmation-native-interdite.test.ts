@@ -46,13 +46,7 @@ import { describe, it, expect } from 'vitest'
  */
 const DETTE: Record<string, number> = {
   'apps/app1/app/components/organizers/MealsModal.vue': 1,
-  'apps/app1/app/pages/admin/api-tokens.vue': 1,
-  'apps/app1/app/pages/admin/backup.vue': 1,
-  'apps/app1/app/pages/admin/project-costs.vue': 2,
-  'apps/app1/app/pages/admin/users/[id].vue': 2,
-  'apps/app1/app/pages/admin/users/index.vue': 5,
   'apps/app1/app/pages/profile/mes-candidatures-benevole.vue': 1,
-  'apps/app1/app/pages/profile/mes-conventions.vue': 2,
   'layers/artists/app/components/artists/MealsModal.vue': 1,
   'layers/carpool/app/components/edition/carpool/RequestCard.vue': 1,
   'layers/carpool/app/components/edition/carpool/RequestDetail.vue': 1,
