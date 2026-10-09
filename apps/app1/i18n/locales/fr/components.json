@@ -34,6 +34,8 @@
       "confirmed_passengers": "Covoitureurs confirmés",
       "contact": "Contact",
       "contact_user": "Contacter {name}",
+      "delete_comment": "Supprimer mon commentaire",
+      "delete_comment_confirm": "Ce commentaire sera retiré de la discussion. Cette action est définitive.",
       "delete_offer": "Supprimer l'offre",
       "delete_request": "Supprimer la demande",
       "departure_date_time": "Date et heure de départ",

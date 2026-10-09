@@ -1,4 +1,5 @@
 import { createError, getRouterParam, readBody } from 'h3'
+import { z } from 'zod'
 
 import { NotificationHelpers, safeNotify } from './notification-service'
 import prisma from './prisma'
@@ -8,6 +9,7 @@ import { sanitizeUserContent } from './validation-helpers'
 import type { H3Event } from 'h3'
 
 import { isHttpError } from '#server/types/api'
+import { commentSchema } from '#server/utils/validation-schemas'
 
 export type CommentEntityType = 'carpoolOffer' | 'carpoolRequest'
 
@@ -188,18 +190,31 @@ export async function createCommentForEntity(
       throw createError({ status: 404, message: errorMsg })
     }
 
-    const body = await readBody(event)
-
-    if (!body.content || !body.content.trim()) {
-      throw createError({
-        status: 400,
-        message: 'Le contenu du commentaire est requis',
-      })
-    }
+    /*
+     * ⚠️ `commentSchema` ÉTAIT ÉCRIT, TESTÉ, ET BRANCHÉ NULLE PART.
+     *
+     * Il borne le contenu à 1 000 caractères depuis toujours, et ses deux seules autres occurrences
+     * du dépôt étaient dans son propre fichier de tests. Le handler lisait `body.content` à la
+     * main, avec deux conséquences :
+     *
+     * - **aucune borne de longueur.** La colonne est un `TEXT` : on pouvait y déposer 64 Ko, que
+     *   chaque chargement de la liste retransportait ensuite ;
+     * - **un corps absent levait un `TypeError`**. `!body.content` sur `body === null` n'est pas une
+     *   validation, c'est un accès à une propriété de `null` — converti en **500**, là où une
+     *   requête mal formée mérite un 400.
+     *
+     * 📍 Deuxième occurrence de ce motif dans le dépôt — après le constat A7 de `serveur-transverse`
+     * — et le carnet le note : « deux occurrences font une habitude ». Un schéma qu'on écrit sans le
+     * brancher donne la couverture d'une règle sans la règle.
+     *
+     * `?? {}` sur le corps : `readBody` rend `null` ou `undefined` pour un corps vide, et c'est à
+     * zod de le refuser avec son message, pas au moteur JavaScript de lever.
+     */
+    const { content } = commentSchema.parse((await readBody(event)) ?? {})
 
     // Construire les données du commentaire dynamiquement
     const commentData: any = {
-      content: sanitizeUserContent(body.content),
+      content: sanitizeUserContent(content),
       userId: event.context.user?.id,
     }
     commentData[config.entityIdField] = parsedId
@@ -231,6 +246,24 @@ export async function createCommentForEntity(
 
     return comment
   } catch (error: unknown) {
+    /*
+     * ⚠️ UNE ERREUR DE SAISIE N'EST PAS UNE ERREUR SERVEUR.
+     *
+     * `commentSchema.parse` lève une `ZodError`, et ce `catch` l'aurait convertie en **500** avec
+     * le message « Erreur lors de la création du commentaire ». Brancher le schéma sans ce relais
+     * aurait donc DÉPLACÉ le défaut au lieu de le refermer : un commentaire de 1 001 caractères
+     * serait passé d'« accepté en silence » à « panne serveur », et c'est le serveur qu'on serait
+     * allé regarder.
+     *
+     * `wrapApiHandler` — qui enveloppe les deux points d'API appelants — sait déjà en faire un
+     * **400** via `handleValidationError`, en rendant au passage le champ fautif et son message.
+     * La laisser remonter intacte est donc le seul geste juste ; la recopier ici en ferait une
+     * seconde version à faire vieillir en parallèle.
+     *
+     * Et on ne journalise pas : une saisie trop longue n'est pas un incident d'exploitation.
+     */
+    if (error instanceof z.ZodError) throw error
+
     console.error(`Erreur lors de la création du commentaire pour ${config.entityType}:`, error)
 
     if (isHttpError(error)) {

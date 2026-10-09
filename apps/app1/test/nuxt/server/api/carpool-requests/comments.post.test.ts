@@ -127,7 +127,8 @@ describe('/api/carpool-requests/[id]/comments POST', () => {
     prismaMock.carpoolRequest.findUnique.mockResolvedValue({ id: 1 })
     global.readBody.mockResolvedValue(emptyBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Le contenu du commentaire est requis')
+    await expect(handler(mockEvent as any)).rejects.toMatchObject({ statusCode: 400 })
+    expect(prismaMock.carpoolRequestComment.create).not.toHaveBeenCalled()
   })
 
   it("devrait valider que le contenu n'est pas seulement des espaces", async () => {
@@ -139,7 +140,8 @@ describe('/api/carpool-requests/[id]/comments POST', () => {
     prismaMock.carpoolRequest.findUnique.mockResolvedValue({ id: 1 })
     global.readBody.mockResolvedValue(whitespaceBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Le contenu du commentaire est requis')
+    await expect(handler(mockEvent as any)).rejects.toMatchObject({ statusCode: 400 })
+    expect(prismaMock.carpoolRequestComment.create).not.toHaveBeenCalled()
   })
 
   it('devrait valider que le contenu existe', async () => {
@@ -149,7 +151,8 @@ describe('/api/carpool-requests/[id]/comments POST', () => {
     prismaMock.carpoolRequest.findUnique.mockResolvedValue({ id: 1 })
     global.readBody.mockResolvedValue(noContentBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Le contenu du commentaire est requis')
+    await expect(handler(mockEvent as any)).rejects.toMatchObject({ statusCode: 400 })
+    expect(prismaMock.carpoolRequestComment.create).not.toHaveBeenCalled()
   })
 
   it('devrait rejeter si demande de covoiturage non trouvée', async () => {
@@ -194,6 +197,23 @@ describe('/api/carpool-requests/[id]/comments POST', () => {
     await expect(handler(mockEvent as any)).rejects.toThrow(
       'Erreur lors de la création du commentaire'
     )
+  })
+
+  it('devrait refuser un commentaire de plus de 1 000 caractères', async () => {
+    /*
+     * ⚠️ LE SECOND CÔTÉ DE LA BORNE, ET LE CODE QUI LA DIT.
+     *
+     * Sans ce cas, le test précédent serait satisfait par l'ABSENCE de borne — c'est exactement ce
+     * qu'il mesurait avant. Et le `statusCode` compte autant que le refus : la `ZodError` levée par
+     * le schéma était attrapée puis convertie en **500** par le `catch` du handler partagé. Brancher
+     * le schéma sans faire remonter l'erreur aurait transformé une saisie trop longue en panne
+     * serveur — un défaut déplacé, pas refermé.
+     */
+    prismaMock.carpoolRequest.findUnique.mockResolvedValue({ id: 1, editionId: 1, userId: 2 })
+    global.readBody.mockResolvedValue({ content: 'a'.repeat(1001) })
+
+    await expect(handler(mockEvent as any)).rejects.toMatchObject({ statusCode: 400 })
+    expect(prismaMock.carpoolRequestComment.create).not.toHaveBeenCalled()
   })
 
   it("devrait permettre à l'auteur de la demande de commenter sa propre demande", async () => {
