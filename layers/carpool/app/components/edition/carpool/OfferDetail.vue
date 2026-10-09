@@ -94,6 +94,17 @@
             >
               {{ $t('components.carpool.reveal_contact') }}
             </UButton>
+            <!-- ⚠️ LA TROISIÈME BRANCHE, CELLE QUI MANQUAIT.
+                 `hasPhoneNumber: true` avec `phoneNumber: null` est l'état d'un passager connecté
+                 dont la réservation n'est pas encore acceptée. Le bloc s'ouvrait donc sur le BON
+                 drapeau — celui qui existe précisément pour dire « il y a un numéro, mais pas pour
+                 vous » — puis ses deux branches exigeaient le numéro et ne rendaient RIEN : ni
+                 bouton, ni explication. Le passager ne savait pas s'il devait attendre ou
+                 commenter. La condition testait la bonne information et la jetait. -->
+            <div v-else class="flex items-center gap-2 text-sm text-gray-500">
+              <UIcon name="i-heroicons-phone" />
+              <span>{{ $t('components.carpool.phone_after_acceptance') }}</span>
+            </div>
           </template>
         </div>
 
