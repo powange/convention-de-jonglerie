@@ -45,11 +45,31 @@ export default wrapApiHandler(
         showCallId: showCall.id,
         status: 'PENDING',
       },
-      select: { id: true },
+      // `userId` est demandé pour la garde ci-dessous, et pour elle seule.
+      select: { id: true, userId: true },
     })
 
     if (!application) {
       throw createError({ status: 404, message: 'Candidature non trouvée ou non éligible' })
+    }
+
+    /*
+     * ⚠️ ON NE NOTE PAS SA PROPRE CANDIDATURE.
+     *
+     * Le sondage est ouvert à TOUT utilisateur connecté qui possède le jeton, et c'est voulu : il
+     * sert à un jury informel qu'on constitue en partageant un lien, sans gérer de comptes. Mais
+     * `user.id` ne servait qu'à IDENTIFIER le votant — il n'était jamais comparé à
+     * `application.userId`. Un artiste ayant candidaté à cet appel pouvait donc se mettre la note
+     * maximale, et son vote comptait dans la moyenne comme les autres.
+     *
+     * 📍 Un 403 et non un 404 : la candidature existe, et le demandeur sait parfaitement qu'elle
+     * est la sienne. Un 404 ici ne cacherait rien et rendrait le refus incompréhensible.
+     */
+    if (application.userId === user.id) {
+      throw createError({
+        status: 403,
+        message: 'Vous ne pouvez pas noter votre propre candidature',
+      })
     }
 
     // Upsert du vote

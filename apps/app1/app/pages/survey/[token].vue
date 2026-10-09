@@ -51,6 +51,19 @@
         class="mb-6"
       />
 
+      <!-- Pourquoi sa propre candidature n'apparaît pas : sans cela, un artiste candidat verrait
+           une liste à laquelle il manque un élément — le sien — sans que rien ne le dise, et
+           conclurait à un défaut. -->
+      <UAlert
+        v-if="surveyData.isApplicant"
+        icon="i-heroicons-information-circle"
+        color="info"
+        variant="soft"
+        :title="$t('survey.own_application_hidden')"
+        :description="$t('survey.own_application_hidden_description')"
+        class="mb-6"
+      />
+
       <!-- No applications -->
       <div v-if="surveyData.applications.length === 0" class="py-12 text-center">
         <UIcon name="i-heroicons-inbox" class="size-16 text-gray-400 mx-auto mb-4" />
@@ -111,6 +124,13 @@ interface SurveyData {
   applications: SurveyApplication[]
   myVotes: Record<number, number>
   results: SurveyResult[] | null
+  /**
+   * Le demandeur a-t-il lui-même candidaté à cet appel ?
+   *
+   * Sert à EXPLIQUER l'absence de sa fiche, que le serveur retire de `applications` — un artiste
+   * ne note pas sa propre candidature. Sans cet indicateur, l'absence passerait pour un défaut.
+   */
+  isApplicant: boolean
 }
 
 definePageMeta({
