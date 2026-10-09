@@ -113,7 +113,10 @@
       "loading_error_title": "Indlæsningsfejl",
       "logo_preview": "Logo forhåndsvisning:",
       "logo_url_description": "URL til konventionslogoets billede",
-      "upload_file": "Upload fil"
+      "upload_file": "Upload fil",
+      "image_uploaded_description": "Billedet er uploadet",
+      "image_deleted_description": "Billedet er slettet",
+      "logo_url_invalid": "Logoets URL er ikke gyldig"
     },
     "country_multi_select": {
       "placeholder": "Vælg lande..."
@@ -158,7 +161,13 @@
       "program_link": "Link til programmet",
       "program_section_title": "Program",
       "program_section_description": "Hvis du har dit program et andet sted, så angiv siden, der beskriver det",
-      "dates_timezone": "Tider i stedets lokale tid ({timezone})"
+      "dates_timezone": "Tider i stedets lokale tid ({timezone})",
+      "name_help": "Hvis du ikke angiver et navn, bruges konventets navn",
+      "address_placeholder": "Jongløvej 123",
+      "step_services_description": "Tilgængelige faciliteter",
+      "incomplete_form_title": "Formularen er ufuldstændig",
+      "incomplete_form_description": "Udfyld alle obligatoriske felter",
+      "invalid_dates_title": "Ugyldige datoer"
     },
     "favorites_map": {
       "all_favorites": "Alle er favoritter",

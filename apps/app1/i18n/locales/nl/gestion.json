@@ -377,7 +377,12 @@
         "not_declared": "Niet opgegeven",
         "not_declared_short": "In te vullen",
         "title": "Aanwezigheid van {name} op de editie"
-      }
+      },
+      "select_user": "Selecteer een gebruiker",
+      "organizer_rights": "Rechten van de organisator",
+      "not_authorized_title": "Actie niet toegestaan",
+      "not_authorized_description": "Je hebt geen rechten om deze organisator te wijzigen",
+      "add_error": "Fout bij het toevoegen"
     },
     "overview": "Overzicht",
     "services": {

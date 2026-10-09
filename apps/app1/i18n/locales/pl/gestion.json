@@ -377,7 +377,12 @@
         "not_declared": "Niezadeklarowane",
         "not_declared_short": "Do uzupełnienia",
         "title": "Obecność osoby {name} na edycji"
-      }
+      },
+      "select_user": "Wybierz użytkownika",
+      "organizer_rights": "Uprawnienia osoby organizującej",
+      "not_authorized_title": "Operacja niedozwolona",
+      "not_authorized_description": "Nie masz uprawnień, aby edytować tę osobę organizującą",
+      "add_error": "Błąd podczas dodawania"
     },
     "overview": "Przegląd",
     "services": {

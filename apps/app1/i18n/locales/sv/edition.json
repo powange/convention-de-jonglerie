@@ -153,7 +153,9 @@
     "organizers": "Arrangörer",
     "select_user": "Välj en användare",
     "status_control": "Kontroll av synlighet",
-    "status_control_desc": "Publicera eller avpublicera dina utgåvor allteftersom de utvecklas"
+    "status_control_desc": "Publicera eller avpublicera dina utgåvor allteftersom de utvecklas",
+    "delete_edition_irreversible": "Varning: den här åtgärden kan inte ångras",
+    "delete_edition_confirm_description": "Är du säker på att du vill ta bort den här upplagan? All tillhörande data (volontärer, kommentarer, kvarglömda saker m.m.) försvinner permanent."
   },
   "diet": {
     "none": "Nej",

@@ -113,7 +113,10 @@
       "loading_error_title": "Loading error",
       "logo_preview": "Logo preview:",
       "logo_url_description": "URL to the convention logo image",
-      "upload_file": "Upload file"
+      "upload_file": "Upload file",
+      "image_uploaded_description": "The image was successfully uploaded",
+      "image_deleted_description": "The image was successfully deleted",
+      "logo_url_invalid": "The logo URL is not valid"
     },
     "country_multi_select": {
       "placeholder": "Select countries..."
@@ -158,7 +161,13 @@
       "program_link": "Programme link",
       "program_section_title": "Programme",
       "program_section_description": "If you keep your programme elsewhere, give the page that describes it",
-      "dates_timezone": "Times in the venue's local time ({timezone})"
+      "dates_timezone": "Times in the venue's local time ({timezone})",
+      "name_help": "If no name is given, the convention's name will be used",
+      "address_placeholder": "123 Juggling Street",
+      "step_services_description": "Available services",
+      "incomplete_form_title": "Incomplete form",
+      "incomplete_form_description": "Please fill in all required fields",
+      "invalid_dates_title": "Invalid dates"
     },
     "favorites_map": {
       "all_favorites": "All are favorites",

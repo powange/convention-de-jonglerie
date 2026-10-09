@@ -377,7 +377,12 @@
         "not_declared": "Sin declarar",
         "not_declared_short": "Por completar",
         "title": "Presencia de {name} en la edición"
-      }
+      },
+      "select_user": "Selecciona una persona",
+      "organizer_rights": "Permisos de la persona organizadora",
+      "not_authorized_title": "Acción no permitida",
+      "not_authorized_description": "No tienes permisos para modificar a esta persona organizadora",
+      "add_error": "Error al añadir"
     },
     "overview": "Vista general",
     "services": {

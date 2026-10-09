@@ -124,11 +124,11 @@
     <!-- Boutons d'action -->
     <div class="flex gap-3 pt-4">
       <UButton type="submit" color="primary" :loading="loading" :disabled="loading">
-        {{ submitButtonText }}
+        {{ submitButtonText || $t('common.save') }}
       </UButton>
 
       <UButton type="button" color="neutral" variant="outline" @click="$emit('cancel')">
-        Annuler
+        {{ $t('common.cancel') }}
       </UButton>
     </div>
   </UForm>
@@ -151,7 +151,6 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  submitButtonText: 'Enregistrer',
   loading: false,
   initialData: undefined,
 })
@@ -218,7 +217,7 @@ const onImageUploaded = (result: { imageUrl?: string }) => {
     form.logo = result.imageUrl
     toast.add({
       title: t('components.convention_form.image_uploaded'),
-      description: "L'image a été uploadée avec succès",
+      description: t('components.convention_form.image_uploaded_description'),
       color: 'success',
     })
   }
@@ -228,14 +227,14 @@ const onImageDeleted = () => {
   form.logo = ''
   toast.add({
     title: t('components.convention_form.image_deleted'),
-    description: "L'image a été supprimée avec succès",
+    description: t('components.convention_form.image_deleted_description'),
     color: 'success',
   })
 }
 
 const onImageError = (error: string) => {
   toast.add({
-    title: 'Erreur',
+    title: t('common.error'),
     description: error,
     color: 'error',
   })
@@ -269,7 +268,10 @@ const validate = (state: typeof form) => {
 
   // Valider l'URL du logo seulement en mode URL et si elle n'est pas vide
   if (state.logo && state.logo.trim() && !isValidUrl(state.logo.trim())) {
-    errors.push({ path: 'logo', message: "L'URL du logo n'est pas valide" })
+    errors.push({
+      path: 'logo',
+      message: t('components.convention_form.logo_url_invalid'),
+    })
   }
 
   return errors

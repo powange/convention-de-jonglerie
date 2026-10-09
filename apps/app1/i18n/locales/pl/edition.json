@@ -153,7 +153,9 @@
     "organizers": "Organizatorzy",
     "select_user": "Wybierz użytkownika",
     "status_control": "Kontrola widoczności",
-    "status_control_desc": "Publikuj lub cofaj publikację swoich edycji zgodnie z ich stanem przygotowania"
+    "status_control_desc": "Publikuj lub cofaj publikację swoich edycji zgodnie z ich stanem przygotowania",
+    "delete_edition_irreversible": "Uwaga: tej operacji nie można cofnąć",
+    "delete_edition_confirm_description": "Czy na pewno chcesz usunąć tę edycję? Wszystkie powiązane dane (wolontariusze, komentarze, rzeczy znalezione itd.) zostaną nieodwracalnie utracone."
   },
   "diet": {
     "none": "Brak",

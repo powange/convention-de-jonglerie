@@ -388,7 +388,12 @@
       },
       "title": "Organisateurs",
       "title_column": "Titre",
-      "title_required": "Le titre de l'organisateur est requis"
+      "title_required": "Le titre de l'organisateur est requis",
+      "select_user": "Sélectionner un utilisateur",
+      "organizer_rights": "Droits de l'organisateur",
+      "not_authorized_title": "Action non autorisée",
+      "not_authorized_description": "Vous n'avez pas les droits pour modifier cet organisateur",
+      "add_error": "Erreur lors de l'ajout"
     },
     "overview": "Vue d'ensemble",
     "services": {

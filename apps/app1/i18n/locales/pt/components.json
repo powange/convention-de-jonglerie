@@ -113,7 +113,10 @@
       "loading_error_title": "Erro de carregamento",
       "logo_preview": "Pré-visualização do logótipo:",
       "logo_url_description": "URL da imagem do logótipo da convenção",
-      "upload_file": "Carregar ficheiro"
+      "upload_file": "Carregar ficheiro",
+      "image_uploaded_description": "A imagem foi carregada com sucesso",
+      "image_deleted_description": "A imagem foi eliminada com sucesso",
+      "logo_url_invalid": "O URL do logótipo não é válido"
     },
     "country_multi_select": {
       "placeholder": "Selecionar países..."
@@ -158,7 +161,13 @@
       "program_link": "Ligação do programa",
       "program_section_title": "Programa",
       "program_section_description": "Se mantém o seu programa noutro sítio, indique a página que o descreve",
-      "dates_timezone": "Horas na hora local do local ({timezone})"
+      "dates_timezone": "Horas na hora local do local ({timezone})",
+      "name_help": "Se não for indicado um nome, será usado o nome da convenção",
+      "address_placeholder": "Rua do Malabarismo, 123",
+      "step_services_description": "Serviços disponíveis",
+      "incomplete_form_title": "Formulário incompleto",
+      "incomplete_form_description": "Preenche todos os campos obrigatórios",
+      "invalid_dates_title": "Datas inválidas"
     },
     "favorites_map": {
       "all_favorites": "Todas são favoritas",

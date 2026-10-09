@@ -377,7 +377,12 @@
         "not_declared": "Не вказано",
         "not_declared_short": "Заповнити",
         "title": "Присутність {name} на випуску"
-      }
+      },
+      "select_user": "Виберіть користувача",
+      "organizer_rights": "Права організатора",
+      "not_authorized_title": "Дію не дозволено",
+      "not_authorized_description": "Ви не маєте прав змінювати цього організатора",
+      "add_error": "Помилка під час додавання"
     },
     "overview": "Огляд",
     "services": {

@@ -29,7 +29,7 @@
             :label="$t('forms.labels.edition_name_optional')"
             name="name"
             :error="getNameError()"
-            description="Si aucun nom n'est spécifié, le nom de la convention sera utilisé"
+            :description="$t('components.edition_form.name_help')"
           >
             <UInput
               v-model="state.name"
@@ -154,7 +154,9 @@
           <div class="space-y-4">
             <div class="flex items-center gap-2 mb-2">
               <UIcon name="i-heroicons-map-pin" class="text-primary-500" />
-              <h4 class="text-lg font-medium text-gray-700 dark:text-gray-300">Adresse du lieu</h4>
+              <h4 class="text-lg font-medium text-gray-700 dark:text-gray-300">
+                {{ $t('components.edition_form.address_title') }}
+              </h4>
             </div>
 
             <UAlert
@@ -184,7 +186,7 @@
                   <UInput
                     v-model="state.addressLine1"
                     required
-                    placeholder="123 rue de la Jonglerie"
+                    :placeholder="$t('components.edition_form.address_placeholder')"
                     size="lg"
                     class="w-full"
                     @blur="
@@ -530,7 +532,7 @@
         type="submit"
         :loading="loading"
         icon="i-heroicons-check"
-        >{{ submitButtonText }}</UButton
+        >{{ submitButtonText || $t('common.save') }}</UButton
       >
     </div>
   </UForm>
@@ -632,7 +634,7 @@ const steps = computed<StepperItem[]>(() => [
   },
   {
     title: t('components.edition_form.step_services_title'),
-    description: 'Services Disponibles',
+    description: t('components.edition_form.step_services_description'),
     icon: 'i-heroicons-cog',
     slot: 'services',
   },
@@ -789,8 +791,8 @@ const fetchUserConventions = async () => {
   } catch (error) {
     console.error('Erreur lors du chargement des conventions:', error)
     toast.add({
-      title: 'Erreur',
-      description: 'Impossible de charger vos conventions',
+      title: t('common.error'),
+      description: t('conventions.cannot_load_conventions'),
       icon: 'i-heroicons-exclamation-triangle',
       color: 'error',
     })
@@ -934,8 +936,8 @@ const validateGeneralStep = (): boolean => {
     !state.country
   ) {
     toast.add({
-      title: 'Formulaire incomplet',
-      description: 'Veuillez remplir tous les champs obligatoires',
+      title: t('components.edition_form.incomplete_form_title'),
+      description: t('components.edition_form.incomplete_form_description'),
       icon: 'i-heroicons-exclamation-triangle',
       color: 'error',
     })
@@ -945,7 +947,7 @@ const validateGeneralStep = (): boolean => {
   // Check date validation
   if (!dateValidation.value.isValid) {
     toast.add({
-      title: 'Dates invalides',
+      title: t('components.edition_form.invalid_dates_title'),
       description: dateValidation.value.error,
       icon: 'i-heroicons-exclamation-triangle',
       color: 'error',

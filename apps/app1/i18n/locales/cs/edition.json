@@ -153,7 +153,9 @@
     "organizers": "Organizátoři",
     "select_user": "Výběr uživatele",
     "status_control": "Kontrola viditelnosti",
-    "status_control_desc": "Publikovat nebo zrušit publikování svých edic podle jejich průběhu"
+    "status_control_desc": "Publikovat nebo zrušit publikování svých edic podle jejich průběhu",
+    "delete_edition_irreversible": "Pozor: tuto akci nelze vzít zpět",
+    "delete_edition_confirm_description": "Opravdu chcete smazat tento ročník? Všechna související data (dobrovolníci, komentáře, nalezené předměty atd.) budou nenávratně ztracena."
   },
   "diet": {
     "none": "Ne",

@@ -153,7 +153,9 @@
     "organizers": "Organizzatori",
     "select_user": "Seleziona un utente",
     "status_control": "Controllo della visibilità",
-    "status_control_desc": "Pubblica o nascondi le tue edizioni secondo il loro progresso"
+    "status_control_desc": "Pubblica o nascondi le tue edizioni secondo il loro progresso",
+    "delete_edition_irreversible": "Attenzione: questa azione è irreversibile",
+    "delete_edition_confirm_description": "Vuoi davvero eliminare questa edizione? Tutti i dati associati (volontari, commenti, oggetti smarriti, ecc.) andranno perduti definitivamente."
   },
   "diet": {
     "none": "Nessuno",

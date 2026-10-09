@@ -153,7 +153,9 @@
     "organizers": "Organizers",
     "select_user": "Select a user",
     "status_control": "Visibility control",
-    "status_control_desc": "Publish or unpublish your editions according to their progress"
+    "status_control_desc": "Publish or unpublish your editions according to their progress",
+    "delete_edition_irreversible": "Warning: this action cannot be undone",
+    "delete_edition_confirm_description": "Are you sure you want to delete this edition? All related data (volunteers, comments, lost property, etc.) will be permanently lost."
   },
   "diet": {
     "none": "None",

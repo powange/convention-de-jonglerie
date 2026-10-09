@@ -377,7 +377,12 @@
         "not_declared": "Não declarado",
         "not_declared_short": "A preencher",
         "title": "Presença de {name} na edição"
-      }
+      },
+      "select_user": "Seleciona uma pessoa",
+      "organizer_rights": "Permissões da pessoa organizadora",
+      "not_authorized_title": "Ação não permitida",
+      "not_authorized_description": "Não tens permissões para alterar esta pessoa organizadora",
+      "add_error": "Erro ao adicionar"
     },
     "overview": "Visão geral",
     "services": {

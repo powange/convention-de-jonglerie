@@ -153,7 +153,9 @@
     "organizers": "Organisatoren",
     "select_user": "Selecteer een gebruiker",
     "status_control": "Zichtbaarheidscontrole",
-    "status_control_desc": "Publiceer of verberg je edities volgens hun voortgang"
+    "status_control_desc": "Publiceer of verberg je edities volgens hun voortgang",
+    "delete_edition_irreversible": "Let op: deze actie kan niet worden teruggedraaid",
+    "delete_edition_confirm_description": "Weet je zeker dat je deze editie wilt verwijderen? Alle bijbehorende gegevens (vrijwilligers, reacties, gevonden voorwerpen, enz.) gaan definitief verloren."
   },
   "diet": {
     "none": "Geen",

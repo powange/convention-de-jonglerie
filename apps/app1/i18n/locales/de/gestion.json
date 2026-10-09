@@ -377,7 +377,12 @@
         "not_declared": "Nicht angegeben",
         "not_declared_short": "Auszufüllen",
         "title": "Anwesenheit von {name} bei der Ausgabe"
-      }
+      },
+      "select_user": "Benutzerin oder Benutzer auswählen",
+      "organizer_rights": "Berechtigungen der Organisation",
+      "not_authorized_title": "Aktion nicht erlaubt",
+      "not_authorized_description": "Sie haben keine Berechtigung, diese Organisatorin oder diesen Organisator zu bearbeiten",
+      "add_error": "Fehler beim Hinzufügen"
     },
     "overview": "Übersicht",
     "services": {

@@ -129,7 +129,9 @@
           <div class="space-y-3">
             <!-- Recherche utilisateur -->
             <div>
-              <label class="block text-sm font-medium mb-2"> Sélectionner un utilisateur </label>
+              <label class="block text-sm font-medium mb-2">
+                {{ $t('gestion.organizers.select_user') }}
+              </label>
               <UserSelector
                 v-model="newOrganizerUser"
                 v-model:search-term="newOrganizersearchTerm"
@@ -141,7 +143,9 @@
 
             <!-- Configuration des droits -->
             <div v-if="newOrganizerUser">
-              <label class="block text-sm font-medium mb-2"> Droits du organisateur </label>
+              <label class="block text-sm font-medium mb-2">
+                {{ $t('gestion.organizers.organizer_rights') }}
+              </label>
               <OrganizerRightsFields
                 v-model="newOrganizerRights"
                 :editions="conventionDetail?.editions ?? []"
@@ -192,17 +196,16 @@
     </UModal>
 
     <!-- Modal de confirmation de suppression d'édition -->
-    <UModal v-model:open="deleteEditionModalOpen" title="Confirmer la suppression">
+    <UModal v-model:open="deleteEditionModalOpen" :title="$t('common.confirm_delete')">
       <template #body>
         <div class="space-y-4">
           <div class="flex items-center gap-3 text-orange-600">
             <UIcon name="i-heroicons-exclamation-triangle" size="20" />
-            <span class="font-medium">Attention : cette action est irréversible</span>
+            <span class="font-medium">{{ $t('conventions.delete_edition_irreversible') }}</span>
           </div>
 
           <p class="text-gray-600 dark:text-gray-300">
-            Êtes-vous sûr de vouloir supprimer cette édition ? Toutes les données associées
-            (bénévoles, commentaires, objets trouvés, etc.) seront définitivement perdues.
+            {{ $t('conventions.delete_edition_confirm_description') }}
           </p>
 
           <div v-if="editionToDelete" class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -447,8 +450,8 @@ function openHistoryModal() {
 const openEditOrganizerModal = (organizer: DashboardOrganizer) => {
   if (!selectedListItem.value || !canManageOrganizers(selectedListItem.value)) {
     toast.add({
-      title: 'Action non autorisée',
-      description: "Vous n'avez pas les droits pour modifier ce organisateur",
+      title: t('gestion.organizers.not_authorized_title'),
+      description: t('gestion.organizers.not_authorized_description'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })
@@ -558,8 +561,8 @@ const { execute: executeAddOrganizer } = useApiAction(
       title: newOrganizerRights.value.title,
       perEdition: newOrganizerRights.value.perEdition || [],
     }),
-    successMessage: { title: 'Organisateur ajouté' },
-    errorMessages: { default: "Erreur lors de l'ajout" },
+    successMessage: { title: t('gestion.organizers.organizer_added') },
+    errorMessages: { default: t('gestion.organizers.add_error') },
     onSuccess: async () => {
       closeAddOrganizerModal()
       if (selectedListItem.value) await fetchConventionDetail(selectedListItem.value.id)

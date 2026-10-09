@@ -113,7 +113,10 @@
       "loading_error_title": "Error de carga",
       "logo_preview": "Vista previa del logo:",
       "logo_url_description": "URL de la imagen del logo de la convención",
-      "upload_file": "Subir archivo"
+      "upload_file": "Subir archivo",
+      "image_uploaded_description": "La imagen se ha subido correctamente",
+      "image_deleted_description": "La imagen se ha eliminado correctamente",
+      "logo_url_invalid": "La URL del logotipo no es válida"
     },
     "country_multi_select": {
       "placeholder": "Seleccionar países..."
@@ -158,7 +161,13 @@
       "program_link": "Enlace del programa",
       "program_section_title": "Programa",
       "program_section_description": "Si mantiene su programa en otro sitio, indique la página que lo describe",
-      "dates_timezone": "Horas en la hora local del lugar ({timezone})"
+      "dates_timezone": "Horas en la hora local del lugar ({timezone})",
+      "name_help": "Si no se indica ningún nombre, se usará el de la convención",
+      "address_placeholder": "Calle de los Malabares, 123",
+      "step_services_description": "Servicios disponibles",
+      "incomplete_form_title": "Formulario incompleto",
+      "incomplete_form_description": "Rellena todos los campos obligatorios",
+      "invalid_dates_title": "Fechas no válidas"
     },
     "favorites_map": {
       "all_favorites": "Todas son favoritas",
