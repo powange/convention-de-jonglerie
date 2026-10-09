@@ -770,6 +770,11 @@
         </UModal>
       </template>
     </div>
+
+    <!-- Une seule modale pour les confirmations de l'écran. `confirm()` bloquait la page, ne
+         suivait pas la langue choisie, et certains navigateurs laissent l'utilisateur le
+         désactiver — auquel cas la suppression partait sans que rien ne soit demandé. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -792,6 +797,7 @@ const { buildLoginUrl } = useReturnTo()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
 const { t } = useI18n()
+const confirmation = useConfirmation()
 const { formatDate } = useDateFormat()
 
 const editionId = parseInt(route.params.id as string)
@@ -1116,9 +1122,38 @@ function submitWithoutSaving() {
   doSubmitApplication()
 }
 
-async function confirmDeletePreset() {
+/**
+ * La demande passe par la modale de l'application, et non plus par `confirm()`.
+ *
+ * ⚠️ La boîte native bloque la page, **ne suit pas la langue choisie** — elle affiche « OK » et
+ * « Annuler » dans celle du navigateur — et certains navigateurs laissent l'utilisateur la
+ * DÉSACTIVER : la suppression partait alors **sans que rien ne soit demandé**. C'est ce
+ * raisonnement qui est déjà écrit dans les deux pages de spectacle du module et sur l'écran des
+ * candidatures ; ce chemin-ci l'avait sauté.
+ *
+ * 📍 `couleurConfirmer: 'error'` : la suppression est définitive, et le bouton doit le dire.
+ */
+function confirmDeletePreset() {
   if (!selectedPresetId.value) return
-  if (!window.confirm(t('shows_call.presets.delete_preset_confirm'))) return
+  confirmation.demanderConfirmation({
+    titre: t('common.confirm_delete'),
+    /*
+     * La clé EXISTANTE, comme le demandait le constat — et elle convient : elle nomme ce qui part
+     * (« ce spectacle enregistré ») plutôt que de se contenter d'un « Êtes-vous sûr ? », ce que
+     * `DemandeDeConfirmation` refuse explicitement dans sa documentation.
+     *
+     * 📍 Y faire figurer le NOM du spectacle enregistré demanderait une clé neuve avec un
+     * emplacement : laissé de côté pour ne pas ajouter de libellé dans un lot qui n'en demande pas.
+     */
+    description: t('shows_call.presets.delete_preset_confirm'),
+    libelleConfirmer: t('common.delete'),
+    couleurConfirmer: 'error',
+    agir: () => supprimerLePreset(),
+  })
+}
+
+async function supprimerLePreset() {
+  if (!selectedPresetId.value) return
 
   deletingPreset.value = true
   try {
