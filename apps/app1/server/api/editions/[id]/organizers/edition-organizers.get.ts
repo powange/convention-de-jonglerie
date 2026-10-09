@@ -8,9 +8,15 @@ import { rolesDeLEdition } from '~~/shared/utils/roles-edition'
 
 export default wrapApiHandler(
   async (event) => {
-    // `requireAuth` plutôt que `requireUserSession` : l'utilisateur de session n'est pas typé
-    // avec `id` ni `isGlobalAdmin`, que les contrôles de permission attendent. C'est déjà ce
-    // qu'emploie le POST voisin.
+    /*
+     * `requireAuth` comme les 414 autres handlers du dépôt : il lit `event.context.user`, que le
+     * middleware d'authentification a déjà rempli, et le rend typé `AuthenticatedUser` — donc
+     * avec `id` et `isGlobalAdmin`, que les contrôles de permission attendent.
+     *
+     * ⚠️ Ce commentaire affirmait « C'est déjà ce qu'emploie le POST voisin ». C'ÉTAIT FAUX : le
+     * POST, `available.get.ts` et la suppression employaient `requireUserSession`, qui relit et
+     * descelle le cookie une seconde fois pour rien. Les trois ont été alignés ici.
+     */
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
 

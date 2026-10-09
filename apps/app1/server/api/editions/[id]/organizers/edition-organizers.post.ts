@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { isHttpError } from '#server/types/api'
+import { requireAuth } from '#server/utils/auth-utils'
 import { syncOrganizersGroupParticipants } from '#server/utils/messenger-helpers'
 import { canManageEditionOrganizers } from '#server/utils/permissions/edition-permissions'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
@@ -12,8 +13,7 @@ const bodySchema = z.object({
 
 export default wrapApiHandler(
   async (event) => {
-    const session = await requireUserSession(event)
-    const user = session.user
+    const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
     const body = bodySchema.parse(await readBody(event))

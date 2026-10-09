@@ -1,11 +1,11 @@
 import { isHttpError } from '#server/types/api'
+import { requireAuth } from '#server/utils/auth-utils'
 import { syncOrganizersGroupParticipants } from '#server/utils/messenger-helpers'
 import { canManageEditionOrganizers } from '#server/utils/permissions/edition-permissions'
 
 export default wrapApiHandler(
   async (event) => {
-    const session = await requireUserSession(event)
-    const user = session.user
+    const user = requireAuth(event)
     const editionId = validateEditionId(event)
     const editionOrganizerId = parseInt(getRouterParam(event, 'editionOrganizerId') || '0')
 
