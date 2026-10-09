@@ -31,6 +31,8 @@ import {
  * `**`, `##` et `:performing_arts:` soient **absents** de la carte — c'est-à-dire exactement les
  * trois symptômes que le constat nommait.
  */
+const BASE = 'http://localhost:3000'
+
 const NOM = `Appel E2E description ${Date.now()}`
 const DESCRIPTION = '## Conditions\n\n**Scène ouverte** en juillet :performing_arts:'
 
@@ -39,10 +41,25 @@ test.describe.serial('Appels ouverts — description sans balisage', () => {
 
   let editionId: string
   let showCallId: string | null = null
+  let statutInitial: string | null = null
 
   test('prépare un appel public avec une description en markdown', async ({ page }) => {
     editionId = String(loadState().editionId)
     await updateEdition(page, editionId, { artistsEnabled: true })
+
+    /*
+     * ⚠️ L'ÉDITION DOIT ÊTRE ANNONÇABLE, et c'est la CI qui l'a dit : la carte n'apparaissait
+     * jamais. `/api/shows-call/open` borne son `where` sur l'INTERSECTION des statuts visibles
+     * publiquement et de ceux qui accueillent des candidatures, soit `PUBLISHED` et `PLANNED`. Or
+     * **toute édition naît `OFFLINE`** — celle du décor E2E comprise. L'appel existait bien, mais
+     * la liste ne pouvait pas le rendre.
+     *
+     * Le statut d'origine est relevé puis restauré, comme le fait déjà `swaps-mobile.spec.ts` : la
+     * base est partagée avec les lots qui tournent en parallèle, et la laisser publiée changerait
+     * ce que voient leurs propres parcours.
+     */
+    statutInitial = await getEditionStatus(page, editionId)
+    await setEditionStatus(page, editionId, 'PUBLISHED')
 
     const appel = await createShowCall(page, editionId, { name: NOM, description: DESCRIPTION })
     expect(appel.id).toBeTruthy()
@@ -60,26 +77,51 @@ test.describe.serial('Appels ouverts — description sans balisage', () => {
     })
   })
 
+  /*
+   * ⚠️ L'API AVANT LA PAGE, et c'est délibéré : si la liste ne rend pas l'appel, l'échec doit le
+   * dire ICI plutôt que de se présenter comme un défaut d'affichage. C'est exactement la confusion
+   * dans laquelle le premier passage de CI m'a laissé — « carte introuvable » là où la cause était
+   * le statut de l'édition.
+   */
+  test('la liste des appels ouverts rend bien cet appel', async ({ page }) => {
+    const reponse = await page.request.get(`${BASE}/api/shows-call/open`)
+    expect(reponse.ok(), await reponse.text()).toBe(true)
+    const corps = await reponse.json()
+    const appels = corps?.showCalls ?? corps?.data?.showCalls ?? []
+    const notre = appels.find((a: { name?: string }) => a.name === NOM)
+    expect(
+      notre,
+      `appel absent de la liste — noms rendus : ${appels.map((a: { name?: string }) => a.name).join(', ')}`
+    ).toBeTruthy()
+    // La description part BRUTE de l'API : c'est la page qui la met en forme, et c'est ce que le
+    // cas suivant mesure.
+    expect(notre.description).toBe(DESCRIPTION)
+  })
+
   test('affiche un extrait texte, et aucun marqueur markdown', async ({ page, goto }) => {
     await goto('/shows-call/open', { waitUntil: 'hydration' })
 
-    const carte = page.locator('div', { hasText: NOM }).last()
-    await expect(carte).toBeVisible({ timeout: 25000 })
+    /*
+     * Le nom d'abord : il rend les assertions d'ABSENCE ci-dessous non vacuoues. Sans lui, une
+     * page vide — ou qui n'aurait pas chargé — les satisferait toutes.
+     */
+    await expect(page.getByText(NOM)).toBeVisible({ timeout: 25000 })
 
     /*
      * L'extrait attendu : les blocs de premier niveau joints par ` · `, le gras retiré, le
      * raccourci d'emoji converti. Sans séparateur, « Conditions Scène ouverte… » se lirait comme
      * une phrase mal formée.
      */
-    await expect(carte).toContainText('Conditions · Scène ouverte en juillet 🎭', {
+    await expect(page.getByText('Conditions · Scène ouverte en juillet 🎭')).toBeVisible({
       timeout: 20000,
     })
 
     /*
      * ⚠️ LE TÉMOIN NÉGATIF. Interpoler la description brute contiendrait AUSSI « Scène ouverte » :
-     * sans ces trois assertions, le test passerait au-dessus du défaut qu'il doit attraper.
+     * sans ces assertions, le test passerait au-dessus du défaut qu'il doit attraper. La portée
+     * est la PAGE entière — c'est une liste d'appels, rien d'autre n'y porterait ces marqueurs.
      */
-    const texte = (await carte.textContent()) ?? ''
+    const texte = (await page.locator('body').textContent()) ?? ''
     expect(texte, 'le gras markdown ne doit pas être servi tel quel').not.toContain('**')
     expect(texte, 'le titre de niveau 2 ne doit pas être servi tel quel').not.toContain('##')
     expect(texte, "le raccourci d'emoji doit être converti").not.toContain(':performing_arts:')
@@ -95,6 +137,10 @@ test.describe.serial('Appels ouverts — description sans balisage', () => {
     const page = await browser.newPage()
     try {
       await deleteShowCall(page, editionId, showCallId)
+      // Le statut est remis tel qu'il était : la base est partagée avec les lots voisins.
+      if (statutInitial) {
+        await setEditionStatus(page, editionId, statutInitial as 'OFFLINE').catch(() => {})
+      }
     } finally {
       await page.close()
     }
