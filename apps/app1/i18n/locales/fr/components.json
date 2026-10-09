@@ -20,6 +20,7 @@
       "book_seats": "Réserver",
       "booking_message": "Message pour le conducteur (optionnel)",
       "booking_message_placeholder": "Ex: J'ai beaucoup de bagages, puis-je prendre 2 places ?",
+      "bookings": "Réservations",
       "call": "Appeler",
       "comments": "Commentaires",
       "confirm_booking": "Confirmer la réservation",
@@ -57,9 +58,9 @@
       "map_without_point": "Annonces sans position",
       "map_without_point_hint": "Leur ville n’a pas pu être située sur la carte : elles sont listées ici pour ne pas être perdues.",
       "my_booking": "Ma réservation",
+      "no_bookings": "Aucune réservation",
       "no_comments": "Aucun commentaire",
       "no_offers": "Aucune offre de covoiturage",
-      "no_pending_bookings": "Aucune réservation en attente",
       "no_requests": "Aucune demande de covoiturage",
       "no_requests_published": "Aucune demande n'a été publiée pour le moment.",
       "offer": "offre",
@@ -68,7 +69,6 @@
       "offered_on": "Proposé le {date}",
       "offers_long": "Offres de covoiturage",
       "offers_short": "Offres",
-      "pending_bookings": "Réservations en attente",
       "propose_carpool": "Proposer un covoiturage",
       "publish": "Publier",
       "reject": "Refuser",
@@ -88,16 +88,16 @@
       "seats_needed": "{count} place recherchée | {count} places recherchées",
       "show_active_only": "Actifs seulement",
       "show_all": "Afficher tout",
+      "suggestions": "Suggestions",
+      "to_add_comment": "pour ajouter un commentaire",
+      "trip_date": "Date du trajet",
+      "view_comments": "Voir les commentaires ({count})",
       "status": {
         "accepted": "Acceptée",
         "cancelled": "Annulée",
         "pending": "En attente",
         "rejected": "Refusée"
-      },
-      "suggestions": "Suggestions",
-      "to_add_comment": "pour ajouter un commentaire",
-      "trip_date": "Date du trajet",
-      "view_comments": "Voir les commentaires ({count})"
+      }
     },
     "convention_form": {
       "click_to_select_image": "Cliquez pour sélectionner une image",

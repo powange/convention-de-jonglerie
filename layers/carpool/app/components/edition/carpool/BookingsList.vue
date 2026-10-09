@@ -2,34 +2,58 @@
   <div class="space-y-2">
     <div class="flex items-center gap-2">
       <UIcon name="i-heroicons-clipboard-document-list" />
-      <span class="font-medium">{{ $t('components.carpool.pending_bookings') }}</span>
+      <!-- « Réservations » et non « Réservations en attente » : la liste montre AUSSI les
+           acceptées et les refusées, badge compris. Le titre promettait une liste filtrée qui
+           n'existe pas. -->
+      <span class="font-medium">{{ $t('components.carpool.bookings') }}</span>
     </div>
     <div v-if="bookings.length === 0" class="text-sm text-gray-500">
-      {{ $t('components.carpool.no_pending_bookings') }}
+      <!-- « Aucune réservation » : la liste n'est pas filtrée, donc un vide signifie qu'il n'y en
+           a aucune — ni en attente, ni traitée. -->
+      {{ $t('components.carpool.no_bookings') }}
     </div>
     <div v-else class="space-y-2">
+      <!-- `items-start` et non `items-center` : le message du passager peut faire plusieurs
+           lignes, et centrer verticalement ferait flotter les boutons au milieu du texte. -->
       <div
         v-for="b in bookings"
         :key="b.id"
-        class="flex items-center justify-between border rounded p-2"
+        class="flex items-start justify-between gap-3 border rounded p-2"
+        data-reservation
       >
-        <div class="flex items-center gap-2">
+        <div class="flex min-w-0 items-start gap-2">
           <UiUserAvatar :user="b.requester" size="xs" />
-          <div>
+          <div class="min-w-0">
             <div class="font-medium">{{ b.requester.pseudo }}</div>
             <div class="text-xs text-gray-500">
               {{ $t('components.carpool.requested_seats', { count: b.seats }) }}
             </div>
+            <!-- ⚠️ LE MESSAGE DU PASSAGER, QUE LE CONDUCTEUR NE VOYAIT NULLE PART.
+                 Le passager le saisit, l'API le renvoie — et cet écran, le SEUL du conducteur,
+                 affichait pseudo, places et boutons. Il acceptait ou refusait à l'aveugle, et la
+                 seule trace du message était le texte de la notification.
+                 `whitespace-pre-line` : un passager écrit « je peux récupérer à la gare /
+                 arrivée vers 18 h » sur deux lignes, et les coller en ferait une phrase. -->
+            <p
+              v-if="b.message"
+              class="mt-1 whitespace-pre-line break-words text-sm italic text-gray-600 dark:text-gray-400"
+            >
+              {{ b.message }}
+            </p>
           </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex shrink-0 items-center gap-2">
           <UBadge
             v-if="b.status !== 'PENDING'"
             :color="
               b.status === 'ACCEPTED' ? 'success' : b.status === 'REJECTED' ? 'error' : 'neutral'
             "
-            >{{ b.status }}</UBadge
           >
+            <!-- Le code brut `ACCEPTED` s'affichait tel quel. La clé existe pourtant déjà, et
+                 `OfferDetail.vue` l'emploie pour le MÊME statut vu du passager : les deux côtés de
+                 la même réservation le nommaient différemment. -->
+            {{ $t(`components.carpool.status.${b.status.toLowerCase()}`) }}
+          </UBadge>
           <!-- Retirer une place déjà accordée. Le conducteur ne pouvait pas le faire : il ne lui
                restait qu'à supprimer l'offre entière, ce qui prévient tout le monde pour retirer
                une seule personne. Le bouton est discret (`ghost`) à côté du badge « accepté » :
