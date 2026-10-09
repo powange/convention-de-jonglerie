@@ -167,15 +167,13 @@ const canEdit = computed(() => {
   return authStore.user && authStore.user.id === props.offer.user.id
 })
 
-// Calculer les places restantes: si fourni par l'API via bookings ACCEPTED, sinon fallback sur passagers
-const remainingSeats = computed(() => {
-  if (typeof props.offer.remainingSeats === 'number') return props.offer.remainingSeats
-  const bookings = props.offer.bookings || []
-  const accepted = bookings
-    .filter((b) => b.status === 'ACCEPTED')
-    .reduce((s, b) => s + (b.seats || 0), 0)
-  return Math.max(0, props.offer.availableSeats - accepted)
-})
+/*
+ * Une seule définition des places restantes pour tout le module (`utils/places-restantes.ts`).
+ * Cette règle était recopiée à l'identique ici et dans son voisin, et le filtre « avec des places
+ * libres » en aurait écrit une troisième : la liste aurait pu masquer une offre que cette fiche
+ * annonce encore disponible.
+ */
+const remainingSeats = computed(() => placesRestantes(props.offer))
 
 /*
  * Un seul formateur pour tout le module (`utils/date-covoiturage.ts`), au fuseau du NAVIGATEUR :
