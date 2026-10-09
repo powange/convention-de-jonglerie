@@ -701,3 +701,73 @@ describe('tripDateSchema — une date de trajet', () => {
     })
   })
 })
+
+/**
+ * Les schémas de MISE À JOUR d'un covoiturage.
+ *
+ * ## Le défaut
+ *
+ * À la création, `tripDate` passe par `dateSchema` et `phoneNumber` par `phoneSchema`. À la mise à
+ * jour, les deux se contentaient de `z.string().optional()` et `max(20)` — sur l'offre **comme** sur
+ * la demande.
+ *
+ * - `new Date('demain')` donne un `Invalid Date` que le handler écrit tel quel, et Prisma le rejette
+ *   en **500**. Une saisie fautive du client doit rendre 400 ;
+ * - un numéro **non international** était enregistré, alors que le lien `tel:` de l'écran suppose le
+ *   format `+…`. Le client validait, mais l'API est publique.
+ */
+describe('mise à jour d’un covoiturage — date et téléphone', () => {
+  const ADEMAIN = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+
+  for (const [nom, schema] of [
+    ['offre', () => schemas.updateCarpoolOfferSchema],
+    ['demande', () => schemas.updateCarpoolRequestSchema],
+  ] as const) {
+    describe(nom, () => {
+      it('refuse une date qui ne s’analyse pas', () => {
+        expect(() => schema().parse({ tripDate: 'demain' })).toThrow()
+      })
+
+      it('accepte une date valide', () => {
+        expect(() => schema().parse({ tripDate: ADEMAIN })).not.toThrow()
+      })
+
+      it('accepte l’absence de date — une mise à jour est partielle', () => {
+        /*
+         * ⚠️ LE TÉMOIN QUI BORNE LA RÈGLE. Sans lui, un schéma qui EXIGERAIT la date la
+         * satisferait aussi — et modifier la seule description deviendrait impossible.
+         */
+        expect(() => schema().parse({})).not.toThrow()
+      })
+
+      it('accepte une date PASSÉE, et c’est voulu', () => {
+        /*
+         * ⚠️ `optionalDateSchema` et NON `tripDateSchema` : ce dernier refuse le passé, ce qui est
+         * juste à la création. À la mise à jour ce serait un défaut — le formulaire renvoie TOUS ses
+         * champs, date comprise, donc corriger la description d'un trajet déjà parti deviendrait
+         * impossible. Ne pas « harmoniser » les deux.
+         */
+        const hier = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+        expect(() => schema().parse({ tripDate: hier })).not.toThrow()
+      })
+
+      it('refuse un numéro qui n’est pas au format international', () => {
+        expect(() => schema().parse({ phoneNumber: '0612345678' })).toThrow()
+      })
+
+      it('accepte un numéro international', () => {
+        expect(() => schema().parse({ phoneNumber: '+33612345678' })).not.toThrow()
+      })
+
+      it('accepte `null` pour effacer le numéro', () => {
+        // « Vidé » est une VALEUR, distincte de « non fourni » : le conducteur doit pouvoir retirer
+        // son téléphone.
+        expect(() => schema().parse({ phoneNumber: null })).not.toThrow()
+      })
+
+      it('refuse un numéro trop long pour la colonne', () => {
+        expect(() => schema().parse({ phoneNumber: `+${'3'.repeat(25)}` })).toThrow()
+      })
+    })
+  }
+})

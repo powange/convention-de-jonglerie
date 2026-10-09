@@ -119,25 +119,33 @@ describe('/api/carpool-requests/[id] PUT', () => {
   })
 
   it('devrait permettre de modifier le numéro de téléphone', async () => {
-    const updateData = { phoneNumber: '0612345678' }
+    /*
+     * ⚠️ UN NUMÉRO INTERNATIONAL, et ce test CONSACRAIT le défaut.
+     *
+     * Il employait `'0612345678'` — un numéro national — et vérifiait qu'il était accepté. C'était
+     * précisément le défaut : la mise à jour ne validait pas le format, alors que la CRÉATION
+     * l'exige et que le lien `tel:` de l'écran suppose le `+…`. Le test ne décrivait pas une
+     * tolérance, il figeait l'absence de règle.
+     */
+    const updateData = { phoneNumber: '+33612345678' }
 
     global.readBody.mockResolvedValue(updateData)
     prismaMock.carpoolRequest.findUnique.mockResolvedValue(mockCarpoolRequest)
     prismaMock.carpoolRequest.update.mockResolvedValue({
       ...mockCarpoolRequest,
-      phoneNumber: '0612345678',
+      phoneNumber: '+33612345678',
     })
 
     const result = await handler(mockEvent as any)
 
-    expect(result.data.phoneNumber).toBe('0612345678')
+    expect(result.data.phoneNumber).toBe('+33612345678')
   })
 
   it('devrait permettre de supprimer le numéro de téléphone (null)', async () => {
     global.readBody.mockResolvedValue({ phoneNumber: null })
     prismaMock.carpoolRequest.findUnique.mockResolvedValue({
       ...mockCarpoolRequest,
-      phoneNumber: '0612345678',
+      phoneNumber: '+33612345678',
     })
     prismaMock.carpoolRequest.update.mockResolvedValue({
       ...mockCarpoolRequest,
