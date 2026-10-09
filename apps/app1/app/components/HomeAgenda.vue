@@ -89,7 +89,7 @@
             </UBadge>
           </div>
         </div>
-        <div v-else class="text-sm text-gray-500">{{ t('common.error') || '—' }}</div>
+        <div v-else class="text-sm text-gray-500">{{ t('common.error') }}</div>
       </template>
       <template #footer>
         <UButton

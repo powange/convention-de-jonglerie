@@ -395,7 +395,7 @@ const { t } = useI18n()
 // à la main, elles reculaient d'un jour pour qui lit depuis l'ouest — un repas est stocké à minuit
 // UTC, et « samedi 15 » devenait « vendredi 14 » à New York.
 const { formatDateFull, formatDateWeekdayMonth, formatDateWeekdayMonthShort } = useDateFormat()
-const toast = useToast()
+const { erreur, succes } = useNotificateur()
 
 const editionId = computed(() => parseInt(route.params.id as string))
 
@@ -653,7 +653,7 @@ const exporterParticipants = async (format: 'csv' | 'pdf') => {
     })
   }
 
-  toast.add({ title: t('common.export_success'), color: 'success' })
+  succes(t('common.export_success'))
 }
 
 // Statistiques (reçues de l'API)
@@ -839,7 +839,7 @@ watch(selectedCateringDate, async (jour) => {
     )) as any
     repasDuJour.value = donnees?.meals ?? []
   } catch (e: any) {
-    toast.add({ title: e?.message || t('common.error'), color: 'error' })
+    erreur(e?.message || t('common.error'))
   } finally {
     chargementDesRepas.value = false
   }
@@ -1121,9 +1121,9 @@ const genererResumePdf = async () => {
         t('gestion.meals.pdf_summary')
       )
     )
-    toast.add({ title: t('common.export_success'), color: 'success' })
+    succes(t('common.export_success'))
   } catch (e: any) {
-    toast.add({ title: e?.message || t('common.error'), color: 'error' })
+    erreur(e?.message || t('common.error'))
   } finally {
     pdfEnCours.value = null
   }
@@ -1307,9 +1307,9 @@ const genererListePdf = async (meal: any) => {
         `${t(resumeDuRepas.cleTypeRepas)} ${phasesDuTableau}`
       )
     )
-    toast.add({ title: t('common.export_success'), color: 'success' })
+    succes(t('common.export_success'))
   } catch (e: any) {
-    toast.add({ title: e?.message || t('common.error'), color: 'error' })
+    erreur(e?.message || t('common.error'))
   } finally {
     pdfEnCours.value = null
   }
@@ -1364,11 +1364,7 @@ onMounted(async () => {
 
   // Afficher les erreurs de chargement si nécessaire
   if (volunteersInfoError.value) {
-    toast.add({
-      title: t('common.error'),
-      description: volunteersInfoError.value,
-      color: 'error',
-    })
+    erreur(t('common.error'), { description: volunteersInfoError.value })
   }
 })
 </script>

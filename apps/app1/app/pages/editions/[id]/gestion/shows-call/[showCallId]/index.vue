@@ -399,7 +399,7 @@ definePageMeta({
 const route = useRoute()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
-const toast = useToast()
+const { erreur, succes } = useNotificateur()
 const { t } = useI18n()
 
 const editionId = Number(route.params.id)
@@ -453,20 +453,12 @@ async function copyShowCallLink() {
   try {
     await navigator.clipboard.writeText(showCallPublicUrl.value)
     linkCopied.value = true
-    toast.add({
-      title: t('common.link_copied'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
+    succes(t('common.link_copied'))
     setTimeout(() => {
       linkCopied.value = false
     }, 3000)
   } catch {
-    toast.add({
-      title: t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(t('common.error'))
   }
 }
 

@@ -459,7 +459,7 @@ definePageMeta({
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
+const { erreur, succes } = useNotificateur()
 const { formatDate } = useDateFormat()
 const { t } = useI18n()
 
@@ -884,7 +884,7 @@ const exporterLesOrganisateurs = () => {
     'text/csv;charset=utf-8'
   )
 
-  toast.add({ title: t('common.export_success'), color: 'success' })
+  succes(t('common.export_success'))
 }
 
 /**
@@ -911,7 +911,7 @@ const exporterLesOrganisateursEnPdf = async () => {
     nomFichier: `organisateurs-edition-${editionId}`,
   })
 
-  toast.add({ title: t('common.export_success'), color: 'success' })
+  succes(t('common.export_success'))
 }
 
 // Fonctions pour gérer les organisateurs d'édition
@@ -929,11 +929,8 @@ const loadEditionOrganizers = async () => {
     availableOrganizers.value = availableOrgsResult.data?.organizers || []
   } catch (error) {
     console.error('Failed to load edition organizers:', error)
-    toast.add({
-      title: t('errors.loading_error'),
+    erreur(t('errors.loading_error'), {
       description: t('gestion.organizers.load_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
     })
   } finally {
     loadingEditionOrganizers.value = false

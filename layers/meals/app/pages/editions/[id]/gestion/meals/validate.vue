@@ -592,7 +592,7 @@ import { heureDans, journeeDans } from '~~/shared/utils/fuseau-edition'
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
+const { erreur, succes } = useNotificateur()
 const { t } = useI18n()
 const { getMealTypeLabel } = useMealTypeLabel()
 
@@ -817,21 +817,13 @@ const validateMeal = async (person: any) => {
       },
     })
 
-    toast.add({
-      title: t('gestion.meals.meal_validated'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
+    succes(t('gestion.meals.meal_validated'))
 
     // Rafraîchir la recherche et les stats pour mettre à jour le statut
     await Promise.all([searchPeople(), fetchMealStats()])
   } catch (error: unknown) {
     const err = error as { data?: { message?: string } }
-    toast.add({
-      title: err?.data?.message || t('gestion.meals.error_validating'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(err?.data?.message || t('gestion.meals.error_validating'))
   } finally {
     validatingIds.value = validatingIds.value.filter((id) => id !== person.uniqueId)
   }
@@ -895,21 +887,13 @@ const cancelMeal = async (person: any) => {
       },
     })
 
-    toast.add({
-      title: t('gestion.meals.meal_cancelled'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
+    succes(t('gestion.meals.meal_cancelled'))
 
     // Rafraîchir la recherche et les stats pour mettre à jour le statut
     await Promise.all([searchPeople(), fetchMealStats()])
   } catch (error: unknown) {
     const err = error as { data?: { message?: string } }
-    toast.add({
-      title: err?.data?.message || t('gestion.meals.error_cancelling'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(err?.data?.message || t('gestion.meals.error_cancelling'))
   } finally {
     validatingIds.value = validatingIds.value.filter((id) => id !== person.uniqueId)
   }

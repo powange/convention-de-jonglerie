@@ -146,7 +146,7 @@ const volunteerConfig = getParticipantTypeConfig('volunteer')
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
+const { succes } = useNotificateur()
 const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
@@ -270,10 +270,7 @@ const checkIfMobile = () => {
 
 // Fonction pour traiter les actions de déplacer/ajouter depuis la modal
 const handleVolunteerAdded = async () => {
-  toast.add({
-    title: t('volunteers.volunteer_added_success'),
-    color: 'success',
-  })
+  succes(t('volunteers.volunteer_added_success'))
   // Recharger les données
   await fetchVolunteersInfo()
   await fetchTeamAssignments()

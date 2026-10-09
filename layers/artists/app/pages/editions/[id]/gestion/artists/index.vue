@@ -873,7 +873,7 @@ definePageMeta({
 const route = useRoute()
 const router = useRouter()
 const { t, locale } = useI18n()
-const toast = useToast()
+const { erreur, succes } = useNotificateur()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const editionId = computed(() => parseInt(route.params.id as string))
@@ -896,17 +896,9 @@ const artistSpaceUrl = computed(
 const copyArtistSpaceUrl = async () => {
   try {
     await navigator.clipboard.writeText(artistSpaceUrl.value)
-    toast.add({
-      title: t('common.success'),
-      description: t('common.link_copied'),
-      color: 'success',
-    })
+    succes(t('common.success'), { description: t('common.link_copied') })
   } catch {
-    toast.add({
-      title: t('common.error'),
-      description: t('common.copy_error'),
-      color: 'error',
-    })
+    erreur(t('common.error'), { description: t('common.copy_error') })
   }
 }
 
@@ -1336,7 +1328,7 @@ const exporterCsv = () => {
     'text/csv;charset=utf-8'
   )
 
-  toast.add({ title: t('common.export_success'), color: 'success' })
+  succes(t('common.export_success'))
 }
 
 async function exporterPdf() {
@@ -1399,11 +1391,7 @@ async function exporterPdf() {
     doc.save(nomFichierArtistes(edition.value?.name, maintenant))
   } catch (error) {
     console.error('Export PDF des artistes :', error)
-    toast.add({
-      title: t('artists.export_pdf_error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(t('artists.export_pdf_error'))
   } finally {
     exportEnCours.value = false
   }
@@ -1756,10 +1744,7 @@ const openMealsModal = (artist: any) => {
 const handleMealsSaved = () => {
   // Rafraîchir les artistes pour obtenir les repas mis à jour
   fetchArtists()
-  toast.add({
-    title: t('artists.meals.meals_updated'),
-    color: 'success',
-  })
+  succes(t('artists.meals.meals_updated'))
 }
 
 // Ouvrir le modal de gestion des notes

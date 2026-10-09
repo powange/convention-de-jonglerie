@@ -8,7 +8,7 @@
       icon="i-heroicons-exclamation-triangle"
     >
       <template #title>
-        {{ t('volunteers.scheduling_conflicts') || 'Conflits de planning détectés' }}
+        {{ t('volunteers.scheduling_conflicts') }}
       </template>
       <template #description>
         <UCollapsible v-model:open="chevauchementsDeplies" class="space-y-2">
@@ -71,7 +71,7 @@
       icon="i-heroicons-information-circle"
     >
       <template #title>
-        {{ t('volunteers.team_preference_conflicts') || "Conflits de préférences d'équipe" }}
+        {{ t('volunteers.team_preference_conflicts') }}
       </template>
       <template #description>
         <UCollapsible v-model:open="preferencesDepliees" class="space-y-2">
@@ -110,10 +110,7 @@
                   ({{ formatDateTimeRange(warning.slot.startDateTime, warning.slot.endDateTime) }})
                   <br />
                   <span class="text-blue-600 dark:text-blue-400">
-                    {{
-                      t('volunteers.not_in_team_preferences') ||
-                      'Cette équipe ne fait pas partie des préférences du bénévole'
-                    }}
+                    {{ t('volunteers.not_in_team_preferences') }}
                   </span>
                 </div>
               </div>
@@ -131,7 +128,7 @@
       icon="i-heroicons-exclamation-circle"
     >
       <template #title>
-        {{ t('volunteers.meal_time_conflicts') || 'Conflits avec les horaires de repas' }}
+        {{ t('volunteers.meal_time_conflicts') }}
       </template>
       <template #description>
         <!-- Repliable : la liste peut compter des dizaines de lignes et repousser hors de
@@ -175,10 +172,8 @@
                   <span class="text-blue-600 dark:text-blue-400">
                     {{
                       warning.mealPeriod === 'lunch'
-                        ? t('volunteers.covers_lunch_period') ||
-                          'Couvre toute la période du déjeuner (11h30-14h)'
-                        : t('volunteers.covers_dinner_period') ||
-                          'Couvre toute la période du dîner (19h30-22h)'
+                        ? t('volunteers.covers_lunch_period')
+                        : t('volunteers.covers_dinner_period')
                     }}
                   </span>
                 </div>

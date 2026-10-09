@@ -157,7 +157,7 @@ const route = useRoute()
 const router = useRouter()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
+const { erreur, succes } = useNotificateur()
 const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
@@ -201,21 +201,15 @@ const createCounter = async () => {
 
   try {
     const counter = await createCounterApi(newCounterName.value)
-    toast.add({
-      title: t('common.success'),
+    succes(t('common.success'), {
       description: t('ticketing.counters.counter_created'),
-      color: 'success',
     })
     showCreateModal.value = false
     newCounterName.value = ''
     // Naviguer vers le nouveau compteur (utilise le token sécurisé)
     navigateToCounter(counter.token)
   } catch {
-    toast.add({
-      title: t('common.error'),
-      description: t('ticketing.counters.create_error'),
-      color: 'error',
-    })
+    erreur(t('common.error'), { description: t('ticketing.counters.create_error') })
   }
 }
 
@@ -227,18 +221,12 @@ const confirmDelete = (counterId: number, counterName: string) => {
 const deleteCounter = async () => {
   try {
     await deleteCounterApi(counterToDelete.value.id)
-    toast.add({
-      title: t('common.success'),
+    succes(t('common.success'), {
       description: t('ticketing.counters.counter_deleted'),
-      color: 'success',
     })
     showDeleteModal.value = false
   } catch {
-    toast.add({
-      title: t('common.error'),
-      description: t('ticketing.counters.delete_error'),
-      color: 'error',
-    })
+    erreur(t('common.error'), { description: t('ticketing.counters.delete_error') })
   }
 }
 

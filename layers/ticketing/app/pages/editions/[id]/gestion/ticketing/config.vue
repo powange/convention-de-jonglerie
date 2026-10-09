@@ -388,7 +388,7 @@ const route = useRoute()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
 const { t } = useI18n()
-const toast = useToast()
+const { erreur, succes } = useNotificateur()
 
 // Titre de l'onglet : « Configuration - Billetterie », cohérent avec la section Billetterie.
 useSeoMeta({
@@ -473,18 +473,12 @@ const handleSaveSumupConfig = async () => {
       affiliateKey: sumupAffiliateKey.value.trim(),
       appId: sumupAppId.value.trim(),
     })
-    toast.add({
-      title: t('common.saved'),
+    succes(t('common.saved'), {
       description: t('gestion.ticketing.sumup_config_saved'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
     })
   } catch (e: any) {
-    toast.add({
-      title: t('common.error'),
+    erreur(t('common.error'), {
       description: e?.data?.message || t('gestion.ticketing.sumup_config_error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
     })
   }
 }
@@ -499,20 +493,14 @@ const handleDeleteSumupConfig = async () => {
     sumupAffiliateKey.value = ''
     sumupAppId.value = ''
     showSumupDeleteModal.value = false
-    toast.add({
-      title: t('common.deleted'),
+    succes(t('common.deleted'), {
       description: t('gestion.ticketing.sumup_config_deleted'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
     })
   } catch (e: any) {
     // La modale reste ouverte sur échec : la refermer laisserait croire que la configuration
     // a été supprimée alors qu'elle est toujours là.
-    toast.add({
-      title: t('common.error'),
+    erreur(t('common.error'), {
       description: e?.data?.message || t('gestion.ticketing.sumup_config_error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
     })
   } finally {
     deletingSumupConfig.value = false
@@ -526,18 +514,10 @@ const handleToggleOnsiteRegistration = async (val: boolean) => {
   try {
     await updateSettings({ allowOnsiteRegistration: val })
 
-    toast.add({
-      title: t('common.saved'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
+    succes(t('common.saved'))
   } catch (e: any) {
     allowOnsiteRegistration.value = previous
-    toast.add({
-      title: e?.data?.message || e?.message || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(e?.data?.message || e?.message || t('common.error'))
   }
 }
 
@@ -547,18 +527,10 @@ const handleToggleAnonymousOrders = async (val: boolean) => {
   try {
     await updateSettings({ allowAnonymousOrders: val })
 
-    toast.add({
-      title: t('common.saved'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
+    succes(t('common.saved'))
   } catch (e: any) {
     allowAnonymousOrders.value = previous
-    toast.add({
-      title: e?.data?.message || e?.message || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(e?.data?.message || e?.message || t('common.error'))
   }
 }
 
@@ -641,18 +613,10 @@ const appliquerBasculeArticles = async (val: boolean) => {
     // se mettent à jour avec la nouvelle valeur du flag.
     await editionStore.fetchEditionById(editionId.value, { force: true })
 
-    toast.add({
-      title: t('common.saved'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
+    succes(t('common.saved'))
   } catch (e: any) {
     handoutItemsEnabled.value = previous
-    toast.add({
-      title: e?.data?.message || e?.message || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(e?.data?.message || e?.message || t('common.error'))
   }
 }
 
@@ -671,11 +635,7 @@ const handleTogglePaymentMethod = async (field: string, val: boolean) => {
   try {
     await updateSettings({ [field]: val })
 
-    toast.add({
-      title: t('common.saved'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
+    succes(t('common.saved'))
 
     // Si on vient d'activer SumUp et qu'on n'a pas encore chargé la config, le faire
     if (field === 'sumupEnabled' && val && !sumupConfig.value) {
@@ -687,11 +647,7 @@ const handleTogglePaymentMethod = async (field: string, val: boolean) => {
     }
   } catch (e: any) {
     ref.value = previous
-    toast.add({
-      title: e?.data?.message || e?.message || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(e?.data?.message || e?.message || t('common.error'))
   }
 }
 
@@ -709,18 +665,10 @@ const handleTogglePaymentCard = async (val: boolean) => {
 
     await updateSettings(data)
 
-    toast.add({
-      title: t('common.saved'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
+    succes(t('common.saved'))
   } catch (e: any) {
     paymentCard.value = previous
-    toast.add({
-      title: e?.data?.message || e?.message || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    erreur(e?.data?.message || e?.message || t('common.error'))
   }
 }
 </script>
