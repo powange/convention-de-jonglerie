@@ -850,7 +850,7 @@ import type {
   OptionTag,
 } from '../../../../../components/stock/StockFiltresObjets.vue'
 import type { TableColumn } from '@nuxt/ui'
-import type { Column, SortingFn } from '@tanstack/vue-table'
+import type { SortingFn } from '@tanstack/vue-table'
 
 definePageMeta({
   layout: 'edition-dashboard',
@@ -1181,22 +1181,6 @@ const triACompter = ref<{ id: string; desc: boolean }[]>([{ id: 'name', desc: fa
 const triComplets = ref<{ id: string; desc: boolean }[]>([{ id: 'name', desc: false }])
 
 /** En-tête cliquable, avec la flèche qui dit le sens du tri en cours. */
-function enTeteTriable(column: Column<ObjetManquant>, libelle: string) {
-  const trie = column.getIsSorted()
-  return h(resolveComponent('UButton'), {
-    color: 'neutral',
-    variant: 'ghost',
-    label: libelle,
-    icon: trie
-      ? trie === 'asc'
-        ? 'i-lucide-arrow-up-narrow-wide'
-        : 'i-lucide-arrow-down-wide-narrow'
-      : 'i-lucide-arrow-up-down',
-    class: '-mx-2.5',
-    onClick: () => column.toggleSorting(trie === 'asc'),
-  })
-}
-
 /**
  * Comparaison de deux textes à la française.
  *

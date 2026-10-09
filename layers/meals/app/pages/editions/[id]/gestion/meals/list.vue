@@ -509,15 +509,43 @@ const libelleColonneParticipant = (id: string): string => {
 
 const columns = [
   // Sans le nom, une ligne ne désigne plus personne.
-  { accessorKey: 'nom', header: t('common.name'), enableHiding: false },
-  { accessorKey: 'prenom', header: t('common.first_name') },
-  { accessorKey: 'email', header: t('common.email') },
-  { accessorKey: 'type', header: t('common.type') },
-  { accessorKey: 'mealDate', header: t('common.date') },
-  { accessorKey: 'mealType', header: t('gestion.meals.meal_type') },
-  { accessorKey: 'mealPhase', header: t('gestion.meals.phase') },
-  { accessorKey: 'dietaryPreference', header: t('gestion.meals.diet') },
-  { accessorKey: 'afterShow', header: t('gestion.meals.after_show') },
+  /*
+   * Toutes triables : les neuf colonnes portent déjà un `accessorKey`, donc TanStack a de quoi
+   * comparer sans qu'on ajoute d'accesseur. C'est le cas le plus simple des sept écrans alignés —
+   * et il attendait pourtant le tri, parce que l'ajouter imposait de recopier une sixième fois
+   * l'en-tête cliquable.
+   */
+  {
+    accessorKey: 'nom',
+    header: ({ column }: any) => enTeteTriable(column, t('common.name')),
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'prenom',
+    header: ({ column }: any) => enTeteTriable(column, t('common.first_name')),
+  },
+  { accessorKey: 'email', header: ({ column }: any) => enTeteTriable(column, t('common.email')) },
+  { accessorKey: 'type', header: ({ column }: any) => enTeteTriable(column, t('common.type')) },
+  {
+    accessorKey: 'mealDate',
+    header: ({ column }: any) => enTeteTriable(column, t('common.date')),
+  },
+  {
+    accessorKey: 'mealType',
+    header: ({ column }: any) => enTeteTriable(column, t('gestion.meals.meal_type')),
+  },
+  {
+    accessorKey: 'mealPhase',
+    header: ({ column }: any) => enTeteTriable(column, t('gestion.meals.phase')),
+  },
+  {
+    accessorKey: 'dietaryPreference',
+    header: ({ column }: any) => enTeteTriable(column, t('gestion.meals.diet')),
+  },
+  {
+    accessorKey: 'afterShow',
+    header: ({ column }: any) => enTeteTriable(column, t('gestion.meals.after_show')),
+  },
 ]
 
 /** Les colonnes que le lecteur a le droit de masquer — l'URL ne peut pas en cacher d'autres. */

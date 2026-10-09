@@ -779,29 +779,51 @@ const libelleColonneOrganisateur = (id: string): string => {
   return libelles[id] ?? id
 }
 
+/*
+ * ⚠️ UN `accessorFn` EST INDISPENSABLE POUR TRIER. Ces colonnes n'avaient qu'un `id` et un
+ * gabarit de cellule : TanStack n'avait donc aucune valeur à comparer, et un en-tête cliquable
+ * n'aurait rien fait — en silence. L'accesseur rend la valeur qu'on veut voir ORDONNÉE, pas
+ * celle qu'on affiche : pour une personne, c'est son nom affiché, et non l'objet `user`.
+ *
+ * 📍 Toutes les colonnes ne se trient pas. `roles` est une LISTE de droits : l'ordonner
+ * reviendrait à comparer des ensembles, et le résultat n'aurait pas de sens pour qui le lit.
+ * Elle reste donc non triable, comme `meals` et `presence`, qui sont des grilles de bascules.
+ */
+const nomPourLeTri = (organisateur: {
+  user?: { prenom?: string; nom?: string; pseudo?: string }
+}) =>
+  [organisateur.user?.prenom, organisateur.user?.nom].filter(Boolean).join(' ') ||
+  organisateur.user?.pseudo ||
+  ''
+
 const editionOrganizersColumns = computed((): TableColumn<any>[] => [
   {
     // Sans le nom, une ligne ne désigne plus personne.
     id: 'organizer',
-    header: t('gestion.organizers.organizer'),
+    header: ({ column }) => enTeteTriable(column, t('gestion.organizers.organizer')),
+    accessorFn: nomPourLeTri,
     size: 300,
     enableHiding: false,
   },
   {
     id: 'email',
-    header: t('common.email'),
+    header: ({ column }) => enTeteTriable(column, t('common.email')),
+    accessorFn: (o: any) => o.user?.email ?? '',
     size: 250,
   },
   {
     id: 'phone',
-    header: t('common.phone'),
+    header: ({ column }) => enTeteTriable(column, t('common.phone')),
+    accessorFn: (o: any) => o.user?.phone ?? '',
     size: 160,
   },
   ...(edition.value?.ticketingEnabled
     ? [
         {
           id: 'status',
-          header: t('gestion.organizers.status'),
+          header: ({ column }: any) => enTeteTriable(column, t('gestion.organizers.status')),
+          // Validé d'abord : c'est l'état sur lequel on trie pour voir qui reste à accueillir.
+          accessorFn: (o: any) => (o.entryValidated ? 0 : 1),
           size: 150,
         },
       ]

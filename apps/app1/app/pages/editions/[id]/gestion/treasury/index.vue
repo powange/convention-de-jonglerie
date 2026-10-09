@@ -642,7 +642,6 @@ import {
 import { colonnesTresorerieVisibles, tresorerieVersCsv } from '~/utils/export-tresorerie-csv'
 
 import type { TableColumn } from '@nuxt/ui'
-import type { Column } from '@tanstack/vue-table'
 
 import { cleDuNomAvance } from '~~/shared/utils/avance-nom-libre'
 import { BOM_UTF8 } from '~~/shared/utils/csv'
@@ -978,22 +977,6 @@ const groups = computed(() => {
  * les recettes par ordre d'arrivée donnerait deux lectures contradictoires sur un même écran.
  */
 const tri = ref<{ id: string; desc: boolean }[]>([])
-
-function enTeteTriable(column: Column<TreasuryLine>, label: string) {
-  const sens = column.getIsSorted()
-  return h(resolveComponent('UButton'), {
-    color: 'neutral',
-    variant: 'ghost',
-    label,
-    icon: sens
-      ? sens === 'asc'
-        ? 'i-lucide-arrow-up-narrow-wide'
-        : 'i-lucide-arrow-down-wide-narrow'
-      : 'i-lucide-arrow-up-down',
-    class: '-mx-2.5',
-    onClick: () => column.toggleSorting(sens === 'asc'),
-  })
-}
 
 const colonnes = computed((): TableColumn<TreasuryLine>[] => [
   {

@@ -99,10 +99,28 @@
         />
       </ClientOnly>
 
-      <div v-for="journee in journees" :key="journee.date" class="space-y-2">
+      <!-- Choisir ses colonnes, puis les emporter. Un seul menu pour toutes les journées : elles
+           partagent le même jeu de colonnes, et en régler une à la fois serait absurde. -->
+      <div v-if="journees.length" class="flex flex-wrap items-center justify-end gap-2">
+        <UiColumnsMenu
+          size="xs"
+          variant="ghost"
+          :table-api="tableaux[0]?.tableApi"
+          :libelle="libelleDeColonne"
+        />
+        <UiExportMenu size="xs" :on-csv="exporterCsv" :on-pdf="exporterPdf" />
+      </div>
+
+      <div v-for="(journee, index) in journees" :key="journee.date" class="space-y-2">
         <h2 class="font-semibold capitalize">{{ formaterJour(journee.date) }}</h2>
 
-        <UTable :data="journee.entrees" :columns="colonnes" class="w-full">
+        <UTable
+          :ref="(el: any) => el && (tableaux[index] = el)"
+          v-model:column-visibility="colonnesVisibles"
+          :data="journee.entrees"
+          :columns="colonnes"
+          class="w-full"
+        >
           <template #heure-cell="{ row }">
             <span class="font-mono text-sm whitespace-nowrap">{{
               plageHoraire(row.original)
@@ -331,6 +349,8 @@ import {
 } from '~~/shared/utils/fuseau-edition'
 import { grouperParJournee, type EntreeProgramme } from '~~/shared/utils/program-timeline'
 
+const { succes } = useNotificateur()
+
 definePageMeta({
   middleware: ['auth-protected'],
 })
@@ -412,6 +432,96 @@ const basculerVisibilitePublique = () => executerBasculeVisibilite()
  * le rendu serveur aurait sinon formaté les heures en UTC.
  */
 const fuseau = computed(() => donneesFrise.value?.data?.fuseau ?? null)
+
+/*
+ * ⚠️ PAS DE TRI SUR CET ÉCRAN, ET C'EST UN REFUS RAISONNÉ — pas un oubli.
+ *
+ * Le programme est une FRISE : son ordre chronologique est l'information. L'ordonner par titre ou
+ * par lieu détruirait la seule lecture qui serve — « qu'est-ce qui se passe après ? » — et les
+ * tableaux étant déjà découpés par journée, il n'y aurait même pas de tri global à offrir.
+ *
+ * Les deux autres fonctions, en revanche, ont leur sens ici : masquer une colonne pour lire une
+ * frise dense, et emporter le programme entier dans un fichier.
+ */
+const tableaux = ref<{ tableApi?: unknown }[]>([])
+
+const COLONNES_MASQUABLES = ['heure', 'titre', 'source', 'lieu', 'visibilite']
+const { visibilite: colonnesVisibles } = useColonnesDansUrl(COLONNES_MASQUABLES)
+
+const libelleDeColonne = (id: string) =>
+  ({
+    heure: t('gestion.program.column.time'),
+    titre: t('gestion.program.column.title'),
+    source: t('gestion.program.column.source'),
+    lieu: t('gestion.program.column.place'),
+    visibilite: t('gestion.program.column.visibility'),
+  })[id] ?? id
+
+/**
+ * Ce que l'export emporte.
+ *
+ * ⚠️ Une colonne de plus que le tableau : la DATE. À l'écran, elle est portée par le titre de
+ * chaque journée ; dans un fichier à plat, une heure sans son jour ne désigne rien.
+ */
+function colonnesExportables(): ColonneExportable<EntreeProgramme>[] {
+  return [
+    { id: 'heure', entete: t('gestion.program.column.time'), valeur: (e) => plageHoraire(e) },
+    { id: 'titre', entete: t('gestion.program.column.title'), valeur: (e) => e.titre },
+    {
+      id: 'source',
+      entete: t('gestion.program.column.source'),
+      valeur: (e) => t(`gestion.program.source.${e.source}`),
+    },
+    {
+      id: 'lieu',
+      entete: t('gestion.program.column.place'),
+      valeur: (e) => e.zone?.nom ?? e.repere?.nom ?? e.lieuTexte ?? '',
+    },
+    {
+      id: 'visibilite',
+      entete: t('gestion.program.column.visibility'),
+      valeur: (e) => (e.publie ? t('common.visible') : t('common.hidden')),
+    },
+  ]
+}
+
+/** Toutes les journées à la suite, chacune précédée de sa date. */
+function lignesDuProgramme() {
+  const { entetes, lignes } = tableauAExporter(
+    colonnesExportables(),
+    colonnesVisibles.value,
+    journees.value.flatMap((j) => j.entrees)
+  )
+  const dates = journees.value.flatMap((j) => j.entrees.map(() => formaterJour(j.date)))
+  return {
+    entetes: [t('gestion.program.column.day'), ...entetes],
+    lignes: lignes.map((ligne, i) => [dates[i] ?? '', ...ligne]),
+  }
+}
+
+const nomDuFichier = computed(() => `programme-edition-${editionId.value}`)
+
+function exporterCsv() {
+  const { entetes, lignes } = lignesDuProgramme()
+  telechargerFichier(
+    `${nomDuFichier.value}.csv`,
+    versCsv(entetes, lignes),
+    'text/csv;charset=utf-8'
+  )
+  succes(t('common.export_success'))
+}
+
+async function exporterPdf() {
+  const { entetes, lignes } = lignesDuProgramme()
+  await exporterTableauEnPdf({
+    nomFichier: nomDuFichier.value,
+    // `edition.program` : le MÊME libellé que la barre latérale, plutôt qu'une clé neuve.
+    titre: t('edition.program'),
+    entetes,
+    lignes,
+  })
+  succes(t('common.export_success'))
+}
 
 const journees = computed(() =>
   grouperParJournee(donneesFrise.value?.data?.entrees ?? [], fuseau.value)

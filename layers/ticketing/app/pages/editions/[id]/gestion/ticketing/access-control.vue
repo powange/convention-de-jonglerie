@@ -1489,7 +1489,9 @@ const { execute: executerInvalidation } = useApiActionById(
       title: t('ticketing.access_control.entry_invalidated_title'),
       description: t('ticketing.access_control.entry_invalidated_description'),
     },
-    errorMessages: { default: t('common.error') },
+    // Le message du domaine, et non « Erreur » : à la porte d'une convention, « Impossible de
+    // dévalider l'entrée » dit ce qui n'a pas marché sans qu'on ait à deviner.
+    errorMessages: { default: t('ticketing.access_control.invalidate_error') },
     onSuccess: async () => {
       // Recharger les statistiques et les dernières validations
       await Promise.all([loadStats(), loadRecentValidations()])
@@ -1548,7 +1550,9 @@ const { execute: executerRemboursement } = useApiActionById(
         ? t('ticketing.access_control.refund_recorded')
         : t('ticketing.access_control.refund_undone'),
     }),
-    errorMessages: { default: t('common.error') },
+    // « Impossible d'enregistrer le remboursement » : il s'agit d'argent rendu en espèces, et un
+    // « Erreur » générique laisserait douter de ce qui a été soldé.
+    errorMessages: { default: t('ticketing.access_control.refund_error') },
     onSuccess: async () => {
       // Recharger le billet pour que la fiche montre la dette soldée plutôt que la somme due.
       if (selectedParticipant.value?.ticket?.qrCode) {

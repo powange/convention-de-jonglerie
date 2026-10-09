@@ -1237,7 +1237,8 @@
         "title": "Título",
         "source": "Tipo",
         "place": "Lugar",
-        "visibility": "Visibilidad"
+        "visibility": "Visibilidad",
+        "day": "Día"
       },
       "local_times": "Horarios en la hora local de la convención ({fuseau}), también al introducirlos.",
       "convert": "Convertir",

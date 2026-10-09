@@ -1264,7 +1264,7 @@ const { execute: executerEnregistrementInfomaniak } = useApiAction(
         },
       }
     },
-    successMessage: { title: t('common.saved') },
+    successMessage: { title: t('gestion.ticketing.infomaniak_config_saved') },
     errorMessages: { default: t('gestion.ticketing.infomaniak_config_error') },
     onSuccess: () => {
       const config = configInfomaniak.value!
@@ -1302,7 +1302,9 @@ const { execute: executerTestInfomaniak } = useApiAction<unknown, any>(
         count: (resultat?.events || []).length,
       }),
     }),
-    errorMessages: { default: t('common.error') },
+    // « Échec de la connexion » plutôt qu'« Erreur » : l'utilisateur vient de taper une clé
+    // d'API, et savoir que c'est la CONNEXION qui a échoué lui dit où chercher.
+    errorMessages: { default: t('gestion.ticketing.infomaniak_test_failed') },
     onSuccess: (resultat) => {
       infomaniakConfigModalRef.value?.setEvents(resultat?.events || [])
       infomaniakConfigModalRef.value?.setTesting(false)

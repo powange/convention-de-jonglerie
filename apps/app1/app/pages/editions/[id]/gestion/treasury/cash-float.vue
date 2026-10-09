@@ -118,14 +118,33 @@
 
       <UCard>
         <template #header>
-          <h2 class="font-semibold">{{ $t('gestion.treasury.cash_float_entries') }}</h2>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 class="font-semibold">{{ $t('gestion.treasury.cash_float_entries') }}</h2>
+            <!-- Choisir ses colonnes, puis les emporter : l'export reprend ce que le tableau
+                 montre, et rien d'autre. -->
+            <div v-if="apports.length" class="flex items-center gap-2">
+              <UiColumnsMenu
+                size="xs"
+                variant="ghost"
+                :table-api="tableauApports?.tableApi"
+                :libelle="libelleDeColonne"
+              />
+              <UiExportMenu size="xs" :on-csv="exporterCsv" :on-pdf="exporterPdf" />
+            </div>
+          </div>
         </template>
 
         <p v-if="!apports.length" class="text-sm text-gray-500 dark:text-gray-400">
           {{ $t('gestion.treasury.cash_float_empty') }}
         </p>
 
-        <UTable v-else :data="apports" :columns="colonnes">
+        <UTable
+          v-else
+          ref="tableauApports"
+          v-model:column-visibility="colonnesVisibles"
+          :data="apports"
+          :columns="colonnes"
+        >
           <template #lender-cell="{ row }">
             {{ nomDeLApport(row.original) }}
           </template>
@@ -192,6 +211,8 @@
 import type { ApportSaisissable } from '~/components/treasury/CashFloatModal.vue'
 
 import type { EtatDuFondsDeCaisse, PreteurDeFondsDeCaisse } from '~~/shared/utils/fonds-de-caisse'
+
+const { succes } = useNotificateur()
 
 /**
  * Le fonds de caisse d'une édition : qui a prêté de l'espèce pour rendre la monnaie, ce qu'on leur
@@ -338,13 +359,110 @@ const effacerLeComptage = () => {
 
 /* ------------------------------------------------- le tableau et la modale */
 
+/*
+ * Les colonnes, triables et masquables — comme sur les autres tableaux de gestion.
+ *
+ * ⚠️ Les `accessorFn` rendent la valeur À ORDONNER, qui n'est pas celle qu'on affiche : le prêteur
+ * se trie sur son nom et non sur l'objet `lentBy`, et la restitution sur un booléen plutôt que sur
+ * la pastille. Sans eux, l'en-tête serait cliquable et ne ferait rien.
+ */
 const colonnes = computed(() => [
-  { accessorKey: 'lender', header: t('gestion.treasury.cash_float_lender') },
-  { accessorKey: 'amount', header: t('gestion.treasury.cash_float_amount') },
-  { accessorKey: 'operationDate', header: t('gestion.treasury.cash_float_date') },
-  { accessorKey: 'restitution', header: t('gestion.treasury.cash_float_restitution') },
-  { accessorKey: 'actions', header: '' },
+  {
+    id: 'lender',
+    accessorFn: (a: ApportSaisissable) => nomDeLApport(a),
+    header: ({ column }: any) => enTeteTriable(column, t('gestion.treasury.cash_float_lender')),
+  },
+  {
+    id: 'amount',
+    accessorKey: 'amount',
+    header: ({ column }: any) => enTeteTriable(column, t('gestion.treasury.cash_float_amount')),
+  },
+  {
+    id: 'operationDate',
+    accessorKey: 'operationDate',
+    header: ({ column }: any) => enTeteTriable(column, t('gestion.treasury.cash_float_date')),
+  },
+  {
+    id: 'restitution',
+    // Rendu d'abord : c'est l'état sur lequel on trie pour voir ce qu'il reste à rembourser.
+    accessorFn: (a: ApportSaisissable) => (a.restitutedAt ? 0 : 1),
+    header: ({ column }: any) =>
+      enTeteTriable(column, t('gestion.treasury.cash_float_restitution')),
+  },
+  { id: 'actions', accessorKey: 'actions', header: '', enableHiding: false },
 ])
+
+const COLONNES_MASQUABLES = ['lender', 'amount', 'operationDate', 'restitution']
+const tableauApports = useTemplateRef<{ tableApi?: unknown }>('tableauApports')
+const { visibilite: colonnesVisibles } = useColonnesDansUrl(COLONNES_MASQUABLES)
+
+const libelleDeColonne = (id: string) =>
+  ({
+    lender: t('gestion.treasury.cash_float_lender'),
+    amount: t('gestion.treasury.cash_float_amount'),
+    operationDate: t('gestion.treasury.cash_float_date'),
+    restitution: t('gestion.treasury.cash_float_restitution'),
+  })[id] ?? id
+
+/** Ce que l'export emporte : les colonnes affichées, dans leur ordre, avec leurs valeurs. */
+function colonnesExportables(): ColonneExportable<ApportSaisissable>[] {
+  return [
+    {
+      id: 'lender',
+      entete: t('gestion.treasury.cash_float_lender'),
+      valeur: (a) => nomDeLApport(a),
+    },
+    {
+      id: 'amount',
+      entete: t('gestion.treasury.cash_float_amount'),
+      // Le montant mis en forme comme à l'écran : un CSV qui porterait des centimes bruts
+      // obligerait à diviser par cent avant de s'en servir.
+      valeur: (a) => money(a.amount),
+    },
+    {
+      id: 'operationDate',
+      entete: t('gestion.treasury.cash_float_date'),
+      valeur: (a) => (a.operationDate ? formatDate(a.operationDate) : ''),
+    },
+    {
+      id: 'restitution',
+      entete: t('gestion.treasury.cash_float_restitution'),
+      // Les MÊMES libellés que les pastilles du tableau — « Rendu » / « Dû ». Inventer une paire
+      // de clés pour l'export ferait dire deux choses différentes au même état.
+      valeur: (a) =>
+        a.restitutedAt
+          ? t('gestion.treasury.cash_float_restituted_badge')
+          : t('gestion.treasury.cash_float_due_badge'),
+    },
+  ]
+}
+
+const nomDuFichier = `fonds-de-caisse-edition-${editionId.value}`
+
+function exporterCsv() {
+  const { entetes, lignes } = tableauAExporter(
+    colonnesExportables(),
+    colonnesVisibles.value,
+    apports.value
+  )
+  telechargerFichier(`${nomDuFichier}.csv`, versCsv(entetes, lignes), 'text/csv;charset=utf-8')
+  succes(t('common.export_success'))
+}
+
+async function exporterPdf() {
+  const { entetes, lignes } = tableauAExporter(
+    colonnesExportables(),
+    colonnesVisibles.value,
+    apports.value
+  )
+  await exporterTableauEnPdf({
+    nomFichier: nomDuFichier,
+    titre: t('gestion.treasury.cash_float_entries'),
+    entetes,
+    lignes,
+  })
+  succes(t('common.export_success'))
+}
 
 const anonyme = () => t('gestion.treasury.cash_float_unknown_lender')
 const nomDeLApport = (a: ApportSaisissable) => a.lentBy?.pseudo ?? a.lentByName ?? anonyme()

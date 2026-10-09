@@ -1237,7 +1237,8 @@
         "title": "Titel",
         "source": "Typ",
         "place": "Ort",
-        "visibility": "Sichtbarkeit"
+        "visibility": "Sichtbarkeit",
+        "day": "Tag"
       },
       "local_times": "Zeiten in der Ortszeit der Convention ({fuseau}), auch bei der Eingabe.",
       "convert": "Umwandeln",
