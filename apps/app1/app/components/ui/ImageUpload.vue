@@ -26,6 +26,7 @@
           <!-- Bouton de suppression -->
           <UButton
             v-if="!uploading && displayImageUrl && (previewUrl || (modelValue && allowDelete))"
+            :aria-label="$t('common.delete')"
             icon="i-heroicons-trash"
             color="error"
             variant="solid"

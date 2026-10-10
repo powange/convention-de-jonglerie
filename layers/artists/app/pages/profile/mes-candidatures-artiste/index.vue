@@ -432,6 +432,7 @@
               <!-- Actions rapides -->
               <div class="flex flex-wrap gap-1 sm:gap-1 justify-start sm:justify-end">
                 <UButton
+                  :aria-label="$t('common.view')"
                   :to="`/editions/${application.showCall.edition.id}`"
                   size="xs"
                   color="primary"
@@ -442,6 +443,7 @@
                 />
                 <UButton
                   v-if="peutModifier(application)"
+                  :aria-label="$t('common.edit')"
                   :to="`/editions/${application.showCall.edition.id}/shows-call/${application.showCall.id}/apply`"
                   size="xs"
                   color="info"
@@ -478,6 +480,7 @@
       :ui="{ content: 'sm:max-w-2xl' }"
     >
       <UButton
+        :aria-label="$t('common.contact')"
         color="primary"
         variant="outline"
         icon="i-heroicons-chat-bubble-left-right"

@@ -258,6 +258,7 @@
                     </span>
                     <div class="flex items-center gap-2">
                       <UButton
+                        :aria-label="$t('common.decrease_quantity')"
                         icon="i-heroicons-minus"
                         size="lg"
                         color="neutral"
@@ -273,6 +274,7 @@
                         </span>
                       </div>
                       <UButton
+                        :aria-label="$t('common.increase_quantity')"
                         icon="i-heroicons-plus"
                         size="lg"
                         color="primary"

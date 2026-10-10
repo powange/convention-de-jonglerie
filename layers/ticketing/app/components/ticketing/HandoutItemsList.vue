@@ -32,7 +32,12 @@
             @update:model-value="updateItemCumulative(item, $event === true)"
           />
           <UTooltip :text="resumeDesAssociations(item)">
-            <UButton icon="i-heroicons-trash" color="error" @click="confirmDeleteItem(item)" />
+            <UButton
+              :aria-label="$t('common.delete')"
+              icon="i-heroicons-trash"
+              color="error"
+              @click="confirmDeleteItem(item)"
+            />
           </UTooltip>
         </UFieldGroup>
       </div>
@@ -56,7 +61,13 @@
               wrapper: 'text-xs',
             }"
           />
-          <UButton icon="i-heroicons-plus" color="primary" :loading="saving" @click="handleSave" />
+          <UButton
+            :aria-label="$t('common.add')"
+            icon="i-heroicons-plus"
+            color="primary"
+            :loading="saving"
+            @click="handleSave"
+          />
         </UFieldGroup>
       </div>
     </div>

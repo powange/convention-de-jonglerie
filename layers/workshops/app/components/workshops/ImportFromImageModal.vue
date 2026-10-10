@@ -55,6 +55,7 @@
                     {{ selectedImage.name }}
                   </p>
                   <UButton
+                    :aria-label="$t('common.clear')"
                     icon="i-heroicons-x-mark"
                     size="xs"
                     color="error"

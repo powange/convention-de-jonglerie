@@ -31,6 +31,7 @@
             <div class="flex items-center gap-2">
               <!-- Bouton actualiser -->
               <UButton
+                :aria-label="$t('common.refresh')"
                 icon="i-heroicons-arrow-path"
                 variant="ghost"
                 size="sm"
@@ -41,6 +42,7 @@
 
             <!-- Fermer (séparé à droite) -->
             <UButton
+              :aria-label="$t('common.close')"
               icon="i-heroicons-x-mark"
               color="neutral"
               variant="ghost"
@@ -152,6 +154,7 @@
                     />
                     <!-- Bouton supprimer -->
                     <UButton
+                      :aria-label="$t('common.delete')"
                       icon="i-heroicons-x-mark"
                       variant="ghost"
                       size="xs"

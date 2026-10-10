@@ -177,6 +177,7 @@
               <template #header>
                 <div class="flex items-center gap-3">
                   <UButton
+                    :aria-label="$t('common.back')"
                     icon="i-heroicons-arrow-left"
                     variant="ghost"
                     color="neutral"
@@ -233,6 +234,7 @@
                     </UFormField>
                     <UButton
                       v-if="selectedPresetId"
+                      :aria-label="$t('common.delete')"
                       variant="soft"
                       color="error"
                       icon="i-heroicons-trash"
@@ -483,6 +485,7 @@
                         </UButton>
                         <UButton
                           v-if="!showCustomCount && formState.additionalPerformersCount <= 5"
+                          :aria-label="$t('common.add')"
                           color="neutral"
                           variant="outline"
                           size="lg"

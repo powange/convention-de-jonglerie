@@ -126,6 +126,7 @@
             </UButton>
             <UDropdownMenu v-if="canManage" :items="itemActions">
               <UButton
+                :aria-label="$t('common.actions')"
                 icon="i-heroicons-ellipsis-vertical"
                 size="sm"
                 variant="ghost"
@@ -336,6 +337,7 @@
               />
               <UDropdownMenu v-if="canModifyReservation(r)" :items="reservationActions(r)">
                 <UButton
+                  :aria-label="$t('common.actions')"
                   icon="i-heroicons-ellipsis-vertical"
                   size="xs"
                   variant="ghost"

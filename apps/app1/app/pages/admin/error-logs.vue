@@ -511,6 +511,7 @@
             <template #actions-cell="{ row }">
               <UDropdownMenu :items="rowActions(row.original)" :content="{ align: 'end' }">
                 <UButton
+                  :aria-label="$t('common.actions')"
                   icon="i-heroicons-ellipsis-vertical"
                   color="neutral"
                   variant="ghost"

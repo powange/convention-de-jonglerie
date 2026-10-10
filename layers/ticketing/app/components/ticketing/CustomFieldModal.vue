@@ -46,6 +46,7 @@
                     class="flex-1"
                   />
                   <UButton
+                    :aria-label="$t('common.remove')"
                     icon="i-heroicons-trash"
                     color="error"
                     variant="ghost"

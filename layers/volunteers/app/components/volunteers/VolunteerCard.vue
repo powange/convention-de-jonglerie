@@ -59,6 +59,7 @@
       />
       <!-- Désassigner -->
       <UButton
+        :aria-label="$t('common.remove')"
         icon="material-symbols-light:delete-outline"
         size="sm"
         color="error"

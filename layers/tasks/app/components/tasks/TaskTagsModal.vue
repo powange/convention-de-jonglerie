@@ -28,6 +28,7 @@
                   @keydown.escape="cancelEdit"
                 />
                 <UButton
+                  :aria-label="$t('common.validate')"
                   icon="i-heroicons-check"
                   size="xs"
                   color="primary"
@@ -36,6 +37,7 @@
                   @click="saveEdit(tag)"
                 />
                 <UButton
+                  :aria-label="$t('common.cancel')"
                   icon="i-heroicons-x-mark"
                   size="xs"
                   color="neutral"
@@ -55,6 +57,7 @@
             <div v-else class="flex items-center gap-2">
               <TasksTaskTagBadge :tag="tag" size="sm" class="flex-1 max-w-fit" />
               <UButton
+                :aria-label="$t('common.edit')"
                 icon="i-heroicons-pencil-square"
                 size="xs"
                 color="neutral"
@@ -63,6 +66,7 @@
                 @click="startEdit(tag)"
               />
               <UButton
+                :aria-label="$t('common.delete')"
                 icon="i-heroicons-trash"
                 size="xs"
                 color="error"

@@ -87,6 +87,7 @@
                   <span class="text-sm text-gray-900 dark:text-white">{{ location.name }}</span>
                   <UButton
                     v-if="canEdit"
+                    :aria-label="$t('common.delete')"
                     size="xs"
                     color="error"
                     variant="ghost"

@@ -227,6 +227,7 @@
                 @click.stop
               >
                 <UButton
+                  :aria-label="$t('common.actions')"
                   color="neutral"
                   variant="ghost"
                   icon="i-heroicons-ellipsis-horizontal"
@@ -366,6 +367,7 @@
                         />
                         <UDropdownMenu :items="getDropdownItems(edition.id)">
                           <UButton
+                            :aria-label="$t('common.actions')"
                             color="neutral"
                             variant="ghost"
                             icon="i-heroicons-ellipsis-horizontal"

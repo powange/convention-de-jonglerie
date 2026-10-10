@@ -38,6 +38,8 @@
               <ClientOnly>
                 <UButton
                   v-if="authStore.isAuthenticated"
+                  :aria-label="$t('common.favorite')"
+                  :aria-pressed="isFavorited"
                   :icon="isFavorited ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
                   :color="isFavorited ? 'warning' : 'neutral'"
                   variant="ghost"

@@ -196,6 +196,8 @@
               <template #actions="{ edition: ed }">
                 <UButton
                   v-if="authStore.isAuthenticated"
+                  :aria-label="$t('common.favorite')"
+                  :aria-pressed="isFavorited(ed.id)"
                   :icon="isFavorited(ed.id) ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
                   :color="isFavorited(ed.id) ? 'warning' : 'neutral'"
                   variant="ghost"

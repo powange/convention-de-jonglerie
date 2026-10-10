@@ -13,6 +13,7 @@
           class="shadow-xl transition-transform group-hover:scale-105"
         />
         <UButton
+          :aria-label="$t('common.change_profile_picture')"
           icon="i-heroicons-camera"
           size="sm"
           color="primary"

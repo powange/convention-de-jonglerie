@@ -17,6 +17,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
       <div class="flex items-center gap-3">
         <UButton
+          :aria-label="$t('common.back')"
           icon="i-heroicons-arrow-left"
           color="neutral"
           variant="ghost"

@@ -381,6 +381,7 @@
                 {{ t('admin.project_costs.rates.add') }}
               </UButton>
               <UButton
+                :aria-label="$t('common.edit')"
                 icon="i-heroicons-pencil-square"
                 variant="soft"
                 color="neutral"
@@ -388,6 +389,7 @@
                 @click="openEditModal(expense)"
               />
               <UButton
+                :aria-label="$t('common.delete')"
                 icon="i-heroicons-trash"
                 variant="soft"
                 color="error"
@@ -459,6 +461,7 @@
                 <td class="py-2 px-3">
                   <div class="flex gap-1">
                     <UButton
+                      :aria-label="$t('common.edit')"
                       icon="i-heroicons-pencil-square"
                       variant="ghost"
                       color="neutral"
@@ -466,6 +469,7 @@
                       @click="openEditRateModal(expense.id, rate)"
                     />
                     <UButton
+                      :aria-label="$t('common.delete')"
                       icon="i-heroicons-trash"
                       variant="ghost"
                       color="error"

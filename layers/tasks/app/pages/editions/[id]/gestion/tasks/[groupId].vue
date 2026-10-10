@@ -63,6 +63,7 @@
             </UButton>
             <UDropdownMenu :items="groupActions">
               <UButton
+                :aria-label="$t('common.actions')"
                 icon="i-heroicons-ellipsis-vertical"
                 size="sm"
                 variant="ghost"

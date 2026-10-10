@@ -60,6 +60,7 @@
             </UButton>
             <UDropdownMenu v-if="canManage" :items="groupActions">
               <UButton
+                :aria-label="$t('common.actions')"
                 icon="i-heroicons-ellipsis-vertical"
                 size="sm"
                 variant="ghost"

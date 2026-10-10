@@ -313,6 +313,7 @@
                       @click="goToEditActs(row.original.show)"
                     />
                     <UButton
+                      :aria-label="$t('common.edit')"
                       icon="i-heroicons-pencil"
                       color="primary"
                       variant="ghost"
@@ -320,6 +321,7 @@
                       @click="goToEditShow(row.original.show)"
                     />
                     <UButton
+                      :aria-label="$t('common.delete')"
                       icon="i-heroicons-trash"
                       color="error"
                       variant="ghost"

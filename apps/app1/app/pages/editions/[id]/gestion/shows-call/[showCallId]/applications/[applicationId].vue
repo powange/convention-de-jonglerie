@@ -225,6 +225,7 @@
                     {{ $t('shows_call.form.description') }}
                     <UButton
                       v-if="!editingDescription"
+                      :aria-label="$t('common.edit')"
                       color="neutral"
                       variant="ghost"
                       icon="i-heroicons-pencil-square"
@@ -245,6 +246,7 @@
                   </UButton>
                   <UButton
                     v-if="editingDescription && !descriptionChanged"
+                    :aria-label="$t('common.cancel')"
                     color="neutral"
                     variant="ghost"
                     icon="i-heroicons-x-mark"

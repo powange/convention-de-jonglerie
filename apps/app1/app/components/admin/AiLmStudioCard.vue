@@ -62,6 +62,7 @@
               </span>
             </div>
             <UButton
+              :aria-label="$t('common.delete')"
               color="error"
               variant="ghost"
               size="xs"

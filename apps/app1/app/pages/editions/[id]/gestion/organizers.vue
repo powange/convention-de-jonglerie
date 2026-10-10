@@ -259,6 +259,7 @@
                 <template #actions-cell="{ row }">
                   <div class="flex items-center justify-end gap-1">
                     <UButton
+                      :aria-label="$t('common.remove')"
                       icon="i-heroicons-trash"
                       color="error"
                       variant="ghost"

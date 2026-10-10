@@ -11,6 +11,7 @@
       >
         <template v-if="search" #trailing>
           <UButton
+            :aria-label="$t('common.clear')"
             icon="i-heroicons-x-mark"
             color="neutral"
             variant="ghost"

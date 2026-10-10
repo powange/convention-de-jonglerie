@@ -358,6 +358,7 @@
               <UIcon name="i-heroicons-tag" class="h-3 w-3" />
               {{ typeFilterItems.find((t) => t.value === filters.type)?.label }}
               <UButton
+                :aria-label="$t('common.clear')"
                 icon="i-heroicons-x-mark"
                 size="sm"
                 variant="ghost"
@@ -382,6 +383,7 @@
               <UIcon name="i-heroicons-folder" class="h-3 w-3" />
               {{ categoryFilterItems.find((c) => c.value === filters.category)?.label }}
               <UButton
+                :aria-label="$t('common.clear')"
                 icon="i-heroicons-x-mark"
                 size="sm"
                 variant="ghost"
@@ -406,6 +408,7 @@
               <UIcon name="i-heroicons-calendar-days" class="h-3 w-3" />
               {{ daysFilterItems.find((d) => d.value === filters.days)?.label }}
               <UButton
+                :aria-label="$t('common.clear')"
                 icon="i-heroicons-x-mark"
                 size="sm"
                 variant="ghost"
@@ -561,6 +564,7 @@
             ]"
           >
             <UButton
+              :aria-label="$t('common.actions')"
               variant="ghost"
               color="neutral"
               square

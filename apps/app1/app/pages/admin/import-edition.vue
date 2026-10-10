@@ -162,6 +162,7 @@
             <h2 class="text-xl font-bold">{{ $t('admin.import.test_results_title') }}</h2>
           </div>
           <UButton
+            :aria-label="$t('common.clear')"
             icon="i-heroicons-x-mark"
             variant="ghost"
             color="neutral"
