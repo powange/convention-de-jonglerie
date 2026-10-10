@@ -6,60 +6,112 @@ import { global } from '../../globales-nitro'
 const prismaMock = (globalThis as any).prisma
 
 /**
- * `/api/countries` alimente le filtre « pays » de la page d'accueil. Elle est publique — elle
- * figure dans `public-routes.ts`, sans session — et elle honorait `?includeOffline=true` comme sa
- * jumelle `/api/editions` : n'importe quel visiteur anonyme apprenait ainsi dans quels pays se
- * trouvent des éditions volontairement cachées.
+ * Les pays proposés dans les filtres de l'accueil — constat A8.
  *
- * Elle en dit moins que la liste des éditions, mais c'était le même interrupteur, et il n'avait
- * aucun appelant : le composant `CountryMultiSelect` recopie les filtres de la page, où
- * `includeOffline` n'a jamais figuré.
+ * ## ⚠️ DEUX DÉFAUTS, SUR UNE ROUTE PUBLIQUE
+ *
+ * 1. `new Date(startDate)` n'était pas validé : `?startDate=abc` donnait une `Invalid Date` que
+ *    Prisma refuse — un **500 journalisé** sur une saisie d'URL. N'importe qui pouvait remplir le
+ *    journal d'erreurs en modifiant un paramètre.
+ * 2. `?name[]=a` passait un **tableau** à `contains`, que Prisma refuse également.
+ *
+ * Et la réponse partait **hors enveloppe** : le tableau nu, là où 449 des 574 handlers passent par
+ * `createSuccessResponse`. Le client devait deviner, point d'API par point d'API, s'il lit `res` ou
+ * `res.data` — et ce doute a déjà produit des appels voués à l'échec dans ce dépôt.
+ *
+ * ## ⚠️⚠️ CE QUI REND CES CAS NON CREUX
+ *
+ * Le mock de Prisma ignore le `where` : un test qui compterait les pays rendus mesurerait ce qu'on a
+ * demandé au mock. Ce qui se mesure ici est donc le REFUS (400 au lieu de 500, avant toute requête)
+ * et la FORME de la réponse — les deux choses que le lot change.
  */
 describe('GET /api/countries', () => {
-  const publique = { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] }
+  const evenement = { context: {} } as never
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    prismaMock.edition.findMany.mockResolvedValue([{ country: 'France' }, { country: 'Belgique' }])
     global.getQuery = vi.fn().mockReturnValue({})
-    prismaMock.edition.findMany.mockResolvedValue([{ country: 'France' }])
   })
 
-  const clauseDuDernierAppel = () => prismaMock.edition.findMany.mock.calls.at(-1)![0].where
+  it('⚠️ REFUSE UNE DATE ILLISIBLE, et ne la passe pas à Prisma', async () => {
+    /*
+     * C'est le 500 que n'importe quel visiteur pouvait provoquer. Le second `expect` est le plus
+     * important : la requête ne doit même pas partir, sinon on a seulement déplacé l'erreur.
+     */
+    global.getQuery = vi.fn().mockReturnValue({ startDate: 'abc' })
 
-  it('ne retient que les éditions visibles d’un visiteur', async () => {
-    await handler({} as any)
-
-    expect(clauseDuDernierAppel().status).toEqual(publique)
+    await expect(handler(evenement)).rejects.toThrow()
+    expect(prismaMock.edition.findMany).not.toHaveBeenCalled()
   })
 
-  it('ne montre pas les pays des éditions cachées, même si l’URL le demande', async () => {
-    global.getQuery.mockReturnValue({ includeOffline: 'true' })
+  it('⚠️ REFUSE UN NOM PASSÉ EN TABLEAU', async () => {
+    // `?name[]=a` : Prisma refuse un tableau dans `contains`, et c'était un 500 de plus.
+    global.getQuery = vi.fn().mockReturnValue({ name: ['a', 'b'] })
 
-    await handler({} as any)
-
-    expect(clauseDuDernierAppel().status.in).not.toContain('OFFLINE')
-    expect(clauseDuDernierAppel().status).toEqual(publique)
+    await expect(handler(evenement)).rejects.toThrow()
+    expect(prismaMock.edition.findMany).not.toHaveBeenCalled()
   })
 
-  it('rend exactement la même chose avec et sans le paramètre', async () => {
-    // Ce n'est pas seulement que OFFLINE a disparu : c'est que le paramètre ne change plus rien.
-    global.getQuery.mockReturnValue({})
-    await handler({} as any)
-    const sansParametre = clauseDuDernierAppel()
+  it('accepte une date ISO et un nom ordinaire', async () => {
+    /*
+     * LE TÉMOIN. Sans lui, un schéma qui refuserait tout satisferait les deux cas ci-dessus — et le
+     * sélecteur de pays de l'accueil ne proposerait plus rien, sans que rien ne le dise.
+     */
+    global.getQuery = vi.fn().mockReturnValue({ startDate: '2026-06-01', name: 'Jong' })
 
-    global.getQuery.mockReturnValue({ includeOffline: 'true' })
-    await handler({} as any)
+    const reponse = (await handler(evenement)) as { success: boolean; data: string[] }
 
-    expect(clauseDuDernierAppel()).toEqual(sansParametre)
+    expect(reponse.success).toBe(true)
+    expect(prismaMock.edition.findMany).toHaveBeenCalled()
   })
 
-  it('garde le filtre de statut quand d’autres filtres s’ajoutent', async () => {
-    // Le statut est posé sur le même objet `where` que les services : une refonte de la
-    // construction de la clause pourrait le perdre sans que les cas nus ci-dessus s'en aperçoivent.
-    global.getQuery.mockReturnValue({ hasGala: 'true', includeOffline: 'true' })
+  it('accepte aussi une date-heure complète', async () => {
+    // Le client peut envoyer l'une ou l'autre forme : n'accepter que `yyyy-mm-dd` casserait un lien
+    // déjà partagé qui porte une date-heure.
+    global.getQuery = vi.fn().mockReturnValue({ startDate: '2026-06-01T10:00:00Z' })
 
-    await handler({} as any)
+    await expect(handler(evenement)).resolves.toMatchObject({ success: true })
+  })
 
-    expect(clauseDuDernierAppel()).toMatchObject({ hasGala: true, status: publique })
+  it('⚠️ RÉPOND SOUS ENVELOPPE `{ success, data }`', async () => {
+    const reponse = (await handler(evenement)) as { success: boolean; data: string[] }
+
+    expect(reponse.success).toBe(true)
+    expect(Array.isArray(reponse.data)).toBe(true)
+    expect(reponse.data).toContain('France')
+  })
+
+  it('rend une enveloppe même quand aucun filtre temporel n’est coché', async () => {
+    /*
+     * Ce chemin sortait par un `return []` nu — une seconde forme de réponse pour le même point
+     * d'API. Le client qui lit `res.data` aurait alors reçu `undefined`, et le sélecteur serait
+     * resté vide sans erreur.
+     */
+    global.getQuery = vi
+      .fn()
+      .mockReturnValue({ showPast: 'false', showCurrent: 'false', showFuture: 'false' })
+
+    const reponse = (await handler(evenement)) as { success: boolean; data: string[] }
+
+    expect(reponse.success).toBe(true)
+    expect(reponse.data).toEqual([])
+  })
+
+  it('garde les trois états d’un drapeau temporel', async () => {
+    /*
+     * ⚠️ LE PIÈGE DE LA VALIDATION. Le corps distingue TROIS états — coché, décoché, absent — et
+     * « aucun filtre coché » n'est pas « aucun filtre fourni » : le second rend tous les pays.
+     * Convertir les drapeaux en booléens aurait écrasé cette distinction, et le sélecteur se serait
+     * vidé dès qu'on décoche la dernière case… ou l'inverse.
+     */
+    global.getQuery = vi.fn().mockReturnValue({})
+    const sansFiltre = (await handler(evenement)) as { data: string[] }
+    expect(sansFiltre.data.length).toBeGreaterThan(0)
+
+    global.getQuery = vi.fn().mockReturnValue({ showFuture: 'true' })
+    const avecUnFiltre = (await handler(evenement)) as { data: string[] }
+    expect(avecUnFiltre.data.length).toBeGreaterThan(0)
   })
 })

@@ -1,11 +1,63 @@
-import { wrapApiHandler } from '#server/utils/api-helpers'
+import { z } from 'zod'
+
+import { createSuccessResponse, wrapApiHandler } from '#server/utils/api-helpers'
 import { deduplicateCountries } from '#server/utils/countries'
 import { filtreStatutEdition } from '~~/shared/utils/visibilite-edition'
+
+/**
+ * Les filtres acceptés, VALIDÉS — constat A8.
+ *
+ * ## ⚠️ DEUX DÉFAUTS, SUR UNE ROUTE PUBLIQUE
+ *
+ * 1. `new Date(startDate)` n'était pas validé : `?startDate=abc` donnait une `Invalid Date` que
+ *    Prisma refuse — un **500 journalisé** sur une saisie d'URL.
+ * 2. `?name[]=a` passait un **tableau** à `contains`, que Prisma refuse également.
+ *
+ * ⚠️ LES DRAPEAUX RESTENT DES CHAÎNES `'true'`/`'false'`, et ce n'est pas de la paresse : le corps
+ * du handler distingue TROIS états — coché, décoché, absent. « Aucun filtre temporel coché » n'est
+ * pas la même chose que « aucun filtre temporel fourni », et le second rend tous les pays. Les
+ * convertir en booléens écraserait cette distinction.
+ */
+const schemaDesFiltres = z.object({
+  name: z.string().max(200).optional(),
+  startDate: z.string().datetime({ offset: true }).or(z.string().date()).optional(),
+  endDate: z.string().datetime({ offset: true }).or(z.string().date()).optional(),
+  showPast: z.enum(['true', 'false']).optional(),
+  showCurrent: z.enum(['true', 'false']).optional(),
+  showFuture: z.enum(['true', 'false']).optional(),
+  hasFoodTrucks: z.enum(['true', 'false']).optional(),
+  hasKidsZone: z.enum(['true', 'false']).optional(),
+  acceptsPets: z.enum(['true', 'false']).optional(),
+  hasTentCamping: z.enum(['true', 'false']).optional(),
+  hasTruckCamping: z.enum(['true', 'false']).optional(),
+  hasFamilyCamping: z.enum(['true', 'false']).optional(),
+  hasSleepingRoom: z.enum(['true', 'false']).optional(),
+  hasGym: z.enum(['true', 'false']).optional(),
+  hasFireSpace: z.enum(['true', 'false']).optional(),
+  hasGala: z.enum(['true', 'false']).optional(),
+  hasOpenStage: z.enum(['true', 'false']).optional(),
+  hasConcert: z.enum(['true', 'false']).optional(),
+  hasCantine: z.enum(['true', 'false']).optional(),
+  hasAerialSpace: z.enum(['true', 'false']).optional(),
+  hasSlacklineSpace: z.enum(['true', 'false']).optional(),
+  hasToilets: z.enum(['true', 'false']).optional(),
+  hasShowers: z.enum(['true', 'false']).optional(),
+  hasPrmAccess: z.enum(['true', 'false']).optional(),
+  // Voir `editions/index.get.ts` : l'ancien nom reste accepté pour les liens déjà partagés.
+  hasAccessibility: z.enum(['true', 'false']).optional(),
+  hasSignLanguage: z.enum(['true', 'false']).optional(),
+  hasWorkshops: z.enum(['true', 'false']).optional(),
+  hasCashPayment: z.enum(['true', 'false']).optional(),
+  hasCreditCardPayment: z.enum(['true', 'false']).optional(),
+  hasAfjTokenPayment: z.enum(['true', 'false']).optional(),
+  hasLongShow: z.enum(['true', 'false']).optional(),
+  hasATM: z.enum(['true', 'false']).optional(),
+})
 
 export default wrapApiHandler(
   async (event) => {
     // Cette API est publique, pas besoin d'authentification
-    const query = getQuery(event)
+    const query = schemaDesFiltres.parse(getQuery(event))
     const {
       name,
       startDate,
@@ -51,15 +103,15 @@ export default wrapApiHandler(
 
     // Filtre par nom
     if (name) {
-      where.name = { contains: name as string }
+      where.name = { contains: name }
     }
 
     // Filtre par dates
     if (startDate) {
-      where.startDate = { gte: new Date(startDate as string) }
+      where.startDate = { gte: new Date(startDate) }
     }
     if (endDate) {
-      where.endDate = { lte: new Date(endDate as string) }
+      where.endDate = { lte: new Date(endDate) }
     }
 
     // Filtres par services (booléens)
@@ -127,7 +179,8 @@ export default wrapApiHandler(
       }
       // Si aucun filtre temporel n'est coché, ne rien retourner
       else if (showPast === 'false' && showCurrent === 'false' && showFuture === 'false') {
-        return [] // Aucun pays si aucune édition ne correspond
+        // Aucun pays si aucune édition ne correspond
+        return createSuccessResponse<string[]>([])
       }
     }
 
@@ -142,7 +195,13 @@ export default wrapApiHandler(
 
     // Dédupliquer les pays par code ISO et retourner les noms français
     const rawCountries = countriesResult.map((c) => c.country).filter(Boolean) as string[]
-    return deduplicateCountries(rawCountries)
+    /*
+     * ⚠️ SOUS ENVELOPPE, comme 449 des 574 handlers. Le tableau partait nu : le client devait
+     * deviner, point d'API par point d'API, s'il lit `res` ou `res.data` — et ce doute a déjà
+     * produit des appels voués à l'échec dans ce dépôt. Le seul appelant de cette route est dans
+     * le dépôt, donc les deux côtés bougent ensemble.
+     */
+    return createSuccessResponse(deduplicateCountries(rawCountries))
   },
   { operationName: 'GetCountries' }
 )

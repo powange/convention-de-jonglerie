@@ -77,16 +77,23 @@ const queryParams = computed(() => {
   return params
 })
 
-// Utiliser useFetch avec les filtres comme dépendances
-const { data: rawCountries, status } = useFetch<string[]>('/api/countries', {
+/*
+ * ⚠️ LA RÉPONSE EST SOUS ENVELOPPE `{ success, data }`.
+ *
+ * Elle arrivait nue, et ce point d'API faisait partie des 125 qui répondent hors de l'enveloppe du
+ * projet : le client devait deviner, point d'API par point d'API, s'il lit `res` ou `res.data`.
+ * Les deux côtés bougent dans le même lot — c'est la seule façon de ne pas casser l'écran.
+ */
+const { data: reponse, status } = useFetch<{ success: boolean; data: string[] }>('/api/countries', {
   query: queryParams,
   watch: [queryParams], // Rafraîchir quand les filtres changent
 })
 
 // Transformer les pays en objets avec icônes
 const data = computed(() => {
-  if (!rawCountries.value) return []
-  return rawCountries.value.map((country) => ({
+  const pays = reponse.value?.data
+  if (!pays) return []
+  return pays.map((country) => ({
     label: country,
     value: country,
     icon: `flag:${getCountryCode(country)}-4x3`,
