@@ -38,16 +38,22 @@ Notes Auth (nuxt-auth-utils):
   - `npm run test:db:run` (prépare Docker + migrations + run)
   - `npm run test:setup` / `npm run test:teardown` (DB de test)
 
-4. E2E (Nuxt lancé + $fetch boîte noire)
+4. Parcours de bout en bout — **Playwright**, pas Vitest
 
-- Projet: `e2e` dans `vitest.config.ts`
-- Setup: `test/e2e/setup.ts`
+- Specs: `test/e2e/playwright/**`
 - Scripts:
-  - `npm run test:e2e` / `npm run test:e2e:run`
+  - `npm run test:playwright` (tout)
+  - `npm run test:playwright:ui` (interface de Playwright)
 
-Raccourci pour tout lancer (hors DB):
+> ⚠️ **Il n'y a plus de projet Vitest « e2e ».** Il n'incluait qu'un seul fichier, dont le
+> `describe` racine était `.skip` : le contrôle CI `test (e2e)` passait au vert **sans exécuter une
+> assertion**. Ses trois cas sont couverts par `test/nuxt/server/api/auth/`
+> (`login`, `register`, `request-password-reset`) et le parcours réel par Playwright. Projet,
+> scripts, job de matrice et fichiers morts ont été retirés.
 
-- `npm run test:all` → unit + nuxt + e2e
+Raccourci pour tout lancer (hors DB et hors Playwright):
+
+- `npm run test:all` → unit + nuxt
 
 ## Environnement DB de test
 

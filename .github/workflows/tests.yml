@@ -342,7 +342,6 @@ jobs:
         test-group:
           - { name: 'unit', cmd: 'npm run test:unit:run', db: false }
           - { name: 'nuxt', cmd: 'npm run test:nuxt:run', db: false }
-          - { name: 'e2e', cmd: 'npm run test:e2e:run', db: false }
           - { name: 'database', cmd: 'npm run test:db:run', db: true }
 
     services:
