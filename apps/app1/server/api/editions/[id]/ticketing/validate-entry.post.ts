@@ -570,15 +570,28 @@ export default wrapApiHandler(
           },
         })
 
-        // Si le paiement est confirmé, mettre à jour le statut de la commande et des items
+        /*
+         * Si le paiement est confirmé, solder la commande et ses lignes.
+         *
+         * ## ⚠️ LES TROIS REQUÊTES DE CE BLOC ÉTAIENT HORS DE L'ÉDITION
+         *
+         * La validation, juste au-dessus, est bornée par `porteeTicket` — qui porte
+         * `order: { editionId }`. Ce bloc-ci, lui, travaillait sur `body.participantIds` **nus** :
+         * la relecture des lignes, la mise à jour des commandes et celle des lignes.
+         *
+         * Un bénévole en créneau de contrôle d'accès sur l'édition A pouvait donc, avec des
+         * identifiants de billets de l'édition B et un `paymentMethod`, marquer **payées** des
+         * commandes en attente de B. La réponse annonçait `validated: 0` — la validation, elle,
+         * était bien refusée — mais l'écriture avait eu lieu. Un encaissement fantôme sur une
+         * édition qu'on n'administre pas, invisible dans la réponse.
+         *
+         * Les trois requêtes reprennent donc la MÊME borne que la validation. `porteeTicket` est
+         * réutilisé tel quel pour les lignes ; les commandes portent `editionId` en direct.
+         */
         if (body.paymentMethod) {
-          // Récupérer les items validés pour obtenir les IDs de commandes
+          // Les lignes concernées, pour en déduire les commandes — bornées à l'édition.
           const validatedItems = await prisma.ticketingOrderItem.findMany({
-            where: {
-              id: {
-                in: body.participantIds,
-              },
-            },
+            where: porteeTicket,
             select: {
               orderId: true,
               state: true,
@@ -595,6 +608,10 @@ export default wrapApiHandler(
                 id: {
                   in: orderIds,
                 },
+                // ⚠️ Ceinture ET bretelles : `orderIds` ne vient déjà plus que de l'édition, mais
+                // le `where` de l'écriture la redit. Une relecture future qui élargirait la
+                // requête ci-dessus ne rouvrirait pas la brèche pour autant.
+                editionId: editionId,
                 status: 'Pending',
               },
               data: {
@@ -605,9 +622,7 @@ export default wrapApiHandler(
             }),
             prisma.ticketingOrderItem.updateMany({
               where: {
-                id: {
-                  in: body.participantIds,
-                },
+                ...porteeTicket,
                 state: 'Pending',
               },
               data: {
