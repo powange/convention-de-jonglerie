@@ -72,7 +72,30 @@ export function wrapApiHandler<T = any>(
         return handleValidationError(error)
       }
 
-      // 4. Erreurs génériques - logger et transformer en 500
+      /*
+       * 4. Erreurs Prisma CONNUES — les traduire plutôt que les rendre en 500.
+       *
+       * ## ⚠️ POURQUOI CETTE ÉTAPE N'EXISTAIT PAS (constat A7)
+       *
+       * `handlePrismaError` traduit P2002 en 409, P2025 en 404 et P2003 en 400 depuis longtemps.
+       * Aucun des 552 handlers ne l'appelait — zéro usage mesuré. Partout, une contrainte unique ou
+       * une clé étrangère violée traversait ce wrapper comme erreur générique : **500**, message
+       * neutre, ligne de journal en « erreur inattendue », et pour l'utilisateur un « Erreur serveur
+       * interne » là où « déjà existant » ou « référence invalide » l'orienterait.
+       *
+       * 📍 C'est le cas le plus coûteux de code mort : il était **testé** — huit cas — donc il avait
+       * l'air vivant, et il le restait tant qu'on jugeait sur la couverture.
+       *
+       * ⚠️ SEULS LES CODES CONNUS SONT DÉLÉGUÉS. Tout déléguer ferait perdre aux codes inconnus le
+       * journal « erreur inattendue » avec son `operationName` — c'est-à-dire la seule trace qui
+       * permette de retrouver l'appel fautif. Un code Prisma qu'on n'a pas prévu doit rester une
+       * surprise bruyante.
+       */
+      if (estUneErreurPrismaTraduisible(error)) {
+        handlePrismaError(error, operationName)
+      }
+
+      // 5. Erreurs génériques - logger et transformer en 500
       const isUserError = isHttpError(error) || isApiError(error)
       const shouldLog =
         !silentErrors && (!isUserError || (isApiError(error) && error.status >= 500))
@@ -96,8 +119,29 @@ export function wrapApiHandler<T = any>(
 }
 
 /**
+ * Les codes Prisma que `handlePrismaError` sait traduire en refus explicite.
+ *
+ * ⚠️ La liste est FERMÉE, et c'est le point : un code absent d'ici garde le chemin générique, donc
+ * son journal « erreur inattendue » et son `operationName`. Ajouter un code ici, c'est accepter de
+ * perdre cette trace en échange d'un message utile — ce qui se décide code par code.
+ */
+const CODES_PRISMA_TRADUITS = ['P2002', 'P2025', 'P2003'] as const
+
+/** Une erreur Prisma dont on sait faire un refus plutôt qu'une panne. */
+export function estUneErreurPrismaTraduisible(error: unknown): boolean {
+  if (!error || typeof error !== 'object' || !('code' in error)) return false
+  return (CODES_PRISMA_TRADUITS as readonly string[]).includes(
+    String((error as { code: unknown }).code)
+  )
+}
+
+/**
  * Gère les erreurs Prisma courantes (notamment P2002 - contrainte unique)
  * Convertit les erreurs Prisma en erreurs API standardisées
+ *
+ * Branché dans `wrapApiHandler` : les handlers n'ont pas à l'appeler eux-mêmes. Ceux qui traitent
+ * déjà P2002 à la main (sept fichiers) gardent leur message, puisque l'erreur HTTP qu'ils lèvent
+ * est reconnue plus tôt dans la chaîne.
  */
 export function handlePrismaError(error: unknown, context?: string): never {
   if (error && typeof error === 'object' && 'code' in error) {
@@ -105,13 +149,19 @@ export function handlePrismaError(error: unknown, context?: string): never {
 
     switch (prismaError.code) {
       case 'P2002': {
-        // Contrainte unique violée
+        /*
+         * Contrainte unique violée.
+         *
+         * ⚠️ LE NOM DE COLONNE NE PART PLUS DANS LE MESSAGE. Il rendait « Ce editionId_name est
+         * déjà utilisé » : le nom de l'index Prisma, lisible par personne, et une fuite du schéma
+         * dans une réponse d'API. Le champ reste disponible dans `data` pour qui veut l'afficher.
+         */
         const target = prismaError.meta?.target
-        const field = Array.isArray(target) ? target[0] : 'champ'
-        // Convertir en erreur h3 (pour rester compatible)
+        const champ = Array.isArray(target) ? target.join(', ') : (target ?? null)
         throw createError({
           status: 409,
-          message: `Ce ${field} est déjà utilisé`,
+          message: 'Cette valeur est déjà utilisée',
+          data: { champ },
         })
       }
 
