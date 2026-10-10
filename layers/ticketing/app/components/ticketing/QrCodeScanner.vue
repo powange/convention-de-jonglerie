@@ -130,6 +130,26 @@ const scanning = ref(false)
 const loading = ref(false)
 const error = ref('')
 const isTransitioning = ref(false)
+/**
+ * Un code a-t-il déjà été émis pour cette session de scan&nbsp;?
+ *
+ * ## ⚠️ POURQUOI UN VERROU, ET POURQUOI IL N'EST PAS RÉACTIF
+ *
+ * `html5-qrcode` est configuré à **10 images par seconde** et rappelle son callback à **chaque
+ * image décodée** tant que `stop()` n'a pas résolu. Or `onScanSuccess` appelait `stopScanning()`
+ * **sans l'attendre** avant d'émettre : le deuxième appel arrivait donc avant l'arrêt effectif,
+ * sortait bien de `stopScanning` grâce à `isTransitioning`… mais **après avoir émis une seconde
+ * fois**. Dix occasions par seconde.
+ *
+ * Côté écran, cela lançait deux `verify`, deux toasts « participant trouvé » et rouvrait la fiche.
+ * Aucune validation n'était doublée — elle est atomique — mais la file d'entrée voyait deux
+ * notifications par personne, sur un geste déjà lent au téléphone.
+ *
+ * ⚠️ Une variable ordinaire, PAS un `ref` : le verrou doit être posé **dans le même tour de boucle**
+ * que la lecture. Un `ref` est tout aussi synchrone en lecture/écriture, mais le signaler ici évite
+ * qu'on le transforme un jour en `computed` ou qu'on l'attende — ce qui rouvrirait la fenêtre.
+ */
+let codeDejaEmis = false
 const manualCode = ref('')
 let html5QrCode: Html5Qrcode | null = null
 
@@ -140,6 +160,8 @@ const startScanning = async () => {
   error.value = ''
   loading.value = true
   isTransitioning.value = true
+  // Chaque session de scan repart du bon pied : sans cela, le scanner rouvert ne lirait plus rien.
+  codeDejaEmis = false
 
   try {
     // D'abord afficher l'élément #qr-reader en mettant scanning à true
@@ -172,8 +194,14 @@ const startScanning = async () => {
 
     // Callback de succès
     const onScanSuccess = (decodedText: string) => {
-      // Arrêter le scan et émettre le résultat
-      stopScanning()
+      // Le verrou AVANT tout le reste : c'est la seule place qui ferme la fenêtre.
+      if (codeDejaEmis) return
+      codeDejaEmis = true
+
+      // L'arrêt n'est pas attendu — le geste de l'utilisateur ne doit pas traîner derrière la
+      // caméra —, mais son échec est capté : une promesse rejetée non gérée ici interromprait
+      // l'hydratation, défaut déjà payé ailleurs dans ce dépôt.
+      void stopScanning().catch(() => {})
       emit('scan', decodedText)
       close()
     }
