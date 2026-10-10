@@ -134,44 +134,49 @@ describe('api-helpers', () => {
   })
 
   describe('handlePrismaError', () => {
-    it("devrait gérer l'erreur P2002 (contrainte unique)", () => {
-      const error = {
-        code: 'P2002',
-        meta: { target: ['email'] },
-      }
-
-      expect(() => handlePrismaError(error)).toThrow()
+    /**
+     * L'erreur levée, capturée sans risque de silence.
+     *
+     * ⚠️ LES TROIS CAS P2002 ÉTAIENT ÉCRITS EN `try { … } catch (e) { expect(…) }`, et deux d'entre
+     * eux sans aucune garde : si la fonction cessait de lever, le `catch` ne s'exécutait jamais et
+     * le test passait **sans rien vérifier**. Ce helper exige qu'une erreur ait bien été levée.
+     */
+    const refusLeve = (error: unknown, context?: string) => {
       try {
-        handlePrismaError(error)
-      } catch (e: any) {
-        expect(e.statusCode).toBe(409)
-        expect(e.message).toBe('Ce email est déjà utilisé')
+        handlePrismaError(error, context)
+      } catch (e) {
+        return e as { statusCode: number; message: string; data?: { champ?: string | null } }
       }
+      throw new Error('handlePrismaError devait lever')
+    }
+
+    it('⚠️ NE MET PLUS LE NOM DE COLONNE DANS LE MESSAGE (P2002)', () => {
+      /*
+       * Il rendait « Ce email est déjà utilisé » — et, sur un index composite, « Ce editionId_name
+       * est déjà utilisé » : le nom de l'index Prisma, lisible par personne, et une fuite du schéma
+       * dans une réponse d'API. Le champ reste disponible dans `data` pour qui veut l'afficher.
+       */
+      const erreur = refusLeve({ code: 'P2002', meta: { target: ['email'] } })
+
+      expect(erreur.statusCode).toBe(409)
+      expect(erreur.message).toBe('Cette valeur est déjà utilisée')
+      expect(erreur.data?.champ).toBe('email')
     })
 
-    it('devrait gérer P2002 avec target array', () => {
-      const error = {
-        code: 'P2002',
-        meta: { target: ['pseudo', 'email'] },
-      }
+    it('garde tous les champs d’un index composite dans `data`', () => {
+      // L'ancien code ne gardait que le PREMIER : sur `[editionId, name]`, il annonçait « Ce
+      // editionId est déjà utilisé », ce qui désigne le mauvais champ.
+      const erreur = refusLeve({ code: 'P2002', meta: { target: ['editionId', 'name'] } })
 
-      try {
-        handlePrismaError(error)
-      } catch (e: any) {
-        expect(e.statusCode).toBe(409)
-        expect(e.message).toBe('Ce pseudo est déjà utilisé')
-      }
+      expect(erreur.data?.champ).toBe('editionId, name')
     })
 
-    it('devrait gérer P2002 sans meta', () => {
-      const error = { code: 'P2002' }
+    it('reste exploitable sans `meta`', () => {
+      const erreur = refusLeve({ code: 'P2002' })
 
-      try {
-        handlePrismaError(error)
-      } catch (e: any) {
-        expect(e.statusCode).toBe(409)
-        expect(e.message).toBe('Ce champ est déjà utilisé')
-      }
+      expect(erreur.statusCode).toBe(409)
+      expect(erreur.message).toBe('Cette valeur est déjà utilisée')
+      expect(erreur.data?.champ).toBeNull()
     })
 
     it("devrait gérer l'erreur P2025 (enregistrement non trouvé)", () => {
@@ -340,6 +345,113 @@ describe('api-helpers', () => {
       const result = await wrapped(mockEvent)
 
       expect(result).toEqual({ sync: true })
+    })
+
+    /**
+     * Les erreurs Prisma traversaient ce wrapper en 500 — constat A7.
+     *
+     * ## ⚠️ LE DÉFAUT
+     *
+     * `handlePrismaError` traduit P2002 en 409, P2025 en 404 et P2003 en 400 depuis longtemps.
+     * **Aucun des 552 handlers ne l'appelait** : zéro usage mesuré. Partout, une contrainte unique
+     * ou une clé étrangère violée arrivait ici comme erreur générique — 500, message neutre, ligne
+     * de journal en « erreur inattendue », et pour l'utilisateur un « Erreur serveur interne » là
+     * où « déjà existant » ou « référence invalide » l'orienterait.
+     *
+     * 📍 C'est le cas le plus coûteux de code mort : il était **testé**, huit cas, donc il avait
+     * l'air vivant. Il le restait tant qu'on jugeait sur la couverture.
+     *
+     * ## ⚠️⚠️ CE QUI REND CES CAS NON CREUX
+     *
+     * Ils passent par `wrapApiHandler`, c'est-à-dire par le chemin que prennent les 552 handlers —
+     * et non par `handlePrismaError` directement, qui était déjà couvert et ne prouvait rien sur le
+     * branchement. Le témoin est un code Prisma INCONNU : il doit rester un 500 bruyant.
+     */
+    describe('les erreurs Prisma connues', () => {
+      const parLeWrapper = async (error: unknown) => {
+        const wrapped = wrapApiHandler(vi.fn().mockRejectedValue(error), {
+          operationName: 'TestPrisma',
+        })
+        try {
+          await wrapped({} as any)
+        } catch (e) {
+          return e as { statusCode: number; message: string; data?: { champ?: string | null } }
+        }
+        throw new Error('le wrapper devait lever')
+      }
+
+      it('⚠️ TRADUIT P2002 EN 409, et non en 500', async () => {
+        const erreur = await parLeWrapper({ code: 'P2002', meta: { target: ['name'] } })
+
+        expect(erreur.statusCode).toBe(409)
+        expect(erreur.message).toBe('Cette valeur est déjà utilisée')
+        expect(erreur.data?.champ).toBe('name')
+      })
+
+      it('⚠️ TRADUIT P2025 EN 404', async () => {
+        const erreur = await parLeWrapper({ code: 'P2025' })
+
+        expect(erreur.statusCode).toBe(404)
+      })
+
+      it('⚠️ TRADUIT P2003 EN 400', async () => {
+        const erreur = await parLeWrapper({ code: 'P2003' })
+
+        expect(erreur.statusCode).toBe(400)
+        expect(erreur.message).toBe('Référence invalide')
+      })
+
+      it('laisse un code Prisma INCONNU en 500 bruyant', async () => {
+        /*
+         * LE TÉMOIN, et il protège la diagnosticabilité. Tout déléguer ferait perdre aux codes
+         * inconnus le journal « erreur inattendue » avec son `operationName` — la seule trace qui
+         * permette de retrouver l'appel fautif. Un code qu'on n'a pas prévu doit rester une
+         * surprise bruyante.
+         */
+        const journal = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+        const erreur = await parLeWrapper({ code: 'P2037', message: 'trop de connexions' })
+
+        expect(erreur.statusCode).toBe(500)
+        expect(journal).toHaveBeenCalledWith(
+          expect.stringContaining('[TestPrisma]'),
+          expect.anything()
+        )
+        journal.mockRestore()
+      })
+
+      it('ne confond pas un code système avec un code Prisma', async () => {
+        /*
+         * SECOND TÉMOIN. La détection d'origine testait seulement la PRÉSENCE d'un champ `code` :
+         * une erreur de système de fichiers (`ENOENT`) y aurait été prise pour une erreur Prisma et
+         * rendue en 500 « Erreur de base de données », message qui envoie chercher au mauvais
+         * endroit. La liste des codes traduits est fermée.
+         */
+        const journal = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+        const erreur = await parLeWrapper(
+          Object.assign(new Error('fichier absent'), { code: 'ENOENT' })
+        )
+
+        expect(erreur.statusCode).toBe(500)
+        expect(erreur.message).toBe('Erreur serveur interne')
+        journal.mockRestore()
+      })
+
+      it('laisse passer le refus d’un handler qui gère déjà P2002 lui-même', async () => {
+        /*
+         * TROISIÈME TÉMOIN, et il garde sept fichiers. Les handlers qui traitent P2002 à la main
+         * lèvent leur propre erreur HTTP, avec un message plus précis — « Ce tag existe déjà pour
+         * cette édition ». Elle est reconnue plus tôt dans la chaîne, donc ce branchement ne doit
+         * pas la remplacer par son message générique.
+         */
+        const erreur = await parLeWrapper({
+          statusCode: 409,
+          message: 'Ce tag existe déjà pour cette édition',
+        })
+
+        expect(erreur.message).toBe('Ce tag existe déjà pour cette édition')
+      })
     })
   })
 })
