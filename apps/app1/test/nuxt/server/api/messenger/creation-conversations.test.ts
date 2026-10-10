@@ -259,10 +259,45 @@ describe('POST /api/messenger/volunteer-to-organizers', () => {
     expect(where.userId).toBe(UTILISATEUR)
   })
 
-  it('refuse un corps sans édition', async () => {
-    global.readBody = vi.fn().mockResolvedValue({})
+  describe('la validation du corps', () => {
+    /*
+     * ⚠️ CE CAS N'ASSÈRE PLUS LE MESSAGE. Il exigeait `/requis/`, le texte du contrôle de présence
+     * écrit à la main. Le corps est désormais validé par zod, et `wrapApiHandler` transforme une
+     * `ZodError` en 400 : le refus est le même pour l'appelant, mais sa formulation vient de zod.
+     * Asserter un libellé d'erreur, c'est se lier à la façon dont il est produit.
+     */
+    it('refuse un corps sans édition', async () => {
+      global.readBody = vi.fn().mockResolvedValue({})
 
-    await expect(benevoleVersOrganisateurs(evenement as any)).rejects.toThrow(/requis/)
+      await expect(benevoleVersOrganisateurs(evenement as any)).rejects.toThrow()
+      expect(assurerBenevoleVersOrganisateurs).not.toHaveBeenCalled()
+    })
+
+    it('⚠️ REFUSE UN IDENTIFIANT QUI N’EST PAS UN NOMBRE', async () => {
+      /*
+       * LE CŒUR DU CONSTAT A3. Seule la PRÉSENCE de l'identifiant était contrôlée : `{ editionId:
+       * 'trois' }` passait le contrôle, puis Prisma refusait la requête — 500 sur une saisie. Un
+       * test qui n'envoyait qu'un corps vide ne pouvait pas le voir.
+       */
+      global.readBody = vi.fn().mockResolvedValue({ editionId: 'trois' })
+
+      await expect(benevoleVersOrganisateurs(evenement as any)).rejects.toThrow()
+      expect(prismaMock.editionVolunteerApplication.findFirst).not.toHaveBeenCalled()
+    })
+
+    it('accepte un identifiant écrit en chaîne', async () => {
+      /*
+       * LE TÉMOIN. Un corps JSON peut porter « 7 » plutôt que 7 — c'est le cas d'un formulaire. Un
+       * schéma sans `coerce` refuserait cette forme et casserait des appels qui fonctionnaient,
+       * tout en satisfaisant le cas ci-dessus.
+       */
+      global.readBody = vi.fn().mockResolvedValue({ editionId: String(EDITION) })
+
+      const reponse: any = await benevoleVersOrganisateurs(evenement as any)
+
+      expect(reponse.data.conversationId).toBe('conv-vo')
+      expect(assurerBenevoleVersOrganisateurs).toHaveBeenCalledWith(EDITION, UTILISATEUR)
+    })
   })
 
   it('refuse un anonyme', async () => {
@@ -309,10 +344,29 @@ describe('POST /api/messenger/organizers-group', () => {
     expect(where.editionId).toBe(EDITION)
   })
 
-  it('refuse un corps sans édition', async () => {
-    global.readBody = vi.fn().mockResolvedValue({})
+  describe('la validation du corps', () => {
+    // Même raison que pour le point d'API voisin : le refus vient maintenant de zod, et son
+    // libellé n'est plus le nôtre.
+    it('refuse un corps sans édition', async () => {
+      global.readBody = vi.fn().mockResolvedValue({})
 
-    await expect(groupeOrganisateurs(evenement as any)).rejects.toThrow(/requis/)
+      await expect(groupeOrganisateurs(evenement as any)).rejects.toThrow()
+    })
+
+    it('⚠️ REFUSE UN IDENTIFIANT QUI N’EST PAS UN NOMBRE', async () => {
+      // Ce point d'API était le dernier des trois à n'avoir aucun schéma.
+      global.readBody = vi.fn().mockResolvedValue({ editionId: 'trois' })
+
+      await expect(groupeOrganisateurs(evenement as any)).rejects.toThrow()
+      expect(prismaMock.editionOrganizer.findFirst).not.toHaveBeenCalled()
+    })
+
+    it('accepte un identifiant écrit en chaîne', async () => {
+      // Le témoin : `coerce` doit accepter la forme réelle d'un corps JSON.
+      global.readBody = vi.fn().mockResolvedValue({ editionId: String(EDITION) })
+
+      await expect(groupeOrganisateurs(evenement as any)).resolves.toBeTruthy()
+    })
   })
 
   it('refuse un anonyme', async () => {

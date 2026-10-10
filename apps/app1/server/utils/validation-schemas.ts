@@ -985,3 +985,29 @@ export const showApplicationStatusSchema = z.object({
     .max(10000, 'La description ne peut pas dépasser 10000 caractères')
     .optional(),
 })
+
+/**
+ * Les bornes d'une pagination lue dans l'URL.
+ *
+ * ## ⚠️ POURQUOI CE SCHÉMA EXISTE (constat A3)
+ *
+ * Plusieurs points d'API transformaient `limit` et `offset` par un `parseInt` nu — sans `min`, sans
+ * `max`, sans garde sur `NaN`. Deux conséquences, et aucune ne demandait d'effort à produire :
+ *
+ * - `?limit=abc` donnait `take: NaN`, que Prisma refuse : une **panne 500** sur une saisie d'URL ;
+ * - `?limit=100000` chargeait tout, avec les relations incluses.
+ *
+ * ⚠️ UNE VALEUR VIDE VAUT UNE ABSENCE. `?limit=` arrive comme la chaîne vide, que `z.coerce.number`
+ * convertit en **zéro** — donc refusé par `min(1)`, là où l'ancien code retombait sur son défaut.
+ * Durcir une entrée ne doit pas transformer en erreur ce qui marchait : la chaîne vide est ramenée
+ * à `undefined` avant toute vérification.
+ */
+const videVautAbsent = (valeur: unknown) => (valeur === '' ? undefined : valeur)
+
+/** `limit` : un entier entre 1 et `max` (100 par défaut), ou rien. */
+export const limiteDePagination = (max = 100) =>
+  z.preprocess(videVautAbsent, z.coerce.number().int().min(1).max(max).optional())
+
+/** `offset` : un entier positif ou nul, ou rien. */
+export const decalageDePagination = () =>
+  z.preprocess(videVautAbsent, z.coerce.number().int().min(0).optional())
