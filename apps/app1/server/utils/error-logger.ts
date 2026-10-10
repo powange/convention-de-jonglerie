@@ -149,24 +149,125 @@ function sanitizeBody(body: any): any {
     'email', // Emails pour RGPD (on garde que le domaine)
   ].map((champ) => champ.toLowerCase())
 
-  const sanitized: any = {}
+  return nettoyer(body, sensitiveFields, 0, new WeakSet())
+}
 
-  for (const [key, value] of Object.entries(body)) {
-    const lowerKey = key.toLowerCase()
-    if (sensitiveFields.includes(lowerKey)) {
-      if (lowerKey === 'email' && typeof value === 'string') {
-        // Garder seulement le domaine pour les emails
-        const domain = value.split('@')[1]
-        sanitized[key] = domain ? `***@${domain}` : '***REDACTED***'
-      } else {
-        sanitized[key] = '***REDACTED***'
-      }
-    } else {
-      sanitized[key] = value
-    }
+/**
+ * Les champs qui portent le CONTENU d'un fichier, remplacés par leur taille.
+ *
+ * ⚠️ POURQUOI (constat B5). Le journal consigne le corps de toute requête en erreur, et un
+ * refus d'envoi — « Type de fichier non autorisé », « Fichier trop volumineux » — est un 400,
+ * donc consigné. Le corps d'un envoi est `{ files: [{ name, type, size, content: base64 }] }` :
+ * c'est **le fichier entier**, jusqu'à ~13 Mo de base64, qui partait dans la colonne `body`.
+ *
+ * Chaque mauvais fichier choisi par un utilisateur coûtait donc plusieurs mégaoctets de table, et
+ * l'écran d'administration charge cette ligne en entier.
+ *
+ * ⚠️ Ce n'est pas évitable en amont : `validateUploadedFile` lit `file.content`, donc le corps est
+ * **déjà entièrement parsé** quand la validation refuse. Refuser sur `content-length` avant de lire
+ * demanderait un autre dispositif ; ici on borne ce qu'on ÉCRIT.
+ */
+const CHAMPS_DE_CONTENU = ['content', 'data']
+
+/** Au-delà de cette longueur, un champ de contenu est remplacé par sa taille. */
+const LONGUEUR_MAX_DUN_CONTENU = 1000
+
+/** Profondeur maximale explorée : au-delà, la valeur est remplacée par un repère. */
+const PROFONDEUR_MAX = 6
+
+/**
+ * Nettoie récursivement un corps de requête.
+ *
+ * ⚠️ RÉCURSIF, ET C'ÉTAIT TOUT LE TROU. L'ancienne version ne regardait que les clés de PREMIER
+ * NIVEAU : `files[0].content` passait tel quel, et un mot de passe imbriqué —
+ * `{ user: { password } }` — aussi. Aucun point d'API n'envoie aujourd'hui la seconde forme, mais
+ * la garde ne l'aurait pas vue.
+ *
+ * Le `WeakSet` et la profondeur bornent le parcours : un corps cyclique ferait boucler
+ * indéfiniment la journalisation d'une erreur, c'est-à-dire le code qu'on appelle précisément
+ * quand quelque chose va déjà mal.
+ */
+function nettoyer(
+  valeur: unknown,
+  champsSensibles: string[],
+  profondeur: number,
+  vus: WeakSet<object>
+): unknown {
+  if (valeur === null || typeof valeur !== 'object') return valeur
+  if (profondeur >= PROFONDEUR_MAX) return '***TROP PROFOND***'
+  if (vus.has(valeur as object)) return '***CYCLE***'
+  vus.add(valeur as object)
+
+  if (Array.isArray(valeur)) {
+    return valeur.map((element) => nettoyer(element, champsSensibles, profondeur + 1, vus))
   }
 
-  return sanitized
+  const nettoye: Record<string, unknown> = {}
+  for (const [cle, brut] of Object.entries(valeur as Record<string, unknown>)) {
+    const cleMinuscule = cle.toLowerCase()
+
+    if (champsSensibles.includes(cleMinuscule)) {
+      if (cleMinuscule === 'email' && typeof brut === 'string') {
+        // Garder seulement le domaine pour les emails
+        const domaine = brut.split('@')[1]
+        nettoye[cle] = domaine ? `***@${domaine}` : '***REDACTED***'
+      } else {
+        nettoye[cle] = '***REDACTED***'
+      }
+      continue
+    }
+
+    if (
+      CHAMPS_DE_CONTENU.includes(cleMinuscule) &&
+      typeof brut === 'string' &&
+      brut.length > LONGUEUR_MAX_DUN_CONTENU
+    ) {
+      nettoye[cle] = `***${Buffer.byteLength(brut, 'utf8')} octets***`
+      continue
+    }
+
+    nettoye[cle] = nettoyer(brut, champsSensibles, profondeur + 1, vus)
+  }
+
+  return nettoye
+}
+
+/**
+ * La taille maximale du corps écrit dans le journal.
+ *
+ * Le remplacement des champs de contenu couvre le cas connu — un envoi de fichier. Ce plafond est
+ * le filet pour ceux qu'on n'a pas prévus : un champ de texte très long, un tableau de mille
+ * lignes. Mieux vaut un repère exploitable qu'une ligne de table de plusieurs mégaoctets que
+ * l'écran d'administration chargera en entier.
+ */
+const TAILLE_MAX_DU_CORPS = 64 * 1024
+
+/** Le corps tel qu'il sera écrit : nettoyé, et plafonné s'il reste trop gros. */
+export function corpsPourLeJournal(body: unknown): unknown {
+  const nettoye = sanitizeBody(body)
+  if (nettoye === null || typeof nettoye !== 'object') return nettoye
+
+  let taille: number
+  try {
+    taille = Buffer.byteLength(JSON.stringify(nettoye) ?? '', 'utf8')
+  } catch {
+    // Un corps non sérialisable (cycle résiduel, BigInt) ne doit pas faire échouer la
+    // journalisation : c'est le dispositif qu'on appelle quand quelque chose va déjà mal.
+    return { __corpsIllisible__: true }
+  }
+
+  if (taille <= TAILLE_MAX_DU_CORPS) return nettoye
+
+  /*
+   * Les CLÉS sont conservées, pas les valeurs : savoir quels champs la requête portait suffit
+   * presque toujours au diagnostic, et un corps tronqué au milieu d'une chaîne ne serait plus du
+   * JSON valide dans une colonne qui en attend.
+   */
+  return {
+    __corpsTropGros__: true,
+    octets: taille,
+    champs: Array.isArray(nettoye) ? `${nettoye.length} éléments` : Object.keys(nettoye),
+  }
 }
 
 /**
@@ -452,7 +553,7 @@ export async function logApiError({ error, statusCode, event }: ErrorInfo): Prom
       referer,
       origin,
       headers: sanitizeHeaders(getHeaders(event)),
-      body: body ? sanitizeBody(body) : null,
+      body: body ? corpsPourLeJournal(body) : null,
       queryParams: Object.fromEntries(urlObj.searchParams.entries()),
       prismaDetails: prismaDetails || undefined,
       userId,
