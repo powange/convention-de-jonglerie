@@ -54,6 +54,42 @@ const PAGES = [
     /** Racine de clé employée par la page → domaine qui la porte. */
     racines: { conventions: 'edition', gestion: 'gestion' },
   },
+  /*
+   * ⚠️ QUATRE ROUTES AJOUTÉES PAR LE CONSTAT B1, mesurées une par une sur le code courant.
+   *
+   * Le balayage d'origine en annonçait sept. Deux ont disparu depuis — `workshops.page_title` n'est
+   * plus employé que sur la page des ateliers, qui charge son domaine, et le composant
+   * `CommentsModal.vue` n'existe plus. Une cinquième, le lien de connexion du covoiturage, se
+   * corrige autrement : voir le cas dédié plus bas.
+   */
+  {
+    route: '/conventions/1/edit',
+    fichier: 'app/pages/conventions/[id]/edit.vue',
+    // `conventions.*` vit dans `edition.json`, et aucune règle ne couvrait `/conventions`.
+    racines: { conventions: 'edition' },
+  },
+  {
+    route: '/conventions/1/editions/add',
+    fichier: 'app/pages/conventions/[id]/editions/add.vue',
+    racines: { conventions: 'edition' },
+  },
+  {
+    route: '/editions/1/gestion',
+    fichier: 'app/pages/editions/[id]/gestion/index.vue',
+    // La carte des renforts, sur la PREMIÈRE page que voit un organisateur.
+    racines: { volunteers: 'volunteers' },
+  },
+  {
+    /*
+     * ⚠️ LA ROUTE ET LE FICHIER NE SE CORRESPONDENT PAS ICI, et c'est le cas le plus instructif :
+     * les clés sont dans un COMPOSANT, qui hérite du domaine chargé par la route qui le rend. Le
+     * composant de progression vit sous `/admin` dans un cas et sous `/editions/:id/gestion` dans
+     * l'autre — et seul le premier chargeait `admin`.
+     */
+    route: '/editions/1/gestion/ai-update',
+    fichier: 'app/components/admin/ImportGenerationProgress.vue',
+    racines: { admin: 'admin' },
+  },
 ]
 
 /** Les fichiers de locale chargés d'emblée, par langue, lus dans `nuxt.config.ts`. */
@@ -87,6 +123,30 @@ describe('clés i18n — chaque page charge le domaine de ses clés', () => {
     for (const racine of Object.keys(racines)) {
       expect(employees.has(racine), `${fichier} n'emploie plus « ${racine}.* »`).toBe(true)
     }
+  })
+
+  it('⚠️ LE LIEN DE CONNEXION DU COVOITURAGE N’EXIGE PLUS LE DOMAINE `auth`', () => {
+    /*
+     * LE CINQUIÈME CAS DU CONSTAT B1, corrigé autrement que par un chargement.
+     *
+     * Le commentaire d'une annonce proposait `auth.login` à un visiteur non connecté. `auth.json`
+     * n'est chargé que sous /auth, /login, /register et /profile : sur une page de covoiturage
+     * atteinte par rechargement, la clé sortait donc brute.
+     *
+     * Charger tout le domaine `auth` sur chaque page d'édition pour un seul mot coûterait plus que
+     * de prendre `navigation.login`, de même texte, dans `common.json` — qui est TOUJOURS embarqué.
+     * Ce cas interdit le retour en arrière.
+     */
+    const src = fs.readFileSync(
+      path.resolve(
+        __dirname,
+        '../../../../../layers/carpool/app/components/edition/carpool/CommentsInline.vue'
+      ),
+      'utf8'
+    )
+
+    expect(src).toContain("$t('navigation.login')")
+    expect(src).not.toContain("$t('auth.")
   })
 
   it('le socle commun correspond à ce que nuxt.config.ts charge pour toutes les langues', () => {
