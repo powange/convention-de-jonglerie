@@ -48,7 +48,6 @@
         </h6>
         <UButton
           v-if="localValue.perEdition.length"
-          :aria-label="$t('common.clear')"
           size="xs"
           variant="ghost"
           color="neutral"

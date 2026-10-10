@@ -513,7 +513,6 @@
     <div class="flex justify-between mt-4">
       <UButton
         v-if="currentStep > 0"
-        :aria-label="$t('common.back')"
         color="neutral"
         variant="solid"
         icon="i-heroicons-arrow-left"
@@ -522,7 +521,6 @@
       >
       <UButton
         v-if="currentStep < steps.length - 1"
-        :aria-label="$t('common.next')"
         color="primary"
         variant="solid"
         icon="i-heroicons-arrow-right"
@@ -532,7 +530,6 @@
       >
       <UButton
         v-if="currentStep === steps.length - 1"
-        :aria-label="$t('common.validate')"
         type="submit"
         :loading="loading"
         icon="i-heroicons-check"
