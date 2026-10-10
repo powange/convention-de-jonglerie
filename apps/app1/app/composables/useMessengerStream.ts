@@ -51,12 +51,34 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
   // Accusés de lecture en temps réel : userId -> id du dernier message lu
   const readReceipts = ref<Record<number, string>>({})
 
+  /**
+   * Le nombre de fois que ce flux s'est RÉTABLI après une perte.
+   *
+   * L'écran s'en sert pour recharger les messages : pendant la coupure, le flux global ne pousse
+   * rien à une conversation qui n'écoute plus, et personne ne va les chercher ensuite. Un compteur
+   * plutôt qu'un booléen, pour qu'une deuxième coupure déclenche un deuxième rattrapage — un
+   * drapeau déjà levé ne se remarquerait pas.
+   */
+  const reconnexionsApresPerte = ref(0)
+
   // Instance EventSource
   let eventSource: EventSource | null = null
   let reconnectTimer: NodeJS.Timeout | null = null
-  const maxReconnectAttempts = 3
-  let reconnectAttempts = 0
+  /**
+   * Le plafond du délai entre deux tentatives — il n'y a PLUS de plafond au NOMBRE de tentatives.
+   *
+   * ⚠️ Il y en avait trois. Passé la troisième, le flux était abandonné pour de bon : il posait un
+   * message d'erreur dans `streamStats`, que l'écran de la messagerie ne lit pas. Or cette
+   * connexion EST le signal de présence — la personne disparaissait donc de la liste des présents
+   * pour le reste de la session, sans que rien ne le dise, ni à elle ni aux autres. Une perte de
+   * wifi de quelques secondes ou un déploiement suffisait.
+   *
+   * Le flux global des notifications, lui, remonte à cinq tentatives ET se rétablit au retour de
+   * l'onglet au premier plan. Celui-ci n'avait ni l'un ni l'autre.
+   */
+  const DELAI_MAX = 30000
   let reconnectDelay = 2000
+  let perdueDepuisLaDerniereOuverture = false
 
   /**
    * Établit la connexion SSE pour une conversation
@@ -93,8 +115,15 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
         }
         streamStats.value.isConnected = true
         streamStats.value.isConnecting = false
-        reconnectAttempts = 0
+        streamStats.value.error = null
         reconnectDelay = 2000
+
+        // Rétablissement APRÈS une perte : c'est le seul cas où il y a quelque chose à rattraper.
+        // Une première ouverture n'a rien manqué, et prévenir l'écran la ferait recharger pour rien.
+        if (perdueDepuisLaDerniereOuverture) {
+          perdueDepuisLaDerniereOuverture = false
+          reconnexionsApresPerte.value++
+        }
       }
 
       // Ce flux ne porte plus que le ping : il garde la connexion — donc la présence — vivante.
@@ -112,6 +141,7 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
       // Gestion des erreurs
       eventSource.onerror = (error) => {
         console.error('[Messenger SSE] Erreur de connexion:', error)
+        if (streamStats.value.isConnected) perdueDepuisLaDerniereOuverture = true
         streamStats.value.isConnected = false
         streamStats.value.isConnecting = false
         streamStats.value.error = 'Connection error'
@@ -133,20 +163,43 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
   const scheduleReconnect = () => {
     if (!conversationId.value) return
 
-    if (reconnectAttempts >= maxReconnectAttempts) {
-      streamStats.value.error = 'Max reconnect attempts reached'
-      return
-    }
+    // Un onglet au second plan ne réessaie pas : le navigateur y ralentit les minuteurs, et c'est
+    // `visibilitychange` qui reprend la main au retour. Même politique que le flux global.
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return
 
     if (reconnectTimer) {
       clearTimeout(reconnectTimer)
     }
 
     reconnectTimer = setTimeout(() => {
-      reconnectAttempts++
-      reconnectDelay = Math.min(reconnectDelay * 2, 10000) // Max 10s
+      reconnectDelay = Math.min(reconnectDelay * 2, DELAI_MAX)
       connect()
     }, reconnectDelay)
+  }
+
+  /**
+   * Reprendre la main quand l'onglet revient au premier plan.
+   *
+   * ⚠️ `typeof document`, ET NON `import.meta.client` : ce dernier est FAUX sous vitest, ce qui
+   * rendrait la reprise morte sous le harnais — un test vert sur du code qui ne tourne pas. Piège
+   * déjà payé dans ce dépôt.
+   */
+  const auRetourDeLOnglet = () => {
+    if (document.visibilityState !== 'visible') {
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer)
+        reconnectTimer = null
+      }
+      return
+    }
+    if (!conversationId.value) return
+    if (streamStats.value.isConnected || streamStats.value.isConnecting) return
+    reconnectDelay = 2000
+    connect()
+  }
+
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', auRetourDeLOnglet)
   }
 
   /**
@@ -170,7 +223,7 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
     streamStats.value.isConnecting = false
     streamStats.value.lastPing = null
     streamStats.value.error = null
-    reconnectAttempts = 0
+    reconnectDelay = 2000
   }
 
   /*
@@ -249,6 +302,19 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
       clearMessages()
     }
 
+    /*
+     * ⚠️ LE DRAPEAU SE REMET À ZÉRO ICI, ET NON DANS `disconnect`.
+     *
+     * `connect` commence par fermer une connexion existante, donc par appeler `disconnect` : y
+     * remettre le drapeau à zéro l'effaçait juste avant la tentative de reconnexion, et le
+     * rattrapage n'avait jamais lieu. Le test l'a attrapé — c'est tout ce que ces deux cas
+     * mesurent.
+     *
+     * Changer de conversation, en revanche, n'est pas une perte : la suivante vient d'être chargée
+     * en entier, et un rattrapage y referait la même requête pour rien.
+     */
+    perdueDepuisLaDerniereOuverture = false
+
     if (newId) {
       connect()
     }
@@ -257,12 +323,17 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
   // Nettoyage lors de la destruction
   onUnmounted(() => {
     disconnect()
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', auRetourDeLOnglet)
+    }
   })
 
   return {
     // État
     streamStats: readonly(streamStats),
     isConnected: computed(() => streamStats.value.isConnected),
+    /** Incrémenté à chaque rétablissement après une perte : l'écran y accroche son rattrapage. */
+    reconnexionsApresPerte: readonly(reconnexionsApresPerte),
     isConnecting: computed(() => streamStats.value.isConnecting),
     realtimeMessages: readonly(realtimeMessages),
     messageUpdates: readonly(messageUpdates),

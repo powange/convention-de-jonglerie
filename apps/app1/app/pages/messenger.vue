@@ -314,6 +314,20 @@
           </div>
 
           <div v-else class="flex-1 flex flex-col overflow-hidden">
+            <!-- Le flux de la conversation est coupé.
+                 Cette connexion EST le signal de présence : tant qu'elle est perdue, les autres
+                 participants nous voient absents. Le dire, plutôt que de laisser croire que la
+                 conversation est vivante — c'est exactement ce qui manquait, alors que le fil
+                 d'une candidature de spectacle affiche déjà sa pastille. -->
+            <UAlert
+              v-if="!fluxConnecte"
+              icon="i-heroicons-arrow-path"
+              color="warning"
+              variant="subtle"
+              :title="$t('messenger.reconnecting')"
+              :ui="{ root: 'rounded-none', title: 'text-xs' }"
+            />
+
             <!-- Zone de messages avec UChatMessages -->
             <div ref="messagesContainerRef" class="flex-1 overflow-y-auto" @scroll="handleScroll">
               <!-- Indicateur de chargement des messages précédents -->
@@ -607,6 +621,8 @@ const {
   realtimeMessages: streamRealtimeMessages,
   messageUpdates,
   readReceipts: streamReadReceipts,
+  isConnected: fluxConnecte,
+  reconnexionsApresPerte,
 } = useMessengerStream(selectedConversationId)
 
 // Indicateurs « lu » (style Messenger), pour les conversations privées ET de groupe :
@@ -929,18 +945,49 @@ onMounted(async () => {
   }
 })
 
-// Sélectionner une conversation
-async function selectConversation(conversationId: string) {
-  selectedConversationId.value = conversationId
-
-  // Réinitialiser la pagination
+/**
+ * Recharger la première page de messages d'une conversation.
+ *
+ * Extraite parce que DEUX gestes en ont besoin : ouvrir une conversation, et se rétablir après une
+ * coupure du flux. Les écrire deux fois laisserait la pagination se désynchroniser d'un chemin à
+ * l'autre — c'est `hasMoreMessages` qui le paierait, en silence.
+ */
+async function chargerLesMessages(conversationId: string) {
   hasMoreMessages.value = true
-
   loadingMessages.value = true
   const result = await fetchMessages(conversationId, { limit: messagesLimit, offset: 0 })
   messages.value = result.data
   hasMoreMessages.value = result.pagination?.hasNextPage ?? result.data.length >= messagesLimit
   loadingMessages.value = false
+}
+
+/**
+ * Le rattrapage après une coupure du flux.
+ *
+ * ## ⚠️ POURQUOI IL FAUT RECHARGER, ET NON ATTENDRE
+ *
+ * Les messages n'arrivent plus par le flux de la conversation — c'est le flux global qui les
+ * pousse, et il ne pousse qu'aux écoutants du moment. Pendant une coupure, personne n'écoute pour
+ * cette conversation, et rien ensuite ne va chercher ce qui a été écrit : le fil restait figé
+ * jusqu'à ce qu'on reselectionne la conversation.
+ *
+ * ⚠️ La fiche d'audit prescrivait un `?since=` sur le flux de la conversation. Ce n'est plus le bon
+ * endroit : ce flux ne porte aucun message depuis le passage au flux global, et le serveur n'a ni
+ * `lastMessageTime` ni filtre de date. Recharger la première page est à la fois plus simple et plus
+ * sûr — c'est la même requête que l'ouverture, donc un seul chemin à garder juste.
+ */
+watch(reconnexionsApresPerte, async () => {
+  const conversation = selectedConversationId.value
+  if (!conversation) return
+  await chargerLesMessages(conversation)
+  scrollToBottom()
+})
+
+// Sélectionner une conversation
+async function selectConversation(conversationId: string) {
+  selectedConversationId.value = conversationId
+
+  await chargerLesMessages(conversationId)
 
   // Scroller vers le bas après le chargement des messages
   scrollToBottom()
