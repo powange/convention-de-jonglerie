@@ -37,6 +37,29 @@ describe('notifications store', () => {
     },
   ]
 
+  /**
+   * La pagination TELLE QUE LE SERVEUR LA REND.
+   *
+   * ⚠️ Les anciennes attentes de ce fichier écrivaient `{ limit, offset, hasMore }` — une forme que
+   * `/api/notifications` n'a jamais renvoyée. Elles passaient parce qu'aucune n'exigeait
+   * `hasMore: true` : le champ absent valait `undefined`, donc `false`, donc « il n'y a plus rien ».
+   * C'est exactement le défaut du store, recopié dans son test, et c'est ce qui l'a laissé vivre.
+   *
+   * `createPaginatedResponse` rend ces six champs, et pas d'autres.
+   */
+  const paginationDe = ({
+    page = 1,
+    limit = 20,
+    totalCount = 2,
+  }: { page?: number; limit?: number; totalCount?: number } = {}) => ({
+    page,
+    limit,
+    totalCount,
+    totalPages: Math.ceil(totalCount / limit),
+    hasNextPage: page * limit < totalCount,
+    hasPrevPage: page > 1,
+  })
+
   beforeEach(() => {
     setActivePinia(createPinia())
     store = useNotificationsStore()
@@ -84,7 +107,7 @@ describe('notifications store', () => {
         success: true,
         data: mockNotifications,
         unreadCount: 1,
-        pagination: { limit: 20, offset: 0, hasMore: false },
+        pagination: paginationDe({ limit: 20, totalCount: 2 }),
       }
 
       vi.mocked($fetch).mockResolvedValue(mockResponse)
@@ -102,7 +125,7 @@ describe('notifications store', () => {
         success: true,
         data: [],
         unreadCount: 0,
-        pagination: { limit: 10, offset: 0, hasMore: false },
+        pagination: paginationDe({ limit: 10, totalCount: 0 }),
       }
 
       vi.mocked($fetch).mockResolvedValue(mockResponse)
@@ -125,7 +148,7 @@ describe('notifications store', () => {
         success: true,
         data: [mockNotifications[1]],
         unreadCount: 1,
-        pagination: { limit: 20, offset: 1, hasMore: false },
+        pagination: paginationDe({ limit: 20, totalCount: 2 }),
       }
 
       vi.mocked($fetch).mockResolvedValue(mockResponse)
@@ -144,6 +167,65 @@ describe('notifications store', () => {
     })
   })
 
+  /**
+   * Le drapeau « il reste des pages » — constat B3, moitié client.
+   *
+   * ## ⚠️ LE DÉFAUT
+   *
+   * Le store lisait `response.pagination?.hasMore`. Le point d'API, lui, répond par
+   * `createPaginatedResponse`, qui nomme ce drapeau **`hasNextPage`**. Le champ lu n'existait donc
+   * pas : `undefined || false` → `false` au premier chargement. Le bouton « Charger plus » de
+   * `/notifications` n'apparaissait jamais, et la garde de `loadMore` refermait la porte derrière
+   * lui — **tout ce qui dépasse la première page était inaccessible**, sans la moindre erreur.
+   *
+   * Ce qui rend ce défaut durable : `hasMore` existe ailleurs dans le dépôt — les groupes du
+   * journal d'erreurs le rendent vraiment. Le nom est plausible, et un nom plausible et absent se
+   * lit comme « il n'y a plus rien », jamais comme une faute.
+   */
+  describe('hasMore, d’après la réponse du serveur', () => {
+    const repondAvec = (pagination: ReturnType<typeof paginationDe>) => {
+      vi.mocked($fetch).mockResolvedValue({
+        success: true,
+        data: mockNotifications,
+        unreadCount: 0,
+        pagination,
+      })
+    }
+
+    it('⚠️ VAUT « VRAI » QUAND IL RESTE UNE PAGE', async () => {
+      // 25 notifications, 20 par page : il en reste. Avec `hasMore`, ce cas rendait `false`.
+      repondAvec(paginationDe({ page: 1, limit: 20, totalCount: 25 }))
+
+      await store.fetchNotifications({ limit: 20 })
+
+      expect(store.hasMore).toBe(true)
+    })
+
+    it('vaut « faux » sur la dernière page', async () => {
+      /*
+       * LE TÉMOIN. Sans lui, un `hasMore` figé à `true` satisferait le cas ci-dessus — et le bouton
+       * « Charger plus » resterait affiché pour toujours, à rapporter des pages vides.
+       */
+      repondAvec(paginationDe({ page: 2, limit: 20, totalCount: 25 }))
+
+      await store.fetchNotifications({ limit: 20, offset: 20 })
+
+      expect(store.hasMore).toBe(false)
+    })
+
+    it('laisse « Charger plus » faire son travail', async () => {
+      // Le bout de chaîne que le défaut coupait : un premier chargement qui annonce une suite doit
+      // permettre à `loadMore` de partir. C'est la garde `if (!this.hasMore) return` qui bloquait.
+      repondAvec(paginationDe({ page: 1, limit: 20, totalCount: 25 }))
+      await store.fetchNotifications({ limit: 20 })
+      vi.mocked($fetch).mockClear()
+
+      await store.loadMore()
+
+      expect($fetch).toHaveBeenCalledWith('/api/notifications?limit=20&offset=20')
+    })
+  })
+
   describe('loadMore', () => {
     it('charge plus de notifications avec pagination', async () => {
       store.hasMore = true
@@ -153,7 +235,7 @@ describe('notifications store', () => {
         success: true,
         data: [mockNotifications[1]],
         unreadCount: 1,
-        pagination: { limit: 10, offset: 10, hasMore: false },
+        pagination: paginationDe({ page: 2, limit: 10, totalCount: 11 }),
       }
 
       vi.mocked($fetch).mockResolvedValue(mockResponse)
@@ -345,7 +427,7 @@ describe('notifications store', () => {
         success: true,
         notifications: [],
         unreadCount: 0,
-        pagination: { limit: 20, offset: 0, hasMore: false },
+        pagination: paginationDe({ limit: 20, totalCount: 2 }),
       })
     })
 

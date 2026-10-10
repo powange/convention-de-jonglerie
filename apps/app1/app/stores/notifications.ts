@@ -128,11 +128,30 @@ export const useNotificationsStore = defineStore('notifications', {
           params.append('offset', filters.offset.toString())
         }
 
+        /**
+         * ⚠️ `hasNextPage`, ET NON `hasMore`.
+         *
+         * Le point d'API répond par `createPaginatedResponse`, qui nomme ce drapeau `hasNextPage`.
+         * Le store lisait `pagination.hasMore` : un champ qui n'existe pas, donc `undefined`, donc
+         * `false` au premier chargement. Le bouton « Charger plus » n'apparaissait jamais et la
+         * garde de `loadMore` refermait la porte — les notifications au-delà de la première page
+         * étaient inaccessibles, sans la moindre erreur.
+         *
+         * Le type est écrit ici plutôt que laissé implicite : c'est lui qui aurait dit, au moment
+         * d'écrire `hasMore`, que ce champ n'existait pas.
+         */
         const response = await $fetch<{
           success: boolean
           data: RawNotification[]
           unreadCount: number
-          pagination: { limit: number; offset: number; hasMore: boolean }
+          pagination: {
+            page: number
+            limit: number
+            totalCount: number
+            totalPages: number
+            hasNextPage: boolean
+            hasPrevPage: boolean
+          }
         }>(`/api/notifications?${params}`)
 
         // Normaliser les notifications pour la compatibilité
@@ -149,7 +168,7 @@ export const useNotificationsStore = defineStore('notifications', {
         }
 
         this.unreadCount = response.unreadCount || 0
-        this.hasMore = response.pagination?.hasMore || false
+        this.hasMore = response.pagination?.hasNextPage || false
         this.currentFilters = { ...filters }
         this.lastFetch = new Date()
 

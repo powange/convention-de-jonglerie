@@ -114,6 +114,27 @@ export interface Conversation {
 }
 
 /**
+ * La pagination telle que `createPaginatedResponse` la rend, écrite ICI.
+ *
+ * ⚠️ ELLE ÉTAIT TYPÉE `any`, et c'est ce qui a laissé passer le défaut. Deux écrans lisaient
+ * `pagination.hasMore` — un champ que cette réponse ne porte pas, et que `any` ne pouvait pas
+ * contredire. Le drapeau valait donc `undefined`, et le chargement des pages suivantes restait
+ * fermé sans la moindre erreur.
+ *
+ * `hasMore` existe ailleurs dans le dépôt — les groupes du journal d'erreurs le rendent vraiment —
+ * d'où la confusion. Ce qui la rend coûteuse, c'est qu'un nom plausible et absent se lit comme
+ * « il n'y a plus rien », jamais comme une faute.
+ */
+export interface PaginationDeMessages {
+  page: number
+  limit: number
+  totalCount: number
+  totalPages: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
+}
+
+/**
  * Composable pour gérer la messagerie entre bénévoles
  */
 export const useMessenger = () => {
@@ -168,12 +189,12 @@ export const useMessenger = () => {
   const fetchMessages = async (
     conversationId: string,
     options?: { limit?: number; offset?: number }
-  ): Promise<{ data: ConversationMessage[]; pagination: any }> => {
+  ): Promise<{ data: ConversationMessage[]; pagination: PaginationDeMessages | null }> => {
     try {
       const response = await $fetch<{
         success: boolean
         data: ConversationMessage[]
-        pagination: any
+        pagination: PaginationDeMessages
       }>(`/api/messenger/conversations/${conversationId}/messages`, {
         query: {
           limit: options?.limit || 50,

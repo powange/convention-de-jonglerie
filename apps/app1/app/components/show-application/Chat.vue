@@ -8,7 +8,7 @@ import {
   remplacerMessage,
 } from '~/utils/messages-conversation'
 
-import type { ConversationMessage } from '@@/app/composables/useMessenger'
+import type { ConversationMessage, PaginationDeMessages } from '@@/app/composables/useMessenger'
 
 /**
  * La discussion d'une candidature d'artiste, dans une carte : sur la fiche de la candidature en
@@ -40,7 +40,16 @@ const composerRef = ref<{ focaliser: () => void } | null>(null)
 
 // Messages
 const messages = ref<ConversationMessage[]>([])
-const pagination = ref<{ total: number; hasMore: boolean } | null>(null)
+/**
+ * ⚠️ `hasNextPage`, ET NON `hasMore`.
+ *
+ * Cette référence était typée `{ total, hasMore }` : deux champs que la réponse paginée ne porte
+ * pas — elle dit `totalCount` et `hasNextPage`. `hasMore` valait donc `undefined`, la garde de
+ * `loadMoreMessages` refermait la porte, et les messages antérieurs aux cinquante derniers étaient
+ * inaccessibles dans le fil d'une candidature. Même défaut que la page « Notifications », au même
+ * endroit du raisonnement.
+ */
+const pagination = ref<PaginationDeMessages | null>(null)
 
 // Réponse ou modification en cours dans la zone de saisie : la même logique que la messagerie.
 const {
@@ -101,7 +110,7 @@ const loadMessages = async () => {
 
 // Charger plus de messages
 const loadMoreMessages = async () => {
-  if (!conversationId.value || isLoadingMore.value || !pagination.value?.hasMore) return
+  if (!conversationId.value || isLoadingMore.value || !pagination.value?.hasNextPage) return
 
   isLoadingMore.value = true
   const result = await messenger.fetchMessages(conversationId.value, {
@@ -277,7 +286,9 @@ defineExpose({
         ref="messagesContainerRef"
         class="flex-1 overflow-y-auto py-2"
         @scroll="
-          ($event.target as HTMLElement).scrollTop < 50 && pagination?.hasMore && loadMoreMessages()
+          ($event.target as HTMLElement).scrollTop < 50 &&
+          pagination?.hasNextPage &&
+          loadMoreMessages()
         "
       >
         <!-- Loader pour les anciens messages -->
