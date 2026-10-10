@@ -1,4 +1,4 @@
-import { createRateLimiter } from './rate-limiter'
+import { adresseDuClient, createRateLimiter } from './rate-limiter'
 
 /**
  * Combien de fichiers un compte peut déposer en une heure.
@@ -61,13 +61,7 @@ export const checkoutRateLimiter = createRateLimiter({
   windowMs: 60 * 60 * 1000, // 1 heure
   max: 10,
   message: 'Trop de tentatives de paiement, veuillez réessayer plus tard',
-  keyGenerator: (event) => {
-    const ip =
-      (String(event.node.req.headers['x-forwarded-for'] || '').split(',')[0] ?? '').trim() ||
-      event.node.req.socket.remoteAddress ||
-      'unknown'
-    return `checkout:${ip}`
-  },
+  keyGenerator: (event) => `checkout:${adresseDuClient(event)}`,
 })
 
 /**
