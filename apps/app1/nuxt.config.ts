@@ -202,6 +202,67 @@ export default defineNuxtConfig({
     // Utiliser le mode `remote` pour éviter d'empaqueter les collections locales volumineuses
     // et ne récupérer que les icônes utilisées à l'exécution (taille serveur fortement réduite)
     serverBundle: 'remote',
+
+    /*
+     * ⚠️ `serverBundle: 'remote'` SEUL FAIT DÉPENDRE LA PRODUCTION D'UN SERVICE TIERS. Sans
+     * `clientBundle`, aucune icône n'est dans le paquet : chaque page demande
+     * `/api/_nuxt_icon/<collection>.json?icons=…`, et le serveur va les chercher sur
+     * api.iconify.design (mis en cache en mémoire ensuite, donc au premier appel après chaque
+     * redémarrage). Mesuré au navigateur sur le serveur de développement : **8 requêtes sur
+     * l'accueil, 3 sur /login**. Le cache hors ligne a dû prévoir un cas exprès pour ces réponses
+     * (`shared/utils/offline-cache.ts`), et la CSP ouvre api.iconify.design côté client.
+     *
+     * Le scan embarque les icônes écrites LITTÉRALEMENT dans les sources ; `serverBundle` reste
+     * donc le repli pour celles dont le nom est construit à l'exécution. Mesuré : 334 icônes
+     * distinctes, 207 Ko de données Iconify (et non les « ~3 600 » annoncées par l'audit, qui
+     * comptait les occurrences).
+     */
+    clientBundle: {
+      scan: {
+        /*
+         * ⚠️ DEUX ÉLARGISSEMENTS NÉCESSAIRES, et chacun pour une raison mesurée.
+         *
+         * 1. Le défaut est un glob sur `vue,jsx,tsx,md,mdc,mdx,yml,yaml` : les `.ts` n'y sont PAS,
+         *    alors que 87 icônes y vivent — les couleurs de module, la navigation, les catégories.
+         * 2. Le glob est relatif à la racine du projet, soit `apps/app1` : les layers en sont
+         *    DEHORS, et ils portent 163 icônes. Sans ce second motif, toute la moitié « gestion »
+         *    de l'application continuerait à les demander une par une.
+         */
+        globInclude: ['app/**/*.{vue,ts}', '../../layers/*/app/**/*.{vue,ts}'],
+        /*
+         * ⚠️ LES DRAPEAUX RESTENT AU SERVEUR, et c'est la décision la plus payante du réglage :
+         * ils pèsent **92 Ko à eux quatorze**, soit 44 % du poids total pour 4 % des icônes. Or
+         * ces quatorze sont les seuls écrits littéralement — ceux du sélecteur de langue ; les
+         * drapeaux de pays sont nommés à l'exécution depuis la base (`FlagIcon.vue`,
+         * `utils/countries.ts`) et il y en a près de deux cents. Les embarquer coûterait donc le
+         * plus gros du paquet sans supprimer une seule requête pour les autres.
+         */
+        ignoreCollections: ['flag'],
+      },
+      /*
+       * ⚠️ TROIS ICÔNES QUE LE SCAN NE PEUT PAS VOIR : elles sont écrites dans les composants de
+       * Nuxt UI, donc dans `node_modules`, que le scan exclut — à juste titre. Ce sont la croix de
+       * fermeture d'une modale et le soleil/lune du sélecteur de thème, c'est-à-dire l'en-tête de
+       * TOUTES les pages : sans elles, chaque page garde une requête pour la collection `lucide`.
+       */
+      icons: [
+        'lucide:sun',
+        'lucide:moon',
+        'lucide:x',
+        /*
+         * ⚠️ CES DEUX-LÀ SONT POURTANT ÉCRITES LITTÉRALEMENT dans `app/components/edition/Header.vue`,
+         * un fichier que le glob couvre — et le scan ne les voit pas. Mesuré : sans cette ligne,
+         * elles restent les SEULES icônes encore demandées au serveur hors drapeaux, sur toutes les
+         * pages d'édition. L'heuristique du scan n'est pas documentée à ce niveau ; plutôt que de
+         * la deviner, on nomme les deux cas constatés.
+         */
+        'heroicons:building-library',
+        'material-symbols:calendar-add-on',
+      ],
+      // Le plafond fait ÉCHOUER le build quand il est franchi, ce qui est le comportement voulu :
+      // un paquet d'icônes qui enfle doit se signaler, pas se glisser dans une livraison.
+      sizeLimitKb: 256,
+    },
   },
   // Sécurité HTTP — CSP + headers de protection
   security: {
