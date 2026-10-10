@@ -2,6 +2,7 @@ import type { ServerFile } from 'nuxt-file-storage'
 
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { uploadRateLimiter } from '#server/utils/api-rate-limiter'
 import { validateUploadedFile } from '#server/utils/upload-validation'
 
 interface RequestBody {
@@ -16,6 +17,13 @@ export default wrapApiHandler(
   async (event) => {
     // Vérifier l'authentification et que l'utilisateur est admin global
     await requireGlobalAdminWithDbCheck(event)
+
+    /*
+     * Le même limiteur que les sept autres points d'envoi, bien que celui-ci soit réservé aux
+     * administrateurs globaux. L'uniformité est le but : c'est elle que le test de garde vérifie,
+     * et une exception — même défendable — serait le trou par lequel la règle se perd.
+     */
+    await uploadRateLimiter(event)
 
     const { files, metadata } = await readBody<RequestBody>(event)
 
