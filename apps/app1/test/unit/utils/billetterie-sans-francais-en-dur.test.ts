@@ -28,9 +28,8 @@ import { describe, it, expect } from 'vitest'
  * ## Le découpage, et pourquoi il y en a un
  *
  * 169 littéraux dans un seul lot donneraient un diff de dix-huit fichiers qu'on ne relit pas — et
- * une clé mal tapée s'affiche **brute** sans qu'aucun test ne la voie. Trois lots : les écrans de
- * paramétrage (67) et le parcours du guichet (37), faits ; les commandes et la billetterie externe
- * (65), à venir.
+ * une clé mal tapée s'affiche **brute** sans qu'aucun test ne la voie. Trois lots, tous livrés : écrans de
+ * paramétrage (67), parcours du guichet (37), commandes et billetterie externe (63).
  */
 
 /** Attributs dont la valeur est lue par un humain. */
@@ -48,18 +47,16 @@ const FRANCAIS = /[A-ZÉÈÀÇÙÔÎ][a-zéèàçùêôîïœ']/
 const MARQUES = new Set(['HelloAsso', 'Infomaniak'])
 
 /**
- * La dette au 10/10/2026, après les lots « écrans de paramétrage » (67) et « parcours du guichet »
- * (37). Il ne reste que les commandes et la billetterie externe.
+ * La dette : **vide** depuis le 10/10/2026.
  *
- * ⚠️ Ces nombres ne doivent que DESCENDRE. Un fichier traité sort de la liste ; un fichier qui en
- * ajoute fait tomber le test ; et une entrée **périmée** le fait tomber aussi — sans quoi elle
- * exempterait silencieusement un fichier revenu en arrière.
+ * Les 169 littéraux ont été traités en trois lots — écrans de paramétrage (67), parcours du guichet
+ * (37), commandes et billetterie externe (63, dont deux noms de marque écartés). Ce test est donc
+ * devenu une **interdiction**.
+ *
+ * ⚠️ Toute entrée ajoutée ici serait une REMONTÉE, c'est-à-dire l'autorisation d'un libellé non
+ * traduit de plus. Poser une clé dans l'écran, pas une ligne dans cette liste.
  */
-const DETTE: Record<string, number> = {
-  'components/edition/ticketing/HelloAssoConfigModal.vue': 10,
-  'pages/editions/[id]/gestion/ticketing/external.vue': 8,
-  'pages/editions/[id]/gestion/ticketing/orders.vue': 47,
-}
+const DETTE: Record<string, number> = {}
 
 const RACINE = path.resolve(__dirname, '../../../../../layers/ticketing/app')
 
@@ -93,7 +90,9 @@ function litterauxParFichier(): Record<string, number> {
           }
           for (const m of ligne.matchAll(/>\s*([^<>{}\n]{3,}?)\s*</g)) {
             const valeur = m[1]!.trim()
-            if (FRANCAIS.test(valeur) && !valeur.startsWith('$t')) n += 1
+            // ⚠️ `MARQUES` vaut aussi ici : `<span>HelloAsso</span>` n'est pas à traduire, et la
+            // première version de ce test ne l'excluait que dans les attributs — deux faux positifs.
+            if (FRANCAIS.test(valeur) && !valeur.startsWith('$t') && !MARQUES.has(valeur)) n += 1
           }
         }
         if (n > 0) {

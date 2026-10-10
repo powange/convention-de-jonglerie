@@ -26,7 +26,7 @@
             >
               1
             </div>
-            <h3 class="font-semibold text-base">Identifiants API</h3>
+            <h3 class="font-semibold text-base">{{ $t('edition.ticketing.api_credentials') }}</h3>
           </div>
 
           <div
@@ -57,7 +57,11 @@
             </div>
           </div>
 
-          <UFormField label="Client ID" hint="Identifiant public de votre client API" required>
+          <UFormField
+            :label="$t('edition.ticketing.client_id_label')"
+            :hint="$t('ticketing.external.client_id_hint')"
+            required
+          >
             <UInput
               v-model="localConfig.clientId"
               placeholder="ex: abc123def456"
@@ -69,7 +73,7 @@
           </UFormField>
 
           <UFormField
-            label="Client Secret"
+            :label="$t('edition.ticketing.client_secret_label')"
             :hint="
               isEditing
                 ? 'Laisser vide pour conserver le secret actuel'
@@ -96,11 +100,11 @@
             >
               2
             </div>
-            <h3 class="font-semibold text-base">Identifier votre formulaire</h3>
+            <h3 class="font-semibold text-base">{{ $t('ticketing.external.identify_form') }}</h3>
           </div>
 
           <UFormField
-            label="URL de votre billetterie HelloAsso"
+            :label="$t('ticketing.external.form_url_label')"
             :hint="urlParseError || undefined"
             :status="urlParseError ? 'error' : parsedUrl ? 'success' : undefined"
             required
@@ -125,20 +129,27 @@
                 class="text-success-600 dark:text-success-400 mt-0.5 flex-shrink-0"
               />
               <div class="text-sm space-y-1">
-                <p class="font-medium text-success-900 dark:text-success-100">Formulaire détecté</p>
+                <p class="font-medium text-success-900 dark:text-success-100">
+                  {{ $t('ticketing.external.form_detected') }}
+                </p>
                 <ul class="text-success-700 dark:text-success-300 space-y-0.5">
                   <li>
-                    <span class="font-medium">Organisation :</span>
+                    <span class="font-medium">{{
+                      $t('ticketing.external.organization_prefix')
+                    }}</span>
                     {{ localConfig.organizationSlug }}
                   </li>
                   <li>
-                    <span class="font-medium">Type :</span>
+                    <span class="font-medium">{{ $t('ticketing.external.type_prefix') }}</span>
                     {{
                       formTypeOptions.find((o) => o.value === localConfig.formType)?.label ||
                       localConfig.formType
                     }}
                   </li>
-                  <li><span class="font-medium">Formulaire :</span> {{ localConfig.formSlug }}</li>
+                  <li>
+                    <span class="font-medium">{{ $t('ticketing.external.form_prefix') }}</span>
+                    {{ localConfig.formSlug }}
+                  </li>
                 </ul>
               </div>
             </div>
