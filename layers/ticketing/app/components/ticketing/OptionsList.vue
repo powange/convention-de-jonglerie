@@ -66,7 +66,9 @@
 
         <!-- Choix disponibles -->
         <div v-if="option.choices && option.choices.length > 0">
-          <p class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Choix :</p>
+          <p class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {{ $t('ticketing.options.list.choices_prefix') }}
+          </p>
           <div class="flex flex-wrap gap-1.5">
             <UBadge
               v-for="(choice, idx) in option.choices"
@@ -82,7 +84,9 @@
 
         <!-- Quotas associés -->
         <div v-if="option.quotas && option.quotas.length > 0" class="flex flex-wrap gap-1">
-          <p class="font-medium text-gray-700 dark:text-gray-300">Quotas :</p>
+          <p class="font-medium text-gray-700 dark:text-gray-300">
+            {{ $t('ticketing.options.list.quotas_prefix') }}
+          </p>
           <UBadge
             v-for="quotaRelation in option.quotas"
             :key="quotaRelation.quota.id"
@@ -112,7 +116,9 @@
 
         <!-- Tarifs associés -->
         <div v-if="option.tiers && option.tiers.length > 0" class="flex flex-wrap gap-1">
-          <p class="font-medium text-gray-700 dark:text-gray-300">Tarifs :</p>
+          <p class="font-medium text-gray-700 dark:text-gray-300">
+            {{ $t('ticketing.options.list.tiers_prefix') }}
+          </p>
           <UBadge
             v-for="tierRelation in option.tiers"
             :key="tierRelation.tier.id"
@@ -128,7 +134,9 @@
           v-if="edition?.mealsEnabled && option.meals && option.meals.length > 0"
           class="flex flex-wrap gap-1"
         >
-          <p class="font-medium text-gray-700 dark:text-gray-300">Repas :</p>
+          <p class="font-medium text-gray-700 dark:text-gray-300">
+            {{ $t('ticketing.options.list.meals_prefix') }}
+          </p>
           <UBadge
             v-for="mealRelation in option.meals"
             :key="mealRelation.meal.id"
@@ -176,9 +184,9 @@
   <!-- Modal de confirmation de suppression d'option -->
   <UiConfirmModal
     v-model="deleteConfirmOpen"
-    title="Supprimer l'option"
+    :title="$t('ticketing.options.list.delete_title')"
     :description="`Êtes-vous sûr de vouloir supprimer l'option '${optionToDelete?.name}' ?`"
-    confirm-label="Supprimer"
+    :confirm-label="$t('common.delete')"
     confirm-color="error"
     confirm-icon="i-heroicons-trash"
     icon-name="i-heroicons-exclamation-triangle"

@@ -3,7 +3,9 @@
     <!-- En-tête avec bouton ajouter -->
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Champs personnalisés</h3>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+          {{ $t('ticketing.custom_fields.list.title') }}
+        </h3>
         <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
           Gérez les champs personnalisés pour vos tarifs
         </p>
@@ -65,7 +67,9 @@
               <h4 class="text-base font-semibold text-gray-900 dark:text-white truncate">
                 {{ field.label }}
               </h4>
-              <UBadge v-if="field.isRequired" color="orange" variant="subtle"> Obligatoire </UBadge>
+              <UBadge v-if="field.isRequired" color="orange" variant="subtle">
+                {{ $t('ticketing.custom_fields.list.required_badge') }}
+              </UBadge>
             </div>
 
             <!-- Type et valeurs -->
@@ -82,7 +86,9 @@
                 <div class="flex items-start gap-2">
                   <UIcon name="i-heroicons-list-bullet" class="h-4 w-4 text-gray-400 mt-0.5" />
                   <div class="flex-1">
-                    <span class="text-gray-600 dark:text-gray-400">Choix : </span>
+                    <span class="text-gray-600 dark:text-gray-400"
+                      >{{ $t('ticketing.custom_fields.list.choices_prefix') }}
+                    </span>
                     <div class="flex flex-wrap gap-1 mt-1">
                       <UBadge
                         v-for="(value, idx) in field.values"
@@ -102,7 +108,9 @@
                 <div class="flex items-start gap-2">
                   <UIcon name="i-heroicons-ticket" class="h-4 w-4 text-gray-400 mt-0.5" />
                   <div class="flex-1">
-                    <span class="text-gray-600 dark:text-gray-400">Tarifs : </span>
+                    <span class="text-gray-600 dark:text-gray-400"
+                      >{{ $t('ticketing.custom_fields.list.tiers_prefix') }}
+                    </span>
                     <div class="flex flex-wrap gap-1 mt-1">
                       <UBadge
                         v-for="tier in field.tiers"
@@ -122,7 +130,9 @@
                 <div class="flex items-start gap-2">
                   <UIcon name="i-heroicons-chart-bar" class="h-4 w-4 text-gray-400 mt-0.5" />
                   <div class="flex-1">
-                    <span class="text-gray-600 dark:text-gray-400">Quotas : </span>
+                    <span class="text-gray-600 dark:text-gray-400"
+                      >{{ $t('ticketing.custom_fields.list.quotas_prefix') }}
+                    </span>
                     <div class="flex flex-wrap gap-1 mt-1">
                       <UBadge
                         v-for="quota in field.quotas"
@@ -143,7 +153,9 @@
                 <div class="flex items-start gap-2">
                   <UIcon name="i-heroicons-gift" class="h-4 w-4 text-gray-400 mt-0.5" />
                   <div class="flex-1">
-                    <span class="text-gray-600 dark:text-gray-400">Articles à remettre : </span>
+                    <span class="text-gray-600 dark:text-gray-400"
+                      >{{ $t('ticketing.custom_fields.list.handout_items_prefix') }}
+                    </span>
                     <div class="flex flex-wrap gap-1 mt-1">
                       <UBadge
                         v-for="item in field.handoutItems"
@@ -169,7 +181,7 @@
               color="neutral"
               variant="ghost"
               size="sm"
-              title="Gérer les associations"
+              :title="$t('ticketing.custom_fields.list.manage_associations')"
               @click="openAssociationsModal(field)"
             />
             <UButton
@@ -178,7 +190,7 @@
               color="neutral"
               variant="ghost"
               size="sm"
-              title="Modifier le champ"
+              :title="$t('ticketing.custom_fields.list.edit_field')"
               @click="openEditModal(field)"
             />
             <UButton
@@ -187,7 +199,7 @@
               color="error"
               variant="ghost"
               size="sm"
-              title="Supprimer le champ"
+              :title="$t('ticketing.custom_fields.list.delete_field')"
               @click="confirmDelete(field)"
             />
           </div>
@@ -214,9 +226,9 @@
     <!-- Modal de confirmation de suppression -->
     <UiConfirmModal
       v-model="showDeleteModal"
-      title="Supprimer le champ personnalisé"
+      :title="$t('ticketing.custom_fields.list.delete_confirm_title')"
       :description="`Êtes-vous sûr de vouloir supprimer le champ &quot;${customFieldToDelete?.label}&quot; ? Cette action est irréversible.`"
-      confirm-label="Supprimer"
+      :confirm-label="$t('common.delete')"
       confirm-color="error"
       confirm-icon="i-heroicons-trash"
       icon-name="i-heroicons-exclamation-triangle"

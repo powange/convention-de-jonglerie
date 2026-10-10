@@ -12,7 +12,7 @@
           color="info"
           variant="soft"
           :title="$t('ticketing.tiers.modal.title')"
-          description="Ce tarif est synchronisé depuis HelloAsso. Seuls les articles à remettre et les dates de validité peuvent être modifiés."
+          :description="$t('ticketing.tiers.modal.helloasso_locked')"
         />
 
         <UFormField
@@ -42,7 +42,7 @@
         >
           <UInput
             v-model="form.customName"
-            placeholder="Nom personnalisé pour l'affichage"
+            :placeholder="$t('ticketing.tiers.modal.display_name_placeholder')"
             size="lg"
             class="w-full"
           />
@@ -98,7 +98,7 @@
             <UFormField
               :label="$t('ticketing.tiers.modal.min_amount_label')"
               name="minAmount"
-              help="Peut être à 0 pour permettre la participation gratuite"
+              :help="$t('ticketing.tiers.modal.price_help')"
             >
               <UiMoneyInput
                 v-model="form.minAmountInEuros"
@@ -112,7 +112,7 @@
             <UFormField
               :label="$t('ticketing.tiers.modal.max_amount_label')"
               name="maxAmount"
-              help="Laissez vide pour un don sans limite haute"
+              :help="$t('ticketing.tiers.modal.donation_max_help')"
             >
               <UiMoneyInput
                 v-model="form.maxAmountInEuros"
@@ -129,7 +129,7 @@
           <UFormField
             :label="$t('ticketing.tiers.modal.position_label')"
             name="position"
-            help="Ordre d'affichage (0 = premier)"
+            :help="$t('ticketing.tiers.modal.position_help')"
           >
             <UInput
               v-model.number="form.position"
@@ -156,7 +156,10 @@
           </UFormField>
         </div>
 
-        <UFormField label="Comptabilisation des participants" name="countAsParticipant">
+        <UFormField
+          :label="$t('ticketing.tiers.modal.count_as_participant_label')"
+          name="countAsParticipant"
+        >
           <div class="flex items-start gap-3">
             <UCheckbox v-model="form.countAsParticipant" class="mt-1" />
             <div class="flex-1">
@@ -204,32 +207,32 @@
           <!-- `clearable` sur les quatre champs : ces bornes sont FACULTATIVES — leur texte à
                vide dit « Aucune limite » — et rien ne permettait de les retirer une fois
                posées. Ni le calendrier ni le sélecteur ne se vident d'eux-mêmes. -->
-          <UFormField label="Date de début" name="validFrom">
+          <UFormField :label="$t('common.start_date')" name="validFrom">
             <UiDateField
               v-if="form.isAllDay"
               v-model="validFromForField"
-              placeholder="Aucune limite"
+              :placeholder="$t('ticketing.tiers.modal.no_limit_placeholder')"
               clearable
             />
             <UiDateTimePicker
               v-else
               v-model="validFromForDateTime"
-              placeholder="Aucune limite"
+              :placeholder="$t('ticketing.tiers.modal.no_limit_placeholder')"
               clearable
             />
           </UFormField>
 
-          <UFormField label="Date de fin" name="validUntil">
+          <UFormField :label="$t('common.end_date')" name="validUntil">
             <UiDateField
               v-if="form.isAllDay"
               v-model="validUntilForField"
-              placeholder="Aucune limite"
+              :placeholder="$t('ticketing.tiers.modal.no_limit_placeholder')"
               clearable
             />
             <UiDateTimePicker
               v-else
               v-model="validUntilForDateTime"
-              placeholder="Aucune limite"
+              :placeholder="$t('ticketing.tiers.modal.no_limit_placeholder')"
               clearable
             />
           </UFormField>
@@ -255,18 +258,21 @@
             monter. À défaut, toute la durée de l'édition est retenue.
           </p>
 
-          <UFormField label="Arrivée" name="presenceFrom">
+          <UFormField :label="$t('ticketing.tiers.modal.presence_from_label')" name="presenceFrom">
             <UiDateTimePicker
               v-model="presenceFromForField"
-              placeholder="Début de l'édition"
+              :placeholder="$t('ticketing.tiers.modal.presence_from_placeholder')"
               clearable
             />
           </UFormField>
 
-          <UFormField label="Départ" name="presenceUntil">
+          <UFormField
+            :label="$t('ticketing.tiers.modal.presence_until_label')"
+            name="presenceUntil"
+          >
             <UiDateTimePicker
               v-model="presenceUntilForField"
-              placeholder="Fin de l'édition"
+              :placeholder="$t('ticketing.tiers.modal.presence_until_placeholder')"
               clearable
             />
           </UFormField>
@@ -299,7 +305,9 @@
 
     <template #footer>
       <div class="flex gap-2 justify-end">
-        <UButton color="neutral" variant="soft" @click="isOpen = false"> Annuler </UButton>
+        <UButton color="neutral" variant="soft" @click="isOpen = false">
+          {{ $t('common.cancel') }}
+        </UButton>
         <UButton color="primary" icon="i-heroicons-check" :loading="saving" @click="handleSubmit">
           {{ tier ? 'Enregistrer' : 'Ajouter' }}
         </UButton>
