@@ -52,12 +52,36 @@ describe('GET /api/editions/[id]/ticketing/stats/purchases', () => {
       id: EDITION,
       startDate: new Date('2026-07-01T00:00:00Z'),
       endDate: new Date('2026-07-05T00:00:00Z'),
+      timezone: 'Europe/Paris',
     })
     prismaMock.ticketingOrder.findFirst.mockResolvedValue({
       orderDate: new Date('2026-06-01T00:00:00Z'),
     })
     prismaMock.ticketingOrderItem.findMany.mockResolvedValue([])
   })
+
+  /**
+   * Un achat, rendu pour la SEULE courbe des participants au guichet.
+   *
+   * ⚠️ On répond d'après ce qui est DEMANDÉ, et non d'après l'ordre des appels : le handler lance
+   * ses quatre requêtes dans un `Promise.all`, et un test qui compterait les appels casserait au
+   * premier remaniement. Rendre le même achat aux quatre le compterait quatre fois, ce qui rendrait
+   * illisible la seule chose qu'on mesure ici — la TRANCHE où il tombe.
+   */
+  const achatAu = (...instants: string[]) => {
+    prismaMock.ticketingOrderItem.findMany.mockImplementation((args: any) =>
+      Promise.resolve(
+        args?.where?.order?.externalTicketingId === null &&
+          args?.where?.tier?.countAsParticipant === true
+          ? instants.map((i) => ({ order: { orderDate: new Date(i) } }))
+          : []
+      )
+    )
+  }
+
+  /** La tranche où un achat a été compté : la seule dont la courbe n'est pas à zéro. */
+  const trancheComptee = (reponse: any) =>
+    reponse.timestamps[reponse.participantsManual.findIndex((n: number) => n > 0)]
 
   /** Les quatre `where` de lignes demandés par le handler. */
   const whereDesLignes = () =>
@@ -170,16 +194,109 @@ describe('GET /api/editions/[id]/ticketing/stats/purchases', () => {
   })
 
   it('rend les quatre séries et leurs totaux', async () => {
-    // Non-régression de la forme de la réponse : l'écran lit ces six tableaux par leur nom.
+    // Non-régression de la forme de la réponse : l'écran lit ces tableaux par leur nom.
     const reponse: any = await handler(evenement)
 
-    expect(reponse.labels.length).toBeGreaterThan(0)
-    expect(reponse.timestamps).toHaveLength(reponse.labels.length)
+    expect(reponse.timestamps.length).toBeGreaterThan(0)
+    expect(reponse.participantsManual).toHaveLength(reponse.timestamps.length)
     expect(reponse.totals).toEqual({
       participantsManual: 0,
       participantsExternal: 0,
       othersManual: 0,
       othersExternal: 0,
+    })
+  })
+
+  /**
+   * Le découpage dans le temps — constat B11.
+   *
+   * ## ⚠️ LE DÉFAUT
+   *
+   * Les tranches étaient découpées sur l'horloge de la MACHINE (`setHours(0, 0, 0, 0)`, puis
+   * `DateTime.fromJSDate` sans zone) et les étiquettes composées par le serveur en
+   * `setLocale('fr')`. Le conteneur tourne en UTC : un achat passé à 0 h 30 heure de Paris tombait
+   * donc dans la journée de la VEILLE, et l'axe s'affichait en français quelle que soit la langue
+   * de l'écran. Le graphique des validations, juste à côté sur le même écran, avait déjà été
+   * corrigé : les deux courbes se lisaient côte à côte sans parler du même temps.
+   *
+   * ## ⚠️⚠️ CE QUI REND CES CAS NON CREUX
+   *
+   * Le mock de Prisma ignore le `where` — c'est dit plus haut, et c'est pourquoi les cas
+   * précédents portent sur la forme des requêtes. Ici la mesure est différente : le DÉCOUPAGE est
+   * du calcul pur, fait dans le handler sur ce que la base a rendu. On choisit donc l'instant d'un
+   * achat et l'on vérifie dans quelle tranche il est compté. Le mock n'y décide de rien.
+   *
+   * Le témoin est le cas `UTC` : sans lui, un découpage qui resterait sur la pendule du serveur
+   * passerait au vert dès que cette pendule est à l'heure de Paris — ce qui est le cas sur un poste
+   * de développement, et jamais en production.
+   */
+  describe('le découpage dans le temps', () => {
+    it('⚠️ RANGE UN ACHAT DE 23 H 30 UTC DANS LE LENDEMAIN, à l’heure du lieu', async () => {
+      // 23 h 30 UTC le 14/06 = 1 h 30 du matin le 15/06 à Paris. C'est le 15 qui doit le compter :
+      // l'organisateur qui lit ce graphique est sur place, pas à Greenwich.
+      achatAu('2026-06-14T23:30:00Z')
+
+      const reponse: any = await handler(evenement)
+
+      expect(trancheComptee(reponse)).toBe('2026-06-15T00:00:00.000+02:00')
+    })
+
+    it('le compte bien la VEILLE quand l’édition est en UTC', async () => {
+      /*
+       * LE TÉMOIN. Le même instant, une autre édition : si le découpage ignorait le fuseau reçu,
+       * les deux cas rendraient la même tranche et le premier ne prouverait rien.
+       */
+      prismaMock.edition.findUnique.mockResolvedValue({
+        id: EDITION,
+        startDate: new Date('2026-07-01T00:00:00Z'),
+        endDate: new Date('2026-07-05T00:00:00Z'),
+        timezone: 'UTC',
+      })
+      achatAu('2026-06-14T23:30:00Z')
+
+      const reponse: any = await handler(evenement)
+
+      expect(trancheComptee(reponse)).toBe('2026-06-14T00:00:00.000Z')
+    })
+
+    it('fait commencer « 1 semaine » un LUNDI, et non un jeudi', async () => {
+      /*
+       * L'ancien arrondi divisait le timestamp par 10 080 minutes depuis l'époque Unix — le
+       * 1ᵉʳ janvier 1970 était un JEUDI. Les tranches commençaient donc un jeudi sous une étiquette
+       * « Semaine du … », ce que personne ne pouvait deviner depuis l'écran.
+       */
+      global.getQuery = vi.fn(() => ({ granularity: '10080' })) as any
+      // Le mercredi 17/06 appartient à la semaine du lundi 15/06.
+      achatAu('2026-06-17T10:00:00Z')
+
+      const reponse: any = await handler(evenement)
+
+      expect(trancheComptee(reponse)).toBe('2026-06-15T00:00:00.000+02:00')
+    })
+
+    it('fait commencer « 1 mois » le PREMIER du mois', async () => {
+      /*
+       * L'ancien arrondi découpait par blocs de trente jours depuis l'époque, sous une étiquette
+       * « Juin 2026 » : un bloc pouvait chevaucher deux mois, et l'étiquette en nommait un seul.
+       */
+      global.getQuery = vi.fn(() => ({ granularity: '43200' })) as any
+      achatAu('2026-06-17T10:00:00Z')
+
+      const reponse: any = await handler(evenement)
+
+      expect(trancheComptee(reponse)).toBe('2026-06-01T00:00:00.000+02:00')
+    })
+
+    it('ne compose plus les libellés, et dit dans quel fuseau il a découpé', async () => {
+      /*
+       * La langue de l'axe revient au lecteur. Sans ce cas, le serveur pourrait recommencer à
+       * composer « Lun 15/06 » en français et le client, qui formate désormais lui-même, afficherait
+       * les deux formes selon les écrans sans que rien ne tombe.
+       */
+      const reponse: any = await handler(evenement)
+
+      expect(reponse.labels).toBeUndefined()
+      expect(reponse.timezone).toBe('Europe/Paris')
     })
   })
 })
