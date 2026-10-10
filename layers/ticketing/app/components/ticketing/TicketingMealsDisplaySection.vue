@@ -2,7 +2,9 @@
   <div v-if="mealsByDay.length > 0" class="space-y-4">
     <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
       <UIcon name="i-cbi:mealie" class="text-orange-600 dark:text-orange-400" />
-      <h4 class="font-semibold text-gray-900 dark:text-white">Repas</h4>
+      <h4 class="font-semibold text-gray-900 dark:text-white">
+        {{ $t('ticketing.participant.meals_title') }}
+      </h4>
     </div>
 
     <div class="space-y-4">

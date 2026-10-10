@@ -163,7 +163,7 @@
       <UFormField :label="$t('ticketing.payment.checkNumber')" required>
         <UInput
           :model-value="checkNumber"
-          placeholder="Ex: 1234567"
+          :placeholder="$t('ticketing.payment.check_number_placeholder')"
           class="w-full"
           @update:model-value="$emit('update:checkNumber', $event)"
         />

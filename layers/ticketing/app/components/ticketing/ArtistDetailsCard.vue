@@ -10,10 +10,14 @@
           <p :class="`text-sm ${artistConfig.textClass} ${artistConfig.darkTextClass}`">
             {{ $t('edition.ticketing.access_type') }}
           </p>
-          <p class="text-lg font-semibold text-gray-900 dark:text-white">Artiste</p>
+          <p class="text-lg font-semibold text-gray-900 dark:text-white">
+            {{ $t('common.artist') }}
+          </p>
         </div>
       </div>
-      <UBadge color="warning" variant="soft" size="lg"> Artiste invité </UBadge>
+      <UBadge color="warning" variant="soft" size="lg">
+        {{ $t('ticketing.participant.artist_guest') }}
+      </UBadge>
     </div>
 
     <!-- Statut de validation d'entrée -->
@@ -47,7 +51,7 @@
     <!-- Informations de l'artiste -->
     <TicketingUserInfoSection
       ref="userInfoSection"
-      title="Artiste"
+      :title="$t('common.artist')"
       :first-name="editableFirstName"
       :last-name="editableLastName"
       :email="editableEmail"
@@ -65,7 +69,9 @@
     <div class="space-y-4">
       <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
         <UIcon name="i-heroicons-star" class="text-yellow-600 dark:text-yellow-400" />
-        <h4 class="font-semibold text-gray-900 dark:text-white">Spectacles</h4>
+        <h4 class="font-semibold text-gray-900 dark:text-white">
+          {{ $t('edition.public_shows') }}
+        </h4>
       </div>
 
       <div v-if="artist.shows && artist.shows.length > 0" class="space-y-2">
@@ -100,7 +106,7 @@
         class="p-4 text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-lg"
       >
         <UIcon name="i-heroicons-star" class="mx-auto h-8 w-8 mb-2 text-gray-400" />
-        <p class="text-sm">Aucun spectacle assigné</p>
+        <p class="text-sm">{{ $t('ticketing.participant.no_show_assigned') }}</p>
       </div>
     </div>
 

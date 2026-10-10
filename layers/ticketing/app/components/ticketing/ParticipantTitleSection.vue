@@ -20,8 +20,8 @@
         icon="i-heroicons-exclamation-triangle"
         color="error"
         variant="soft"
-        title="Commande annulée"
-        description="Cette commande a été annulée. Les billets ne peuvent pas être validés."
+        :title="$t('ticketing.orders.order_canceled')"
+        :description="$t('ticketing.participant.canceled_order_description')"
       />
 
       <!--
@@ -249,7 +249,9 @@
             </p>
           </div>
           <div v-if="participant.ticket.order.status">
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Statut de la commande</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              {{ $t('ticketing.participant.order_status') }}
+            </p>
             <!--
               `Canceled` ne figure plus ici : c'est un état de LIGNE, jamais un statut de
               commande. Les deux branches qui le testaient ne se sont donc jamais exécutées —
@@ -410,7 +412,9 @@
                       </p>
                     </div>
                     <div>
-                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Statut du billet</p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        {{ $t('ticketing.participant.ticket_status') }}
+                      </p>
                       <UBadge
                         :color="
                           item.state === 'Processed'
