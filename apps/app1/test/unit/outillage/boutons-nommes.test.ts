@@ -11,7 +11,7 @@ const RACINE_LAYERS = join(process.cwd(), '..', '..', 'layers')
  *
  * ## ⚠️ Le défaut, mesuré avant d'être corrigé
  *
- * Sur l'ensemble des `<UButton>` de `apps/app1/app` et des `layers/*​/app`, **98** portaient une
+ * Sur l'ensemble des `<UButton>` de `apps/app1/app` et des layers, **98** portaient une
  * icône et **aucun** nom — ni `aria-label`, ni `label`, ni `title`, ni texte dans leur slot —,
  * répartis sur **58 fichiers**. Un lecteur d'écran les annonce « bouton », sans dire ce qu'ils
  * font : mettre en favori, fermer le panneau, actualiser, supprimer la ligne. Les plus exposés
