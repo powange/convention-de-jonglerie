@@ -154,7 +154,7 @@
 
                   <UTooltip :text="$t('gestion.map.place_marker')">
                     <UButton
-                      icon="i-lucide-map-pin"
+                      icon="i-heroicons-map-pin"
                       color="neutral"
                       size="xl"
                       :aria-label="$t('gestion.map.place_marker')"

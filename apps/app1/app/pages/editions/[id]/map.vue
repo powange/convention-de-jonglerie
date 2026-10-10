@@ -45,7 +45,7 @@
               @click="selectedView = 'site'"
             />
             <UButton
-              icon="i-lucide-map"
+              icon="i-heroicons-map"
               :color="activeView === 'google' ? 'primary' : 'neutral'"
               :variant="activeView === 'google' ? 'solid' : 'outline'"
               :label="$t('map.view_external')"
@@ -114,7 +114,7 @@
         <!-- Message si pas de zones ni de markers -->
         <UAlert
           v-if="activeView === 'site' && !hasSiteMap"
-          icon="i-lucide-map"
+          icon="i-heroicons-map"
           color="info"
           variant="soft"
           :title="$t('map.no_items')"

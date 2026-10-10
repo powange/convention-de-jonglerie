@@ -317,7 +317,12 @@ const tagItems = computed(() => props.tags.map((tg) => ({ label: tg.name, value:
 // Les mêmes options que la fiche d'un objet : icône du type, couleur de la zone ou du marqueur —
 // celle du type à défaut pour un marqueur, exactement comme là-bas.
 const mapPinItems = computed(() => [
-  { label: t('gestion.stock.no_map_pin'), value: AUCUN_PIN, icon: 'i-lucide-minus', color: null },
+  {
+    label: t('gestion.stock.no_map_pin'),
+    value: AUCUN_PIN,
+    icon: 'i-heroicons-minus',
+    color: null,
+  },
   ...(props.zones || []).map((z) => ({
     label: z.name,
     value: `zone:${z.id}`,

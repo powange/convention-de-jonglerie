@@ -128,7 +128,7 @@
                 class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 space-y-3"
               >
                 <div class="flex items-center gap-2">
-                  <UIcon name="i-lucide-map" class="size-4 text-blue-600 dark:text-blue-400" />
+                  <UIcon name="i-heroicons-map" class="size-4 text-blue-600 dark:text-blue-400" />
                   <h4 class="text-sm font-medium text-blue-800 dark:text-blue-200">
                     {{ $t('workshops.import_from_map') }}
                   </h4>
@@ -143,13 +143,17 @@
                     size="xs"
                     color="primary"
                     variant="soft"
-                    :icon="item.type === 'zone' ? 'i-lucide-square' : 'i-lucide-map-pin'"
+                    :icon="item.type === 'zone' ? 'i-lucide-square' : 'i-heroicons-map-pin'"
                     :disabled="isMapItemAlreadyAdded(item)"
                     :loading="addingFromMap"
                     @click="addLocationFromMap(item)"
                   >
                     {{ item.name }}
-                    <UIcon v-if="isMapItemAlreadyAdded(item)" name="i-lucide-check" class="ml-1" />
+                    <UIcon
+                      v-if="isMapItemAlreadyAdded(item)"
+                      name="i-heroicons-check"
+                      class="ml-1"
+                    />
                   </UButton>
                 </div>
               </div>

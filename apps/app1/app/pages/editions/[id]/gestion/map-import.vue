@@ -26,7 +26,7 @@
           />
         </div>
         <UButton
-          icon="i-lucide-arrow-left"
+          icon="i-heroicons-arrow-left"
           color="neutral"
           variant="outline"
           :to="`/editions/${editionId}/gestion/map`"
@@ -57,7 +57,7 @@
 
         <UAlert
           v-if="importedCount > 0 && edition.externalMapRef"
-          icon="i-lucide-map"
+          icon="i-heroicons-map"
           color="info"
           variant="subtle"
           :title="$t('gestion.map.import_switch_title')"
@@ -191,7 +191,7 @@
                     v-if="row.state === 'imported' && !canReimport(row)"
                     color="success"
                     variant="subtle"
-                    icon="i-lucide-check"
+                    icon="i-heroicons-check"
                   >
                     {{ $t('gestion.map.import_state_imported') }}
                   </UBadge>
@@ -277,7 +277,7 @@
 
         <UAlert
           v-if="data && data.rows.length === 0"
-          icon="i-lucide-inbox"
+          icon="i-heroicons-inbox"
           color="neutral"
           variant="subtle"
           :title="$t('gestion.map.import_empty')"
@@ -571,7 +571,7 @@ function canReimport(row: ViewRow): boolean {
 }
 
 function kindIcon(row: ViewRow): string {
-  if (row.object?.kind === 'point' || row.record?.kind === 'marker') return 'i-lucide-map-pin'
+  if (row.object?.kind === 'point' || row.record?.kind === 'marker') return 'i-heroicons-map-pin'
   if (row.object?.kind === 'line') return 'i-lucide-spline'
   return 'i-lucide-pentagon'
 }

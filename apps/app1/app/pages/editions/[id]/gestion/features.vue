@@ -167,7 +167,7 @@
         <UCard>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <UIcon name="i-lucide-map" class="text-blue-500 size-5" />
+              <UIcon name="i-heroicons-map" class="text-blue-500 size-5" />
               <div>
                 <h3 class="font-medium text-gray-900 dark:text-white">
                   {{ $t('edition.site_map') }}

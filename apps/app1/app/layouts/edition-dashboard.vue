@@ -495,12 +495,12 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
         },
         {
           label: t('gestion.services.title'),
-          icon: 'i-lucide-wrench',
+          icon: 'i-heroicons-wrench',
           to: `/editions/${editionId.value}/gestion/services`,
         },
         {
           label: t('gestion.external_links.title'),
-          icon: 'i-lucide-link',
+          icon: 'i-heroicons-link',
           to: `/editions/${editionId.value}/gestion/external-links`,
         },
         ...(edition.value?.programEnabled
@@ -516,7 +516,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           ? [
               {
                 label: t('edition.site_map'),
-                icon: 'i-lucide-map',
+                icon: 'i-heroicons-map',
                 to: `/editions/${editionId.value}/gestion/map`,
               },
             ]
@@ -530,7 +530,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           ? [
               {
                 label: t('gestion.ai_update.title'),
-                icon: 'i-lucide-sparkles',
+                icon: 'i-heroicons-sparkles',
                 to: `/editions/${editionId.value}/gestion/ai-update`,
               },
             ]

@@ -92,7 +92,7 @@
       <ClientOnly>
         <UAlert
           v-if="fuseauADire"
-          icon="i-lucide-clock"
+          icon="i-heroicons-clock"
           color="neutral"
           variant="subtle"
           :title="$t('gestion.program.local_times', { fuseau: nomFuseau })"

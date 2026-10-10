@@ -137,7 +137,7 @@
             <!-- Services -->
             <ManagementNavigationCard
               :to="`/editions/${edition.id}/gestion/services`"
-              icon="i-lucide-wrench"
+              icon="i-heroicons-wrench"
               :title="$t('gestion.services.title')"
               :description="$t('gestion.infos.services_description')"
               color="teal"
@@ -146,7 +146,7 @@
             <!-- Liens externes -->
             <ManagementNavigationCard
               :to="`/editions/${edition.id}/gestion/external-links`"
-              icon="i-lucide-link"
+              icon="i-heroicons-link"
               :title="$t('gestion.external_links.title')"
               :description="$t('gestion.infos.external_links_description')"
               color="violet"
@@ -167,7 +167,7 @@
             <ManagementNavigationCard
               v-if="edition.siteMapEnabled"
               :to="`/editions/${edition.id}/gestion/map`"
-              icon="i-lucide-map"
+              icon="i-heroicons-map"
               :title="$t('edition.site_map')"
               :description="$t('gestion.infos.map_description')"
               color="blue"
@@ -177,7 +177,7 @@
             <ManagementNavigationCard
               v-if="isUnclaimedConvention || authStore.isAdminModeActive"
               :to="`/editions/${edition.id}/gestion/ai-update`"
-              icon="i-lucide-sparkles"
+              icon="i-heroicons-sparkles"
               :title="$t('gestion.ai_update.title')"
               :description="$t('gestion.ai_update.description')"
               color="yellow"

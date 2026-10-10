@@ -16,7 +16,7 @@
         <UButton
           variant="link"
           size="sm"
-          icon="i-lucide-book-open"
+          icon="i-heroicons-book-open"
           class="p-0"
           :label="$t('gestion.treasury.plan_open')"
           @click="planOpen = true"
@@ -36,7 +36,7 @@
             maxlength="120"
           />
           <UButton
-            icon="i-lucide-plus"
+            icon="i-heroicons-plus"
             :loading="creating"
             :disabled="!canCreate"
             :label="$t('common.add')"

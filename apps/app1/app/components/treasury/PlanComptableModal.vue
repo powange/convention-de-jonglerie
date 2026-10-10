@@ -79,7 +79,9 @@
               >
                 <UIcon
                   :name="
-                    estDepliee(racine.code) ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'
+                    estDepliee(racine.code)
+                      ? 'i-heroicons-chevron-down'
+                      : 'i-heroicons-chevron-right'
                   "
                   class="size-4 shrink-0"
                 />

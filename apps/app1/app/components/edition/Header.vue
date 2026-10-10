@@ -266,7 +266,7 @@
           ]"
           :title="t('edition.site_map')"
         >
-          <UIcon name="i-lucide-map" :class="['md:mr-1']" size="24" class="md:w-4! md:h-4!" />
+          <UIcon name="i-heroicons-map" :class="['md:mr-1']" size="24" class="md:w-4! md:h-4!" />
           <span class="hidden md:inline">{{ t('edition.site_map') }}</span>
         </NuxtLink>
 
@@ -668,7 +668,7 @@ const mobileTabItems = computed<{ label: string; value: string; icon: string; pa
       items.push({
         label: t('edition.site_map'),
         value: 'map',
-        icon: 'i-lucide-map',
+        icon: 'i-heroicons-map',
         path: `/editions/${editionId}/map`,
       })
     }
