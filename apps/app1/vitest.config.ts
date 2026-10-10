@@ -134,27 +134,26 @@ export default defineConfig({
           globals: true,
         },
       }),
-      // Projet 3 : Tests E2E (serveur Nuxt démarré)
-      await defineVitestProject({
-        resolve: {
-          // Workaround: @nuxt/test-utils importe bun:test dynamiquement,
-          // ce qui casse Vite. On redirige vers un fichier existant.
-          // Ref: https://github.com/nuxt/test-utils/issues/1490
-          alias: {
-            'bun:test': resolve(__dirname, 'vitest.config.ts'),
-          },
-        },
-        test: {
-          name: 'e2e',
-          include: ['test/e2e/**/*.{test,spec}.ts'],
-          exclude: ['test/e2e/playwright/**'],
-          environment: 'nuxt',
-          globals: true,
-          testTimeout: 60000,
-          hookTimeout: 60000,
-        },
-      }),
-      // Projet 4 : Tests d'intégration (avec base de données)
+      /*
+       * ⚠️ IL N'Y A PLUS DE PROJET « e2e », et c'est délibéré.
+       *
+       * Il incluait `test/e2e/**` hors `playwright/`, ce qui ne laissait qu'un seul fichier —
+       * `test/e2e/api/auth.test.ts` — dont le `describe` racine était `.skip`. Le contrôle CI
+       * `test (e2e)`, l'un des dix-sept exigés, installait l'environnement, préparait Nuxt et
+       * passait au vert **sans exécuter une seule assertion**. Un contrôle vert vide est pire
+       * qu'absent : il laisse croire que l'API d'authentification est exercée en boîte noire.
+       *
+       * Ses trois cas sont couverts ailleurs, et mieux : `test/nuxt/server/api/auth/login.test.ts`
+       * (mot de passe incorrect, compte Google, compte sans fournisseur), `register.test.ts`
+       * (format de l'email) et `request-password-reset.test.ts` — qui vérifie en plus que le
+       * message est IDENTIQUE pour un email inexistant, ce que le test désactivé ne faisait pas.
+       * Le parcours réel, lui, est joué par Playwright (`public/auth.spec.ts`,
+       * `authenticated/login.spec.ts`).
+       *
+       * `test/e2e/playwright/**` reste en place : ces specs sont lancées par Playwright, pas par
+       * Vitest, et n'ont jamais eu besoin de ce projet.
+       */
+      // Projet 3 : Tests d'intégration (avec base de données)
       {
         test: {
           name: 'integration',

@@ -28,8 +28,6 @@
     "app1:test:ui": "cd apps/app1 && npm run test:ui",
     "app1:test:nuxt": "cd apps/app1 && npm run test:nuxt",
     "app1:test:nuxt:run": "cd apps/app1 && npm run test:nuxt:run",
-    "app1:test:e2e": "cd apps/app1 && npm run test:e2e",
-    "app1:test:e2e:run": "cd apps/app1 && npm run test:e2e:run",
     "app1:test:playwright": "cd apps/app1 && npm run test:playwright",
     "app1:test:playwright:ui": "cd apps/app1 && npm run test:playwright:ui",
     "app1:test:all": "cd apps/app1 && npm run test:all",
