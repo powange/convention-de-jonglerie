@@ -124,6 +124,147 @@ describe('error-logger – logApiError', () => {
     })
   })
 
+  /**
+   * Ce que le journal écrit d'un envoi de fichier refusé — constat B5.
+   *
+   * ## ⚠️ LE DÉFAUT
+   *
+   * Le journal consigne le corps de toute requête en erreur, et un refus d'envoi — « Type de
+   * fichier non autorisé », « Fichier trop volumineux » — est un **400**, donc consigné. Le corps
+   * d'un envoi est `{ files: [{ name, type, size, content: base64 }] }` : c'était **le fichier
+   * entier**, jusqu'à ~13 Mo de base64, qui partait dans la colonne `body`.
+   *
+   * `sanitizeBody` ne regardait que les clés de **premier niveau** : `files[0].content` passait tel
+   * quel. Chaque mauvais fichier choisi par un utilisateur coûtait donc plusieurs mégaoctets de
+   * table — et l'écran d'administration charge cette ligne en entier.
+   *
+   * Le même trou valait pour un secret imbriqué : `{ user: { password } }` partait en clair. Aucun
+   * point d'API n'envoie cette forme aujourd'hui, mais la garde ne l'aurait pas vue.
+   *
+   * ## ⚠️⚠️ CE QUI REND CES CAS NON CREUX
+   *
+   * On lit le corps **réellement écrit** en base, par le même chemin que la production. Un test qui
+   * appellerait une fonction de nettoyage exportée mesurerait cette fonction ; ici l'on mesure ce
+   * que `logApiError` enregistre, c'est-à-dire ce qui occupe la table.
+   *
+   * Le témoin est un corps ordinaire, qui doit passer **intact** : sans lui, un nettoyage qui
+   * écraserait tout satisferait les autres cas et le journal ne servirait plus à diagnostiquer
+   * quoi que ce soit.
+   */
+  describe('le contenu d’un fichier refusé', () => {
+    beforeEach(() => {
+      prismaMock.apiErrorLog.create.mockResolvedValue({})
+    })
+
+    /** Un envoi tel que les points d'API `/api/files/*` le reçoivent. */
+    const envoiDeFichier = (octets: number) => ({
+      files: [
+        {
+          name: 'affiche.png',
+          type: 'image/png',
+          size: String(octets),
+          content: `data:image/png;base64,${'A'.repeat(octets)}`,
+        },
+      ],
+      metadata: { entityId: 7 },
+    })
+
+    it('⚠️ EST REMPLACÉ PAR SA TAILLE, et non écrit en entier', async () => {
+      await logApiError({
+        error: new Error('Type de fichier non autorisé'),
+        statusCode: 400,
+        event: makeEvent(7, envoiDeFichier(50_000)) as any,
+      })
+
+      const corps = corpsEnregistre() as { files: { content: string; name: string }[] }
+      expect(corps.files[0].content).toMatch(/^\*\*\*\d+ octets\*\*\*$/)
+      // Le reste de la ligne est ce qui sert au diagnostic : on le garde.
+      expect(corps.files[0].name).toBe('affiche.png')
+    })
+
+    it('⚠️ MASQUE AUSSI UN SECRET IMBRIQUÉ', async () => {
+      // La garde ne descendait pas dans les objets : `{ user: { password } }` partait en clair.
+      await logApiError({
+        error: new Error('boom'),
+        statusCode: 400,
+        event: makeEvent(7, { user: { pseudo: 'alice', password: 'hunter2' } }) as any,
+      })
+
+      expect(corpsEnregistre()).toEqual({
+        user: { pseudo: 'alice', password: '***REDACTED***' },
+      })
+    })
+
+    it('laisse un petit contenu lisible', async () => {
+      /*
+       * TÉMOIN. Un champ nommé `content` n'est pas forcément un fichier : le corps d'un message, le
+       * texte d'une publication. Les écraser tous rendrait indiagnosticables les refus qui portent
+       * précisément sur eux — « Le message est trop long » sans pouvoir lire le message.
+       */
+      await logApiError({
+        error: new Error('boom'),
+        statusCode: 400,
+        event: makeEvent(7, { content: 'Bonjour tout le monde' }) as any,
+      })
+
+      expect(corpsEnregistre()).toEqual({ content: 'Bonjour tout le monde' })
+    })
+
+    it('plafonne un corps qui reste trop gros, en gardant les CLÉS', async () => {
+      /*
+       * Le filet pour ce qu'on n'a pas prévu : un champ de texte très long, un tableau de mille
+       * lignes. Les clés suffisent presque toujours au diagnostic, et un corps tronqué au milieu
+       * d'une chaîne ne serait plus du JSON valide dans une colonne qui en attend.
+       */
+      await logApiError({
+        error: new Error('boom'),
+        statusCode: 400,
+        event: makeEvent(7, { description: 'x'.repeat(100_000), titre: 'Edition' }) as any,
+      })
+
+      const corps = corpsEnregistre() as { __corpsTropGros__?: boolean; champs?: string[] }
+      expect(corps.__corpsTropGros__).toBe(true)
+      expect(corps.champs).toEqual(['description', 'titre'])
+    })
+
+    it('ne boucle pas sur un corps cyclique', async () => {
+      /*
+       * La journalisation est le code qu'on appelle quand quelque chose va DÉJÀ mal : y boucler
+       * indéfiniment transformerait une erreur en serveur figé. Le parcours est borné par un
+       * `WeakSet` et une profondeur.
+       */
+      const cyclique: Record<string, unknown> = { nom: 'boucle' }
+      cyclique.moi = cyclique
+
+      await expect(
+        logApiError({
+          error: new Error('boom'),
+          statusCode: 400,
+          event: makeEvent(7, cyclique) as any,
+        })
+      ).resolves.toBeUndefined()
+
+      expect(corpsEnregistre()).toMatchObject({ nom: 'boucle', moi: '***CYCLE***' })
+    })
+
+    it('garde un corps ordinaire intact', async () => {
+      /*
+       * LE TÉMOIN PRINCIPAL. Sans lui, un nettoyage qui écraserait tout satisferait les cas
+       * ci-dessus — et le journal ne servirait plus à diagnostiquer quoi que ce soit.
+       */
+      await logApiError({
+        error: new Error('boom'),
+        statusCode: 400,
+        event: makeEvent(7, { name: 'Edition 2026', services: ['douches', 'parking'] }) as any,
+      })
+
+      expect(corpsEnregistre()).toEqual({
+        name: 'Edition 2026',
+        services: ['douches', 'parking'],
+      })
+    })
+  })
+
   describe('détail des champs refusés par la validation', () => {
     const erreurValidation = (errors: Record<string, string>) =>
       Object.assign(new Error('Données invalides'), {
