@@ -65,8 +65,8 @@
               <img
                 v-if="ticket.type === 'ticket'"
                 :src="logoDuFournisseur(ticket.provider)"
-                :alt="nomDuFournisseur(ticket.provider) ?? $t('gestion.ticketing.origin_site')"
-                :title="nomDuFournisseur(ticket.provider) ?? $t('gestion.ticketing.origin_site')"
+                :alt="nomDuFournisseur(ticket.provider) ?? $t('ticketing.origin_site')"
+                :title="nomDuFournisseur(ticket.provider) ?? $t('ticketing.origin_site')"
                 class="h-4 w-4 object-contain"
               />
               <!-- Bouton QR Code -->

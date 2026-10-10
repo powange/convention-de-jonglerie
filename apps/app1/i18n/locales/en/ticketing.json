@@ -308,6 +308,7 @@
       "stats_discounted_help": "Paid back on tickets that stay valid — already deducted from the total",
       "stats_discounted_title": "Discounts"
     },
+    "origin_site": "Created on the site",
     "participant": {
       "entry_validated": "Entry already validated",
       "first_name": "First Name",

@@ -308,6 +308,7 @@
       "stats_discounted_help": "Повернено за квитками, які залишаються дійсними — уже відняте від підсумку",
       "stats_discounted_title": "Знижки"
     },
+    "origin_site": "Створено на сайті",
     "participant": {
       "entry_validated": "Вхід вже підтверджено",
       "first_name": "Ім'я",

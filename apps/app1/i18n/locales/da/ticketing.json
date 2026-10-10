@@ -308,6 +308,7 @@
       "stats_discounted_help": "Tilbagebetalt på billetter, der stadig er gyldige — allerede trukket fra totalen",
       "stats_discounted_title": "Rabatter"
     },
+    "origin_site": "Oprettet på sitet",
     "participant": {
       "entry_validated": "Adgang allerede valideret",
       "first_name": "Fornavn",

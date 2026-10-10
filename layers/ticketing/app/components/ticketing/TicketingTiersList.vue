@@ -72,10 +72,8 @@
                  inconnue. -->
             <img
               :src="logoDuFournisseur(row.original.provider)"
-              :alt="nomDuFournisseur(row.original.provider) ?? $t('gestion.ticketing.origin_site')"
-              :title="
-                nomDuFournisseur(row.original.provider) ?? $t('gestion.ticketing.origin_site')
-              "
+              :alt="nomDuFournisseur(row.original.provider) ?? $t('ticketing.origin_site')"
+              :title="nomDuFournisseur(row.original.provider) ?? $t('ticketing.origin_site')"
               class="h-5 w-5 object-contain flex-shrink-0"
             />
             <span class="font-semibold text-gray-900 dark:text-white">

@@ -932,7 +932,6 @@
       "assign_quotas_modal_title": "Квоты тарифа",
       "assign_quotas_count": "Выбрано квот: {count}",
       "assign_quotas_saved": "Квоты тарифа сохранены",
-      "origin_site": "Создано на сайте",
       "assign_quotas_no_option": "Пока нет опций.",
       "assign_quotas_edit_option": "Изменить квоты этой опции",
       "assign_quotas_no_custom_field": "Пока нет пользовательских полей.",

@@ -308,6 +308,7 @@
       "stats_discounted_help": "Vráceno u vstupenek, které zůstávají platné — již odečteno z celkové částky",
       "stats_discounted_title": "Slevy"
     },
+    "origin_site": "Vytvořeno na webu",
     "participant": {
       "entry_validated": "Položka již byla ověřena",
       "first_name": "Jméno",
