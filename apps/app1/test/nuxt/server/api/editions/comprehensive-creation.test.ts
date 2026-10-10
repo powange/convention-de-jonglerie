@@ -4,13 +4,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 vi.mock('../../../../../server/utils/geocoding', () => ({
   geocodeEdition: vi.fn(),
 }))
-vi.mock('../../../../../server/utils/move-temp-image', () => ({
-  moveTempImageToEdition: vi.fn(),
-  moveTempImageFromPlaceholder: vi.fn(),
+// La création d'édition range l'affiche par `handleFileUpload`, comme la modification : elle
+// n'a plus de fonction à elle. Un `vi.mock` sur un module supprimé fait échouer le chargement.
+vi.mock('../../../../../server/utils/file-helpers', () => ({
+  handleFileUpload: vi.fn(),
 }))
 
 import { geocodeEdition } from '../../../../../server/utils/geocoding'
-import { moveTempImageToEdition } from '../../../../../server/utils/move-temp-image'
+import { handleFileUpload } from '../../../../../server/utils/file-helpers'
 import handler from '../../../../../server/api/editions/index.post'
 import { global } from '../../../globales-nitro'
 
@@ -18,7 +19,7 @@ import { global } from '../../../globales-nitro'
 const prismaMock = (globalThis as any).prisma
 
 const mockGeocodeEdition = geocodeEdition as ReturnType<typeof vi.fn>
-const mockMoveTempImage = moveTempImageToEdition as ReturnType<typeof vi.fn>
+const mockMoveTempImage = handleFileUpload as ReturnType<typeof vi.fn>
 
 describe('/api/editions POST - Tests complets', () => {
   const mockUser = {
@@ -71,7 +72,7 @@ describe('/api/editions POST - Tests complets', () => {
       latitude: 48.8566,
       longitude: 2.3522,
     })
-    mockMoveTempImage.mockResolvedValue('/uploads/editions/1/image.jpg')
+    mockMoveTempImage.mockResolvedValue('image.jpg')
   })
 
   describe('Validation des données', () => {

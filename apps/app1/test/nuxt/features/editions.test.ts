@@ -19,8 +19,9 @@ vi.mock('../../../server/utils/geocoding', () => ({
   }),
 }))
 
-vi.mock('../../../server/utils/move-temp-image', () => ({
-  moveTempImageToEdition: vi.fn().mockResolvedValue('/uploads/editions/1/image.jpg'),
+// Même déplacement que dans les autres tests de création : l'affiche passe par le helper partagé.
+vi.mock('../../../server/utils/file-helpers', () => ({
+  handleFileUpload: vi.fn().mockResolvedValue('image.jpg'),
 }))
 
 describe("Système d'éditions", () => {
@@ -197,7 +198,7 @@ describe("Système d'éditions", () => {
     })
 
     it("devrait gérer l'upload d'image", async () => {
-      const { moveTempImageToEdition } = await import('../../../server/utils/move-temp-image')
+      const { handleFileUpload } = await import('../../../server/utils/file-helpers')
 
       const editionData = {
         conventionId: 1,
@@ -233,7 +234,10 @@ describe("Système d'éditions", () => {
 
       const result = await createEditionHandler(mockEvent as any)
 
-      expect(moveTempImageToEdition).toHaveBeenCalledWith('/temp/123456.jpg', 1)
+      expect(handleFileUpload).toHaveBeenCalledWith('/temp/123456.jpg', null, {
+        resourceId: 1,
+        resourceType: 'editions',
+      })
       expect(result.success).toBe(true)
       expect(result.data.imageUrl).toBe('/uploads/editions/1/image.jpg')
     })

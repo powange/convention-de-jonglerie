@@ -4,16 +4,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 vi.mock('../../../../../server/utils/geocoding', () => ({
   geocodeEdition: vi.fn(),
 }))
-vi.mock('../../../../../server/utils/move-temp-image', () => ({
-  moveTempImageToEdition: vi.fn(),
-  moveTempImageFromPlaceholder: vi.fn(),
+/*
+ * ⚠️ `handleFileUpload`, ET NON `move-temp-image`. La création d'édition employait deux fonctions
+ * à elle — dont une morte — pour ranger l'affiche ; elle passe désormais par le MÊME helper que la
+ * modification. Ce bouchon suit ce déplacement : le fichier `move-temp-image.ts` n'existe plus, et
+ * un `vi.mock` sur un module absent fait échouer le chargement du fichier de test.
+ */
+vi.mock('../../../../../server/utils/file-helpers', () => ({
+  handleFileUpload: vi.fn(),
 }))
 
 import { geocodeEdition } from '../../../../../server/utils/geocoding'
-import {
-  moveTempImageToEdition,
-  moveTempImageFromPlaceholder,
-} from '../../../../../server/utils/move-temp-image'
+import { handleFileUpload } from '../../../../../server/utils/file-helpers'
 import handler from '../../../../../server/api/editions/index.post'
 import { global } from '../../../globales-nitro'
 import { CLES_SERVICES_EDITION } from '../../../../../shared/utils/services-d-edition'
@@ -22,8 +24,7 @@ import { CLES_SERVICES_EDITION } from '../../../../../shared/utils/services-d-ed
 const prismaMock = (globalThis as any).prisma
 
 const mockGeocodeEdition = geocodeEdition as ReturnType<typeof vi.fn>
-const mockMoveTempImage = moveTempImageToEdition as ReturnType<typeof vi.fn>
-const mockMoveTempImageFromPlaceholder = moveTempImageFromPlaceholder as ReturnType<typeof vi.fn>
+const mockHandleFileUpload = handleFileUpload as ReturnType<typeof vi.fn>
 
 describe('/api/editions POST', () => {
   const mockUser = {
@@ -82,7 +83,7 @@ describe('/api/editions POST', () => {
       latitude: 48.8566,
       longitude: 2.3522,
     })
-    mockMoveTempImage.mockResolvedValue('/uploads/editions/1/image.jpg')
+    mockHandleFileUpload.mockResolvedValue('image.jpg')
   })
 
   it('devrait créer une édition avec succès', async () => {
@@ -259,7 +260,16 @@ describe('/api/editions POST', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(mockMoveTempImage).toHaveBeenCalledWith('/temp/123456.jpg', 1)
+    /*
+     * ⚠️ RANGÉE SOUS `editions/<id>`, COMME À LA MODIFICATION. La création écrivait sous
+     * `conventions/<id>` avec un chemin de montage codé en dur, et appelait ensuite une copie vers
+     * `.output/public` qui échouait à chaque fois en production. Les deux chemins partagent enfin
+     * une seule définition.
+     */
+    expect(mockHandleFileUpload).toHaveBeenCalledWith('/temp/123456.jpg', null, {
+      resourceId: 1,
+      resourceType: 'editions',
+    })
     expect(result.data.imageUrl).toBe('/uploads/editions/1/image.jpg')
   })
 
