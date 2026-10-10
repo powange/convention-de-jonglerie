@@ -10,7 +10,7 @@ import { typeDeNotification, type TaskDeadlineKind } from './rappels-echeance'
 import { translateServerSide } from './server-i18n'
 import { unifiedPushService, type PushNotificationData } from './unified-push-service'
 
-import type { NotificationType } from '#server/types/prisma'
+import type { NotificationType, Prisma } from '#server/types/prisma'
 
 /**
  * Les paramètres de traduction d'une notification, ramenés à ce que la traduction sait lire.
@@ -82,6 +82,21 @@ export interface NotificationFilters {
   category?: string
   limit?: number
   offset?: number
+}
+
+/**
+ * Les conditions d'une liste de notifications, écrites UNE fois.
+ *
+ * `getForUser` et `countForUser` doivent filtrer à l'identique : un compte qui ne poserait pas la
+ * même condition que la liste annoncerait des pages qui n'existent pas, ou en cacherait. C'est le
+ * genre d'écart qu'on ne voit pas en relisant deux fonctions voisines, et qui se remarque seulement
+ * au bout d'un « Charger plus » qui ne rend rien.
+ */
+function whereDesNotifications(filters: NotificationFilters) {
+  const where: Prisma.NotificationWhereInput = { userId: filters.userId }
+  if (filters.isRead !== undefined) where.isRead = filters.isRead
+  if (filters.category) where.category = filters.category
+  return where
 }
 
 /**
@@ -278,20 +293,8 @@ export const NotificationService = {
    * Récupère les notifications d'un utilisateur
    */
   async getForUser(filters: NotificationFilters) {
-    const where: any = {
-      userId: filters.userId,
-    }
-
-    if (filters.isRead !== undefined) {
-      where.isRead = filters.isRead
-    }
-
-    if (filters.category) {
-      where.category = filters.category
-    }
-
     return await prisma.notification.findMany({
-      where,
+      where: whereDesNotifications(filters),
       orderBy: {
         createdAt: 'desc',
       },
@@ -309,6 +312,17 @@ export const NotificationService = {
         },
       },
     })
+  },
+
+  /**
+   * Combien de notifications correspondent à ces filtres, toutes pages confondues.
+   *
+   * La page « Notifications » en a besoin pour savoir s'il reste quelque chose à charger. Elle s'en
+   * passait avec une estimation — `offset + reçues + (page pleine ? limite : 0)` — qui donne un
+   * `totalPages` faux dès la première page et ne dit jamais combien il y en a vraiment.
+   */
+  async countForUser(filters: NotificationFilters) {
+    return await prisma.notification.count({ where: whereDesNotifications(filters) })
   },
 
   /**

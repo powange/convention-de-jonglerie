@@ -26,13 +26,30 @@ export default wrapApiHandler(
     const query = getQuery(event)
     const parsed = querySchema.parse(query)
 
-    const notifications = await NotificationService.getForUser({
+    // Calculer la page à partir de l'offset et du limit pour createPaginatedResponse
+    const limit = parsed.limit || 50
+    const offset = parsed.offset || 0
+    const page = Math.floor(offset / limit) + 1
+
+    const filtres = {
       userId: user.id,
       isRead: parsed.isRead,
       category: parsed.category,
-      limit: parsed.limit || 50,
-      offset: parsed.offset || 0,
-    })
+    }
+
+    /**
+     * La liste et son TOTAL RÉEL, demandés ensemble.
+     *
+     * Le total était estimé : `offset + reçues + (page pleine ? limite : 0)`. Il servait à calculer
+     * `hasNextPage`, et une page exactement pleine lui faisait donc annoncer une page suivante qui
+     * pouvait être vide — tandis que `totalPages` était faux dès le premier chargement. Un `count`
+     * sur les mêmes filtres coûte une requête et dit la vérité.
+     */
+    const [notifications, total, unreadCount] = await Promise.all([
+      NotificationService.getForUser({ ...filtres, limit, offset }),
+      NotificationService.countForUser(filtres),
+      NotificationService.getUnreadCount(user.id, parsed.category),
+    ])
 
     // Mapper les notifications pour retirer l'email (emailHash déjà présent)
     const mappedNotifications = notifications.map((notification) => ({
@@ -44,17 +61,6 @@ export default wrapApiHandler(
         profilePicture: notification.user.profilePicture,
       },
     }))
-
-    // Obtenir aussi le nombre total de notifications non lues
-    const unreadCount = await NotificationService.getUnreadCount(user.id, parsed.category)
-
-    // Calculer la page à partir de l'offset et du limit pour createPaginatedResponse
-    const limit = parsed.limit || 50
-    const offset = parsed.offset || 0
-    const page = Math.floor(offset / limit) + 1
-
-    // Obtenir le total pour la pagination (approximatif avec hasMore)
-    const total = offset + notifications.length + (notifications.length === limit ? limit : 0)
 
     return {
       ...createPaginatedResponse(mappedNotifications, total, page, limit),
