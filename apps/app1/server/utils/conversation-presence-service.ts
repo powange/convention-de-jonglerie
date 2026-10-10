@@ -6,8 +6,24 @@ import { messengerStreamService } from './messenger-unread-service'
  */
 
 class ConversationPresenceService {
-  // Map: conversationId -> Set<userId>
-  private presenceMap: Map<string, Set<number>> = new Map()
+  /**
+   * conversationId → (userId → nombre de flux OUVERTS pour cette personne).
+   *
+   * ## ⚠️ C'ÉTAIT UN `Set`, ET C'EST TOUT LE DÉFAUT
+   *
+   * Chaque flux SSE ouvert appelait `markPresent`, chaque fermeture `markAbsent`. Sans compteur,
+   * deux onglets sur la même conversation — ou un téléphone et un ordinateur — se marchaient
+   * dessus : fermer le premier retirait la personne de l'ensemble et diffusait « absent » aux
+   * autres participants, alors que le second lisait toujours. La pastille verte et la liste des
+   * présents devenaient fausses jusqu'à une nouvelle connexion.
+   *
+   * Un simple rechargement de page produisait le même symptôme en plus bref : fermeture puis
+   * réouverture, donc un clignotement absent/présent diffusé à tout le monde.
+   *
+   * Compter les CONNEXIONS plutôt que les personnes rend les deux gestes symétriques : on ne
+   * notifie qu'aux passages 0 → 1 et 1 → 0.
+   */
+  private presenceMap: Map<string, Map<number, number>> = new Map()
 
   // Map: conversationId -> Set<userId> pour les participants de la conversation (cache)
   private conversationParticipantsCache: Map<string, number[]> = new Map()
@@ -16,19 +32,19 @@ class ConversationPresenceService {
    * Marquer un utilisateur comme présent sur une conversation
    */
   markPresent(userId: number, conversationId: string): void {
-    // Vérifier si l'utilisateur était déjà présent (pour les logs)
-    const wasPresent = this.isPresent(userId, conversationId)
-
-    if (!this.presenceMap.has(conversationId)) {
-      this.presenceMap.set(conversationId, new Set())
+    let connexions = this.presenceMap.get(conversationId)
+    if (!connexions) {
+      connexions = new Map()
+      this.presenceMap.set(conversationId, connexions)
     }
 
-    this.presenceMap.get(conversationId)!.add(userId)
+    const avant = connexions.get(userId) ?? 0
+    connexions.set(userId, avant + 1)
 
-    // Logger et notifier uniquement si c'est un nouveau présent (pas un refresh)
-    if (!wasPresent) {
+    // Notifier au seul passage 0 → 1 : un deuxième onglet n'est pas une arrivée.
+    if (avant === 0) {
       console.log(
-        `✅ [Presence] Utilisateur ${userId} rejoint conversation ${conversationId} (${this.presenceMap.get(conversationId)?.size} présent(s))`
+        `✅ [Presence] Utilisateur ${userId} rejoint conversation ${conversationId} (${connexions.size} présent(s))`
       )
 
       // Notifier les autres participants via SSE
@@ -38,22 +54,36 @@ class ConversationPresenceService {
 
   /**
    * Marquer un utilisateur comme absent d'une conversation
+   *
+   * Décrémente une connexion. Le départ n'est annoncé qu'à la DERNIÈRE : tant qu'un autre onglet
+   * lit, la personne est présente.
    */
   markAbsent(userId: number, conversationId: string): void {
-    const users = this.presenceMap.get(conversationId)
-    const wasPresent = users?.has(userId) || false
+    this.retirerDesConnexions(userId, conversationId, 1)
+  }
 
-    if (users) {
-      users.delete(userId)
-      if (users.size === 0) {
-        this.presenceMap.delete(conversationId)
-      }
-    }
+  /**
+   * Retirer `combien` connexions — ou toutes, avec `Infinity`.
+   *
+   * Le départ n'est annoncé qu'au passage à zéro, et une seule fois : c'est le point unique par
+   * lequel passent la fermeture d'un onglet et la déconnexion globale, pour qu'ils ne puissent pas
+   * diverger.
+   */
+  private retirerDesConnexions(userId: number, conversationId: string, combien: number): void {
+    const connexions = this.presenceMap.get(conversationId)
+    const avant = connexions?.get(userId) ?? 0
+    if (!connexions || avant === 0) return
 
-    // Logger et notifier uniquement si l'utilisateur était effectivement présent
-    if (wasPresent) {
+    const reste = Math.max(0, avant - combien)
+    if (reste === 0) connexions.delete(userId)
+    else connexions.set(userId, reste)
+
+    if (connexions.size === 0) this.presenceMap.delete(conversationId)
+
+    // Logger et notifier uniquement au départ de la dernière connexion
+    if (reste === 0) {
       console.log(
-        `👋 [Presence] Utilisateur ${userId} quitte conversation ${conversationId} (${users?.size || 0} présent(s))`
+        `👋 [Presence] Utilisateur ${userId} quitte conversation ${conversationId} (${connexions.size} présent(s))`
       )
 
       // Notifier les autres participants via SSE
@@ -129,14 +159,14 @@ class ConversationPresenceService {
    * Vérifier si un utilisateur est présent sur une conversation
    */
   isPresent(userId: number, conversationId: string): boolean {
-    return this.presenceMap.get(conversationId)?.has(userId) || false
+    return (this.presenceMap.get(conversationId)?.get(userId) ?? 0) > 0
   }
 
   /**
    * Obtenir tous les utilisateurs présents sur une conversation
    */
   getPresentUsers(conversationId: string): number[] {
-    return Array.from(this.presenceMap.get(conversationId) || [])
+    return Array.from(this.presenceMap.get(conversationId)?.keys() ?? [])
   }
 
   /**
@@ -150,10 +180,15 @@ class ConversationPresenceService {
    * Nettoyer toutes les présences d'un utilisateur (déconnexion globale)
    */
   cleanupUser(userId: number): void {
-    for (const [conversationId, users] of this.presenceMap.entries()) {
-      if (users.has(userId)) {
-        this.markAbsent(userId, conversationId)
-      }
+    /*
+     * Une déconnexion globale emporte TOUTES les connexions de la personne, pas une seule.
+     * Décrémenter de 1 la laisserait présente avec un onglet fantôme qui ne se refermera jamais —
+     * et plus rien, ensuite, ne viendrait corriger ce compte.
+     *
+     * La liste est copiée avant de la parcourir : le retrait supprime des entrées de la `Map`.
+     */
+    for (const conversationId of Array.from(this.presenceMap.keys())) {
+      this.retirerDesConnexions(userId, conversationId, Infinity)
     }
   }
 
@@ -163,16 +198,16 @@ class ConversationPresenceService {
   getStats() {
     const totalConversations = this.presenceMap.size
     const totalUsers = new Set(
-      Array.from(this.presenceMap.values()).flatMap((users) => Array.from(users))
+      Array.from(this.presenceMap.values()).flatMap((connexions) => Array.from(connexions.keys()))
     ).size
 
     return {
       totalConversations,
       totalUsers,
-      conversations: Array.from(this.presenceMap.entries()).map(([conversationId, users]) => ({
+      conversations: Array.from(this.presenceMap.entries()).map(([conversationId, connexions]) => ({
         conversationId,
-        userCount: users.size,
-        users: Array.from(users),
+        userCount: connexions.size,
+        users: Array.from(connexions.keys()),
       })),
     }
   }
