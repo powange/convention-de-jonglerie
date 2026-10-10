@@ -3,8 +3,8 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { invalidateEditionCache } from '#server/utils/cache-helpers'
 import { normalizeDateToISO } from '#server/utils/date-helpers'
 import { syncEventMetadataFromEdition } from '#server/utils/event-sync'
+import { handleFileUpload } from '#server/utils/file-helpers'
 import { geocodeEdition } from '#server/utils/geocoding'
-import { moveTempImageToEdition, moveTempImageFromPlaceholder } from '#server/utils/move-temp-image'
 import { getConventionForEditionCreation } from '#server/utils/permissions/convention-permissions'
 import { editionWithFavoritesInclude } from '#server/utils/prisma-select-helpers'
 import { editionSchema } from '#server/utils/validation-schemas'
@@ -115,17 +115,37 @@ export default wrapApiHandler(
       return created
     })
 
-    // Si une image temporaire a été fournie, la déplacer dans le bon dossier
+    /*
+     * L'affiche déposée avant que l'édition existe, rangée sous son identifiant.
+     *
+     * ## ⚠️ CE QUI ÉTAIT CASSÉ ICI (constat B3)
+     *
+     * Ce bloc appelait `move-temp-image.ts`, qui faisait le même travail que `handleFileUpload` —
+     * en moins bien, et sur DEUX chemins dont un mort :
+     *
+     * - le dossier de stockage y était écrit **en dur** (`/uploads`), donc `NUXT_FILE_STORAGE_MOUNT`
+     *   était ignoré ;
+     * - il appelait ensuite `copyToOutputPublic`, qui lit sa source sous `public/` là où le fichier
+     *   vient d'être écrit sous le montage : en production, **chaque création d'édition avec
+     *   affiche** écrivait « Erreur lors de la copie vers .output/public » dans les journaux, pour
+     *   un mécanisme que la route `/uploads/**` a rendu inutile ;
+     * - la seconde branche cherchait le fichier sous `public/uploads/temp/`, où **rien n'est jamais
+     *   écrit** : une URL temporaire autre que `NEW_EDITION` laissait l'édition pointer vers
+     *   `/uploads/temp/…`, que la purge horaire effaçait une heure plus tard.
+     *
+     * `handleFileUpload` — celui que la MODIFICATION d'une édition emploie déjà — n'a aucun de ces
+     * défauts : il déduit le dossier temporaire de l'URL reçue, passe par nuxt-file-storage (donc
+     * par le montage) et supprime le fichier temporaire. Les deux chemins partagent enfin une
+     * seule définition, et l'affiche est rangée sous `editions/<id>` des deux côtés.
+     *
+     * ⚠️ La garde reste `includes('/temp/')`, comme avant : `handleFileUpload` sait aussi
+     * télécharger une URL http, mais la création ne le faisait pas et ce lot ne l'ajoute pas.
+     */
     if (imageUrl && imageUrl.includes('/temp/')) {
-      let newImageUrl: string | null = null
-
-      if (imageUrl.includes('/temp/editions/NEW_EDITION/')) {
-        // Gérer les fichiers uploadés avec le placeholder NEW_EDITION
-        newImageUrl = await moveTempImageFromPlaceholder(imageUrl, edition.id)
-      } else {
-        // Gérer les autres images temporaires
-        newImageUrl = await moveTempImageToEdition(imageUrl, edition.id)
-      }
+      const newImageUrl = await handleFileUpload(imageUrl, null, {
+        resourceId: edition.id,
+        resourceType: 'editions',
+      })
 
       if (newImageUrl) {
         // Mettre à jour l'édition avec la nouvelle URL
