@@ -54,20 +54,29 @@ export default wrapApiHandler(
 
         // Créer un wrapper pour le stream manager
         const streamWrapper = {
-          push: (message: { event?: string; data: string }) => {
+          /*
+           * ⚠️ MÊME DÉFAUT QUE LE FLUX DES NOTIFICATIONS, et il se voit davantage ici : l'écran du
+           * compteur affiche le NOMBRE de personnes connectées. Un `push` qui avale son échec
+           * laisse la connexion morte dans le gestionnaire, et ce nombre annonce du monde qui n'est
+           * plus là — au guichet, où l'on compte justement sur ce chiffre pour savoir si un
+           * collègue tient l'autre entrée.
+           */
+          push: (message: { event?: string; data: string }): boolean => {
             if (isControllerClosed) {
               console.log(
                 `[Counter SSE] Tentative d'envoi sur controller fermé pour counter ${counterId}`
               )
-              return
+              return false
             }
             try {
               const eventName = message.event || 'message'
               const sseData = `event: ${eventName}\ndata: ${message.data}\n\n`
               controller.enqueue(new TextEncoder().encode(sseData))
+              return true
             } catch (error) {
               console.error("[Counter SSE] Erreur lors de l'envoi:", error)
               isControllerClosed = true
+              return false
             }
           },
           onClosed: (callback: () => void) => {

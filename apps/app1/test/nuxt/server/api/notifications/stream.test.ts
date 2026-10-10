@@ -131,6 +131,68 @@ describe('/api/notifications/stream GET (SSE)', () => {
     expect(mockStreamManager.removeConnection).toHaveBeenCalledWith('connection-123')
   })
 
+  /**
+   * Ce que le flux RÉPOND au gestionnaire — constat A2, côté point d'API.
+   *
+   * ## ⚠️ LE DÉFAUT
+   *
+   * `push` attrapait l'erreur d'`enqueue`, posait son drapeau de fermeture et retournait sans rien
+   * dire. Le gestionnaire ne voyait donc jamais d'échec, et tout ce qui en dépendait — retrait de
+   * la connexion, `lastPing`, `cleanupStaleConnections` — était inatteignable.
+   *
+   * ## ⚠️⚠️ CE QUI REND CES CAS NON CREUX
+   *
+   * Le gabarit passé au gestionnaire est RÉCUPÉRÉ depuis le bouchon d'`addConnection` : on
+   * l'interroge comme le ferait le gestionnaire. Un test qui n'observerait que « la connexion a été
+   * ajoutée » — ce que font les cas ci-dessus — serait vert avant comme après.
+   */
+  describe('ce que le flux répond au gestionnaire', () => {
+    /** Le gabarit que le point d'API a confié au gestionnaire. */
+    const gabarit = () => mockStreamManager.addConnection.mock.calls.at(-1)![1]
+
+    it('⚠️ DIT « NON » QUAND LE FLUX EST FERMÉ', async () => {
+      const mockEvent = createMockEvent()
+      await handler(mockEvent as any)
+      await new Promise((resolve) => setTimeout(resolve, 10))
+
+      const flux = gabarit()
+      // La fermeture passe par le `cleanup` de la requête, comme un client qui s'en va.
+      mockReqEvents['close']?.[0]?.()
+
+      expect(flux.push({ event: 'ping', data: '{}' })).toBe(false)
+    })
+
+    it('dit « oui » tant qu’il accepte', async () => {
+      /*
+       * LE TÉMOIN. Sans lui, un `push` qui rendrait toujours `false` satisferait le cas ci-dessus —
+       * et le gestionnaire retirerait la connexion dès le message de bienvenue, donc tout le monde
+       * serait coupé immédiatement.
+       */
+      const mockEvent = createMockEvent()
+      await handler(mockEvent as any)
+      await new Promise((resolve) => setTimeout(resolve, 10))
+
+      expect(gabarit().push({ event: 'ping', data: '{}' })).toBe(true)
+    })
+
+    it('⚠️ EXPOSE UNE FERMETURE AU GESTIONNAIRE', async () => {
+      /*
+       * `removeConnection` retirait la connexion de ses Maps et laissait le contrôleur ouvert : le
+       * client gardait une connexion que plus rien n'alimentait. Le gestionnaire a maintenant de
+       * quoi la fermer — et il ne peut le faire que si le gabarit la lui donne.
+       */
+      const mockEvent = createMockEvent()
+      await handler(mockEvent as any)
+      await new Promise((resolve) => setTimeout(resolve, 10))
+
+      const flux = gabarit()
+      expect(typeof flux.close).toBe('function')
+      flux.close()
+
+      expect(flux.push({ event: 'ping', data: '{}' })).toBe(false)
+    })
+  })
+
   it('devrait utiliser le bon userId pour la connexion', async () => {
     const mockEvent = createMockEvent({
       ...mockUser,

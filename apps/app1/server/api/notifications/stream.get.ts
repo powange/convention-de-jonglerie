@@ -33,22 +33,45 @@ export default wrapApiHandler(
           }
         }
 
-        // Créer un wrapper pour le stream manager
+        /*
+         * ⚠️ `push` REND UN BOOLÉEN, et c'est tout le constat A2.
+         *
+         * Il attrapait l'erreur d'`enqueue`, posait `isControllerClosed` et retournait sans rien
+         * dire. Le gestionnaire ne voyait donc JAMAIS d'échec : son `try/catch` ne pouvait pas se
+         * déclencher, `lastPing` était rafraîchi à chaque cycle même sur un contrôleur fermé, et
+         * `cleanupStaleConnections` — écrit trente lignes plus bas, avec son seuil de deux minutes
+         * — était du code mort.
+         *
+         * Conséquence : une connexion dont le `close` de la requête ne remonte pas (intermédiaire
+         * réseau, coupure brutale) restait indéfiniment dans les Maps, comptée dans `getStats` et
+         * parcourue à chaque envoi. Un `catch` qui ne relance pas rend inatteignable le nettoyage
+         * prévu pour lui.
+         */
         const streamWrapper = {
-          push: (message: { event?: string; data: string }) => {
+          push: (message: { event?: string; data: string }): boolean => {
             if (isControllerClosed) {
               console.log(`[SSE] Tentative d'envoi sur controller fermé pour user ${user.id}`)
-              return
+              return false
             }
             try {
               const eventName = message.event || 'message'
               const sseData = `event: ${eventName}\ndata: ${message.data}\n\n`
               controller.enqueue(new TextEncoder().encode(sseData))
+              return true
             } catch (error) {
               console.error("[SSE] Erreur lors de l'envoi:", error)
               isControllerClosed = true
+              return false
             }
           },
+          /**
+           * Fermer le flux à la demande du gestionnaire.
+           *
+           * Sans elle, `removeConnection` retirait la connexion de ses Maps et laissait le
+           * contrôleur ouvert : le client gardait une connexion que plus rien n'alimentait, et
+           * attendait son ping jusqu'à ce que son propre réseau tranche.
+           */
+          close: safeClose,
           onClosed: (callback: () => void) => {
             // Géré par la fermeture du stream
             event.node.req.on('close', callback)
