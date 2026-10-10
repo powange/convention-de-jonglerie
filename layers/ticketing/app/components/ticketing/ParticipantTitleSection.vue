@@ -208,12 +208,10 @@
             v-if="participant.ticket.order"
             :src="logoDuFournisseur(participant.ticket.order.provider)"
             :alt="
-              nomDuFournisseur(participant.ticket.order.provider) ??
-              $t('gestion.ticketing.origin_site')
+              nomDuFournisseur(participant.ticket.order.provider) ?? $t('ticketing.origin_site')
             "
             :title="
-              nomDuFournisseur(participant.ticket.order.provider) ??
-              $t('gestion.ticketing.origin_site')
+              nomDuFournisseur(participant.ticket.order.provider) ?? $t('ticketing.origin_site')
             "
             class="h-5 w-5 object-contain"
           />

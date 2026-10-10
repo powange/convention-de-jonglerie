@@ -33,7 +33,7 @@
                    quoi l'absence se lirait comme une origine inconnue. -->
               <img
                 :src="logoDuFournisseur(option.provider)"
-                :alt="nomDuFournisseur(option.provider) ?? $t('gestion.ticketing.origin_site')"
+                :alt="nomDuFournisseur(option.provider) ?? $t('ticketing.origin_site')"
                 :title="infobulleProvenance(option)"
                 class="h-4 w-4 object-contain flex-shrink-0"
               />
@@ -240,7 +240,7 @@ const { money } = useEditionCurrency(() => props.editionId)
  */
 const infobulleProvenance = (option: TicketingOption) => {
   const fournisseur = nomDuFournisseur(option.provider)
-  if (!fournisseur) return t('gestion.ticketing.origin_site')
+  if (!fournisseur) return t('ticketing.origin_site')
   return option.helloAssoOptionId
     ? `${fournisseur} (ID : ${option.helloAssoOptionId})`
     : fournisseur

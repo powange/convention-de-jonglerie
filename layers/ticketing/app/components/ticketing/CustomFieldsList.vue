@@ -60,7 +60,7 @@
                    toujours un — celui du site quand le champ a été saisi ici. -->
               <img
                 :src="logoDuFournisseur(field.provider)"
-                :alt="nomDuFournisseur(field.provider) ?? $t('gestion.ticketing.origin_site')"
+                :alt="nomDuFournisseur(field.provider) ?? $t('ticketing.origin_site')"
                 :title="infobulleProvenance(field)"
                 class="h-5 w-5 object-contain flex-shrink-0"
               />
@@ -354,7 +354,7 @@ const deleteCustomField = () => {
  */
 const infobulleProvenance = (field: CustomField) => {
   const fournisseur = nomDuFournisseur(field.provider)
-  if (!fournisseur) return t('gestion.ticketing.origin_site')
+  if (!fournisseur) return t('ticketing.origin_site')
   return field.helloAssoCustomFieldId
     ? `${fournisseur} (ID : ${field.helloAssoCustomFieldId})`
     : fournisseur

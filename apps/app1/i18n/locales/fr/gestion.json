@@ -935,7 +935,6 @@
       "orders_none": "Aucune commande trouvée",
       "orders_none_hint": "Importez les commandes depuis votre billetterie externe",
       "orders_title": "Commandes",
-      "origin_site": "Créé sur le site",
       "payment_methods_description": "Choisissez les moyens de paiement acceptés lors de l'ajout de participants sur place",
       "payment_methods_note": "L'option « Non spécifié » reste toujours disponible pour les cas où le paiement n'est pas encore encaissé",
       "payment_methods_title": "Moyens de paiement acceptés",

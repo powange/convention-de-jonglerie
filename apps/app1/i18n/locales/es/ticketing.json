@@ -308,6 +308,7 @@
       "stats_discounted_help": "Devuelto sobre entradas que siguen siendo válidas — ya deducido del total",
       "stats_discounted_title": "Descuentos"
     },
+    "origin_site": "Creado en el sitio",
     "participant": {
       "entry_validated": "Entrada ya validada",
       "first_name": "Nombre",

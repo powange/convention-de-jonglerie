@@ -107,8 +107,8 @@
                        quotas. -->
                   <img
                     :src="logoDuFournisseur(tier.provider)"
-                    :alt="nomDuFournisseur(tier.provider) ?? $t('gestion.ticketing.origin_site')"
-                    :title="nomDuFournisseur(tier.provider) ?? $t('gestion.ticketing.origin_site')"
+                    :alt="nomDuFournisseur(tier.provider) ?? $t('ticketing.origin_site')"
+                    :title="nomDuFournisseur(tier.provider) ?? $t('ticketing.origin_site')"
                     class="h-5 w-5 object-contain shrink-0"
                   />
                   <div class="flex-1 min-w-0">
@@ -167,10 +167,8 @@
                        tarifs et sur la page des quotas. -->
                   <img
                     :src="logoDuFournisseur(option.provider)"
-                    :alt="nomDuFournisseur(option.provider) ?? $t('gestion.ticketing.origin_site')"
-                    :title="
-                      nomDuFournisseur(option.provider) ?? $t('gestion.ticketing.origin_site')
-                    "
+                    :alt="nomDuFournisseur(option.provider) ?? $t('ticketing.origin_site')"
+                    :title="nomDuFournisseur(option.provider) ?? $t('ticketing.origin_site')"
                     class="h-5 w-5 object-contain shrink-0"
                   />
                   <div class="flex-1 min-w-0">
@@ -229,8 +227,8 @@
                        tarifs et sur la page des quotas. -->
                   <img
                     :src="logoDuFournisseur(cf.provider)"
-                    :alt="nomDuFournisseur(cf.provider) ?? $t('gestion.ticketing.origin_site')"
-                    :title="nomDuFournisseur(cf.provider) ?? $t('gestion.ticketing.origin_site')"
+                    :alt="nomDuFournisseur(cf.provider) ?? $t('ticketing.origin_site')"
+                    :title="nomDuFournisseur(cf.provider) ?? $t('ticketing.origin_site')"
                     class="h-5 w-5 object-contain shrink-0"
                   />
                   <div class="flex-1 min-w-0">

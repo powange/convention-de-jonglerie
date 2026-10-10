@@ -308,6 +308,7 @@
       "stats_discounted_help": "Zwrócone na biletach, które pozostają ważne — już odliczone od sumy",
       "stats_discounted_title": "Rabaty"
     },
+    "origin_site": "Utworzone na stronie",
     "participant": {
       "entry_validated": "Wejście już zwalidowane",
       "first_name": "Imię",

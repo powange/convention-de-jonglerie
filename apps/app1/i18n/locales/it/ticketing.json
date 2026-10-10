@@ -308,6 +308,7 @@
       "stats_discounted_help": "Restituito su biglietti che restano validi — già dedotto dal totale",
       "stats_discounted_title": "Sconti"
     },
+    "origin_site": "Creato sul sito",
     "participant": {
       "entry_validated": "Ingresso già convalidato",
       "first_name": "Nome",

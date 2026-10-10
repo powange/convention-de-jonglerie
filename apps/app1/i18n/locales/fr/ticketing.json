@@ -428,6 +428,7 @@
       "unfinished_orders": "Commandes non finalisées",
       "validate_entry_error": "Erreur lors de la validation de l'entrée"
     },
+    "origin_site": "Créé sur le site",
     "participant": {
       "add": {
         "amount_placeholder": "Montant en euros",

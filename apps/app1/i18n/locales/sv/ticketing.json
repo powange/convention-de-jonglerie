@@ -308,6 +308,7 @@
       "stats_discounted_help": "Återbetalat på biljetter som förblir giltiga — redan avdraget från totalen",
       "stats_discounted_title": "Rabatter"
     },
+    "origin_site": "Skapad på webbplatsen",
     "participant": {
       "entry_validated": "Posten är redan validerad",
       "first_name": "Förnamn",

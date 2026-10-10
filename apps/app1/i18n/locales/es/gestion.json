@@ -932,7 +932,6 @@
       "assign_quotas_modal_title": "Cupos de la tarifa",
       "assign_quotas_count": "{count} cupo(s) seleccionado(s)",
       "assign_quotas_saved": "Cupos de la tarifa guardados",
-      "origin_site": "Creado en el sitio",
       "assign_quotas_no_option": "Ninguna opción por ahora.",
       "assign_quotas_edit_option": "Editar los cupos de esta opción",
       "assign_quotas_no_custom_field": "Ningún campo personalizado por ahora.",

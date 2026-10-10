@@ -308,6 +308,7 @@
       "stats_discounted_help": "Возвращено по билетам, которые остаются действительными — уже вычтено из итога",
       "stats_discounted_title": "Скидки"
     },
+    "origin_site": "Создано на сайте",
     "participant": {
       "entry_validated": "Вход уже подтвержден",
       "first_name": "Имя",

@@ -308,6 +308,7 @@
       "stats_discounted_help": "Auf weiterhin gültige Tickets zurückgezahlt — bereits vom Gesamtbetrag abgezogen",
       "stats_discounted_title": "Rabatte"
     },
+    "origin_site": "Auf der Website erstellt",
     "participant": {
       "entry_validated": "Eintritt bereits validiert",
       "first_name": "Vorname",

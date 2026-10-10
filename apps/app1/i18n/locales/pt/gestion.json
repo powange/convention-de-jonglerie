@@ -932,7 +932,6 @@
       "assign_quotas_modal_title": "Quotas da tarifa",
       "assign_quotas_count": "{count} quota(s) selecionada(s)",
       "assign_quotas_saved": "Quotas da tarifa guardadas",
-      "origin_site": "Criado no site",
       "assign_quotas_no_option": "Nenhuma opção por agora.",
       "assign_quotas_edit_option": "Editar as quotas desta opção",
       "assign_quotas_no_custom_field": "Nenhum campo personalizado por agora.",

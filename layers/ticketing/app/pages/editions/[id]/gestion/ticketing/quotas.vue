@@ -591,7 +591,7 @@ const tarifsAssociables = computed<ElementAssociable[]>(() =>
     nom: tarif.customName || tarif.name,
     quotas: (tarif.quotas ?? []).map((lien) => lien.quota),
     logo: logoDuFournisseur(tarif.provider),
-    origine: nomDuFournisseur(tarif.provider) ?? t('gestion.ticketing.origin_site'),
+    origine: nomDuFournisseur(tarif.provider) ?? t('ticketing.origin_site'),
   }))
 )
 
@@ -943,7 +943,7 @@ const champsAssociables = computed<ElementAssociable[]>(() =>
     // sert plus qu'à satisfaire la forme commune.
     quotas: [],
     logo: logoDuFournisseur(champ.provider),
-    origine: nomDuFournisseur(champ.provider) ?? t('gestion.ticketing.origin_site'),
+    origine: nomDuFournisseur(champ.provider) ?? t('ticketing.origin_site'),
   }))
 )
 

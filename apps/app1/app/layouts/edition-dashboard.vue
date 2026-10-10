@@ -630,9 +630,18 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       //
       // Pas de pastille : le nombre de volants disponibles change à chaque minute et n'attend
       // aucune décision. Elle serait allumée en permanence et ne voudrait plus rien dire.
+      //
+      // ⚠️ `edition.volunteers.renforts` et non `volunteers.renforts_title`, comme tous ses
+      // voisins de ce menu : ce layout habille TOUTES les pages de gestion, et le domaine
+      // `volunteers` n'est chargé que sur l'accueil de la gestion et sous `/gestion/volunteers`.
+      // Ce lien était donc le seul du menu à sortir brut — « volunteers.renforts_title » — sur la
+      // FAQ, le stock, les tâches, la trésorerie et les autres. Charger ici les 48 Ko de
+      // `volunteers.json` pour un libellé de lien serait disproportionné ; les libellés de
+      // navigation de cette barre vivent dans `common.json`, toujours embarqué, et c'est déjà le
+      // cas de `edition.volunteers.swaps`, `.planning` et `.volunteer_notifications` juste au-dessus.
       if (aDesEquipesVolantes.value) {
         volunteersChildren.push({
-          label: t('volunteers.renforts_title'),
+          label: t('edition.volunteers.renforts'),
           icon: 'i-heroicons-bolt',
           to: `/editions/${editionId.value}/gestion/volunteers/renforts`,
         })

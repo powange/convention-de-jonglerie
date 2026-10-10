@@ -308,6 +308,7 @@
       "stats_discounted_help": "Devolvido em bilhetes que continuam válidos — já deduzido do total",
       "stats_discounted_title": "Descontos"
     },
+    "origin_site": "Criado no site",
     "participant": {
       "entry_validated": "Entrada já validada",
       "first_name": "Nome",

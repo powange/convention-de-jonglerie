@@ -932,7 +932,6 @@
       "assign_quotas_modal_title": "Tier quotas",
       "assign_quotas_count": "{count} quota(s) selected",
       "assign_quotas_saved": "Tier quotas saved",
-      "origin_site": "Created on the site",
       "assign_quotas_no_option": "No option yet.",
       "assign_quotas_edit_option": "Edit this option's quotas",
       "assign_quotas_no_custom_field": "No custom field yet.",
