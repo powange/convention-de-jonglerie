@@ -28,7 +28,7 @@
         variant="soft"
         class="mb-6"
       >
-        <template #title>Billeterie externe non configurée</template>
+        <template #title>{{ $t('ticketing.orders.external_not_configured') }}</template>
         <template #description>
           <div class="space-y-2">
             <p>
@@ -58,7 +58,9 @@
                 <UIcon name="i-heroicons-shopping-cart" class="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Commandes</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('ticketing.orders.stat_orders') }}
+                </p>
                 <p class="text-2xl font-bold text-gray-900 dark:text-white">
                   {{ stats.totalOrders }}
                 </p>
@@ -72,7 +74,9 @@
                 <UIcon name="i-heroicons-ticket" class="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Billets</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('ticketing.orders.stat_tickets') }}
+                </p>
                 <p class="text-2xl font-bold text-gray-900 dark:text-white">
                   {{ stats.totalItems }}
                 </p>
@@ -89,7 +93,9 @@
                 <UIcon name="i-heroicons-currency-euro" class="h-6 w-6 text-purple-600" />
               </div>
               <div class="flex-1">
-                <p class="text-sm text-gray-600 dark:text-gray-400">Montant total</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('ticketing.orders.stat_total_amount') }}
+                </p>
                 <p class="text-2xl font-bold text-gray-900 dark:text-white">
                   {{ money(stats.totalAmount) }}
                 </p>
@@ -104,7 +110,9 @@
                 <UIcon name="i-heroicons-heart" class="h-6 w-6 text-orange-600" />
               </div>
               <div>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Donations</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('ticketing.orders.stat_donations') }}
+                </p>
                 <p class="text-2xl font-bold text-gray-900 dark:text-white">
                   {{ stats.totalDonations }}
                 </p>
@@ -121,7 +129,9 @@
                 <UIcon name="i-heroicons-clock" class="h-6 w-6 text-success-600" />
               </div>
               <div>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Dernière sync</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('ticketing.orders.last_sync') }}
+                </p>
                 <p class="text-sm font-medium text-gray-900 dark:text-white">
                   {{ lastSyncText }}
                 </p>
@@ -136,7 +146,7 @@
             <div class="flex items-center gap-4">
               <UInput
                 v-model="searchQuery"
-                placeholder="Rechercher par nom, email, numéro de chèque..."
+                :placeholder="$t('ticketing.orders.search_placeholder')"
                 icon="i-heroicons-magnifying-glass"
                 class="flex-1"
                 size="lg"
@@ -173,7 +183,7 @@
                     v-model="filtres.tarifs"
                     :items="tierSelectItems"
                     multiple
-                    placeholder="Sélectionner des tarifs"
+                    :placeholder="$t('ticketing.orders.filter_tiers_placeholder')"
                     value-key="value"
                     size="md"
                     class="w-full"
@@ -222,7 +232,7 @@
                     v-model="filtres.options"
                     :items="optionSelectItems"
                     multiple
-                    placeholder="Sélectionner des options"
+                    :placeholder="$t('ticketing.orders.filter_options_placeholder')"
                     value-key="value"
                     size="md"
                     class="w-full"
@@ -263,7 +273,7 @@
                   <USelect
                     v-model="filtres.statutEntree"
                     :items="entryStatusOptions"
-                    placeholder="Tous les billets"
+                    :placeholder="$t('ticketing.orders.filter_tickets_placeholder')"
                     value-key="value"
                     size="md"
                     class="w-full"
@@ -332,7 +342,7 @@
                   <USelect
                     v-model="filtres.moyensDePaiement"
                     :items="paymentMethodOptions"
-                    placeholder="Toutes les méthodes"
+                    :placeholder="$t('ticketing.orders.filter_methods_placeholder')"
                     value-key="value"
                     size="md"
                     class="w-full"
@@ -349,7 +359,7 @@
                   <USelect
                     v-model="filtres.typesDeLigne"
                     :items="itemTypeOptions"
-                    placeholder="Tous les types"
+                    :placeholder="$t('ticketing.orders.filter_types_placeholder')"
                     value-key="value"
                     size="md"
                     class="w-full"
@@ -365,7 +375,9 @@
                             : $t('common.item_selected')
                         }}
                       </span>
-                      <span v-else class="text-gray-400 dark:text-gray-500"> Tous les types </span>
+                      <span v-else class="text-gray-400 dark:text-gray-500">
+                        {{ $t('ticketing.orders.filter_all_types') }}
+                      </span>
                     </template>
                   </USelect>
                 </div>
@@ -448,7 +460,7 @@
                   <USelect
                     v-model="newFilterName"
                     :items="customFieldNameItems"
-                    placeholder="Sélectionner un champ"
+                    :placeholder="$t('ticketing.orders.filter_field_placeholder')"
                     value-key="value"
                     size="md"
                     class="w-full"
@@ -458,7 +470,7 @@
                     v-model="newFilterValue"
                     :items="newFilterValueItems"
                     :disabled="!newFilterName"
-                    placeholder="Sélectionner une valeur"
+                    :placeholder="$t('ticketing.orders.filter_value_placeholder')"
                     value-key="value"
                     size="md"
                     class="w-full"
@@ -608,22 +620,24 @@
                     <template #leading>
                       <UIcon name="i-heroicons-exclamation-triangle" class="h-3 w-3" />
                     </template>
-                    <span class="hidden sm:inline">Payé - Méthode non renseignée</span>
+                    <span class="hidden sm:inline">{{
+                      $t('ticketing.orders.paid_unknown_method')
+                    }}</span>
                     <span class="sm:hidden">À définir</span>
                   </UBadge>
                   <UBadge v-else-if="order.paymentMethod === 'cash'" color="success" variant="soft">
                     <template #leading>
                       <UIcon name="i-heroicons-banknotes" class="h-3 w-3" />
                     </template>
-                    <span class="hidden sm:inline">Payé - Liquide</span>
-                    <span class="sm:hidden">Liquide</span>
+                    <span class="hidden sm:inline">{{ $t('ticketing.orders.paid_cash') }}</span>
+                    <span class="sm:hidden">{{ $t('ticketing.payment.methods.cash') }}</span>
                   </UBadge>
                   <UBadge v-else-if="order.paymentMethod === 'card'" color="success" variant="soft">
                     <template #leading>
                       <UIcon name="i-heroicons-credit-card" class="h-3 w-3" />
                     </template>
-                    <span class="hidden sm:inline">Payé - Carte</span>
-                    <span class="sm:hidden">Carte</span>
+                    <span class="hidden sm:inline">{{ $t('ticketing.orders.paid_card') }}</span>
+                    <span class="sm:hidden">{{ $t('ticketing.payment.methods.card_short') }}</span>
                   </UBadge>
                   <UBadge
                     v-else-if="order.paymentMethod === 'check'"
@@ -637,14 +651,16 @@
                     <span class="hidden sm:inline">
                       Payé - Chèque{{ order.checkNumber ? ` n°${order.checkNumber}` : '' }}
                     </span>
-                    <span class="sm:hidden">Chèque</span>
+                    <span class="sm:hidden">{{ $t('ticketing.payment.methods.check') }}</span>
                   </UBadge>
                   <UBadge v-else-if="order.status === 'Pending'" color="warning" variant="soft">
                     <template #leading>
                       <UIcon name="i-heroicons-clock" class="h-3 w-3" />
                     </template>
-                    <span class="hidden sm:inline">En attente de paiement</span>
-                    <span class="sm:hidden">En attente</span>
+                    <span class="hidden sm:inline">{{
+                      $t('ticketing.orders.status_pending')
+                    }}</span>
+                    <span class="sm:hidden">{{ $t('ticketing.orders.awaiting_short') }}</span>
                   </UBadge>
                 </div>
                 <!-- Ligne 3 : email et date -->
@@ -1050,7 +1066,7 @@
     </UModal>
 
     <!-- Modal QR Code -->
-    <UModal v-model:open="isQrModalOpen" title="QR Code du billet">
+    <UModal v-model:open="isQrModalOpen" :title="$t('ticketing.orders.qr_title')">
       <template #body>
         <div v-if="selectedItem" class="space-y-4">
           <!-- Informations du billet -->
@@ -1071,7 +1087,9 @@
 
           <!-- Valeur brute du QR Code -->
           <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Valeur du QR Code :</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+              {{ $t('ticketing.orders.qr_value_prefix') }}
+            </p>
             <div class="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
               <p class="text-xs font-mono text-gray-900 dark:text-white break-all">
                 {{ selectedItem.qrCode }}
@@ -1115,19 +1133,25 @@
               </span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-600 dark:text-gray-400">Email :</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                $t('ticketing.orders.email_prefix')
+              }}</span>
               <span class="font-medium text-gray-900 dark:text-white">
                 {{ orderToCancel.payerEmail }}
               </span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-600 dark:text-gray-400">Montant :</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                $t('ticketing.orders.amount_prefix')
+              }}</span>
               <span class="font-medium text-gray-900 dark:text-white">
                 {{ money(orderToCancel.amount) }}
               </span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-600 dark:text-gray-400">Billets :</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                $t('ticketing.orders.tickets_prefix')
+              }}</span>
               <span class="font-medium text-gray-900 dark:text-white">
                 {{ orderToCancel.items?.length || 0 }}
               </span>
@@ -1195,7 +1219,9 @@
           <!-- Informations du billet -->
           <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg space-y-2">
             <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-600 dark:text-gray-400">Billet :</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                $t('ticketing.orders.ticket_prefix')
+              }}</span>
               <span class="font-medium text-gray-900 dark:text-white">
                 {{ itemToValidate.name || itemToValidate.type }}
               </span>
@@ -1204,19 +1230,25 @@
               v-if="itemToValidate.firstName || itemToValidate.lastName"
               class="flex items-center justify-between"
             >
-              <span class="text-sm text-gray-600 dark:text-gray-400">Participant :</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                $t('ticketing.orders.participant_prefix')
+              }}</span>
               <span class="font-medium text-gray-900 dark:text-white">
                 {{ itemToValidate.firstName }} {{ itemToValidate.lastName }}
               </span>
             </div>
             <div v-if="itemToValidate.email" class="flex items-center justify-between">
-              <span class="text-sm text-gray-600 dark:text-gray-400">Email :</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                $t('ticketing.orders.email_prefix')
+              }}</span>
               <span class="font-medium text-gray-900 dark:text-white">
                 {{ itemToValidate.email }}
               </span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-600 dark:text-gray-400">Montant :</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                $t('ticketing.orders.amount_prefix')
+              }}</span>
               <span class="font-medium text-gray-900 dark:text-white">
                 {{ money(itemToValidate.amount) }}
               </span>
@@ -1259,7 +1291,7 @@
     <!-- Modal détails des montants -->
     <UModal
       v-model:open="isAmountDetailsModalOpen"
-      title="Détail des montants par méthode de paiement"
+      :title="$t('ticketing.orders.amounts_by_method_title')"
     >
       <template #body>
         <div class="space-y-4">
@@ -1326,7 +1358,9 @@
                   <UIcon name="i-heroicons-banknotes" class="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <p class="font-medium text-gray-900 dark:text-white">Liquide</p>
+                  <p class="font-medium text-gray-900 dark:text-white">
+                    {{ $t('ticketing.payment.methods.cash') }}
+                  </p>
                   <p class="text-xs text-gray-600 dark:text-gray-400">
                     Paiements en espèces sur place
                   </p>
@@ -1347,8 +1381,12 @@
                   <UIcon name="i-heroicons-document-text" class="h-5 w-5 text-purple-600" />
                 </div>
                 <div>
-                  <p class="font-medium text-gray-900 dark:text-white">Chèque</p>
-                  <p class="text-xs text-gray-600 dark:text-gray-400">Paiements par chèque</p>
+                  <p class="font-medium text-gray-900 dark:text-white">
+                    {{ $t('ticketing.payment.methods.check') }}
+                  </p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">
+                    {{ $t('ticketing.orders.check_payments') }}
+                  </p>
                 </div>
               </div>
               <p class="text-lg font-bold text-purple-600">
@@ -1371,7 +1409,9 @@
                   <p class="font-medium text-gray-900 dark:text-white">
                     Payé (méthode non spécifiée)
                   </p>
-                  <p class="text-xs text-gray-600 dark:text-gray-400">Anciennes commandes payées</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">
+                    {{ $t('ticketing.orders.old_paid_orders') }}
+                  </p>
                 </div>
               </div>
               <p class="text-lg font-bold text-gray-600">
@@ -1391,8 +1431,12 @@
                   <UIcon name="i-heroicons-clock" class="h-5 w-5 text-yellow-600" />
                 </div>
                 <div>
-                  <p class="font-medium text-gray-900 dark:text-white">En attente de paiement</p>
-                  <p class="text-xs text-gray-600 dark:text-gray-400">Commandes non finalisées</p>
+                  <p class="font-medium text-gray-900 dark:text-white">
+                    {{ $t('ticketing.orders.status_pending') }}
+                  </p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">
+                    {{ $t('ticketing.orders.unfinished_orders') }}
+                  </p>
                 </div>
               </div>
               <p class="text-lg font-bold text-yellow-600">
@@ -1410,7 +1454,9 @@
                 <div class="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
                   <UIcon name="i-heroicons-currency-euro" class="h-6 w-6 text-primary-600" />
                 </div>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white">Total général</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white">
+                  {{ $t('ticketing.orders.grand_total') }}
+                </p>
               </div>
               <p class="text-2xl font-bold text-primary-600">
                 {{ money(stats.totalAmount) }}
@@ -1433,7 +1479,9 @@
                 <UIcon name="i-heroicons-x-circle" class="h-5 w-5 text-red-600" />
               </div>
               <div>
-                <p class="font-medium text-gray-900 dark:text-white">Annulé</p>
+                <p class="font-medium text-gray-900 dark:text-white">
+                  {{ $t('edition.status.cancelled') }}
+                </p>
                 <p class="text-xs text-gray-600 dark:text-gray-400">
                   Billets et commandes annulés, remboursés ou non — non compris dans le total
                 </p>
@@ -1484,7 +1532,7 @@
     <!-- Modal de définition de la méthode de paiement -->
     <UModal
       v-model:open="isPaymentMethodModalOpen"
-      title="Définir la méthode de paiement"
+      :title="$t('ticketing.orders.set_payment_method')"
       :description="
         selectedOrder
           ? `Commande de ${selectedOrder.payerFirstName} ${selectedOrder.payerLastName} - ${money(selectedOrder.amount)}`
@@ -1539,7 +1587,9 @@
                   >
                     Liquide
                   </p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">Paiement en espèces</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ $t('ticketing.orders.pay_cash') }}
+                  </p>
                 </div>
                 <UIcon
                   v-if="selectedPaymentMethod === 'cash'"
@@ -1588,7 +1638,9 @@
                   >
                     Carte bancaire
                   </p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">Paiement par carte</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ $t('ticketing.orders.pay_card') }}
+                  </p>
                 </div>
                 <UIcon
                   v-if="selectedPaymentMethod === 'card'"
@@ -1637,7 +1689,9 @@
                   >
                     Chèque
                   </p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">Paiement par chèque</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ $t('ticketing.orders.pay_check') }}
+                  </p>
                 </div>
                 <UIcon
                   v-if="selectedPaymentMethod === 'check'"
@@ -1650,8 +1704,11 @@
 
           <!-- Numéro de chèque -->
           <div v-if="selectedPaymentMethod === 'check'">
-            <UFormField label="Numéro de chèque (optionnel)">
-              <UInput v-model="selectedCheckNumber" placeholder="Ex: 1234567" />
+            <UFormField :label="$t('ticketing.orders.check_number_label')">
+              <UInput
+                v-model="selectedCheckNumber"
+                :placeholder="$t('ticketing.payment.check_number_placeholder')"
+              />
             </UFormField>
           </div>
         </div>

@@ -58,7 +58,7 @@
               icon="i-heroicons-information-circle"
               color="info"
               variant="soft"
-              description="Connectez votre compte HelloAsso pour synchroniser automatiquement les billets et participants."
+              :description="$t('ticketing.external.helloasso_connect_description')"
             />
 
             <!-- Résumé de la configuration (si existante) -->
@@ -165,7 +165,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <UFormField
                     :label="$t('edition.ticketing.client_id_label')"
-                    hint="Identifiant public de votre client API"
+                    :hint="$t('ticketing.external.client_id_hint')"
                     required
                   >
                     <UInput
@@ -180,7 +180,7 @@
 
                   <UFormField
                     :label="$t('edition.ticketing.client_secret_label')"
-                    hint="Clé secrète (chiffrée après enregistrement)"
+                    :hint="$t('ticketing.external.client_secret_hint')"
                     required
                   >
                     <UInput
@@ -230,7 +230,7 @@
                 <div class="space-y-4">
                   <UFormField
                     :label="$t('edition.ticketing.organization_slug_label')"
-                    hint="Le nom de votre association dans l'URL"
+                    :hint="$t('ticketing.external.organization_slug_hint')"
                     required
                   >
                     <UInput
@@ -243,7 +243,7 @@
 
                   <UFormField
                     :label="$t('edition.ticketing.form_type_label')"
-                    hint="Le type visible dans l'URL HelloAsso"
+                    :hint="$t('ticketing.external.form_type_hint')"
                     required
                   >
                     <USelect
@@ -256,7 +256,7 @@
 
                   <UFormField
                     :label="$t('edition.ticketing.form_slug_label')"
-                    hint="Le nom de votre formulaire dans l'URL"
+                    :hint="$t('ticketing.external.form_slug_hint')"
                     required
                   >
                     <UInput
