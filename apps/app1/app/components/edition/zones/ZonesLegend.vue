@@ -264,7 +264,7 @@ const handleDelete = (item: LegendItem) => {
             target="_blank"
           />
           <UButton
-            :icon="isVisible(item) ? 'i-lucide-eye' : 'i-lucide-eye-off'"
+            :icon="isVisible(item) ? 'i-heroicons-eye' : 'i-lucide-eye-off'"
             size="xs"
             color="neutral"
             variant="ghost"
@@ -276,7 +276,7 @@ const handleDelete = (item: LegendItem) => {
         <!-- Actions (mode édition) -->
         <div v-if="editable" class="flex shrink-0 gap-1" @click.stop>
           <UButton
-            :icon="isVisible(item) ? 'i-lucide-eye' : 'i-lucide-eye-off'"
+            :icon="isVisible(item) ? 'i-heroicons-eye' : 'i-lucide-eye-off'"
             size="xs"
             color="neutral"
             variant="ghost"

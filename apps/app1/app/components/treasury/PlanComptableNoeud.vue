@@ -11,7 +11,7 @@
         size="xs"
         color="neutral"
         variant="ghost"
-        :icon="deplie ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'"
+        :icon="deplie ? 'i-heroicons-chevron-down' : 'i-heroicons-chevron-right'"
         :aria-label="deplie ? $t('common.collapse') : $t('common.expand')"
         @click="deplie = !deplie"
       />
@@ -49,7 +49,7 @@
         v-else-if="!enEdition"
         size="xs"
         variant="ghost"
-        icon="i-lucide-plus"
+        icon="i-heroicons-plus"
         class="mt-0.5 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
         :label="$t('gestion.treasury.plan_import')"
         @click="ouvrirEdition"
@@ -76,7 +76,7 @@
       <div class="flex gap-2">
         <UButton
           size="sm"
-          icon="i-lucide-check"
+          icon="i-heroicons-check"
           :label="$t('gestion.treasury.plan_import')"
           :disabled="!libelleChoisi.trim()"
           @click="confirmer"

@@ -80,25 +80,25 @@ const toolbarItems = computed<EditorToolbarItem[][]>(() => [
     {
       kind: 'mark',
       mark: 'bold',
-      icon: 'i-lucide-bold',
+      icon: 'i-heroicons-bold',
       tooltip: { text: t('common.editor.bold_tooltip') },
     },
     {
       kind: 'mark',
       mark: 'italic',
-      icon: 'i-lucide-italic',
+      icon: 'i-heroicons-italic',
       tooltip: { text: t('common.editor.italic_tooltip') },
     },
     {
       kind: 'mark',
       mark: 'underline',
-      icon: 'i-lucide-underline',
+      icon: 'i-heroicons-underline',
       tooltip: { text: t('common.editor.underline_tooltip') },
     },
     {
       kind: 'mark',
       mark: 'strike',
-      icon: 'i-lucide-strikethrough',
+      icon: 'i-heroicons-strikethrough',
       tooltip: { text: t('common.editor.strike_tooltip') },
     },
   ],
@@ -111,7 +111,7 @@ const toolbarItems = computed<EditorToolbarItem[][]>(() => [
     },
     {
       kind: 'link',
-      icon: 'i-lucide-link',
+      icon: 'i-heroicons-link',
       tooltip: { text: t('common.editor.link_tooltip') },
     },
   ],
@@ -151,25 +151,25 @@ const bubbleItems = computed<EditorToolbarItem[]>(() => [
   {
     kind: 'mark',
     mark: 'bold',
-    icon: 'i-lucide-bold',
+    icon: 'i-heroicons-bold',
     tooltip: { text: t('common.editor.bold_tooltip') },
   },
   {
     kind: 'mark',
     mark: 'italic',
-    icon: 'i-lucide-italic',
+    icon: 'i-heroicons-italic',
     tooltip: { text: t('common.editor.italic_tooltip') },
   },
   {
     kind: 'mark',
     mark: 'underline',
-    icon: 'i-lucide-underline',
+    icon: 'i-heroicons-underline',
     tooltip: { text: t('common.editor.underline_tooltip') },
   },
   {
     kind: 'mark',
     mark: 'strike',
-    icon: 'i-lucide-strikethrough',
+    icon: 'i-heroicons-strikethrough',
     tooltip: { text: t('common.editor.strike_tooltip') },
   },
   {
@@ -180,7 +180,7 @@ const bubbleItems = computed<EditorToolbarItem[]>(() => [
   },
   {
     kind: 'link',
-    icon: 'i-lucide-link',
+    icon: 'i-heroicons-link',
     tooltip: { text: t('common.editor.link_tooltip') },
   },
 ])

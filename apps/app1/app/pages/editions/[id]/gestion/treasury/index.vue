@@ -190,7 +190,7 @@
             <UButton
               class="ml-auto"
               size="sm"
-              icon="i-lucide-plus"
+              icon="i-heroicons-plus"
               :label="group.addLabel"
               :data-testid="`treasury-add-${group.kind.toLowerCase()}`"
               @click="openEntryModal(null, group.kind)"
@@ -501,7 +501,7 @@
                       size="xs"
                       color="success"
                       variant="soft"
-                      icon="i-lucide-check"
+                      icon="i-heroicons-check"
                       :loading="rembourser.isLoading(ligne.cle)"
                       :label="$t('gestion.treasury.mark_reimbursed')"
                       @click.stop="demanderLeRemboursement(ligne)"
@@ -583,7 +583,7 @@
       "
       :confirm-label="$t('gestion.treasury.mark_reimbursed')"
       confirm-color="success"
-      confirm-icon="i-lucide-check"
+      confirm-icon="i-heroicons-check"
       :loading="!!aRembourser && rembourser.isLoading(aRembourser.cle)"
       @confirm="confirmerLeRemboursement"
       @cancel="confirmationRemboursement = false"
@@ -1153,7 +1153,7 @@ const totalCards = computed(() => {
       label: t('gestion.treasury.balance'),
       value: money(totals?.balance ?? 0),
       hint: t('gestion.treasury.balance_hint'),
-      icon: 'i-lucide-scale',
+      icon: 'i-heroicons-scale',
       iconBg: 'bg-sky-100 dark:bg-sky-900/40',
       iconColor: 'text-sky-600 dark:text-sky-400',
       valueClass:

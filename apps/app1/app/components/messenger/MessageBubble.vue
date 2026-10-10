@@ -84,7 +84,7 @@
           variant="soft"
           block
           size="lg"
-          icon="i-lucide-trash"
+          icon="i-heroicons-trash"
           :label="$t('messenger.delete')"
           class="justify-start"
           @click="handleDelete"

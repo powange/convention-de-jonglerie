@@ -22,7 +22,7 @@
       <UCard class="mb-6">
         <template #header>
           <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-link" class="text-blue-500" />
+            <UIcon name="i-heroicons-link" class="text-blue-500" />
             <h2 class="text-lg font-semibold">{{ $t('gestion.ai_update.external_links') }}</h2>
           </div>
         </template>
@@ -92,7 +92,7 @@
       <UCard>
         <template #header>
           <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-sparkles" class="text-yellow-500" />
+            <UIcon name="i-heroicons-sparkles" class="text-yellow-500" />
             <h2 class="text-lg font-semibold">{{ $t('gestion.ai_update.search_updates') }}</h2>
           </div>
         </template>
@@ -197,7 +197,7 @@
 
           <UButton
             color="warning"
-            icon="i-lucide-sparkles"
+            icon="i-heroicons-sparkles"
             :loading="generating"
             :disabled="selectedUrls.length === 0 || !perimetreValide"
             @click="searchForUpdates"
@@ -358,7 +358,7 @@
 
           <UButton
             color="primary"
-            icon="i-lucide-check"
+            icon="i-heroicons-check"
             :loading="applying"
             :disabled="selectedDifferences.length === 0"
             @click="applyUpdates"
@@ -454,7 +454,7 @@
         <UiEtatVide
           v-if="differences.length === 0 && planAffiche.length === 0 && !erreurProgramme"
           compact
-          icone="i-lucide-check-circle"
+          icone="i-heroicons-check-circle"
           classe-icone="text-green-500"
           :titre="$t('gestion.ai_update.no_differences')"
         />
@@ -612,7 +612,7 @@ watch(
       links.push({
         url: ed.ticketingUrl,
         label: t('gestion.ai_update.link_ticketing'),
-        icon: 'i-lucide-ticket',
+        icon: 'i-heroicons-ticket',
         selected: true,
       })
     }
@@ -622,7 +622,7 @@ watch(
       links.push({
         url: ed.programUrl,
         label: t('gestion.ai_update.link_program'),
-        icon: 'i-lucide-calendar-days',
+        icon: 'i-heroicons-calendar-days',
         selected: true,
       })
     }

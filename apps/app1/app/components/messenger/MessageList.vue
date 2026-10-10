@@ -275,7 +275,7 @@ const affiches = computed(() => {
           ...(estLeMien
             ? [
                 {
-                  icon: 'i-lucide-trash',
+                  icon: 'i-heroicons-trash',
                   color: 'error' as const,
                   label: t('messenger.delete'),
                   onClick: () => emit('supprimer', message.id),

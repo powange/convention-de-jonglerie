@@ -58,7 +58,7 @@
            évite qu'il la croie déjà visible de tous. -->
       <UAlert
         v-if="donneesFrise?.data && !donneesFrise.data.pagePublique"
-        icon="i-lucide-eye-slash"
+        icon="i-heroicons-eye-slash"
         color="warning"
         variant="subtle"
         :title="$t('program.not_public_preview')"
@@ -71,7 +71,7 @@
       <ClientOnly>
         <UAlert
           v-if="fuseauADire"
-          icon="i-lucide-clock"
+          icon="i-heroicons-clock"
           color="neutral"
           variant="subtle"
           :title="$t('program.local_times', { fuseau: nomFuseau })"
@@ -114,14 +114,14 @@
                 :to="lienCarte(entree)!"
                 class="inline-flex items-center gap-1 text-sm text-primary"
               >
-                <UIcon name="i-lucide-map-pin" class="h-4 w-4" />
+                <UIcon name="i-heroicons-map-pin" class="h-4 w-4" />
                 {{ nomDuLieu(entree) }}
               </ULink>
               <p
                 v-else-if="nomDuLieu(entree)"
                 class="inline-flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400"
               >
-                <UIcon name="i-lucide-map-pin" class="h-4 w-4" />
+                <UIcon name="i-heroicons-map-pin" class="h-4 w-4" />
                 {{ nomDuLieu(entree) }}
               </p>
             </div>

@@ -20,7 +20,7 @@
         </span>
       </span>
       <span v-else class="text-gray-500">{{ placeholder }}</span>
-      <UIcon name="i-lucide-chevron-down" class="size-4 shrink-0" />
+      <UIcon name="i-heroicons-chevron-down" class="size-4 shrink-0" />
     </UButton>
 
     <UModal v-model:open="ouvert" :title="titre">

@@ -201,7 +201,7 @@ const isOpen = computed({
 
 const NONE_PIN = 'none'
 const mapPinItems = computed(() => [
-  { label: t('gestion.stock.no_map_pin'), value: NONE_PIN, icon: 'i-lucide-minus', color: null },
+  { label: t('gestion.stock.no_map_pin'), value: NONE_PIN, icon: 'i-heroicons-minus', color: null },
   ...(props.zones || []).map((z) => ({
     label: z.name,
     value: `zone:${z.id}`,

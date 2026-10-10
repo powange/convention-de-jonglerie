@@ -86,7 +86,7 @@
                 class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-4 border border-gray-200 dark:border-gray-800"
               >
                 <div class="flex items-center gap-2">
-                  <UIcon name="i-lucide-user" class="size-4 text-gray-600 dark:text-gray-400" />
+                  <UIcon name="i-heroicons-user" class="size-4 text-gray-600 dark:text-gray-400" />
                   <h3 class="text-sm font-medium text-gray-800 dark:text-gray-200">
                     {{ $t('artists.user_info') }}
                   </h3>
@@ -167,7 +167,10 @@
               <!-- Présence -->
               <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 space-y-4">
                 <div class="flex items-center gap-2">
-                  <UIcon name="i-lucide-calendar" class="size-4 text-blue-600 dark:text-blue-400" />
+                  <UIcon
+                    name="i-heroicons-calendar"
+                    class="size-4 text-blue-600 dark:text-blue-400"
+                  />
                   <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
                     {{ $t('artists.presence_section') }}
                   </h3>
