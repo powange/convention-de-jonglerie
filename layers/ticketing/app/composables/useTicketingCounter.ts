@@ -1,4 +1,4 @@
-import { ref, computed, onBeforeUnmount } from 'vue'
+import { ref, computed, onBeforeUnmount, watch } from 'vue'
 
 interface Counter {
   id: number
@@ -60,6 +60,63 @@ function refusDefinitif(erreur: unknown): boolean {
 }
 
 /**
+ * La file d'attente survit au rechargement de la page.
+ *
+ * ## ⚠️ LE DÉFAUT (constat F1)
+ *
+ * Le mode hors-ligne reposait sur un `ref` **en mémoire**. Or le téléphone qu'on tient à l'entrée
+ * d'une convention est précisément l'appareil qui décharge ses onglets — et la personne qui voit la
+ * pastille rouge « Déconnecté » **recharge la page pour réparer**. Les gestes en attente
+ * disparaissaient alors **sans un message**, et le compteur reprenait la valeur du serveur : les
+ * entrées comptées hors ligne étaient perdues, et rien ne le disait.
+ *
+ * La file est donc écrite dans `localStorage`, par édition ET par jeton — deux compteurs ouverts
+ * côte à côte ne doivent pas mélanger leurs gestes.
+ *
+ * ## Pourquoi `localStorage` et pas autre chose
+ *
+ * Ce qui attend là est **propre à cet appareil** : des gestes que le serveur n'a pas vus. Les
+ * envoyer ailleurs n'aurait pas de sens, et le navigateur est le seul endroit qui survive à un
+ * rechargement sans réseau.
+ *
+ * ⚠️ Chaque accès est gardé : en navigation privée, avec les données de site bloquées, ou sur un
+ * quota plein, `localStorage` **lève** au lieu de rendre `null`. Un compteur qui refuserait de
+ * s'ouvrir pour cela serait pire que le défaut qu'on corrige.
+ */
+const clefDeFile = (editionId: number, token: string) => `cdj-compteur-file-${editionId}-${token}`
+
+/**
+ * Le navigateur sait-il stocker&nbsp;?
+ *
+ * ⚠️ On teste la PRÉSENCE de `localStorage`, et non `import.meta.client`. Les deux coïncident en
+ * production, mais pas ailleurs : le rendu serveur n'a pas de `localStorage`, et un test unitaire
+ * n'est pas « client » tout en en fournissant un. Tester ce dont on a réellement besoin évite une
+ * persistance silencieusement morte sous le harnais — c'est-à-dire des tests verts sur rien.
+ */
+const stockageDisponible = () => typeof localStorage !== 'undefined'
+
+function lireLaFile(editionId: number, token: string): PendingOperation[] {
+  try {
+    const brut = localStorage.getItem(clefDeFile(editionId, token))
+    if (!brut) return []
+    const file = JSON.parse(brut)
+    // On ne fait pas confiance à ce qu'on relit : un format changé ne doit pas casser l'écran.
+    return Array.isArray(file) ? file.filter((o) => o && typeof o.id === 'string' && o.type) : []
+  } catch {
+    return []
+  }
+}
+
+function ecrireLaFile(editionId: number, token: string, file: PendingOperation[]): void {
+  try {
+    if (file.length === 0) localStorage.removeItem(clefDeFile(editionId, token))
+    else localStorage.setItem(clefDeFile(editionId, token), JSON.stringify(file))
+  } catch {
+    // Rien à faire : le geste reste en mémoire pour cette session, ce qui vaut mieux que de lever.
+  }
+}
+
+/**
  * Composable pour gérer un compteur de billetterie avec synchronisation temps réel
  * et support du mode hors-ligne avec file d'attente
  */
@@ -71,7 +128,27 @@ export function useTicketingCounter(editionId: number, token: string) {
   const isConnected = ref(false)
   const isUpdating = ref(false)
   const isSyncing = ref(false)
-  const pendingOperations = ref<PendingOperation[]>([])
+  /*
+   * Relue depuis le navigateur dès la création : si l'onglet a été rechargé, les gestes en attente
+   * sont déjà là quand le premier rendu a lieu — `displayValue` les rajoute à la valeur serveur,
+   * donc le total affiché est juste sans attendre quoi que ce soit.
+   */
+  const pendingOperations = ref<PendingOperation[]>(
+    stockageDisponible() ? lireLaFile(editionId, token) : []
+  )
+
+  /*
+   * ⚠️ `deep: true` est nécessaire, et ce n'est pas du zèle : la file est tantôt REMPLACÉE
+   * (`filter` à la synchronisation) tantôt MUTÉE (`push` à la mise en attente). Un watcher
+   * superficiel manquerait précisément le cas qui compte — le geste qu'on vient d'ajouter.
+   */
+  watch(
+    pendingOperations,
+    (file) => {
+      if (stockageDisponible()) ecrireLaFile(editionId, token, file)
+    },
+    { deep: true }
+  )
   const localValue = ref(0) // Valeur locale optimiste
 
   let eventSource: EventSource | null = null
