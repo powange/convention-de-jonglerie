@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon'
+
 import { NotificationHelpers, safeNotify } from '../utils/notification-service'
 import {
   cleDeTitreDuRappel,
@@ -5,6 +7,7 @@ import {
   palierDeRappel,
   PREFIXE_CLE_RAPPEL,
 } from '../utils/rappels-echeance'
+import { FUSEAU_DES_TACHES } from '../utils/scheduled-tasks'
 
 /**
  * Tâche planifiée : rappels d'échéance sur les tâches d'édition.
@@ -34,13 +37,19 @@ export default defineTask({
   },
   async run() {
     try {
-      // Début de la journée courante en heure serveur, et fin du septième jour : la fenêtre
-      // couvre le palier le plus lointain.
-      const todayStart = new Date()
-      todayStart.setHours(0, 0, 0, 0)
-      const fenetreFin = new Date(todayStart)
-      fenetreFin.setDate(fenetreFin.getDate() + PALIERS[0])
-      fenetreFin.setHours(23, 59, 59, 999)
+      /*
+       * Début de la journée courante AU FUSEAU DES TÂCHES, et fin du septième jour : la fenêtre
+       * couvre le palier le plus lointain.
+       *
+       * ⚠️ C'était `setHours(0, 0, 0, 0)`, donc l'horloge du conteneur — UTC. Une échéance
+       * « demain 00 h 30 » heure de Paris y tombait dans la journée en cours, et le rappel partait
+       * au mauvais palier. Le fuseau est le même que celui du planificateur : l'heure à laquelle le
+       * cron part et le jour qu'il considère doivent se correspondre, sinon la tâche de 9 h raisonne
+       * sur une autre journée que celle qu'elle vient d'ouvrir.
+       */
+      const debutDeJournee = DateTime.now().setZone(FUSEAU_DES_TACHES).startOf('day')
+      const todayStart = debutDeJournee.toJSDate()
+      const fenetreFin = debutDeJournee.plus({ days: PALIERS[0] }).endOf('day').toJSDate()
 
       const tasks = await prisma.task.findMany({
         where: {
@@ -102,7 +111,7 @@ export default defineTask({
         if (!task.deadline) continue
 
         // Seuls les quatre paliers notifient : une échéance à J-5 attendra J-3.
-        const kind = palierDeRappel(task.deadline, todayStart)
+        const kind = palierDeRappel(task.deadline, todayStart, FUSEAU_DES_TACHES)
         if (!kind) continue
 
         const cleDuRappel = cleDeTitreDuRappel(kind)
