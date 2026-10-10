@@ -22,6 +22,7 @@
         <template #actions="{ edition: ed }">
           <UDropdownMenu :items="getEditionActions(ed)">
             <UButton
+              :aria-label="$t('common.actions')"
               color="neutral"
               variant="ghost"
               icon="i-heroicons-ellipsis-horizontal"

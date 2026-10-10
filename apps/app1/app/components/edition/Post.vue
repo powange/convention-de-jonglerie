@@ -18,6 +18,8 @@
           <!-- Boutons d'action -->
           <UButton
             v-if="canPin"
+            :aria-label="$t('common.pin')"
+            :aria-pressed="post.pinned"
             color="neutral"
             variant="ghost"
             :icon="post.pinned ? 'i-heroicons-bookmark-solid' : 'i-heroicons-bookmark'"
@@ -26,6 +28,7 @@
           />
           <UButton
             v-if="canDeletePost"
+            :aria-label="$t('common.delete')"
             color="neutral"
             variant="ghost"
             icon="i-heroicons-trash"

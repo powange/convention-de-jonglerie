@@ -68,6 +68,7 @@
                 ]"
               >
                 <UButton
+                  :aria-label="$t('common.actions')"
                   variant="ghost"
                   color="neutral"
                   icon="i-heroicons-ellipsis-vertical"

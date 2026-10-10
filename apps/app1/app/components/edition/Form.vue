@@ -300,6 +300,7 @@
                       </template>
                       <template #trailing>
                         <UButton
+                          :aria-label="$t('common.cancel')"
                           icon="i-heroicons-x-mark"
                           color="neutral"
                           variant="link"

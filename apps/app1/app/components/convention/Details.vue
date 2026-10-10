@@ -26,6 +26,7 @@
         </div>
         <UDropdownMenu v-if="canEdit || canDelete" :items="conventionActions">
           <UButton
+            :aria-label="$t('common.actions')"
             color="neutral"
             variant="ghost"
             icon="i-heroicons-ellipsis-horizontal"

@@ -124,6 +124,7 @@
             />
             <UButton
               v-if="form.anthropicApiKey"
+              :aria-label="$t('common.clear')"
               color="error"
               variant="ghost"
               size="sm"

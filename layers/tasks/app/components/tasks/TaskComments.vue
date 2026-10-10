@@ -42,6 +42,7 @@
             </div>
             <UDropdownMenu v-if="canManage(c)" :items="getActions(c)">
               <UButton
+                :aria-label="$t('common.actions')"
                 icon="i-heroicons-ellipsis-vertical"
                 size="xs"
                 variant="ghost"

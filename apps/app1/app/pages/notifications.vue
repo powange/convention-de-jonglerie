@@ -194,6 +194,7 @@
 
                   <!-- Supprimer -->
                   <UButton
+                    :aria-label="$t('common.delete')"
                     icon="i-heroicons-trash"
                     variant="ghost"
                     size="sm"

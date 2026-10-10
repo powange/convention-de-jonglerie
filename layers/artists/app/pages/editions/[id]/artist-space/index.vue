@@ -394,6 +394,7 @@
                     {{ $t('artists.dietary_preference') }}
                   </span>
                   <UButton
+                    :aria-label="$t('common.edit')"
                     icon="i-heroicons-pencil-square"
                     variant="ghost"
                     size="xs"
@@ -528,6 +529,7 @@
               </h2>
               <UButton
                 v-if="!editingAccommodation"
+                :aria-label="$t('common.edit')"
                 icon="i-heroicons-pencil-square"
                 variant="ghost"
                 size="xs"

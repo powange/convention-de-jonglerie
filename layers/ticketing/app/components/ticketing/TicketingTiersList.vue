@@ -274,6 +274,7 @@
       <template #actions-cell="{ row }">
         <div class="flex gap-2">
           <UButton
+            :aria-label="$t('common.edit')"
             icon="i-heroicons-pencil"
             color="primary"
             variant="ghost"
@@ -282,6 +283,7 @@
           />
           <UButton
             v-if="!row.original.helloAssoTierId"
+            :aria-label="$t('common.delete')"
             icon="i-heroicons-trash"
             color="error"
             variant="ghost"

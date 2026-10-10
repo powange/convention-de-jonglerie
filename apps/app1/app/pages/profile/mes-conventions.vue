@@ -6,6 +6,7 @@
         <div class="flex items-center gap-3">
           <h2 class="text-2xl font-bold">{{ $t('navigation.my_conventions') }}</h2>
           <UButton
+            :aria-label="$t('common.help')"
             icon="i-heroicons-question-mark-circle"
             size="xs"
             color="neutral"

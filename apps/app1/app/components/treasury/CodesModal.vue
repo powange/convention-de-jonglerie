@@ -54,6 +54,7 @@
             <UBadge color="neutral" variant="subtle" class="font-mono">{{ code.code }}</UBadge>
             <span class="min-w-0 flex-1 truncate">{{ code.label }}</span>
             <UButton
+              :aria-label="$t('common.delete')"
               size="xs"
               color="error"
               variant="ghost"

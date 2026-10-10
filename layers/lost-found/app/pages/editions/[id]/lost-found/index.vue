@@ -153,6 +153,7 @@
                   @keyup.enter="postComment(item.id)"
                 />
                 <UButton
+                  :aria-label="$t('common.send')"
                   icon="i-heroicons-paper-airplane"
                   color="primary"
                   :disabled="!commentContents[item.id]?.trim()"

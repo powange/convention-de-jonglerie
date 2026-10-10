@@ -446,6 +446,7 @@
                       <span class="text-primary-600 dark:text-primary-400">{{ filter.value }}</span>
                     </span>
                     <UButton
+                      :aria-label="$t('common.remove')"
                       color="error"
                       variant="ghost"
                       size="sm"
@@ -736,6 +737,7 @@
                 <!-- Menu d'actions -->
                 <UDropdownMenu :items="getOrderMenuItems(order)" :ui="{ content: 'min-w-48' }">
                   <UButton
+                    :aria-label="$t('common.actions')"
                     icon="i-heroicons-ellipsis-vertical"
                     color="neutral"
                     variant="ghost"
@@ -967,6 +969,7 @@
                   <!-- Menu d'actions du billet -->
                   <UDropdownMenu :items="getItemMenuItems(item)" :ui="{ content: 'min-w-40' }">
                     <UButton
+                      :aria-label="$t('common.actions')"
                       icon="i-heroicons-ellipsis-vertical"
                       color="neutral"
                       variant="ghost"

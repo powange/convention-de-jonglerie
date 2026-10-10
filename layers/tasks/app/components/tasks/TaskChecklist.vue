@@ -26,6 +26,7 @@
             @keydown.escape="cancelEdit"
           />
           <UButton
+            :aria-label="$t('common.validate')"
             icon="i-heroicons-check"
             size="xs"
             color="primary"
@@ -34,6 +35,7 @@
             @click="saveEdit(item)"
           />
           <UButton
+            :aria-label="$t('common.cancel')"
             icon="i-heroicons-x-mark"
             size="xs"
             color="neutral"
@@ -47,6 +49,7 @@
           </span>
           <UButton
             v-if="canEdit"
+            :aria-label="$t('common.edit')"
             icon="i-heroicons-pencil-square"
             size="xs"
             color="neutral"
@@ -56,6 +59,7 @@
           />
           <UButton
             v-if="canEdit"
+            :aria-label="$t('common.delete')"
             icon="i-heroicons-trash"
             size="xs"
             color="error"

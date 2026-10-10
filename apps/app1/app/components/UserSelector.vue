@@ -64,6 +64,7 @@
       </UButton>
       <UButton
         v-if="internalValue && showClearButton"
+        :aria-label="$t('common.clear')"
         variant="outline"
         color="neutral"
         size="sm"

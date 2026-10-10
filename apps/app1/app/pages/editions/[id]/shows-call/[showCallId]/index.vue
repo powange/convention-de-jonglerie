@@ -31,6 +31,7 @@
             <div class="flex items-start justify-between gap-4">
               <div class="flex items-center gap-3">
                 <UButton
+                  :aria-label="$t('common.back')"
                   icon="i-heroicons-arrow-left"
                   variant="ghost"
                   color="neutral"

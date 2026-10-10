@@ -421,6 +421,7 @@
               />
               <UButton
                 v-if="application.status === 'ACCEPTED'"
+                :aria-label="$t('common.contact')"
                 size="xs"
                 color="success"
                 variant="ghost"
@@ -431,6 +432,7 @@
               />
               <UButton
                 v-if="application.status === 'ACCEPTED'"
+                :aria-label="$t('common.show_qr_code')"
                 size="xs"
                 color="primary"
                 variant="ghost"
@@ -441,6 +443,7 @@
               />
               <UButton
                 v-if="application.status === 'PENDING'"
+                :aria-label="$t('common.remove')"
                 size="xs"
                 color="error"
                 variant="ghost"

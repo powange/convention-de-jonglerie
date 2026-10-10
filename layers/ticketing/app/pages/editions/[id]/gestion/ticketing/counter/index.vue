@@ -64,6 +64,7 @@
                 {{ counter.name }}
               </h3>
               <UButton
+                :aria-label="$t('common.delete')"
                 icon="i-heroicons-trash"
                 variant="ghost"
                 color="error"

@@ -309,6 +309,11 @@
                         "
                       >
                         <UButton
+                          :aria-label="
+                            organisateur.leaderTeamIds.includes(team.id)
+                              ? $t('pages.volunteers.team_distribution.remove_as_leader')
+                              : $t('pages.volunteers.team_distribution.set_as_leader')
+                          "
                           :icon="
                             organisateur.leaderTeamIds.includes(team.id)
                               ? 'i-heroicons-star-solid'

@@ -23,6 +23,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
       <div class="flex items-center gap-3">
         <UButton
+          :aria-label="$t('common.back')"
           icon="i-heroicons-arrow-left"
           color="neutral"
           variant="ghost"
@@ -597,6 +598,7 @@
                 />
                 <UTooltip v-if="canManage" :text="t('gestion.stock.shopping_rename')">
                   <UButton
+                    :aria-label="t('gestion.stock.shopping_rename')"
                     icon="i-heroicons-pencil-square"
                     color="neutral"
                     variant="ghost"
@@ -606,6 +608,7 @@
                 </UTooltip>
                 <UTooltip v-if="canManage" :text="t('common.delete')">
                   <UButton
+                    :aria-label="$t('common.delete')"
                     icon="i-heroicons-trash"
                     color="error"
                     variant="ghost"
@@ -699,6 +702,7 @@
             <template #retrait-cell="{ row }">
               <UTooltip :text="t('gestion.stock.shopping_remove_item')">
                 <UButton
+                  :aria-label="t('gestion.stock.shopping_remove_item')"
                   icon="i-heroicons-x-mark"
                   color="neutral"
                   variant="ghost"

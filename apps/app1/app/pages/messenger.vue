@@ -225,6 +225,7 @@
               <div class="flex items-center gap-3 min-w-0">
                 <!-- Bouton retour (mobile uniquement) -->
                 <UButton
+                  :aria-label="$t('common.back')"
                   color="neutral"
                   variant="ghost"
                   icon="i-heroicons-arrow-left"
