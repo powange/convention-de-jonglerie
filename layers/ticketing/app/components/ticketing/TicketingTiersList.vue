@@ -275,7 +275,7 @@
         <div class="flex gap-2">
           <UButton
             :aria-label="$t('common.edit')"
-            icon="i-heroicons-pencil"
+            icon="i-heroicons-pencil-square"
             color="primary"
             variant="ghost"
             size="sm"

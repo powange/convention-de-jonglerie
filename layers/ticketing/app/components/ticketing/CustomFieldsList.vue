@@ -186,7 +186,7 @@
             />
             <UButton
               v-if="!field.helloAssoCustomFieldId"
-              icon="i-heroicons-pencil"
+              icon="i-heroicons-pencil-square"
               color="neutral"
               variant="ghost"
               size="sm"

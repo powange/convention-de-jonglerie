@@ -62,7 +62,7 @@
 
         <div class="flex items-center gap-1 shrink-0">
           <UButton
-            icon="i-heroicons-pencil"
+            icon="i-heroicons-pencil-square"
             color="neutral"
             variant="ghost"
             :title="$t('ticketing.quotas.list.edit_button')"

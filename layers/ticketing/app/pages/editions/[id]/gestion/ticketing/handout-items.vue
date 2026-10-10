@@ -288,7 +288,7 @@
                     size="sm"
                     color="primary"
                     variant="soft"
-                    icon="i-heroicons-pencil"
+                    icon="i-heroicons-pencil-square"
                     @click="openOrganizerItemsModal(null)"
                   >
                     {{ $t('common.edit') }}
@@ -390,7 +390,7 @@
                     size="sm"
                     color="primary"
                     variant="soft"
-                    icon="i-heroicons-pencil"
+                    icon="i-heroicons-pencil-square"
                     @click="artistItemsModalOpen = true"
                   >
                     {{ $t('common.edit') }}

@@ -260,7 +260,7 @@
                       size="xs"
                       color="primary"
                       variant="soft"
-                      icon="i-heroicons-pencil"
+                      icon="i-heroicons-pencil-square"
                       @click="openEditApplicationModal"
                     >
                       {{ t('volunteers.edit_application') }}

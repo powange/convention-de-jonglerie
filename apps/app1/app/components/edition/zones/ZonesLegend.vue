@@ -284,7 +284,7 @@ const handleDelete = (item: LegendItem) => {
             @click="toggleVisibility(item)"
           />
           <UButton
-            icon="i-lucide-pencil"
+            icon="i-heroicons-pencil-square"
             size="xs"
             color="neutral"
             variant="ghost"

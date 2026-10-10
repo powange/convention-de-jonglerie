@@ -372,7 +372,7 @@
                     size="xs"
                     color="neutral"
                     variant="ghost"
-                    icon="i-lucide-pencil"
+                    icon="i-heroicons-pencil-square"
                     :title="$t('common.edit')"
                     @click="openEntryModal(row.original)"
                   />
@@ -1088,7 +1088,7 @@ const surClicDroit = (_evenement: Event, row: { original: TreasuryLine }) => {
       : [
           {
             label: t('common.edit'),
-            icon: 'i-lucide-pencil',
+            icon: 'i-heroicons-pencil-square',
             onSelect: () => openEntryModal(ligne),
           },
           { type: 'separator' },

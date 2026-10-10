@@ -167,7 +167,7 @@ const modes = computed(() => [
   },
   {
     value: 'libre' as const,
-    icon: 'i-heroicons-pencil',
+    icon: 'i-heroicons-pencil-square',
     label: t('gestion.treasury.entry_advanced_by_free'),
   },
 ])

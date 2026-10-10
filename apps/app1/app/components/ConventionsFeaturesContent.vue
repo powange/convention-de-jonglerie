@@ -74,7 +74,11 @@
       </h4>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div :class="itemClasses">
-          <UIcon name="i-heroicons-pencil" class="text-blue-500 mt-0.5 flex-shrink-0" size="16" />
+          <UIcon
+            name="i-heroicons-pencil-square"
+            class="text-blue-500 mt-0.5 flex-shrink-0"
+            size="16"
+          />
           <div>
             <p class="font-medium text-sm text-gray-900 dark:text-white">
               {{ $t('conventions.edit_permissions') }}

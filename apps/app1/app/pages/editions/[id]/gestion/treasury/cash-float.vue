@@ -174,7 +174,7 @@
           <template #actions-cell="{ row }">
             <div class="flex justify-end gap-1">
               <UButton
-                icon="i-heroicons-pencil"
+                icon="i-heroicons-pencil-square"
                 color="neutral"
                 variant="ghost"
                 size="xs"

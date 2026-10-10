@@ -8,7 +8,7 @@
           <UiUserDisplay :user="request.user" :datetime="request.createdAt" size="lg" />
           <div v-if="canEdit" class="flex gap-1">
             <UButton
-              icon="i-heroicons-pencil"
+              icon="i-heroicons-pencil-square"
               size="sm"
               color="warning"
               variant="ghost"

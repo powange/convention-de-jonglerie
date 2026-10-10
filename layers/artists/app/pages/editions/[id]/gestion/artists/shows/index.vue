@@ -280,7 +280,7 @@
                   <!-- Un numéro se modifie sur la page dédiée du cabaret -->
                   <UButton
                     v-if="row.original.kind === 'act'"
-                    icon="i-heroicons-pencil"
+                    icon="i-heroicons-pencil-square"
                     color="primary"
                     variant="ghost"
                     size="sm"
@@ -314,7 +314,7 @@
                     />
                     <UButton
                       :aria-label="$t('common.edit')"
-                      icon="i-heroicons-pencil"
+                      icon="i-heroicons-pencil-square"
                       color="primary"
                       variant="ghost"
                       size="sm"
@@ -634,7 +634,7 @@ const onContextmenu = (_event: Event, row: TableRow<ShowTableRow>) => {
   }
   items.push({
     label: t('common.edit'),
-    icon: 'i-heroicons-pencil',
+    icon: 'i-heroicons-pencil-square',
     onSelect: () => goToEditShow(show),
   })
   items.push({ type: 'separator' })

@@ -692,7 +692,7 @@
                        muets au lecteur d'écran, et impossibles à viser autrement que par leur
                        position. Les libellés existaient déjà. -->
                   <UButton
-                    icon="i-heroicons-pencil"
+                    icon="i-heroicons-pencil-square"
                     color="primary"
                     variant="ghost"
                     size="sm"
@@ -1569,7 +1569,7 @@ const onRowContextmenu = (_e: Event, row: { original: any }) => {
     { type: 'label', label: artist.user?.pseudo || artist.name || t('common.artist') },
     {
       label: t('common.edit'),
-      icon: 'i-heroicons-pencil',
+      icon: 'i-heroicons-pencil-square',
       onSelect: () => openEditArtistModal(artist),
     },
     { type: 'separator' },

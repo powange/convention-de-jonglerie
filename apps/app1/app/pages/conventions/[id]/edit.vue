@@ -3,7 +3,7 @@
     <UCard>
       <template #header>
         <div class="flex items-center gap-3">
-          <UIcon name="i-heroicons-pencil" class="text-warning-500" size="24" />
+          <UIcon name="i-heroicons-pencil-square" class="text-warning-500" size="24" />
           <h1 class="text-2xl font-bold">{{ $t('conventions.edit') }}</h1>
         </div>
         <p v-if="convention" class="text-gray-600 mt-2">

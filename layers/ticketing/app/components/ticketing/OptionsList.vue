@@ -152,7 +152,7 @@
         <!-- Actions -->
         <div class="flex gap-2">
           <UButton
-            icon="i-heroicons-pencil"
+            icon="i-heroicons-pencil-square"
             color="primary"
             variant="soft"
             @click="openOptionModal(option)"
