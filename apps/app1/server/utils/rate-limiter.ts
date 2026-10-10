@@ -1,3 +1,5 @@
+import { sanitizeEmail } from './validation-helpers'
+
 import type { H3Event } from 'h3'
 
 interface RateLimitConfig {
@@ -24,6 +26,23 @@ setInterval(
 )
 
 /**
+ * L'adresse du client, derrière le proxy s'il y en a un.
+ *
+ * ⚠️ ÉCRITE UNE FOIS. Cette expression existait en quatre copies — le limiteur par défaut, celui du
+ * paiement, celui de la recherche, celui des recherches de personnes — et elles ne faisaient pas
+ * tout à fait la même chose : le limiteur par défaut ne découpait PAS `x-forwarded-for` sur la
+ * virgule, alors que cet en-tête porte la chaîne complète des relais (`client, proxy1, proxy2`).
+ * Sa clé variait donc avec le chemin suivi par la requête, et le même visiteur pouvait obtenir
+ * plusieurs compteurs.
+ */
+export function adresseDuClient(event: H3Event): string {
+  const transmise = String(event.node.req.headers['x-forwarded-for'] || '')
+    .split(',')[0]
+    ?.trim()
+  return transmise || event.node.req.socket.remoteAddress || 'unknown'
+}
+
+/**
  * Middleware de rate limiting
  */
 export function createRateLimiter(config: RateLimitConfig) {
@@ -31,14 +50,8 @@ export function createRateLimiter(config: RateLimitConfig) {
     windowMs,
     max,
     message = 'Trop de requêtes, veuillez réessayer plus tard',
-    keyGenerator = (event: H3Event) => {
-      // Par défaut, utiliser l'IP + la route
-      const ip =
-        event.node.req.headers['x-forwarded-for'] ||
-        event.node.req.socket.remoteAddress ||
-        'unknown'
-      return `${ip}:${event.path}`
-    },
+    // Par défaut, l'adresse du client + la route
+    keyGenerator = (event: H3Event) => `${adresseDuClient(event)}:${event.path}`,
   } = config
 
   return async (event: H3Event) => {
@@ -124,7 +137,40 @@ export const checkEmailRateLimiter = createRateLimiter({
  * Note : nécessite que `event.context.user` soit défini (utilisateur authentifié)
  *        ou `event.context.body.email` (rarement rempli avant readBody)
  */
-export const emailRateLimiter = createRateLimiter({
+/**
+ * L'adresse visée par un envoi, normalisée — ou `'-'` si la requête n'en annonce pas.
+ *
+ * ⚠️ `typeof === 'string'` EST INDISPENSABLE. La clé était `body?.email` brut : un corps portant
+ * `{ email: { toString: … } }` ou un tableau donnait la clé `'[object Object]'`, **partagée par
+ * tous** — trois envois par quart d'heure consommés par le premier venu.
+ *
+ * La normalisation, elle, ferme l'autre moitié : « A@x.fr » et « a@x.fr » ouvraient deux compteurs
+ * distincts pour la même boîte.
+ */
+function adresseViseeParLEnvoi(event: H3Event): string {
+  const brut = (event.context.body as { email?: unknown } | undefined)?.email
+  return typeof brut === 'string' && brut.trim() ? sanitizeEmail(brut) : '-'
+}
+
+/**
+ * Trois envois par quart d'heure, par COUPLE (adresse du client, adresse visée).
+ *
+ * ## ⚠️ CE QUE LA CLÉ ÉTAIT, ET POURQUOI C'ÉTAIT UN TROU (constat B7)
+ *
+ * `body?.email || user?.id || 'unknown'` — c'est-à-dire l'adresse **visée**, jamais l'expéditeur.
+ * Trois conséquences, et la fiche n'en nommait que deux :
+ *
+ * 1. Une même machine pouvait déclencher des renvois vers **autant d'adresses qu'elle voulait** :
+ *    chaque adresse ouvrait son propre compteur. D'où le second limiteur, par adresse cliente.
+ * 2. Varier la casse ouvrait un compteur de plus pour la même boîte.
+ * 3. Et surtout : `claim.post.ts` appelle ce limiteur **sans** avoir rempli `context.body`. La clé
+ *    y valait donc la chaîne littérale `'unknown'`, **un seau partagé par tout le monde** — trois
+ *    revendications par quart d'heure pour le site entier, consommées par le premier venu.
+ *
+ * L'adresse du client est maintenant dans la clé, donc une requête qui n'annonce pas d'adresse
+ * visée est quand même comptée par machine, et non dans un seau commun.
+ */
+const envoiParCoupleRateLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
   /*
    * La dérogation en développement et en E2E, que les cinq autres limiteurs de ce fichier avaient
@@ -134,13 +180,34 @@ export const emailRateLimiter = createRateLimiter({
    */
   max: import.meta.dev || process.env.E2E_TEST === 'true' ? 100 : 3,
   message: "Trop d'envois d'email, veuillez réessayer plus tard",
-  keyGenerator: (event: H3Event) => {
-    // Utiliser l'email ou l'ID utilisateur si disponible
-    const body = event.context.body
-    const user = event.context.user
-    return body?.email || user?.id || 'unknown'
-  },
+  keyGenerator: (event: H3Event) =>
+    `email:${adresseDuClient(event)}:${adresseViseeParLEnvoi(event)}`,
 })
+
+/**
+ * Dix envois par quart d'heure et par machine, quelles que soient les adresses visées.
+ *
+ * C'est le plafond qui manquait : sans lui, compter par couple (client, adresse) laisse une machine
+ * arroser autant de boîtes qu'elle veut — chacune avec son compteur neuf. Dix laisse la place à
+ * quelqu'un qui se trompe d'adresse, se corrige, et renvoie son code deux ou trois fois.
+ */
+const envoiParMachineRateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: import.meta.dev || process.env.E2E_TEST === 'true' ? 200 : 10,
+  message: "Trop d'envois d'email depuis cette connexion, veuillez réessayer plus tard",
+  keyGenerator: (event: H3Event) => `email-machine:${adresseDuClient(event)}`,
+})
+
+/**
+ * Rate limiter pré-configuré pour l'envoi d'emails.
+ *
+ * Les deux bornes en un seul appel : les points d'API n'ont pas à savoir qu'il y en a deux, et
+ * n'avoir à en brancher qu'une est ce qui évite qu'un appelant futur en oublie une.
+ */
+export const emailRateLimiter = async (event: H3Event) => {
+  await envoiParMachineRateLimiter(event)
+  await envoiParCoupleRateLimiter(event)
+}
 
 /**
  * Rate limiter pré-configuré pour les demandes de reset de mot de passe
