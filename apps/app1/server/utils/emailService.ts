@@ -18,6 +18,24 @@ export interface EmailOptions {
   subject: string
   html: string
   text?: string
+  /**
+   * Comment se désabonner de ce type de courriel — en-tête `List-Unsubscribe`.
+   *
+   * ⚠️ CE N'EST PAS UNE POLITESSE. Gmail et Outlook s'en servent pour afficher leur propre bouton
+   * « Se désabonner », et son ABSENCE sur des courriels envoyés en nombre pèse sur la
+   * délivrabilité : une personne qui ne trouve pas comment arrêter les notifications les signale
+   * comme pourriel, et c'est le domaine entier qui en paie le prix — y compris les courriels de
+   * vérification d'adresse, dont personne ne se plaint jamais.
+   *
+   * On ne le pose donc QUE sur les courriels dont on peut effectivement se désabonner : les
+   * notifications. Un courriel de réinitialisation de mot de passe n'a pas de case à décocher.
+   *
+   * ⚠️ PAS de `List-Unsubscribe-Post`. Cet en-tête promet qu'un simple POST sur l'URL suffit à
+   * désabonner, sans confirmation. Nous ne proposons qu'une PAGE de réglages : l'annoncer à tort
+   * ferait échouer le désabonnement en un clic là où le client l'affiche — c'est-à-dire pire
+   * qu'un lien ordinaire, puisque la personne croirait l'avoir fait.
+   */
+  listUnsubscribe?: string
 }
 
 export function getSiteUrl(): string {
@@ -113,6 +131,9 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       html: options.html,
       text: options.text,
       ...(bcc.length > 0 ? { bcc } : {}),
+      ...(options.listUnsubscribe
+        ? { headers: { 'List-Unsubscribe': `<${options.listUnsubscribe}>` } }
+        : {}),
     }
 
     const info = await transporter.sendMail(mailOptions)
@@ -206,7 +227,8 @@ export async function generateNotificationEmailHtml(
   title: string,
   message: string,
   actionUrl?: string,
-  actionText?: string
+  actionText?: string,
+  locale = 'fr'
 ): Promise<string> {
   const baseUrl = getSiteUrl()
 
@@ -219,6 +241,7 @@ export async function generateNotificationEmailHtml(
       baseUrl,
       actionUrl,
       actionText,
+      locale,
     },
     {
       pretty: true,

@@ -8,6 +8,14 @@ const prevenirEnDirect = vi.hoisted(() => vi.fn(async () => true))
 vi.mock('../../../../server/utils/emailService', () => ({
   sendEmail: envoyerCourriel,
   generateNotificationEmailHtml: composerCourriel,
+  /*
+   * ⚠️ À DÉCLARER ICI, SOUS PEINE DE SILENCE. `getSiteUrl` sert à composer les URL absolues de la
+   * version texte et l'adresse de désabonnement. Oublié dans ce bouchon, il vaut `undefined`,
+   * l'appel lève — et le `try/catch` qui entoure l'envoi de courriel (délibéré : une notification
+   * ne doit pas échouer parce que le courriel échoue) avale l'erreur. `sendEmail` n'est alors
+   * jamais appelé, et deux cas tombent sur « attendu 1 appel, reçu 0 » en accusant le code.
+   */
+  getSiteUrl: () => 'https://juggling-convention.com',
 }))
 
 vi.mock('../../../../server/utils/notification-stream-manager', () => ({

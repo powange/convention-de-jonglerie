@@ -1,4 +1,5 @@
-import { sendEmail, generateNotificationEmailHtml } from './emailService'
+import { sendEmail, generateNotificationEmailHtml, getSiteUrl } from './emailService'
+import { CHEMIN_DES_PREFERENCES, texteDeCourriel } from './habillage-courriel'
 import {
   isNotificationAllowed,
   isEmailNotificationAllowed,
@@ -261,14 +262,32 @@ export const NotificationService = {
               emailMessage,
               // `?? undefined` : la colonne est nullable, le générateur attend une absence.
               notification.actionUrl ?? undefined,
-              emailActionText
+              emailActionText,
+              preferredLanguage
             )
 
+            /*
+             * La version TEXTE porte désormais la salutation et le lien d'action.
+             *
+             * Elle était le message nu : les clients qui n'affichent pas le HTML — et les filtres
+             * anti-pourriel, qui la lisent pour juger — n'y voyaient AUCUN moyen d'agir. Le bouton
+             * n'existait que dans la version HTML.
+             */
+            const baseUrl = getSiteUrl()
             const emailSent = await sendEmail({
               to: user.email,
               subject: emailTitle,
               html: emailHtml,
-              text: emailMessage,
+              text: texteDeCourriel({
+                prenom,
+                message: emailMessage,
+                baseUrl,
+                actionUrl: notification.actionUrl ?? undefined,
+                actionText: emailActionText,
+                locale: preferredLanguage,
+              }),
+              // Se désabonner, c'est décocher la préférence : l'URL mène aux réglages.
+              listUnsubscribe: `${baseUrl}${CHEMIN_DES_PREFERENCES}`,
             })
 
             console.log(

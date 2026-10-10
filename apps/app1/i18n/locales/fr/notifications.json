@@ -125,6 +125,13 @@
         "title": "Rappel d'événement 📅"
       }
     },
+    "email": {
+      "automatic": "Cet email a été envoyé automatiquement par Juggling Convention.",
+      "greeting": "Bonjour {prenom},",
+      "manage_notifications": "Gérer mes notifications",
+      "signature": "— L'équipe de Juggling Convention",
+      "support_project": "Soutenir le projet"
+    },
     "loading": "Chargement des notifications...",
     "manage_description": "Gérez vos notifications et préférences",
     "none_found": "Aucune notification trouvée",
