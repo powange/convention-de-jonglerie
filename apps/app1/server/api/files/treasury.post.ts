@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { uploadRateLimiter } from '#server/utils/api-rate-limiter'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTreasuryById } from '#server/utils/permissions/edition-permissions'
 import {
@@ -45,6 +46,10 @@ const bodySchema = z.object({
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
+
+    // Borne le débit d'envoi, par COMPTE : appelé après `requireAuth`, pour que la clé soit un
+    // utilisateur réel et non le seau commun des anonymes.
+    await uploadRateLimiter(event)
 
     const analyse = bodySchema.safeParse(await readBody(event))
     if (!analyse.success) {

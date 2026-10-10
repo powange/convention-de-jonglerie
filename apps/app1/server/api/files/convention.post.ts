@@ -1,4 +1,5 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { uploadRateLimiter } from '#server/utils/api-rate-limiter'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canEditConvention } from '#server/utils/permissions/convention-permissions'
 import { validateUploadedFile } from '#server/utils/upload-validation'
@@ -15,6 +16,10 @@ interface RequestBody {
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
+
+    // Borne le débit d'envoi, par COMPTE : appelé après `requireAuth`, pour que la clé soit un
+    // utilisateur réel et non le seau commun des anonymes.
+    await uploadRateLimiter(event)
 
     const { files, metadata } = await readBody<RequestBody>(event)
 

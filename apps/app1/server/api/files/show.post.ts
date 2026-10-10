@@ -1,4 +1,5 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { uploadRateLimiter } from '#server/utils/api-rate-limiter'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageArtists } from '#server/utils/permissions/edition-permissions'
 import { validateUploadedFile } from '#server/utils/upload-validation'
@@ -6,6 +7,10 @@ import { validateUploadedFile } from '#server/utils/upload-validation'
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
+
+    // Borne le débit d'envoi, par COMPTE : appelé après `requireAuth`, pour que la clé soit un
+    // utilisateur réel et non le seau commun des anonymes.
+    await uploadRateLimiter(event)
 
     const body = await readBody(event)
 
