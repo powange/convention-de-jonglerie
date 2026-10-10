@@ -54,6 +54,7 @@
       "volunteer_to_organizers_from_organizer": "Nouveau message d'un organisateur {editionName}",
       "volunteer_to_organizers_from_volunteer": "Nouveau message d'un bénévole {editionName}"
     },
+    "reconnecting": "Reconnexion au fil de la conversation…",
     "reply": "Répondre",
     "reply_to": "Répondre à {pseudo}",
     "resume_today": "Aujourd'hui, {time}",
