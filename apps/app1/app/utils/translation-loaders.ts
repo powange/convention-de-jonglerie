@@ -18,6 +18,14 @@ export function getTranslationsToLoad(path: string): string[] {
   const routeTranslations: Record<string, string[]> = {
     '/admin': ['admin', 'auth', 'profil'],
     '/editions': ['edition'],
+    /*
+     * ⚠️ `/conventions` NE TOMBAIT SOUS AUCUNE RÈGLE, et les clés `conventions.*` vivent dans
+     * `edition.json`. Le titre de `/conventions/:id/edit` et le message « convention introuvable »
+     * sortaient donc BRUTS dès qu'on arrivait par rechargement ou lien direct — le symptôme
+     * disparaissant en navigation interne depuis une page qui avait déjà chargé le domaine, ce qui
+     * explique qu'il soit passé inaperçu.
+     */
+    '/conventions': ['edition'],
     '/project-costs': ['project-costs'],
     '/auth': ['auth', 'profil'],
     '/login': ['auth'],
@@ -48,11 +56,28 @@ export function getTranslationsToLoad(path: string): string[] {
       pattern: /^\/editions\/\d+\/gestion/,
       translations: ['gestion'],
     },
-    // Vue d'ensemble racine : workshops (cartes de modules). Le libellé de la carte
-    // « tâches » vit dans le domaine gestion (gestion.task.manage_*), déjà chargé.
+    /*
+     * Vue d'ensemble racine : workshops (cartes de modules). Le libellé de la carte « tâches » vit
+     * dans le domaine gestion (gestion.task.manage_*), déjà chargé.
+     *
+     * ⚠️ `volunteers` Y MANQUAIT : la carte des renforts affiche `volunteers.renforts_title` et
+     * `volunteers.renforts_description`, et ce domaine n'était chargé que sous
+     * `/gestion/volunteers`. La carte sortait donc avec ses deux clés brutes sur la page d'accueil
+     * de la gestion — la première page que voit un organisateur.
+     */
     {
       pattern: /^\/editions\/\d+\/gestion$/,
-      translations: ['workshops'],
+      translations: ['workshops', 'volunteers'],
+    },
+    /*
+     * Mise à jour par IA : le composant de progression affiche `admin.import.agent_exploring` et
+     * `admin.import.total_time`. Le domaine `admin` n'était chargé que sous `/admin` — or cet écran
+     * vit sous `/editions/:id/gestion`, et c'est un organisateur, pas un administrateur, qui s'en
+     * sert.
+     */
+    {
+      pattern: /^\/editions\/\d+\/gestion\/ai-update/,
+      translations: ['admin'],
     },
     // Gestion des tâches : domaine tasks (partagé) + gestion-tasks (clés management)
     {

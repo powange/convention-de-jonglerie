@@ -87,7 +87,12 @@
           :to="useReturnTo().buildLoginUrl($route.fullPath)"
           class="text-primary-600 hover:underline"
         >
-          {{ $t('auth.login') }}
+          <!-- `navigation.login` et non `auth.login` : même texte (« Connexion »), mais
+               `common.json` est TOUJOURS embarqué, alors que `auth.json` n'est chargé que sous
+               /auth, /login, /register et /profile. Sur une page de covoiturage atteinte par
+               rechargement, un visiteur non connecté voyait donc la clé brute. Charger tout le
+               domaine `auth` sur chaque page d'édition coûterait plus que de déplacer un mot. -->
+          {{ $t('navigation.login') }}
         </NuxtLink>
         {{ $t('components.carpool.to_add_comment') }}
       </p>
