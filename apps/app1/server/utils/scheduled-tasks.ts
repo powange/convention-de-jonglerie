@@ -7,9 +7,25 @@
  * invalide » relevé en production), et `task-deadlines-reminders` n'apparaissait nulle part alors
  * qu'elle tournait. Les deux points d'API lisent désormais ce tableau.
  *
- * Ce qu'il reste à tenir à jour en ajoutant une tâche : ce catalogue, et le `CronJob` dans
- * `server/plugins/scheduler.ts` qui la déclenche.
+ * Ce qu'il reste à tenir à jour en ajoutant une tâche : ce catalogue, et l'appel à `planifier`
+ * dans `server/plugins/scheduler.ts`. Un test compare les deux, dans les deux sens, expressions
+ * cron comprises.
  */
+
+/**
+ * Le fuseau dans lequel les heures de ce catalogue sont exprimées.
+ *
+ * ## ⚠️ POURQUOI IL EST ÉCRIT QUELQUE PART (constat A6)
+ *
+ * Ce catalogue annonçait « Quotidien à 10h » et les `CronJob` ne recevaient **aucun** `timeZone` ;
+ * ni l'image Docker ni les piles ne posent `TZ`. Les tâches partaient donc à l'heure **UTC du
+ * conteneur** : « 9h » s'exécutait à 11 h en été française, « 2h du matin » à 4 h. L'écran
+ * d'administration affichait des heures que personne ne pouvait vérifier.
+ *
+ * Une seule valeur ici, lue par le planificateur ET par les rappels d'échéance : c'est elle qui
+ * fait que l'heure annoncée est l'heure réelle.
+ */
+export const FUSEAU_DES_TACHES = 'Europe/Paris'
 export interface TachePlanifiee {
   /** Nom passé à `runTask`, identique au fichier de `server/tasks/`. */
   name: string
@@ -30,7 +46,7 @@ export const TACHES_PLANIFIEES: TachePlanifiee[] = [
   {
     name: 'convention-favorites-reminders',
     description: 'Notifie les utilisateurs des conventions favorites qui commencent dans 3 jours',
-    schedule: 'Quotidien à 10h',
+    schedule: 'Quotidien à 10h (heure de Paris)',
     cronExpression: '0 10 * * *',
     category: 'Notifications',
   },
@@ -38,14 +54,14 @@ export const TACHES_PLANIFIEES: TachePlanifiee[] = [
     name: 'task-deadlines-reminders',
     description:
       "Rappelle aux assignés les tâches dont l'échéance approche (J-7, J-3, J-1 et le jour même)",
-    schedule: 'Quotidien à 9h',
+    schedule: 'Quotidien à 9h (heure de Paris)',
     cronExpression: '0 9 * * *',
     category: 'Notifications',
   },
   {
     name: 'cleanup-expired-tokens',
     description: 'Nettoie les tokens de réinitialisation de mot de passe expirés',
-    schedule: 'Quotidien à 2h',
+    schedule: 'Quotidien à 2h (heure de Paris)',
     cronExpression: '0 2 * * *',
     category: 'Maintenance',
   },
@@ -70,21 +86,21 @@ export const TACHES_PLANIFIEES: TachePlanifiee[] = [
     // décrite comme ne supprimant que les erreurs résolues, alors qu'elle emporte aussi les
     // autres. Les deux mensonges portaient sur une suppression définitive.
     description: "Purge le journal d'erreurs : résolues après 30 jours, non résolues après 90",
-    schedule: 'Quotidien (3h)',
+    schedule: 'Quotidien à 3h (heure de Paris)',
     cronExpression: '0 3 * * *',
     category: 'Maintenance',
   },
   {
     name: 'cleanup-inactive-subscriptions',
     description: 'Nettoie les subscriptions push inactives',
-    schedule: 'Quotidien à 4h',
+    schedule: 'Quotidien à 4h (heure de Paris)',
     cronExpression: '0 4 * * *',
     category: 'Maintenance',
   },
   {
     name: 'cleanup-empty-conversations',
     description: 'Supprime les conversations sans messages créées il y a plus de 7 jours',
-    schedule: 'Quotidien à 5h',
+    schedule: 'Quotidien à 5h (heure de Paris)',
     cronExpression: '0 5 * * *',
     category: 'Maintenance',
   },

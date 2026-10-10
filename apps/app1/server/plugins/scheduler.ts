@@ -1,129 +1,82 @@
 import { CronJob } from 'cron'
 
+import { FUSEAU_DES_TACHES, TACHES_PLANIFIEES } from '#server/utils/scheduled-tasks'
+
+/**
+ * Les tâches en cours d'exécution.
+ *
+ * ## ⚠️ POURQUOI UN VERROU (constat A6)
+ *
+ * `volunteer-reminders` tourne **chaque minute** et envoie des notifications — SMTP, FCM, autant
+ * d'attentes réseau. Rien ne vérifiait que l'exécution précédente était terminée : un envoi lent
+ * se recouvrait avec le suivant, et le même rappel pouvait partir deux fois.
+ *
+ * Le verrou vit en mémoire, donc par processus. C'est suffisant ici : les crons ne tournent que
+ * dans le conteneur applicatif, en un seul exemplaire. Le jour où il y en aurait deux, il faudrait
+ * un verrou en base — et ce commentaire est là pour qu'on sache que ce n'est pas le cas.
+ */
+const enCours = new Set<string>()
+
+/**
+ * Lance une tâche, sauf si la précédente n'est pas finie.
+ *
+ * ⚠️ L'échec est JOURNALISÉ et non propagé : une tâche qui lève ne doit pas arrêter le
+ * planificateur, sinon un défaut passager dans l'une d'elles éteindrait les huit autres.
+ */
+async function lancerSansRecouvrement(nom: string) {
+  if (enCours.has(nom)) {
+    console.warn(`⏭️ ${nom} : exécution précédente encore en cours, ce passage est ignoré`)
+    return
+  }
+
+  enCours.add(nom)
+  try {
+    await runTask(nom)
+  } catch (error) {
+    console.error(`Erreur lors de l'exécution de ${nom}:`, error)
+  } finally {
+    enCours.delete(nom)
+  }
+}
+
+/**
+ * Planifie une tâche du catalogue.
+ *
+ * ⚠️ NEUF BLOCS IDENTIQUES À UN NOM PRÈS, voilà ce que ce fichier contenait — chacun avec son
+ * `try/catch` recopié, et aucun avec `timeZone`. Une règle écrite neuf fois est une règle qu'on
+ * corrige huit fois : il suffisait d'en oublier un pour que la correction soit partielle, et rien
+ * ne l'aurait signalé.
+ *
+ * L'expression cron vient du CATALOGUE et n'est plus écrite ici : c'est elle que l'écran
+ * d'administration affiche, et les deux listes avaient déjà divergé une fois.
+ */
+function planifier(nom: string) {
+  const tache = TACHES_PLANIFIEES.find((t) => t.name === nom)
+  if (!tache) {
+    console.error(`⚠️ ${nom} absente du catalogue des tâches planifiées : elle ne sera pas lancée`)
+    return
+  }
+
+  CronJob.from({
+    cronTime: tache.cronExpression,
+    timeZone: FUSEAU_DES_TACHES,
+    onTick: () => lancerSansRecouvrement(nom),
+    start: true,
+  })
+}
+
 export default defineNitroPlugin(async (_nitroApp) => {
   // Ne lancer les crons qu'en production ou si explicitement demandé
   if (process.env.NODE_ENV === 'production' || process.env.ENABLE_CRON === 'true') {
-    console.log('🕒 Initialisation du système de cron...')
+    console.log(`🕒 Initialisation du système de cron (fuseau : ${FUSEAU_DES_TACHES})...`)
 
-    // Rappels aux bénévoles (toutes les minutes pour vérifier les créneaux dans 30min)
-    CronJob.from({
-      cronTime: '* * * * *',
-      onTick: async () => {
-        try {
-          await runTask('volunteer-reminders')
-        } catch (error) {
-          console.error("Erreur lors de l'exécution de volunteer-reminders:", error)
-        }
-      },
-      start: true,
-    })
+    for (const tache of TACHES_PLANIFIEES) planifier(tache.name)
 
-    // Notifications conventions favorites (quotidien à 10h)
-    CronJob.from({
-      cronTime: '0 10 * * *',
-      onTick: async () => {
-        try {
-          await runTask('convention-favorites-reminders')
-        } catch (error) {
-          console.error("Erreur lors de l'exécution de convention-favorites-reminders:", error)
-        }
-      },
-      start: true,
-    })
-
-    // Fermeture des demandes d'échange de créneau devenues sans objet (toutes les heures)
-    CronJob.from({
-      cronTime: '30 * * * *',
-      onTick: async () => {
-        try {
-          await runTask('cleanup-expired-swaps')
-        } catch (error) {
-          console.error("Erreur lors de l'exécution de cleanup-expired-swaps:", error)
-        }
-      },
-      start: true,
-    })
-
-    // Purge des envois temporaires abandonnés (toutes les heures)
-    CronJob.from({
-      cronTime: '15 * * * *',
-      onTick: async () => {
-        try {
-          await runTask('cleanup-temp-uploads')
-        } catch (error) {
-          console.error("Erreur lors de l'exécution de cleanup-temp-uploads:", error)
-        }
-      },
-      start: true,
-    })
-
-    // Rappels d'échéance sur les tâches d'édition (quotidien à 9h)
-    CronJob.from({
-      cronTime: '0 9 * * *',
-      onTick: async () => {
-        try {
-          await runTask('task-deadlines-reminders')
-        } catch (error) {
-          console.error("Erreur lors de l'exécution de task-deadlines-reminders:", error)
-        }
-      },
-      start: true,
-    })
-
-    // Nettoyage des tokens expirés (quotidien à 2h du matin)
-    CronJob.from({
-      cronTime: '0 2 * * *',
-      onTick: async () => {
-        try {
-          await runTask('cleanup-expired-tokens')
-        } catch (error) {
-          console.error("Erreur lors de l'exécution de cleanup-expired-tokens:", error)
-        }
-      },
-      start: true,
-    })
-
-    // Purge du journal d'erreurs (quotidien à 3h du matin)
-    CronJob.from({
-      cronTime: '0 3 * * *',
-      onTick: async () => {
-        try {
-          await runTask('purge-journal-erreurs')
-        } catch (error) {
-          console.error("Erreur lors de l'exécution de purge-journal-erreurs:", error)
-        }
-      },
-      start: true,
-    })
-
-    // Nettoyage des subscriptions push inactives (quotidien à 4h du matin)
-    CronJob.from({
-      cronTime: '0 4 * * *',
-      onTick: async () => {
-        try {
-          await runTask('cleanup-inactive-subscriptions')
-        } catch (error) {
-          console.error("Erreur lors de l'exécution de cleanup-inactive-subscriptions:", error)
-        }
-      },
-      start: true,
-    })
-
-    // Nettoyage des conversations vides (quotidien à 5h du matin)
-    CronJob.from({
-      cronTime: '0 5 * * *',
-      onTick: async () => {
-        try {
-          await runTask('cleanup-empty-conversations')
-        } catch (error) {
-          console.error("Erreur lors de l'exécution de cleanup-empty-conversations:", error)
-        }
-      },
-      start: true,
-    })
-
-    console.log('✅ Système de cron initialisé avec succès')
+    console.log(`✅ ${TACHES_PLANIFIEES.length} tâches planifiées`)
   } else {
     console.log('⏸️ Système de cron désactivé (développement)')
   }
 })
+
+/** Exporté pour les tests : le verrou n'est observable que par là. */
+export const _pourLesTests = { enCours, lancerSansRecouvrement }

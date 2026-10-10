@@ -4,6 +4,7 @@
  * Isolés du reste — ni Prisma, ni notification — parce que c'est ici que se décide *quand* un
  * rappel part, et que cette décision se teste sans base de données.
  */
+import { DateTime } from 'luxon'
 
 /** Un palier, du plus lointain au jour même. */
 export type TaskDeadlineKind = 'J_MINUS_7' | 'J_MINUS_3' | 'J_MINUS_1' | 'J'
@@ -55,22 +56,23 @@ export function cleDeTitreDuRappel(kind: TaskDeadlineKind): string {
  * sont toutes deux « J-1 ». Compter en heures aurait fait dépendre le palier de l'heure à
  * laquelle le cron tourne — la même tâche aurait basculé de J-1 à J selon un décalage de cron.
  *
- * Le calcul repasse par des dates locales à minuit plutôt que de diviser un écart de
- * millisecondes : les changements d'heure font des journées de 23 et 25 heures, qu'une division
- * brute décalerait d'un jour.
+ * Le calcul repasse par des dates à minuit plutôt que de diviser un écart de millisecondes : les
+ * changements d'heure font des journées de 23 et 25 heures, qu'une division brute décalerait d'un
+ * jour.
+ *
+ * ## ⚠️ LE FUSEAU EST OBLIGATOIRE, ET C'ÉTAIT LE DÉFAUT (constat A6)
+ *
+ * Ce calcul employait `getFullYear/getMonth/getDate`, c'est-à-dire le calendrier de la MACHINE.
+ * Le conteneur tourne en UTC : une échéance « demain 00 h 30 » heure de Paris y vaut « aujourd'hui
+ * 22 h 30 », donc le même jour — et la tâche la classait au mauvais palier. L'assigné recevait son
+ * rappel « jour même » la veille, ou pas du tout.
+ *
+ * Pas de valeur par défaut : un fuseau implicite est exactement ce qui a produit le défaut.
  */
-export function joursAvant(echeance: Date, debutDeJournee: Date): number {
-  const jourEcheance = new Date(
-    echeance.getFullYear(),
-    echeance.getMonth(),
-    echeance.getDate()
-  ).getTime()
-  const jourCourant = new Date(
-    debutDeJournee.getFullYear(),
-    debutDeJournee.getMonth(),
-    debutDeJournee.getDate()
-  ).getTime()
-  return Math.round((jourEcheance - jourCourant) / 86_400_000)
+export function joursAvant(echeance: Date, debutDeJournee: Date, fuseau: string): number {
+  const jourEcheance = DateTime.fromJSDate(echeance, { zone: fuseau }).startOf('day')
+  const jourCourant = DateTime.fromJSDate(debutDeJournee, { zone: fuseau }).startOf('day')
+  return Math.round(jourEcheance.diff(jourCourant, 'days').days)
 }
 
 /**
@@ -79,8 +81,12 @@ export function joursAvant(echeance: Date, debutDeJournee: Date): number {
  * Rend `null` aussi pour une échéance DÉPASSÉE : le retard n'est pas un rappel d'échéance, et
  * relancer tous les jours sur une tâche en retard n'a pas été demandé.
  */
-export function palierDeRappel(echeance: Date, debutDeJournee: Date): TaskDeadlineKind | null {
-  const jours = joursAvant(echeance, debutDeJournee)
+export function palierDeRappel(
+  echeance: Date,
+  debutDeJournee: Date,
+  fuseau: string
+): TaskDeadlineKind | null {
+  const jours = joursAvant(echeance, debutDeJournee, fuseau)
   const palier = PALIERS.find((p) => p === jours)
   return palier === undefined ? null : KIND_PAR_PALIER[palier]
 }
