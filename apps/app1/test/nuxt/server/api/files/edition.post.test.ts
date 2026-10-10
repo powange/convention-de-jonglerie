@@ -21,6 +21,7 @@ import {
 } from '../../../../../server/utils/permissions/edition-permissions'
 import handler from '../../../../../server/api/files/edition.post'
 import { global } from '../../../globales-nitro'
+import { JPEG_MINIMAL } from '../../../../fixtures/fichiers-minimaux'
 
 const mockCanEditEdition = canEditEdition as ReturnType<typeof vi.fn>
 const mockGetEdition = getEditionWithPermissions as ReturnType<typeof vi.fn>
@@ -48,7 +49,15 @@ const mockFile = {
   filename: 'affiche.jpg',
   type: 'image/jpeg',
   size: '15',
-  content: 'data:image/jpeg;base64,ZmFrZSBpbWFnZSBkYXRh',
+  /*
+   * ⚠️ UN VRAI DÉBUT DE JPEG, et non `'fake image data'`.
+   *
+   * La validation vérifie désormais les octets de signature du contenu : un texte déguisé en image
+   * est refusé en 400, et c'est tout l'objet du constat A2. Ce fichier déposait justement un texte
+   * — il passait parce que rien ne regardait le contenu, donc il serait resté vert quelle que soit
+   * la correction.
+   */
+  content: JPEG_MINIMAL,
   data: Buffer.from('fake image data'),
 }
 
