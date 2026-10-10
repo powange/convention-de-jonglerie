@@ -113,17 +113,25 @@
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {{ $t('ticketing.counters.step') }}:
                 </label>
-                <div class="flex items-center gap-2">
-                  <UButton
-                    icon="i-heroicons-minus"
-                    variant="outline"
-                    size="sm"
-                    :disabled="step <= 1"
-                    @click="step = Math.max(1, step - 1)"
-                  />
-                  <UInput v-model.number="step" type="number" min="1" class="w-20 text-center" />
-                  <UButton icon="i-heroicons-plus" variant="outline" size="sm" @click="step++" />
-                </div>
+                <!--
+                  ⚠️ `UInputNumber` REMPLACE `UInput type="number"` ET LES DEUX BOUTONS QUI
+                  L'ENCADRAIENT.
+
+                  Le `min="1"` d'un `UInput type="number"` n'est qu'une indication HTML : vidé par
+                  l'utilisateur, le champ envoyait la chaîne vide (`v-model.number` ne rend pas `0`
+                  dans ce cas), le serveur refusait en 400, et ce refus **jammait la file d'attente**
+                  du compteur — l'écran affichait « 1 opération en attente » jusqu'au rechargement,
+                  avec un total optimiste faux. `UInputNumber` borne la valeur et ne la laisse pas
+                  vide.
+
+                  Ses propres boutons +/− rendent les deux `UButton` voisins redondants : les
+                  garder aurait donné deux jeux de contrôles pour un même champ.
+
+                  📍 Pour un ENTIER seulement : le `CLAUDE.md` interdit ce composant pour un
+                  montant, dont l'analyse dépend d'une locale non câblée. Un pas de comptage, lui,
+                  est bien un entier.
+                -->
+                <UInputNumber v-model="step" :min="1" class="w-28" />
               </div>
 
               <!-- Boutons de contrôle -->
