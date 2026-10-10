@@ -106,7 +106,7 @@
         ? `Êtes-vous sûr de vouloir valider l'entrée de ces ${selectedParticipants.length} participants ?`
         : 'Êtes-vous sûr de vouloir valider l\'entrée de ce participant ?'
     "
-    confirm-label="Valider"
+    :confirm-label="$t('common.validate')"
     confirm-color="success"
     confirm-icon="i-heroicons-check-circle"
     icon-name="i-heroicons-information-circle"
@@ -124,9 +124,9 @@
   <!-- Modal de confirmation de dévalidation -->
   <UiConfirmModal
     v-model="showInvalidateModal"
-    title="Dévalider l'entrée"
-    description="Êtes-vous sûr de vouloir dévalider l'entrée de ce participant ? Cette action annulera la validation."
-    confirm-label="Dévalider"
+    :title="$t('ticketing.participant.invalidate_title')"
+    :description="$t('ticketing.participant.invalidate_description')"
+    :confirm-label="$t('ticketing.participant.invalidate_confirm')"
     confirm-color="error"
     confirm-icon="i-heroicons-x-circle"
     icon-name="i-heroicons-exclamation-triangle"
@@ -176,15 +176,18 @@
   />
 
   <!-- Modal de confirmation de paiement -->
-  <UModal v-model:open="showPaymentConfirmModal" title="Confirmer le paiement">
+  <UModal
+    v-model:open="showPaymentConfirmModal"
+    :title="$t('ticketing.participant.confirm_payment_title')"
+  >
     <template #body>
       <div class="space-y-4">
         <UAlert
           icon="i-heroicons-exclamation-triangle"
           color="warning"
           variant="soft"
-          title="Paiement en attente"
-          description="Cette commande n'a pas encore été marquée comme payée. Sélectionnez le mode de paiement avant de valider l'entrée."
+          :title="$t('ticketing.participant.pending_payment_title')"
+          :description="$t('ticketing.participant.pending_payment_description')"
         />
 
         <!-- Montant à payer -->

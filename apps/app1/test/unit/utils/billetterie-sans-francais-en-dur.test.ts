@@ -29,8 +29,8 @@ import { describe, it, expect } from 'vitest'
  *
  * 169 littéraux dans un seul lot donneraient un diff de dix-huit fichiers qu'on ne relit pas — et
  * une clé mal tapée s'affiche **brute** sans qu'aucun test ne la voie. Trois lots : les écrans de
- * paramétrage (67, faits), le parcours du guichet (37), les commandes et la billetterie externe
- * (65).
+ * paramétrage (67) et le parcours du guichet (37), faits ; les commandes et la billetterie externe
+ * (65), à venir.
  */
 
 /** Attributs dont la valeur est lue par un humain. */
@@ -48,7 +48,8 @@ const FRANCAIS = /[A-ZÉÈÀÇÙÔÎ][a-zéèàçùêôîïœ']/
 const MARQUES = new Set(['HelloAsso', 'Infomaniak'])
 
 /**
- * La dette au 10/10/2026, après le lot des écrans de paramétrage.
+ * La dette au 10/10/2026, après les lots « écrans de paramétrage » (67) et « parcours du guichet »
+ * (37). Il ne reste que les commandes et la billetterie externe.
  *
  * ⚠️ Ces nombres ne doivent que DESCENDRE. Un fichier traité sort de la liste ; un fichier qui en
  * ajoute fait tomber le test ; et une entrée **périmée** le fait tomber aussi — sans quoi elle
@@ -56,13 +57,6 @@ const MARQUES = new Set(['HelloAsso', 'Infomaniak'])
  */
 const DETTE: Record<string, number> = {
   'components/edition/ticketing/HelloAssoConfigModal.vue': 10,
-  'components/ticketing/AddParticipantModal.vue': 15,
-  'components/ticketing/ArtistDetailsCard.vue': 5,
-  'components/ticketing/ParticipantDetailsModal.vue': 7,
-  'components/ticketing/ParticipantTitleSection.vue': 4,
-  'components/ticketing/PaymentMethodSelector.vue': 1,
-  'components/ticketing/QrCodeScanner.vue': 4,
-  'components/ticketing/TicketingMealsDisplaySection.vue': 1,
   'pages/editions/[id]/gestion/ticketing/external.vue': 8,
   'pages/editions/[id]/gestion/ticketing/orders.vue': 47,
 }

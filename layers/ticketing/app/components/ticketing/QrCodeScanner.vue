@@ -48,22 +48,22 @@
           icon="i-heroicons-information-circle"
           color="info"
           variant="soft"
-          description="Positionnez le QR code devant la caméra. La détection est automatique."
+          :description="$t('ticketing.access_control.scanner_hint')"
         />
 
         <!-- Saisie manuelle du code -->
         <div class="space-y-2">
-          <UFormField label="Saisie manuelle du code">
+          <UFormField :label="$t('ticketing.access_control.manual_entry_label')">
             <UFieldGroup class="w-full">
               <UInput
                 v-model="manualCode"
-                placeholder="Entrez le code du billet"
+                :placeholder="$t('ticketing.access_control.manual_entry_placeholder')"
                 icon="i-heroicons-ticket"
                 class="w-full"
                 @keydown.enter="handleManualInput"
               />
               <UButton
-                label="Valider"
+                :label="$t('common.validate')"
                 icon="i-heroicons-check-circle"
                 color="success"
                 :disabled="!manualCode"

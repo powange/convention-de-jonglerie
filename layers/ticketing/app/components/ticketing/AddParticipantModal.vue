@@ -37,7 +37,9 @@
                 name="i-heroicons-user"
                 class="h-12 w-12 mx-auto mb-3 text-primary-600 dark:text-primary-400"
               />
-              <h3 class="font-semibold text-gray-900 dark:text-white">Avec informations</h3>
+              <h3 class="font-semibold text-gray-900 dark:text-white">
+                {{ $t('ticketing.participant.add.with_info') }}
+              </h3>
               <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
                 Participant identifié avec nom, prénom et email
               </p>
@@ -53,7 +55,9 @@
                 name="i-heroicons-user-circle"
                 class="h-12 w-12 mx-auto mb-3 text-gray-600 dark:text-gray-400"
               />
-              <h3 class="font-semibold text-gray-900 dark:text-white">Anonyme</h3>
+              <h3 class="font-semibold text-gray-900 dark:text-white">
+                {{ $t('ticketing.participant.add.anonymous') }}
+              </h3>
               <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
                 Participant sans informations personnelles
               </p>
@@ -95,8 +99,8 @@
             icon="i-heroicons-check-circle"
             color="success"
             variant="soft"
-            title="Utilisateur trouvé"
-            description="Les informations ont été pré-remplies automatiquement"
+            :title="$t('ticketing.participant.add.user_found_title')"
+            :description="$t('ticketing.participant.add.user_found_description')"
           />
 
           <!--
@@ -298,7 +302,7 @@
           </p>
 
           <div v-if="selectedItems.length === 0" class="text-center py-8">
-            <p class="text-gray-500">Aucun billet sélectionné</p>
+            <p class="text-gray-500">{{ $t('ticketing.participant.add.no_ticket_selected') }}</p>
           </div>
 
           <div v-else class="space-y-4">
@@ -320,7 +324,9 @@
 
                 <!-- Options pour ce billet -->
                 <div v-if="getOptionsForTier(item.tierId).length > 0" class="space-y-3 mt-3">
-                  <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Options :</p>
+                  <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {{ $t('ticketing.participant.add.options_prefix') }}
+                  </p>
                   <div
                     v-for="option in getOptionsForTier(item.tierId)"
                     :key="option.id"
@@ -373,7 +379,7 @@
                       <div v-else-if="option.type === 'YesNo'">
                         <UCheckbox
                           :model-value="getOptionAnswer(item, option.name) === 'true'"
-                          label="Oui"
+                          :label="$t('common.yes')"
                           @update:model-value="
                             (value: boolean) =>
                               setOptionAnswer(
@@ -396,7 +402,7 @@
                               value: choice,
                             }))
                           "
-                          placeholder="Sélectionner une option"
+                          :placeholder="$t('ticketing.participant.add.option_placeholder')"
                           @update:model-value="
                             (value: string) => setOptionAnswer(item, option.id, option.name, value)
                           "
@@ -417,7 +423,7 @@
                       <div v-else-if="option.type === 'Phone'">
                         <UiPhoneInput
                           :model-value="getOptionAnswer(item, option.name)"
-                          placeholder="Numéro de téléphone"
+                          :placeholder="$t('ticketing.participant.add.phone_placeholder')"
                           @update:model-value="
                             (value: string) => setOptionAnswer(item, option.id, option.name, value)
                           "
@@ -428,7 +434,7 @@
                       <div v-else-if="option.type === 'Zipcode'">
                         <UInput
                           :model-value="getOptionAnswer(item, option.name)"
-                          placeholder="Code postal"
+                          :placeholder="$t('common.postal_code')"
                           @update:model-value="
                             (value: string) => setOptionAnswer(item, option.id, option.name, value)
                           "
@@ -440,7 +446,7 @@
                         <UInput
                           :model-value="getOptionAnswer(item, option.name)"
                           type="number"
-                          placeholder="Nombre"
+                          :placeholder="$t('ticketing.participant.add.number_placeholder')"
                           @update:model-value="
                             (value: string) => setOptionAnswer(item, option.id, option.name, value)
                           "
@@ -488,7 +494,9 @@
                     <p v-if="isFixedPrice(item)" class="text-sm text-gray-600 dark:text-gray-400">
                       {{ formatPrice(item.price) }}
                     </p>
-                    <p v-else class="text-sm text-gray-600 dark:text-gray-400">Prix libre</p>
+                    <p v-else class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ $t('ticketing.participant.add.free_price') }}
+                    </p>
                   </div>
                   <UBadge color="primary" variant="soft"
                     >{{ $t('common.item') }} {{ index + 1 }}</UBadge
@@ -504,7 +512,7 @@
                     <UInput
                       :model-value="getFreePriceDisplay(item, index)"
                       inputmode="decimal"
-                      placeholder="Montant en euros"
+                      :placeholder="$t('ticketing.participant.add.amount_placeholder')"
                       @update:model-value="
                         (value: string) => handleFreePriceInput(item, index, value)
                       "
@@ -598,7 +606,7 @@
                         <UCheckbox
                           v-else-if="customField.type === 'YesNo'"
                           :model-value="getTierCustomFieldAnswer(item, customField.id) === 'true'"
-                          label="Oui"
+                          :label="$t('common.yes')"
                           @update:model-value="
                             (value: boolean) =>
                               setTierCustomFieldAnswer(
@@ -620,7 +628,7 @@
                               value: choice,
                             }))
                           "
-                          placeholder="Sélectionner une option"
+                          :placeholder="$t('ticketing.participant.add.option_placeholder')"
                           @update:model-value="
                             (value: string) =>
                               setTierCustomFieldAnswer(
