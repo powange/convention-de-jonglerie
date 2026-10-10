@@ -135,6 +135,20 @@ model ApiErrorLog {
   @@index([userId])
   @@index([resolved])
   @@index([resolved, createdAt]) // Index composite pour filtrer par resolved + tri par date
+  /**
+   * L'écran d'administration filtre par TYPE puis trie par date — c'est son usage principal, et
+   * aucun index ne le servait : il balayait la table, que la purge ne vide qu'à 90 jours.
+   */
+  @@index([errorType, createdAt])
+  /**
+   * La déduplication des clés i18n manquantes cherche `(errorType, message)`. `message` est un
+   * `Text`, que MySQL ne peut indexer que sur un préfixe : 191 caractères suffisent largement — une
+   * clé i18n est bornée à 200 et ses premiers segments la distinguent déjà.
+   *
+   * Sans cet index, chaque clé reçue déclenchait un balayage complet de la table, et le point
+   * d'API en accepte cinquante par appel.
+   */
+  @@index([errorType, message(length: 191)])
 }
 
 // ========== NOTIFICATIONS ==========
