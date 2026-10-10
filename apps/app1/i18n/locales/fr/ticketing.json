@@ -101,6 +101,8 @@
       "info_title": "Informations",
       "last_actor": "Modifié par",
       "last_update": "Dernière mise à jour",
+      "leave_with_pending": "{count} comptage(s) attendent d'être envoyés au serveur. Ils sont conservés sur cet appareil et repartiront au retour du réseau — mais tant qu'ils n'ont pas été envoyés, les autres écrans ne les voient pas.",
+      "leave_with_pending_title": "Des comptages ne sont pas envoyés",
       "loading": "Chargement des compteurs...",
       "loading_error": "Erreur lors du chargement des compteurs",
       "no_counters": "Aucun compteur",

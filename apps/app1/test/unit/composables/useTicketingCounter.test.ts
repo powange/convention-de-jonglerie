@@ -58,6 +58,32 @@ const COMPTEUR = {
 
 const fetchMock = vi.fn()
 
+/**
+ * Un `localStorage` simulé, et pilotable jusqu'à l'échec.
+ *
+ * ⚠️ `jsdom` en fournit un vrai, mais il ne sait pas LEVER — or c'est le cas qui compte : en
+ * navigation privée, avec les données de site bloquées ou sur un quota plein, `localStorage` jette
+ * au lieu de rendre `null`. Un compteur qui refuserait de s'ouvrir pour cela serait pire que le
+ * défaut qu'on corrige, et seul un faux pilotable permet de l'éprouver.
+ */
+const stockage = {
+  donnees: new Map<string, string>(),
+  leve: false,
+  getItem(c: string) {
+    if (stockage.leve) throw new Error('accès refusé')
+    return stockage.donnees.get(c) ?? null
+  },
+  setItem(c: string, v: string) {
+    if (stockage.leve) throw new Error('quota dépassé')
+    stockage.donnees.set(c, v)
+  },
+  removeItem(c: string) {
+    if (stockage.leve) throw new Error('accès refusé')
+    stockage.donnees.delete(c)
+  },
+}
+
+vi.stubGlobal('localStorage', stockage)
 vi.stubGlobal('onBeforeUnmount', onBeforeUnmount)
 vi.stubGlobal('EventSource', FauxEventSource as unknown as typeof EventSource)
 vi.stubGlobal('$fetch', fetchMock)
@@ -75,6 +101,8 @@ describe('useTicketingCounter — la file d’attente', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
     vi.spyOn(console, 'log').mockImplementation(() => {})
     FauxEventSource.derniere = null
+    stockage.donnees.clear()
+    stockage.leve = false
     fetchMock.mockResolvedValue({ success: true, data: { counter: { ...COMPTEUR } } })
   })
 
@@ -212,6 +240,101 @@ describe('useTicketingCounter — la file d’attente', () => {
        * garde pas la trace d'un comptage que le serveur a refusé.
        */
       expect(c.displayValue.value).toBe(10)
+    })
+  })
+
+  describe('la file survit au rechargement (constat F1)', () => {
+    const CLEF = 'cdj-compteur-file-7-jeton'
+
+    it('écrit le geste en attente dans le navigateur', async () => {
+      const c = useTicketingCounter(7, 'jeton')
+      await c.init() // hors ligne
+      await c.increment(3)
+      await new Promise((r) => setTimeout(r, 0)) // le watcher est asynchrone
+
+      const file = JSON.parse(stockage.donnees.get(CLEF)!)
+      expect(file).toHaveLength(1)
+      expect(file[0]).toMatchObject({ type: 'increment', step: 3 })
+    })
+
+    it('⚠️ LA RETROUVE APRÈS UN RECHARGEMENT, et le total affiché avec', async () => {
+      /*
+       * LE CŒUR DU CONSTAT. Le téléphone qu'on tient à l'entrée décharge ses onglets, et la
+       * personne qui voit « Déconnecté » recharge pour réparer. Les gestes disparaissaient alors
+       * SANS UN MESSAGE, et le compteur reprenait la valeur du serveur.
+       *
+       * Un nouveau composable sur le même jeton = exactement ce que fait un rechargement.
+       */
+      stockage.donnees.set(
+        CLEF,
+        JSON.stringify([
+          { type: 'increment', step: 4, timestamp: 1, id: 'a' },
+          { type: 'decrement', step: 1, timestamp: 2, id: 'b' },
+        ])
+      )
+
+      const c = useTicketingCounter(7, 'jeton')
+      await c.init()
+
+      expect(c.pendingCount.value).toBe(2)
+      // 10 au serveur, +4, −1 : la valeur affichée est juste dès le premier rendu.
+      expect(c.displayValue.value).toBe(13)
+    })
+
+    it('ne mélange pas deux compteurs ouverts côte à côte', async () => {
+      // ⚠️ La clé porte l'édition ET le jeton : sans le jeton, deux guichets de la même édition
+      // se voleraient leurs gestes, et chacun compterait les entrées de l'autre.
+      stockage.donnees.set(
+        CLEF,
+        JSON.stringify([{ type: 'increment', step: 9, timestamp: 1, id: 'a' }])
+      )
+
+      const autre = useTicketingCounter(7, 'autre-jeton')
+      await autre.init()
+
+      expect(autre.pendingCount.value).toBe(0)
+    })
+
+    it('oublie la clé quand la file se vide', async () => {
+      const c = await enLigne()
+      fetchMock.mockRejectedValueOnce(new Error('Failed to fetch'))
+      await expect(c.increment(2)).rejects.toThrow()
+      await new Promise((r) => setTimeout(r, 0))
+      expect(stockage.donnees.has(CLEF)).toBe(true)
+
+      fetchMock.mockResolvedValue({ success: true })
+      await c.increment(1)
+      await new Promise((r) => setTimeout(r, 0))
+
+      // Une clé laissée à `[]` traînerait dans le navigateur de tous les guichets du monde.
+      expect(stockage.donnees.has(CLEF)).toBe(false)
+    })
+
+    it('⚠️ N’EMPÊCHE PAS LE COMPTEUR DE S’OUVRIR si le navigateur refuse de stocker', async () => {
+      /*
+       * Navigation privée, données de site bloquées, quota plein : `localStorage` LÈVE. Sans garde,
+       * le composable mourrait à la création et l'écran resterait blanc — un compteur inutilisable
+       * pour avoir voulu sauvegarder une file. Le geste reste alors en mémoire pour la session, ce
+       * qui vaut mieux que rien.
+       */
+      stockage.leve = true
+
+      const c = useTicketingCounter(7, 'jeton')
+      await c.init()
+      await expect(c.increment(2)).resolves.toBeUndefined()
+      await new Promise((r) => setTimeout(r, 0))
+
+      expect(c.pendingCount.value).toBe(1)
+      expect(c.displayValue.value).toBe(12)
+    })
+
+    it('ignore une file relue illisible plutôt que de casser', async () => {
+      stockage.donnees.set(CLEF, '{ pas du JSON')
+
+      const c = useTicketingCounter(7, 'jeton')
+      await c.init()
+
+      expect(c.pendingCount.value).toBe(0)
     })
   })
 

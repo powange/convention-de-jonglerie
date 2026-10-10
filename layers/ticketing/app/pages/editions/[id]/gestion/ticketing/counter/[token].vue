@@ -327,6 +327,9 @@
         />
       </div>
     </div>
+
+    <!-- L'avertissement avant de quitter avec des comptages non envoyés. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -496,6 +499,22 @@ onMounted(async () => {
 })
 
 // Déconnecter explicitement avant de quitter la page
+/*
+ * Prévenir avant de quitter quand des comptages n'ont pas été envoyés.
+ *
+ * ⚠️ La file SURVIT désormais au rechargement (elle est écrite dans le navigateur), donc on ne
+ * perd plus rien — mais partir sans le savoir reste gênant : tant que ces gestes n'ont pas été
+ * envoyés, **les autres écrans qui partagent ce compteur ne les voient pas**. Le message le dit,
+ * plutôt que d'agiter une perte qui n'a plus lieu.
+ *
+ * `useGardeDeSortie` rend au routeur une promesse résolue dans les deux sens : sans cela, refuser
+ * laisserait la navigation en suspens et la page deviendrait inquittable.
+ */
+const { confirmation } = useGardeDeSortie(() => pendingCount.value > 0, undefined, {
+  titre: () => t('ticketing.counters.leave_with_pending_title'),
+  description: () => t('ticketing.counters.leave_with_pending', { count: pendingCount.value }),
+})
+
 onBeforeRouteLeave(() => {
   disconnect()
 })
