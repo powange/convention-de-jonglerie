@@ -340,7 +340,7 @@ export async function ensureVolunteerToOrganizersConversation(
   })
 
   if (!edition) {
-    throw new Error('Édition introuvable')
+    throw createError({ status: 404, message: 'Édition introuvable' })
   }
 
   // 2. Récupérer tous les organisateurs ayant les droits de gestion des bénévoles
@@ -368,9 +368,18 @@ export async function ensureVolunteerToOrganizersConversation(
 
   const organizerUserIds = conventionOrganizers.map((org) => org.userId)
 
-  // Si aucun organisateur n'a les droits, lever une erreur
+  /*
+   * Aucun organisateur ne gère les bénévoles sur cette édition : il n'y a personne à contacter.
+   *
+   * ⚠️ C'était un `throw new Error` nu, donc un 500 muet : le bénévole qui cliquait « contacter
+   * les organisateurs » voyait une panne, là où la vraie réponse est « personne n'est joignable ».
+   * Un 409 le dit, et l'écran affiche déjà les erreurs qu'on lui rend.
+   */
   if (organizerUserIds.length === 0) {
-    throw new Error('Aucun organisateur avec les droits de gestion des bénévoles trouvé')
+    throw createError({
+      status: 409,
+      message: 'Aucun organisateur avec les droits de gestion des bénévoles trouvé',
+    })
   }
 
   // 2. Chercher une conversation existante avec le bénévole comme participant
@@ -598,9 +607,9 @@ export async function ensureOrganizersGroupConversation(
 
   const organizerUserIds = editionOrganizers.map((org) => org.organizer.userId)
 
-  // Si aucun organisateur, lever une erreur
+  // Même raison qu'au-dessus : une édition sans organisateur n'est pas une panne, c'est un refus.
   if (organizerUserIds.length === 0) {
-    throw new Error('Aucun organisateur trouvé pour cette édition')
+    throw createError({ status: 409, message: 'Aucun organisateur trouvé pour cette édition' })
   }
 
   // 2. Chercher la conversation existante de type ORGANIZERS_GROUP pour cette édition
@@ -757,7 +766,7 @@ export async function ensureShowApplicationConversation(
   })
 
   if (!application) {
-    throw new Error('Candidature introuvable')
+    throw createError({ status: 404, message: 'Candidature introuvable' })
   }
 
   const editionId = application.showCall.edition.id
@@ -861,7 +870,7 @@ async function participantsDuGroupeSpectacle(
   })
 
   if (!show) {
-    throw new Error('Spectacle introuvable')
+    throw createError({ status: 404, message: 'Spectacle introuvable' })
   }
 
   const organisateurs = await organisateursHabilitesSurLesArtistes(show.editionId, client)

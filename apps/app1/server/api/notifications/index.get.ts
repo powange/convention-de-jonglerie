@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { NotificationService } from '#server/utils/notification-service'
+import { decalageDePagination, limiteDePagination } from '#server/utils/validation-schemas'
 
 const querySchema = z.object({
   isRead: z
@@ -10,14 +11,13 @@ const querySchema = z.object({
     .optional()
     .transform((val) => (val === 'true' ? true : val === 'false' ? false : undefined)),
   category: z.string().optional(),
-  limit: z
-    .string()
-    .optional()
-    .transform((val) => (val ? parseInt(val, 10) : undefined)),
-  offset: z
-    .string()
-    .optional()
-    .transform((val) => (val ? parseInt(val, 10) : undefined)),
+  /*
+   * ⚠️ Mêmes bornes que les messages, et pour la même raison : `parseInt` nu laissait passer
+   * `?limit=abc` en `NaN` — refusé par Prisma, donc 500 sur une saisie d'URL — et `?limit=100000`
+   * chargeait toutes les notifications d'un compte. Le plafond de 100 est le quintuple du défaut.
+   */
+  limit: limiteDePagination(),
+  offset: decalageDePagination(),
 })
 
 export default wrapApiHandler(

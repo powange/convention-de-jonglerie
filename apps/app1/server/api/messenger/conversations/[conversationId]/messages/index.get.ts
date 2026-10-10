@@ -5,17 +5,22 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { masquerMessageSupprime } from '#server/utils/messenger-message-affiche'
 import { messengerMessageInclude } from '#server/utils/prisma-select-helpers'
 import { checkArtistApplicationConversationAccess } from '#server/utils/show-application-helpers'
+import { decalageDePagination, limiteDePagination } from '#server/utils/validation-schemas'
 
+/**
+ * Les bornes de la pagination, VALIDÉES — la règle et son pourquoi sont dans
+ * `validation-schemas.ts`.
+ *
+ * Le plafond de 100 y est le double de ce que demandent les deux écrans qui appellent ce point
+ * d'API : la messagerie et le fil d'une candidature chargent 50 messages à la fois.
+ */
 const querySchema = z.object({
-  limit: z
-    .string()
-    .optional()
-    .transform((val) => (val ? parseInt(val, 10) : 50)),
-  offset: z
-    .string()
-    .optional()
-    .transform((val) => (val ? parseInt(val, 10) : 0)),
+  limit: limiteDePagination(),
+  offset: decalageDePagination(),
 })
+
+/** Ce qu'on charge quand l'appelant ne demande rien — la valeur d'avant. */
+const LIMITE_PAR_DEFAUT = 50
 
 /**
  * GET /api/messenger/conversations/[conversationId]/messages
@@ -26,7 +31,9 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const conversationId = getRouterParam(event, 'conversationId')!
     const query = getQuery(event)
-    const { limit, offset } = querySchema.parse(query)
+    const { limit: limiteDemandee, offset: decalageDemande } = querySchema.parse(query)
+    const limit = limiteDemandee ?? LIMITE_PAR_DEFAUT
+    const offset = decalageDemande ?? 0
 
     // Vérifier que l'utilisateur est participant de cette conversation
     const participant = await prisma.conversationParticipant.findFirst({
