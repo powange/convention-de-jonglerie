@@ -591,10 +591,12 @@
              de vente laissait un graphique vide à l'écran là où « aucune donnée » se lit mieux.
              Et en comparaison, l'axe reste celui des deux éditions — le graphique garde donc sa
              raison d'être même si l'édition en cours n'a rien vendu sur la période retenue. -->
-        <div v-else-if="donneesDesAchats && donneesDesAchats.labels.length > 0">
+        <div v-else-if="donneesDesAchats && donneesDesAchats.timestamps.length > 0">
           <PurchaseChart
             v-if="donneesDesAchats"
             :data="donneesDesAchats"
+            :granularite="selectedPurchaseGranularity"
+            :etiquettes="comparaisonAchats ? comparaisonAchats.etiquettes : null"
             :comparaison="
               comparaisonAchats
                 ? {
@@ -933,8 +935,9 @@ const validationsError = ref(false)
 
 // Données d'achats
 interface PurchaseData {
-  labels: string[]
   timestamps: string[]
+  /** Le fuseau dans lequel le serveur a découpé les tranches — le graphique formate avec lui. */
+  timezone?: string | null
   participantsManual: number[]
   participantsExternal: number[]
   othersManual: number[]
@@ -1130,7 +1133,6 @@ function filtrerAchats(donnees: PurchaseData | null): PurchaseData | null {
 
   return {
     ...donnees,
-    labels: indices.map((i) => donnees.labels[i]).filter((v): v is string => v !== undefined),
     timestamps: indices
       .map((i) => donnees.timestamps[i])
       .filter((v): v is string => v !== undefined),
@@ -1301,7 +1303,6 @@ const donneesDesAchats = computed(() => {
   if (!c) return brut
   return {
     ...brut,
-    labels: c.etiquettes,
     participantsManual: (c.courante.participantsManual ?? []).map((v) => v ?? 0),
     participantsExternal: (c.courante.participantsExternal ?? []).map((v) => v ?? 0),
     othersManual: (c.courante.othersManual ?? []).map((v) => v ?? 0),

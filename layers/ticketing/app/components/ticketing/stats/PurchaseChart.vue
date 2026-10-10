@@ -55,6 +55,7 @@ import {
 } from 'chart.js'
 import { Bar } from 'vue-chartjs'
 
+import { etiquettesDesAchats } from '../../../utils/etiquettes-dachats'
 import {
   APLAT_CSS,
   MOTIF_CSS,
@@ -70,14 +71,36 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 interface Props {
   data: {
-    labels: string[]
+    /**
+     * Les instants de début de chaque tranche. Le serveur ne compose plus les libellés : la langue
+     * de l'axe est celle du lecteur, et l'heure celle du LIEU.
+     */
+    timestamps: string[]
+    /** Le fuseau dans lequel les tranches ont été découpées. */
+    timezone?: string | null
     participantsManual: number[]
     participantsExternal: number[]
     othersManual: number[]
     othersExternal: number[]
   }
+  /**
+   * La granularité choisie, en minutes — elle décide de la FORME de l'étiquette.
+   *
+   * Une tranche de douze heures a besoin de son heure, une tranche d'un mois n'a que faire du jour
+   * de la semaine. Le serveur composait ces quatre formes lui-même ; il rend maintenant des
+   * instants, et c'est ici qu'on sait laquelle convient.
+   */
+  granularite?: number
   showParticipants?: boolean
   showOthers?: boolean
+  /**
+   * Les étiquettes de l'axe, quand la page en impose.
+   *
+   * En comparaison, l'axe ne porte plus des dates mais des repères — « J1 », « J-30 » —, parce que
+   * deux éditions qui n'ont pas eu lieu aux mêmes dates n'ont aucune date commune. Absent, le
+   * composant compose les siennes depuis les instants.
+   */
+  etiquettes?: string[] | null
   /**
    * L'édition à laquelle on se compare, déjà alignée sur le même axe que `data`, série par série.
    *
@@ -93,12 +116,14 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  granularite: 1440,
   showParticipants: true,
   showOthers: true,
+  etiquettes: null,
   comparaison: null,
 })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { getParticipantTypeConfig } = useParticipantTypes()
 const { exportChartToPDF } = useChartExport()
 
@@ -124,6 +149,35 @@ const handleExport = async () => {
 
 // Récupérer les configurations de couleurs
 const ticketConfig = getParticipantTypeConfig('ticket')
+
+/**
+ * Les étiquettes des tranches, composées ICI.
+ *
+ * Le serveur rendait « Lun 15/06 » avec `setLocale('fr')` et l'heure d'UTC : la langue de l'axe
+ * était décidée par le serveur, et un achat passé à 0 h 30 sur place s'affichait la veille. Il rend
+ * désormais des instants, et le fuseau dans lequel il les a découpés.
+ *
+ * La règle de mise en forme vit dans `etiquettes-dachats`, avec ses tests : ici on ne fait que lui
+ * donner la langue de l'écran et la façon de dire « Semaine du … », qu'elle ne peut pas traduire
+ * elle-même.
+ */
+const etiquettes = computed(() =>
+  etiquettesDesAchats(
+    props.data.timestamps,
+    props.granularite,
+    props.data.timezone,
+    locale.value,
+    (date) => t('gestion.ticketing.stats_week_of', { date })
+  )
+)
+
+/**
+ * Les étiquettes réellement tracées : celles que la page impose en comparaison, sinon les dates.
+ *
+ * Déclarée ICI, au-dessus de son unique lecteur : un `computed` déclaré plus bas que son usage a
+ * déjà cassé une page de ce dépôt, par zone morte temporelle.
+ */
+const etiquettesAffichees = computed(() => props.etiquettes ?? etiquettes.value)
 
 /**
  * Les séries visibles, décrites une fois.
@@ -185,7 +239,7 @@ const chartData = computed<ChartData<'bar'>>(() => {
   }
 
   return {
-    labels: props.data.labels,
+    labels: etiquettesAffichees.value,
     datasets: datasets as ChartData<'bar'>['datasets'],
   }
 })

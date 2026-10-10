@@ -1008,6 +1008,7 @@
       "stats_view_items": "Par billets",
       "stats_view_orders": "Par commandes",
       "stats_volunteers": "Bénévoles",
+      "stats_week_of": "Semaine du {date}",
       "sumup_affiliate_key": "Clé d'affiliation SumUp",
       "sumup_affiliate_key_help": "Identifiant unique de votre compte marchand SumUp, fourni dans votre dashboard SumUp lors de la création de l'App ID.",
       "sumup_app_id": "App ID SumUp",
