@@ -306,9 +306,9 @@
   <!-- Modal de confirmation de suppression de tarif -->
   <UiConfirmModal
     v-model="deleteConfirmOpen"
-    title="Supprimer le tarif"
+    :title="$t('ticketing.tiers.list.delete_title')"
     :description="`Êtes-vous sûr de vouloir supprimer le tarif '${tierToDelete?.name}' ?`"
-    confirm-label="Supprimer"
+    :confirm-label="$t('common.delete')"
     confirm-color="error"
     confirm-icon="i-heroicons-trash"
     icon-name="i-heroicons-exclamation-triangle"

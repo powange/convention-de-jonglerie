@@ -8,16 +8,18 @@
       <div class="space-y-6">
         <!-- Information sur le custom field -->
         <UAlert icon="i-heroicons-information-circle" color="info" variant="soft">
-          <template #title>Associations</template>
+          <template #title>{{ $t('ticketing.custom_fields.associations.title') }}</template>
           <template #description>
-            <p>Configurez les tarifs associés à ce champ personnalisé.</p>
+            <p>{{ $t('ticketing.custom_fields.associations.intro') }}</p>
           </template>
         </UAlert>
 
         <!-- Section Tarifs -->
         <div class="space-y-4">
           <div class="flex items-center justify-between">
-            <h4 class="font-semibold text-gray-900 dark:text-white">Tarifs associés</h4>
+            <h4 class="font-semibold text-gray-900 dark:text-white">
+              {{ $t('ticketing.custom_fields.associations.tiers_label') }}
+            </h4>
           </div>
 
           <div v-if="loadingTiers" class="flex justify-center py-4">
@@ -31,14 +33,18 @@
             class="space-y-2"
           />
 
-          <p v-else class="text-sm text-gray-500">Aucun tarif disponible</p>
+          <p v-else class="text-sm text-gray-500">
+            {{ $t('edition.ticketing.no_tiers_available') }}
+          </p>
         </div>
       </div>
     </template>
 
     <template #footer>
       <div class="flex justify-end gap-2">
-        <UButton color="neutral" variant="soft" @click="isOpen = false"> Annuler </UButton>
+        <UButton color="neutral" variant="soft" @click="isOpen = false">
+          {{ $t('common.cancel') }}
+        </UButton>
         <UButton color="primary" icon="i-heroicons-check" :loading="saving" @click="save">
           Enregistrer
         </UButton>

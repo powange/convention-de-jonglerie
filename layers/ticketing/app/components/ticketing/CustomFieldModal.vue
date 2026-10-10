@@ -8,19 +8,23 @@
       <div class="space-y-6">
         <!-- Informations de base -->
         <div class="space-y-4">
-          <UFormField label="Label du champ" required>
-            <UInput v-model="form.label" placeholder="Ex: Taille de t-shirt" class="w-full" />
+          <UFormField :label="$t('ticketing.custom_fields.modal.label_label')" required>
+            <UInput
+              v-model="form.label"
+              :placeholder="$t('ticketing.custom_fields.modal.label_placeholder')"
+              class="w-full"
+            />
           </UFormField>
 
           <UFormField
-            label="Type de champ"
+            :label="$t('ticketing.custom_fields.modal.type_label')"
             required
             :hint="customField ? 'Non modifiable après création' : undefined"
           >
             <USelect
               v-model="form.type"
               :items="typeOptions"
-              placeholder="Sélectionnez un type"
+              :placeholder="$t('edition.ticketing.form_type_placeholder')"
               value-key="value"
               :disabled="!!customField"
               @update:model-value="onTypeChange"
@@ -29,7 +33,7 @@
 
           <!-- Valeurs pour ChoiceList -->
           <div v-if="form.type === 'ChoiceList'" class="space-y-3">
-            <UFormField label="Choix disponibles" required>
+            <UFormField :label="$t('ticketing.options.modal.choices_label')" required>
               <div class="space-y-2">
                 <div
                   v-for="(value, index) in form.values"
@@ -38,7 +42,7 @@
                 >
                   <UInput
                     v-model="form.values[index]"
-                    placeholder="Ex: S, M, L, XL"
+                    :placeholder="$t('ticketing.custom_fields.modal.choices_placeholder')"
                     class="flex-1"
                   />
                   <UButton
@@ -63,8 +67,11 @@
             </UFormField>
           </div>
 
-          <UFormField label="Champ obligatoire">
-            <UCheckbox v-model="form.isRequired" label="Ce champ est obligatoire" />
+          <UFormField :label="$t('ticketing.custom_fields.modal.required_label')">
+            <UCheckbox
+              v-model="form.isRequired"
+              :label="$t('ticketing.custom_fields.modal.required_checkbox')"
+            />
           </UFormField>
         </div>
 
@@ -72,7 +79,9 @@
 
         <!-- Association aux tarifs -->
         <div class="space-y-3">
-          <h4 class="font-semibold text-gray-900 dark:text-white">Association aux tarifs</h4>
+          <h4 class="font-semibold text-gray-900 dark:text-white">
+            {{ $t('ticketing.custom_fields.modal.tiers_association') }}
+          </h4>
           <p class="text-sm text-gray-600 dark:text-gray-400">
             Sélectionnez les tarifs auxquels ce champ sera associé
           </p>
@@ -88,7 +97,9 @@
             class="space-y-2"
           />
 
-          <p v-else class="text-sm text-gray-500">Aucun tarif disponible</p>
+          <p v-else class="text-sm text-gray-500">
+            {{ $t('edition.ticketing.no_tiers_available') }}
+          </p>
         </div>
 
         <!-- Note pour les associations avancées.
@@ -101,7 +112,9 @@
           color="info"
           variant="soft"
         >
-          <template #title>Associations quotas/articles</template>
+          <template #title>{{
+            $t('ticketing.custom_fields.modal.quotas_items_association')
+          }}</template>
           <template #description>
             Les associations avec les quotas et articles à remettre pour chaque choix peuvent être
             configurées après la création du champ.
@@ -112,7 +125,9 @@
 
     <template #footer>
       <div class="flex justify-end gap-2">
-        <UButton color="neutral" variant="soft" @click="isOpen = false"> Annuler </UButton>
+        <UButton color="neutral" variant="soft" @click="isOpen = false">
+          {{ $t('common.cancel') }}
+        </UButton>
         <UButton
           color="primary"
           icon="i-heroicons-check"

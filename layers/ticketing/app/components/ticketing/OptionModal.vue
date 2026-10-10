@@ -12,7 +12,7 @@
           color="info"
           variant="soft"
           :title="$t('ticketing.options.modal.title')"
-          description="Cette option est synchronisée depuis HelloAsso et ne peut pas être modifiée."
+          :description="$t('ticketing.options.modal.helloasso_locked')"
         />
 
         <UFormField :label="$t('ticketing.options.modal.name_label')" name="name" required>
@@ -36,9 +36,9 @@
         </UFormField>
 
         <UFormField
-          label="Prix de l'option"
+          :label="$t('ticketing.options.modal.price_label')"
           name="price"
-          help="Prix supplémentaire en euros (laisser vide si l'option est gratuite)"
+          :help="$t('ticketing.options.modal.price_help')"
         >
           <!-- Voir `UiMoneyInput` : « 12,50 » valait 1 250 dans un champ `type="number"`. -->
           <UiMoneyInput
@@ -79,7 +79,7 @@
           v-if="form.type === 'MultipleChoice' || form.type === 'Select'"
           :label="$t('ticketing.options.modal.choices_label')"
           name="choices"
-          help="Un choix par ligne"
+          :help="$t('ticketing.options.modal.choices_help')"
         >
           <UTextarea
             v-model="choicesText"
@@ -93,7 +93,7 @@
         <UFormField
           :label="$t('ticketing.options.modal.position_label')"
           name="position"
-          help="Ordre d'affichage (0 = premier)"
+          :help="$t('ticketing.options.modal.position_help')"
         >
           <UInput
             v-model.number="form.position"
@@ -106,7 +106,7 @@
         </UFormField>
 
         <UFormField
-          label="Tarifs associés"
+          :label="$t('ticketing.options.modal.tiers_label')"
           name="tiers"
           :help="
             isHelloAssoOption
@@ -121,11 +121,13 @@
             multiple
             searchable
             :disabled="isHelloAssoOption"
-            placeholder="Sélectionner les tarifs..."
+            :placeholder="$t('ticketing.options.modal.tiers_placeholder')"
             class="w-full"
           >
             <template #default>
-              <span v-if="form.tierIds.length === 0">Tous les tarifs</span>
+              <span v-if="form.tierIds.length === 0">{{
+                $t('ticketing.options.modal.all_tiers')
+              }}</span>
               <span v-else>{{ form.tierIds.length }} tarif(s) sélectionné(s)</span>
             </template>
           </USelectMenu>
@@ -133,9 +135,9 @@
 
         <UFormField
           v-if="edition?.mealsEnabled"
-          label="Repas associés"
+          :label="$t('ticketing.options.modal.meals_label')"
           name="meals"
-          help="Cette option donnera accès aux repas sélectionnés"
+          :help="$t('ticketing.options.modal.meals_help')"
         >
           <USelectMenu
             v-model="form.mealIds"
@@ -143,11 +145,13 @@
             value-key="value"
             multiple
             searchable
-            placeholder="Sélectionner les repas..."
+            :placeholder="$t('ticketing.options.modal.meals_placeholder')"
             class="w-full"
           >
             <template #default>
-              <span v-if="form.mealIds.length === 0">Aucun repas sélectionné</span>
+              <span v-if="form.mealIds.length === 0">{{
+                $t('ticketing.options.modal.no_meal_selected')
+              }}</span>
               <span v-else>{{ form.mealIds.length }} repas sélectionné(s)</span>
             </template>
           </USelectMenu>
@@ -157,7 +161,9 @@
 
     <template #footer>
       <div class="flex gap-2 justify-end">
-        <UButton color="neutral" variant="soft" @click="isOpen = false"> Annuler </UButton>
+        <UButton color="neutral" variant="soft" @click="isOpen = false">
+          {{ $t('common.cancel') }}
+        </UButton>
         <UButton color="primary" icon="i-heroicons-check" :loading="saving" @click="handleSubmit">
           {{ option ? 'Enregistrer' : 'Ajouter' }}
         </UButton>

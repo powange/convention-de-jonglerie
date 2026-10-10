@@ -47,8 +47,8 @@
       "organizers_not_validated_description": "Liste des organisateurs qui n'ont pas encore scanné leur billet au contrôle d'accès.",
       "organizers_not_validated_title": "Organisateurs n'ayant pas validé leur billet",
       "phase": {
-        "montage": "Montage seulement",
         "demontage": "Démontage seulement",
+        "montage": "Montage seulement",
         "montage-demontage": "Montage et démontage"
       },
       "qr_format_obsolete": "Ce QR code est à un format qui n'est plus accepté. Demandez à la personne de rouvrir son billet depuis l'application pour en afficher un nouveau.",
@@ -118,8 +118,35 @@
       "token_regenerated": "Lien régénéré avec succès"
     },
     "custom_fields": {
+      "associations": {
+        "intro": "Configurez les tarifs associés à ce champ personnalisé.",
+        "tiers_label": "Tarifs associés",
+        "title": "Associations"
+      },
       "created": "Champ personnalisé créé avec succès",
       "error_saving": "Impossible de sauvegarder le champ personnalisé",
+      "list": {
+        "choices_prefix": "Choix :",
+        "delete_confirm_title": "Supprimer le champ personnalisé",
+        "delete_field": "Supprimer le champ",
+        "edit_field": "Modifier le champ",
+        "handout_items_prefix": "Articles à remettre :",
+        "manage_associations": "Gérer les associations",
+        "quotas_prefix": "Quotas :",
+        "required_badge": "Obligatoire",
+        "tiers_prefix": "Tarifs :",
+        "title": "Champs personnalisés"
+      },
+      "modal": {
+        "choices_placeholder": "Ex: S, M, L, XL",
+        "label_label": "Label du champ",
+        "label_placeholder": "Ex: Taille de t-shirt",
+        "quotas_items_association": "Associations quotas/articles",
+        "required_checkbox": "Ce champ est obligatoire",
+        "required_label": "Champ obligatoire",
+        "tiers_association": "Association aux tarifs",
+        "type_label": "Type de champ"
+      },
       "updated": "Champ personnalisé modifié avec succès"
     },
     "entry_log": {
@@ -172,15 +199,15 @@
     },
     "handout_items": {
       "associations": {
-        "tarifs": "{count} tarif | {count} tarifs",
-        "options": "{count} option | {count} options",
-        "champsPersonnalises": "{count} champ personnalisé | {count} champs personnalisés",
-        "spectacles": "{count} spectacle | {count} spectacles",
         "artistes": "{count} artiste | {count} artistes",
+        "champsPersonnalises": "{count} champ personnalisé | {count} champs personnalisés",
+        "coordination": "et",
         "equipesBenevoles": "{count} équipe de bénévoles | {count} équipes de bénévoles",
+        "options": "{count} option | {count} options",
         "organisateurs": "{count} organisateur | {count} organisateurs",
         "repas": "{count} repas | {count} repas",
-        "coordination": "et"
+        "spectacles": "{count} spectacle | {count} spectacles",
+        "tarifs": "{count} tarif | {count} tarifs"
       },
       "list": {
         "add_placeholder": "Nouvel article…",
@@ -225,12 +252,12 @@
         "replaces_global_badge": "Remplace la configuration globale",
         "replaces_global_explanation": "Ces articles remplacent complètement les articles globaux pour les bénévoles de cette équipe",
         "save": "Enregistrer",
-        "section_title": "Articles remis aux bénévoles",
         "saved": "Articles enregistrés",
         "scope_all_option": "🌍 Tous les bénévoles (global)",
         "scope_global_hint": "Remis à tous les bénévoles, sauf à ceux dont l'équipe a son propre paramétrage.",
         "scope_label": "Portée",
         "scope_replaces_global_warning": "Les articles d'une équipe REMPLACENT les articles globaux : les bénévoles de cette équipe ne recevront que ce qui est associé ici, et plus le paramétrage « tous les bénévoles ».",
+        "section_title": "Articles remis aux bénévoles",
         "team_only": "Équipe uniquement",
         "unknown_team": "Équipe inconnue"
       }
@@ -243,19 +270,36 @@
       "created": "Option créée avec succès",
       "error_saving": "Impossible d'enregistrer l'option",
       "list": {
+        "choices_prefix": "Choix :",
+        "delete_title": "Supprimer l'option",
         "loading": "Chargement...",
-        "none_found": "Aucune option trouvée"
+        "meals_prefix": "Repas :",
+        "none_found": "Aucune option trouvée",
+        "quotas_prefix": "Quotas :",
+        "tiers_prefix": "Tarifs :"
       },
       "modal": {
+        "all_tiers": "Tous les tarifs",
+        "choices_help": "Un choix par ligne",
         "choices_label": "Choix disponibles",
         "choices_placeholder": "Option 1\nOption 2\nOption 3",
         "description_label": "Description",
         "description_placeholder": "Description de l'option (optionnel)",
+        "helloasso_locked": "Cette option est synchronisée depuis HelloAsso et ne peut pas être modifiée.",
         "is_mandatory_label": "Option obligatoire",
+        "meals_help": "Cette option donnera accès aux repas sélectionnés",
+        "meals_label": "Repas associés",
+        "meals_placeholder": "Sélectionner les repas...",
         "name_label": "Nom de l'option",
         "name_placeholder": "Ex: T-shirt convention",
+        "no_meal_selected": "Aucun repas sélectionné",
+        "position_help": "Ordre d'affichage (0 = premier)",
         "position_label": "Position d'affichage",
         "position_placeholder": "0",
+        "price_help": "Prix supplémentaire en euros (laisser vide si l'option est gratuite)",
+        "price_label": "Prix de l'option",
+        "tiers_label": "Tarifs associés",
+        "tiers_placeholder": "Sélectionner les tarifs...",
         "title": "Option HelloAsso",
         "type_label": "Type d'option"
       },
@@ -406,30 +450,35 @@
       "created": "Tarif créé avec succès",
       "error_saving": "Impossible d'enregistrer le tarif",
       "export": {
-        "title": "Titre",
-        "position": "Ordre",
         "description": "Description",
-        "price": "Tarif",
-        "validFrom": "Début de validité",
-        "validUntil": "Fin de validité",
-        "tickets": "Billets vendus",
-        "quotas": "Quotas",
+        "document_title": "Tarifs de la billetterie",
         "handoutItems": "Articles à remettre",
-        "meals": "Repas",
         "isActive": "Actif",
-        "document_title": "Tarifs de la billetterie"
+        "meals": "Repas",
+        "position": "Ordre",
+        "price": "Tarif",
+        "quotas": "Quotas",
+        "tickets": "Billets vendus",
+        "title": "Titre",
+        "validFrom": "Début de validité",
+        "validUntil": "Fin de validité"
       },
       "list": {
+        "delete_title": "Supprimer le tarif",
         "drag_to_reorder": "Glisser pour réordonner",
         "inactive": "Inactif",
         "loading": "Chargement...",
         "none_found": "Aucun tarif trouvé"
       },
       "modal": {
+        "count_as_participant_label": "Comptabilisation des participants",
         "description_label": "Description",
         "description_placeholder": "Description du tarif (optionnel)",
+        "display_name_placeholder": "Nom personnalisé pour l'affichage",
+        "donation_max_help": "Laissez vide pour un don sans limite haute",
         "free_price_label": "Tarif libre",
         "handout_items_label": "Articles à remettre",
+        "helloasso_locked": "Ce tarif est synchronisé depuis HelloAsso. Seuls les articles à remettre et les dates de validité peuvent être modifiés.",
         "max_amount_label": "Montant maximum (€)",
         "max_amount_placeholder": "0.00",
         "meals_label": "Repas inclus",
@@ -438,10 +487,17 @@
         "min_amount_placeholder": "0.00",
         "name_label": "Nom du tarif",
         "name_placeholder": "Ex: Pass 3 jours",
+        "no_limit_placeholder": "Aucune limite",
         "no_meal_selected": "Aucun repas sélectionné",
         "no_quota_selected": "Aucun quota sélectionné",
+        "position_help": "Ordre d'affichage (0 = premier)",
         "position_label": "Position d'affichage",
         "position_placeholder": "0",
+        "presence_from_label": "Arrivée",
+        "presence_from_placeholder": "Début de l'édition",
+        "presence_until_label": "Départ",
+        "presence_until_placeholder": "Fin de l'édition",
+        "price_help": "Peut être à 0 pour permettre la participation gratuite",
         "price_label": "Prix (€)",
         "price_placeholder": "0.00",
         "quotas_placeholder": "Sélectionner des quotas",
@@ -449,6 +505,7 @@
         "title": "Tarif HelloAsso"
       },
       "name_required": "Le nom du tarif est obligatoire",
+      "sync_label": "Sync:",
       "updated": "Tarif modifié avec succès"
     }
   }
