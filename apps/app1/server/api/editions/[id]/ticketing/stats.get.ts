@@ -1,7 +1,10 @@
+import { DateTime } from 'luxon'
+
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
 import { benevolePresentSurPlace } from '#server/utils/ticketing/benevoles-presents'
 import { billetsQuiComptent, estUnParticipant } from '#server/utils/ticketing/billets-qui-comptent'
+import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
 import { compterLesParticipants } from '~~/shared/utils/participants-par-personne'
 
 export default wrapApiHandler(
@@ -19,8 +22,26 @@ export default wrapApiHandler(
       })
 
     try {
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
+      /**
+       * « Aujourd'hui » commence à minuit SUR PLACE, pas à minuit sur la machine.
+       *
+       * `setHours(0, 0, 0, 0)` s'appliquait à l'horloge du conteneur, qui tourne en UTC. Pour une
+       * convention en France en été, les quatre compteurs « validés aujourd'hui » de l'écran de
+       * contrôle d'accès se remettaient donc à zéro à **2 h du matin**, et comptaient dans
+       * « aujourd'hui » les entrées de la veille passées entre minuit et 2 h — précisément les
+       * heures de fin de gala, quand on regarde ce chiffre.
+       *
+       * Même correction que pour le graphique des validations et celui des achats : une heure de
+       * convention est une heure de lieu.
+       */
+      const edition = await prisma.edition.findUnique({
+        where: { id: editionId },
+        select: { timezone: true },
+      })
+      const today = DateTime.now()
+        .setZone(fuseauUtilisable(edition?.timezone))
+        .startOf('day')
+        .toJSDate()
 
       /*
        * Les billets qui comptent comme participants, lus UNE fois.
