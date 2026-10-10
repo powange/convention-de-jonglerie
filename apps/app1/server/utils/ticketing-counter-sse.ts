@@ -11,8 +11,24 @@ interface EventStreamMessage {
 }
 
 interface CounterStreamConnection {
-  push: (message: string | EventStreamMessage) => void
+  /**
+   * Envoie un message, et dit s'il est PARTI.
+   *
+   * ⚠️ Il rendait `void`, et le `try/catch` de `broadcastUpdate` ne pouvait donc jamais se
+   * déclencher : une connexion morte restait dans le gestionnaire, et `getConnectionCount` —
+   * affiché à l'écran du compteur — annonçait du monde qui n'était plus là. Au guichet, c'est le
+   * chiffre qui dit si un collègue tient l'autre entrée.
+   *
+   * `undefined` est toléré : un flux qui oublie de répondre est traité comme un succès, faute de
+   * mieux — exactement comme avant. Seul un `false` explicite fait retirer la connexion.
+   */
+  push: (message: string | EventStreamMessage) => boolean | undefined
   close: () => void
+}
+
+/** Un `push` a réussi tant qu'il n'a pas explicitement dit non. */
+function aEtePousse(resultat: boolean | undefined): boolean {
+  return resultat !== false
 }
 
 /**
@@ -166,19 +182,34 @@ class CounterStreamManager {
     }
 
     let sentCount = 0
+    /*
+     * Les retraits sont COLLECTÉS puis appliqués : `removeConnection` retire de ce même `Set`, et
+     * le modifier pendant son propre parcours est le genre de chose qui marche jusqu'au jour où
+     * elle ne marche plus. C'est aussi ce que fait le gestionnaire des notifications.
+     */
+    const aRetirer: string[] = []
 
     counterConnections.forEach((connectionId) => {
       const connection = this.connectionObjects.get(connectionId)
-      if (connection) {
-        try {
-          connection.push(message)
-          sentCount++
-        } catch (error) {
-          console.error(`[Counter SSE] Erreur lors de l'envoi à ${connectionId}:`, error)
-          this.removeConnection(connectionId, editionId, counterId)
+      if (!connection) {
+        aRetirer.push(connectionId)
+        return
+      }
+      try {
+        if (aEtePousse(connection.push(message))) sentCount++
+        else {
+          console.log(`[Counter SSE] Connexion ${connectionId} ne reçoit plus : retrait`)
+          aRetirer.push(connectionId)
         }
+      } catch (error) {
+        console.error(`[Counter SSE] Erreur lors de l'envoi à ${connectionId}:`, error)
+        aRetirer.push(connectionId)
       }
     })
+
+    for (const connectionId of aRetirer) {
+      this.removeConnection(connectionId, editionId, counterId)
+    }
 
     console.log(
       `[Counter SSE] Mise à jour diffusée à ${sentCount} connexion(s) pour counter ${counterId}`
