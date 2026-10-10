@@ -2,6 +2,8 @@
 import { Text, Button, Section, Hr } from '@vue-email/components'
 import { computed } from 'vue'
 
+import { habillageDeCourriel, salutationDeCourriel } from '../utils/habillage-courriel'
+
 import BaseEmail from './BaseEmail.vue'
 
 interface Props {
@@ -11,9 +13,14 @@ interface Props {
   baseUrl: string
   actionUrl?: string
   actionText?: string
+  /** La langue du destinataire : le titre et le message arrivent déjà traduits, l'emballage non. */
+  locale?: string
 }
 
 const props = defineProps<Props>()
+
+const emballage = computed(() => habillageDeCourriel(props.locale ?? 'fr'))
+const salutation = computed(() => salutationDeCourriel(props.prenom, props.locale ?? 'fr'))
 
 // `message` est du texte brut, potentiellement contrôlé par un utilisateur
 // (ex. messageText d'une notification saisie par un organisateur, ou une
@@ -35,9 +42,10 @@ const messageHtml = computed(() =>
   <BaseEmail
     :title="title"
     :base-url="baseUrl"
+    :habillage="emballage"
     :preheader="message.replace(/<[^>]*>/g, '').substring(0, 120)"
   >
-    <Text :style="{ color: '#374151', margin: '0 0 16px' }">Bonjour {{ prenom }},</Text>
+    <Text :style="{ color: '#374151', margin: '0 0 16px' }">{{ salutation }}</Text>
 
     <Section
       :style="{
@@ -78,7 +86,7 @@ const messageHtml = computed(() =>
     <Hr :style="{ borderColor: '#e5e7eb', margin: '0 0 20px' }" />
 
     <Text :style="{ color: '#6b7280', fontSize: '14px', margin: '0' }">
-      &#8212; L'&#233;quipe de Juggling Convention
+      {{ emballage.signature }}
     </Text>
   </BaseEmail>
 </template>

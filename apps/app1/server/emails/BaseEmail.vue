@@ -10,19 +10,37 @@ import {
   Link,
   Preview,
 } from '@vue-email/components'
+import { computed } from 'vue'
+
+import {
+  CHEMIN_DES_PREFERENCES,
+  habillageDeCourriel,
+  type HabillageDeCourriel,
+} from '../utils/habillage-courriel'
 
 interface Props {
   title: string
   baseUrl: string
   headerColor?: 'primary' | 'error'
   preheader?: string
+  /**
+   * L'emballage du courriel dans la langue du destinataire.
+   *
+   * Absent, il retombe sur le français — c'est le cas des six autres gabarits, dont les appelants
+   * ne connaissent pas encore la langue de la personne. Le défaut est calculé dans un `.ts` et non
+   * écrit ici : `check-i18n` ne scanne pas les `.vue` du serveur, et des clés qui ne vivraient que dans
+   * ce fichier passeraient pour inutilisées.
+   */
+  habillage?: HabillageDeCourriel
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+
+const emballage = computed(() => props.habillage ?? habillageDeCourriel('fr'))
 </script>
 
 <template>
-  <Html lang="fr">
+  <Html :lang="emballage.lang">
     <Head />
     <Preview v-if="preheader">{{ preheader }}</Preview>
     <Container
@@ -94,18 +112,22 @@ defineProps<Props>()
         <!-- Footer -->
         <Section :style="{ padding: '24px 0', textAlign: 'center' }">
           <Text :style="{ color: '#9ca3af', fontSize: '13px', margin: '0 0 12px' }">
+            <!-- `/profile/notifications`, et non `/profile` : c'est là que vivent les
+                 préférences. Le lien menait à la page du profil, où rien ne parle de
+                 notifications — on cliquait « Gérer mes notifications » et il fallait les
+                 chercher. -->
             <Link
-              :href="`${baseUrl}/profile`"
+              :href="`${baseUrl}${CHEMIN_DES_PREFERENCES}`"
               :style="{ color: '#6b7280', textDecoration: 'underline' }"
             >
-              G&#233;rer mes notifications
+              {{ emballage.gererNotifications }}
             </Link>
             &nbsp;&middot;&nbsp;
             <Link
               :href="`${baseUrl}/project-costs`"
               :style="{ color: '#6b7280', textDecoration: 'underline' }"
             >
-              Soutenir le projet
+              {{ emballage.soutenirLeProjet }}
             </Link>
           </Text>
           <Text :style="{ color: '#9ca3af', fontSize: '13px', margin: '0 0 16px' }">
@@ -123,7 +145,7 @@ defineProps<Props>()
             </Link>
           </Text>
           <Text :style="{ color: '#b0b6c0', fontSize: '12px', margin: '0' }">
-            Cet email a &#233;t&#233; envoy&#233; automatiquement par Juggling Convention.
+            {{ emballage.envoiAutomatique }}
           </Text>
         </Section>
       </Section>
