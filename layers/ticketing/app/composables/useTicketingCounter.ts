@@ -32,6 +32,34 @@ interface PendingOperation {
 }
 
 /**
+ * Le serveur a-t-il REFUSÉ, ou n'a-t-il simplement pas répondu&nbsp;?
+ *
+ * ## ⚠️ POURQUOI CETTE DISTINCTION DÉCIDE DE TOUT ICI
+ *
+ * La file d'attente de ce compteur existe pour le hors-ligne : on garde le geste et on le rejoue
+ * quand le réseau revient. Elle mettait en attente **toute** erreur — y compris un refus
+ * définitif : un `step` invalide (400), un jeton régénéré (404), une session expirée (401).
+ *
+ * Une opération que le serveur refusera toujours ne part jamais. Et comme la synchronisation
+ * s'arrêtait à la première erreur, elle restait **en tête de file et retenait toutes les
+ * suivantes** : l'écran annonçait « 1 opération en attente » indéfiniment, avec un total optimiste
+ * faux, jusqu'au rechargement de la page.
+ *
+ * Un 4xx est donc définitif — on l'abandonne en le disant. Une coupure réseau ou un 5xx est
+ * passager — on garde le geste. `408` et `429` sont des 4xx qu'on retente malgré tout : l'un dit
+ * « trop lent », l'autre « trop vite », et aucun des deux ne dit « jamais ».
+ */
+const CODES_A_RETENTER = new Set([408, 429])
+
+function refusDefinitif(erreur: unknown): boolean {
+  const code =
+    (erreur as { statusCode?: number; response?: { status?: number } })?.statusCode ??
+    (erreur as { response?: { status?: number } })?.response?.status
+  if (typeof code !== 'number') return false // pas de réponse du tout : coupure réseau
+  return code >= 400 && code < 500 && !CODES_A_RETENTER.has(code)
+}
+
+/**
  * Composable pour gérer un compteur de billetterie avec synchronisation temps réel
  * et support du mode hors-ligne avec file d'attente
  */
@@ -149,7 +177,39 @@ export function useTicketingCounter(editionId: number, token: string) {
         pendingOperations.value = pendingOperations.value.filter((o) => o.id !== op.id)
       } catch (err) {
         console.error('[Counter] Erreur lors de la synchronisation:', err)
-        // On garde les opérations en attente en cas d'échec
+        /*
+         * ⚠️ UN REFUS DÉFINITIF EST ABANDONNÉ, PAS GARDÉ.
+         *
+         * Le `break` d'origine retenait toute la file derrière l'opération fautive, et celle-ci ne
+         * passerait jamais. On la retire donc, et on le DIT — un geste perdu en silence est pire
+         * qu'un geste refusé : la personne au comptoir croirait avoir compté.
+         *
+         * Une erreur passagère, elle, garde sa place et arrête la boucle : l'ordre des opérations
+         * compte sur un compteur, et rejouer la suite sans la précédente donnerait un total faux.
+         */
+        if (refusDefinitif(err)) {
+          pendingOperations.value = pendingOperations.value.filter((o) => o.id !== op.id)
+          /*
+           * ⚠️ ET LA VALEUR OPTIMISTE EST DÉFAITE, sinon l'écran garderait le geste abandonné.
+           *
+           * `increment` avait ajouté le pas, `decrement` l'avait retiré en bornant à zéro : on
+           * rend donc l'inverse, borné de même. Un `reset` n'est PAS défait — il avait mis la
+           * valeur à zéro, et la valeur d'avant est perdue. On recharge alors depuis le serveur,
+           * seul endroit qui la connaisse encore.
+           */
+          if (op.type === 'increment') {
+            localValue.value = Math.max(0, localValue.value - (op.step ?? 1))
+          } else if (op.type === 'decrement') {
+            localValue.value += op.step ?? 1
+          } else {
+            void fetchCounter()
+          }
+          error.value =
+            (err as { data?: { message?: string } })?.data?.message ??
+            'Une opération en attente a été refusée et abandonnée'
+          continue
+        }
+        // On garde les opérations en attente en cas d'échec passager
         break
       }
     }
@@ -287,8 +347,20 @@ export function useTicketingCounter(editionId: number, token: string) {
   /**
    * Incrémente le compteur (avec support hors-ligne)
    */
-  const increment = async (step: number = 1) => {
+  /**
+   * Un pas utilisable, quoi qu'ait saisi l'écran.
+   *
+   * ⚠️ Le champ « pas » est un `v-model.number` : vidé par l'utilisateur, il ne rend pas `0` mais
+   * la chaîne vide. `Number.isFinite` l'écarte — là où `Math.max(1, NaN)` rendrait `NaN`, piège
+   * déjà payé ailleurs dans ce dépôt. Le serveur refusait alors en 400, et ce refus jammait la
+   * file ; il est maintenant abandonné proprement, mais autant ne pas l'émettre.
+   */
+  const pasUtilisable = (step: unknown): number =>
+    typeof step === 'number' && Number.isFinite(step) && step > 0 ? Math.trunc(step) : 1
+
+  const increment = async (pasDemande: number = 1) => {
     if (!counter.value) return
+    const step = pasUtilisable(pasDemande)
 
     // Créer l'opération en attente
     const operation: PendingOperation = {
@@ -316,7 +388,35 @@ export function useTicketingCounter(editionId: number, token: string) {
         body: { step },
       })
       // La mise à jour sera reçue via SSE
+      /*
+       * ⚠️ ET ON PROFITE DE CE SUCCÈS POUR VIDER LA FILE.
+       *
+       * Elle n'était rejouée qu'à l'événement SSE `connected` — donc **jamais** tant que le flux
+       * restait ouvert. Une opération mise en attente par un échec passager (un 502 de
+       * redéploiement, une coupure de quelques secondes) y dormait jusqu'au rechargement de la
+       * page, alors que la connexion était revenue depuis longtemps.
+       *
+       * Un envoi direct qui réussit est la meilleure preuve que le serveur répond de nouveau.
+       * L'appel n'est pas attendu : le geste de l'utilisateur ne doit pas traîner derrière la file.
+       */
+      if (pendingOperations.value.length > 0) void syncPendingOperations()
     } catch (err: any) {
+      /*
+       * ⚠️ UN REFUS DÉFINITIF NE VA PAS EN FILE.
+       *
+       * Ce bloc mettait en attente **toute** erreur. Or un 4xx — `step` invalide, jeton régénéré,
+       * session expirée — ne passera jamais : l'opération dormait en tête de file et retenait
+       * toutes les suivantes. L'écran annonçait « 1 opération en attente » jusqu'au rechargement,
+       * avec un total optimiste faux.
+       *
+       * On remonte donc l'erreur sans rien mettre en file, et **sans toucher la valeur
+       * affichée** : annoncer un comptage qui n'a pas eu lieu est le défaut à éviter ici.
+       */
+      if (refusDefinitif(err)) {
+        error.value = err?.data?.message || err?.message || "Erreur lors de l'incrémentation"
+        throw err
+      }
+
       // En cas d'échec, mettre en attente
       if (import.meta.dev) {
         console.log("[Counter] Échec de l'envoi : opération mise en attente", err)
@@ -333,8 +433,9 @@ export function useTicketingCounter(editionId: number, token: string) {
   /**
    * Décrémente le compteur (avec support hors-ligne)
    */
-  const decrement = async (step: number = 1) => {
+  const decrement = async (pasDemande: number = 1) => {
     if (!counter.value) return
+    const step = pasUtilisable(pasDemande)
 
     // Créer l'opération en attente
     const operation: PendingOperation = {
@@ -362,7 +463,35 @@ export function useTicketingCounter(editionId: number, token: string) {
         body: { step },
       })
       // La mise à jour sera reçue via SSE
+      /*
+       * ⚠️ ET ON PROFITE DE CE SUCCÈS POUR VIDER LA FILE.
+       *
+       * Elle n'était rejouée qu'à l'événement SSE `connected` — donc **jamais** tant que le flux
+       * restait ouvert. Une opération mise en attente par un échec passager (un 502 de
+       * redéploiement, une coupure de quelques secondes) y dormait jusqu'au rechargement de la
+       * page, alors que la connexion était revenue depuis longtemps.
+       *
+       * Un envoi direct qui réussit est la meilleure preuve que le serveur répond de nouveau.
+       * L'appel n'est pas attendu : le geste de l'utilisateur ne doit pas traîner derrière la file.
+       */
+      if (pendingOperations.value.length > 0) void syncPendingOperations()
     } catch (err: any) {
+      /*
+       * ⚠️ UN REFUS DÉFINITIF NE VA PAS EN FILE.
+       *
+       * Ce bloc mettait en attente **toute** erreur. Or un 4xx — `step` invalide, jeton régénéré,
+       * session expirée — ne passera jamais : l'opération dormait en tête de file et retenait
+       * toutes les suivantes. L'écran annonçait « 1 opération en attente » jusqu'au rechargement,
+       * avec un total optimiste faux.
+       *
+       * On remonte donc l'erreur sans rien mettre en file, et **sans toucher la valeur
+       * affichée** : annoncer un comptage qui n'a pas eu lieu est le défaut à éviter ici.
+       */
+      if (refusDefinitif(err)) {
+        error.value = err?.data?.message || err?.message || 'Erreur lors de la décrémentation'
+        throw err
+      }
+
       // En cas d'échec, mettre en attente
       if (import.meta.dev) {
         console.log("[Counter] Échec de l'envoi : opération mise en attente", err)
@@ -415,7 +544,35 @@ export function useTicketingCounter(editionId: number, token: string) {
         method: 'PATCH',
       })
       // La mise à jour sera reçue via SSE
+      /*
+       * ⚠️ ET ON PROFITE DE CE SUCCÈS POUR VIDER LA FILE.
+       *
+       * Elle n'était rejouée qu'à l'événement SSE `connected` — donc **jamais** tant que le flux
+       * restait ouvert. Une opération mise en attente par un échec passager (un 502 de
+       * redéploiement, une coupure de quelques secondes) y dormait jusqu'au rechargement de la
+       * page, alors que la connexion était revenue depuis longtemps.
+       *
+       * Un envoi direct qui réussit est la meilleure preuve que le serveur répond de nouveau.
+       * L'appel n'est pas attendu : le geste de l'utilisateur ne doit pas traîner derrière la file.
+       */
+      if (pendingOperations.value.length > 0) void syncPendingOperations()
     } catch (err: any) {
+      /*
+       * ⚠️ UN REFUS DÉFINITIF NE VA PAS EN FILE.
+       *
+       * Ce bloc mettait en attente **toute** erreur. Or un 4xx — `step` invalide, jeton régénéré,
+       * session expirée — ne passera jamais : l'opération dormait en tête de file et retenait
+       * toutes les suivantes. L'écran annonçait « 1 opération en attente » jusqu'au rechargement,
+       * avec un total optimiste faux.
+       *
+       * On remonte donc l'erreur sans rien mettre en file, et **sans toucher la valeur
+       * affichée** : annoncer un comptage qui n'a pas eu lieu est le défaut à éviter ici.
+       */
+      if (refusDefinitif(err)) {
+        error.value = err?.data?.message || err?.message || 'Erreur lors de la réinitialisation'
+        throw err
+      }
+
       // En cas d'échec, mettre en attente
       if (import.meta.dev) {
         console.log("[Counter] Échec de l'envoi : opération mise en attente", err)
