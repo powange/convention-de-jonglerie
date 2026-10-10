@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between gap-3">
       <h4 class="font-medium">{{ titre }}</h4>
       <UButton
-        icon="i-heroicons-pencil"
+        icon="i-heroicons-pencil-square"
         color="neutral"
         variant="ghost"
         :title="libelleEdition"

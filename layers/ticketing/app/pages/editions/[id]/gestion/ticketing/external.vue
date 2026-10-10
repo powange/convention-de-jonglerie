@@ -89,7 +89,7 @@
                   variant="outline"
                   color="neutral"
                   size="sm"
-                  icon="i-heroicons-pencil"
+                  icon="i-heroicons-pencil-square"
                   @click="openConfigModal"
                 >
                   Modifier
@@ -790,7 +790,7 @@
                   variant="outline"
                   color="neutral"
                   size="sm"
-                  icon="i-heroicons-pencil"
+                  icon="i-heroicons-pencil-square"
                   @click="openInfomaniakConfigModal"
                 >
                   {{ $t('common.edit') }}

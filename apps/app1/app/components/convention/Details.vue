@@ -81,7 +81,7 @@ const conventionActions = computed(() => {
   if (props.canEdit) {
     actions.push({
       label: t('conventions.edit'),
-      icon: 'i-heroicons-pencil',
+      icon: 'i-heroicons-pencil-square',
       onSelect: () => emit('edit'),
     })
   }

@@ -68,7 +68,7 @@
       </div>
 
       <UButton
-        icon="i-heroicons-pencil"
+        icon="i-heroicons-pencil-square"
         color="neutral"
         variant="ghost"
         class="shrink-0"

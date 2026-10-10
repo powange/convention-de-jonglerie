@@ -12,7 +12,7 @@
           <ClientOnly>
             <div v-if="canEdit" class="flex gap-1">
               <UButton
-                icon="i-heroicons-pencil"
+                icon="i-heroicons-pencil-square"
                 size="xs"
                 color="warning"
                 variant="ghost"

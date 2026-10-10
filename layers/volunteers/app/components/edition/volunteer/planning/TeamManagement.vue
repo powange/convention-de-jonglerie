@@ -56,7 +56,7 @@
                   [
                     {
                       label: t('common.edit'),
-                      icon: 'i-heroicons-pencil',
+                      icon: 'i-heroicons-pencil-square',
                       onSelect: () => openEditTeamModal(team),
                     },
                     {

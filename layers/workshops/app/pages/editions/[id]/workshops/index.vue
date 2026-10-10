@@ -131,7 +131,7 @@
                       size="xs"
                       color="warning"
                       variant="soft"
-                      icon="i-heroicons-pencil"
+                      icon="i-heroicons-pencil-square"
                       :title="$t('workshops.edit_workshop')"
                       @click="editWorkshop(workshop)"
                     >

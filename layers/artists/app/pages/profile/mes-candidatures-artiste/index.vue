@@ -319,7 +319,7 @@
                     size="sm"
                     color="info"
                     variant="outline"
-                    icon="i-heroicons-pencil"
+                    icon="i-heroicons-pencil-square"
                     class="flex-1 sm:flex-none"
                   >
                     <span class="hidden sm:inline">{{ $t('pages.artists.edit_application') }}</span>
@@ -448,7 +448,7 @@
                   size="xs"
                   color="info"
                   variant="ghost"
-                  icon="i-heroicons-pencil"
+                  icon="i-heroicons-pencil-square"
                   class="sm:w-auto w-8 h-8"
                   square
                 />

@@ -350,7 +350,7 @@
                 size="xs"
                 color="neutral"
                 variant="soft"
-                icon="i-heroicons-pencil"
+                icon="i-heroicons-pencil-square"
                 @click="openEditApplicationModal(row.original)"
               />
             </div>

@@ -19,7 +19,7 @@
         size="sm"
         color="primary"
         variant="soft"
-        icon="i-heroicons-pencil"
+        icon="i-heroicons-pencil-square"
         @click="ouvrirLaModale"
       >
         {{ $t('common.edit') }}

@@ -95,7 +95,7 @@
             <div class="flex gap-2">
               <UButton
                 v-if="!isEditing"
-                icon="i-heroicons-pencil"
+                icon="i-heroicons-pencil-square"
                 color="primary"
                 variant="soft"
                 @click="startEditing"

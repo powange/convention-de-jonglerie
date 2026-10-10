@@ -234,7 +234,7 @@
           color="primary"
           variant="soft"
           size="sm"
-          icon="i-heroicons-pencil"
+          icon="i-heroicons-pencil-square"
         >
           Gérer les équipes
         </UButton>
