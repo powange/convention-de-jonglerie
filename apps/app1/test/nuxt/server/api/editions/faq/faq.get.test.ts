@@ -165,4 +165,70 @@ describe('GET /api/editions/[id]/faq', () => {
     await expect(handler(baseEvent as any)).rejects.toThrow('FAQ non disponible')
     expect(prismaMock.faqEntry.findMany).not.toHaveBeenCalled()
   })
+  /**
+   * ⚠️⚠️ LE VERDICT `publicPageVisible` — constat B6.
+   *
+   * La page publique décidait elle-même, sur `faqEnabled && faqPagePublic`, **sans regarder qui
+   * demande**. Deux conséquences, et la fiche n'en voyait qu'une :
+   *
+   * 1. au RECHARGEMENT, `$fetch` n'emportant pas le cookie en rendu serveur, la requête partait
+   *    anonyme et le serveur répondait 404 ;
+   * 2. mais même en NAVIGATION INTERNE — cookie présent, serveur à 200 — la page retombait sur sa
+   *    propre condition et levait un 404 quand même. **La fiche affirmait que ce cas fonctionnait ;
+   *    il ne fonctionnait pas.** Un éditeur ne pouvait relire sa FAQ non publiée par aucun chemin.
+   *
+   * Le serveur rend donc son verdict, et la page le LIT. Ces cas le figent, population par
+   * population — c'est la seule façon de prouver qu'on n'a pas simplement ouvert la porte.
+   */
+  describe('publicPageVisible : qui voit la page publique', () => {
+    const verdict = async (evenement: unknown = baseEvent) =>
+      ((await handler(evenement as any)) as any).data.publicPageVisible
+
+    it('une FAQ publiée est visible du premier visiteur venu', async () => {
+      expect(await verdict()).toBe(true)
+    })
+
+    it('⚠️ UNE FAQ NON PUBLIÉE RESTE VISIBLE DE QUI LA GÈRE', async () => {
+      mockGetFaqVisibility.mockResolvedValue({ enabled: true, pagePublic: false })
+      mockOptionalAuth.mockReturnValue({ id: 5 })
+      mockCanManageFAQ.mockReturnValue(true)
+
+      expect(await verdict({ context: { params: { id: '1' }, user: { id: 5 } } })).toBe(true)
+      // Et sans payer la requête d'accès à la gestion : il gère la FAQ, la question est tranchée.
+      expect(mockAAccesGestionEdition).not.toHaveBeenCalled()
+    })
+
+    it('et de qui entre dans l’espace de gestion sans gérer la FAQ', async () => {
+      mockGetFaqVisibility.mockResolvedValue({ enabled: true, pagePublic: false })
+      mockOptionalAuth.mockReturnValue({ id: 6 })
+      mockCanManageFAQ.mockReturnValue(false)
+      mockAAccesGestionEdition.mockResolvedValue(true)
+
+      expect(await verdict({ context: { params: { id: '1' }, user: { id: 6 } } })).toBe(true)
+    })
+
+    it('⚠️ UN MODULE ÉTEINT NE MONTRE RIEN, PAS MÊME À QUI LE GÈRE', async () => {
+      /*
+       * LE TÉMOIN qui empêche d'avoir simplement ouvert la porte. Le serveur répond 200 à un
+       * gestionnaire même module éteint — c'est la page de GESTION qui en a besoin — mais la page
+       * PUBLIQUE, elle, n'a rien à montrer : « un module éteint n'a rien à montrer à personne »,
+       * dit le handler, et ce cas le tient.
+       */
+      mockGetFaqVisibility.mockResolvedValue({ enabled: false, pagePublic: true })
+      mockOptionalAuth.mockReturnValue({ id: 5 })
+      mockCanManageFAQ.mockReturnValue(true)
+
+      expect(await verdict({ context: { params: { id: '1' }, user: { id: 5 } } })).toBe(false)
+    })
+
+    it('un visiteur sur une FAQ non publiée reçoit 404, et non un verdict négatif', async () => {
+      /*
+       * La distinction compte : répondre 200 avec `publicPageVisible: false` dirait à un visiteur
+       * qu'il EXISTE une FAQ derrière ce numéro. Le 404 est antérieur au verdict.
+       */
+      mockGetFaqVisibility.mockResolvedValue({ enabled: true, pagePublic: false })
+
+      await expect(handler(baseEvent as any)).rejects.toThrow('FAQ non disponible')
+    })
+  })
 })

@@ -114,4 +114,59 @@ test.describe.serial('FAQ — API, gestion et page publique', () => {
     await apiDelete(page, `${BASE}/api/editions/${editionId}/faq/${entryId}`)
     await updateEdition(page, editionId, { faqEnabled: false, faqPagePublic: false })
   })
+  test('⚠️ l’éditeur relit sa FAQ NON PUBLIÉE, rechargement complet compris', async ({
+    page,
+    goto,
+  }) => {
+    /*
+     * ⚠️⚠️ CONSTAT B6, ET SEUL PLAYWRIGHT PEUT L'ÉPROUVER.
+     *
+     * Cette page est rendue CÔTÉ SERVEUR, et son chargement est attendu au premier niveau du
+     * `setup`. Deux défauts s'y cumulaient :
+     *
+     *  1. `$fetch` n'emporte pas le cookie de session pendant le rendu serveur : la requête
+     *     partait anonyme, le serveur répondait 404, et l'échec étant `fatal`, ce n'était pas une
+     *     liste vide — la page entière disparaissait ;
+     *  2. la page recalculait elle-même `faqEnabled && faqPagePublic`, SANS regarder qui demande :
+     *     même en navigation interne, cookie présent et serveur à 200, elle levait un 404.
+     *
+     * Aucun test unitaire ne voit cela : le premier défaut vit dans le transport des en-têtes en
+     * SSR, le second dans une page qu'il faut rendre pour la juger. Et un `curl` ne prouverait
+     * rien non plus — il faut une SESSION, donc un navigateur authentifié.
+     *
+     * 📍 `page.reload()` et non `goto` : c'est le RECHARGEMENT qui refait un rendu serveur. Une
+     * navigation interne, elle, n'exerce que le second défaut.
+     */
+    const { editionId } = loadState()
+    // Module actif, mais page publique NON publiée : l'état exact du défaut.
+    await updateEdition(page, editionId, { faqEnabled: true, faqPagePublic: false })
+
+    const marker = `E2E_FAQ_BROUILLON_${Date.now()}`
+    const create = await apiPost(page, `${BASE}/api/editions/${editionId}/faq`, {
+      data: {
+        question: `${marker} ?`,
+        answer: 'Visible de l’éditeur avant publication',
+        isPublic: true,
+      },
+    })
+    expect(create.ok()).toBe(true)
+    const entryId = (await create.json()).data.entry.id
+
+    await goto(`/editions/${editionId}/faq`, { waitUntil: 'hydration' })
+    await expect(page.getByText(marker, { exact: false })).toBeVisible({ timeout: 15000 })
+
+    /*
+     * Le geste qui échouait : un rechargement complet, donc un rendu serveur.
+     *
+     * 📍 PAS DE `networkidle` ICI : le serveur de développement tient une liaison permanente pour
+     * le rechargement à chaud, si bien que le réseau n'est JAMAIS au repos — mon premier essai a
+     * attendu les deux minutes du délai imparti puis échoué sur l'attente, pas sur la page.
+     * L'assertion qui suit porte son propre délai, et c'est elle qui juge.
+     */
+    await page.reload()
+    await expect(page.getByText(marker, { exact: false })).toBeVisible({ timeout: 15000 })
+
+    await apiDelete(page, `${BASE}/api/editions/${editionId}/faq/${entryId}`)
+    await updateEdition(page, editionId, { faqEnabled: false, faqPagePublic: false })
+  })
 })
