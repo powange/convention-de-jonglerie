@@ -35,6 +35,8 @@
     "import_from_image": "Importer depuis une photo",
     "import_from_map": "Importer depuis la carte du site",
     "import_from_map_description": "Ajoutez rapidement des zones ou points de repère de la carte comme lieux de workshop.",
+    "import_locations_ignored": "Lieu non repris",
+    "import_locations_ignored_description": "Le lieu lu sur l'affiche ne figure pas dans la liste des lieux de l'édition : {count} atelier(s) ont été importés sans lieu ({titles}). Ajoutez le lieu, puis renseignez-le sur ces ateliers.",
     "import_partial_error": "Import partiellement réussi",
     "import_partial_error_description": "{success} workshop(s) importé(s), {fail} échec(s)",
     "import_selected": "Importer la sélection",

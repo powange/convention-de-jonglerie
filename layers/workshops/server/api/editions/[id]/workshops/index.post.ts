@@ -41,32 +41,50 @@ export default wrapApiHandler(
       editionEndDate: cfg.endDate?.toISOString(),
     })
 
-    // Gérer le lieu du workshop
+    /*
+     * Le lieu de l'atelier — constat B2.
+     *
+     * ⚠️ CE BLOC NE CHERCHAIT LE LIEU QU'EN MODE « SAISIE LIBRE ». En mode LIEUX EXCLUSIFS,
+     * un `locationName` était donc purement et simplement ignoré, sans un mot : c'est ce que vit
+     * l'import depuis une affiche, qui ne connaît que des NOMS — l'IA lit « Salle A » sur l'image,
+     * elle n'a aucun identifiant à proposer.
+     *
+     * Désormais le nom est d'abord RAPPROCHÉ d'un lieu existant de l'édition, dans les deux modes.
+     * Ce n'est qu'à défaut que les deux modes divergent, et pour une bonne raison : en mode
+     * exclusif, l'organisation a arrêté une liste de lieux, et en inventer un la contredirait.
+     *
+     * 📍 LA COMPARAISON EST DÉJÀ INSENSIBLE À LA CASSE, et ce n'est pas une supposition : la
+     * collation de la table est `utf8mb4_unicode_ci` (relevée en base), donc « salle a » retrouve
+     * « Salle A ». Il ne faut SURTOUT PAS ajouter `mode: 'insensitive'` que la fiche suggérait :
+     * le connecteur MySQL de Prisma ne l'accepte pas. Corollaire pour les tests : cette
+     * insensibilité est une garantie de la BASE, qu'aucun bouchon ne peut éprouver.
+     */
     let locationId = validatedData.locationId || null
+    /** Un lieu a été demandé, et il n'a pas pu être rattaché. L'appelant doit pouvoir le dire. */
+    let locationIgnored = false
+    const nomDeLieu = validatedData.locationName?.trim() || null
 
-    // Si un nom de lieu est fourni (mode libre) et pas d'ID, créer ou récupérer le lieu
-    if (validatedData.locationName && !locationId && cfg.locationsFreeInput) {
-      const locationName = validatedData.locationName.trim()
-
-      // Chercher si le lieu existe déjà
-      const existingLocation = await prisma.workshopLocation.findFirst({
-        where: {
-          editionId,
-          name: locationName,
-        },
+    if (nomDeLieu && !locationId) {
+      const lieuExistant = await prisma.workshopLocation.findFirst({
+        where: { editionId, name: nomDeLieu },
+        select: { id: true },
       })
 
-      if (existingLocation) {
-        locationId = existingLocation.id
-      } else {
-        // Créer le nouveau lieu
-        const newLocation = await prisma.workshopLocation.create({
-          data: {
-            editionId,
-            name: locationName,
-          },
+      if (lieuExistant) {
+        locationId = lieuExistant.id
+      } else if (cfg.locationsFreeInput) {
+        const lieuCree = await prisma.workshopLocation.create({
+          data: { editionId, name: nomDeLieu },
         })
-        locationId = newLocation.id
+        locationId = lieuCree.id
+      } else {
+        /*
+         * Mode LIEUX EXCLUSIFS et nom inconnu : on ne peut pas créer le lieu, mais on ne jette pas
+         * l'atelier pour autant — son titre, son horaire et sa description sont justes, et les
+         * perdre pour un lieu absent de la liste coûterait plus que ce que ça protège. En revanche
+         * l'appelant est PRÉVENU : l'ancien silence est précisément le défaut de ce constat.
+         */
+        locationIgnored = true
       }
     }
 
@@ -100,7 +118,12 @@ export default wrapApiHandler(
       },
     })
 
-    return createSuccessResponse(newWorkshop)
+    /*
+     * `locationIgnored` voyage à côté de l'atelier, toujours présent et non seulement quand il
+     * vaut `true` : un appelant qui lit `data.locationIgnored` ne doit pas avoir à distinguer
+     * « faux » de « ce serveur ne le dit pas ».
+     */
+    return createSuccessResponse({ ...newWorkshop, locationIgnored })
   },
   { operationName: 'CreateWorkshop' }
 )
