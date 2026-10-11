@@ -281,8 +281,8 @@
       "volunteers": "Volunteers",
       "no_enabled_meal": "No meal to validate",
       "no_enabled_meal_description": "This edition has no enabled meal: they have not been configured yet, or they have all been disabled. Enable at least one meal to open the counter.",
-      "confirm_disable_description": "The volunteers' answers for this meal will be deleted, and this deletion is permanent. Re-enabling the meal will not restore them: every eligible volunteer will be signed up again as accepting, including those who had declined.",
-      "confirm_disable_label": "Disable and delete the answers",
+      "confirm_disable_description": "[TODO] The volunteers' answers for this meal will be deleted, and this deletion is permanent. Re-enabling the meal will not restore them: every eligible volunteer will be signed up again as accepting, including those who had declined.",
+      "confirm_disable_label": "[TODO] Disable and delete the answers",
       "confirm_disable_title": "Disable this meal?"
     },
     "organizers": {

@@ -281,8 +281,8 @@
       "volunteers": "Volontari",
       "no_enabled_meal": "Nessun pasto da convalidare",
       "no_enabled_meal_description": "Questa edizione non ha alcun pasto attivato: non sono ancora stati configurati oppure sono stati tutti disattivati. Attiva almeno un pasto per aprire il banco.",
-      "confirm_disable_description": "Le risposte dei volontari per questo pasto saranno eliminate, e l'eliminazione è definitiva. Riattivare il pasto non le ripristinerà: ogni volontario idoneo sarà iscritto di nuovo come accettante, compresi quelli che avevano rifiutato.",
-      "confirm_disable_label": "Disattiva ed elimina le risposte",
+      "confirm_disable_description": "[TODO] Le risposte dei volontari per questo pasto saranno eliminate, e l'eliminazione è definitiva. Riattivare il pasto non le ripristinerà: ogni volontario idoneo sarà iscritto di nuovo come accettante, compresi quelli che avevano rifiutato.",
+      "confirm_disable_label": "[TODO] Disattiva ed elimina le risposte",
       "confirm_disable_title": "Disattivare questo pasto?"
     },
     "organizers": {

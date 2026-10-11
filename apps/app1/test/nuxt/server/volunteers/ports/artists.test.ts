@@ -31,10 +31,18 @@ describe('port artists (câblage jonglerie par défaut)', () => {
       })
       // Seul l'artiste 1 (éligible) est upserté
       expect(prismaMock.artistMealSelection.upsert).toHaveBeenCalledTimes(1)
+      /*
+       * ⚠️ `update: {}` ET NON `{ accepted: true }` — constat B3.
+       *
+       * Écrire `accepted: true` à la réactivation d'un repas RÉ-INSCRIVAIT d'office un artiste
+       * qui l'avait décliné : son refus était une réponse explicite, et il disparaissait sans un
+       * mot — avec un effet sur les quantités commandées en cuisine. L'`upsert` ne sert plus
+       * qu'à créer la ligne manquante sans échouer sur celle qui existe déjà.
+       */
       expect(prismaMock.artistMealSelection.upsert).toHaveBeenCalledWith({
         where: { artistId_mealId: { artistId: 1, mealId: 42 } },
         create: { artistId: 1, mealId: 42, accepted: true },
-        update: { accepted: true },
+        update: {},
       })
 
       // Même garde que côté bénévoles : on confronte les champs écrits au schéma, plutôt que de
@@ -49,12 +57,25 @@ describe('port artists (câblage jonglerie par défaut)', () => {
   })
 
   describe('removeMealSelections', () => {
-    it('supprime toutes les sélections artistes du repas', async () => {
+    /**
+     * ⚠️⚠️ CE CAS DISAIT L'INVERSE, et il figeait le défaut — constat B3.
+     *
+     * Il exigeait un `deleteMany` sur toutes les sélections du repas. Or ce `deleteMany` effaçait
+     * les `consumedAt` posés au comptoir et les `afterShow` : un clic malheureux sur le
+     * commutateur pendant l'événement perdait l'historique de service d'un repas entier.
+     *
+     * 📍 CE QUI REND L'INERTIE SÛRE, et c'est vérifié plutôt que supposé : toutes les lectures
+     * bornent sur `enabled: true` — celle des bénévoles (`meals-service.ts`) comme celle des
+     * participants d'un repas (`participants.get.ts`, l. 58-62). Les lignes d'un repas désactivé
+     * n'apparaissent nulle part ; elles attendent.
+     *
+     * Ce cas garde donc désormais une DÉCISION : s'il tombe, c'est que quelqu'un a remis une
+     * suppression, et à lui de dire pourquoi.
+     */
+    it('⚠️ NE SUPPRIME PLUS RIEN — les repas servis survivent à une désactivation', async () => {
       await createDefaultVolunteerPorts().artists.removeMealSelections(42)
 
-      expect(prismaMock.artistMealSelection.deleteMany).toHaveBeenCalledWith({
-        where: { mealId: 42 },
-      })
+      expect(prismaMock.artistMealSelection.deleteMany).not.toHaveBeenCalled()
     })
   })
 

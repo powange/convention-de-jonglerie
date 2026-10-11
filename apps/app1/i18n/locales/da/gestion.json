@@ -281,8 +281,8 @@
       "volunteers": "Frivillige",
       "no_enabled_meal": "Intet måltid at validere",
       "no_enabled_meal_description": "Denne udgave har ingen aktiverede måltider: de er endnu ikke konfigureret, eller de er alle blevet deaktiveret. Aktivér mindst ét måltid for at åbne disken.",
-      "confirm_disable_description": "De frivilliges svar for dette måltid slettes, og sletningen er endelig. At slå måltidet til igen genskaber dem ikke: hver berettiget frivillig bliver tilmeldt på ny som accepterende, også dem der havde takket nej.",
-      "confirm_disable_label": "Slå fra og slet svarene",
+      "confirm_disable_description": "[TODO] De frivilliges svar for dette måltid slettes, og sletningen er endelig. At slå måltidet til igen genskaber dem ikke: hver berettiget frivillig bliver tilmeldt på ny som accepterende, også dem der havde takket nej.",
+      "confirm_disable_label": "[TODO] Slå fra og slet svarene",
       "confirm_disable_title": "Slå dette måltid fra?"
     },
     "organizers": {

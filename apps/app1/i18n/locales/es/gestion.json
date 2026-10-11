@@ -281,8 +281,8 @@
       "volunteers": "Voluntarios",
       "no_enabled_meal": "Ninguna comida por validar",
       "no_enabled_meal_description": "Esta edición no tiene ninguna comida activada: aún no se han configurado o se han desactivado todas. Active al menos una comida para abrir el mostrador.",
-      "confirm_disable_description": "Las respuestas de los voluntarios para esta comida se eliminarán, y esta eliminación es definitiva. Reactivar la comida no las restaurará: cada voluntario elegible quedará inscrito de nuevo como aceptando, incluidos los que habían rechazado.",
-      "confirm_disable_label": "Desactivar y eliminar las respuestas",
+      "confirm_disable_description": "[TODO] Las respuestas de los voluntarios para esta comida se eliminarán, y esta eliminación es definitiva. Reactivar la comida no las restaurará: cada voluntario elegible quedará inscrito de nuevo como aceptando, incluidos los que habían rechazado.",
+      "confirm_disable_label": "[TODO] Desactivar y eliminar las respuestas",
       "confirm_disable_title": "¿Desactivar esta comida?"
     },
     "organizers": {
