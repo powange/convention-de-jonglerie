@@ -17,9 +17,36 @@ export default wrapApiHandler(
       })
 
     try {
+      /*
+       * ⚠️ LE COMPTE DES ASSOCIATIONS, PAR FAMILLE — constat F3.
+       *
+       * Supprimer un quota emporte **en cascade** tout ce qui s'y rattache : six tables de
+       * liaison portent `onDelete: Cascade`. La confirmation, elle, ne nommait que le quota — six
+       * cascades, zéro mot — et l'action est **irréversible**.
+       *
+       * Les comptes sont rendus avec la LISTE plutôt que demandés au moment de la suppression :
+       * la confirmation doit s'afficher sans attendre un aller-retour, et un écran qui chargerait
+       * le détail au clic laisserait une fraction de seconde où le bouton est actif sans que
+       * l'information soit là.
+       *
+       * 📍 Les six noms sont ceux des relations du modèle, pas une liste à tenir à jour : une
+       * septième famille ajoutée au schéma se verra ici, puisqu'elle manquera au `_count`.
+       */
       const quotas = await prisma.ticketingQuota.findMany({
         where: { editionId },
         orderBy: { position: 'asc' },
+        include: {
+          _count: {
+            select: {
+              tiers: true,
+              options: true,
+              customFields: true,
+              organizers: true,
+              volunteers: true,
+              artists: true,
+            },
+          },
+        },
       })
 
       return createSuccessResponse({ quotas })

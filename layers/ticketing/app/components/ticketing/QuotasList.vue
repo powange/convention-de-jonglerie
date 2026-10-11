@@ -72,6 +72,7 @@
             icon="i-heroicons-trash"
             color="error"
             variant="ghost"
+            data-supprimer-quota
             :title="$t('ticketing.quotas.list.delete_button')"
             @click="confirmDeleteQuota(quota)"
           />
@@ -150,7 +151,7 @@
   <UiConfirmModal
     v-model="deleteConfirmOpen"
     :title="$t('ticketing.quotas.list.delete_title')"
-    :description="$t('ticketing.quotas.list.delete_confirm', { name: quotaToDelete?.title })"
+    :description="descriptionDeLaSuppression"
     :confirm-label="$t('ticketing.quotas.list.delete_button')"
     confirm-color="error"
     confirm-icon="i-heroicons-trash"
@@ -163,11 +164,21 @@
 </template>
 
 <script setup lang="ts">
+// Import EXPLICITE, comme ses voisins du module : l'auto-import de Nuxt couvre les fonctions mais
+// la convention du dossier est l'import relatif, et un type ne s'auto-importe pas partout.
+import { associationsDuQuota, type ComptesDuQuota } from '../../utils/associations-du-quota'
+
 interface Quota {
   id: number
   title: string
   description: string | null
   quantity: number
+  /**
+   * Les associations qui disparaîtront avec le quota — constat F3. Rendues par la LISTE, de sorte
+   * que la confirmation s'affiche sans aller-retour : un écran qui chargerait le détail au clic
+   * laisserait un instant où le bouton est actif sans que l'information soit là.
+   */
+  _count?: ComptesDuQuota
 }
 
 interface QuotaForm {
@@ -191,6 +202,32 @@ const toast = useToast()
 
 const deleteConfirmOpen = ref(false)
 const quotaToDelete = ref<Quota | null>(null)
+
+/**
+ * Ce que la confirmation annonce — constat F3.
+ *
+ * ⚠️ DEUX LIBELLÉS, ET LE PREMIER EST CONSERVÉ : un quota posé sur rien n'a aucune association à
+ * annoncer, et lui dire « ses 0 association(s) disparaîtront » serait absurde. C'est le cas le
+ * plus courant juste après la création d'un quota.
+ *
+ * 📍 Le détail est composé ICI et non dans l'util : celui-ci rend des clés et des nombres, et la
+ * traduction appartient au composant. Un mot français en dur dans l'util sortirait tel quel chez
+ * un lecteur allemand.
+ */
+const descriptionDeLaSuppression = computed(() => {
+  const nom = quotaToDelete.value?.title
+  const { total, familles } = associationsDuQuota(quotaToDelete.value?._count)
+  if (total === 0) {
+    return t('ticketing.quotas.list.delete_confirm', { name: nom })
+  }
+  return t('ticketing.quotas.list.delete_confirm_with_links', {
+    name: nom,
+    count: total,
+    detail: familles
+      .map((famille) => t(`ticketing.quotas.list.${famille.cle}`, { count: famille.nombre }))
+      .join(', '),
+  })
+})
 
 /**
  * Édition d'un quota dans une fenêtre dédiée.
