@@ -875,6 +875,55 @@ jobs:
             apps/app1/playwright-report/
             apps/app1/test-results/
           retention-days: 7
+  # Les vulnérabilités connues des dépendances. ⚠️ CE JOB NE BLOQUE PAS `ci-verte`, et c'est
+  # délibéré : un avis publié pendant la nuit rendrait rouge une PR qui ne touche pas aux
+  # dépendances, et bloquerait le dépôt pour une raison étrangère à son contenu. Il est là pour
+  # RENDRE LA DÉRIVE VISIBLE — les cinq installations du workflow passent `--no-audit`, si bien que
+  # personne ne voyait le compte monter.
+  #
+  # Il échoue tout de même sur une vulnérabilité CRITIQUE. L'état de référence est zéro critique,
+  # atteint en montant `websocket-driver` de 0.7.4 à 0.7.5 : l'exigence est donc tenable, et une
+  # critique mérite qu'on s'arrête dessus.
+  #
+  # ⚠️ Le seuil n'est PAS un compte. Caler une garde sur « pas plus de 96 hautes » la ferait tomber
+  # le jour où le chiffre baisse, et il faudrait la corriger pour avoir bien travaillé. Le compte
+  # est écrit dans le résumé du run, où il se lit ; seul le niveau critique arrête.
+  audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 8
+    needs: setup
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Préparer l'environnement
+        uses: ./.github/actions/preparer-env
+
+      # Le compte complet, lisible dans le résumé de la PR sans ouvrir le journal du job.
+      - name: Compter les vulnérabilités
+        id: compte
+        run: |
+          npm audit --json > audit.json 2>/dev/null || true
+          node -e "
+            const a = JSON.parse(require('fs').readFileSync('audit.json', 'utf8'))
+            const v = a.metadata.vulnerabilities
+            const l = ['| Gravité | Nombre |', '| --- | ---: |']
+            for (const n of ['critical', 'high', 'moderate', 'low']) l.push('| ' + n + ' | ' + v[n] + ' |')
+            l.push('', 'Total : **' + v.total + '** sur ' + a.metadata.dependencies.total + ' paquets.')
+            l.push('', '> Ce job ne bloque pas la CI. Il échoue uniquement sur une vulnérabilité critique.')
+            require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY, '## npm audit\n\n' + l.join('\n') + '\n')
+            console.log(JSON.stringify(v))
+          "
+
+      # `--audit-level=critical` ne rend un code non nul que pour une critique : les hautes et les
+      # modérées sont comptées au-dessus, pas transformées en échec.
+      - name: Refuser une vulnérabilité critique
+        run: npm audit --audit-level=critical
+
 
   # ---------------------------------------------------------------------------------------------
   # Le seul contrôle à déclarer requis dans la protection de branche.
