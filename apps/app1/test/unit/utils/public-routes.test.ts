@@ -44,6 +44,19 @@ const CHEMINS_SENSIBLES: [string, string][] = [
   ['/api/editions/1', 'PUT'],
   ['/api/editions/1', 'DELETE'],
   ['/api/editions/1/zones', 'POST'],
+  /*
+   * SIGNALER un objet trouvé reste réservé aux comptes : ouvrir la LECTURE ne doit jamais ouvrir
+   * l'écriture, et le motif de la liste ne cite que `GET`. C'est le risque propre à une entrée
+   * posée sur un chemin qui porte aussi des mutations.
+   */
+  ['/api/editions/1/lost-found', 'POST'],
+  /*
+   * Les LIEUX d'ateliers, que la fiche de B1 proposait d'ouvrir aussi. Écarté après mesure : cette
+   * liste n'est demandée qu'à l'ouverture de la modale de création, derrière un bouton réservé à
+   * qui peut créer un atelier. Aucun anonyme ne l'appelle, donc l'ouvrir n'exposerait des données
+   * que pour rien. Cette ligne tient la décision.
+   */
+  ['/api/editions/1/workshops/locations', 'GET'],
   ['/api/editions/1/markers', 'POST'],
   ['/api/conventions/1', 'PUT'],
   ['/api/editions', 'POST'],
@@ -70,6 +83,14 @@ const CHEMINS_PUBLICS: [string, string][] = [
   ['/api/editions/42/markers', 'GET'],
   ['/api/editions/42/program', 'GET'],
   ['/api/editions/42/faq', 'GET'],
+  /*
+   * La liste des objets trouvés — constat B1. Sa page ne pose aucun middleware et l'en-tête en
+   * propose l'onglet à tout visiteur : le 401 du middleware se traduisait par un toast d'erreur
+   * puis « aucun objet n'a été signalé », c'est-à-dire le contraire de la vérité.
+   */
+  ['/api/editions/42/lost-found', 'GET'],
+  // Les ateliers, ouverts depuis #651 : la fiche de B1 les redemandait, c'était déjà fait.
+  ['/api/editions/42/workshops', 'GET'],
   ['/api/editions/42/posts', 'GET'],
   ['/api/editions/42/carpool-offers', 'GET'],
   /*
