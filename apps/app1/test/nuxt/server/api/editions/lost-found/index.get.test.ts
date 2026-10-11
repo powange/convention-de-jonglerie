@@ -1,10 +1,22 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 const mockGetEventTiming = vi.hoisted(() => vi.fn())
+const mockAccesAuxDonnees = vi.hoisted(() => vi.fn())
 
 // Étape modularisation : l'existence de l'événement vient désormais du port lost-found.
 vi.mock('#server/lost-found/ports/registry', () => ({
   useLostFoundPorts: () => ({ event: { getEventTiming: mockGetEventTiming } }),
+}))
+
+/*
+ * ⚠️ SEUL `canAccessEditionData` EST REMPLACÉ, le reste du module demeure réel : c'est lui que
+ * `assurerEditionLisible` interroge pour savoir si le demandeur fait partie de l'organisation. Un
+ * `vi.mock` complet de ce module le priverait de ses autres exports, dont dépend la chaîne
+ * d'imports du handler.
+ */
+vi.mock('#server/utils/permissions/edition-permissions', async (original) => ({
+  ...(await original<Record<string, unknown>>()),
+  canAccessEditionData: mockAccesAuxDonnees,
 }))
 
 import handler from '../../../../../../../../layers/lost-found/server/api/editions/[id]/lost-found/index.get'
@@ -71,7 +83,18 @@ const mockLostFoundItems = [
 describe('/api/editions/[id]/lost-found GET', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockGetEventTiming.mockResolvedValue({ found: true, startDate: new Date('2024-01-01') })
+    /*
+     * ⚠️ `visibilite` EST OBLIGATOIRE DANS LE JEU D'ESSAI depuis le constat B1 : le port le rend
+     * dans la même lecture que `found`, et le handler s'en sert pour refuser une édition retirée
+     * de la vue du public. L'omettre ne ferait pas échouer les cas — le handler sauterait la garde
+     * — mais ils cesseraient de l'exercer, en silence : c'est le pire des deux.
+     */
+    mockGetEventTiming.mockResolvedValue({
+      found: true,
+      startDate: new Date('2024-01-01'),
+      visibilite: { status: 'PUBLISHED', creatorId: 7, conventionAuthorId: 11 },
+    })
+    mockAccesAuxDonnees.mockResolvedValue(false)
     prismaMock.lostFoundItem.findMany.mockReset()
     global.getRouterParam = vi.fn().mockReturnValue('1')
   })
@@ -233,5 +256,60 @@ describe('/api/editions/[id]/lost-found GET', () => {
         where: { editionId: 123 },
       })
     )
+  })
+  /**
+   * ⚠️⚠️ LA GARDE DE VISIBILITÉ, arrivée AVEC l'ouverture au public — constat B1.
+   *
+   * Jusqu'ici le middleware répondait 401 à tout anonyme sur cette route, et c'est ce qui tenait
+   * lieu de protection : la page affichait alors un toast d'erreur puis « aucun objet n'a été
+   * signalé », soit le contraire de la vérité. Déclarer la route publique corrige cet état vide
+   * trompeur — mais le handler ne vérifiait QUE l'existence de l'édition.
+   *
+   * Sans la garde, on aurait donc remplacé un affichage faux par une FUITE : les objets d'une
+   * édition hors ligne, pseudos et photos des auteurs compris, lisibles de qui connaît son numéro.
+   * Les deux cas ci-dessous sont les deux moitiés de cette décision, et le second est indispensable
+   * — une garde qui refuserait TOUT LE MONDE satisferait le premier.
+   */
+  describe('visibilité de l’édition', () => {
+    const horsLigne = () =>
+      mockGetEventTiming.mockResolvedValue({
+        found: true,
+        startDate: new Date('2024-01-01'),
+        visibilite: { status: 'OFFLINE', creatorId: 7, conventionAuthorId: 11 },
+      })
+
+    it('⚠️ UN VISITEUR NE LIT PAS LES OBJETS D’UNE ÉDITION HORS LIGNE', async () => {
+      horsLigne()
+      prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
+
+      // 404 et non 403 : distinguer les deux dirait qu'il EXISTE quelque chose derrière ce numéro.
+      await expect(handler(mockEvent as any)).rejects.toThrow('Édition non trouvée')
+      expect(prismaMock.lostFoundItem.findMany).not.toHaveBeenCalled()
+    })
+
+    it('mais l’organisation, elle, continue de les lire', async () => {
+      horsLigne()
+      mockAccesAuxDonnees.mockResolvedValue(true)
+      prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
+
+      const result = await handler({ context: { user: { id: 7 } } } as any)
+
+      expect(result).toHaveLength(mockLostFoundItems.length)
+      expect(mockAccesAuxDonnees).toHaveBeenCalledWith(1, 7, expect.anything())
+    })
+
+    it('et une édition publiée reste ouverte à tous, sans interroger les droits', async () => {
+      /*
+       * LE TÉMOIN. Il garde le cas ORDINAIRE : une garde posée trop haut — avant le test du statut
+       * — ferait un aller-retour de droits sur chaque affichage public, et refuserait tout anonyme
+       * sur une édition parfaitement publiée.
+       */
+      prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
+
+      const result = await handler(mockEvent as any)
+
+      expect(result).toHaveLength(mockLostFoundItems.length)
+      expect(mockAccesAuxDonnees).not.toHaveBeenCalled()
+    })
   })
 })

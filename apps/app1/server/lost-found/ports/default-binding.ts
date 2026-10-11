@@ -9,9 +9,25 @@ export function createDefaultLostFoundPorts(): LostFoundPorts {
       async getEventTiming(editionId) {
         const edition = await prisma.edition.findUnique({
           where: { id: editionId },
-          select: { startDate: true },
+          select: {
+            startDate: true,
+            // Jonglerie : la visibilité d'un événement est celle de l'Edition, et l'auteur de la
+            // convention compte parmi ceux qui peuvent la lire hors ligne.
+            status: true,
+            creatorId: true,
+            convention: { select: { authorId: true } },
+          },
         })
-        return { found: !!edition, startDate: edition?.startDate ?? null }
+        if (!edition) return { found: false, startDate: null, visibilite: null }
+        return {
+          found: true,
+          startDate: edition.startDate ?? null,
+          visibilite: {
+            status: edition.status,
+            creatorId: edition.creatorId ?? null,
+            conventionAuthorId: edition.convention?.authorId ?? null,
+          },
+        }
       },
     },
   }

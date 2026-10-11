@@ -191,6 +191,30 @@ export const publicRoutes: PublicRoute[] = [
   // ====== FAQ (entrées publiques) ======
   { pattern: /^\/api\/editions\/\d+\/faq$/, methods: ['GET'], hydrateSession: true },
 
+  /*
+   * Les objets trouvés d'une édition — constat B1.
+   *
+   * La page `/editions/:id/lost-found` ne pose AUCUN middleware, l'en-tête propose son onglet à
+   * tout visiteur, et le handler n'exige aucune session. Seule cette liste manquait : le
+   * middleware répondait donc 401, et l'écran enchaînait un toast « impossible de charger » puis
+   * « aucun objet n'a été signalé » — alors qu'il y en avait. Le pire des deux états : non
+   * seulement on ne voit rien, mais on lit le contraire de la vérité.
+   *
+   * ⚠️ LE HANDLER A REÇU EN MÊME TEMPS LA GARDE DE VISIBILITÉ de l'édition. Ouvrir la route
+   * sans elle aurait livré les objets d'une édition hors ligne — pseudos et photos compris — à qui
+   * connaît son numéro. Les deux moitiés ne se livrent pas séparément.
+   *
+   * 📍 CE QUI N'EST PAS AJOUTÉ, et ce n'est pas un oubli : `/workshops/locations`, que la fiche
+   * nommait aussi. Mesuré — cette liste n'est demandée qu'à l'OUVERTURE DE LA MODALE de création
+   * d'un atelier, donc derrière un bouton réservé à qui peut en créer. Un anonyme ne l'appelle
+   * jamais, et son échec est de toute façon avalé en silence (« les lieux ne sont pas critiques »).
+   * L'ouvrir exposerait les lieux d'une édition sans que personne ne l'ait demandé.
+   *
+   * 📍 Et `/workshops`, la troisième route de la fiche, est publique DEPUIS #651 : la fiche a
+   * vieilli entre sa rédaction et ce lot.
+   */
+  { pattern: /^\/api\/editions\/\d+\/lost-found$/, methods: ['GET'], hydrateSession: true },
+
   // ====== Coûts du projet & donations ======
   { path: '/api/project-costs', methods: ['GET'] },
   { path: '/api/project-costs/donations', methods: ['GET'] },
