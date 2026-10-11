@@ -871,6 +871,54 @@ jobs:
           NUXT_SERVER_LOG=/tmp/nuxt-server.log \
             npx playwright test --project=${{ matrix.lot.projet }} ${{ matrix.lot.args }} "${fichiers[@]}"
 
+      # ⚠️ UN TEST INSTABLE PASSAIT VERT SANS TRACE. `retries: 2` le rejoue jusqu'à ce qu'il
+      # réussisse, et le rapport HTML est un artefact qu'il faut télécharger pour le voir : un test
+      # qui échoue une fois sur trois se cachait jusqu'au jour où il échoue trois fois de suite.
+      #
+      # 📍 Mesuré avant d'exiger quoi que ce soit, sur quatre runs consécutifs : **547 tests
+      # passés, zéro instable** à chaque fois. L'état de référence étant zéro, l'exigence est
+      # tenable — et elle nomme le test fautif dans le résumé de la PR plutôt que de laisser
+      # chercher.
+      #
+      # `if: always()` : sans lui, l'étape serait sautée quand les tests échouent, c'est-à-dire
+      # précisément quand on veut savoir si une reprise a eu lieu.
+      - name: Refuser un test instable
+        if: always()
+        run: |
+          RAPPORT=playwright-resultats.json
+          if [ ! -f "$RAPPORT" ]; then
+            echo "::warning::$RAPPORT absent — le rapporteur json n'a pas écrit, rien à compter."
+            exit 0
+          fi
+          node -e "
+            const r = JSON.parse(require('fs').readFileSync('playwright-resultats.json', 'utf8'))
+            const instables = []
+            const parcourir = (suite) => {
+              for (const spec of suite.specs ?? []) {
+                for (const t of spec.tests ?? []) {
+                  // Playwright marque 'flaky' un test passé après au moins une reprise.
+                  if (t.status === 'flaky') instables.push(spec.title)
+                }
+              }
+              for (const s of suite.suites ?? []) parcourir(s)
+            }
+            for (const s of r.suites ?? []) parcourir(s)
+
+            const lot = process.env.LOT || '?'
+            const resume = instables.length
+              ? ['### ⚠️ Tests instables — lot ' + lot, '', ...instables.map((t) => '- ' + t)].join('\n')
+              : '### Lot ' + lot + ' : aucun test instable'
+            require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY, resume + '\n\n')
+
+            if (instables.length) {
+              console.error('::error::' + instables.length + ' test(s) instable(s) : ' + instables.join(' | '))
+              process.exit(1)
+            }
+            console.log('aucun test instable')
+          "
+        env:
+          LOT: ${{ matrix.lot.cle }}
+
       - name: Dump server log on failure
         if: failure()
         run: |
@@ -936,7 +984,6 @@ jobs:
       # modérées sont comptées au-dessus, pas transformées en échec.
       - name: Refuser une vulnérabilité critique
         run: npm audit --audit-level=critical
-
 
   # ---------------------------------------------------------------------------------------------
   # Le seul contrôle à déclarer requis dans la protection de branche.

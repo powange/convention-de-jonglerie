@@ -124,7 +124,27 @@ test.describe.serial('Stock : ordre de base des objets d’un groupe', () => {
     }
     // L'animation dure 150 ms : relâcher avant sa fin rendait l'ordre final indécis.
     await page.waitForTimeout(300)
+
+    /*
+     * ⚠️⚠️ LA COURSE QUE CE TEST CACHAIT DERRIÈRE SES REPRISES, trouvée en CI le 11/10/2026 par
+     * l'étape « Refuser un test instable » (lot A9) — le test passait au second essai, et Playwright
+     * le déclarait donc réussi.
+     *
+     * L'ordre AFFICHÉ juste après le dépôt ne prouve pas que le serveur l'a retenu : SortableJS
+     * déplace le nœud du DOM lui-même, si bien que l'écran est juste AVANT que la requête ne soit
+     * partie. Le `expect.poll` ci-dessous était donc satisfait par un effet LOCAL, puis le
+     * rechargement courait contre le `PUT` et lisait parfois l'ancien ordre.
+     *
+     * On attend la RÉPONSE de l'enregistrement, et non un délai : c'est la cause qu'on observe,
+     * pas le temps qu'elle met. La promesse est créée AVANT le relâchement, sans quoi la réponse
+     * pourrait arriver avant qu'on ne l'écoute.
+     */
+    const enregistrement = page.waitForResponse(
+      (r) => r.request().method() === 'PUT' && r.url().includes('/items/reorder')
+    )
     await page.mouse.up()
+    const reponse = await enregistrement
+    expect(reponse.ok(), `le PUT de réordonnancement a répondu ${reponse.status()}`).toBe(true)
 
     // Charlie, premier, passe en dernier.
     await expect.poll(() => nomsAffiches(page), { timeout: 15000 }).toEqual([ALPHA, BRAVO, CHARLIE])
