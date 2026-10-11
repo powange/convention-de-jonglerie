@@ -1,6 +1,7 @@
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { validatePagination } from '#server/utils/validation-helpers'
+import { TYPES_DE_NOTIFICATION, valeurDEnumeration } from '~~/shared/utils/filtres-enum'
 
 /**
  * API Admin - Récupérer les notifications récentes
@@ -25,7 +26,9 @@ export default wrapApiHandler(
 
     // Filtres optionnels
     const category = query.category as string | undefined
-    const type = query.type as string | undefined
+    // Même défaut que la liste des retours, et la même garde — constat B8. `Notification.type`
+    // est une énumération : une valeur inconnue faisait rejeter la requête par Prisma.
+    const type = valeurDEnumeration(TYPES_DE_NOTIFICATION, query.type)
     const days = Math.max(1, parseInt(query.days as string) || 30)
 
     // Définir les critères pour les "notifications récentes"
