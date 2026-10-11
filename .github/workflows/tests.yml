@@ -17,6 +17,19 @@ on:
 #
 # L'annulation est conditionnée à l'événement, et c'est délibéré : sur un push vers main, un run
 # interrompu laisserait un commit de la branche de référence sans vérification.
+# ⚠️ LE JETON EST EN LECTURE SEULE POUR TOUS LES JOBS, et c'est écrit ici plutôt que supposé.
+#
+# Sept des neuf jobs n'avaient aucun `permissions:` et héritaient du défaut du DÉPÔT. Mesuré, ce
+# défaut est bien `read` — le risque décrit par l'audit (« un jeton capable d'écrire ») n'existait
+# donc pas. Mais ce réglage vit dans l'interface de GitHub, hors du code : quiconque le passe en
+# lecture-écriture, un jour, donne ce pouvoir à huit jobs de PR d'un coup, sans qu'aucune revue le
+# voie. La déclarer ici rend la contrainte indépendante de ce réglage.
+#
+# `playwright` et `audit` gardent la leur : ils la restreignent ou l'étendent pour leur propre
+# besoin, et une déclaration de job l'emporte sur celle du workflow.
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}

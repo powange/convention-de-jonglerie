@@ -33,6 +33,10 @@ concurrency:
   group: publier-android
   cancel-in-progress: false
 
+# Le paquet Android ne fait que lire le dépôt et déposer un artefact : la lecture suffit.
+permissions:
+  contents: read
+
 jobs:
   paquet-android:
     runs-on: ubuntu-22.04
