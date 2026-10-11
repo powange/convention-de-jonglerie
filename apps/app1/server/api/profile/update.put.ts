@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { isHttpError } from '#server/types/api'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { demarrerChangementDAdresse } from '#server/utils/changement-d-adresse'
@@ -164,6 +165,13 @@ export default wrapApiHandler(
          */
         await effacerAnciennePhoto(photoActuelle, user.id)
       } catch (error) {
+        /*
+         * ⚠️ LE RELAIS EN TÊTE DU BLOC, et c'est la garde de [[billetterie-billetterie-d6]] qui
+         * l'a exigé — sur ce lot même, dans l'heure. Sans lui, un refus 4xx levé par l'une des
+         * fonctions appelées ici ressortirait en 500 générique : le message juste serait écrit, et
+         * personne ne le lirait jamais.
+         */
+        if (isHttpError(error)) throw error
         console.error('Erreur lors du déplacement du fichier de profil:', error)
         /*
          * ⚠⚠ ON NE GARDE PLUS LE NOM DU FICHIER TEMPORAIRE — constat B4.
