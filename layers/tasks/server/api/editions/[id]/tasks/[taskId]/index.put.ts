@@ -116,10 +116,26 @@ export default wrapApiHandler(
     if (isMovedToOtherGroup) {
       // Retire tous les tags de l'ancien groupe
       tagsToRemove = existing.tagAssignments.map((a) => a.tagId)
-      // Si tagIds fourni, valide qu'ils appartiennent au nouveau groupe
-      if (data.tagIds !== undefined && data.tagIds.length > 0) {
-        await assertTagsBelongToGroup(targetGroupId, data.tagIds)
-        tagsToAdd = data.tagIds
+      /*
+       * ⚠️ LES TAGS DE L'ANCIEN GROUPE SONT IGNORÉS, PAS REFUSÉS — constat B1.
+       *
+       * Ce bloc validait `data.tagIds` ENTIER contre le groupe cible, c'est-à-dire y compris les
+       * tags qu'il venait de décider de jeter deux lignes plus haut. Le handler se contredisait
+       * lui-même en huit lignes : un tag étant scopé à SON groupe, un tag de l'ancien groupe ne
+       * peut par construction pas appartenir au nouveau. Toute tâche portant au moins un tag était
+       * donc indéplaçable — 400 « Certains tags n'appartiennent pas à ce groupe » — et le seul
+       * moyen de s'en sortir était de décocher les étiquettes d'abord, ce que rien n'indiquait.
+       *
+       * 📍 La validation reste, et elle doit rester : un appelant peut légitimement poser des
+       * tags DU NOUVEAU groupe en déplaçant la tâche, et un tag d'un TROISIÈME groupe doit toujours
+       * être refusé. Ce qui change, c'est qu'on la pose sur ce qui sera réellement ÉCRIT.
+       */
+      if (data.tagIds !== undefined) {
+        const tagsDeLAncienGroupe = new Set(tagsToRemove)
+        tagsToAdd = data.tagIds.filter((id) => !tagsDeLAncienGroupe.has(id))
+        if (tagsToAdd.length > 0) {
+          await assertTagsBelongToGroup(targetGroupId, tagsToAdd)
+        }
       }
     } else if (data.tagIds !== undefined) {
       const previousTagIds = new Set(existing.tagAssignments.map((a) => a.tagId))
