@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { isHttpError } from '#server/types/api'
 import { createSuccessResponse, wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
@@ -50,6 +51,13 @@ export default wrapApiHandler(
 
       return createSuccessResponse(quota)
     } catch (error: unknown) {
+      /*
+       * Un refus DÉJÀ ÉCRIT reste lisible — constat D6. Sans ce relais, ce `catch` réécrit en
+       * 500 générique les 4xx levés dans le `try`, y compris par les fonctions qu'il appelle :
+       * au comptoir, « Erreur lors de la validation » remplace « Ce billet a été remboursé », et
+       * la différence est entre comprendre et appeler quelqu'un.
+       */
+      if (isHttpError(error)) throw error
       console.error('Failed to create quota:', error)
       throw createError({
         status: 500,

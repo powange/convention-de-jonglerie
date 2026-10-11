@@ -1,3 +1,4 @@
+import { isHttpError } from '#server/types/api'
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { getHelloAssoAccessToken } from '#server/utils/editions/ticketing/helloasso'
 import { decrypt } from '#server/utils/encryption'
@@ -70,6 +71,13 @@ export default wrapApiHandler(
         orders: ordersData,
       })
     } catch (error: unknown) {
+      /*
+       * Un refus DÉJÀ ÉCRIT reste lisible — constat D6. Sans ce relais, ce `catch` réécrit en
+       * 500 générique les 4xx levés dans le `try`, y compris par les fonctions qu'il appelle :
+       * au comptoir, « Erreur lors de la validation » remplace « Ce billet a été remboursé », et
+       * la différence est entre comprendre et appeler quelqu'un.
+       */
+      if (isHttpError(error)) throw error
       console.error('Failed to fetch raw HelloAsso data:', error)
       throw createError({
         status: 500,
