@@ -4,6 +4,7 @@ import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateUserId } from '#server/utils/validation-helpers'
+import { donneesDePromotionAdmin } from '~~/shared/utils/promotion-administrateur'
 
 const promoteUserSchema = z.object({
   isGlobalAdmin: z.boolean(),
@@ -34,7 +35,12 @@ export default wrapApiHandler(
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
-        isGlobalAdmin: validatedData.isGlobalAdmin,
+        /*
+         * La DATE de promotion part avec le drapeau — constat B7. L'écran d'activité de
+         * l'administration se fondait jusqu'ici sur `updatedAt`, que tout changement de profil
+         * touche, et annonçait donc des promotions qui n'avaient pas eu lieu.
+         */
+        ...donneesDePromotionAdmin(validatedData.isGlobalAdmin),
         updatedAt: new Date(),
       },
       select: {
@@ -46,6 +52,7 @@ export default wrapApiHandler(
         phone: true,
         isEmailVerified: true,
         isGlobalAdmin: true,
+        promotedAdminAt: true,
         createdAt: true,
         updatedAt: true,
         profilePicture: true,

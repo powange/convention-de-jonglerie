@@ -76,11 +76,25 @@ export default wrapApiHandler(
         take: Math.ceil(limit / 4),
       }),
 
-      // Promotions admin récentes (utilisateurs devenus admin récemment)
+      /*
+       * Promotions admin récentes — constat B7.
+       *
+       * ⚠️ CE BLOC ANNONÇAIT DES PROMOTIONS QUI N'AVAIENT PAS EU LIEU. Il filtrait sur
+       * `updatedAt`, que **tout** changement de profil touche : un administrateur qui corrigeait
+       * son numéro de téléphone « devenait super administrateur » dans la foulée. Mesuré sur la
+       * base de développement avant correctif : l'unique administrateur du jeu de données y
+       * figurait, sans avoir jamais été promu récemment.
+       *
+       * `promotedAdminAt` est écrit par les deux seuls points qui donnent ce droit
+       * (`admin/users/[id]/promote.put.ts` et `scripts/manage-admin.ts`), via
+       * `donneesDePromotionAdmin`. Il est `null` pour les comptes promus avant la colonne : ils
+       * n'apparaissent pas, et c'est voulu — leur promotion n'a laissé aucune trace, et en
+       * inventer une datée d'aujourd'hui recréerait exactement le défaut qu'on corrige.
+       */
       prisma.user.findMany({
         where: {
           isGlobalAdmin: true,
-          updatedAt: {
+          promotedAdminAt: {
             gt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 derniers jours
           },
         },
@@ -89,9 +103,9 @@ export default wrapApiHandler(
           prenom: true,
           nom: true,
           pseudo: true,
-          updatedAt: true,
+          promotedAdminAt: true,
         },
-        orderBy: { updatedAt: 'desc' },
+        orderBy: { promotedAdminAt: 'desc' },
         take: Math.ceil(limit / 4),
       }),
 
@@ -182,6 +196,7 @@ export default wrapApiHandler(
           status: true,
           subject: true,
           createdAt: true,
+          updatedAt: true,
           user: {
             select: {
               prenom: true,
@@ -190,7 +205,15 @@ export default wrapApiHandler(
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        /*
+         * ⚠️ ORDONNÉ SUR `updatedAt`, et non sur la date de soumission — constat B7. Une ligne
+         * « Feedback traité » porte la date du traitement (voir plus bas) ; la trier sur la
+         * soumission revenait à ne jamais la faire entrer dans la liste : un retour reçu il y a
+         * trois mois et résolu ce matin était daté de trois mois, donc rejeté hors des dix
+         * activités affichées. Mesuré : 11 des 12 retours traités de la base de développement
+         * étaient dans ce cas.
+         */
+        orderBy: { updatedAt: 'desc' },
         take: Math.ceil(limit / 4),
       }),
 
@@ -358,6 +381,14 @@ export default wrapApiHandler(
 
     // Ajouter les promotions admin
     recentAdminPromotions.forEach((admin) => {
+      /*
+       * SANS DATE DE PROMOTION, IL N'Y A RIEN À ANNONCER : le compte est administrateur depuis
+       * un moment qu'on n'a jamais enregistré. Le `where` les exclut déjà ; ce garde-fou vaut
+       * pour le jour où quelqu'un l'élargit — c'est exactement le défaut qu'on corrige ici, et
+       * il était invisible parce qu'une ligne en trop ne ressemble pas à une erreur.
+       */
+      if (!admin.promotedAdminAt) return
+
       const adminName = `${admin.prenom || ''} ${admin.nom || ''}`.trim() || admin.pseudo
 
       activities.push({
@@ -365,7 +396,7 @@ export default wrapApiHandler(
         type: 'admin_promoted',
         title: 'Nouvelle promotion administrateur',
         description: `${adminName} (@${admin.pseudo}) est devenu super administrateur`,
-        createdAt: admin.updatedAt.toISOString(),
+        createdAt: admin.promotedAdminAt.toISOString(),
         relatedId: admin.id,
         relatedType: 'user',
       })
@@ -491,7 +522,16 @@ export default wrapApiHandler(
         type: activityType,
         title,
         description,
-        createdAt: feedback.createdAt.toISOString(),
+        /*
+         * La date dit ce que la ligne raconte : un retour SOUMIS porte sa date de soumission, un
+         * retour TRAITÉ la date de son traitement. Les deux sortaient jusqu'ici datées de la
+         * soumission, ce qui plaçait « Feedback traité » des semaines avant le traitement.
+         *
+         * `updatedAt` est une approximation assumée : une note interne ajoutée après coup la
+         * déplace. Elle reste la bonne approximation — c'est un geste de l'équipe sur ce
+         * retour —, là où `createdAt` ne peut pas l'être.
+         */
+        createdAt: (traite ? feedback.updatedAt : feedback.createdAt).toISOString(),
         relatedId: feedback.id,
         relatedType: 'feedback',
       })

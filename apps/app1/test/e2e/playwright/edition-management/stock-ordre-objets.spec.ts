@@ -165,7 +165,18 @@ test.describe.serial('Stock : ordre de base des objets d’un groupe', () => {
     await ouvrirLeGroupe(page, goto, editionId, groupId)
 
     const boutonsMonter = page.getByRole('button', { name: 'Monter' })
-    expect(await boutonsMonter.count()).toBeGreaterThan(0)
+    const poignees = page.locator('tbody.objets-du-groupe .poignee-ordre')
+    /*
+     * ⚠️ `expect(…).not.toHaveCount(0)` ET NON `await locator.count()`, et c'est la course que ce
+     * test cachait derrière ses reprises — refusé en CI le 11/10/2026 par l'étape « Refuser un
+     * test instable », sur une PR qui ne touchait pas au stock.
+     *
+     * `count()` est un relevé INSTANTANÉ : il ne réessaie pas. `ouvrirLeGroupe` attend les trois
+     * objets, mais les boutons de déplacement sont rendus par un second passage — les mesurer
+     * dans la même foulée donne tantôt 3, tantôt 0. Une assertion web-first, elle, réessaie
+     * jusqu'au délai imparti.
+     */
+    await expect(boutonsMonter).not.toHaveCount(0)
 
     await page.getByRole('button', { name: /Nom de l’objet|Nom de l'objet/ }).click()
 
@@ -174,17 +185,24 @@ test.describe.serial('Stock : ordre de base des objets d’un groupe', () => {
 
     // Et le déplacement n'est plus proposé — ni poignée, ni bouton.
     await expect(boutonsMonter).toHaveCount(0)
-    await expect(page.locator('tbody.objets-du-groupe .poignee-ordre')).toHaveCount(0)
-    await expect(
-      page.getByText('Le tableau est trié par une colonne', { exact: false })
-    ).toBeVisible()
+    await expect(poignees).toHaveCount(0)
+    const avertissement = page.getByText('Le tableau est trié par une colonne', { exact: false })
+    await expect(avertissement).toBeVisible()
 
     await page.getByRole('button', { name: 'Retirer le tri' }).click()
 
-    // L'ordre du groupe revient — ici le même que l'alphabétique, le glissement précédent l'ayant
-    // amené là ; ce qui se vérifie est le RETOUR des poignées.
-    await expect.poll(() => nomsAffiches(page), { timeout: 15000 }).toEqual([ALPHA, BRAVO, CHARLIE])
-    expect(await boutonsMonter.count()).toBeGreaterThan(0)
+    /*
+     * ⚠️ CE QUI SE VÉRIFIE ICI EST LE RETOUR DES POIGNÉES, et l'ordre ne peut pas en juger : le
+     * glissement du test précédent a amené le groupe dans l'ordre alphabétique, donc les deux
+     * ordres COÏNCIDENT. Un `expect.poll` sur les noms était satisfait AVANT même que le tri ne
+     * soit retiré — il ne mesurait rien, et laissait la mesure suivante courir contre le rendu.
+     */
+    await expect(boutonsMonter).not.toHaveCount(0)
+    await expect(poignees).not.toHaveCount(0)
+    await expect(avertissement).toBeHidden()
+
+    // Non-régression : le retrait du tri ne réarrange pas les lignes dans le dos de personne.
+    expect(await nomsAffiches(page)).toEqual([ALPHA, BRAVO, CHARLIE])
   })
 })
 
