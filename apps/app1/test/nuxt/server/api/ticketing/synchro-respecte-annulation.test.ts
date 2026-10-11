@@ -28,7 +28,7 @@ vi.mock('#server/utils/encryption', () => ({
   decrypt: () => 'secret-en-clair',
 }))
 
-import handler from '../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/helloasso/orders.get'
+import handler from '../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/helloasso/import.post'
 
 const prismaMock = (globalThis as any).prisma
 

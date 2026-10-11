@@ -30,6 +30,25 @@ function orderTotal(order: {
   )
 }
 
+/**
+ * POST .../ticketing/helloasso/import — importe les commandes HelloAsso dans la base.
+ *
+ * ## ⚠️ POURQUOI CE FICHIER S'APPELLE DÉSORMAIS `import.post.ts` — constat F7
+ *
+ * Cet import vivait dans `orders.get.ts`, c'est-à-dire **sur un GET**. Or il écrit : six
+ * opérations Prisma (`upsert` de la commande, `update`/`create` des lignes, `upsert` des options,
+ * `create` des repas) puis la date de dernière synchronisation.
+ *
+ * **Un GET est rejoué sans intention** — un rechargement, un retour arrière, un préchargement du
+ * navigateur, un lien ouvert deux fois. Les écritures étant des `upsert`, les données n'en
+ * souffrent pas : le coût est en **temps et en verrous**, sur une transaction qui touche plusieurs
+ * centaines de lignes.
+ *
+ * 📍 `orders.post.ts`, juste à côté, N'ÉTAIT PAS la solution : lu en entier, il n'écrit rien —
+ * c'est une lecture paginée, et il est documenté comme telle. Y verser l'import aurait changé le
+ * contrat d'un point d'API documenté, et fait écrire un endpoint annoncé comme lisant. D'où une
+ * route **nommée par son action**, qui dit ce qu'elle fait.
+ */
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
@@ -361,5 +380,5 @@ export default wrapApiHandler(
       throw error
     }
   },
-  { operationName: 'GET ticketing helloasso orders' }
+  { operationName: 'POST ticketing helloasso import' }
 )

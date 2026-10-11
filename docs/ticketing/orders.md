@@ -167,9 +167,16 @@ model TicketingOrderItem {
 
 ## API Routes
 
-### Récupérer les Commandes depuis HelloAsso
+### Importer les Commandes depuis HelloAsso
 
-**Route** : `GET /api/editions/:id/ticketing/helloasso/orders`
+**Route** : `POST /api/editions/:id/ticketing/helloasso/import`
+
+> ⚠️ **C'était un `GET /…/helloasso/orders` jusqu'au 11/10/2026** — constat F7. Ce point d'API
+> **écrit** (six opérations Prisma, puis la date de dernière synchronisation), et un GET est rejoué
+> sans intention : rechargement, retour arrière, préchargement du navigateur. Les écritures étant
+> des `upsert`, les données n'en souffraient pas — le coût était en temps et en verrous, sur une
+> transaction touchant plusieurs centaines de lignes. La route est donc nommée par son **action**,
+> et l'ancienne n'existe plus.
 
 **Permission** : `canAccessEditionData`
 
@@ -545,7 +552,10 @@ Le QR code est scanné lors du contrôle d'accès via :
 ### 1. Synchroniser les Commandes HelloAsso
 
 ```typescript
-const { orders, stats } = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/orders`)
+// Un POST : cet appel IMPORTE en base (voir l'avertissement de la section « Importer »).
+const { orders, stats } = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/import`, {
+  method: 'POST',
+})
 
 console.log(`${stats.totalOrders} commandes, ${stats.totalItems} participants`)
 ```
