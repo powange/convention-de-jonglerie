@@ -272,109 +272,130 @@ export default wrapApiHandler(
       const hash = createHash('sha256').update(hashInput).digest('hex').substring(0, 16)
       const qrCode = `onsite-${hash}`
 
-      // Créer la commande
-      const order = await prisma.ticketingOrder.create({
-        data: {
-          editionId: editionId,
-          externalTicketingId: null,
-          helloAssoOrderId: null,
-          payerFirstName: body.payerFirstName,
-          payerLastName: body.payerLastName,
-          payerEmail: body.payerEmail,
-          amount: totalAmount,
-          status: body.paymentMethod ? 'Onsite' : 'Pending',
-          paymentMethod: body.paymentMethod,
-          checkNumber: body.checkNumber || null,
-          orderDate,
-        },
-      })
+      /*
+       * ⚠️ TOUT OU RIEN — constat B3.
+       *
+       * La commande, ses billets, leurs options et les accès repas s'écrivaient en une dizaine
+       * d'opérations SANS transaction, dans des boucles imbriquées. Une erreur au milieu — une
+       * contrainte d'unicité `(orderItemId, optionId)` si la même option arrive deux fois, une
+       * connexion perdue — laissait une commande avec une PARTIE de ses billets et un code QR
+       * déjà attribué. Le caissier voyait une erreur, ressaisissait, et la personne se
+       * retrouvait avec DEUX commandes.
+       *
+       * 📍 La lecture des tarifs, le calcul du total et celui du code QR restent DEHORS : ils ne
+       * touchent rien, et les garder dedans allongerait la transaction sans rien protéger.
+       *
+       * 📍 Le plafond par défaut d'une transaction interactive Prisma est de 5 s, et il n'est pas
+       * relevé : une commande de guichet fait au plus quelques dizaines d'écritures. L'import
+       * HelloAsso, bien plus volumineux, tient déjà dans le même plafond.
+       */
+      const { order, orderItems } = await prisma.$transaction(async (tx) => {
+        // Créer la commande
+        const order = await tx.ticketingOrder.create({
+          data: {
+            editionId: editionId,
+            externalTicketingId: null,
+            helloAssoOrderId: null,
+            payerFirstName: body.payerFirstName,
+            payerLastName: body.payerLastName,
+            payerEmail: body.payerEmail,
+            amount: totalAmount,
+            status: body.paymentMethod ? 'Onsite' : 'Pending',
+            paymentMethod: body.paymentMethod,
+            checkNumber: body.checkNumber || null,
+            orderDate,
+          },
+        })
 
-      // Créer les items de commande
-      const orderItems = []
-      for (const item of body.items) {
-        const tier = tierMap.get(item.tierId)!
-        const customParticipants = item.customParticipants || []
-        /*
-         * ⚠️ LE MÊME CALCUL QUE POUR LE TOTAL, par la même fonction. Les deux endroits écrivaient
-         * `item.customAmount ?? tier.price` chacun de leur côté : appliquer la nouvelle règle à un
-         * seul aurait fait diverger le total de la commande et le prix de ses lignes — un écart
-         * qui ne lève aucune erreur, et que seul un rapprochement comptable révèle.
-         *
-         * C'est exactement le défaut qui s'est déjà produit dans ce fichier, quand les options
-         * entraient dans le total sans entrer dans les lignes.
-         */
-        const itemPrice = prixDeLaLigne(item)
+        // Créer les items de commande
+        const orderItems = []
+        for (const item of body.items) {
+          const tier = tierMap.get(item.tierId)!
+          const customParticipants = item.customParticipants || []
+          /*
+           * ⚠️ LE MÊME CALCUL QUE POUR LE TOTAL, par la même fonction. Les deux endroits écrivaient
+           * `item.customAmount ?? tier.price` chacun de leur côté : appliquer la nouvelle règle à un
+           * seul aurait fait diverger le total de la commande et le prix de ses lignes — un écart
+           * qui ne lève aucune erreur, et que seul un rapprochement comptable révèle.
+           *
+           * C'est exactement le défaut qui s'est déjà produit dans ce fichier, quand les options
+           * entraient dans le total sans entrer dans les lignes.
+           */
+          const itemPrice = prixDeLaLigne(item)
 
-        // Créer un item pour chaque quantité
-        for (let i = 0; i < item.quantity; i++) {
-          const participant = customParticipants[i] || {
-            firstName: body.payerFirstName,
-            lastName: body.payerLastName,
-            email: body.payerEmail,
-            customFields: undefined,
-          }
+          // Créer un item pour chaque quantité
+          for (let i = 0; i < item.quantity; i++) {
+            const participant = customParticipants[i] || {
+              firstName: body.payerFirstName,
+              lastName: body.payerLastName,
+              email: body.payerEmail,
+              customFields: undefined,
+            }
 
-          // Séparer les options des vrais customFields
-          const allCustomFields = participant.customFields || []
-          const optionFields = allCustomFields.filter((field) => field.optionId)
-          const realCustomFields = allCustomFields.filter((field) => !field.optionId)
+            // Séparer les options des vrais customFields
+            const allCustomFields = participant.customFields || []
+            const optionFields = allCustomFields.filter((field) => field.optionId)
+            const realCustomFields = allCustomFields.filter((field) => !field.optionId)
 
-          const orderItem = await prisma.ticketingOrderItem.create({
-            data: {
-              orderId: order.id,
-              helloAssoItemId: null,
-              tierId: tier.id,
-              firstName: participant.firstName,
-              lastName: participant.lastName,
-              email: participant.email,
-              name: tier.name,
-              type: 'Registration',
-              amount: itemPrice,
-              state: body.paymentMethod ? 'Processed' : 'Pending',
-              qrCode, // Même QR code pour tous les items de la commande
-              entryValidated: false,
-              customFields: realCustomFields.length > 0 ? realCustomFields : null,
-            },
-          })
+            const orderItem = await tx.ticketingOrderItem.create({
+              data: {
+                orderId: order.id,
+                helloAssoItemId: null,
+                tierId: tier.id,
+                firstName: participant.firstName,
+                lastName: participant.lastName,
+                email: participant.email,
+                name: tier.name,
+                type: 'Registration',
+                amount: itemPrice,
+                state: body.paymentMethod ? 'Processed' : 'Pending',
+                qrCode, // Même QR code pour tous les items de la commande
+                entryValidated: false,
+                customFields: realCustomFields.length > 0 ? realCustomFields : null,
+              },
+            })
 
-          // Créer les associations d'options et les accès repas
-          if (optionFields.length > 0) {
-            for (const optionField of optionFields) {
-              // L'option vient de la lecture unique faite plus haut : la relire ici faisait une
-              // requête par option et par participant, et son prix restait pourtant ignoré.
-              const option = optionParId.get(optionField.optionId as number)
+            // Créer les associations d'options et les accès repas
+            if (optionFields.length > 0) {
+              for (const optionField of optionFields) {
+                // L'option vient de la lecture unique faite plus haut : la relire ici faisait une
+                // requête par option et par participant, et son prix restait pourtant ignoré.
+                const option = optionParId.get(optionField.optionId as number)
 
-              if (option) {
-                // Créer l'association orderItem <-> option
-                await prisma.ticketingOrderItemOption.create({
-                  data: {
-                    orderItemId: orderItem.id,
-                    optionId: option.id,
-                    // Le prix réellement encaissé, et non zéro : c'est lui que totalise
-                    // `montantTotalDeLaLigne` et que retrouvent les totaux par moyen de paiement.
-                    amount: option.price ?? 0,
-                    customFields: null,
-                  },
-                })
+                if (option) {
+                  // Créer l'association orderItem <-> option
+                  await tx.ticketingOrderItemOption.create({
+                    data: {
+                      orderItemId: orderItem.id,
+                      optionId: option.id,
+                      // Le prix réellement encaissé, et non zéro : c'est lui que totalise
+                      // `montantTotalDeLaLigne` et que retrouvent les totaux par moyen de paiement.
+                      amount: option.price ?? 0,
+                      customFields: null,
+                    },
+                  })
 
-                // Créer les accès repas si l'option donne accès à des repas
-                if (option.meals && option.meals.length > 0) {
-                  for (const mealRelation of option.meals) {
-                    await prisma.ticketingOrderItemMeal.create({
-                      data: {
-                        orderItemId: orderItem.id,
-                        mealId: mealRelation.mealId,
-                      },
-                    })
+                  // Créer les accès repas si l'option donne accès à des repas
+                  if (option.meals && option.meals.length > 0) {
+                    for (const mealRelation of option.meals) {
+                      await tx.ticketingOrderItemMeal.create({
+                        data: {
+                          orderItemId: orderItem.id,
+                          mealId: mealRelation.mealId,
+                        },
+                      })
+                    }
                   }
                 }
               }
             }
-          }
 
-          orderItems.push(orderItem)
+            orderItems.push(orderItem)
+          }
         }
-      }
+
+        return { order, orderItems }
+      })
 
       // Retourner le QR code pour redirection
       return createSuccessResponse({
