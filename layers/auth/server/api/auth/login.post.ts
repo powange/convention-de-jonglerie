@@ -8,6 +8,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { authRateLimiter } from '#server/utils/rate-limiter'
 import { ouvrirSession } from '#server/utils/session-helpers'
 import { sanitizeString } from '#server/utils/validation-helpers'
+import { utilisateurDeSession } from '~~/shared/utils/utilisateur-de-session'
 
 // Les fournisseurs OAuth pris en charge, tels qu'ils sont écrits en base par
 // routes/auth/google.get.ts et facebook.get.ts.
@@ -130,21 +131,7 @@ export default wrapApiHandler<ApiSuccessResponse<LoginResponse>>(
     await ouvrirSession(
       event,
       {
-        user: {
-          id: user.id,
-          email: user.email,
-          pseudo: user.pseudo,
-          nom: user.nom,
-          prenom: user.prenom,
-          phone: user.phone,
-          isGlobalAdmin: user.isGlobalAdmin,
-          isVolunteer: user.isVolunteer,
-          isArtist: user.isArtist,
-          isOrganizer: user.isOrganizer,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-          isEmailVerified: user.isEmailVerified,
-        },
+        user: utilisateurDeSession(user),
       },
       { seSouvenirDeMoi: rememberMe === true, sessionVersion: user.sessionVersion }
     )

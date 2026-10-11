@@ -6,6 +6,7 @@ import { $fetch } from 'ofetch'
 import { getEmailHash } from '#server/utils/email-hash'
 import { sanitizeReturnTo } from '#server/utils/safe-redirect'
 import { ouvrirSession } from '#server/utils/session-helpers'
+import { utilisateurDeSession } from '~~/shared/utils/utilisateur-de-session'
 
 function slugifyPseudo(base: string) {
   const clean =
@@ -184,18 +185,7 @@ export default defineEventHandler(async (event) => {
   await ouvrirSession(
     event,
     {
-      user: {
-        id: dbUser.id,
-        email: dbUser.email,
-        pseudo: dbUser.pseudo,
-        nom: dbUser.nom,
-        prenom: dbUser.prenom,
-        profilePicture: dbUser.profilePicture,
-        isGlobalAdmin: dbUser.isGlobalAdmin,
-        createdAt: dbUser.createdAt,
-        updatedAt: dbUser.updatedAt,
-        isEmailVerified: dbUser.isEmailVerified,
-      },
+      user: utilisateurDeSession(dbUser),
     },
     { seSouvenirDeMoi: isPWA, sessionVersion: dbUser.sessionVersion }
   )

@@ -5,6 +5,7 @@ import {
 } from '#server/utils/impersonation-helpers'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { ouvrirSession } from '#server/utils/session-helpers'
+import { utilisateurDeSession } from '~~/shared/utils/utilisateur-de-session'
 
 export default wrapApiHandler(
   async (event) => {
@@ -31,18 +32,7 @@ export default wrapApiHandler(
     await ouvrirSession(
       event,
       {
-        user: {
-          id: originalUser.id,
-          email: originalUser.email,
-          pseudo: originalUser.pseudo,
-          nom: originalUser.nom,
-          prenom: originalUser.prenom,
-          phone: originalUser.phone,
-          isGlobalAdmin: originalUser.isGlobalAdmin,
-          createdAt: originalUser.createdAt,
-          updatedAt: originalUser.updatedAt,
-          isEmailVerified: originalUser.isEmailVerified,
-        },
+        user: utilisateurDeSession(originalUser),
       },
       {
         // La génération courante du compte : sans elle, la session naîtrait avec le

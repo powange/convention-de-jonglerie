@@ -3,6 +3,7 @@ import { setImpersonationCookie } from '#server/utils/impersonation-helpers'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { ouvrirSession } from '#server/utils/session-helpers'
 import { validateResourceId } from '#server/utils/validation-helpers'
+import { utilisateurDeSession } from '~~/shared/utils/utilisateur-de-session'
 
 export default wrapApiHandler(
   async (event) => {
@@ -41,22 +42,7 @@ export default wrapApiHandler(
     await ouvrirSession(
       event,
       {
-        user: {
-          id: targetUser.id,
-          email: targetUser.email,
-          emailHash: targetUser.emailHash,
-          pseudo: targetUser.pseudo,
-          nom: targetUser.nom,
-          prenom: targetUser.prenom,
-          phone: targetUser.phone,
-          isGlobalAdmin: targetUser.isGlobalAdmin,
-          isVolunteer: targetUser.isVolunteer,
-          isArtist: targetUser.isArtist,
-          isOrganizer: targetUser.isOrganizer,
-          createdAt: targetUser.createdAt,
-          updatedAt: targetUser.updatedAt,
-          isEmailVerified: targetUser.isEmailVerified,
-        },
+        user: utilisateurDeSession(targetUser),
       },
       {
         // La génération courante du compte : sans elle, la session naîtrait avec le
