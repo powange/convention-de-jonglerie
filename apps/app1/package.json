@@ -70,7 +70,7 @@
     "format:check": "prettier --config package.json -c \"**/*.{js,cjs,mjs,ts,vue,json,md,yml,yaml}\" \"../../layers/**/*.{js,cjs,mjs,ts,vue,json,md,yml,yaml}\"",
     "favicons": "tsx scripts/generate-favicons.ts",
     "deps:reset": "bash scripts/reset-deps.sh",
-    "jcodemunch:watch": "uvx --with 'jcodemunch-mcp[watch]' jcodemunch-mcp watch-claude --repos /root/projets/convention-de-jonglerie"
+    "jcodemunch:watch": "uvx --with 'jcodemunch-mcp[watch]' jcodemunch-mcp watch-claude --repos ../.."
   },
   "prettier": {
     "singleQuote": true,
