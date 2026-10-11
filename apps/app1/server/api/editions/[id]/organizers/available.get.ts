@@ -1,3 +1,4 @@
+import { isHttpError } from '#server/types/api'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageEditionOrganizers } from '#server/utils/permissions/edition-permissions'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
@@ -107,6 +108,13 @@ export default wrapApiHandler(
         total: availableOrganizers.length,
       })
     } catch (error: unknown) {
+      /*
+       * Un refus DÉJÀ ÉCRIT reste lisible — constat D6. Sans ce relais, ce `catch` réécrit en
+       * 500 générique les 4xx levés dans le `try`, y compris par les fonctions qu'il appelle :
+       * au comptoir, « Erreur lors de la validation » remplace « Ce billet a été remboursé », et
+       * la différence est entre comprendre et appeler quelqu'un.
+       */
+      if (isHttpError(error)) throw error
       console.error('Database error fetching available organizers:', error)
       throw createError({
         status: 500,

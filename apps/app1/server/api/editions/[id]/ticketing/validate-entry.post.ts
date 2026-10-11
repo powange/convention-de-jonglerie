@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { isHttpError } from '#server/types/api'
 import { requireAuth } from '#server/utils/auth-utils'
 import { updateUserInfo } from '#server/utils/editions/ticketing/user-info-update'
 import { utilisateursResponsablesDeLEquipe } from '#server/utils/editions/volunteers/responsables-equipe'
@@ -683,6 +684,13 @@ export default wrapApiHandler(
         })
       }
     } catch (error: unknown) {
+      /*
+       * Un refus DÉJÀ ÉCRIT reste lisible — constat D6. Sans ce relais, ce `catch` réécrit en
+       * 500 générique les 4xx levés dans le `try`, y compris par les fonctions qu'il appelle :
+       * au comptoir, « Erreur lors de la validation » remplace « Ce billet a été remboursé », et
+       * la différence est entre comprendre et appeler quelqu'un.
+       */
+      if (isHttpError(error)) throw error
       console.error('Database validate entry error:', error)
       throw createError({
         status: 500,
