@@ -26,6 +26,7 @@
       "group_name_placeholder": "Ex: Préparation logistique",
       "group_not_found": "Ce groupe est introuvable ou a été supprimé",
       "legacy_assignees_warning": "Certains assignés ne font plus partie des organisateurs ou bénévoles acceptés. Décochez-les si vous ne souhaitez plus les conserver.",
+      "move_removes_tags": "Déplacer la tâche retirera ses {count} étiquette(s) : les étiquettes appartiennent au groupe où elles ont été créées.",
       "move_to_group": "Déplacer vers le groupe",
       "new_group": "Nouveau groupe",
       "new_task": "Nouvelle tâche",

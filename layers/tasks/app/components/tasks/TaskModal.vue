@@ -128,6 +128,13 @@
             :items="taskGroups.map((g) => ({ label: g.name, value: g.id }))"
             class="w-full"
           />
+          <p
+            v-if="etiquettesRetireesAuDeplacement"
+            data-etiquettes-retirees
+            class="text-xs text-amber-600 dark:text-amber-400 mt-1"
+          >
+            {{ $t('gestion.task.move_removes_tags', { count: etiquettesRetireesAuDeplacement }) }}
+          </p>
         </UFormField>
       </form>
 
@@ -360,6 +367,22 @@ const tagItems = computed<TagSelectItem[]>(() =>
 )
 const selectedTags = ref<TagSelectItem[]>([])
 
+/** Vrai quand le groupe choisi n'est pas celui que la tâche porte déjà. */
+const deplacementDeGroupe = computed(
+  () =>
+    Boolean(props.task) &&
+    Boolean(formData.taskGroupId) &&
+    formData.taskGroupId !== props.task?.taskGroupId
+)
+/*
+ * Ce que le déplacement va EMPORTER, annoncé avant le clic. Sans cela, les étiquettes
+ * disparaissaient sans un mot — et avant le correctif de ce lot, c'est l'enregistrement entier
+ * qui échouait, sur un message parlant de tags alors qu'on venait de choisir un groupe.
+ */
+const etiquettesRetireesAuDeplacement = computed(() =>
+  deplacementDeGroupe.value ? selectedTags.value.length : 0
+)
+
 const fieldErrors = ref<Record<string, string>>({})
 const saving = ref(false)
 const deleting = ref(false)
@@ -418,10 +441,21 @@ async function handleSubmit() {
         ? versInstant(formData.deadline, fuseauEdition.value) || null
         : null,
       assigneeIds: selectedAssignees.value.map((u) => u.id),
-      tagIds: selectedTags.value.map((t) => t.value),
+    }
+    /*
+     * ⚠️ ON N'ENVOIE PAS `tagIds` EN DÉPLAÇANT LA TÂCHE — constat B1.
+     *
+     * Les étiquettes cochées sont celles du groupe qu'on QUITTE : un tag est scopé à son groupe,
+     * donc aucune d'elles n'a de sens dans le groupe d'arrivée, et le serveur les retire d'office.
+     * Les lui transmettre quand même lui faisait REFUSER le déplacement en 400. Et il ne s'agit
+     * pas d'envoyer à la place les tags du groupe cible : cette modale ne connaît que ceux du
+     * groupe courant (`availableTags`), et elle le dit maintenant à l'écran.
+     */
+    if (!deplacementDeGroupe.value) {
+      body.tagIds = selectedTags.value.map((t) => t.value)
     }
     if (props.task) {
-      if (formData.taskGroupId && formData.taskGroupId !== props.task.taskGroupId) {
+      if (deplacementDeGroupe.value) {
         body.taskGroupId = formData.taskGroupId
       }
       await $fetch(`/api/editions/${props.editionId}/tasks/${props.task.id}`, {
