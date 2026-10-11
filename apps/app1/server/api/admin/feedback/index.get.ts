@@ -1,6 +1,11 @@
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { validatePagination } from '#server/utils/validation-helpers'
+import {
+  STATUTS_DE_RETOUR,
+  TYPES_DE_RETOUR,
+  valeurDEnumeration,
+} from '~~/shared/utils/filtres-enum'
 
 export default wrapApiHandler(
   async (event) => {
@@ -8,11 +13,14 @@ export default wrapApiHandler(
     await requireGlobalAdminWithDbCheck(event)
     const { page, limit, skip } = validatePagination(event)
     const query = getQuery(event)
-    const type = query.type as string
-    const statutsConnus = ['NEW', 'IN_PROGRESS', 'RESOLVED', 'REJECTED']
-    const status = statutsConnus.includes(query.status as string)
-      ? (query.status as string)
-      : undefined
+    /*
+     * ⚠️ LE TYPE ÉTAIT RECOPIÉ TEL QUEL dans le `where` — constat B8. `Feedback.type` est une
+     * énumération : `?type=PIZZA` faisait rejeter la requête ENTIÈRE par Prisma, donc une liste
+     * vide, un 500 dans le journal d'erreurs, et rien à l'écran. Le filtre voisin, `status`,
+     * était déjà gardé six lignes plus bas depuis toujours.
+     */
+    const type = valeurDEnumeration(TYPES_DE_RETOUR, query.type)
+    const status = valeurDEnumeration(STATUTS_DE_RETOUR, query.status)
     const search = query.search as string
 
     // Construction des filtres
