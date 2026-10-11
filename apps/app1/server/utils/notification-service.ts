@@ -1234,6 +1234,21 @@ export const NotificationHelpers = {
   /**
    * Notification d'assignation à une tâche
    */
+  /**
+   * ⚠️ L'ADRESSE EST CELLE DE « MES TÂCHES », PAS DE LA GESTION — constat B2.
+   *
+   * Les deux notifications de tâche visaient `/editions/<id>/gestion/tasks`, page réservée à
+   * `canManageTasks`. Or un assigné peut parfaitement être un bénévole accepté — c'est
+   * `assertAssigneesAreAssignable` qui le dit — et pour lui le bouton « Voir la tâche » menait sur
+   * un écran dont le premier appel répond 403. La notification arrive, le lien ne mène nulle part.
+   *
+   * 📍 La bonne adresse existait DANS CE FICHIER, à quelques lignes : le rappel d'échéance
+   * visait déjà `/my-tasks`. Les trois la partagent désormais, et toutes trois portent `?task=`
+   * pour OUVRIR la tâche — aucune ne le faisait, pas même celle qui visait la bonne page.
+   *
+   * `my-tasks` convient aux deux populations : un assigné y figure toujours, par construction du
+   * point d'API `/tasks/mine`, et les deux notifications ne partent qu'aux ASSIGNÉS (vérifié).
+   */
   async taskAssigned(
     userId: number,
     taskTitle: string,
@@ -1251,7 +1266,7 @@ export const NotificationHelpers = {
       category: 'task',
       entityType: 'Task',
       entityId: taskId.toString(),
-      actionUrl: `/editions/${editionId}/gestion/tasks`,
+      actionUrl: `/editions/${editionId}/my-tasks?task=${taskId}`,
       notificationType: 'task_assigned',
     })
   },
@@ -1278,7 +1293,7 @@ export const NotificationHelpers = {
       category: 'task',
       entityType: 'Task',
       entityId: taskId.toString(),
-      actionUrl: `/editions/${editionId}/gestion/tasks`,
+      actionUrl: `/editions/${editionId}/my-tasks?task=${taskId}`,
       notificationType: 'task_commented',
     })
   },
@@ -1344,7 +1359,7 @@ export const NotificationHelpers = {
       category: 'task',
       entityType: 'Task',
       entityId: taskId.toString(),
-      actionUrl: `/editions/${editionId}/my-tasks`,
+      actionUrl: `/editions/${editionId}/my-tasks?task=${taskId}`,
       notificationType: typeDeNotification(kind),
     })
   },
