@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { benevoleAccepteEtPresentSurPlace } from '#server/utils/ticketing/benevoles-presents'
+import { estUnBilletAnnule } from '#server/utils/ticketing/billets-qui-comptent'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -46,6 +47,21 @@ export default wrapApiHandler(
         provider: ticket.order.externalTicketing?.provider ?? null,
         entryValidated: ticket.entryValidated,
         entryValidatedAt: ticket.entryValidatedAt,
+        /*
+         * ⚠️ ANNONCÉ, PAS MASQUÉ — constat B8.
+         *
+         * Un billet annulé chez HelloAsso, ou dont la commande a été remboursée, apparaissait
+         * ici comme n'importe quel autre : avec son code QR, et sans un mot. Au guichet, ce
+         * même billet est REFUSÉ par `billetAnnule()`. Le participant découvrait l'annulation
+         * **devant la file**.
+         *
+         * Le filtrer aurait été pire : le billet disparaîtrait de « Mes billets » sans
+         * explication, et la personne croirait n'en avoir jamais eu. On le garde, et on le DIT.
+         *
+         * Le vocabulaire est celui du guichet, par le même util : les deux surfaces répondaient
+         * à la même question en se contredisant.
+         */
+        annule: estUnBilletAnnule(ticket, ticket.order),
       }))
     )
 

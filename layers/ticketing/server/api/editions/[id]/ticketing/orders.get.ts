@@ -3,7 +3,7 @@ import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpe
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { alternativesMotCle, motsClesDeLaRequete } from '#server/utils/recherche-mots-cles'
-import { ETATS_DE_BILLET_ANNULE } from '#server/utils/ticketing/billets-qui-comptent'
+import { estUnBilletAnnule } from '#server/utils/ticketing/billets-qui-comptent'
 import { resoudreLesValidateurs } from '#server/utils/ticketing/nom-du-validateur'
 import { billetARembourser, montantARembourser } from '#server/utils/ticketing/remboursement-du'
 import { validatePagination, validateEditionId } from '#server/utils/validation-helpers'
@@ -414,9 +414,15 @@ export default wrapApiHandler(
         discountAmount?: number | null
       }) => montantNetDeLaLigne(item)
 
-      const billetAnnule = (order: { status: string }, item: { state: string }) =>
-        order.status === 'Refunded' ||
-        (ETATS_DE_BILLET_ANNULE as readonly string[]).includes(item.state)
+      /*
+       * ⚠️ UN PRÉDICAT LOCAL `billetAnnule` VIVAIT ICI, écrit à la main, SOUS LE MÊME NOM que
+       * l'util `billetAnnule()` du dépôt — qu'il masquait localement. Deux réponses à une seule
+       * question, dont une invisible depuis l'autre : c'est ainsi qu'elles divergent.
+       *
+       * Il est supprimé plutôt que transformé en coquille : garder le nom homonyme perpétuerait
+       * le piège. Les appels passent directement par `estUnBilletAnnule(ligne, commande)`, qui
+       * vit à côté du fragment de `where` lisant la même liste d'états.
+       */
 
       /*
        * Les statistiques de la sélection AFFICHÉE, recherche comprise.
@@ -492,7 +498,7 @@ export default wrapApiHandler(
           for (const item of articlesRetenus(order.items, filtresDArticles)) {
             const prix = prixDuBillet(item)
 
-            if (billetAnnule(order, item)) {
+            if (estUnBilletAnnule(item, order)) {
               amountsByPaymentMethod.refunded += prix
               continue
             }
@@ -569,7 +575,8 @@ export default wrapApiHandler(
          * ses cinq tee-shirts annulés. L'écran l'annonce donc à côté, plutôt que de le taire.
          */
         canceledAmount: (order.items ?? []).reduce(
-          (sum: number, item: any) => sum + (billetAnnule(order, item) ? prixDuBillet(item) : 0),
+          (sum: number, item: any) =>
+            sum + (estUnBilletAnnule(item, order) ? prixDuBillet(item) : 0),
           0
         ),
         /**
@@ -584,7 +591,8 @@ export default wrapApiHandler(
          * entier, et compter leur remise ici la soustrairait une seconde fois à la lecture.
          */
         discountAmount: (order.items ?? []).reduce(
-          (sum: number, item: any) => sum + (billetAnnule(order, item) ? 0 : remiseDeLaLigne(item)),
+          (sum: number, item: any) =>
+            sum + (estUnBilletAnnule(item, order) ? 0 : remiseDeLaLigne(item)),
           0
         ),
         items: (order.items ?? []).map((item: any) => ({

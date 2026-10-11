@@ -106,6 +106,29 @@ export function billetAnnule() {
 }
 
 /**
+ * « Ce billet-ci, déjà chargé, est-il annulé ? » — le même vocabulaire, côté données.
+ *
+ * ⚠️ POURQUOI DEUX FORMES DE LA MÊME RÈGLE. `billetAnnule()` rend un fragment de `where` : elle
+ * sert à ne PAS charger ces billets. Ce prédicat-ci juge une ligne qu'on a déjà en main, pour
+ * l'ANNONCER plutôt que la cacher. Les deux répondent à la même question et doivent donc lire la
+ * même liste d'états — c'est tout l'objet de les poser côte à côte.
+ *
+ * 📍 Cette fonction existait, écrite à la main, dans `layers/ticketing/.../orders.get.ts`, où
+ * elle portait **le même nom que l'util** (`billetAnnule`) et le masquait localement. Deux
+ * réponses à une seule question, dont une invisible depuis l'autre : c'est ainsi qu'elles
+ * divergent. Le constat B8 en ajoutait une troisième dans « Mes billets ».
+ */
+export function estUnBilletAnnule(
+  ligne: { state?: string | null },
+  commande: { status?: string | null }
+): boolean {
+  return (
+    (ETATS_DE_BILLET_ANNULE as readonly string[]).includes(ligne.state ?? '') ||
+    commande.status === STATUT_COMMANDE_REMBOURSEE
+  )
+}
+
+/**
  * Les natures de ligne qui ne donnent AUCUN droit d'entrée.
  *
  * Un don, une adhésion ou un paiement portent le nom du payeur, et parfois un code QR : sur la
