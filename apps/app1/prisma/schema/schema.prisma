@@ -47,6 +47,20 @@ model User {
 
   isGlobalAdmin          Boolean   @default(false)
 
+  /// Quand ce compte a été promu super administrateur — constat B7.
+  ///
+  /// ⚠️ IL N'EXISTAIT AUCUNE DATE DE PROMOTION, et l'écran d'activité en fabriquait une : il
+  /// listait les `isGlobalAdmin` dont `updatedAt` datait de moins de trente jours, et annonçait
+  /// « X est devenu super administrateur ». Toute modification de profil, tout changement de mot de
+  /// passe, toute connexion qui touche `updatedAt` produisait donc cette ligne — mesuré sur la base
+  /// de développement : l'unique administrateur y figurait, à tort.
+  ///
+  /// `null` pour les comptes promus AVANT cette colonne : leur promotion n'a laissé aucune trace,
+  /// et en inventer une datée d'aujourd'hui annoncerait un événement qui n'a pas eu lieu. La
+  /// section se remplit à partir de la prochaine promotion — c'est le prix d'une information qu'on
+  /// n'avait jamais enregistrée.
+  promotedAdminAt        DateTime?
+
   /// Le numéro de génération des sessions de ce compte.
   ///
   /// Les sessions vivent dans un cookie scellé, sans trace en base : rien ne permettait donc

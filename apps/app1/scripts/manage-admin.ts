@@ -2,6 +2,7 @@ import 'dotenv/config'
 import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 
 import { PrismaClient } from '../server/generated/prisma/client'
+import { donneesDePromotionAdmin } from '../shared/utils/promotion-administrateur'
 
 const databaseUrl = process.env.DATABASE_URL
 if (!databaseUrl) {
@@ -94,7 +95,8 @@ async function addAdmin(email: string) {
 
   await prisma.user.update({
     where: { email },
-    data: { isGlobalAdmin: true },
+    // Même geste que le point d'API : la date part avec le drapeau — constat B7.
+    data: donneesDePromotionAdmin(true),
   })
 
   console.log(
@@ -132,7 +134,8 @@ async function removeAdmin(email: string) {
 
   await prisma.user.update({
     where: { email },
-    data: { isGlobalAdmin: false },
+    // La rétrogradation efface la date, sans quoi l'activité annoncerait encore la promotion.
+    data: donneesDePromotionAdmin(false),
   })
 
   console.log(

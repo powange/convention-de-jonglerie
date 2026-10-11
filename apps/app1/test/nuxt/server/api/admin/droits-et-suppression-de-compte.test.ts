@@ -64,6 +64,20 @@ describe('PUT /api/admin/users/[id]/promote', () => {
     expect(res.data.isGlobalAdmin).toBe(true)
   })
 
+  it('⚠️ ENREGISTRE LA DATE DE LA PROMOTION — constat B7', async () => {
+    /*
+     * Rien n'enregistrait quand un compte était promu, et l'écran « Activité récente » de
+     * l'administration s'en passait : il listait les administrateurs dont `updatedAt` datait de
+     * moins de trente jours, donc quiconque corrigeait son téléphone « devenait super
+     * administrateur ». Le correctif suppose que ce point d'API écrive la date — un util juste et
+     * branché nulle part ne corrigerait rien, et le dépôt a déjà payé ce défaut cinq fois.
+     */
+    await promouvoir({} as any)
+
+    const data = prismaMock.user.update.mock.calls[0][0].data
+    expect(data.promotedAdminAt, 'la date de promotion n’est pas écrite').toBeInstanceOf(Date)
+  })
+
   it('rétrograde aussi bien qu’il promeut', async () => {
     ;(global as any).readBody = vi.fn().mockResolvedValue({ isGlobalAdmin: false })
     prismaMock.user.update.mockResolvedValue({ id: 42, isGlobalAdmin: false })
@@ -71,6 +85,12 @@ describe('PUT /api/admin/users/[id]/promote', () => {
     expect(prismaMock.user.update).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ isGlobalAdmin: false }) })
     )
+    /*
+     * ET LA DATE EST EFFACÉE. La garder ferait réapparaître « est devenu super administrateur »
+     * au prochain balayage, pour quelqu'un qui ne l'est plus — et une re-promotion ultérieure
+     * porterait la date de la première.
+     */
+    expect(prismaMock.user.update.mock.calls[0][0].data.promotedAdminAt).toBeNull()
   })
 
   it('refuse qu’un administrateur modifie ses PROPRES droits', async () => {
