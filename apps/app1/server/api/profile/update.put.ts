@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { demarrerChangementDAdresse } from '#server/utils/changement-d-adresse'
+import { effacerAnciennePhoto } from '#server/utils/photo-de-profil'
 import { sanitizeString } from '#server/utils/validation-helpers'
 import {
   updateProfileSchema,
@@ -85,6 +86,28 @@ export default wrapApiHandler(
       }
     }
 
+    /*
+     * ⚠⚠ LA PHOTO COURANTE SE LIT EN BASE, PAS DANS LA SESSION — constats B3 et B4.
+     *
+     * `AuthenticatedUser` ne porte que `id`, `email`, `pseudo` et `isGlobalAdmin` : `profilePicture`
+     * n'y est PAS. La branche de suppression testait pourtant `user.profilePicture`, donc une
+     * condition toujours fausse pour tout compte à mot de passe — personne n'effaçait jamais rien,
+     * et le disque de production ne faisait que grossir pendant que la personne croyait avoir
+     * retiré son image, toujours servie par `/api/uploads`.
+     *
+     * Une seule lecture sert les deux chemins : le REMPLACEMENT (qui ne supprimait pas l'ancien
+     * fichier) et le RETRAIT.
+     */
+    const photoActuelle =
+      profilePicture !== undefined
+        ? ((
+            await prisma.user.findUnique({
+              where: { id: user.id },
+              select: { profilePicture: true },
+            })
+          )?.profilePicture ?? null)
+        : null
+
     // Gérer la photo de profil
     let finalProfileFilename = profilePicture
 
@@ -131,34 +154,40 @@ export default wrapApiHandler(
         }
 
         finalProfileFilename = newFilename
+
+        /*
+         * L'ANCIENNE PHOTO PART MAINTENANT, et pas avant — constat B3, premier chemin. Le
+         * remplacement stockait la nouvelle et laissait la précédente sur le disque pour toujours.
+         *
+         * 📍 Après le stockage, délibérément : effacer d'abord et échouer ensuite laisserait un
+         * compte sans aucune image, alors que la personne en remplaçait simplement une.
+         */
+        await effacerAnciennePhoto(photoActuelle, user.id)
       } catch (error) {
         console.error('Erreur lors du déplacement du fichier de profil:', error)
-        // En cas d'erreur, garder le nom du fichier temporaire
-        finalProfileFilename = profilePicture.split('/').pop() || null
+        /*
+         * ⚠⚠ ON NE GARDE PLUS LE NOM DU FICHIER TEMPORAIRE — constat B4.
+         *
+         * Le `catch` enregistrait `x.png` « en cas d'erreur ». L'adresse construite ensuite,
+         * `/uploads/profiles/<id>/x.png`, n'existe pas : la personne voyait une image CASSÉE
+         * partout où elle apparaît, et la réponse était un 200 avec un message de succès.
+         *
+         * Un refus franc est préférable : le profil n'est pas touché, l'ancienne photo reste, et
+         * le message dit quoi faire.
+         */
+        throw createError({
+          status: 500,
+          message: "La photo n'a pas pu être enregistrée, réessayez",
+        })
       }
     } else if (profilePicture && !profilePicture.includes('/temp/')) {
       // Si c'est déjà un nom de fichier simple, le garder tel quel
       finalProfileFilename = profilePicture.split('/').pop() || profilePicture
     }
 
-    // Gérer la suppression de l'ancienne photo si nécessaire
-    if (profilePicture === null && user.profilePicture) {
-      try {
-        // Extraire le nom du fichier et le dossier séparément
-        const oldFilename = user.profilePicture.includes('/')
-          ? user.profilePicture.split('/').pop()!
-          : user.profilePicture
-        const oldFolder = user.profilePicture.includes('/')
-          ? user.profilePicture.replace('/uploads/', '').split('/').slice(0, -1).join('/')
-          : `profiles/${user.id}`
-
-        // Utiliser deleteFile de nuxt-file-storage (filename, folder séparés)
-        await deleteFile(oldFilename, oldFolder)
-        console.log(`Ancienne photo supprimée: ${oldFilename} dans ${oldFolder}`)
-      } catch (error) {
-        // Log l'erreur mais ne pas faire échouer la mise à jour
-        console.warn(`Impossible de supprimer l'ancienne photo: ${user.profilePicture}`, error)
-      }
+    // Le retrait de la photo : la valeur courante vient de la BASE (cf. plus haut).
+    if (profilePicture === null) {
+      await effacerAnciennePhoto(photoActuelle, user.id)
     }
 
     // Mettre à jour le profil
