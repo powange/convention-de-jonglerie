@@ -242,7 +242,41 @@ onMounted(async () => {
     ? Promise.resolve()
     : editionStore.fetchEditionById(editionId, { force: true })
   await Promise.all([loadEdition, fetchTasks()])
+  ouvrirLaTacheDeLAdresse()
 })
+
+/**
+ * Ouvre la tâche que l'adresse désigne — constat B2.
+ *
+ * Les notifications de tâche portent `?task=<id>`. Sans cette lecture, elles déposaient la
+ * personne devant SA LISTE ENTIÈRE : à elle de retrouver, parmi ses tâches, celle dont on venait
+ * de lui parler. Aucune des trois n'ouvrait quoi que ce soit, pas même celle qui visait déjà la
+ * bonne page.
+ *
+ * ⚠️ APPELÉE APRÈS `fetchTasks`, et c'est tout l'intérêt : la tâche est cherchée dans la liste
+ * REÇUE, jamais demandée à part. On ne peut donc pas ouvrir par cette adresse une tâche qui ne
+ * nous est pas assignée — l'identifiant vient d'une URL, et une URL se modifie à la main.
+ *
+ * ⚠️ UN IDENTIFIANT ABSENT DE LA LISTE EST IGNORÉ EN SILENCE : un lien d'hier, ou une tâche dont
+ * on s'est fait retirer. Une erreur n'aurait rien à proposer — la liste, elle, est toujours utile.
+ */
+function ouvrirLaTacheDeLAdresse() {
+  const brut = Array.isArray(route.query.task) ? route.query.task[0] : route.query.task
+  const id = parseInt(String(brut ?? ''), 10)
+  /*
+   * Le paramètre quitte l'adresse DANS TOUS LES CAS, même quand la tâche est introuvable : il a
+   * été consommé, et le laisser ferait rouvrir la modale à chaque rechargement — y compris après
+   * qu'on l'a délibérément fermée.
+   */
+  if (brut !== undefined) {
+    const query = { ...route.query }
+    delete query.task
+    router.replace({ query })
+  }
+  if (Number.isNaN(id)) return
+  const tache = tasks.value.find((t) => t.id === id)
+  if (tache) openTask(tache)
+}
 
 // --- Filtres ---
 //
