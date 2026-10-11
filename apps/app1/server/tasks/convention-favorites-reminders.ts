@@ -1,50 +1,41 @@
+import { envoyerLesRappelsDEdition } from '../utils/rappels-editions'
+
+/**
+ * Tâche planifiée : les rappels « votre édition commence bientôt ».
+ *
+ * ## ⚠️⚠️ CETTE TÂCHE N'ENVOYAIT RIEN — constat B4
+ *
+ * Le corps de sa boucle était un `// TODO: Intégrer avec le système de notifications` qui
+ * incrémentait un compteur **sans créer aucune notification**. Elle tournait chaque jour à 10 h, le
+ * journal écrivait « N notifications », le catalogue de `/admin/crons` promettait qu'elle notifiait
+ * les favoris, et un administrateur qui la lançait à la main lisait un succès et un compteur non
+ * nul. Rien ne partait, depuis toujours.
+ *
+ * La règle vit désormais dans `utils/rappels-editions.ts`, et le point d'API d'administration —
+ * qui, lui, faisait le travail mais n'était jamais planifié — l'appelle aussi.
+ *
+ * ## 📍 LES COMPTEURS SONT RENDUS À PLAT
+ *
+ * Ils étaient enveloppés dans `{ result: {...} }`, là où toutes les autres tâches les rendent au
+ * premier niveau. `getExecutionStats`, dans `/admin/crons`, parcourt les clés NUMÉRIQUES du
+ * premier niveau : il ne trouvait donc aucun nombre à afficher, et l'écran restait muet sur une
+ * tâche qui prétendait avoir travaillé.
+ */
 export default defineTask({
   meta: {
     name: 'convention-favorites-reminders',
-    description: 'Notify users about favorite conventions starting in 3 days',
+    description: 'Notify favorited editions and accepted volunteers 3 and 7 days before the start',
   },
   async run({ payload: _payload }) {
     try {
-      const now = new Date()
-      // Fenêtre de notification : entre 2.5 et 3.5 jours pour éviter les doublons
-      const notificationStart = new Date(now.getTime() + 2.5 * 24 * 60 * 60 * 1000)
-      const notificationEnd = new Date(now.getTime() + 3.5 * 24 * 60 * 60 * 1000)
-
-      // Trouver toutes les éditions qui commencent dans cette fenêtre
-      const upcomingEditions = await prisma.edition.findMany({
-        where: {
-          startDate: { gte: notificationStart, lte: notificationEnd },
-        },
-        include: {
-          convention: { select: { id: true, name: true, logo: true } },
-          favoritedBy: { select: { id: true, email: true, pseudo: true, nom: true, prenom: true } },
-        },
-      })
-
-      let totalNotificationsSent = 0
-
-      // Traiter chaque édition
-      for (const edition of upcomingEditions) {
-        if (edition.favoritedBy.length > 0) {
-          for (const _user of edition.favoritedBy) {
-            // TODO: Intégrer avec le système de notifications
-            totalNotificationsSent++
-          }
-        }
-      }
+      const resultat = await envoyerLesRappelsDEdition()
 
       console.log(
-        `[CRON convention-favorites-reminders] ${upcomingEditions.length} éditions, ${totalNotificationsSent} notifications`
+        `[CRON convention-favorites-reminders] ${resultat.editionsProcessed} édition(s) examinée(s), ` +
+          `${resultat.notificationsSent} notification(s) envoyée(s)`
       )
 
-      return {
-        result: {
-          success: true,
-          editionsProcessed: upcomingEditions.length,
-          notificationsSent: totalNotificationsSent,
-          timestamp: new Date().toISOString(),
-        },
-      }
+      return { success: true, ...resultat, timestamp: new Date().toISOString() }
     } catch (error) {
       console.error('[CRON convention-favorites-reminders] Erreur:', error)
       throw error

@@ -45,7 +45,14 @@ export const TACHES_PLANIFIEES: TachePlanifiee[] = [
   },
   {
     name: 'convention-favorites-reminders',
-    description: 'Notifie les utilisateurs des conventions favorites qui commencent dans 3 jours',
+    /*
+     * ⚠️ LA DESCRIPTION ANNONÇAIT CE QUE LA TÂCHE NE FAISAIT PAS — constat B4 : son corps était un
+     * TODO qui n'envoyait rien. Et maintenant qu'elle envoie, elle couvre DEUX paliers et DEUX
+     * populations, parce qu'elle appelle la règle que le point d'API d'administration portait déjà.
+     * Une description qui reste en arrière du comportement est la moitié du défaut d'origine.
+     */
+    description:
+      'Rappelle leur édition aux personnes qui l’ont mise en favori et aux bénévoles acceptés, 3 et 7 jours avant le début',
     schedule: 'Quotidien à 10h (heure de Paris)',
     cronExpression: '0 10 * * *',
     category: 'Notifications',

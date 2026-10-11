@@ -1,130 +1,36 @@
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
-import { wrapApiHandler } from '#server/utils/api-helpers'
-import { NotificationHelpers } from '#server/utils/notification-service'
-import { nomAffichableDEdition } from '~~/shared/utils/nom-edition'
+import { createSuccessResponse, wrapApiHandler } from '#server/utils/api-helpers'
+import { envoyerLesRappelsDEdition } from '#server/utils/rappels-editions'
 
+/**
+ * POST /api/admin/notifications/send-reminders — déclenche les rappels d'édition à la main.
+ *
+ * ## ⚠️ LA RÈGLE A DÉMÉNAGÉ — constat B4
+ *
+ * Elle vivait ici, et elle était juste : favoris, bénévoles acceptés, paliers J-3 et J-7,
+ * déduplication sur 24 h. Mais elle n'était **jamais planifiée** — il fallait qu'un administrateur
+ * clique —, pendant que la tâche quotidienne censée le faire incrémentait un compteur **sans rien
+ * envoyer**. Les deux appellent désormais `rappels-editions.ts`.
+ *
+ * 📍 Ce point d'API garde sa raison d'être : rattraper une journée où la tâche n'a pas tourné, ou
+ * vérifier le dispositif sans attendre 10 h. La déduplication des 24 h fait qu'un déclenchement de
+ * plus n'envoie rien en double.
+ *
+ * 📍 Le nom de la réponse ne change pas (`remindersSent`) : l'écran d'administration le lit.
+ */
 export default wrapApiHandler(
   async (event) => {
     // Vérifier l'authentification et les droits admin (mutualisé)
     await requireGlobalAdminWithDbCheck(event)
-    const now = new Date()
-    const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
 
-    // Trouver les éditions qui commencent dans 3 ou 7 jours
-    const upcomingEditions = await prisma.edition.findMany({
-      where: {
-        startDate: {
-          gte: now,
-          lte: sevenDaysFromNow,
-        },
-      },
-      include: {
-        convention: {
-          select: {
-            name: true,
-          },
-        },
-        // Récupérer les utilisateurs qui ont mis cette édition en favori
-        favoritedBy: {
-          select: {
-            id: true,
-            pseudo: true,
-          },
-        },
-        // Récupérer les bénévoles acceptés (relation portée par Event)
-        event: {
-          select: {
-            volunteerApplications: {
-              where: {
-                status: 'ACCEPTED',
-              },
-              include: {
-                user: {
-                  select: {
-                    id: true,
-                    pseudo: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    })
-
-    let remindersSent = 0
-
-    for (const edition of upcomingEditions) {
-      const daysUntil = Math.ceil(
-        (edition.startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-      )
-
-      // Envoyer des rappels seulement pour 3 ou 7 jours
-      if (daysUntil === 3 || daysUntil === 7) {
-        const usersToNotify = new Set<number>()
-
-        // Ajouter les utilisateurs qui ont mis en favori
-        edition.favoritedBy.forEach((user) => {
-          usersToNotify.add(user.id)
-        })
-
-        // Ajouter les bénévoles acceptés
-        edition.event.volunteerApplications.forEach((app) => {
-          usersToNotify.add(app.user.id)
-        })
-
-        // Envoyer les notifications
-        for (const userId of usersToNotify) {
-          try {
-            // Vérifier si un rappel a déjà été envoyé pour cette édition et cet utilisateur
-            const existingNotification = await prisma.notification.findFirst({
-              where: {
-                userId,
-                category: 'edition',
-                entityType: 'Edition',
-                entityId: edition.id.toString(),
-                // `Notification` n'a pas de colonne `title` : le titre est une CLÉ de
-                // traduction, et c'est elle qui identifie un rappel. Chercher « Rappel » dans un
-                // champ inexistant faisait rejeter la requête entière par Prisma.
-                titleKey: 'notifications.edition.reminder.title',
-                createdAt: {
-                  gte: new Date(now.getTime() - 24 * 60 * 60 * 1000), // Dans les dernières 24h
-                },
-              },
-            })
-
-            if (!existingNotification) {
-              await NotificationHelpers.eventReminder(
-                userId,
-                /*
-                 * ⚠️ `edition.title` N'EXISTE PAS — constat B5. Le modèle `Edition` n'a que `name`,
-                 * nullable : la notification s'intitulait « Convention X - undefined », et elle
-                 * partait vraiment. Le fichier avait déjà été corrigé une fois pour un champ
-                 * inexistant (cf. le commentaire sur `titleKey` juste au-dessus) ; celui-ci avait
-                 * survécu.
-                 *
-                 * 📍 La règle est partagée plutôt que recomposée ici : elle existait en trois
-                 * versions, dont celle-ci, fausse.
-                 */
-                nomAffichableDEdition(edition),
-                edition.id,
-                daysUntil
-              )
-              remindersSent++
-            }
-          } catch (error) {
-            console.error(`Erreur lors de l'envoi du rappel pour l'utilisateur ${userId}:`, error)
-          }
-        }
-      }
-    }
+    const { editionsProcessed, notificationsSent } = await envoyerLesRappelsDEdition()
 
     return createSuccessResponse(
       {
-        editionsProcessed: upcomingEditions.length,
-        remindersSent,
+        editionsProcessed,
+        remindersSent: notificationsSent,
       },
-      `${remindersSent} rappel${remindersSent > 1 ? 's' : ''} envoyé${remindersSent > 1 ? 's' : ''}`
+      `${notificationsSent} rappel(s) envoyé(s) pour ${editionsProcessed} édition(s)`
     )
   },
   { operationName: 'SendEditionReminders' }
