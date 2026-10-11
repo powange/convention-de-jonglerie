@@ -68,6 +68,10 @@ const offer = await prisma.carpoolOffer.update({
 | `userWithGravatarSelect`  | id, pseudo, profilePicture, email, emailHash | Historiques, logs         | ~2          |
 | `userWithNameSelect`      | id, pseudo, nom, prenom                      | Bénévoles, exports        | ~15         |
 | `userPublicProfileSelect` | Profil complet public                        | Pages de profil           | Nouveau     |
+| `userWithProfileAndGravatarSelect` | + email, emailHash                  | Avatar avec repli Gravatar | — |
+| `userWithNameAndGravatarSelect` | id, pseudo, nom, prenom, email, emailHash | Exports, courriels | — |
+| `userWithNameAndAvatarSelect` | id, pseudo, nom, prenom, profilePicture | Listes nommées avec avatar | — |
+| `userAdminSelect`         | Fiche complète, santé comprise               | Administration — fiche d'un utilisateur, jamais une liste | — |
 
 ### Conventions
 
@@ -82,6 +86,7 @@ const offer = await prisma.carpoolOffer.update({
 | -------------------- | ------------------------ | ------------------ |
 | `editionListSelect`  | Champs d'affichage liste | Listes, recherches |
 | `editionListInclude` | + creator, convention    | Listes complètes   |
+| `editionWithFavoritesInclude` | + favoritedBy | Savoir si l'utilisateur a mis en favori |
 
 ### Covoiturage
 
@@ -89,6 +94,13 @@ const offer = await prisma.carpoolOffer.update({
 | ----------------------- | ---------------------------------------- |
 | `carpoolOfferInclude`   | Offres de covoiturage avec utilisateur   |
 | `carpoolRequestInclude` | Demandes de covoiturage avec utilisateur |
+| `carpoolUserSelect`     | Le bloc utilisateur commun à tout le covoiturage |
+| `carpoolOfferListInclude` | Liste des offres — réservations ACCEPTED seulement |
+| `carpoolRequestListInclude` | Liste des demandes |
+| `carpoolOfferFullInclude` | Fiche d'une offre, toutes réservations |
+| `carpoolRequestFullInclude` | Fiche d'une demande |
+| `carpoolBookingInclude` | Une réservation avec son demandeur |
+| `carpoolPassengerInclude` | Un passager accepté |
 
 ### Organisateurs
 
@@ -103,6 +115,9 @@ const offer = await prisma.carpoolOffer.update({
 | ----------------------------- | --------------------------------------- |
 | `volunteerApplicationInclude` | Candidatures avec utilisateur           |
 | `volunteerAssignmentInclude`  | Assignations avec utilisateur et équipe |
+| `volunteerUserSelect`         | Le bloc utilisateur commun au bénévolat |
+| `volunteerUserDetailedSelect` | + coordonnées et informations de candidature |
+| `volunteerAssignmentDetailedInclude` | Assignation avec le bénévole détaillé et qui l'a affecté |
 
 ### Autres modules
 
@@ -113,6 +128,15 @@ const offer = await prisma.carpoolOffer.update({
 | `editionPostInclude`        | Posts avec auteur                         |
 | `editionPostCommentInclude` | Commentaires avec auteur                  |
 | `messengerMessageInclude`   | Message de messagerie (auteur + citation) |
+| `editionZoneSelect`         | Zone de la carte d'une édition            |
+| `editionMarkerSelect`       | Repère de la carte d'une édition          |
+| `showZoneSelect`            | Zone rattachée à un spectacle             |
+| `showMarkerSelect`          | Repère rattaché à un spectacle            |
+| `showZoneMarkerInclude`     | Zone + repère d'un spectacle              |
+| `showPerformancesInclude`   | Représentations d'un spectacle            |
+| `showArtistsInclude`        | Artistes d'un spectacle                   |
+| `showActsInclude`           | Numéros d'un spectacle                    |
+| `showCompositionInclude`    | Artistes **et** numéros — la composition complète |
 
 ## 📖 Guide d'utilisation
 

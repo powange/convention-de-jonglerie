@@ -7,7 +7,7 @@ Le projet utilise une configuration multi-projet Vitest pour de meilleures perfs
 1. Unit (sans Nuxt complet, sans DB)
 
 - Projet: `unit` dans `vitest.config.ts`
-- Setup: `test/setup-common.ts`, `test/setup-mocks.ts`
+- Setup: **aucun** — `setupFiles` n'est déclaré que pour le projet `nuxt`
 - Scripts:
   - `npm run test:unit` (watch)
   - `npm run test:unit:run` (one-shot)
@@ -31,7 +31,10 @@ Notes Auth (nuxt-auth-utils):
 3. Intégration/DB (Prisma + MySQL réels)
 
 - Projet: `integration` dans `vitest.config.ts`
-- Setup: `test/setup-common.ts`, `test/setup-integration.ts`, `test/setup-db.ts`
+- Setup: **aucun** `setupFiles` — chaque suite importe `test/setup-db.ts` elle-même (`prismaTest`)
+- ⚠️ Chaque fichier doit porter `describe.skipIf(!process.env.TEST_WITH_DB)` : sans cette garde il
+  échoue sur un délai de connexion au lieu de se sauter, et seulement hors CI. Un test unitaire le
+  vérifie (`test/unit/outillage/suites-non-vides.test.ts`).
 - Exécution mono-thread pour éviter les conflits DB
 - Scripts:
   - `npm run test:db` (watch si DB déjà prête)
@@ -91,8 +94,6 @@ test/
 ├── nuxt/                  # Tests Nuxt (handlers, composables…)
 ├── composables/, stores/, utils/, feedback/  # Unitaires
 ├── setup-common.ts        # Fallbacks H3/Nitro partagés
-├── setup-integration.ts   # Mocks min sans Nuxt pour l’intégration
-├── setup-mocks.ts         # Mocks unitaires
 └── setup.ts               # Setup Nuxt
 ```
 
