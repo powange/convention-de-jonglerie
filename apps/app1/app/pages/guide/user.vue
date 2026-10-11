@@ -242,7 +242,7 @@ const messages = {
       },
       workshops: {
         label: 'Workshops',
-        desc: 'le programme des ateliers, avec leur niveau, le matériel nécessaire et le nombre de places. Vous pouvez vous y inscrire directement.',
+        desc: "le programme des ateliers. Chacun annonce son titre, son horaire, parfois son lieu et un nombre de places — indicatif, car il n'y a pas d'inscription : on se présente à l'heure dite. Vous pouvez marquer un atelier comme favori pour le retrouver, et en proposer un vous-même si vous avez un billet, si vous êtes bénévole accepté, artiste programmé ou organisateur.",
       },
       map: {
         label: 'Carte du site',
@@ -258,7 +258,7 @@ const messages = {
       },
       lostFound: {
         label: 'Objets trouvés',
-        desc: 'le registre des objets perdus et retrouvés. Vous pouvez y signaler un objet que vous avez trouvé.',
+        desc: "le registre des objets perdus et retrouvés, tenu par l'équipe d'organisation : c'est à elle qu'on remet un objet, et elle seule l'inscrit au registre. Vous pouvez en revanche commenter un objet pour le réclamer ou donner une précision. L'onglet apparaît au début de l'édition et ne se referme pas ensuite — on réclame un oubli dans les jours qui suivent.",
       },
       note: "Un module absent du menu signifie simplement que l'organisateur ne l'a pas activé pour cette édition.",
     },

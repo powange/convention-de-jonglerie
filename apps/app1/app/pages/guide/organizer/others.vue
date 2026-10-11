@@ -67,19 +67,25 @@
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.workshops.info') }}</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{
-              t('sections.workshops.instructor')
+              t('sections.workshops.places')
             }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{
-              t('sections.workshops.registration')
+              t('sections.workshops.location')
             }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.workshops.import')
+            }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.workshops.edit') }}</span>
           </li>
         </ul>
       </GuideSection>
@@ -101,6 +107,12 @@
             <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{
               t('sections.lostFound.report')
+            }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.lostFound.comment')
             }}</span>
           </li>
           <li class="flex items-start gap-2">
@@ -186,11 +198,17 @@ const messages = {
     },
     workshops: {
       title: 'Workshops',
-      intro: 'Organisez des ateliers et workshops pendant votre édition.',
-      create: 'Créez un workshop avec un titre, une description, une date et un lieu.',
-      info: 'Précisez le niveau requis, le matériel nécessaire et le nombre de places disponibles.',
-      instructor: 'Associez un animateur (utilisateur de la plateforme ou nom libre).',
-      registration: "Les participants peuvent s'inscrire directement depuis la page de l'édition.",
+      intro:
+        "Le programme des ateliers de votre édition. Vous n'êtes pas seul à le remplir : un atelier peut être proposé par un organisateur, un bénévole accepté, un artiste programmé ou toute personne munie d'un billet.",
+      create:
+        "Créez un atelier avec un titre, une description, une heure de début et, si vous la connaissez, une heure de fin — elle est facultative, bien des ateliers durent ce qu'ils durent.",
+      places:
+        "Le nombre de places est indicatif : il n'y a pas d'inscription, on se présente à l'heure dite. Les participants peuvent en revanche marquer un atelier comme favori.",
+      location:
+        "Le lieu se choisit parmi ceux de l'édition, et un réglage décide si l'on peut en saisir un nouveau au passage ou s'en tenir à la liste. Un lieu peut être rattaché à une zone ou à un repère de la carte du site.",
+      import:
+        "Une affiche photographiée suffit à remplir le programme : l'import en extrait les ateliers, que vous relisez et corrigez avant de les enregistrer.",
+      edit: "Un atelier se modifie et se supprime par son auteur ou par l'équipe d'organisation.",
     },
     lostFound: {
       title: 'Objets trouvés',
@@ -199,7 +217,9 @@ const messages = {
       activate:
         "Et il ne se referme pas à la fin. C'est voulu : on réclame un objet oublié dans les jours qui suivent la convention, rarement pendant.",
       report:
-        'Les participants et bénévoles peuvent signaler un objet trouvé avec photo et description.',
+        "C'est l'équipe d'organisation qui inscrit un objet au registre, avec photo et description : on lui remet ce qu'on a trouvé, elle le consigne. Et pas avant le début de l'édition — un objet perdu ne précède pas la convention.",
+      comment:
+        "Tout compte connecté peut commenter un objet, pour le réclamer ou donner une précision. C'est par là que passe l'échange avec son propriétaire.",
       list: 'Consultez la liste de tous les objets signalés depuis le tableau de bord.',
       recover: 'Marquez un objet comme récupéré lorsque son propriétaire le réclame.',
     },
