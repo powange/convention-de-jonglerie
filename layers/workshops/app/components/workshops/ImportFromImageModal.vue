@@ -558,7 +558,18 @@ const importSelectedWorkshops = async () => {
               ? versInstant(workshop.endDateTime, fuseau.value)
               : null,
             maxParticipants: workshop.maxParticipants || null,
-            location: workshop.location,
+            /*
+             * ⚠️ LE CHAMP S'APPELLE `locationName` — constat B2. Il partait sous le nom
+             * `location`, que le schéma du serveur ne connaît pas : zod retire les clés inconnues
+             * sans rien dire, et le lieu lu sur l'affiche — que l'organisateur avait pu corriger
+             * dans cette modale — n'était JAMAIS enregistré.
+             *
+             * ⚠️ ET `null` PLUTÔT QU'UNE CHAÎNE VIDE, sans quoi le renommage transformait un
+             * défaut silencieux en échec franc : le schéma exige au moins un caractère, donc une
+             * affiche sans lieu aurait fait répondre 400 et l'atelier ne serait pas importé du
+             * tout. C'est le piège d'un champ qui change de nom en même temps que de validation.
+             */
+            locationName: workshop.location?.trim() || null,
           },
         })
       )
@@ -566,6 +577,19 @@ const importSelectedWorkshops = async () => {
 
     const successCount = results.filter((r) => r.status === 'fulfilled').length
     const failCount = results.filter((r) => r.status === 'rejected').length
+
+    /*
+     * Les ateliers importés DONT LE LIEU N'A PAS PU ÊTRE RATTACHÉ. En mode « lieux exclusifs »,
+     * l'organisation a arrêté une liste : un nom lu sur l'affiche qui n'y figure pas ne peut pas
+     * être créé. L'atelier est bien importé — son titre et son horaire sont justes — mais si
+     * personne ne le dit, on découvre le lieu manquant en relisant la frise, ou jamais.
+     */
+    const lieuxIgnores = results.flatMap((r, i) =>
+      r.status === 'fulfilled' &&
+      (r.value as { data?: { locationIgnored?: boolean } })?.data?.locationIgnored
+        ? [selectedWorkshops[i]!.title]
+        : []
+    )
 
     if (successCount > 0) {
       toast.add({
@@ -585,6 +609,18 @@ const importSelectedWorkshops = async () => {
         }),
         color: 'warning',
         icon: 'i-heroicons-exclamation-triangle',
+      })
+    }
+
+    if (lieuxIgnores.length > 0) {
+      toast.add({
+        title: t('workshops.import_locations_ignored'),
+        description: t('workshops.import_locations_ignored_description', {
+          count: lieuxIgnores.length,
+          titles: lieuxIgnores.join(', '),
+        }),
+        color: 'warning',
+        icon: 'i-heroicons-map-pin',
       })
     }
 
