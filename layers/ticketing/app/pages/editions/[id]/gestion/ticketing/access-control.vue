@@ -1824,8 +1824,11 @@ const checkHasTiers = async () => {
 const { execute: syncHelloAsso, loading: syncingHelloAsso } = useApiAction<
   undefined,
   { success: boolean; stats?: { totalItems?: number } }
->(`/api/editions/${editionId}/ticketing/helloasso/orders`, {
-  method: 'GET',
+>(`/api/editions/${editionId}/ticketing/helloasso/import`, {
+  // Un POST, et c'est le fond du constat F7 : cet appel IMPORTE les commandes en base.
+  // Sur un GET, un rechargement ou un préchargement du navigateur rejouait une
+  // transaction de plusieurs centaines de lignes.
+  method: 'POST',
   silentSuccess: true,
   errorMessages: {
     default: t('ticketing.access_control.sync_helloasso_error'),

@@ -1514,8 +1514,11 @@ const ordersStats = ref({ totalOrders: 0, totalItems: 0 })
 const { execute: executeLoadOrders, loading: loadingOrders } = useApiAction<
   never,
   { orders?: any[]; stats?: { totalOrders: number; totalItems: number } }
->(`/api/editions/${editionId}/ticketing/helloasso/orders`, {
-  method: 'GET',
+>(`/api/editions/${editionId}/ticketing/helloasso/import`, {
+  // Un POST, et c'est le fond du constat F7 : cet appel IMPORTE les commandes en base.
+  // Sur un GET, un rechargement ou un préchargement du navigateur rejouait une
+  // transaction de plusieurs centaines de lignes.
+  method: 'POST',
   silentSuccess: true, // Message dynamique
   errorMessages: { default: $t('ticketing.external.participants_load_error') },
   onSuccess: (response) => {
