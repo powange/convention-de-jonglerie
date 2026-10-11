@@ -228,4 +228,66 @@ describe('/api/editions/[id]/lost-found POST', () => {
 
     await expect(handler(mockEvent as any)).rejects.toEqual(httpError)
   })
+  /**
+   * ⚠️⚠️ LA DESCRIPTION EST STOCKÉE TELLE QUELLE — constat B5.
+   *
+   * Elle passait par `sanitizeUserContent`, qui échappe le HTML AVANT stockage. Or l'écran
+   * l'affiche par interpolation `{{ }}` et dans l'attribut `alt` de la photo, deux endroits que
+   * Vue échappe DÉJÀ : le lecteur voyait « Sac &amp;amp; clés ». Un échappement au stockage n'a de
+   * sens que pour un rendu `v-html`, et il n'y en a aucun sur ce champ.
+   *
+   * 📍 Les COMMENTAIRES du même écran n'étaient, eux, pas échappés : une page, deux règles. Ce sont
+   * eux qui font foi.
+   */
+  describe('caractères spéciaux de la description', () => {
+    const creerAvec = async (description: string) => {
+      global.readBody.mockResolvedValue({ description })
+      mockHasPermission.mockResolvedValue(true)
+      prismaMock.lostFoundItem.create.mockResolvedValue(mockLostFoundItem)
+      await handler(mockEvent as any)
+      return (prismaMock.lostFoundItem.create.mock.calls.at(-1)?.[0] as any).data.description
+    }
+
+    it('⚠️ UNE ESPERLUETTE EST ÉCRITE TELLE QUELLE, pas en entité', async () => {
+      expect(await creerAvec('Sac & clés')).toBe('Sac & clés')
+    })
+
+    it('les chevrons aussi — ils ne valent pas du balisage ici', async () => {
+      /*
+       * C'est la seconde moitié de l'échappement retiré, et elle mérite son cas : une description
+       * du genre « gourde <1 L » est du TEXTE, que l'écran rend par interpolation. Vue l'échappe au
+       * rendu, donc rien n'est injecté.
+       */
+      expect(await creerAvec('gourde <1 L > 500 ml')).toBe('gourde <1 L > 500 ml')
+    })
+
+    it('une entité réellement tapée survit intacte', async () => {
+      /*
+       * LE TÉMOIN DU SENS INVERSE : quelqu'un peut écrire « &amp; » littéralement. L'ancien code le
+       * transformait en « &amp;amp; », et un décodage à l'affichage le ramènerait à « & » — on
+       * changerait ce qui a été tapé. Ne rien faire est la seule règle qui préserve les deux cas.
+       */
+      expect(await creerAvec('le symbole &amp; ne se tape pas tous les jours')).toBe(
+        'le symbole &amp; ne se tape pas tous les jours'
+      )
+    })
+
+    it('refuse une description qui dépasse 2000 caractères', async () => {
+      /*
+       * La colonne est un `TEXT` : sans borne, on y déposait 64 Ko que chaque chargement de la
+       * liste retransportait. La borne du bas est gardée par les cas « description vide » déjà
+       * présents dans ce fichier.
+       */
+      global.readBody.mockResolvedValue({ description: 'a'.repeat(2001) })
+      mockHasPermission.mockResolvedValue(true)
+
+      await expect(handler(mockEvent as any)).rejects.toThrow('2000 caractères')
+      expect(prismaMock.lostFoundItem.create).not.toHaveBeenCalled()
+    })
+
+    it('accepte exactement 2000 caractères', async () => {
+      // La borne est gardée des DEUX côtés : refuser 2000 serait un défaut d'un cran.
+      expect(await creerAvec('a'.repeat(2000))).toHaveLength(2000)
+    })
+  })
 })
