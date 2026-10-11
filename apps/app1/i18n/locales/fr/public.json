@@ -143,6 +143,8 @@
       "experience": "Expérience",
       "experience_details": "Détails de l'expérience",
       "export_ical": "Export iCal",
+      "export_ics_default_title": "Créneau bénévole",
+      "export_ics_team_prefix": "Équipe",
       "export_pdf": "Export PDF",
       "export_pdf_column_slot": "Créneau",
       "export_pdf_column_team": "Équipe",

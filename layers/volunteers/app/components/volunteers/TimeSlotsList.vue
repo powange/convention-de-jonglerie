@@ -86,6 +86,7 @@
 <script setup lang="ts">
 import { formatDurationCompact } from '~/utils/date'
 
+import { genererIcs } from '../../utils/export-ics'
 import {
   lignesDePlanning,
   nomFichierPlanning,
@@ -97,7 +98,11 @@ import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
 
 interface TimeSlot {
   id: string
-  title: string
+  /**
+   * ⚠️ NULLABLE, et le typer `string` est ce qui a laissé passer le défaut B6 : le serveur rend
+   * `VolunteerTimeSlot.title` tel quel, et l'export écrivait « null » dans l'agenda.
+   */
+  title: string | null
   startDateTime: string
   endDateTime: string
   delayMinutes?: number | null
@@ -173,81 +178,33 @@ const uniqueTeamsCount = computed(() => {
   return teamIds.size
 })
 
-// Fonction pour formater une date au format iCal (YYYYMMDDTHHMMSS)
-const formatIcalDate = (date: Date): string => {
-  const year = date.getUTCFullYear()
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
-  const day = String(date.getUTCDate()).padStart(2, '0')
-  const hours = String(date.getUTCHours()).padStart(2, '0')
-  const minutes = String(date.getUTCMinutes()).padStart(2, '0')
-  const seconds = String(date.getUTCSeconds()).padStart(2, '0')
-  return `${year}${month}${day}T${hours}${minutes}${seconds}Z`
-}
+/*
+ * `formatIcalDate` et la composition en ligne de l'ICS ont quitté ce fichier pour
+ * `utils/export-ics.ts` — constat B6. Elles écrivaient `SUMMARY:${slot.title}` sur un titre
+ * NULLABLE (donc « null » dans l'agenda) et n'échappaient aucun texte.
+ */
 
-// Fonction pour exporter les créneaux au format iCal
+// L'export iCal : la composition et l'échappement vivent dans `utils/export-ics.ts`, pur et testé.
 const exportToIcal = () => {
-  // Générer le contenu du fichier iCal
-  const icalContent = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Convention de Jonglerie//Planning Bénévoles//FR',
-    'CALSCALE:GREGORIAN',
-    'METHOD:PUBLISH',
-  ]
-
-  // Ajouter chaque créneau comme événement
-  props.timeSlots.forEach((slot) => {
-    const start = new Date(slot.startDateTime)
-    const end = new Date(slot.endDateTime)
-    const now = new Date()
-
-    // Appliquer le retard si présent
-    if (slot.delayMinutes) {
-      start.setMinutes(start.getMinutes() + slot.delayMinutes)
-      end.setMinutes(end.getMinutes() + slot.delayMinutes)
-    }
-
-    // Construire la description
-    let description = slot.description || ''
-    if (slot.team) {
-      description = `Équipe: ${slot.team.name}${description ? '\\n' + description : ''}`
-    }
-
-    // Générer un UID unique
-    const uid = `${slot.id}@convention-de-jonglerie.fr`
-
-    icalContent.push(
-      'BEGIN:VEVENT',
-      `UID:${uid}`,
-      `DTSTAMP:${formatIcalDate(now)}`,
-      `DTSTART:${formatIcalDate(start)}`,
-      `DTEND:${formatIcalDate(end)}`,
-      `SUMMARY:${slot.title}`,
-      description ? `DESCRIPTION:${description}` : '',
-      slot.team?.name ? `LOCATION:${slot.team.name}` : '',
-      'STATUS:CONFIRMED',
-      'SEQUENCE:0',
-      'END:VEVENT'
-    )
+  const icalString = genererIcs(props.timeSlots, {
+    // Traduits ici : un mot en dur dans l'util sortirait en français dans l'agenda d'un lecteur
+    // allemand, et le défaut ne concernerait que lui — donc invisible.
+    titreParDefaut: t('pages.volunteers.export_ics_default_title'),
+    libelleEquipe: `${t('pages.volunteers.export_ics_team_prefix')} :`,
   })
 
-  icalContent.push('END:VCALENDAR')
-
-  // Filtrer les lignes vides
-  const icalString = icalContent.filter((line) => line).join('\r\n')
-
-  // Créer un blob et télécharger
   const blob = new Blob([icalString], { type: 'text/calendar;charset=utf-8' })
   const url = window.URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-
-  // Nom du fichier
-  const fileName = props.editionName
-    ? `planning-${props.editionName.toLowerCase().replace(/\s+/g, '-')}.ics`
-    : 'planning-benevole.ics'
-
-  link.download = fileName
+  /*
+   * ⚠️ LE MÊME ASSAINISSEMENT QUE LE PDF. Le nom était composé par
+   * `editionName.toLowerCase().replace(/\s+/g, '-')` : une édition nommée « EJC 2026 / Lyon »
+   * produisait un nom de fichier contenant une barre oblique, et les accents y restaient.
+   * `nomFichierPlanning` retire les accents et remplace toute ponctuation — une seule règle de
+   * nommage pour les deux exports.
+   */
+  link.download = nomFichierPlanning(props.volunteerName, props.editionName, 'planning', 'ics')
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)

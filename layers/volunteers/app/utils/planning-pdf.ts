@@ -187,7 +187,14 @@ export function lignesDePlanning(
 export function nomFichierPlanning(
   nomBenevole?: string | null,
   nomEdition?: string | null,
-  prefixe = 'planning'
+  prefixe = 'planning',
+  /*
+   * L'extension est un paramètre depuis le constat B6 : l'export iCal composait son propre nom
+   * par `editionName.toLowerCase().replace(/\s+/g, '-')`, qui laissait passer les accents ET la
+   * barre oblique — « EJC 2026 / Lyon » donnait un nom de fichier contenant un séparateur de
+   * chemin. Une seule règle de nommage vaut mieux que deux, dont une fausse.
+   */
+  extension = 'pdf'
 ): string {
   const morceaux = [nomEdition, nomBenevole]
     .map((morceau) =>
@@ -202,5 +209,6 @@ export function nomFichierPlanning(
 
   // Composé plutôt qu'écrit d'une pièce : une chaîne pointée littérale se fait prendre pour une
   // clé de traduction par l'analyse i18n, qui la signale alors comme manquante.
-  return morceaux.length > 0 ? `${prefixe}-${morceaux.join('-')}.pdf` : `${prefixe}.pdf`
+  const base = morceaux.length > 0 ? `${prefixe}-${morceaux.join('-')}` : prefixe
+  return `${base}.${extension}`
 }
