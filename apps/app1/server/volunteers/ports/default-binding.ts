@@ -104,6 +104,9 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
           lastName: true,
           firstName: true,
           email: true,
+          // ⚠️ `customFields` manquait — constat B5. C'est là que vivent le régime et les
+          // allergies déclarés à la commande, et la fiche imprimée pour la cuisine les perdait.
+          customFields: true,
           order: { select: { payerLastName: true, payerFirstName: true, payerEmail: true } },
         }
         const meals = await prisma.volunteerMeal.findMany({
@@ -137,16 +140,36 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
           lastName: string | null
           firstName: string | null
           email: string | null
+          customFields?: unknown
           order: {
             payerLastName: string | null
             payerFirstName: string | null
             payerEmail: string | null
           }
-        }): TicketMealParticipant => ({
-          nom: oi.lastName || oi.order.payerLastName || '',
-          prenom: oi.firstName || oi.order.payerFirstName || '',
-          email: oi.email || oi.order.payerEmail || '',
-        })
+        }): TicketMealParticipant => {
+          /*
+           * `customFields` est une colonne JSON : rien ne garantit sa forme. Un tableau, une
+           * chaîne ou `null` y sont possibles, et `(valeur as Record)` suivi d'un `?.` rendrait
+           * `undefined` sans lever — mais sur un tableau, `cf.allergies` vaudrait `undefined` en
+           * silence là où l'on croit lire un objet. Le test de forme est donc explicite, comme
+           * ailleurs dans le dépôt pour les champs JSON.
+           */
+          const champs =
+            oi.customFields &&
+            typeof oi.customFields === 'object' &&
+            !Array.isArray(oi.customFields)
+              ? (oi.customFields as Record<string, unknown>)
+              : {}
+          const texte = (valeur: unknown) => (typeof valeur === 'string' && valeur ? valeur : null)
+          return {
+            nom: oi.lastName || oi.order.payerLastName || '',
+            prenom: oi.firstName || oi.order.payerFirstName || '',
+            email: oi.email || oi.order.payerEmail || '',
+            dietaryPreference: texte(champs.dietaryPreference),
+            allergies: texte(champs.allergies),
+            allergySeverity: texte(champs.allergySeverity),
+          }
+        }
         const result: Record<number, TicketMealParticipant[]> = {}
         for (const meal of meals) {
           const seen = new Set<number>()

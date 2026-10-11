@@ -112,11 +112,26 @@ export interface EventScopePort {
   getEventDisplayData(eventIds: number[]): Promise<Record<number, Record<string, unknown>>>
 }
 
-/** Identité d'un participant ayant droit à un repas via la billetterie. */
+/**
+ * Identité d'un participant ayant droit à un repas via la billetterie.
+ *
+ * ⚠️ LES TROIS DERNIERS CHAMPS SONT ARRIVÉS AVEC LE CONSTAT B5, et leur absence n'était pas
+ * anodine : la fiche de restauration PDF — celle qu'on imprime pour la cuisine — comptait TOUS
+ * les billets comme « sans régime », et sa section Allergies omettait celles déclarées à la
+ * commande. Or cette section existe, dixit l'en-tête de `restauration-pdf.ts`, pour éviter
+ * d'envoyer quelqu'un à l'hôpital.
+ *
+ * 📍 Le port du layer `meals` les lisait DÉJÀ : la liste à l'écran les affichait et les comptait,
+ * la fiche imprimée non. Deux ports répondaient à la même question, et le plus silencieux était
+ * celui qu'on emporte en cuisine.
+ */
 export interface TicketMealParticipant {
   nom: string
   prenom: string
   email: string
+  dietaryPreference: string | null
+  allergies: string | null
+  allergySeverity: string | null
 }
 
 /** Article à remettre (catalogue billetterie) résolu pour l'affichage. */

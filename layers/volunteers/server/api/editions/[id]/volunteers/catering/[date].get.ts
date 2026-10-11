@@ -38,7 +38,9 @@ export default wrapApiHandler(
       dietaryCounts: {} as Record<string, number>,
       allergies: [] as Array<{
         participantName: string
-        participantType: 'volunteer' | 'artist' | 'organizer'
+        // ⚠️ `'ticket'` MANQUAIT — constat B5. Le type excluait les participants venus par
+        // billetterie, donc leurs allergies ne pouvaient même pas entrer dans ce résumé.
+        participantType: 'volunteer' | 'artist' | 'organizer' | 'ticket'
         allergies: string
         allergySeverity: string | null
         emergencyContactName?: string | null
@@ -86,9 +88,21 @@ export default wrapApiHandler(
         prenom: p.prenom,
         email: p.email,
         phone: '',
-        dietaryPreference: null,
-        allergies: null,
-        allergySeverity: null,
+        /*
+         * ⚠️ CES TROIS CHAMPS ÉTAIENT FORCÉS À `null` — constat B5.
+         *
+         * La fiche imprimée pour la cuisine comptait donc TOUS les billets comme « sans régime »,
+         * et sa section Allergies — celle qui, dixit l'en-tête de `restauration-pdf.ts`, évite
+         * d'envoyer quelqu'un à l'hôpital — omettait les allergies déclarées à la commande.
+         *
+         * 📍 Le port du layer `meals` les lisait DÉJÀ : la liste à l'écran les affichait et les
+         * comptait. Deux ports répondaient à la même question, et le plus silencieux était celui
+         * qu'on emporte en cuisine.
+         */
+        dietaryPreference: p.dietaryPreference,
+        allergies: p.allergies,
+        allergySeverity: p.allergySeverity,
+        // Un billet ne porte pas de contact d'urgence : il n'y a pas de formulaire pour le saisir.
         emergencyContactName: null,
         emergencyContactPhone: null,
         // Un participant venu par billetterie ne passe pas sur scène.
@@ -137,7 +151,13 @@ export default wrapApiHandler(
         if (p.allergies && p.allergies.trim()) {
           summary.allergies.push({
             participantName: `${p.prenom || ''} ${p.nom || ''}`.trim(),
-            participantType: p.type as 'volunteer' | 'artist' | 'organizer',
+            /*
+             * ⚠️ CETTE ASSERTION DE TYPE EXCLUAIT `'ticket'` — constat B5, et c'était le second
+             * verrou. Même les trois champs remontés, un `as` qui ne nomme pas le quatrième cas
+             * aurait tenu à la compilation tout en mentant sur ce que la liste contient : le PDF
+             * ne saurait pas quoi afficher dans sa colonne de provenance.
+             */
+            participantType: p.type,
             allergies: p.allergies,
             allergySeverity: p.allergySeverity,
             emergencyContactName: p.emergencyContactName,
