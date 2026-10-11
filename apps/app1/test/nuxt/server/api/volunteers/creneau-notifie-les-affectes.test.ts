@@ -60,7 +60,7 @@ function affectes({
 }) {
   prismaMock.volunteerAssignment.findMany.mockResolvedValue(benevoles.map((userId) => ({ userId })))
   prismaMock.organizerSlotAssignment.findMany.mockResolvedValue(
-    organisateurs.map((organizerId) => ({ editionOrganizer: { organizerId } }))
+    organisateurs.map((userId) => ({ editionOrganizer: { organizer: { userId } } }))
   )
 }
 
@@ -115,6 +115,11 @@ describe('déplacer un créneau publié', () => {
 
     expect(mockNotify).toHaveBeenCalledTimes(2)
     expect(mockNotify.mock.calls.map((c) => c[0].userId).sort()).toEqual([5, 9])
+    // La relation demandée, et non seulement le résultat : voir la note du cas « organisateur ».
+    const demande = prismaMock.organizerSlotAssignment.findMany.mock.calls[0][0]
+    expect(demande.select).toEqual({
+      editionOrganizer: { select: { organizer: { select: { userId: true } } } },
+    })
     expect(mockNotify.mock.calls[0][0].notificationType).toBe('volunteer_slot_changed')
   })
 
@@ -235,7 +240,7 @@ describe('retirer une personne d’un créneau', () => {
     })
   })
 
-  it('⚠️ prévient l’ORGANISATEUR retiré sur son compte `organizerId`', async () => {
+  it('⚠️ prévient l’ORGANISATEUR retiré sur son VRAI compte (`organizer.userId`)', async () => {
     /*
      * LE PIÈGE DE CE POINT D'API : `EditionOrganizer` ne porte PAS de `userId`. Lire ce champ
      * rendrait `undefined`, et la notification partirait vers un destinataire inexistant sans
@@ -244,13 +249,27 @@ describe('retirer une personne d’un créneau', () => {
      * indiscernables.
      */
     prismaMock.volunteerTimeSlot.findFirst.mockResolvedValue(CRENEAU)
-    prismaMock.editionOrganizer.findUnique.mockResolvedValue({ organizerId: 9 })
+    // `7` = la ligne EditionOrganizer (paramètre d'URL), `11` = ConventionOrganizer, `9` = le
+    // COMPTE. Trois nombres distincts : avec un seul, les trois lectures seraient indiscernables.
+    prismaMock.editionOrganizer.findUnique.mockResolvedValue({
+      id: 7,
+      organizerId: 11,
+      organizer: { userId: 9 },
+    })
     prismaMock.organizerSlotAssignment.deleteMany.mockResolvedValue({ count: 1 })
 
     await retirerOrganisateur(evenement)
 
     expect(mockNotify).toHaveBeenCalledTimes(1)
     expect(mockNotify.mock.calls[0][0].userId).toBe(9)
+    /*
+     * ⚠️ ET LA FORME DU `select`, parce que le bouchon central l'IGNORE : il rend ce qu'on lui a
+     * dit quoi qu'on demande. Sans cette assertion, revenir à `select: { organizerId: true }`
+     * laisserait ce cas VERT — le mock fournirait encore `organizer.userId` — alors qu'en
+     * production Prisma ne renverrait pas la relation et l'on notifierait `undefined`.
+     */
+    const demande = prismaMock.editionOrganizer.findUnique.mock.calls[0][0]
+    expect(demande.select).toEqual({ organizer: { select: { userId: true } } })
   })
 
   it('ne prévient personne quand l’affectation d’organisateur n’existait pas', async () => {

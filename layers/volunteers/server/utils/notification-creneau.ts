@@ -40,8 +40,13 @@ import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
  * Les comptes à prévenir pour un créneau : bénévoles affectés ET organisateurs affectés.
  *
  * ⚠️ Les deux, et c'est le point à ne pas rater : un organisateur posé sur un créneau n'est pas
- * un spectateur, il tient le poste. `OrganizerSlotAssignment` passe par `EditionOrganizer`, dont
- * le compte est `organizerId` — et non `userId`, qui n'existe pas sur ce modèle.
+ * un spectateur, il tient le poste.
+ *
+ * ⚠️⚠️ ET LE COMPTE EST À **DEUX** RELATIONS DE LÀ. `OrganizerSlotAssignment` pointe
+ * `EditionOrganizer`, dont `organizerId` référence **`ConventionOrganizer`** — et NON `User`. Le
+ * compte se lit donc `editionOrganizer.organizer.userId`. Prendre `organizerId` pour un
+ * identifiant de compte notifierait **quelqu'un d'autre**, ou personne : les deux séquences sont
+ * indépendantes, donc l'identifiant existe souvent, et rien ne lèverait.
  *
  * Dédoublonné : une même personne peut être bénévole ET organisatrice de la même édition, et
  * recevrait sinon deux fois le même message.
@@ -54,14 +59,14 @@ export async function comptesAffectesAuCreneau(slotId: string): Promise<number[]
     }),
     prisma.organizerSlotAssignment.findMany({
       where: { timeSlotId: slotId },
-      select: { editionOrganizer: { select: { organizerId: true } } },
+      select: { editionOrganizer: { select: { organizer: { select: { userId: true } } } } },
     }),
   ])
 
   return [
     ...new Set([
       ...benevoles.map((a) => a.userId),
-      ...organisateurs.map((a) => a.editionOrganizer.organizerId),
+      ...organisateurs.map((a) => a.editionOrganizer.organizer.userId),
     ]),
   ]
 }

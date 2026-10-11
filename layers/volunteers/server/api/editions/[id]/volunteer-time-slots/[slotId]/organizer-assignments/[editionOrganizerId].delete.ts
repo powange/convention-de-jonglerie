@@ -52,13 +52,14 @@ export default wrapApiHandler(
     /*
      * Le compte à prévenir se lit AVANT la suppression — constat B4.
      *
-     * ⚠️ `EditionOrganizer` porte le compte sous `organizerId`, et non `userId` : ce dernier
-     * n'existe pas sur ce modèle, et le chercher rendrait `undefined` — donc une notification
-     * envoyée à personne, sans erreur.
+     * ⚠️⚠️ LE COMPTE EST À DEUX RELATIONS DE LÀ, et s'y tromper est SILENCIEUX.
+     * `EditionOrganizer.organizerId` référence `ConventionOrganizer`, pas `User` : le compte se lit
+     * `organizer.userId`. Les deux séquences étant indépendantes, un `organizerId` pris pour un
+     * identifiant de compte désigne le plus souvent un utilisateur EXISTANT — mais un autre.
      */
     const organisateur = await prisma.editionOrganizer.findUnique({
       where: { id: editionOrganizerId },
-      select: { organizerId: true },
+      select: { organizer: { select: { userId: true } } },
     })
 
     const supprimees = await prisma.organizerSlotAssignment.deleteMany({
@@ -76,7 +77,7 @@ export default wrapApiHandler(
       if (organisateur && (await planningPublieDeLEdition(editionId))) {
         await notifierRetraitDuCreneau({
           editionId,
-          userId: organisateur.organizerId,
+          userId: organisateur.organizer.userId,
           creneau: timeSlot,
         })
       }
