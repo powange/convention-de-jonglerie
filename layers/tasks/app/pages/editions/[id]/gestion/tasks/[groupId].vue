@@ -342,6 +342,7 @@
 // Composant frère du même layer → import relatif (le type n'est pas exposé par #components).
 import type { TaskFiltersValue, TaskSort } from '../../../../../components/tasks/TaskFilters.vue'
 
+import { filtrerParEcheance, type FiltreEcheance } from '~~/shared/utils/filtre-echeance-taches'
 import { valeurDepuisUrl } from '~~/shared/utils/filtres-url'
 import { nomAffichableDUnCompte } from '~~/shared/utils/nom-affichable'
 import { contientLaSaisie } from '~~/shared/utils/recherche-texte'
@@ -569,29 +570,19 @@ const filteredTasks = computed<TaskItem[]>(() => {
     list = list.filter((t) => t.tagAssignments.some((a) => set.has(a.tag.id)))
   }
 
-  const due = filters.value.due
-  if (due && due !== 'all') {
-    const now = new Date()
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-    list = list.filter((t) => {
-      if (due === 'none') return t.deadline === null
-      if (!t.deadline) return false
-      const d = new Date(t.deadline)
-      if (due === 'overdue') return d < now && t.status !== 'DONE' && t.status !== 'CANCELLED'
-      if (due === 'today') {
-        const day = new Date(d.getFullYear(), d.getMonth(), d.getDate())
-        return day.getTime() === today.getTime()
-      }
-      if (due === 'next7' || due === 'next30') {
-        const days = due === 'next7' ? 7 : 30
-        const limit = new Date(today)
-        limit.setDate(limit.getDate() + days)
-        limit.setHours(23, 59, 59, 999)
-        return d >= today && d <= limit
-      }
-      return true
-    })
-  }
+  /*
+   * ⚠️ LES JOURNÉES SE DÉCOUPENT À L'HEURE DE L'ÉDITION — constat B4. Ce bloc construisait
+   * « aujourd'hui » dans le fuseau du NAVIGATEUR, alors que l'échéance est saisie et affichée à
+   * l'heure du lieu : pour qui suit depuis ailleurs, une tâche affichée « 12 oct. » pouvait tomber
+   * hors de « aujourd'hui ». La règle est partagée avec l'autre écran qui filtre les mêmes
+   * échéances, et c'est son recopiage qui avait rendu le défaut identique des deux côtés.
+   */
+  list = filtrerParEcheance(
+    list,
+    filters.value.due as FiltreEcheance,
+    new Date(),
+    fuseauEdition.value
+  )
 
   // Le tri vient après le filtrage : on ordonne ce qui reste, pas ce qui a été écarté.
   //
