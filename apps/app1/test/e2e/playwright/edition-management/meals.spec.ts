@@ -74,20 +74,27 @@ test.describe.serial('Module Repas', () => {
   /**
    * Désactiver un repas demande confirmation, et renoncer ne change RIEN.
    *
-   * ⚠️ CE QUE CE GESTE DÉTRUIT : le serveur fait un `deleteMany` sur toutes les réponses des
-   * bénévoles pour ce repas. C'est sans retour — et réactiver le repas ne les restaure pas, il
-   * réinscrit chaque bénévole éligible comme ACCEPTANT, y compris ceux qui avaient refusé.
-   *
    * Le commutateur enregistrait immédiatement, sans rien demander.
+   *
+   * 📍 CE QUE LE CONSTAT B5 A CHANGÉ SOUS CE TEST. Il attendait le mot « définitive » :
+   * désactiver faisait alors un `deleteMany` sur les réponses des bénévoles, et la modale
+   * l'annonçait. Le service ne détruit plus rien — les réponses, les refus et les repas déjà
+   * servis survivent à un cycle désactivation/réactivation —, donc la modale ne pouvait plus
+   * contenir ce mot. L'attente est devenue fausse le jour où le défaut a été corrigé.
+   *
+   * Elle vise désormais la CONSERVATION, ce qui en fait un témoin du correctif et non plus de
+   * l'ancien défaut : une modale qui se remettrait à annoncer une suppression, ou un service qui
+   * se remettrait à supprimer sans que la modale change, feraient tomber ce test.
    *
    * ⚠️ POURQUOI UNE SPEC PLAYWRIGHT ET NON UN TEST DE COMPOSANT : c'est une PAGE de gestion, qui
    * demande une dizaine de points d'API au montage et n'est rendue que côté client, derrière
    * l'authentification. Un `curl` y reçoit la coquille de l'application et un franc 200 — seul un
    * navigateur authentifié exécute la garde.
    *
-   * 🔬 CE QUE LE TEST MESURE est le RENONCEMENT, pas la confirmation. Vérifier que confirmer
-   * supprime bien reviendrait à détruire des données pour prouver qu'on sait les détruire ; ce qui
-   * compte, c'est que le commutateur REVIENNE à sa place et que rien ne soit parti.
+   * 🔬 CE QUE LE TEST MESURE est le RENONCEMENT, pas la confirmation : que le commutateur
+   * REVIENNE à sa place et que rien ne soit parti. Ce que la confirmation conserve est éprouvé
+   * ailleurs, par un test d'invariant sur le service — un cycle désactivation puis réactivation
+   * dont un refus ressort refus.
    */
   test('désactiver un repas demande confirmation, et renoncer ne change rien', async ({
     page,
@@ -126,10 +133,11 @@ test.describe.serial('Module Repas', () => {
 
     await actif.click()
 
-    // La modale s'ouvre, et elle dit ce qui va être détruit — pas seulement « Êtes-vous sûr ? ».
+    // La modale s'ouvre, et elle dit ce que la désactivation fait — pas « Êtes-vous sûr ? ».
     const modale = page.getByRole('dialog')
     await expect(modale).toBeVisible({ timeout: 5000 })
-    await expect(modale).toContainText(/définitive/i)
+    // Le mot porte la garantie du correctif : rien n'est détruit, tout réapparaît tel quel.
+    await expect(modale).toContainText(/conserv/i)
 
     // Renoncer.
     await modale.getByRole('button', { name: /annuler/i }).click()
