@@ -128,9 +128,22 @@ export async function isEmailNotificationAllowed(
  * Types de notifications mappés aux préférences
  */
 export const NotificationTypeMapping = {
-  // Rappels de créneaux bénévoles
+  /*
+   * Tout ce qui concerne SES créneaux : le rappel avant le poste, la publication du planning, et
+   * les changements qui l'atteignent (constat B4).
+   *
+   * ⚠️ AUCUNE PRÉFÉRENCE NOUVELLE pour ces trois derniers, et c'est une décision : couper les
+   * rappels et garder « mon créneau a été déplacé » n'a pas de sens — ce sont les mêmes horaires,
+   * et une case de plus serait un réglage que personne n'a demandé. Le libellé français de
+   * `volunteerReminders` a en revanche été élargi : il annonçait « 30 minutes avant vos créneaux »
+   * alors qu'il gouvernait déjà la publication du planning, donc il promettait moins qu'il ne
+   * couvrait.
+   */
   volunteer_reminder: 'volunteerReminders' as const,
   volunteer_schedule: 'volunteerReminders' as const,
+  volunteer_slot_changed: 'volunteerReminders' as const,
+  volunteer_slot_removed: 'volunteerReminders' as const,
+  volunteer_slot_unassigned: 'volunteerReminders' as const,
 
   // Candidatures bénévoles
   volunteer_application_submitted: 'applicationUpdates' as const,

@@ -75,7 +75,7 @@
       "system_notifications": "Notifications système",
       "system_notifications_desc": "Mises à jour importantes et maintenance",
       "volunteer_reminders": "Rappels de créneaux bénévoles",
-      "volunteer_reminders_desc": "Notifications 30 minutes avant vos créneaux"
+      "volunteer_reminders_desc": "Rappel 30 minutes avant vos créneaux, publication du planning, et changements qui touchent vos créneaux"
     },
     "oauth_password_info": "Vous vous êtes connecté via Google. Vous pouvez définir un mot de passe pour pouvoir vous connecter avec votre email.",
     "optional_section_title": "Informations facultatives",
