@@ -3,6 +3,7 @@
   "private": true,
   "description": "Monorepo — proxy racine vers apps/app1 (et, à terme, apps/app2). Les scripts sont préfixés par app (`app1:*`) pour permettre d'ajouter les équivalents `app2:*` sans collision de noms. Chaque script proxifie `cd apps/app1 && npm run <script>`.",
   "scripts": {
+    "prepare": "simple-git-hooks",
     "app1:build": "cd apps/app1 && npm run build",
     "app1:analyze": "cd apps/app1 && npm run analyze",
     "app1:dev": "cd apps/app1 && npm run dev",
@@ -86,5 +87,15 @@
     "app2:docker:prod:down": "cd apps/app2 && npm run docker:prod:down",
     "app2:docker:release:up": "cd apps/app2 && npm run docker:release:up",
     "app2:docker:release:down": "cd apps/app2 && npm run docker:release:down"
+  },
+  "devDependencies": {
+    "lint-staged": "^17.6.0",
+    "simple-git-hooks": "^2.14.0"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,cjs,mjs,ts,vue,json,md,yml,yaml}": "apps/app1/node_modules/.bin/prettier --config apps/app1/package.json --write"
   }
 }
