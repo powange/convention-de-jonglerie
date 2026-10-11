@@ -2,11 +2,25 @@
 
 ## Vue d'ensemble
 
-Ce projet utilise Docker et Docker Compose pour simplifier le déploiement et le développement. Trois configurations sont disponibles :
+Ce projet utilise Docker et Docker Compose pour simplifier le déploiement et le développement. Les
+quatre configurations qu'on utilise au quotidien :
 
-- **Développement** (`docker-compose.dev.yml`) : Pour le développement local avec rechargement à chaud
-- **Test** (`docker-compose.test.yml`) : Pour les tests automatisés
-- **Production** (`docker-compose.release.yml`) : Pour le déploiement en production
+- **Développement** (`docker-compose.dev.yml`) : développement local avec rechargement à chaud
+- **Test** (`docker-compose.test.yml`) : tests automatisés, MySQL sur le port **3310**
+- **Release** (`docker-compose.release.yml`) : la **pré-production**, <https://test.juggling-convention.com> —
+  conteneurs suffixés `-release`, MySQL sur **3308**, `NUXT_ENV: release`
+- **Production** (`docker-compose.prod.yml`) : la production, <https://juggling-convention.com> —
+  conteneurs suffixés `-prod`, MySQL sur **3309**
+
+> ⚠️ **Ce document appelait `docker-compose.release.yml` « la production »** et ne mentionnait
+> **jamais** `docker-compose.prod.yml`, qui existe pourtant et sert un autre environnement, sur un
+> autre port, avec d'autres conteneurs. S'y fier conduisait à déployer sur la pré-production en
+> croyant toucher la production. Les deux environnements tirent la même image publiée par la CI
+> (`ghcr.io/powange/convention-de-jonglerie:main`) : ce qui les distingue est leur base de données
+> et leurs variables, pas leur code.
+
+Le dépôt compte d'autres composes, plus spécialisés (`dev-e2e`, `dev-install`, `test-all`,
+`test-integration`, `test-simple`, `test-ui`) : voir `apps/app1/`.
 
 ## Architecture des services
 

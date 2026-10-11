@@ -37,29 +37,13 @@ npm run db:assign-meals
 
 Voir [scripts/README-assign-meals.md](scripts/README-assign-meals.md) pour plus de détails.
 
-### Migration droits organisateurs
+### ~~Migration droits organisateurs~~ — supprimé
 
-Exécuter une migration douce des anciens rôles vers les nouveaux booléens de droits.
-
-Dry-run (simulation):
-
-```
-npx ts-node scripts/migrate-organizer-rights.ts --dry
-```
-
-Appliquer réellement:
-
-```
-npx ts-node scripts/migrate-organizer-rights.ts
-```
-
-Règles de mapping:
-
-- ADMINISTRATOR => active tous les droits (edit/delete convention, manageOrganizers, add/edit/delete éditions)
-- MODERATOR => addEdition + editAllEditions seulement
-- Ne réécrit pas un droit déjà à true
-- Crée une entrée history CREATED si aucune n'existe encore
-- Confirmation interactive avant application (utiliser --yes ou -y pour bypass)
+> ⚠️ Cette section documentait `scripts/migrate-organizer-rights.ts`, **qui n'existe plus** —
+> avec `npx ts-node`, alors que ce dépôt utilise `tsx`. Elle décrivait la migration de l'ancien
+> champ `role` de `ConventionOrganizer` (`ADMINISTRATOR` / `MODERATOR`) vers les booléens de
+> droits ; **le champ a été retiré du schéma**, et le test d'intégration qui couvrait ce script
+> était désactivé depuis, puis supprimé. Rien à exécuter.
 
 - `npm run test:run` - Une seule exécution (CI/CD)
 
