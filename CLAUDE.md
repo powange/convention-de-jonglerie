@@ -58,42 +58,33 @@
 
 **Objectif :** Application de gestion et découverte de conventions de jonglerie permettant de consulter, ajouter, modifier des conventions et gérer les favoris.
 
-**Technologies et Versions :**
+**Technologies :**
 
-**Frontend :**
+> ⚠️ **Les numéros précis ne sont PAS repris ici, délibérément.** Ce bloc annonçait dix-neuf
+> versions exactes, dont **dix-sept étaient fausses** — et six d'une MAJEURE entière : Prisma 6
+> quand le projet est en 7, Vitest 3 en 4, ESLint 9 en 10, VueUse 13 en 14, Nuxt Image 1 en 2,
+> Nuxt Test Utils 3 en 4. Un document lu à chaque session qui annonce la mauvaise majeure envoie
+> chercher l'API d'une autre génération d'outil. Seules les **majeures** figurent ci-dessous,
+> parce qu'elles seules changent l'API ; **le détail est dans `apps/app1/package.json`**, qui ne
+> peut pas se périmer. Un test vérifie que ces majeures correspondent encore.
 
-- **Nuxt.js** v4.2.0 - Framework Vue.js universel
-- **Vue.js** v3.5.17 - Framework JavaScript réactif
-- **Nuxt UI** v4.0.0 - Composants UI avec Tailwind CSS
-- **Pinia** v3.0.3 - Gestion d'état pour Vue.js
-- **TypeScript** v5.8.3 - Langage typé
-- **Nuxt i18n** v10.0.3 - Internationalisation
-- **VueUse** v13.6.0 - Collection d'utilitaires Vue
+**Frontend :** Nuxt **4** (Vue 3, Nitro intégré) · Nuxt UI **4** (Tailwind CSS) · Pinia **3** ·
+TypeScript **5** · Nuxt i18n **10** · VueUse **14**
 
-**Backend :**
+**Backend :** Nitro (intégré à Nuxt) · Prisma **7** — avec `@prisma/adapter-mariadb` et
+`prisma.config.ts`, c'est un changement de modèle et pas seulement de numéro · MySQL
 
-- **Nitro** (intégré à Nuxt) - Moteur serveur pour API RESTful
-- **Prisma** v6.18.0 - ORM pour base de données
-- **MySQL** - Base de données relationnelle
+**Authentification & sécurité :** nuxt-auth-utils **0.5** (session par cookie scellé) ·
+bcryptjs **3**
 
-**Authentification & Sécurité :**
+**Visualisation & UI :** Chart.js **4** · FullCalendar **6** · Nuxt QRCode **0.4**
 
-- **nuxt-auth-utils** v0.5.23 - Auth par session avec cookies scellés
-- **bcryptjs** v3.0.2 - Hachage des mots de passe
+**Outils :** ESLint **10** · Vitest **4** · Nuxt Test Utils **4** · Nuxt Scripts **0.13** ·
+Nuxt Image **2** · Prettier **3**
 
-**Visualisation & UI :**
-
-- **Chart.js** v4.5.1 - Graphiques et visualisations
-- **FullCalendar** v6.1.15+ - Calendrier interactif
-- **Nuxt QRCode** v0.4.8 - Génération de QR codes
-
-**Outils de développement :**
-
-- **ESLint** v9.32.0 - Linter JavaScript/TypeScript
-- **Nuxt Test Utils** v3.19.2 - Tests
-- **Vitest** v3.2.4 - Framework de tests
-- **Nuxt Scripts** v0.11.10 & **Nuxt Image** v1.10.0 - Optimisations
-- **Prettier** v3.3.3 - Formatage de code
+⚠️ **Vue n'est pas une dépendance déclarée** : il arrive par Nuxt, et sa version est fixée par
+`overrides` (3.5.38). Les `overrides` ne contiennent plus que `vue` et `@nuxt/devtools` — **il n'y
+a plus d'override `vite`**, contrairement à ce qu'une consigne plus ancienne demandait de préserver.
 
 **Architecture (monorepo) :**
 
