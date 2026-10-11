@@ -9,6 +9,8 @@ import {
 } from '../utils/rappels-echeance'
 import { FUSEAU_DES_TACHES } from '../utils/scheduled-tasks'
 
+import { nomAffichableDEdition } from '~~/shared/utils/nom-edition'
+
 /**
  * Tâche planifiée : rappels d'échéance sur les tâches d'édition.
  *
@@ -117,8 +119,9 @@ export default defineTask({
         const cleDuRappel = cleDeTitreDuRappel(kind)
 
         const editionId = task.group.edition.id
-        const editionName =
-          task.group.edition.name || task.group.edition.convention.name || `Édition #${editionId}`
+        // La règle vit dans `shared/utils/nom-edition.ts` : elle était écrite ici, et une TROISIÈME
+        // version — fausse — composait un champ inexistant dans le rappel d'édition (constat B5).
+        const editionName = nomAffichableDEdition({ ...task.group.edition, id: editionId })
 
         for (const a of task.assignments) {
           const key = `${a.userId}:${task.id}:${cleDuRappel}`
