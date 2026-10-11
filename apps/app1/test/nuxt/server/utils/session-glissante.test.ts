@@ -4,6 +4,7 @@ import {
   aUneSessionDansLaRequete,
   getAuthSession,
   ouvrirSession,
+  rafraichirUtilisateurDeSession,
 } from '../../../../server/utils/session-helpers'
 import { DUREES_DE_SESSION, PLAFOND_ABSOLU } from '../../../../shared/utils/duree-de-session'
 
@@ -278,6 +279,132 @@ describe('un cookie illisible ne rouvre pas la brèche', () => {
     const session = await getAuthSession(requete('nuxt-session=illisible'), primitives)
 
     expect(session).toBeNull()
+    expect(mockSetUserSession).not.toHaveBeenCalled()
+  })
+})
+
+describe('rafraichirUtilisateurDeSession — la copie du compte cesse d’être périmée', () => {
+  /**
+   * ⚠️⚠️ LE DÉFAUT — constat B5.
+   *
+   * La session est un cookie scellé : elle emporte une COPIE du compte, figée à la connexion. Le
+   * profil écrivait en base sans que cette copie en sache rien, et elle restait périmée jusqu'à la
+   * prochaine ouverture de session — des semaines pour qui a coché « se souvenir de moi ».
+   *
+   * Dix-neuf handlers lisent `user.email` ou `user.pseudo` dedans. Le plus visible : « Mes
+   * billets » cherche les commandes par l'adresse de SESSION. Après un changement d'adresse, un
+   * billet acheté avec la nouvelle n'apparaissait pas et un billet acheté avec l'ancienne
+   * continuait d'apparaître — pendant que l'écran du profil affichait la nouvelle.
+   */
+  const SESSION_EN_COURS = {
+    user: { id: 1, email: 'ancienne@exemple.test', pseudo: 'ancien', isGlobalAdmin: false },
+    expireAt: Date.now() + 10 * JOUR,
+    dureeSecondes: DUREES_DE_SESSION.prolongee,
+    ouvertureAt: Date.now() - 2 * JOUR,
+    persistant: true,
+    sessionVersion: 3,
+  }
+
+  it('⚠️ REMPLACE LES CHAMPS DEMANDÉS, et conserve les autres', async () => {
+    mockGetUserSession.mockResolvedValue({ ...SESSION_EN_COURS })
+
+    const fait = await rafraichirUtilisateurDeSession(
+      requete('nuxt-session=abc'),
+      { email: 'neuve@exemple.test' },
+      primitives
+    )
+
+    expect(fait).toBe(true)
+    const [, donnees] = mockSetUserSession.mock.calls[0]!
+    expect(donnees.user).toEqual({
+      id: 1,
+      email: 'neuve@exemple.test',
+      pseudo: 'ancien',
+      isGlobalAdmin: false,
+    })
+  })
+
+  it('⚠️ NE TOUCHE NI À L’ÉCHÉANCE, NI À LA GÉNÉRATION, NI À L’OUVERTURE', async () => {
+    /*
+     * C'est la moitié la plus facile à casser. Réécrire la session ENTIÈRE reviendrait à la
+     * rouvrir : l'horloge du plafond absolu repartirait de zéro, et une session de vingt-neuf jours
+     * redeviendrait neuve à chaque modification du profil. On ne passe donc QUE `user`, et la
+     * primitive fusionne à plat.
+     */
+    mockGetUserSession.mockResolvedValue({ ...SESSION_EN_COURS })
+
+    await rafraichirUtilisateurDeSession(
+      requete('nuxt-session=abc'),
+      { pseudo: 'neuf' },
+      primitives
+    )
+
+    const [, donnees] = mockSetUserSession.mock.calls[0]!
+    expect(Object.keys(donnees)).toEqual(['user'])
+  })
+
+  it('⚠️ REPOSE LE COOKIE AVEC SON ÉCHÉANCE, pour une session persistante', async () => {
+    /*
+     * Sans configuration de cookie, `setUserSession` retombe sur le réglage par défaut : un cookie
+     * daté perdrait sa date, ou un cookie de session en gagnerait une — « se souvenir de moi »
+     * cochée ou décochée à la place de la personne. Le piège est déjà documenté par la lecture
+     * glissante, quelques lignes plus haut dans le même fichier.
+     */
+    mockGetUserSession.mockResolvedValue({ ...SESSION_EN_COURS })
+
+    await rafraichirUtilisateurDeSession(
+      requete('nuxt-session=abc'),
+      { pseudo: 'neuf' },
+      primitives
+    )
+
+    const [, , config] = mockSetUserSession.mock.calls[0]!
+    expect(config.cookie.expires).toEqual(new Date(SESSION_EN_COURS.expireAt))
+  })
+
+  it('laisse un cookie de session SANS date', async () => {
+    // LE TÉMOIN DU SENS INVERSE : sans « se souvenir de moi », aucune date ne doit être écrite.
+    mockGetUserSession.mockResolvedValue({ ...SESSION_EN_COURS, persistant: false })
+
+    await rafraichirUtilisateurDeSession(
+      requete('nuxt-session=abc'),
+      { pseudo: 'neuf' },
+      primitives
+    )
+
+    const [, , config] = mockSetUserSession.mock.calls[0]!
+    expect(config.cookie).toEqual({})
+  })
+
+  it('n’interroge même pas h3 sans cookie entrant', async () => {
+    // Même raison que la lecture : `getSession` ne lit pas, il CRÉE quand il ne trouve rien.
+    const fait = await rafraichirUtilisateurDeSession(requete(), { pseudo: 'neuf' }, primitives)
+
+    expect(fait).toBe(false)
+    expect(mockGetUserSession).not.toHaveBeenCalled()
+    expect(mockSetUserSession).not.toHaveBeenCalled()
+  })
+
+  it('ne réécrit rien quand la session ne porte aucun utilisateur', async () => {
+    mockGetUserSession.mockResolvedValue({})
+
+    expect(
+      await rafraichirUtilisateurDeSession(requete('nuxt-session=abc'), { pseudo: 'n' }, primitives)
+    ).toBe(false)
+    expect(mockSetUserSession).not.toHaveBeenCalled()
+  })
+
+  it('refuse une session persistante SANS échéance, au lieu de poser une date invalide', async () => {
+    /*
+     * Une telle session est antérieure au dispositif glissant, et `getAuthSession` l'aurait déjà
+     * effacée. La laisser passer produirait un `new Date(undefined)` — donc un cookie à date
+     * invalide, c'est-à-dire une déconnexion immédiate sur un geste anodin.
+     */
+    mockGetUserSession.mockResolvedValue({ user: { id: 1 }, persistant: true })
+
+    expect(
+      await rafraichirUtilisateurDeSession(requete('nuxt-session=abc'), { pseudo: 'n' }, primitives)
+    ).toBe(false)
     expect(mockSetUserSession).not.toHaveBeenCalled()
   })
 })

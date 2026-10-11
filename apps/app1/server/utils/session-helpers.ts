@@ -167,6 +167,65 @@ export async function ouvrirSession(
   )
 }
 
+/**
+ * Met à jour les champs du compte PORTÉS PAR LA SESSION, sans toucher à sa durée de vie.
+ *
+ * ## Le défaut — constat B5
+ *
+ * La session est un cookie scellé : elle emporte une COPIE du compte, figée à la connexion. Le
+ * profil écrivait donc en base sans que `event.context.user` en sache rien, et la copie restait
+ * périmée jusqu'à la prochaine ouverture de session — c'est-à-dire des semaines pour qui a coché
+ * « se souvenir de moi ».
+ *
+ * Dix-neuf handlers lisent `user.email` ou `user.pseudo` depuis cette copie. Le plus visible :
+ * « Mes billets » cherche les commandes par l'adresse de SESSION. Après un changement d'adresse,
+ * un billet acheté avec la nouvelle n'apparaissait pas, et un billet acheté avec l'ancienne
+ * continuait d'apparaître — pendant que l'écran du profil affichait, lui, la nouvelle adresse.
+ * L'incohérence était invisible et durable.
+ *
+ * ## ⚠️ CE QUI NE DOIT SURTOUT PAS BOUGER
+ *
+ * `expireAt`, `dureeSecondes`, `ouvertureAt`, `persistant` et `sessionVersion` restent intacts :
+ * on ne passe QUE `user` à la primitive, qui fusionne à plat. Réécrire la session entière
+ * reviendrait à la rouvrir — l'horloge du plafond absolu repartirait de zéro, et une session de
+ * vingt-neuf jours redeviendrait neuve à chaque modification du profil.
+ *
+ * ⚠️ ET LE COOKIE EST REPOSÉ AVEC SON ÉCHÉANCE. Sans cette configuration, `setUserSession`
+ * retombe sur le réglage par défaut : un cookie de session se transformerait en cookie DATÉ — la
+ * case « se souvenir de moi » cochée à la place de la personne. C'est le piège que la lecture
+ * glissante documente déjà quelques lignes plus haut.
+ *
+ * @returns `true` si la session a été réécrite, `false` s'il n'y avait rien à rafraîchir
+ */
+export async function rafraichirUtilisateurDeSession(
+  event: H3Event,
+  champs: Record<string, unknown>,
+  primitives: PrimitivesDeSession = PRIMITIVES_PAR_DEFAUT
+): Promise<boolean> {
+  // Pas de cookie entrant : rien à rafraîchir, et surtout rien à CRÉER (cf. `getAuthSession`).
+  if (!aUneSessionDansLaRequete(event)) return false
+
+  const session = await primitives.lire(event)
+  const utilisateur = (session as { user?: Record<string, unknown> })?.user
+  if (!utilisateur) return false
+
+  const echeance = (session as EcheanceDeSession)?.expireAt
+  const persistant = (session as EcheanceDeSession)?.persistant === true
+  /*
+   * Une session sans échéance est antérieure au dispositif glissant, et `getAuthSession` l'aurait
+   * déjà effacée. La laisser passer ici produirait un `new Date(undefined)` — donc un cookie à
+   * date invalide, c'est-à-dire une déconnexion immédiate sur un geste anodin.
+   */
+  if (persistant && typeof echeance !== 'number') return false
+
+  await primitives.ecrire(
+    event,
+    { user: { ...utilisateur, ...champs } },
+    cookiePourEcheance(echeance as number, persistant)
+  )
+  return true
+}
+
 export function clearAuthSession(event: H3Event) {
   return clearUserSession(event)
 }

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockDemarrer = vi.hoisted(() => vi.fn())
 const mockEffacer = vi.hoisted(() => vi.fn())
+const mockRafraichirSession = vi.hoisted(() => vi.fn())
 
 /*
  * ⚠️ LES TROIS FONCTIONS DE FICHIERS SONT DES AUTO-IMPORTS de nuxt-file-storage : un
@@ -33,6 +34,14 @@ vi.mock('#server/utils/changement-d-adresse', () => ({
  */
 vi.mock('#server/utils/photo-de-profil', () => ({
   effacerAnciennePhoto: mockEffacer,
+}))
+
+/*
+ * Le rafraîchissement de la session est éprouvé dans `session-glissante.test.ts` — ce qui se
+ * vérifie ici est qu'il est APPELÉ, et avec quoi (constat B5).
+ */
+vi.mock('#server/utils/session-helpers', () => ({
+  rafraichirUtilisateurDeSession: mockRafraichirSession,
 }))
 
 /*
@@ -275,6 +284,70 @@ describe('PUT /api/profile/update', () => {
       expect(prismaMock.user.update).not.toHaveBeenCalled()
       // Et l'ancienne photo n'a surtout PAS été effacée : elle est tout ce qui reste.
       expect(mockEffacer).not.toHaveBeenCalled()
+    })
+  })
+  /**
+   * ⚠️⚠️ LA SESSION PORTE UNE COPIE DU COMPTE — constat B5.
+   *
+   * Elle est scellée dans un cookie, figée à la connexion. Le profil écrivait en base sans que
+   * cette copie en sache rien : dix-neuf handlers y lisent `user.email` ou `user.pseudo`, dont
+   * « Mes billets », qui cherche les commandes par l'adresse de SESSION. L'écran affichait le
+   * pseudo neuf pendant que le serveur raisonnait sur l'ancien — des semaines durant pour qui a
+   * coché « se souvenir de moi ».
+   */
+  describe('rafraîchissement de la session', () => {
+    const champsRafraichis = () => mockRafraichirSession.mock.calls.at(-1)?.[1] as any
+
+    it('⚠️ MET À JOUR LES CHAMPS QUE LA SESSION PORTE', async () => {
+      prismaMock.user.update.mockResolvedValue({
+        id: MOI,
+        pseudo: 'camille2',
+        nom: 'Martin',
+        prenom: 'Camille',
+        phone: '0600000000',
+      })
+      global.readBody.mockResolvedValue(corps({ pseudo: 'camille2' }))
+
+      await handler(evenement as any)
+
+      expect(mockRafraichirSession).toHaveBeenCalled()
+      expect(champsRafraichis()).toMatchObject({
+        pseudo: 'camille2',
+        nom: 'Martin',
+        prenom: 'Camille',
+        phone: '0600000000',
+      })
+    })
+
+    it('⚠️ N’Y MET PAS L’ADRESSE, qui ne change plus ici', async () => {
+      /*
+       * Depuis le constat B2, l'adresse ne bascule qu'à la CONFIRMATION du code. L'écrire dans la
+       * session à l'enregistrement y inscrirait une adresse que le compte n'a pas encore — et
+       * « Mes billets » chercherait les commandes d'une adresse non confirmée.
+       */
+      global.readBody.mockResolvedValue(
+        corps({ email: 'nouvelle@exemple.test', currentPassword: 'secret' })
+      )
+
+      await handler(evenement as any)
+
+      expect(champsRafraichis()).not.toHaveProperty('email')
+    })
+
+    it('ne touche aux catégories que si elles sont fournies', async () => {
+      /*
+       * LE TÉMOIN. Les écrire systématiquement depuis la réponse écraserait les déclarations de la
+       * session avec ce que le `select` rend — soit `undefined` pour un corps qui ne les mentionne
+       * pas, c'est-à-dire la perte des trois cases à chaque enregistrement du profil.
+       */
+      global.readBody.mockResolvedValue(corps({ prenom: 'Camille' }))
+
+      await handler(evenement as any)
+
+      const champs = champsRafraichis()
+      expect(champs).not.toHaveProperty('isVolunteer')
+      expect(champs).not.toHaveProperty('isArtist')
+      expect(champs).not.toHaveProperty('isOrganizer')
     })
   })
 })

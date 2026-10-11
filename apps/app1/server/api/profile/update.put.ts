@@ -5,6 +5,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { demarrerChangementDAdresse } from '#server/utils/changement-d-adresse'
 import { effacerAnciennePhoto } from '#server/utils/photo-de-profil'
+import { rafraichirUtilisateurDeSession } from '#server/utils/session-helpers'
 import { sanitizeString } from '#server/utils/validation-helpers'
 import {
   updateProfileSchema,
@@ -256,6 +257,32 @@ export default wrapApiHandler(
         createdAt: true,
         updatedAt: true,
       },
+    })
+
+    /*
+     * ⚠⚠ LA SESSION PORTE UNE COPIE DU COMPTE, et elle était laissée périmée — constat B5.
+     *
+     * Dix-neuf handlers lisent `user.email` ou `user.pseudo` depuis cette copie, figée à la
+     * connexion. Le plus visible : « Mes billets » cherche les commandes par l'adresse de SESSION.
+     * Pendant que l'écran du profil affichait le pseudo neuf, le serveur continuait de raisonner
+     * sur l'ancien — des semaines durant, pour qui a coché « se souvenir de moi ».
+     *
+     * 📍 L'ADRESSE N'EST PAS DANS CETTE LISTE, et ce n'est pas un oubli : depuis le constat B2 elle
+     * ne change plus ici, mais à la CONFIRMATION du code. C'est donc `confirm-email` qui la
+     * rafraîchit — sinon on écrirait dans la session une adresse que le compte n'a pas encore.
+     *
+     * 📍 Ni `profilePicture` : la session ne l'a jamais portée (vérifié à l'ouverture, côté
+     * `login`). L'y ajouter rendrait `user.profilePicture` soudain lisible dans les handlers, et
+     * ferait diverger les sessions ouvertes par OAuth, qui ne la posent pas non plus.
+     */
+    await rafraichirUtilisateurDeSession(event, {
+      pseudo: updatedUser.pseudo,
+      nom: updatedUser.nom,
+      prenom: updatedUser.prenom,
+      phone: updatedUser.phone,
+      ...(isVolunteer !== undefined && { isVolunteer: updatedUser.isVolunteer }),
+      ...(isArtist !== undefined && { isArtist: updatedUser.isArtist }),
+      ...(isOrganizer !== undefined && { isOrganizer: updatedUser.isOrganizer }),
     })
 
     /*

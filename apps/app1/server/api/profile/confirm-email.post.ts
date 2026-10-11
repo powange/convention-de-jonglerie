@@ -4,6 +4,7 @@ import { createSuccessResponse, wrapApiHandler } from '#server/utils/api-helpers
 import { requireAuth } from '#server/utils/auth-utils'
 import { confirmerChangementDAdresse } from '#server/utils/changement-d-adresse'
 import { verificationCodeRateLimiter } from '#server/utils/rate-limiter'
+import { rafraichirUtilisateurDeSession } from '#server/utils/session-helpers'
 import { validateAndSanitize } from '#server/utils/validation-schemas'
 
 const schema = z.object({
@@ -29,11 +30,20 @@ export default wrapApiHandler(
     const { email, emailHash } = await confirmerChangementDAdresse({ userId: user.id, code })
 
     /*
-     * ⚠️ LA SESSION N'EST PAS RÉÉCRITE ICI, et c'est délibéré : elle porte une copie du compte, et
-     * son rafraîchissement après une modification du profil est le sujet entier du constat B5 —
-     * un lot à part. Ce que ce point d'API garantit, c'est que la réponse porte l'adresse NEUVE,
-     * de sorte que l'écran puisse mettre son magasin à jour sans attendre un rechargement.
+     * ⚠⚠ LA SESSION EST RAFRAÎCHIE ICI, ET NULLE PART AILLEURS — constats B2 et B5 réunis.
+     *
+     * La session porte une COPIE du compte, scellée dans un cookie. Dix-neuf handlers y lisent
+     * `user.email`, dont « Mes billets », qui cherche les commandes par cette adresse : sans ce
+     * rafraîchissement, un billet acheté avec la NOUVELLE adresse n'apparaîtrait pas, et un billet
+     * acheté avec l'ANCIENNE continuerait d'apparaître — des semaines durant pour qui a coché
+     * « se souvenir de moi ».
+     *
+     * 📍 C'est le seul endroit où l'adresse de la session doit changer : la mise à jour du profil,
+     * elle, n'écrit plus l'adresse. La rafraîchir là-bas inscrirait dans la session une adresse que
+     * le compte n'a pas encore.
      */
+    await rafraichirUtilisateurDeSession(event, { email })
+
     return createSuccessResponse({ email, emailHash })
   },
   { operationName: 'ConfirmProfileEmail' }
