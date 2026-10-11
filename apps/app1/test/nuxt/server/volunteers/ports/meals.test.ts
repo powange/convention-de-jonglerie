@@ -274,7 +274,18 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
   })
 
   describe('updateEditionMealsConfig', () => {
-    it('à l’activation d’un repas, upsert les bénévoles éligibles et renvoie la bascule', async () => {
+    /**
+     * ⚠️ CE CAS EXIGEAIT UN `upsert` AVEC `update: { accepted: true }` — constat B3.
+     *
+     * C'est-à-dire qu'il figeait le défaut : réactiver un repas RÉ-INSCRIVAIT d'office les
+     * bénévoles qui l'avaient décliné. Leur refus était une réponse explicite, et il disparaissait
+     * sans un mot — avec un effet sur les quantités commandées en cuisine.
+     *
+     * La réactivation ne crée désormais que les lignes MANQUANTES, par un `createMany` précédé de
+     * la lecture de celles qui existent. Les choix déjà faits, acceptation comme refus, sont
+     * intacts.
+     */
+    it('à l’activation d’un repas, ne crée QUE les sélections manquantes', async () => {
       prismaMock.volunteerMeal.findMany
         .mockResolvedValueOnce([{ id: 1, enabled: false }]) // état avant (currentMeals)
         .mockResolvedValueOnce([{ id: 1, handoutItems: [] }]) // re-lecture finale
@@ -299,10 +310,11 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
       ])
 
       expect(prismaMock.volunteerMeal.update).toHaveBeenCalled()
-      expect(prismaMock.volunteerMealSelection.upsert).toHaveBeenCalledWith({
-        where: { volunteerId_mealId: { volunteerId: 1, mealId: 1 } },
-        create: { volunteerId: 1, mealId: 1, accepted: true },
-        update: { accepted: true },
+      // Plus aucun `upsert` : c'est lui qui écrasait les refus.
+      expect(prismaMock.volunteerMealSelection.upsert).not.toHaveBeenCalled()
+      expect(prismaMock.volunteerMealSelection.createMany).toHaveBeenCalledWith({
+        data: [{ volunteerId: 1, mealId: 1, accepted: true }],
+        skipDuplicates: true,
       })
 
       /*
@@ -311,8 +323,8 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
        * bien sur une colonne inexistante — c'est précisément ce qui a figé `selected` ici.
        */
       const colonnes = champsDuModele('VolunteerMealSelection')
-      const argument = prismaMock.volunteerMealSelection.upsert.mock.calls[0][0]
-      for (const champ of [...Object.keys(argument.create), ...Object.keys(argument.update)]) {
+      const argument = prismaMock.volunteerMealSelection.createMany.mock.calls[0][0]
+      for (const champ of Object.keys(argument.data[0])) {
         expect(colonnes, `champ « ${champ} » écrit sur VolunteerMealSelection`).toContain(champ)
       }
       expect(toggles).toEqual([
@@ -320,7 +332,23 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
       ])
     })
 
-    it('à la désactivation, supprime les sélections et renvoie une bascule off', async () => {
+    /**
+     * ⚠️⚠️ CE CAS DISAIT L'INVERSE, et il figeait le défaut — constat B3.
+     *
+     * Il exigeait un `deleteMany` sur toutes les sélections du repas. Or ce `deleteMany` effaçait
+     * les `consumedAt` déjà posés au comptoir : un clic malheureux sur le commutateur pendant
+     * l'événement perdait l'historique de service d'un repas entier, et les choix des personnes
+     * avec — sans message, sans retour possible.
+     *
+     * 📍 CE QUI REND LA CONSERVATION SÛRE, vérifié plutôt que supposé : toutes les lectures
+     * bornent sur `enabled: true` — celle des bénévoles comme celle des participants d'un repas
+     * (`participants.get.ts`, l. 58-62). Les lignes d'un repas désactivé n'apparaissent nulle
+     * part ; elles attendent, et réapparaissent telles quelles à la réactivation.
+     *
+     * Ce cas garde donc une DÉCISION : s'il tombe, c'est que quelqu'un a remis une suppression,
+     * et à lui de dire pourquoi.
+     */
+    it('⚠️ à la désactivation, NE SUPPRIME PLUS RIEN et renvoie une bascule off', async () => {
       prismaMock.volunteerMeal.findMany
         .mockResolvedValueOnce([{ id: 2, enabled: true }]) // état avant
         .mockResolvedValueOnce([{ id: 2, handoutItems: [] }]) // re-lecture finale
@@ -329,10 +357,50 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
         { id: 2, enabled: false },
       ])
 
-      expect(prismaMock.volunteerMealSelection.deleteMany).toHaveBeenCalledWith({
-        where: { mealId: 2 },
-      })
+      expect(prismaMock.volunteerMealSelection.deleteMany).not.toHaveBeenCalled()
       expect(toggles).toEqual([{ mealId: 2, date: new Date(0), mealType: '', enabled: false }])
+    })
+
+    /**
+     * ⚠️ LE CAS QUI MANQUAIT, et c'est celui qui dit le lot en entier.
+     *
+     * Les deux cas ci-dessus mesurent chacun une moitié : « rien n'est supprimé » et « on ne crée
+     * que le manquant ». Pris séparément, ils laisseraient passer une implémentation qui conserve
+     * la ligne puis la réécrit à `accepted: true` — c'est-à-dire exactement le défaut d'origine,
+     * déplacé d'une étape. Ce qu'il faut garder est l'INVARIANT sur le cycle complet : un REFUS
+     * traverse une désactivation suivie d'une réactivation.
+     */
+    it('⚠️ UN REFUS SURVIT à un cycle désactivation puis réactivation', async () => {
+      prismaMock.volunteerMeal.findMany
+        .mockResolvedValueOnce([{ id: 3, enabled: false }]) // état avant : le repas est éteint
+        .mockResolvedValueOnce([{ id: 3, handoutItems: [] }])
+      prismaMock.volunteerMeal.findUnique.mockResolvedValue({
+        date: new Date('2026-06-16'),
+        mealType: 'LUNCH',
+        phases: ['EVENT'],
+      })
+      prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([
+        {
+          id: 8,
+          setupAvailability: true,
+          teardownAvailability: true,
+          eventAvailability: true,
+          arrivalDateTime: null,
+          departureDateTime: null,
+        },
+      ])
+      // Le bénévole 8 a DÉCLINÉ ce repas, et sa ligne a survécu à la désactivation.
+      prismaMock.volunteerMealSelection.findMany.mockResolvedValue([{ volunteerId: 8 }])
+
+      await createDefaultVolunteerPorts().meals.updateEditionMealsConfig(10, [
+        { id: 3, enabled: true },
+      ])
+
+      // Ni création — la ligne existe — ni réécriture : son refus est intact.
+      expect(prismaMock.volunteerMealSelection.createMany).not.toHaveBeenCalled()
+      expect(prismaMock.volunteerMealSelection.upsert).not.toHaveBeenCalled()
+      expect(prismaMock.volunteerMealSelection.update).not.toHaveBeenCalled()
+      expect(prismaMock.volunteerMealSelection.updateMany).not.toHaveBeenCalled()
     })
   })
 

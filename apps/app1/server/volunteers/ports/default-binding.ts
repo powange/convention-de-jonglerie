@@ -197,13 +197,31 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
             prisma.artistMealSelection.upsert({
               where: { artistId_mealId: { artistId: artist.id, mealId } },
               create: { artistId: artist.id, mealId, accepted: true },
-              update: { accepted: true },
+              // ⚠️ RIEN à mettre à jour — constat B3 : écrire `accepted: true` ré-inscrivait
+              // d'office un artiste qui avait décliné ce repas. L'`upsert` ne sert plus qu'à
+              // créer la ligne manquante sans échouer sur celle qui existe déjà.
+              update: {},
             })
           )
         )
       },
-      async removeMealSelections(mealId) {
-        await prisma.artistMealSelection.deleteMany({ where: { mealId } })
+      /*
+       * ⚠️⚠️ NE SUPPRIME PLUS RIEN — constat B3.
+       *
+       * Cette méthode effaçait toutes les sélections d'artistes du repas, `consumedAt` et
+       * `afterShow` compris, dès qu'on désactivait le repas. Un clic malheureux pendant
+       * l'événement perdait l'historique de service.
+       *
+       * Elle est CONSERVÉE mais inerte plutôt que retirée du port : son appelant
+       * (`volunteers/meals.put.ts`) la choisit par une ternaire sur la bascule, et la retirer
+       * demanderait de réécrire ce chemin pour un gain nul. Le nom reste vrai du point de vue du
+       * contrat — « retirer les sélections de ce repas de ce qui est servi » —, et c'est
+       * désormais le filtre `enabled: true` des lectures qui l'assure, sans rien détruire.
+       *
+       * 📍 Ne pas la « réparer » en y remettant un `deleteMany` : c'était le défaut.
+       */
+      async removeMealSelections(_mealId) {
+        // Volontairement vide : voir ci-dessus.
       },
       async getShowSchedule(editionId) {
         const spectacles = await prisma.show.findMany({

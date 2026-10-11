@@ -202,15 +202,28 @@ export async function updateEditionMealsConfig(editionId: number, meals: MealUpd
           )
         )
 
-        await Promise.all(
-          eligibleVolunteers.map((volunteer) =>
-            prisma.volunteerMealSelection.upsert({
-              where: { volunteerId_mealId: { volunteerId: volunteer.id, mealId: meal.id } },
-              create: { volunteerId: volunteer.id, mealId: meal.id, accepted: true },
-              update: { accepted: true },
-            })
-          )
-        )
+        /*
+         * ⚠️ ON NE CRÉE QUE LE MANQUANT — constat B3.
+         *
+         * L'`upsert` écrivait `update: { accepted: true }` : réactiver un repas RÉ-INSCRIVAIT
+         * d'office les bénévoles qui l'avaient décliné. Leur refus était une réponse explicite,
+         * et il disparaissait sans un mot — avec, en prime, un effet sur les quantités
+         * commandées en cuisine.
+         *
+         * `skipDuplicates` laisse donc intactes les lignes existantes, quel que soit leur
+         * `accepted`. C'est le motif que `createVolunteerMealSelections` applique déjà plus bas.
+         */
+        const dejaChoisi = await prisma.volunteerMealSelection.findMany({
+          where: { mealId: meal.id, volunteerId: { in: eligibleVolunteers.map((v) => v.id) } },
+          select: { volunteerId: true },
+        })
+        const connus = new Set(dejaChoisi.map((ligne) => ligne.volunteerId))
+        const aCreer = eligibleVolunteers
+          .filter((volunteer) => !connus.has(volunteer.id))
+          .map((volunteer) => ({ volunteerId: volunteer.id, mealId: meal.id, accepted: true }))
+        if (aCreer.length > 0) {
+          await prisma.volunteerMealSelection.createMany({ data: aCreer, skipDuplicates: true })
+        }
 
         toggles.push({
           mealId: meal.id,
@@ -219,7 +232,23 @@ export async function updateEditionMealsConfig(editionId: number, meals: MealUpd
           enabled: true,
         })
       } else {
-        await prisma.volunteerMealSelection.deleteMany({ where: { mealId: meal.id } })
+        /*
+         * ⚠️⚠️ ON NE SUPPRIME PLUS RIEN À LA DÉSACTIVATION — constat B3.
+         *
+         * Un `deleteMany` effaçait ici TOUTES les sélections du repas, **y compris les
+         * `consumedAt` déjà posés au comptoir** : un clic malheureux pendant l'événement perdait
+         * l'historique de service d'un repas entier, et les choix des personnes avec. Sans
+         * message, sans retour possible.
+         *
+         * 📍 CE QUI REND LA CONSERVATION SÛRE, et c'est vérifié plutôt que supposé : toutes les
+         * lectures bornent sur `enabled: true` — celle des bénévoles (l. 281 de ce fichier) comme
+         * celle des participants d'un repas (`participants.get.ts`, l. 58-62). Les lignes d'un
+         * repas désactivé n'apparaissent donc nulle part ; elles attendent, et réapparaissent
+         * telles quelles si on le réactive.
+         *
+         * 📍 L'asymétrie que le constat relevait disparaît du même coup : les lignes
+         * organisateurs et billets n'étaient déjà pas touchées.
+         */
         toggles.push({ mealId: meal.id, date: new Date(0), mealType: '', enabled: false })
       }
     })

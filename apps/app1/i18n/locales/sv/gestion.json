@@ -281,8 +281,8 @@
       "volunteers": "Volontärer",
       "no_enabled_meal": "Ingen måltid att validera",
       "no_enabled_meal_description": "Den här upplagan har ingen aktiverad måltid: de har ännu inte konfigurerats, eller alla har inaktiverats. Aktivera minst en måltid för att öppna disken.",
-      "confirm_disable_description": "Volontärernas svar för denna måltid raderas, och raderingen är slutgiltig. Att slå på måltiden igen återställer dem inte: varje behörig volontär skrivs in på nytt som accepterande, även de som tackat nej.",
-      "confirm_disable_label": "Stäng av och radera svaren",
+      "confirm_disable_description": "[TODO] Volontärernas svar för denna måltid raderas, och raderingen är slutgiltig. Att slå på måltiden igen återställer dem inte: varje behörig volontär skrivs in på nytt som accepterande, även de som tackat nej.",
+      "confirm_disable_label": "[TODO] Stäng av och radera svaren",
       "confirm_disable_title": "Stänga av denna måltid?"
     },
     "organizers": {

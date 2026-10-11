@@ -217,14 +217,24 @@ const confirmation = useConfirmation()
 /**
  * Enregistre un changement de repas, en demandant confirmation AVANT une désactivation.
  *
- * ⚠️ DÉSACTIVER UN REPAS DÉTRUIT LES SÉLECTIONS DES BÉNÉVOLES, et c'est sans retour : le serveur
- * fait un `deleteMany` sur toutes les lignes du repas. Le commutateur enregistrait immédiatement,
- * sans rien demander — un clic par mégarde, et le travail de chacun disparaissait.
+ * ⚠️⚠️ CE BLOC A ÉTÉ RÉÉCRIT LE 11/10/2026 — son texte d'origine est devenu FAUX, et le laisser
+ * aurait été pire qu'une absence de commentaire.
  *
- * ⚠️ ET LE RÉACTIVER NE LES RESTAURE PAS. Il recrée une sélection ACCEPTÉE pour chaque bénévole
- * éligible : celui qui avait REFUSÉ le repas se retrouve inscrit. Réactiver pour « annuler » sa
- * méprise aggrave donc la situation au lieu de la réparer, et c'est ce que la confirmation doit
- * dire — sans quoi elle laisserait croire que le geste est réversible.
+ * Il disait : « désactiver un repas DÉTRUIT les sélections des bénévoles, et c'est sans retour :
+ * le serveur fait un `deleteMany` » et « le réactiver ne les restaure pas : il recrée une
+ * sélection ACCEPTÉE pour chaque éligible, y compris ceux qui avaient refusé ».
+ *
+ * C'était exact, et c'est précisément ce que le constat B3 a corrigé **côté serveur** : plus
+ * aucune suppression à la désactivation, et la réactivation ne crée que les lignes MANQUANTES.
+ * Les `consumedAt` posés au comptoir et les refus explicites survivent donc au clic.
+ *
+ * ## La confirmation reste, et c'est délibéré
+ *
+ * Désactiver un repas le fait disparaître des écrans, du guichet et des comptages de cuisine : le
+ * geste est lourd même s'il ne détruit plus rien. Ce qui change est ce qu'elle ANNONCE — elle
+ * promettait une perte définitive, elle dit maintenant que tout est conservé et réapparaîtra. Une
+ * confirmation qui surestime le danger se fait fermer sans être lue, exactement comme celle qui
+ * le sous-estime.
  *
  * Seule la DÉSACTIVATION est gardée. Demander confirmation pour activer un repas, ou pour changer
  * ses phases, ajouterait un clic à des gestes qui ne détruisent rien — et une confirmation qu'on
