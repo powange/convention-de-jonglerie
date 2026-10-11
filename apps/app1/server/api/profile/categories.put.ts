@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { rafraichirUtilisateurDeSession } from '#server/utils/session-helpers'
 import {
   categoriesUpdateSchema,
   validateAndSanitize,
@@ -51,6 +52,17 @@ export default wrapApiHandler(
         createdAt: true,
         updatedAt: true,
       },
+    })
+
+    /*
+     * Les trois catégories sont dans la session depuis l'ouverture (cf. `login`) : les y laisser
+     * périmées ferait raisonner le serveur sur des déclarations que la personne vient de changer
+     * — constat B5. Même geste que la mise à jour du profil, même raison.
+     */
+    await rafraichirUtilisateurDeSession(event, {
+      isVolunteer: updatedUser.isVolunteer,
+      isArtist: updatedUser.isArtist,
+      isOrganizer: updatedUser.isOrganizer,
     })
 
     return createSuccessResponse(updatedUser)
