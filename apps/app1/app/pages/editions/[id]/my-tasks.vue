@@ -147,6 +147,7 @@ import type { TaskFiltersValue, TaskSort } from '~/components/tasks/TaskFilters.
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
+import { filtrerParEcheance, type FiltreEcheance } from '~~/shared/utils/filtre-echeance-taches'
 import { contientLaSaisie } from '~~/shared/utils/recherche-texte'
 
 definePageMeta({
@@ -200,6 +201,16 @@ if (Number.isNaN(editionId)) {
 
 const editionLoading = computed(() => editionStore.loading)
 const edition = computed(() => editionStore.getEditionById(editionId))
+
+/**
+ * Le fuseau de l'édition : une échéance est une heure de LIEU, et c'est dans ce fuseau qu'elle a
+ * été saisie. Il était déjà lu pour l'AFFICHAGE d'une date, au point d'appel ; il est nommé une
+ * fois, maintenant que le FILTRE s'en sert aussi — c'est l'écart entre les deux qui faisait le
+ * défaut B4, l'écran montrant un jour et le filtre en lisant un autre.
+ */
+const fuseauEdition = computed(
+  () => (edition.value as { timezone?: string | null } | null)?.timezone ?? null
+)
 
 const tasks = ref<MyTaskItem[]>([])
 const loading = ref(true)
@@ -338,29 +349,19 @@ const filteredTasks = computed<MyTaskItem[]>(() => {
     list = list.filter((t) => t.tagAssignments.some((a) => set.has(a.tag.id)))
   }
 
-  const due = filters.value.due
-  if (due && due !== 'all') {
-    const now = new Date()
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-    list = list.filter((t) => {
-      if (due === 'none') return t.deadline === null
-      if (!t.deadline) return false
-      const d = new Date(t.deadline)
-      if (due === 'overdue') return d < now && t.status !== 'DONE' && t.status !== 'CANCELLED'
-      if (due === 'today') {
-        const day = new Date(d.getFullYear(), d.getMonth(), d.getDate())
-        return day.getTime() === today.getTime()
-      }
-      if (due === 'next7' || due === 'next30') {
-        const days = due === 'next7' ? 7 : 30
-        const limit = new Date(today)
-        limit.setDate(limit.getDate() + days)
-        limit.setHours(23, 59, 59, 999)
-        return d >= today && d <= limit
-      }
-      return true
-    })
-  }
+  /*
+   * ⚠️ LES JOURNÉES SE DÉCOUPENT À L'HEURE DE L'ÉDITION — constat B4. Ce bloc construisait
+   * « aujourd'hui » dans le fuseau du NAVIGATEUR, alors que l'échéance est saisie et affichée à
+   * l'heure du lieu : pour qui suit depuis ailleurs, une tâche affichée « 12 oct. » pouvait tomber
+   * hors de « aujourd'hui ». La règle est partagée avec l'autre écran qui filtre les mêmes
+   * échéances, et c'est son recopiage qui avait rendu le défaut identique des deux côtés.
+   */
+  list = filtrerParEcheance(
+    list,
+    filters.value.due as FiltreEcheance,
+    new Date(),
+    fuseauEdition.value
+  )
 
   return list
 })
@@ -411,7 +412,7 @@ function statusColor(status: TaskStatus): 'neutral' | 'info' | 'success' | 'erro
 
 function formatDeadline(d: string): string {
   try {
-    return formatDateShortMonth(d, edition.value?.timezone ?? null)
+    return formatDateShortMonth(d, fuseauEdition.value)
   } catch {
     return d
   }
