@@ -1,6 +1,12 @@
 import { z } from 'zod'
 
+import { changementNotable } from '../../../../utils/changement-de-creneau'
 import { formaterCreneau, inclusionCreneau } from '../../../../utils/creneau-formate'
+import {
+  comptesAffectesAuCreneau,
+  notifierCreneauDeplace,
+} from '../../../../utils/notification-creneau'
+import { planningPublieDeLEdition } from '../../../../utils/planning-publie'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -150,6 +156,36 @@ export default wrapApiHandler(
       data: updateData,
       include: inclusionCreneau,
     })
+
+    /*
+     * Prévenir ceux qui tiennent ce créneau — constat B4.
+     *
+     * ⚠️ APRÈS l'écriture, et dans un `try` qui englobe les LECTURES autant que l'envoi. Le port
+     * de notification ne lève pas (il le dit dans son type), mais la lecture des destinataires et
+     * du fuseau, elle, peut : sans cette garde, un déplacement pourtant ENREGISTRÉ répondrait 500.
+     * C'est le défaut exact déjà payé sur la messagerie, où seule la boucle d'envoi était protégée.
+     *
+     * `planningPublie` d'abord, parce que c'est la condition la moins coûteuse et la plus souvent
+     * fausse pendant la préparation : inutile de lire les affectations d'un brouillon.
+     */
+    try {
+      const avant = {
+        startDateTime: existingSlot.startDateTime,
+        endDateTime: existingSlot.endDateTime,
+        teamId: existingSlot.teamId,
+        delayMinutes: existingSlot.delayMinutes,
+      }
+      if (changementNotable(avant, timeSlot) && (await planningPublieDeLEdition(editionId))) {
+        await notifierCreneauDeplace({
+          editionId,
+          destinataires: await comptesAffectesAuCreneau(slotId),
+          avant,
+          apres: timeSlot,
+        })
+      }
+    } catch (erreur) {
+      console.error('[UpdateVolunteerTimeSlot] notification du déplacement impossible :', erreur)
+    }
 
     // Le client REMPLACE le créneau qu'il tient par celui-ci : il doit donc porter exactement ce
     // que rend la liste, sans quoi le déplacement d'un créneau efface à l'écran ce que la réponse

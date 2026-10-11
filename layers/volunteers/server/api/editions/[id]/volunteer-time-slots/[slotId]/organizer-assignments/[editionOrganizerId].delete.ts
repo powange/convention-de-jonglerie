@@ -1,3 +1,6 @@
+import { notifierRetraitDuCreneau } from '../../../../../../utils/notification-creneau'
+import { planningPublieDeLEdition } from '../../../../../../utils/planning-publie'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import {
@@ -30,7 +33,14 @@ export default wrapApiHandler(
     // identifiant de créneau venu d'ailleurs.
     const timeSlot = await prisma.volunteerTimeSlot.findFirst({
       where: { id: slotId, eventId: editionId },
-      select: { id: true },
+      // Les dates servent au message de la notification — constat B4.
+      select: {
+        id: true,
+        startDateTime: true,
+        endDateTime: true,
+        teamId: true,
+        delayMinutes: true,
+      },
     })
     if (!timeSlot) {
       throw createError({
@@ -39,11 +49,40 @@ export default wrapApiHandler(
       })
     }
 
+    /*
+     * Le compte à prévenir se lit AVANT la suppression — constat B4.
+     *
+     * ⚠️⚠️ LE COMPTE EST À DEUX RELATIONS DE LÀ, et s'y tromper est SILENCIEUX.
+     * `EditionOrganizer.organizerId` référence `ConventionOrganizer`, pas `User` : le compte se lit
+     * `organizer.userId`. Les deux séquences étant indépendantes, un `organizerId` pris pour un
+     * identifiant de compte désigne le plus souvent un utilisateur EXISTANT — mais un autre.
+     */
+    const organisateur = await prisma.editionOrganizer.findUnique({
+      where: { id: editionOrganizerId },
+      select: { organizer: { select: { userId: true } } },
+    })
+
     const supprimees = await prisma.organizerSlotAssignment.deleteMany({
       where: { editionOrganizerId, timeSlotId: slotId },
     })
     if (supprimees.count === 0) {
       throw createError({ status: 404, message: 'Affectation introuvable' })
+    }
+
+    /*
+     * Un organisateur posé sur un créneau n'est pas un spectateur : il tient le poste, et le
+     * retirer sans le lui dire est le même défaut que pour un bénévole.
+     */
+    try {
+      if (organisateur && (await planningPublieDeLEdition(editionId))) {
+        await notifierRetraitDuCreneau({
+          editionId,
+          userId: organisateur.organizer.userId,
+          creneau: timeSlot,
+        })
+      }
+    } catch (erreur) {
+      console.error('[DeleteOrganizerSlotAssignment] notification du retrait impossible :', erreur)
     }
 
     return createSuccessResponse({ editionOrganizerId, timeSlotId: slotId })

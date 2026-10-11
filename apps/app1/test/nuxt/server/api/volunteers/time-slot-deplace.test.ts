@@ -6,9 +6,20 @@ import {
 } from '../../../../../shared/utils/bornes-retard-creneau'
 
 const mockRequireManagement = vi.fn()
+/*
+ * ⚠️ `notifications` est OBLIGATOIRE dans ce bouchon depuis le constat B4 : le point d'API prévient
+ * désormais les personnes affectées quand le créneau bouge. L'omettre ne rend pas `notify`
+ * silencieux — il rend `notifications` indéfini, et l'accès lève. La garde du handler rattraperait
+ * l'erreur, donc les huit cas de ce fichier resteraient VERTS au-dessus d'une notification qui ne
+ * part jamais : le bouchon doit porter ce que le code appelle.
+ */
+const mockNotify = vi.fn()
 
 vi.mock('#server/volunteers/ports/registry', () => ({
-  useVolunteerPorts: () => ({ organizers: { requireManagementAccess: mockRequireManagement } }),
+  useVolunteerPorts: () => ({
+    organizers: { requireManagementAccess: mockRequireManagement },
+    notifications: { notify: mockNotify },
+  }),
 }))
 
 import { inclusionCreneau } from '../../../../../../../layers/volunteers/server/utils/creneau-formate'
