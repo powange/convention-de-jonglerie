@@ -500,6 +500,13 @@
       "list": {
         "delete_button": "Supprimer",
         "delete_confirm": "Êtes-vous sûr de vouloir supprimer le quota '{name}' ?",
+        "delete_confirm_with_links": "Êtes-vous sûr de vouloir supprimer le quota '{name}' ? Ses {count} association(s) disparaîtront avec lui, sans retour possible : {detail}.",
+        "delete_links_artists": "{count} spectacle(s)",
+        "delete_links_custom_fields": "{count} champ(s) personnalisé(s)",
+        "delete_links_options": "{count} option(s)",
+        "delete_links_organizers": "{count} organisateur(s)",
+        "delete_links_tiers": "{count} tarif(s)",
+        "delete_links_volunteers": "{count} équipe(s) de bénévoles",
         "delete_title": "Supprimer le quota",
         "description": "Définissez ici les quotas pour limiter l'accès à certaines prestations (spectacles, activités, entrées, etc.)",
         "description_label": "description",
