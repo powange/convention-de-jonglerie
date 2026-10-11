@@ -22,6 +22,12 @@ logs
 # État local de la commande /check-error-logs
 .claude/error-logs-monitor.json
 
+# Sauvegarde du hash bcrypt écrite par scripts/_temp-password-swap.ts, le temps d'un échange de
+# mot de passe en développement. ⚠️ Elle n'était PAS ignorée : un `git add -A` l'aurait commitée,
+# et le hash d'un vrai compte serait entré dans l'historique du dépôt — d'où il ne sort plus.
+.pwd-swap-backup.json
+apps/app1/.pwd-swap-backup.json
+
 # Test coverage
 coverage
 
