@@ -56,7 +56,17 @@ jobs:
           java-version: '17'
 
       - name: Préparer le SDK Android
-        uses: android-actions/setup-android@v3
+        # ⚠️ ÉPINGLÉE PAR EMPREINTE, et c'est la SEULE action tierce de ce dépôt. Un tag de
+        # majeure peut être déplacé par son éditeur : c'est le vecteur exploité contre
+        # `tj-actions` en 2025. Les 37 autres usages sont des actions officielles GitHub, 8 une
+        # action locale, 3 de Docker Inc. — les épingler toutes rendrait chaque mise à jour
+        # manuelle pour un risque que GitHub lui-même ne recommande pas de couvrir ainsi.
+        #
+        # Pour la faire évoluer : relever la nouvelle empreinte avec
+        #   gh api repos/android-actions/setup-android/git/ref/tags/<tag> --jq .object.sha
+        # et mettre à jour le commentaire de version. 📍 Une v4 existe (v4.0.4) ; ce lot épingle
+        # l'existant sans le monter, ce sont deux décisions distinctes.
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3.2.2
 
       - name: Préparer Node
         uses: actions/setup-node@v4
