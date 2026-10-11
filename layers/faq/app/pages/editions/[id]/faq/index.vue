@@ -177,16 +177,42 @@ watch(
   { flush: 'post' }
 )
 
+/*
+ * ⚠⚠ `useRequestFetch` ET NON `$fetch` — constat B6.
+ *
+ * Cette page est rendue CÔTÉ SERVEUR, et `fetchEntries` est attendu au premier niveau du `setup`.
+ * Or `$fetch` n'emporte pas le cookie de session pendant le rendu serveur : la requête partait
+ * ANONYME. Pour un éditeur qui rechargeait sa FAQ pas encore publiée, le serveur répondait donc
+ * 404 — et comme l'échec est levé en `fatal`, ce n'était pas une liste vide, c'était la page
+ * entière qui disparaissait. `useRequestFetch` réexpédie les en-têtes de la requête entrante.
+ *
+ * 📍 Le composable est appelé ICI, au `setup` : l'appeler depuis l'intérieur de la fonction
+ * asynchrone le placerait hors du contexte Nuxt une fois la première micro-tâche passée.
+ */
+const requeteAvecSession = useRequestFetch()
+
 async function fetchEntries() {
   try {
     loading.value = true
     // `publicOnly=1` : ne renvoie que les entrées publiques même si l'utilisateur
     // connecté est éditeur (sinon il verrait les privées sur la page publique).
-    const res = await $fetch<{
+    const res = await requeteAvecSession<{
       success: boolean
-      data: { faqEnabled: boolean; faqPagePublic: boolean; entries: FaqEntry[] }
+      data: {
+        faqEnabled: boolean
+        faqPagePublic: boolean
+        publicPageVisible: boolean
+        entries: FaqEntry[]
+      }
     }>(`/api/editions/${editionId}/faq`, { query: { publicOnly: '1' } })
-    if (!res?.data?.faqEnabled || !res?.data?.faqPagePublic) {
+    /*
+     * ⚠️ ON LIT LE VERDICT DU SERVEUR, on ne le recalcule pas. Cette condition portait sur
+     * `faqEnabled && faqPagePublic` sans regarder QUI demande : un éditeur ne pouvait donc jamais
+     * relire sa FAQ avant publication — pas même en navigation interne, où son cookie accompagne
+     * pourtant la requête. Le serveur, lui, le sait : c'est lui qui vient de décider de ne pas
+     * répondre 404.
+     */
+    if (!res?.data?.publicPageVisible) {
       throw createError({ statusCode: 404, statusMessage: 'FAQ non disponible', fatal: true })
     }
     entries.value = res?.data?.entries || []

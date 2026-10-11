@@ -57,12 +57,19 @@ export default wrapApiHandler(
      * cas de loin les plus fréquents — le gestionnaire et le visiteur d'une FAQ publiée — sont
      * tranchés avant d'y arriver.
      */
+    /*
+     * Qui peut voir la page PUBLIQUE d'une FAQ pas encore publiée : celui qui la gère, et plus
+     * largement celui qui entre dans l'espace de gestion. C'est le verdict rendu plus bas sous
+     * `publicPageVisible`, et c'est ce qui dispense la page de le recalculer — cf. le constat B6.
+     */
+    let peutApercevoir = isFaqManager
+
     if (!isFaqManager && !faqEnabled) {
       throw createError({ status: 404, message: 'FAQ non disponible' })
     }
     if (!isFaqManager && !faqPagePublic) {
-      const peutEntrerEnGestion = !!user && (await aAccesGestionEdition(edition, user))
-      if (!peutEntrerEnGestion) {
+      peutApercevoir = !!user && (await aAccesGestionEdition(edition, user))
+      if (!peutApercevoir) {
         throw createError({ status: 404, message: 'FAQ non disponible' })
       }
     }
@@ -91,6 +98,18 @@ export default wrapApiHandler(
     return createSuccessResponse({
       faqEnabled,
       faqPagePublic,
+      /*
+       * ⚠⚠ LE VERDICT, ET IL ÉVITE QUE DEUX ENDROITS RÉPONDENT À LA MÊME QUESTION — constat B6.
+       *
+       * La page publique décidait elle-même, sur `faqEnabled && faqPagePublic`, sans regarder qui
+       * demande : un éditeur ne pouvait donc JAMAIS relire sa FAQ avant de l'avoir publiée, même
+       * en navigation interne où son cookie accompagne la requête. Le serveur, lui, le savait déjà
+       * — c'est lui qui vient de décider de ne pas répondre 404.
+       *
+       * Un module ÉTEINT ne montre rien à personne sur la page publique, pas même à qui le gère :
+       * c'est la règle que porte le commentaire ci-dessus, et `faqEnabled &&` la tient.
+       */
+      publicPageVisible: faqEnabled && (faqPagePublic || peutApercevoir),
       entries,
     })
   },
