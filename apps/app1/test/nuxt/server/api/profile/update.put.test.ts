@@ -1,6 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockDemarrer = vi.hoisted(() => vi.fn())
+const mockEffacer = vi.hoisted(() => vi.fn())
+
+/*
+ * ⚠️ LES TROIS FONCTIONS DE FICHIERS SONT DES AUTO-IMPORTS de nuxt-file-storage : un
+ * `vi.mock('nuxt-file-storage')` ne les intercepte PAS, la globale est la seule prise. Quatrième
+ * fois que ce dépôt le paie.
+ */
+vi.hoisted(() => {
+  const g = globalThis as any
+  g.getFileLocally = vi.fn(() => '/mount/temp/profiles/7/abc.png')
+  g.storeFileLocally = vi.fn(async () => 'def456.png')
+  g.deleteFile = vi.fn(async () => undefined)
+})
 
 vi.mock('#server/utils/auth-utils', () => ({
   requireAuth: vi.fn((event) => event.context.user),
@@ -12,6 +25,25 @@ vi.mock('#server/utils/auth-utils', () => ({
  */
 vi.mock('#server/utils/changement-d-adresse', () => ({
   demarrerChangementDAdresse: mockDemarrer,
+}))
+
+/*
+ * L'effacement physique est éprouvé là où il vit (`image-deletion`) : ici on vérifie qu'il est
+ * APPELÉ, et avec la valeur lue en base — c'est tout l'objet des constats B3 et B4.
+ */
+vi.mock('#server/utils/photo-de-profil', () => ({
+  effacerAnciennePhoto: mockEffacer,
+}))
+
+/*
+ * ⚠️ LE HANDLER LIT RÉELLEMENT LE FICHIER TEMPORAIRE (`await import('fs/promises')`) pour le
+ * réencoder : sans ce bouchon, le cas du remplacement échoue sur un ENOENT, et l'échec est AVALÉ
+ * par le `catch` du handler — on croirait tester le remplacement en mesurant le chemin d'erreur.
+ * Seul `readFile` est remplacé, le reste du module demeure.
+ */
+vi.mock('fs/promises', async (original) => ({
+  ...(await original<Record<string, unknown>>()),
+  readFile: vi.fn(async () => Buffer.from('une image', 'utf8')),
 }))
 
 import handler from '../../../../../server/api/profile/update.put'
@@ -43,6 +75,9 @@ const prismaMock = (globalThis as any).prisma
 const MOI = 7
 const MON_ADRESSE = 'camille@exemple.test'
 
+/** La photo que la BASE porte, réglée cas par cas — la session, elle, n'en porte aucune. */
+const photoEnBase = { valeur: null as string | null }
+
 const compte = { id: MOI, email: MON_ADRESSE, pseudo: 'camille', isGlobalAdmin: false }
 const evenement = { context: { user: compte } }
 
@@ -61,7 +96,14 @@ describe('PUT /api/profile/update', () => {
     vi.clearAllMocks()
     mockDemarrer.mockResolvedValue({ pendingEmail: 'nouvelle@exemple.test' })
     prismaMock.user.findUnique.mockReset()
-    prismaMock.user.findUnique.mockResolvedValue(null)
+    /*
+     * ⚠️ DEUX LECTURES SUR LE MÊME MODÈLE : le contrôle d'unicité du pseudo, et la photo courante.
+     * Le bouchon ignorant le `where`, il faut répondre selon ce qui est DEMANDÉ — sans quoi la
+     * photo courante prend la réponse destinée à l'unicité, et les cas mesurent n'importe quoi.
+     */
+    prismaMock.user.findUnique.mockImplementation(async (args: any) =>
+      args?.select?.profilePicture ? { profilePicture: photoEnBase.valeur } : null
+    )
     prismaMock.user.update.mockReset()
     prismaMock.user.update.mockResolvedValue({ id: MOI, email: MON_ADRESSE, pseudo: 'camille' })
     global.readBody.mockReset()
@@ -149,5 +191,90 @@ describe('PUT /api/profile/update', () => {
 
     await expect(handler(evenement as any)).rejects.toThrow()
     expect(prismaMock.user.update).not.toHaveBeenCalled()
+  })
+  /**
+   * ⚠️⚠️ LES PHOTOS DE PROFIL N'ÉTAIENT JAMAIS EFFACÉES — constats B3 et B4.
+   *
+   * Deux occasions, aucune ne le faisait :
+   *
+   * 1. le REMPLACEMENT stockait la nouvelle image et laissait la précédente sur le disque ;
+   * 2. le RETRAIT testait `user.profilePicture` — lu dans la SESSION, qui ne porte que `id`,
+   *    `email`, `pseudo` et `isGlobalAdmin`. La condition était donc structurellement FAUSSE pour
+   *    tout compte à mot de passe : personne n'effaçait jamais rien, le disque ne faisait que
+   *    grossir, et la personne croyait avoir retiré une image toujours servie par `/api/uploads`.
+   *
+   * 📍 CE QUE LA MESURE A CORRIGÉ DANS LA FICHE. Elle nommait QUATRE chemins ; deux sont déjà
+   * refermés. `DELETE /api/profile/delete-picture` fonctionne — `extractFilePath`, qu'elle
+   * incrimine, n'existe plus : la réécriture de #648 lit la valeur EN BASE et délègue à
+   * `deleteOldFile`. Et la purge des temporaires existe aussi, en tâche planifiée
+   * (`cleanup-temp-uploads`, délai de grâce d'une heure, là où la fiche demandait d'en écrire une
+   * à vingt-quatre heures). La revérification du 9 octobre affirmait que #648 n'avait traité que
+   * les éditions ; c'est inexact.
+   */
+  describe('photo de profil', () => {
+    beforeEach(() => {
+      photoEnBase.valeur = 'ancienne.png'
+    })
+
+    it('⚠️ EFFACE L’ANCIENNE PHOTO AU REMPLACEMENT, avec la valeur lue EN BASE', async () => {
+      global.readBody.mockResolvedValue(
+        corps({ profilePicture: '/uploads/temp/profiles/7/abc.png' })
+      )
+
+      await handler(evenement as any)
+
+      expect(mockEffacer).toHaveBeenCalledWith('ancienne.png', MOI)
+      // Et c'est bien la NOUVELLE qui est enregistrée.
+      expect(donneesEcrites().profilePicture).toBe('def456.png')
+    })
+
+    it('⚠️ EFFACE L’ANCIENNE PHOTO AU RETRAIT — la branche était morte', async () => {
+      global.readBody.mockResolvedValue(corps({ profilePicture: null }))
+
+      await handler(evenement as any)
+
+      expect(mockEffacer).toHaveBeenCalledWith('ancienne.png', MOI)
+      expect(donneesEcrites().profilePicture).toBeNull()
+    })
+
+    it('n’efface rien quand la photo n’est pas touchée', async () => {
+      /*
+       * LE TÉMOIN. Sans lui, un handler qui effacerait à CHAQUE enregistrement satisferait les deux
+       * cas précédents — et corriger son prénom retirerait sa photo.
+       */
+      global.readBody.mockResolvedValue(corps({ prenom: 'Camille' }))
+
+      await handler(evenement as any)
+
+      expect(mockEffacer).not.toHaveBeenCalled()
+      expect(donneesEcrites()).not.toHaveProperty('profilePicture')
+    })
+
+    it('n’efface rien quand il n’y avait aucune photo', async () => {
+      photoEnBase.valeur = null
+      global.readBody.mockResolvedValue(corps({ profilePicture: null }))
+
+      await handler(evenement as any)
+
+      expect(mockEffacer).toHaveBeenCalledWith(null, MOI)
+    })
+
+    it('⚠️ REFUSE EN 500 SI LE DÉPLACEMENT ÉCHOUE, sans rien écrire', async () => {
+      /*
+       * Constat B4. Le `catch` enregistrait le nom du fichier TEMPORAIRE « en cas d'erreur » :
+       * l'adresse construite ensuite — `/uploads/profiles/<id>/abc.png` — n'existe pas, et la
+       * personne voyait une image CASSÉE partout où elle apparaît, avec un 200 et un message de
+       * succès. Un refus franc laisse l'ancienne photo en place.
+       */
+      ;(globalThis as any).getFileLocally.mockReturnValueOnce(null)
+      global.readBody.mockResolvedValue(
+        corps({ profilePicture: '/uploads/temp/profiles/7/abc.png' })
+      )
+
+      await expect(handler(evenement as any)).rejects.toThrow(/réessayez/i)
+      expect(prismaMock.user.update).not.toHaveBeenCalled()
+      // Et l'ancienne photo n'a surtout PAS été effacée : elle est tout ce qui reste.
+      expect(mockEffacer).not.toHaveBeenCalled()
+    })
   })
 })

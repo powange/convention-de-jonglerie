@@ -349,13 +349,27 @@ test.describe.serial('Personnalisation du formulaire de candidature bénévole',
     // Trouver et cliquer sur le switch "Demander le régime alimentaire"
     const dietSwitch = page.getByText(/demander le régime alimentaire/i)
     await expect(dietSwitch).toBeVisible({ timeout: 10000 })
-    await dietSwitch.click()
 
-    // Attendre la sauvegarde automatique
-    await page.waitForResponse(
+    /*
+     * ⚠⚠ L'ATTENTE EST ARMÉE AVANT LE CLIC, ET C'ÉTAIT LA CAUSE DE L'INSTABILITÉ.
+     *
+     * `waitForResponse` n'écoute qu'à partir de son appel : posée APRÈS le clic, elle manque la
+     * réponse déjà arrivée — et l'échec se lit alors « Timeout 5000ms exceeded », ce qui envoie
+     * chercher un enregistrement lent là où il a été trop rapide. La garde anti-instabilité l'a
+     * refusée sur une PR qui ne touchait pas ce module : c'est le même défaut déjà corrigé sur le
+     * réordonnancement du stock.
+     *
+     * Le délai passe aussi à quinze secondes : en CI la machine est partagée, et cinq secondes ne
+     * laissent aucune marge à un enregistrement automatique.
+     */
+    const enregistrement = page.waitForResponse(
       (res) => res.url().includes('/volunteers/settings') && res.request().method() === 'PATCH',
-      { timeout: 5000 }
+      { timeout: 15000 }
     )
+    await dietSwitch.click()
+    const reponse = await enregistrement
+    // On mesure la RÉPONSE, pas le geste : un 500 laisserait le test vert jusqu'à l'assertion finale.
+    expect(reponse.ok(), `le PATCH des réglages a répondu ${reponse.status()}`).toBe(true)
 
     // Vérifier via API que le changement est persisté
     const settings = await getVolunteerSettings(page, editionId)
