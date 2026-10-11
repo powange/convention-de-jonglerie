@@ -1,336 +1,153 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+const mockDemarrer = vi.hoisted(() => vi.fn())
+
+vi.mock('#server/utils/auth-utils', () => ({
+  requireAuth: vi.fn((event) => event.context.user),
+}))
+
+/*
+ * Le départ du changement d'adresse est éprouvé à part (`changement-d-adresse.test.ts`) : ici on
+ * vérifie que le handler l'appelle QUAND IL FAUT, et qu'il n'écrit plus l'adresse lui-même.
+ */
+vi.mock('#server/utils/changement-d-adresse', () => ({
+  demarrerChangementDAdresse: mockDemarrer,
+}))
+
+import handler from '../../../../../server/api/profile/update.put'
 import { global } from '../../../globales-nitro'
 
-// Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
 
-// Créer un handler simplifié pour les tests
-const mockHandler = async (event: any) => {
-  const user = event.context.user
+/**
+ * Modifier son profil — et surtout : ce que ce point d'API fait de l'ADRESSE (constat B2).
+ *
+ * ## ⚠️⚠️ CE FICHIER ÉTAIT ENTIÈREMENT CREUX, et c'est la trouvaille de ce lot
+ *
+ * Il portait un commentaire désarmant — « Créer un handler simplifié pour les tests » — suivi d'une
+ * RECOPIE de la logique du handler dans le fichier de tests. Ses huit cas éprouvaient donc cette
+ * copie, et **jamais** le point d'API : ils sont restés verts quand j'ai retiré l'écriture de
+ * l'adresse du vrai handler. Un fichier de tests qui réimplémente sa cible ne couvre rien — ce
+ * dépôt l'avait déjà payé sur le middleware `super-admin`.
+ *
+ * Il importe désormais le vrai handler, et `validateAndSanitize` n'est PAS bouchonné : c'est le
+ * vrai schéma qui tourne, celui qui accepte maintenant `currentPassword`.
+ *
+ * ## Le défaut que ces cas gardent
+ *
+ * L'adresse s'écrivait immédiatement, sans vérification et sans un mot à l'ancienne. Une faute de
+ * frappe rendait la réinitialisation de mot de passe impossible, on pouvait s'attribuer l'adresse
+ * d'un autre et bloquer son inscription, et une session volée devenait une prise de contrôle
+ * définitive.
+ */
+const MOI = 7
+const MON_ADRESSE = 'camille@exemple.test'
 
-  if (!user) {
-    const error = new Error('Non authentifié')
-    ;(error as any).statusCode = 401
-    throw error
-  }
+const compte = { id: MOI, email: MON_ADRESSE, pseudo: 'camille', isGlobalAdmin: false }
+const evenement = { context: { user: compte } }
 
-  const body = await readBody(event)
+/** Le corps minimal que le schéma accepte : pseudo et adresse sont requis. */
+const corps = (extra: Record<string, unknown> = {}) => ({
+  pseudo: 'camille',
+  email: MON_ADRESSE,
+  ...extra,
+})
 
-  // Validation simplifiée
-  if (!body.email || !body.pseudo) {
-    const error = new Error('Données invalides')
-    ;(error as any).statusCode = 400
-    throw error
-  }
+/** Les données réellement soumises à `prisma.user.update`. */
+const donneesEcrites = () => (prismaMock.user.update.mock.calls.at(-1)?.[0] as any).data
 
-  const { email, pseudo, nom, prenom, telephone, isVolunteer, isArtist, isOrganizer } = body
-
-  // Vérifier si l'email est déjà utilisé par un autre utilisateur
-  if (email !== user.email) {
-    const existingUser = await prismaMock.user.findUnique({
-      where: { email },
-    })
-
-    if (existingUser && existingUser.id !== user.id) {
-      const error = new Error('Cette adresse email est déjà utilisée')
-      ;(error as any).statusCode = 400
-      throw error
-    }
-  }
-
-  // Vérifier si le pseudo est déjà utilisé par un autre utilisateur
-  if (pseudo !== user.pseudo) {
-    const existingUser = await prismaMock.user.findUnique({
-      where: { pseudo },
-    })
-
-    if (existingUser && existingUser.id !== user.id) {
-      const error = new Error('Ce pseudo est déjà utilisé')
-      ;(error as any).statusCode = 400
-      throw error
-    }
-  }
-
-  // Mettre à jour le profil
-  const updatedUser = await prismaMock.user.update({
-    where: { id: user.id },
-    data: {
-      email,
-      pseudo,
-      nom,
-      prenom,
-      telephone,
-      ...(isVolunteer !== undefined && { isVolunteer }),
-      ...(isArtist !== undefined && { isArtist }),
-      ...(isOrganizer !== undefined && { isOrganizer }),
-    },
-    select: {
-      id: true,
-      email: true,
-      pseudo: true,
-      nom: true,
-      prenom: true,
-      telephone: true,
-      profilePicture: true,
-      isVolunteer: true,
-      isArtist: true,
-      isOrganizer: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  })
-
-  return updatedUser
-}
-
-// Mock des fonctions globales
-global.readBody = vi.fn()
-
-describe('API Profile Update', () => {
-  const mockUser = {
-    id: 1,
-    email: 'test@example.com',
-    pseudo: 'testuser',
-    nom: 'Test',
-    prenom: 'User',
-    telephone: '0123456789',
-    isGlobalAdmin: false,
-  }
-
-  const mockUpdatedUser = {
-    id: 1,
-    email: 'newemail@example.com',
-    pseudo: 'newpseudo',
-    nom: 'NewNom',
-    prenom: 'NewPrenom',
-    telephone: '0987654321',
-    profilePicture: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  }
-
+describe('PUT /api/profile/update', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-  })
-
-  it('devrait mettre à jour le profil avec succès', async () => {
-    vi.mocked(readBody).mockResolvedValue({
-      email: 'newemail@example.com',
-      pseudo: 'newpseudo',
-      nom: 'NewNom',
-      prenom: 'NewPrenom',
-      telephone: '0987654321',
-    })
-    prismaMock.user.findUnique.mockResolvedValue(null) // Pas de conflit email/pseudo
-    prismaMock.user.update.mockResolvedValue(mockUpdatedUser)
-
-    const mockEvent = {
-      context: { user: mockUser },
-    }
-
-    const result = await mockHandler(mockEvent)
-
-    expect(prismaMock.user.update).toHaveBeenCalledWith({
-      where: { id: 1 },
-      data: {
-        email: 'newemail@example.com',
-        pseudo: 'newpseudo',
-        nom: 'NewNom',
-        prenom: 'NewPrenom',
-        telephone: '0987654321',
-      },
-      select: {
-        id: true,
-        email: true,
-        pseudo: true,
-        nom: true,
-        prenom: true,
-        telephone: true,
-        profilePicture: true,
-        isVolunteer: true,
-        isArtist: true,
-        isOrganizer: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    })
-    expect(result).toEqual(mockUpdatedUser)
-  })
-
-  it('devrait rejeter si utilisateur non authentifié', async () => {
-    const mockEvent = {
-      context: { user: null },
-    }
-
-    await expect(mockHandler(mockEvent)).rejects.toMatchObject({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  })
-
-  it("devrait rejeter si l'email est déjà utilisé par un autre utilisateur", async () => {
-    vi.mocked(readBody).mockResolvedValue({
-      email: 'newemail@example.com',
-      pseudo: 'testuser',
-      nom: 'Test',
-      prenom: 'User',
-    })
-    const existingUser = { id: 2, email: 'newemail@example.com' }
-    prismaMock.user.findUnique.mockResolvedValue(existingUser as any)
-
-    const mockEvent = {
-      context: { user: mockUser },
-    }
-
-    await expect(mockHandler(mockEvent)).rejects.toMatchObject({
-      statusCode: 400,
-      message: 'Cette adresse email est déjà utilisée',
-    })
-  })
-
-  it('devrait rejeter si le pseudo est déjà utilisé par un autre utilisateur', async () => {
-    vi.mocked(readBody).mockResolvedValue({
-      email: 'test@example.com', // Même email, donc pas de vérification
-      pseudo: 'newpseudo', // Pseudo différent
-      nom: 'Test',
-      prenom: 'User',
-    })
-    const existingUser = { id: 2, pseudo: 'newpseudo' }
-    // Comme l'email est identique, seule la vérification du pseudo aura lieu
-    prismaMock.user.findUnique.mockResolvedValueOnce(existingUser as any) // Conflit pseudo
-
-    const mockEvent = {
-      context: { user: mockUser },
-    }
-
-    await expect(mockHandler(mockEvent)).rejects.toMatchObject({
-      statusCode: 400,
-      message: 'Ce pseudo est déjà utilisé',
-    })
-  })
-
-  it('devrait autoriser de garder le même email', async () => {
-    vi.mocked(readBody).mockResolvedValue({
-      email: 'test@example.com', // Même email
-      pseudo: 'newpseudo',
-      nom: 'NewNom',
-      prenom: 'NewPrenom',
-    })
-    // Mock pour la vérification du pseudo (nouveau pseudo, donc vérification nécessaire)
-    prismaMock.user.findUnique.mockResolvedValueOnce(null) // Pas de conflit pseudo
-    prismaMock.user.update.mockResolvedValue(mockUpdatedUser)
-
-    const mockEvent = {
-      context: { user: mockUser },
-    }
-
-    await mockHandler(mockEvent)
-
-    // La vérification d'email ne devrait pas avoir lieu car c'est le même
-    expect(prismaMock.user.findUnique).not.toHaveBeenCalledWith({
-      where: { email: 'test@example.com' },
-    })
-    // Mais la vérification du pseudo devrait avoir lieu car il est différent
-    expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
-      where: { pseudo: 'newpseudo' },
-    })
-  })
-
-  it('devrait autoriser de garder le même pseudo', async () => {
-    vi.mocked(readBody).mockResolvedValue({
-      email: 'newemail@example.com',
-      pseudo: 'testuser', // Même pseudo
-      nom: 'NewNom',
-      prenom: 'NewPrenom',
-    })
-    prismaMock.user.findUnique.mockResolvedValueOnce(null) // Pas de conflit email
-    prismaMock.user.update.mockResolvedValue(mockUpdatedUser)
-
-    const mockEvent = {
-      context: { user: mockUser },
-    }
-
-    await mockHandler(mockEvent)
-
-    // La vérification de pseudo ne devrait pas avoir lieu car c'est le même
-    expect(prismaMock.user.findUnique).not.toHaveBeenCalledWith({
-      where: { pseudo: 'testuser' },
-    })
-  })
-
-  it('devrait valider les données', async () => {
-    vi.mocked(readBody).mockResolvedValue({
-      email: '', // Email vide
-      pseudo: '', // Pseudo vide
-      nom: 'Test',
-      prenom: 'User',
-    })
-
-    const mockEvent = {
-      context: { user: mockUser },
-    }
-
-    await expect(mockHandler(mockEvent)).rejects.toMatchObject({
-      statusCode: 400,
-      message: 'Données invalides',
-    })
-  })
-
-  it('devrait mettre à jour les catégories utilisateur', async () => {
-    vi.mocked(readBody).mockResolvedValue({
-      email: 'test@example.com',
-      pseudo: 'testuser',
-      nom: 'Test',
-      prenom: 'User',
-      telephone: '0123456789',
-      isVolunteer: true,
-      isArtist: true,
-      isOrganizer: false,
-    })
+    mockDemarrer.mockResolvedValue({ pendingEmail: 'nouvelle@exemple.test' })
+    prismaMock.user.findUnique.mockReset()
     prismaMock.user.findUnique.mockResolvedValue(null)
-    const updatedWithCategories = {
-      ...mockUpdatedUser,
-      isVolunteer: true,
-      isArtist: true,
-      isOrganizer: false,
-    }
-    prismaMock.user.update.mockResolvedValue(updatedWithCategories)
+    prismaMock.user.update.mockReset()
+    prismaMock.user.update.mockResolvedValue({ id: MOI, email: MON_ADRESSE, pseudo: 'camille' })
+    global.readBody.mockReset()
+  })
 
-    const mockEvent = {
-      context: { user: mockUser },
-    }
+  it('enregistre les champs ordinaires du profil', async () => {
+    global.readBody.mockResolvedValue(corps({ prenom: 'Camille', nom: 'Martin' }))
 
-    const result = await mockHandler(mockEvent)
+    const res: any = await handler(evenement as any)
 
-    expect(prismaMock.user.update).toHaveBeenCalledWith({
-      where: { id: 1 },
-      data: {
-        email: 'test@example.com',
-        pseudo: 'testuser',
-        nom: 'Test',
-        prenom: 'User',
-        telephone: '0123456789',
-        isVolunteer: true,
-        isArtist: true,
-        isOrganizer: false,
-      },
-      select: {
-        id: true,
-        email: true,
-        pseudo: true,
-        nom: true,
-        prenom: true,
-        telephone: true,
-        profilePicture: true,
-        isVolunteer: true,
-        isArtist: true,
-        isOrganizer: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+    expect(res.success).toBe(true)
+    expect(donneesEcrites()).toMatchObject({ pseudo: 'camille', prenom: 'Camille', nom: 'Martin' })
+  })
+
+  it('⚠️ N’ÉCRIT JAMAIS L’ADRESSE, même quand elle change', async () => {
+    global.readBody.mockResolvedValue(
+      corps({ email: 'nouvelle@exemple.test', currentPassword: 'secret' })
+    )
+
+    await handler(evenement as any)
+
+    const data = donneesEcrites()
+    // Ni l'adresse, ni son empreinte : celle-ci décide du Gravatar affiché, et l'adresse n'est pas
+    // encore la sienne.
+    expect(data).not.toHaveProperty('email')
+    expect(data).not.toHaveProperty('emailHash')
+  })
+
+  it('⚠️ DÉMARRE LE CHANGEMENT EN DEUX TEMPS, mot de passe transmis', async () => {
+    global.readBody.mockResolvedValue(
+      corps({ email: 'nouvelle@exemple.test', currentPassword: 'secret' })
+    )
+
+    const res: any = await handler(evenement as any)
+
+    expect(mockDemarrer).toHaveBeenCalledWith({
+      userId: MOI,
+      nouvelleAdresse: 'nouvelle@exemple.test',
+      motDePasseFourni: 'secret',
     })
-    expect(result.isVolunteer).toBe(true)
-    expect(result.isArtist).toBe(true)
-    expect(result.isOrganizer).toBe(false)
+    // La réponse le DIT : sans cela, l'écran annoncerait « enregistré » et l'ancienne adresse
+    // reviendrait dans le champ sans explication.
+    expect(res.data.pendingEmail).toBe('nouvelle@exemple.test')
+  })
+
+  it('ne démarre RIEN quand l’adresse ne change pas', async () => {
+    /*
+     * LE TÉMOIN. Sans lui, un handler qui lancerait la procédure à chaque enregistrement
+     * satisferait les deux cas précédents — et l'on recevrait un code à six chiffres pour avoir
+     * corrigé son prénom.
+     */
+    global.readBody.mockResolvedValue(corps({ prenom: 'Camille' }))
+
+    const res: any = await handler(evenement as any)
+
+    expect(mockDemarrer).not.toHaveBeenCalled()
+    expect(res.data.pendingEmail).toBeNull()
+  })
+
+  it('relaie le refus du changement d’adresse au lieu de l’avaler', async () => {
+    /*
+     * Le mot de passe manquant, le mot de passe faux et l'adresse déjà prise sont des refus de
+     * l'util. Les avaler écrirait le reste du profil en laissant croire que l'adresse a changé.
+     */
+    mockDemarrer.mockRejectedValue(
+      Object.assign(new Error('Mot de passe actuel requis'), { statusCode: 400 })
+    )
+    global.readBody.mockResolvedValue(corps({ email: 'nouvelle@exemple.test' }))
+
+    await expect(handler(evenement as any)).rejects.toThrow('Mot de passe actuel requis')
+    // Et RIEN n'est écrit : le profil n'est pas à moitié enregistré.
+    expect(prismaMock.user.update).not.toHaveBeenCalled()
+  })
+
+  it('refuse un pseudo déjà pris', async () => {
+    prismaMock.user.findUnique.mockResolvedValue({ id: 99, pseudo: 'quelquun' })
+    global.readBody.mockResolvedValue(corps({ pseudo: 'quelquun' }))
+
+    await expect(handler(evenement as any)).rejects.toThrow(/pseudo/i)
+  })
+
+  it('rejette un corps invalide', async () => {
+    // Le vrai schéma tourne : un pseudo trop court ne passe pas.
+    global.readBody.mockResolvedValue({ pseudo: 'x', email: MON_ADRESSE })
+
+    await expect(handler(evenement as any)).rejects.toThrow()
+    expect(prismaMock.user.update).not.toHaveBeenCalled()
   })
 })

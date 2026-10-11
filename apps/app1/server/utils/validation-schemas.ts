@@ -139,6 +139,12 @@ export const updateProfileSchema = z.object({
   prenom: z.string().max(100, 'Ce champ ne peut pas dépasser 100 caractères').optional(),
   nom: z.string().max(100, 'Ce champ ne peut pas dépasser 100 caractères').optional(),
   email: emailSchema,
+  /*
+   * Le mot de passe actuel, exigé UNIQUEMENT quand l'adresse change et que le compte en a un —
+   * constat B2. Il est facultatif ici parce que les autres champs du profil ne le demandent pas :
+   * c'est le handler qui tranche, selon ce qui change.
+   */
+  currentPassword: z.string().optional(),
   telephone: phoneSchema.optional(),
   pronouns: z.string().refine(isValidPronoun, 'Pronom invalide').nullable().optional(),
 

@@ -52,6 +52,64 @@
                   class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
                 />
               </UFormField>
+
+              <!--
+                ⚠️ LE MOT DE PASSE N'EST DEMANDÉ QUE SI L'ADRESSE CHANGE — constat B2. Le réclamer
+                pour enregistrer un prénom serait une friction que rien ne justifie ; le réclamer
+                pour l'adresse, si : c'est elle qui permet de reprendre la main sur un compte, donc
+                la cible d'une session volée.
+              -->
+              <UFormField
+                v-if="adresseModifiee && compteAvecMotDePasse"
+                :label="t('profile.current_password_for_email')"
+                name="currentPassword"
+                :description="t('profile.current_password_for_email_help')"
+              >
+                <UInput
+                  v-model="state.currentPassword"
+                  type="password"
+                  icon="i-heroicons-lock-closed"
+                  size="lg"
+                  data-mot-de-passe-adresse
+                />
+              </UFormField>
+
+              <!-- La demande en cours, et le code à saisir. -->
+              <UAlert
+                v-if="adresseEnAttente"
+                data-adresse-en-attente
+                color="warning"
+                variant="soft"
+                icon="i-heroicons-envelope-open"
+                :title="t('profile.pending_email_title')"
+                :description="t('profile.pending_email_description', { email: adresseEnAttente })"
+              />
+              <div v-if="adresseEnAttente" class="flex flex-col sm:flex-row gap-2">
+                <UInput
+                  v-model="codeDeConfirmation"
+                  :placeholder="t('profile.pending_email_code_placeholder')"
+                  size="lg"
+                  class="flex-1"
+                  data-code-adresse
+                />
+                <UButton
+                  :loading="confirmationEnCours"
+                  :disabled="!codeDeConfirmation.trim()"
+                  icon="i-heroicons-check"
+                  @click="confirmerLAdresse()"
+                >
+                  {{ t('profile.pending_email_confirm') }}
+                </UButton>
+                <UButton
+                  variant="ghost"
+                  color="neutral"
+                  :loading="renvoiEnCours"
+                  icon="i-heroicons-arrow-path"
+                  @click="renvoyerLeCode()"
+                >
+                  {{ t('profile.pending_email_resend') }}
+                </UButton>
+              </div>
             </div>
 
             <!-- Colonne 2 : Informations facultatives -->
@@ -251,7 +309,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { z } from 'zod'
 
 import { useAuthStore } from '~/stores/auth'
@@ -338,7 +396,82 @@ const state = reactive({
   allergySeverity: (authStore.user as any)?.allergySeverity || SEVERITE_AUCUNE,
   emergencyContactName: (authStore.user as any)?.emergencyContactName || '',
   emergencyContactPhone: (authStore.user as any)?.emergencyContactPhone || '',
+  /*
+   * Le mot de passe actuel, exigé par le serveur quand l'adresse change — constat B2. Il ne part
+   * QUE dans ce cas, et il n'est jamais préchargé ni conservé après l'enregistrement.
+   */
+  currentPassword: '',
 })
+
+/**
+ * Le changement d'adresse en deux temps — constat B2.
+ *
+ * L'adresse ne s'écrit plus à l'enregistrement : le serveur envoie un code à la NOUVELLE adresse et
+ * un avis à l'ANCIENNE, puis attend le code. Sans ces quelques lignes, l'écran annoncerait
+ * « profil enregistré » et l'ancienne adresse reviendrait dans le champ au rechargement, sans un
+ * mot d'explication — la personne croirait son changement refusé en silence.
+ */
+const adresseEnAttente = ref<string | null>((authStore.user as any)?.pendingEmail ?? null)
+const codeDeConfirmation = ref('')
+const confirmationEnCours = ref(false)
+const renvoiEnCours = ref(false)
+/*
+ * Un compte OAuth n'a pas de mot de passe : le lui réclamer rendrait le changement d'adresse
+ * impossible. Le serveur porte déjà cette nuance ; l'écran ne fait que s'y accorder, et il part de
+ * l'hypothèse PRUDENTE (il en a un) le temps de la réponse — un champ qui apparaît est moins
+ * déroutant qu'un champ qui disparaît sous les doigts.
+ */
+const compteAvecMotDePasse = ref(true)
+const adresseModifiee = computed(() => state.email.trim() !== (authStore.user?.email || ''))
+
+onMounted(async () => {
+  try {
+    const reponse = await $fetch<{ data: { hasPassword: boolean } }>('/api/profile/has-password')
+    compteAvecMotDePasse.value = reponse.data.hasPassword
+  } catch {
+    // On garde l'hypothèse prudente : le serveur refusera de toute façon sans mot de passe.
+    compteAvecMotDePasse.value = true
+  }
+})
+
+const notificateur = useNotificateur()
+
+async function confirmerLAdresse() {
+  confirmationEnCours.value = true
+  try {
+    const reponse = await $fetch<{ data: { email: string; emailHash: string } }>(
+      '/api/profile/confirm-email',
+      { method: 'POST', body: { code: codeDeConfirmation.value.trim() } }
+    )
+    authStore.updateUser({ ...authStore.user!, ...reponse.data, pendingEmail: null } as any)
+    state.email = reponse.data.email
+    adresseEnAttente.value = null
+    codeDeConfirmation.value = ''
+    notificateur.succes(t('profile.pending_email_confirmed'))
+  } catch (erreur) {
+    notificateur.erreur(
+      t('profile.pending_email_confirm_failed'),
+      notificateur.messageDErreurServeur(erreur)
+    )
+  } finally {
+    confirmationEnCours.value = false
+  }
+}
+
+async function renvoyerLeCode() {
+  renvoiEnCours.value = true
+  try {
+    await $fetch('/api/profile/resend-email-change', { method: 'POST' })
+    notificateur.succes(t('profile.pending_email_resent'))
+  } catch (erreur) {
+    notificateur.erreur(
+      t('profile.pending_email_resend_failed'),
+      notificateur.messageDErreurServeur(erreur)
+    )
+  } finally {
+    renvoiEnCours.value = false
+  }
+}
 
 const hasChanges = computed(() => {
   return (
@@ -379,6 +512,10 @@ const { execute: executeUpdateProfile, loading } = useApiAction<unknown, User>(
     method: 'PUT',
     body: () => ({
       email: state.email,
+      // Le serveur ne l'exige que si l'adresse change ; on ne l'envoie donc que là.
+      ...(adresseModifiee.value && state.currentPassword
+        ? { currentPassword: state.currentPassword }
+        : {}),
       pseudo: state.pseudo,
       nom: state.nom || '',
       prenom: state.prenom || '',
@@ -403,6 +540,16 @@ const { execute: executeUpdateProfile, loading } = useApiAction<unknown, User>(
     errorMessages: { default: t('profile.cannot_save_profile') },
     onSuccess: (updatedUser) => {
       authStore.updateUser({ ...authStore.user!, ...updatedUser })
+      /*
+       * ⚠️ L'ADRESSE DU CHAMP EST REMISE À CELLE DU COMPTE quand un changement part en attente :
+       * elle n'est PAS encore la sienne, et la laisser afficher la nouvelle ferait croire que
+       * c'est fait. L'encart, lui, dit ce qui est en cours.
+       */
+      const enAttente = (updatedUser as { pendingEmail?: string | null })?.pendingEmail ?? null
+      adresseEnAttente.value = enAttente
+      if (enAttente) state.email = authStore.user?.email || state.email
+      // Le mot de passe ne reste pas dans la page après usage.
+      state.currentPassword = ''
     },
   }
 )

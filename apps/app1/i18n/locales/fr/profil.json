@@ -143,6 +143,17 @@
       "emergency_contact_name_placeholder": "Prénom et nom",
       "emergency_contact_phone": "Téléphone du contact d'urgence",
       "emergency_contact_phone_placeholder": "Son numéro"
-    }
+    },
+    "current_password_for_email": "Mot de passe actuel",
+    "current_password_for_email_help": "Changer d'adresse de courriel demande votre mot de passe : c'est cette adresse qui permet de reprendre la main sur votre compte.",
+    "pending_email_title": "Adresse en attente de confirmation",
+    "pending_email_description": "Un code à six chiffres vient d'être envoyé à {email}. Votre compte garde son adresse actuelle jusqu'à ce que vous le saisissiez ici.",
+    "pending_email_code_placeholder": "Code à six chiffres",
+    "pending_email_confirm": "Confirmer l'adresse",
+    "pending_email_confirmed": "Votre nouvelle adresse est confirmée",
+    "pending_email_confirm_failed": "La confirmation a échoué",
+    "pending_email_resend": "Renvoyer le code",
+    "pending_email_resent": "Un nouveau code vient de partir",
+    "pending_email_resend_failed": "Le renvoi a échoué"
   }
 }
