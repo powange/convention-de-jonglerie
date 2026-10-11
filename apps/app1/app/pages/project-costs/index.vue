@@ -225,12 +225,30 @@
                 </p>
               </div>
             </div>
+            <!--
+              ⚠️ LES FRAIS SONT CEUX QUE STRIPE A CONFIRMÉS — constat B4. Cette ligne affichait
+              `totalCents − totalNetCents`, une DIFFÉRENCE : un don dont les frais ne sont pas
+              encore connus y apparaissait en entier comme des frais, et un donateur de 10 € lisait
+              « − 10,00 € frais Stripe ».
+            -->
             <p
-              v-if="donations.totalCents - donations.totalNetCents > 0"
+              v-if="donations.totalFeeCents > 0"
+              data-frais-stripe
               class="text-xs text-gray-500 dark:text-gray-400"
             >
-              − {{ ((donations.totalCents - donations.totalNetCents) / 100).toFixed(2) }} €
+              − {{ (donations.totalFeeCents / 100).toFixed(2) }} €
               {{ t('project_costs.coffee.stripe_fees_label') }}
+            </p>
+            <!--
+              Et on le DIT quand des frais manquent encore, plutôt que de laisser un total qui
+              bougera tout seul dans l'heure : le montant reçu est alors légèrement surestimé.
+            -->
+            <p
+              v-if="donations.pendingFeeCount > 0"
+              data-frais-en-attente
+              class="text-xs text-gray-400 dark:text-gray-500"
+            >
+              {{ t('project_costs.coffee.fees_pending', { count: donations.pendingFeeCount }) }}
             </p>
           </div>
 
@@ -439,6 +457,8 @@ const { data: donationsData } = await useFetch<{
   totalDonations: number
   totalCents: number
   totalNetCents: number
+  totalFeeCents: number
+  pendingFeeCount: number
   totalCostCents: number
   estimatedHours: number | null
 }>('/api/project-costs/donations')

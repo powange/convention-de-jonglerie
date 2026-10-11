@@ -55,9 +55,30 @@ export default wrapApiHandler(
       select: { id: true },
     })
 
-    const [donationsResult, expenses, timeEstimate] = await Promise.all([
+    const [donationsResult, fraisEnAttente, expenses, timeEstimate] = await Promise.all([
       prisma.coffeeDonation.aggregate({
-        _sum: { quantity: true, totalCents: true, netCents: true },
+        _sum: { quantity: true, totalCents: true, netCents: true, feeCents: true },
+        _count: true,
+      }),
+      /*
+       * ⚠️ LES DONS DONT LES FRAIS NE SONT PAS ENCORE CONNUS — constat B4.
+       *
+       * Stripe ne livre la « balance transaction » qu'après un délai qui peut atteindre une heure
+       * (c'est écrit dans le webhook), et `feeCents`/`netCents` restent donc NULS en attendant —
+       * définitivement si le second événement n'arrive jamais. Or `_sum` de Prisma IGNORE les
+       * valeurs nulles : `totalNetCents` excluait ces dons alors que `totalCents` les comptait, et
+       * l'écran affichait la différence sous le libellé « frais Stripe ». Un donateur de 10 € lisait
+       * donc « − 10,00 € de frais Stripe », et le solde l'omettait purement et simplement.
+       *
+       * On relève ici leur montant BRUT, pour le compter au net à défaut de mieux : un don reçu est
+       * un don reçu, et le pire des deux approximations est de le présenter comme des frais.
+       *
+       * 📍 La condition porte sur `netCents` et non sur `feeCents` : c'est `netCents` qui manque au
+       * calcul. Les deux sont de toute façon écrits ENSEMBLE, depuis la même balance transaction.
+       */
+      prisma.coffeeDonation.aggregate({
+        where: { netCents: null },
+        _sum: { totalCents: true },
         _count: true,
       }),
       prisma.projectExpense.findMany({
@@ -99,7 +120,16 @@ export default wrapApiHandler(
       totalCoffees: donationsResult._sum.quantity || 0,
       totalDonations: donationsResult._count,
       totalCents: donationsResult._sum.totalCents || 0,
-      totalNetCents: donationsResult._sum.netCents || 0,
+      /*
+       * Le net = ce que Stripe a confirmé, PLUS le brut des dons dont les frais sont encore
+       * inconnus. On surestime donc le net de quelques centimes pendant ce court moment — l'écart
+       * est celui des frais à venir — là où l'ancien calcul retranchait le don ENTIER.
+       */
+      totalNetCents: (donationsResult._sum.netCents || 0) + (fraisEnAttente._sum.totalCents || 0),
+      /** Les frais réellement connus. C'est eux que l'écran annonce, et non une différence. */
+      totalFeeCents: donationsResult._sum.feeCents || 0,
+      /** Combien de dons attendent encore leurs frais, pour que l'écran puisse le dire. */
+      pendingFeeCount: fraisEnAttente._count,
       totalCostCents,
       estimatedHours,
     }

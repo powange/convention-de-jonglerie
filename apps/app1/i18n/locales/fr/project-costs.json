@@ -24,6 +24,7 @@
       "donate_button": "Offrir {count} café(s)",
       "donations_paused": "Les dons sont actuellement suspendus. Merci pour votre soutien passé !",
       "error": "Impossible de créer la session de paiement",
+      "fees_pending": "Les frais Stripe de {count} don(s) ne sont pas encore connus : le montant reçu sera ajusté sous peu.",
       "price_per_coffee": "1 € par café",
       "quantity_label": "Nombre de cafés",
       "stripe_fees_label": "de commissions Stripe",
