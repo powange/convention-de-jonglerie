@@ -156,6 +156,21 @@ export const prismaMock = {
   editionZone: createModelMock(),
   editionMarker: createModelMock(),
 
+  /*
+   * Modèles « coûts du projet » et dons.
+   *
+   * ⚠️ LEUR ABSENCE EST LA RAISON POUR LAQUELLE CES POINTS D'API N'AVAIENT AUCUN TEST — et non
+   * la paresse. Un modèle absent de ce bouchon ne rend pas `undefined` à l'appel : il fait lever
+   * « ne peut pas lire les propriétés de undefined » dès la première requête, AVANT qu'aucune
+   * assertion ne s'exécute. Le fichier devient intestable, ce qui se lit à tort comme « non
+   * couvert ». C'est au moins la septième fois dans ce dépôt.
+   */
+  stripeConfig: createModelMock(),
+  coffeeDonation: createModelMock(),
+  projectExpense: createModelMock(),
+  projectExpenseRate: createModelMock(),
+  timeEstimateConfig: createModelMock(),
+
   // Modèles tâches
   taskGroup: createModelMock(),
   task: createModelMock(),
