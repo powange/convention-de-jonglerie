@@ -63,6 +63,30 @@ export default defineTask({
               },
             },
           },
+          /*
+           * ⚠️ LES ORGANISATEURS AUSSI — constat B5.
+           *
+           * La tâche ne chargeait que `assignments`. Un organisateur posé sur un créneau tient le
+           * poste, et il est compté comme occupant partout ailleurs dans le module : il ne
+           * recevait simplement jamais son rappel.
+           *
+           * ⚠️⚠️ LE COMPTE EST À DEUX RELATIONS DE LÀ. `EditionOrganizer.organizerId` référence
+           * `ConventionOrganizer`, PAS `User` : le compte se lit `organizer.userId`. Les deux
+           * séquences étant indépendantes, prendre `organizerId` pour un identifiant de compte
+           * désigne le plus souvent quelqu'un d'EXISTANT — mais un autre —, et rien ne lèverait.
+           *
+           * Même filtre d'envoi que les bénévoles, pour la même raison : sans lui le rappel
+           * repartirait à chaque passage de la fenêtre.
+           */
+          organizerAssignments: {
+            where: { reminderSentAt: null },
+            select: {
+              editionOrganizerId: true,
+              editionOrganizer: {
+                select: { organizer: { select: { userId: true } } },
+              },
+            },
+          },
           team: { select: { name: true, color: true } },
           event: {
             // Le fuseau voyage avec le nom : l'heure annoncée doit être celle vécue SUR PLACE.
@@ -82,7 +106,7 @@ export default defineTask({
 
       // Traiter chaque créneau
       for (const slot of upcomingSlots) {
-        if (slot.assignments.length > 0) {
+        if (slot.assignments.length > 0 || slot.organizerAssignments.length > 0) {
           const editionName = slot.event.name || 'votre événement'
           const slotTitle = slot.title || 'Créneau bénévole'
           const teamName = slot.team?.name || 'Équipe non assignée'
@@ -109,7 +133,43 @@ export default defineTask({
             slot.event.edition?.timezone ?? null
           )
 
-          for (const assignment of slot.assignments) {
+          /*
+           * UN RAPPEL PAR PERSONNE, et non par affectation — constat B5.
+           *
+           * ⚠️ Une même personne peut être bénévole ET organisatrice du même créneau : les deux
+           * tables la portent alors, et sans ce regroupement elle recevrait DEUX messages
+           * identiques à la même seconde.
+           *
+           * ⚠️⚠️ ET IL FAUT PRENDRE LES DEUX MARQUES, pas seulement celle qui a servi à envoyer.
+           * Si l'on n'en posait qu'une, l'autre affectation resterait vierge et déclencherait un
+           * second rappel à la minute suivante — le défaut qu'on vient de fermer, déplacé d'un
+           * cran.
+           */
+          const parPersonne = new Map<
+            number,
+            { affectationsBenevole: string[]; affectationsOrganisateur: number[] }
+          >()
+          const pour = (userId: number) => {
+            const existant = parPersonne.get(userId)
+            if (existant) return existant
+            const neuf = {
+              affectationsBenevole: [] as string[],
+              affectationsOrganisateur: [] as number[],
+            }
+            parPersonne.set(userId, neuf)
+            return neuf
+          }
+          for (const affectation of slot.assignments) {
+            pour(affectation.user.id).affectationsBenevole.push(affectation.id)
+          }
+          for (const affectation of slot.organizerAssignments) {
+            // Le compte est à DEUX relations : `organizer.userId`, jamais `organizerId`.
+            pour(affectation.editionOrganizer.organizer.userId).affectationsOrganisateur.push(
+              affectation.editionOrganizerId
+            )
+          }
+
+          for (const [userId, affectations] of parPersonne) {
             try {
               /*
                * ⚠️ LA MARQUE EST POSÉE AVANT L'ENVOI, et par un `updateMany` CONDITIONNEL.
@@ -126,28 +186,59 @@ export default defineTask({
                * échoue ensuite coûte UN rappel manqué — moins cher que cinq rappels reçus, et la
                * notification suivante (le courriel de publication, l'écran) reste disponible.
                */
-              const priseDeMarque = await prisma.volunteerAssignment.updateMany({
-                where: { id: assignment.id, reminderSentAt: null },
-                data: { reminderSentAt: new Date() },
-              })
-              if (priseDeMarque.count === 0) continue
+              const marque = new Date()
+              const prises = await Promise.all([
+                ...affectations.affectationsBenevole.map((id) =>
+                  prisma.volunteerAssignment.updateMany({
+                    where: { id, reminderSentAt: null },
+                    data: { reminderSentAt: marque },
+                  })
+                ),
+                ...affectations.affectationsOrganisateur.map((editionOrganizerId) =>
+                  prisma.organizerSlotAssignment.updateMany({
+                    where: { editionOrganizerId, timeSlotId: slot.id, reminderSentAt: null },
+                    data: { reminderSentAt: marque },
+                  })
+                ),
+              ])
+              /*
+               * On envoie dès qu'UNE marque a été prise. Si aucune ne l'a été, un autre passage
+               * s'en est chargé : se taire.
+               *
+               * ⚠️ LIMITE ASSUMÉE, à ne pas lire comme un oubli : deux exécutions simultanées
+               * pourraient se partager les marques d'une même personne — l'une prend celle du
+               * bénévole, l'autre celle de l'organisateur — et envoyer chacune un message. Deux
+               * rappels au lieu d'un, dans un cas rare, contre quatre ou cinq avant tout
+               * marquage. Le fermer demanderait une transaction sur deux tables pour un gain qui
+               * ne se mesure pas.
+               */
+              if (!prises.some((p) => p.count > 0)) continue
 
               await NotificationService.create({
-                userId: assignment.user.id,
+                userId,
                 type: 'INFO',
                 title: 'Rappel : Créneau bénévole dans 30 minutes',
                 message: `Votre créneau "${slotTitle}" pour l'équipe "${teamName}" de "${editionName}" commence à ${startTime}. Merci de vous présenter à l'heure !`,
                 category: 'volunteer',
                 entityType: 'VolunteerTimeSlot',
                 entityId: slot.id,
-                actionUrl: `/profile/mes-candidatures-benevole`,
-                actionText: 'Voir mes candidatures',
+                /*
+                 * ⚠️ LE LIEN MENAIT À LA MAUVAISE PAGE — second volet du constat B5.
+                 *
+                 * `/profile/mes-candidatures-benevole` ne montre que les CANDIDATURES : un
+                 * organisateur n'en a pas et y verrait une liste vide, et même un bénévole y
+                 * arrive une page trop loin de son planning. `/editions/<id>/volunteers` affiche
+                 * « Mes créneaux » aux DEUX populations — `aDroitAuPlanning` compte les équipes
+                 * d'organisateur dans sa condition.
+                 */
+                actionUrl: `/editions/${slot.eventId}/volunteers`,
+                actionText: 'Voir mon planning',
                 notificationType: 'volunteer_reminder',
               })
               totalNotificationsSent++
             } catch (error) {
               console.error(
-                `[CRON volunteer-reminders] Erreur notification ${assignment.user.pseudo}:`,
+                `[CRON volunteer-reminders] Erreur notification compte ${userId}:`,
                 error
               )
             }

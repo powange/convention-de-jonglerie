@@ -49,8 +49,11 @@ const creneauDans30Minutes = (timezone: string | null) => {
     title: 'Bar du soir',
     startDateTime: debut,
     delayMinutes: 0,
+    eventId: 22,
     team: { name: 'Bar', color: '#fff' },
     event: { name: 'EJC', edition: { timezone } },
+    // Voir la note de `rappel-creneau-une-seule-fois` : Prisma renvoie toujours ce tableau.
+    organizerAssignments: [],
     assignments: [
       { user: { id: 7, email: 'b@exemple.test', pseudo: 'bene', nom: 'M', prenom: 'Camille' } },
     ],
