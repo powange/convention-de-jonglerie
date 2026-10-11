@@ -44,6 +44,12 @@ concurrency:
   group: publier-image
   cancel-in-progress: false
 
+# Le plancher du workflow. Le job `publier-image` étend ce droit (`packages: write`) pour
+# pousser sur ghcr.io ; un job ajouté plus tard, lui, partira de la lecture seule au lieu
+# du réglage du dépôt — qui vit dans l’interface de GitHub, hors du code.
+permissions:
+  contents: read
+
 jobs:
   publier-image:
     runs-on: ubuntu-22.04
