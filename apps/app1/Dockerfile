@@ -25,7 +25,8 @@ FROM base AS builder
 # On copie CE SEUL FICHIER, comme dans le stage dev.
 #
 # Le changement est NEUTRE sur l'image produite : `COPY apps/app1/ ./`, plus bas, recopie tout
-# `scripts/`, et le stage runtime le reprend de là. Seul change ce qui invalide le cache — et la
+# `scripts/` dans le stage de BUILD, où le `postinstall` en a besoin. ⚠️ Le stage runtime, lui, ne
+# le reprend plus — voir le commentaire plus bas. Seul change ce qui invalide le cache — et la
 # CI en a un (`cache-from: type=gha`), donc éditer un utilitaire y relançait `npm ci` à chaque
 # fusion sur un build qui dure déjà 330 à 470 s et conditionne le déploiement.
 COPY apps/app1/package*.json ./
@@ -89,7 +90,20 @@ COPY --from=builder /app/apps/app1/prisma.config.ts ./
 COPY --from=builder /app/apps/app1/server/generated ./server/generated
 COPY --from=builder /app/apps/app1/server/prompts ./server/prompts
 COPY --from=builder /app/apps/app1/package*.json ./
-COPY --from=builder /app/apps/app1/scripts ./scripts
+# ⚠️ `scripts/` N'EST PLUS COPIÉ DANS L'IMAGE RUNTIME, et rien en production ne s'en sert :
+# `entrypoint.sh` fabrique son URL de base en `node -e` inline puis fait `exec node
+# .output/server/index.mjs`, et les trois seuls endroits du serveur qui lancent un processus
+# externe appellent `mysqldump`, `mysql`, `tar` et `npx prisma migrate deploy` — jamais un fichier
+# de ce dossier. Vérifié avant de le retirer.
+#
+# Ce qu'il contenait de gênant : 46 fichiers d'outillage de développement, dont
+# `_temp-password-swap.ts`, qui remplace le hash bcrypt d'un utilisateur par un mot de passe
+# temporaire. Il porte deux gardes (refus si `NODE_ENV=production`, refus si l'hôte de la base
+# n'est pas local) et les deux environnements posent bien `NODE_ENV=production` — il REFUSAIT donc
+# de s'exécuter, contrairement à ce que l'audit annonçait. Mais `tsx` est en dépendance de
+# production, son override `ALLOW_PASSWORD_SWAP=I_KNOW` suffit à lever les gardes, et un outil de
+# ce genre n'a simplement rien à faire dans une image de production : on ne compte pas sur une
+# garde interne pour ce qu'on peut ne pas livrer.
 COPY --from=builder /app/apps/app1/i18n ./i18n
 
 # Script d'entrée: appliquer les migrations Prisma avant de démarrer Nuxt
