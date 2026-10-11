@@ -21,7 +21,26 @@ export default defineConfig<ConfigOptions>({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
   workers: 1,
-  reporter: 'html',
+  /*
+   * ⚠️ TROIS RAPPORTEURS, ET CHACUN A SA RAISON.
+   *
+   * `retries: 2` ci-dessus laisse un test instable passer vert à la troisième tentative, et rien
+   * ne le signalait : le rapport HTML est un artefact qu'il faut télécharger et ouvrir pour le
+   * voir. Un test qui échoue une fois sur trois se cachait donc derrière les reprises jusqu'au
+   * jour où il échoue trois fois de suite.
+   *
+   * 📍 MESURÉ AVANT D'AGIR, sur quatre runs consécutifs : **547 tests passés, zéro instable** à
+   * chaque fois. Rien ne se cachait donc derrière les reprises — mais rien ne le mesurait, et une
+   * instabilité apparue demain serait restée invisible. L'état de référence étant zéro, la CI peut
+   * exiger zéro : c'est ce que fait l'étape « Refuser un test instable » du job `playwright`.
+   *
+   * - `list` écrit le résumé dans le journal du job, où il se lit sans rien télécharger ;
+   * - `json` produit le fichier que la CI compte pour remonter les noms dans le résumé de la PR ;
+   * - `html` reste l'artefact qu'on ouvre pour comprendre un échec, avec sa trace et ses captures.
+   */
+  reporter: process.env.CI
+    ? [['list'], ['json', { outputFile: 'playwright-resultats.json' }], ['html']]
+    : 'html',
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
