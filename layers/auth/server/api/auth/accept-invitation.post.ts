@@ -7,6 +7,7 @@ import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
 import { authRateLimiter } from '#server/utils/rate-limiter'
 import { ouvrirSession } from '#server/utils/session-helpers'
 import { passwordSchema } from '#server/utils/validation-schemas'
+import { utilisateurDeSession } from '~~/shared/utils/utilisateur-de-session'
 
 const acceptInvitationSchema = z.object({
   token: z.string(),
@@ -71,21 +72,7 @@ export default wrapApiHandler(
     await ouvrirSession(
       event,
       {
-        user: {
-          id: updatedUser.id,
-          email: updatedUser.email,
-          pseudo: updatedUser.pseudo,
-          nom: updatedUser.nom,
-          prenom: updatedUser.prenom,
-          phone: updatedUser.phone,
-          isGlobalAdmin: updatedUser.isGlobalAdmin,
-          isVolunteer: updatedUser.isVolunteer,
-          isArtist: updatedUser.isArtist,
-          isOrganizer: updatedUser.isOrganizer,
-          createdAt: updatedUser.createdAt,
-          updatedAt: updatedUser.updatedAt,
-          isEmailVerified: updatedUser.isEmailVerified,
-        },
+        user: utilisateurDeSession(updatedUser),
       },
       {
         // La génération courante du compte : sans elle, la session naîtrait avec le

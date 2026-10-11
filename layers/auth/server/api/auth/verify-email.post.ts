@@ -6,6 +6,7 @@ import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
 import { verificationCodeRateLimiter } from '#server/utils/rate-limiter'
 import { ouvrirSession } from '#server/utils/session-helpers'
 import { sanitizeEmail } from '#server/utils/validation-helpers'
+import { utilisateurDeSession } from '~~/shared/utils/utilisateur-de-session'
 
 const verifyEmailSchema = z.object({
   email: z.string().email('Adresse email invalide'),
@@ -98,21 +99,7 @@ export default wrapApiHandler(
       await ouvrirSession(
         event,
         {
-          user: {
-            id: updatedUser.id,
-            email: updatedUser.email,
-            pseudo: updatedUser.pseudo,
-            nom: updatedUser.nom,
-            prenom: updatedUser.prenom,
-            phone: updatedUser.phone,
-            isGlobalAdmin: updatedUser.isGlobalAdmin,
-            isVolunteer: updatedUser.isVolunteer,
-            isArtist: updatedUser.isArtist,
-            isOrganizer: updatedUser.isOrganizer,
-            createdAt: updatedUser.createdAt,
-            updatedAt: updatedUser.updatedAt,
-            isEmailVerified: updatedUser.isEmailVerified,
-          },
+          user: utilisateurDeSession(updatedUser),
         },
         {
           // La génération courante du compte : sans elle, la session naîtrait avec le

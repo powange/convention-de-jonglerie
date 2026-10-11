@@ -271,9 +271,12 @@ export default wrapApiHandler(
      * ne change plus ici, mais à la CONFIRMATION du code. C'est donc `confirm-email` qui la
      * rafraîchit — sinon on écrirait dans la session une adresse que le compte n'a pas encore.
      *
-     * 📍 Ni `profilePicture` : la session ne l'a jamais portée (vérifié à l'ouverture, côté
-     * `login`). L'y ajouter rendrait `user.profilePicture` soudain lisible dans les handlers, et
-     * ferait diverger les sessions ouvertes par OAuth, qui ne la posent pas non plus.
+     * 📍 Ni `profilePicture`, et la raison a été CORRIGÉE depuis — constat B9. Cette note disait
+     * « la session ne l'a jamais portée (vérifié à l'ouverture, côté `login`) » : c'était vrai de
+     * `login` et FAUX des deux fournisseurs OAuth, qui la posaient. Vérifier un point d'entrée ne
+     * dit rien des sept autres. Elle n'y est plus nulle part (cf. `utilisateurDeSession`), et la
+     * laisser dehors évite de devoir la rafraîchir ici à chaque changement de photo — soit le
+     * défaut B5 recréé pour un champ que personne ne lit dans la session.
      */
     await rafraichirUtilisateurDeSession(event, {
       pseudo: updatedUser.pseudo,
