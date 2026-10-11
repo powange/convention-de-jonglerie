@@ -43,8 +43,16 @@ const creneauDans30Minutes = () => ({
   title: 'Bar du soir',
   startDateTime: new Date(Date.now() + 30 * 60 * 1000),
   delayMinutes: 0,
+  eventId: 22,
   team: { name: 'Bar', color: '#fff' },
   event: { name: 'EJC', edition: { timezone: 'Europe/Paris' } },
+  /*
+   * ⚠️ `organizerAssignments` est OBLIGATOIRE dans ces jeux d'essai depuis le constat B5 : la
+   * tâche rappelle désormais aussi les organisateurs affectés. L'omettre ne rend pas la liste
+   * vide — Prisma renvoie toujours le tableau —, cela fait lever « not iterable ». Le bouchon est
+   * donc complété, plutôt que le handler rendu indulgent sur une forme qui n'existe pas.
+   */
+  organizerAssignments: [],
   assignments: [
     {
       id: 'aff-1',
@@ -131,7 +139,7 @@ describe('rappel de créneau — une seule fois', () => {
      * écriture inutile.
      */
     prismaMock.volunteerTimeSlot.findMany.mockResolvedValue([
-      { ...creneauDans30Minutes(), assignments: [] },
+      { ...creneauDans30Minutes(), assignments: [], organizerAssignments: [] },
     ])
 
     await tache.run({ payload: {} } as any)

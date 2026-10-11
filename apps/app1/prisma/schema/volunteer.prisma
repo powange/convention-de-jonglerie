@@ -484,6 +484,17 @@ model OrganizerSlotAssignment {
   editionOrganizerId Int
   timeSlotId         String
   assignedAt         DateTime @default(now())
+  /// Quand le rappel « dans 30 minutes » a été envoyé à cet organisateur — constat B5.
+  ///
+  /// ⚠️ PORTÉE PAR L'AFFECTATION, PAS PAR LE CRÉNEAU, exactement comme celle des bénévoles
+  /// (`VolunteerAssignment.reminderSentAt`, #642). Quelqu'un posé à la dernière minute en
+  /// remplacement arrive avec sa propre ligne vierge et reçoit son rappel ; une marque sur le
+  /// créneau l'en priverait en silence. Décision à ne pas rouvrir.
+  ///
+  /// Sans cette colonne, l'organisateur recevrait le rappel QUATRE À CINQ FOIS : la tâche tourne
+  /// chaque minute sur une fenêtre de 28 à 32 minutes, donc un même créneau y tombe à plusieurs
+  /// passages consécutifs. C'est le défaut que #642 avait refermé pour les seuls bénévoles.
+  reminderSentAt     DateTime?
 
   editionOrganizer EditionOrganizer  @relation(fields: [editionOrganizerId], references: [id], onDelete: Cascade)
   timeSlot         VolunteerTimeSlot @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
