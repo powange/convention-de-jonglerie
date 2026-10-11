@@ -27,6 +27,24 @@ model User {
   emailVerificationCode  String?
   isEmailVerified        Boolean   @default(false)
   verificationCodeExpiry DateTime?
+
+  /// L'adresse DEMANDÉE, en attente de confirmation — constat B2.
+  ///
+  /// Le profil écrivait `email` immédiatement : une faute de frappe rendait la réinitialisation de
+  /// mot de passe impossible, on pouvait s'attribuer l'adresse de quelqu'un d'autre et bloquer son
+  /// inscription, et une session volée devenait une prise de contrôle définitive. L'inscription,
+  /// elle, exige un code à six chiffres depuis toujours : le profil contournait cette exigence.
+  ///
+  /// ⚠️ TROIS COLONNES DÉDIÉES PLUTÔT QUE LA RÉUTILISATION de `emailVerificationCode`, que la
+  /// fiche proposait. La raison est une collision réelle : `admin/users/[id]/invalidate-email`
+  /// repose `isEmailVerified` à faux et RÉÉCRIT ce code. Un changement d'adresse en cours serait
+  /// alors inconfirmable, et `verify-email` finirait par valider l'ANCIENNE adresse en laissant
+  /// une demande en attente derrière lui. Deux mécanismes qui se marchent dessus coûtent plus que
+  /// deux colonnes.
+  pendingEmail           String?
+  pendingEmailCode       String?
+  pendingEmailExpiry     DateTime?
+
   isGlobalAdmin          Boolean   @default(false)
 
   /// Le numéro de génération des sessions de ce compte.

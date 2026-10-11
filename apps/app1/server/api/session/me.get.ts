@@ -16,6 +16,12 @@ export default wrapApiHandler<SessionMeResponse>(
         id: true,
         email: true,
         emailHash: true,
+        /*
+         * L'adresse DEMANDÉE et pas encore confirmée — constat B2. Sans ce champ, l'écran du profil
+         * ne pourrait pas rappeler qu'un changement est en cours : on taperait une nouvelle adresse,
+         * on verrait l'ancienne revenir au rechargement, et rien n'expliquerait pourquoi.
+         */
+        pendingEmail: true,
         pseudo: true,
         nom: true,
         prenom: true,

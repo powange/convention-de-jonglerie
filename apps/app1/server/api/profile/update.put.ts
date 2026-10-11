@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { getEmailHash } from '#server/utils/email-hash'
+import { demarrerChangementDAdresse } from '#server/utils/changement-d-adresse'
 import { sanitizeString } from '#server/utils/validation-helpers'
 import {
   updateProfileSchema,
@@ -46,19 +46,30 @@ export default wrapApiHandler(
       emergencyContactPhone,
     } = validatedData
 
-    // Vérifier si l'email est déjà utilisé par un autre utilisateur
-    if (email !== user.email) {
-      const existingUser = await prisma.user.findUnique({
-        where: { email },
-      })
-
-      if (existingUser && existingUser.id !== user.id) {
-        throw createError({
-          status: 400,
-          message: 'Cette adresse email est déjà utilisée par un autre utilisateur',
-        })
-      }
-    }
+    /*
+     * ⚠️⚠️ L'ADRESSE NE S'ÉCRIT PLUS ICI — constat B2.
+     *
+     * Ce point d'API l'écrivait immédiatement, sans vérification et sans un mot à l'ancienne
+     * adresse. Trois conséquences, toutes réelles :
+     *
+     *   1. une faute de frappe rendait la réinitialisation de mot de passe IMPOSSIBLE — on ne
+     *      reçoit plus rien, et c'est l'adresse qui sert à récupérer son compte ;
+     *   2. on pouvait s'attribuer l'adresse de quelqu'un d'autre et BLOQUER son inscription, la
+     *      contrainte d'unicité faisant ensuite répondre « déjà utilisée » à son propriétaire ;
+     *   3. une session volée devenait une prise de contrôle DÉFINITIVE : l'attaquant posait son
+     *      adresse, puis se réinitialisait un mot de passe.
+     *
+     * L'inscription, elle, exige un code à six chiffres depuis toujours. Le profil contournait
+     * cette exigence : il demande désormais la même chose.
+     */
+    const changementDAdresse =
+      email !== user.email
+        ? await demarrerChangementDAdresse({
+            userId: user.id,
+            nouvelleAdresse: email,
+            motDePasseFourni: validatedData.currentPassword,
+          })
+        : null
 
     // Vérifier si le pseudo est déjà utilisé par un autre utilisateur
     if (pseudo !== user.pseudo) {
@@ -154,7 +165,7 @@ export default wrapApiHandler(
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: {
-        email,
+        // `email` est ABSENT, volontairement : il ne bascule qu'à la confirmation du code.
         pseudo,
         nom: sanitizeString(nom),
         prenom: sanitizeString(prenom),
@@ -180,8 +191,11 @@ export default wrapApiHandler(
         ...(emergencyContactPhone !== undefined && {
           emergencyContactPhone: sanitizeString(emergencyContactPhone) || null,
         }),
-        // Recalculer emailHash si l'email a changé
-        ...(email !== user.email && { emailHash: getEmailHash(email) }),
+        /*
+         * `emailHash` suivait l'adresse, et il la suit toujours — mais à la CONFIRMATION, pas ici.
+         * Le recalculer maintenant ferait afficher le Gravatar de la nouvelle adresse pour une
+         * adresse qui n'est pas encore la sienne.
+         */
       },
       select: {
         id: true,
@@ -207,8 +221,15 @@ export default wrapApiHandler(
       },
     })
 
-    // emailHash est déjà présent dans updatedUser
-    return createSuccessResponse(updatedUser)
+    /*
+     * L'adresse en attente voyage avec la réponse — constat B2. Sans elle, l'écran afficherait
+     * « profil enregistré » et l'ancienne adresse reviendrait dans le champ, sans un mot
+     * d'explication : la personne croirait que son changement a été refusé en silence.
+     */
+    return createSuccessResponse({
+      ...updatedUser,
+      pendingEmail: changementDAdresse?.pendingEmail ?? null,
+    })
   },
   { operationName: 'UpdateProfile' }
 )
