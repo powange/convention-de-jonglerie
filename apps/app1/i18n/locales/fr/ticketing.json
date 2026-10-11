@@ -280,6 +280,11 @@
       }
     },
     "my_ticket": {
+      "cancelled_badge": "Annulé",
+      "cancelled_description": "Il ne donne plus droit d'entrée et sera refusé au contrôle d'accès. Contactez les organisateurs si vous pensez à une erreur.",
+      "cancelled_title": "Ce billet a été annulé",
+      "details_title": "Détails du billet",
+      "entry_validated": "Entrée validée",
       "how_to_use_description": "Présentez ce QR code à l'entrée pour valider votre billet.",
       "how_to_use_title": "Comment utiliser ce QR code"
     },

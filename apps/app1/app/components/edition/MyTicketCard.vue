@@ -40,8 +40,28 @@
                 <p class="text-xs text-gray-500 dark:text-gray-500">{{ ticket.email }}</p>
               </div>
 
+              <!--
+                ⚠️ « ANNULÉ » PRÉVAUT SUR « ENTRÉE VALIDÉE » — constat B8.
+
+                Les deux peuvent être vrais en même temps : un billet validé à l'entrée puis
+                annulé côté billetterie. Afficher la validation masquerait alors l'annulation,
+                c'est-à-dire précisément l'information que la personne doit lire.
+              -->
+              <UBadge
+                v-if="ticket.annule"
+                data-billet-annule
+                color="error"
+                variant="subtle"
+                size="sm"
+              >
+                {{ $t('ticketing.my_ticket.cancelled_badge') }}
+              </UBadge>
               <!-- Statut de validation -->
-              <div v-if="ticket.entryValidated" class="flex items-center gap-2">
+              <div
+                v-else-if="ticket.entryValidated"
+                data-entree-validee
+                class="flex items-center gap-2"
+              >
                 <UIcon
                   name="i-heroicons-check-circle-solid"
                   class="h-4 w-4 text-green-600 dark:text-green-400"
@@ -49,7 +69,7 @@
                 <span
                   class="text-xs font-medium text-green-600 dark:text-green-400 whitespace-nowrap"
                 >
-                  Entrée validée
+                  {{ $t('ticketing.my_ticket.entry_validated') }}
                 </span>
               </div>
             </div>
@@ -75,6 +95,7 @@
                 color="primary"
                 variant="soft"
                 size="sm"
+                :disabled="ticket.annule"
                 @click="showQrCode(ticket)"
               >
                 QR Code
@@ -106,6 +127,19 @@
           </div>
         </div>
 
+        <!--
+          L'encart passe AVANT le code QR : on lit l'annulation avant de voir le code, et non
+          après l'avoir présenté.
+        -->
+        <UAlert
+          v-if="selectedTicket.annule"
+          color="error"
+          variant="subtle"
+          icon="i-heroicons-x-circle"
+          :title="$t('ticketing.my_ticket.cancelled_title')"
+          :description="$t('ticketing.my_ticket.cancelled_description')"
+        />
+
         <!-- QR Code -->
         <div v-if="selectedTicket.qrCode" class="flex flex-col items-center justify-center p-6">
           <Qrcode :value="selectedTicket.qrCode" variant="default" />
@@ -117,7 +151,7 @@
         <!-- Informations du billet -->
         <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
           <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-            Détails du billet
+            {{ $t('ticketing.my_ticket.details_title') }}
           </h4>
           <div class="space-y-2 text-sm">
             <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
@@ -165,6 +199,11 @@ interface Ticket {
   provider?: string | null
   entryValidated: boolean
   entryValidatedAt: Date | null
+  /**
+   * Le billet ne donne plus droit d'entrée — constat B8. Annoncé, jamais masqué : le filtrer
+   * ferait disparaître le billet sans explication, et la personne croirait n'en avoir jamais eu.
+   */
+  annule: boolean
 }
 
 const props = defineProps<{
