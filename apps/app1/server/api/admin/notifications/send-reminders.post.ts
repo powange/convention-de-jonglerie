@@ -1,6 +1,7 @@
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { NotificationHelpers } from '#server/utils/notification-service'
+import { nomAffichableDEdition } from '~~/shared/utils/nom-edition'
 
 export default wrapApiHandler(
   async (event) => {
@@ -95,7 +96,17 @@ export default wrapApiHandler(
             if (!existingNotification) {
               await NotificationHelpers.eventReminder(
                 userId,
-                `${edition.convention.name} - ${edition.title}`,
+                /*
+                 * ⚠️ `edition.title` N'EXISTE PAS — constat B5. Le modèle `Edition` n'a que `name`,
+                 * nullable : la notification s'intitulait « Convention X - undefined », et elle
+                 * partait vraiment. Le fichier avait déjà été corrigé une fois pour un champ
+                 * inexistant (cf. le commentaire sur `titleKey` juste au-dessus) ; celui-ci avait
+                 * survécu.
+                 *
+                 * 📍 La règle est partagée plutôt que recomposée ici : elle existait en trois
+                 * versions, dont celle-ci, fausse.
+                 */
+                nomAffichableDEdition(edition),
                 edition.id,
                 daysUntil
               )
