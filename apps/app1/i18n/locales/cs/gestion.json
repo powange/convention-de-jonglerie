@@ -650,6 +650,7 @@
       "reservation_location": "Umístění",
       "reservation_location_help": "Označuje, odkud bude materiál odebrán (čistě informativní, žádné omezení množství).",
       "reservation_location_placeholder": "Např: Hlavní jeviště, vzadu vpravo",
+      "reservations_load_error": "[TODO] Impossible de charger les réservations de cet objet",
       "reservations_title": "Rezervace",
       "responsible_contact_placeholder": "Nebo: jméno a telefon",
       "responsible_help": "Přezdívka, jméno nebo příjmení hledá mezi lidmi tohoto ročníku — organizátory, dobrovolníky a umělci; celá e-mailová adresa najde kterýkoli účet na webu. Jinak postačí jméno a kontakt.",

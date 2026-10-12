@@ -1,3 +1,8 @@
+import {
+  RESERVATIONS_PAR_PAGE,
+  reservationDeLaFicheSelect,
+} from '../../../../../utils/reservations-de-la-fiche'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
@@ -8,7 +13,16 @@ import { validateEditionId } from '#server/utils/validation-helpers'
 /**
  * GET /api/editions/[id]/stock-items/[itemId]
  *
- * Détail d'un item de stock avec ses réservations actives et futures.
+ * Détail d'un item de stock avec la PREMIÈRE PAGE de ses réservations.
+ *
+ * ⚠️ Il les chargeait TOUTES — constat E3 : ni `take`, ni `where`, alors que ce commentaire
+ * annonçait « ses réservations actives et futures ». Il n'en lit désormais que
+ * `RESERVATIONS_PAR_PAGE`, et rend le total ; la suite se demande à
+ * `GET …/stock-items/[itemId]/reservations`.
+ *
+ * 📍 Mesuré avant d'y toucher : **0 réservation** en base de développement. Ce n'est pas la
+ * correction d'une panne mais une échéance — et l'historique est PAGINÉ plutôt que borné aux
+ * réservations à venir, parce que cet écran affiche délibérément tout le passé.
  */
 export default wrapApiHandler(
   async (event) => {
@@ -45,26 +59,15 @@ export default wrapApiHandler(
         returnResponsible: { select: userWithNameAndAvatarSelect },
         reservations: {
           orderBy: { startsAt: 'asc' },
-          include: {
-            zone: { select: { id: true, name: true, color: true } },
-            marker: { select: { id: true, name: true } },
-            // Pas l'adresse e-mail : cette fiche est ouverte à qui peut consulter le stock, ce
-            // qui inclut les responsables d'équipe bénévole — lesquels n'ont pas à connaître
-            // l'adresse des autres participants. Le planning, qui affiche pourtant les mêmes
-            // réservations, ne prenait déjà que l'empreinte ; c'est ce choix-là qui vaut.
-            // L'empreinte suffit à l'avatar, seul usage qu'en fait l'écran.
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                prenom: true,
-                nom: true,
-                emailHash: true,
-                profilePicture: true,
-              },
-            },
-          },
+          take: RESERVATIONS_PAR_PAGE,
+          // Le select vit dans `reservations-de-la-fiche.ts`, partagé avec la page suivante :
+          // deux définitions divergeraient, et la seconde page finirait par afficher autre chose
+          // que la première — ou par exposer un champ que celle-ci cachait.
+          include: reservationDeLaFicheSelect,
         },
+        // Le total, pour que l'écran sache s'il y a une suite à demander. `_count` est une
+        // agrégation : il ne ramène pas les lignes.
+        _count: { select: { reservations: true } },
       },
     })
     if (!item) {

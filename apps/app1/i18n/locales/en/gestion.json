@@ -672,6 +672,7 @@
       "reservation_location": "Location",
       "reservation_location_help": "Indicates where the gear will be picked up (informative only, no quantity constraint).",
       "reservation_location_placeholder": "E.g.: Main stage, back right",
+      "reservations_load_error": "[TODO] Impossible de charger les réservations de cet objet",
       "reservations_title": "Reservations",
       "responsible_contact_placeholder": "Or: name and phone number",
       "responsible_help": "A nickname, first name or surname searches among the people of this edition — organisers, volunteers and artists; a full e-mail address finds any account on the site. Otherwise, a name and a contact are enough.",
