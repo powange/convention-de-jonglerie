@@ -384,6 +384,19 @@
         </div>
       </UCard>
 
+      <!--
+        Pagination — constat O3. `UPagination` comme sur les quatre autres écrans
+        d'administration ; masquée tant qu'il n'y a qu'une page, pour ne pas occuper une ligne
+        sur une liste de trois conventions.
+      -->
+      <div v-if="nombreDePages > 1" class="flex justify-center pt-2">
+        <UPagination
+          v-model:page="page"
+          :total="data?.pagination?.totalCount ?? 0"
+          :items-per-page="data?.pagination?.limit ?? 20"
+        />
+      </div>
+
       <!-- État vide -->
       <div v-if="sortedConventions.length === 0" class="text-center py-12">
         <UIcon name="i-heroicons-building-library" class="mx-auto h-12 w-12 text-gray-400" />
@@ -563,98 +576,53 @@ const exportedJson = ref('')
 const exportError = ref('')
 const copied = ref(false)
 
-// Récupération des données
-const { data, pending, error, refresh } = await useLazyFetch('/api/admin/conventions')
+/*
+ * ⚠️ LE FILTRE, LE TRI ET LA PAGE SONT DEMANDÉS AU SERVEUR — constat O3.
+ *
+ * Cet écran chargeait TOUTES les conventions avec toutes leurs éditions, leurs organisateurs et
+ * leurs profils, puis filtrait et triait en mémoire. C'était le seul écran d'administration à
+ * liste longue sans pagination.
+ *
+ * La recherche reste temporisée (300 ms) : c'est elle qui est dans l'adresse, et c'est elle qui
+ * déclenche la requête — une par caractère serait coûteuse maintenant qu'elle part au serveur.
+ */
+const page = ref(1)
 
-// Données calculées
-const totalConventions = computed(() => {
-  if (!data.value?.conventions) return 0
-  return data.value.conventions.length
+// Changer de filtre, de tri ou de recherche ramène à la première page : rester en page 7 d'une
+// liste qui n'en compte plus que deux afficherait un vide inexplicable.
+watch([debouncedSearchQuery, archivedFilter, sortBy], () => {
+  page.value = 1
 })
 
-const totalEditions = computed(() => {
-  if (!data.value?.conventions) return 0
-  return data.value.conventions.reduce((total, conv) => total + conv.editions.length, 0)
+const { data, pending, error, refresh } = await useLazyFetch('/api/admin/conventions', {
+  query: computed(() => ({
+    page: page.value,
+    search: debouncedSearchQuery.value || undefined,
+    archived: archivedFilter.value !== DEFAULT_ARCHIVED_FILTER ? archivedFilter.value : undefined,
+    sort: sortBy.value !== DEFAULT_SORT ? sortBy.value : undefined,
+  })),
 })
 
-const activeConventions = computed(() => {
-  if (!data.value?.conventions) return 0
-  return data.value.conventions.filter((conv) => !(conv as any).isArchived).length
-})
+/*
+ * ⚠️ LES TROIS COMPTEURS VIENNENT DU SERVEUR, et c'est la pagination qui l'impose : calculés sur
+ * `data.conventions` comme avant, ils auraient annoncé le contenu de la PAGE — « 20 conventions »
+ * partout. Ce sont des totaux de l'instance, indépendants du filtre, comme ils l'étaient.
+ */
+const totalConventions = computed(() => data.value?.totaux?.conventions ?? 0)
+const totalEditions = computed(() => data.value?.totaux?.editions ?? 0)
+const activeConventions = computed(() => data.value?.totaux?.actives ?? 0)
 
-const filteredConventions = computed(() => {
-  if (!data.value?.conventions) return []
+/*
+ * La liste affichée EST celle que le serveur a rendue : filtrée, triée et paginée par lui.
+ *
+ * ⚠️ `filteredConventions` et `sortedConventions` ont disparu — 70 lignes de filtre et de tri en
+ * mémoire, dont une recherche sur `author.email` qui obligeait à envoyer toutes les adresses au
+ * navigateur. Le serveur cherche désormais dans l'adresse sans la transmettre.
+ */
+const sortedConventions = computed(() => data.value?.conventions ?? [])
 
-  let filtered = data.value.conventions
-
-  // Filtre par statut
-  if (archivedFilter.value === 'active') {
-    filtered = filtered.filter((conv) => !(conv as any).isArchived)
-  } else if (archivedFilter.value === 'archived') {
-    filtered = filtered.filter((conv) => (conv as any).isArchived)
-  } else if (archivedFilter.value === 'unclaimed') {
-    filtered = filtered.filter((conv) => (conv as any)._count?.organizers === 0)
-  }
-
-  // Filtre par recherche (avec debounce)
-  if (debouncedSearchQuery.value.trim()) {
-    const query = debouncedSearchQuery.value.toLowerCase().trim()
-    filtered = filtered.filter((conv) => {
-      return (
-        conv.name.toLowerCase().includes(query) ||
-        conv.description?.toLowerCase().includes(query) ||
-        conv.author?.pseudo?.toLowerCase().includes(query) ||
-        conv.author?.email?.toLowerCase().includes(query) ||
-        conv.editions.some(
-          (edition) =>
-            edition.name?.toLowerCase().includes(query) ||
-            edition.city.toLowerCase().includes(query) ||
-            edition.country.toLowerCase().includes(query)
-        )
-      )
-    })
-  }
-
-  return filtered
-})
-
-// Conventions triées
-const sortedConventions = computed(() => {
-  const conventions = [...filteredConventions.value]
-
-  switch (sortBy.value) {
-    case 'name-asc':
-      return conventions.sort((a, b) => a.name.localeCompare(b.name))
-    case 'name-desc':
-      return conventions.sort((a, b) => b.name.localeCompare(a.name))
-    case 'date-desc':
-      return conventions.sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      )
-    case 'date-asc':
-      return conventions.sort(
-        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      )
-    case 'updated-desc':
-      return conventions.sort(
-        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      )
-    case 'updated-asc':
-      return conventions.sort(
-        (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
-      )
-    case 'editions-desc':
-      return conventions.sort(
-        (a, b) => ((b as any)._count?.editions || 0) - ((a as any)._count?.editions || 0)
-      )
-    case 'editions-asc':
-      return conventions.sort(
-        (a, b) => ((a as any)._count?.editions || 0) - ((b as any)._count?.editions || 0)
-      )
-    default:
-      return conventions
-  }
-})
+/** Le nombre de pages, pour la pagination de bas de liste. */
+const nombreDePages = computed(() => data.value?.pagination?.totalPages ?? 1)
 
 // Fonctions utilitaires
 const getEditionStatusColor = (status: string) => {
