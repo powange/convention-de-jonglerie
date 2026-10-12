@@ -26,10 +26,36 @@
           @refresh="loadQuotas"
         />
 
-        <!-- Associer les quotas : à quoi chaque quota se rattache, et donc ce qu'il compte.
-             Même disposition que les articles à remettre, dont c'est la même question posée
-             autrement. Les trois onglets sont encore vides — ce lot pose la structure. -->
-        <div class="border-t border-gray-200 dark:border-gray-800 pt-8">
+        <!--
+          Associer les quotas : à quoi chaque quota se rattache, et donc ce qu'il compte.
+
+          ⚠️ RIEN À ASSOCIER TANT QU'IL N'Y A PAS DE QUOTA — constat F5. La section et ses six
+          onglets s'affichaient quand même, et le bouton ouvrait une fenêtre au sélecteur VIDE
+          sans rien dire de la cause : on cherchait ce qu'on avait mal fait, là où il n'y avait
+          simplement rien à choisir.
+
+          ⚠️⚠️ ET LA DISTINCTION QUI COMPTE : « pas encore chargé » n'est pas « réellement vide ».
+          `loadingQuotas` part à `true`, donc l'encart n'apparaît qu'une fois la réponse arrivée —
+          sans quoi il clignoterait à chaque ouverture de la page, en annonçant l'absence de
+          quotas pendant qu'on les charge.
+        -->
+        <div
+          v-if="!loadingQuotas && quotas.length === 0"
+          class="border-t border-gray-200 dark:border-gray-800 pt-8"
+        >
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            {{ $t('gestion.ticketing.assign_quotas_title') }}
+          </h2>
+          <UAlert
+            icon="i-heroicons-information-circle"
+            color="neutral"
+            variant="soft"
+            :title="$t('gestion.ticketing.assign_quotas_empty_title')"
+            :description="$t('gestion.ticketing.assign_quotas_empty_description')"
+          />
+        </div>
+
+        <div v-else-if="!loadingQuotas" class="border-t border-gray-200 dark:border-gray-800 pt-8">
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             {{ $t('gestion.ticketing.assign_quotas_title') }}
           </h2>
@@ -1106,26 +1132,46 @@ onMounted(async () => {
   }
 
   if (canAccess.value) {
-    await loadQuotas()
-    await loadTiers()
-    await loadOptions()
-    await loadChamps()
-    await loadOrganisateurs()
-    await loadBenevoles()
-    await loadArtistes()
+    /*
+     * ⚠️ SEPT CHARGEMENTS, ET ILS ÉTAIENT EN FILE — constat F5, dont la prémisse disait « cinq
+     * listes en parallèle ». C'était faux dans le sens qui l'aggrave : sept requêtes, enchaînées
+     * l'une après l'autre, chacune attendant la précédente alors qu'aucune n'a besoin de son
+     * résultat.
+     *
+     * `Promise.all` : le temps d'affichage devient celui de la plus lente, et non leur somme.
+     */
+    await Promise.all([
+      loadQuotas(),
+      loadTiers(),
+      loadOptions(),
+      loadChamps(),
+      loadOrganisateurs(),
+      loadBenevoles(),
+      loadArtistes(),
+    ])
   }
 })
 
 // Recharger quand les permissions changent (mode super admin)
 watch(canAccess, async (nouvelle, ancienne) => {
   if (nouvelle && !ancienne) {
-    await loadQuotas()
-    await loadTiers()
-    await loadOptions()
-    await loadChamps()
-    await loadOrganisateurs()
-    await loadBenevoles()
-    await loadArtistes()
+    /*
+     * ⚠️ SEPT CHARGEMENTS, ET ILS ÉTAIENT EN FILE — constat F5, dont la prémisse disait « cinq
+     * listes en parallèle ». C'était faux dans le sens qui l'aggrave : sept requêtes, enchaînées
+     * l'une après l'autre, chacune attendant la précédente alors qu'aucune n'a besoin de son
+     * résultat.
+     *
+     * `Promise.all` : le temps d'affichage devient celui de la plus lente, et non leur somme.
+     */
+    await Promise.all([
+      loadQuotas(),
+      loadTiers(),
+      loadOptions(),
+      loadChamps(),
+      loadOrganisateurs(),
+      loadBenevoles(),
+      loadArtistes(),
+    ])
   }
 })
 </script>
