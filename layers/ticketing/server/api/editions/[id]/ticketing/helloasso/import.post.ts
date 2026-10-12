@@ -7,8 +7,16 @@ import { synchronisationUnique } from '../../../../../utils/synchronisation-uniq
 import { requireAuth } from '#server/utils/auth-utils'
 import { fetchOrdersFromHelloAsso } from '#server/utils/editions/ticketing/helloasso'
 import { decrypt } from '#server/utils/encryption'
+import { createLogger } from '#server/utils/logger'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { ETATS_DE_BILLET_ANNULE } from '#server/utils/ticketing/billets-qui-comptent'
+
+/*
+ * ⚠️ UN JOURNAL À NIVEAUX, PAS DES `console.log` — constat O3. `createLogger` existait déjà et
+ * n'était pas employé ici : `LOG_LEVEL` vaut `info` en production, donc tout ce qui est en `debug`
+ * en disparaît sans qu'on ait à choisir entre « tout » et « rien ».
+ */
+const journal = createLogger('HELLOASSO-IMPORT')
 
 /** La charge HelloAsso donne-t-elle cette ligne pour annulée ? */
 const annuleeALaSource = (etat: string) =>
@@ -126,7 +134,7 @@ export default wrapApiHandler(
         )
 
         // Sauvegarder les commandes et items en BDD
-        console.log('💾 Nombre de commandes à sauvegarder:', result.data?.length || 0)
+        journal.info('commandes à enregistrer', { nombre: result.data?.length || 0 })
         if (result.data && result.data.length > 0) {
           /*
            * ⚠️ LE PLAFOND DE LA TRANSACTION EST DÉSORMAIS CHOISI, et non hérité — constat O1.
@@ -178,7 +186,7 @@ export default wrapApiHandler(
                 where: { editionId },
                 include: { meals: true },
               })
-              console.log('📊 Nombre de tarifs disponibles:', tiers.length)
+              journal.debug('tarifs disponibles', { nombre: tiers.length })
 
               for (const order of result.data) {
                 // Le statut suit la source : « Annulée » quand HelloAsso a annulé toutes les lignes.
@@ -229,25 +237,45 @@ export default wrapApiHandler(
                     return tier.name === item.name || tier.name === item.priceCategory
                   })
 
-                  // Log pour déboguer
+                  /*
+                   * ⚠️ CE JOURNAL DISAIT DEUX FOIS FAUX — constat O3.
+                   *
+                   * 1. Il écrivait une ligne PAR BILLET, succès compris, et redéversait en plus
+                   *    la liste COMPLÈTE des tarifs de l'édition à chaque ligne non rapprochée.
+                   *    Mesuré : ~117 appels à `console.log` pour l'édition 1, ~230 pour la 9.
+                   *    Ce bruit a eu un coût réel — il a fait croire le constat D4 quatre fois
+                   *    plus grave qu'il ne l'est.
+                   *
+                   * 2. « Aucun tarif trouvé » était une FAUSSE alerte dans la majorité des cas :
+                   *    un DON HelloAsso arrive sans identifiant de tarif et sans nom, donc il ne
+                   *    se rapproche d'aucun tarif — parce que ce n'est pas un billet. Mesuré sur
+                   *    l'édition 21 : 100 lignes `Registration` toutes rapprochées et 20 dons,
+                   *    donc vingt alertes et aucun billet orphelin. Sur l'édition 1, les 35
+                   *    lignes sans tarif sont exactement les 35 dons.
+                   *
+                   * Le message distingue donc les deux cas, et seule la vraie anomalie — un
+                   * billet qu'on n'a pas su rapprocher — passe en avertissement.
+                   */
                   if (!matchingTier) {
-                    console.log('❌ Aucun tarif trouvé pour:', {
-                      itemType: item.type,
-                      itemTierId: item.tierId,
-                      itemName: item.name,
-                      itemPriceCategory: item.priceCategory,
-                      itemAmount: item.amount,
-                      availableTiers: tiers.map((t) => ({
-                        helloAssoTierId: t.helloAssoTierId,
-                        name: t.name,
-                        price: t.price,
-                      })),
-                    })
+                    if (item.type === 'Donation') {
+                      journal.debug('ligne sans tarif : un don, pas un billet', {
+                        commande: order.id,
+                        ligne: item.id,
+                      })
+                    } else {
+                      journal.warn('billet non rapproché d’un tarif', {
+                        commande: order.id,
+                        ligne: item.id,
+                        type: item.type,
+                        tarifHelloAsso: item.tierId,
+                        nom: item.name,
+                        categorie: item.priceCategory,
+                      })
+                    }
                   } else {
-                    console.log('✅ Tarif trouvé:', {
-                      tierName: matchingTier.name,
-                      itemName: item.name,
-                      itemTierId: item.tierId,
+                    journal.debug('billet rapproché', {
+                      tarif: matchingTier.name,
+                      ligne: item.id,
                     })
                   }
 
@@ -396,7 +424,7 @@ export default wrapApiHandler(
                           }
                         }
                       } else {
-                        console.log('⚠️ Option HelloAsso non trouvée:', {
+                        journal.warn('option HelloAsso non rapprochée', {
                           optionId: selectedOption.optionId,
                           optionName: selectedOption.name,
                           availableOptions: availableOptions.map((o) => ({
@@ -443,7 +471,7 @@ export default wrapApiHandler(
           },
         })
       } catch (error: unknown) {
-        console.error('HelloAsso orders fetch error:', error)
+        journal.error('échec de la récupération des commandes', error)
         throw error
       }
     })

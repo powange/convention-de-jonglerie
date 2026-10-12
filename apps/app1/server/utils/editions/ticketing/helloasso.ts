@@ -1,7 +1,23 @@
+import { createLogger } from '#server/utils/logger'
+
 /**
  * Utilitaire pour gérer les interactions avec l'API HelloAsso
  * Utilise l'API REST directement pour une meilleure compatibilité
  */
+
+/*
+ * ⚠️ UN JOURNAL À NIVEAUX, PAS DES `console.log` — constat O3.
+ *
+ * Ce fichier en comptait **vingt-trois**, dont deux déversements complets indentés
+ * (`JSON.stringify(…, null, 2)`) qui produisaient des centaines de lignes physiques par appel.
+ * `createLogger` existait déjà dans le dépôt et n'était pas employé ici : `LOG_LEVEL` vaut `info`
+ * en production, donc tout ce qui est en `debug` en disparaît — sans qu'on ait à choisir entre
+ * « tout » et « rien », ce qui était le vrai problème.
+ *
+ * Ce qui reste en `info` : les deux volumes (combien de commandes à récupérer, combien récupérées).
+ * Ce qui passe en `error` : les quatre échecs, qui étaient déjà des `console.error`.
+ */
+const journal = createLogger('HELLOASSO')
 
 // URL de base de l'API HelloAsso (configurable via variable d'environnement)
 const HELLOASSO_API_URL = process.env.HELLOASSO_API_URL || 'https://api.helloasso.com'
@@ -72,9 +88,10 @@ interface HelloAssoFormIdentifier {
  */
 export async function getHelloAssoAccessToken(credentials: HelloAssoCredentials): Promise<string> {
   try {
-    console.log("🔑 [HelloAsso] Récupération du token d'accès...")
-    console.log('🔑 [HelloAsso] API URL:', HELLOASSO_API_URL)
-    console.log('🔑 [HelloAsso] Client ID:', credentials.clientId)
+    journal.debug("récupération du token d'accès", {
+      api: HELLOASSO_API_URL,
+      clientId: credentials.clientId,
+    })
 
     const response = await fetch(`${HELLOASSO_API_URL}/oauth2/token`, {
       method: 'POST',
@@ -99,10 +116,10 @@ export async function getHelloAssoAccessToken(credentials: HelloAssoCredentials)
       throw new Error("Impossible d'obtenir un token d'accès")
     }
 
-    console.log("✅ [HelloAsso] Token d'accès obtenu avec succès")
+    journal.debug("token d'accès obtenu")
     return data.access_token
   } catch (error: any) {
-    console.error('❌ [HelloAsso] Erreur lors de la récupération du token:', error)
+    journal.error("échec de la récupération du token d'accès", error)
 
     // Utiliser createError si disponible (contexte Nitro), sinon lancer une erreur standard
     if (typeof createError !== 'undefined') {
@@ -124,14 +141,11 @@ export async function getHelloAssoForm(
   formIdentifier: HelloAssoFormIdentifier
 ): Promise<HelloAssoFormResponse> {
   try {
-    console.log('📋 [HelloAsso] Récupération du formulaire...')
-    console.log('📋 [HelloAsso] Organization Slug:', formIdentifier.organizationSlug)
-    console.log('📋 [HelloAsso] Form Type:', formIdentifier.formType)
-    console.log('📋 [HelloAsso] Form Slug:', formIdentifier.formSlug)
+    journal.debug('récupération du formulaire', formIdentifier)
 
     // Utiliser directement l'API REST au lieu du SDK
     const url = `${HELLOASSO_API_URL}/v5/organizations/${formIdentifier.organizationSlug}/forms/${formIdentifier.formType}/${formIdentifier.formSlug}/public`
-    console.log('📋 [HelloAsso] URL:', url)
+    journal.debug('URL du formulaire', url)
 
     const response = await fetch(url, {
       headers: {
@@ -177,10 +191,10 @@ export async function getHelloAssoForm(
 
     const data: HelloAssoFormResponse = await response.json()
 
-    console.log('✅ [HelloAsso] Formulaire récupéré:', data.title)
+    journal.debug('formulaire récupéré', data.title)
     return data
   } catch (error: any) {
-    console.error('❌ [HelloAsso] Erreur lors de la récupération du formulaire:', error)
+    journal.error('échec de la récupération du formulaire', error)
     throw error
   }
 }
@@ -257,17 +271,23 @@ export async function getHelloAssoTiersAndOptions(
   // 2. Récupérer le formulaire
   const formResponse = await getHelloAssoForm(accessToken, formIdentifier)
 
-  console.log('🎫 [HelloAsso API formResponse] :', JSON.stringify(formResponse, null, 2))
+  /*
+   * ⚠️ CE DÉVERSEMENT ÉTAIT LE PLUS COÛTEUX DU MODULE — constat O3. `JSON.stringify(…, null, 2)`
+   * indente : la réponse complète d'un formulaire HelloAsso produisait des CENTAINES de lignes
+   * physiques de journal pour un seul appel. En `debug`, et sans indentation (le journal
+   * sérialise lui-même, compact).
+   */
+  journal.debug('réponse complète du formulaire', formResponse)
 
   // 3. Extraire les tarifs
   const tiers = formResponse.tiers || []
 
   // 3.1 Extraire les custom fields du formulaire (champs globaux)
   const formCustomFields = formResponse.customFields || []
-  console.log(
-    `🎫 [HelloAsso] Found ${formCustomFields.length} custom fields at form level`,
-    JSON.stringify(formCustomFields, null, 2)
-  )
+  journal.debug('champs personnalisés au niveau du formulaire', {
+    nombre: formCustomFields.length,
+    champs: formCustomFields,
+  })
 
   // 4. Extraire les options depuis extraOptions de chaque tier
   const allOptionsMap = new Map<number | string, HelloAssoExtraOption>()
@@ -285,15 +305,17 @@ export async function getHelloAssoTiersAndOptions(
 
   const options = Array.from(allOptionsMap.values())
 
-  console.log(`Found ${tiers.length} tiers and ${options.length} extra options`)
+  journal.debug('tarifs et options extraits', { tarifs: tiers.length, options: options.length })
 
   // 5. Formater les données pour le frontend
   const formattedTiers = tiers.map((tier: HelloAssoTier) => {
     // Les custom fields peuvent être soit au niveau du tier, soit hérités du formulaire
     const tierCustomFields = tier.customFields || formCustomFields
-    console.log(
-      `🎫 [HelloAsso] Tier "${tier.label || tier.name}" has ${tierCustomFields.length} custom fields`
-    )
+    // Une ligne PAR TARIF : en `debug`, donc hors production.
+    journal.debug('champs personnalisés d’un tarif', {
+      tarif: tier.label || tier.name,
+      nombre: tierCustomFields.length,
+    })
 
     // Extraire les IDs des options associées à ce tarif
     const extraOptionIds = (tier.extraOptions || [])
@@ -440,7 +462,7 @@ async function fetchOrdersPageFromHelloAsso(
 
     return await response.json()
   } catch (error: any) {
-    console.error('❌ [HelloAsso] Erreur lors de la récupération des commandes:', error)
+    journal.error('échec de la récupération des commandes', error)
     throw error
   }
 }
@@ -503,11 +525,7 @@ export async function fetchOrdersFromHelloAsso(
   }
 }> {
   try {
-    console.log('📦 [HelloAsso] Récupération des commandes...')
-    console.log('📦 [HelloAsso] Organization Slug:', formIdentifier.organizationSlug)
-    console.log('📦 [HelloAsso] Form Type:', formIdentifier.formType)
-    console.log('📦 [HelloAsso] Form Slug:', formIdentifier.formSlug)
-    console.log('📦 [HelloAsso] Options:', options)
+    journal.debug('récupération des commandes', { ...formIdentifier, options })
 
     // 1. Obtenir un token d'accès
     const accessToken = await getHelloAssoAccessToken(credentials)
@@ -518,7 +536,7 @@ export async function fetchOrdersFromHelloAsso(
     const allOrders: Array<any> = []
 
     // 2. Récupérer la première page pour connaître le nombre total de pages
-    console.log('📦 [HelloAsso] Récupération de la page 1...')
+    journal.debug('récupération de la page 1')
     const firstPageResult = await fetchOrdersPageFromHelloAsso(
       accessToken,
       formIdentifier,
@@ -532,12 +550,12 @@ export async function fetchOrdersFromHelloAsso(
     const totalPages = firstPageResult.pagination.totalPages
     const totalCount = firstPageResult.pagination.totalCount
 
-    console.log(`📦 [HelloAsso] Total: ${totalCount} commandes sur ${totalPages} pages`)
+    journal.info('commandes à récupérer', { commandes: totalCount, pages: totalPages })
 
     // 3. Récupérer les pages suivantes si nécessaire
     if (totalPages > 1) {
       for (currentPage = 2; currentPage <= totalPages; currentPage++) {
-        console.log(`📦 [HelloAsso] Récupération de la page ${currentPage}/${totalPages}...`)
+        journal.debug('récupération d’une page', { page: currentPage, total: totalPages })
         const pageResult = await fetchOrdersPageFromHelloAsso(
           accessToken,
           formIdentifier,
@@ -549,7 +567,7 @@ export async function fetchOrdersFromHelloAsso(
       }
     }
 
-    console.log(`✅ [HelloAsso] ${allOrders.length} commandes récupérées au total`)
+    journal.info('commandes récupérées', { nombre: allOrders.length })
 
     return {
       data: allOrders,
@@ -561,7 +579,7 @@ export async function fetchOrdersFromHelloAsso(
       },
     }
   } catch (error: any) {
-    console.error('❌ [HelloAsso] Erreur dans fetchOrdersFromHelloAsso:', error)
+    journal.error('échec de fetchOrdersFromHelloAsso', error)
     throw error
   }
 }
