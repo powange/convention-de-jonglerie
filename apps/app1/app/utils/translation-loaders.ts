@@ -29,7 +29,11 @@ export function getTranslationsToLoad(path: string): string[] {
     '/project-costs': ['project-costs'],
     '/auth': ['auth', 'profil'],
     '/login': ['auth'],
-    '/register': ['auth', 'profil'],
+    /*
+     * `/register` n'est plus listée : elle ne rend plus de page, elle redirige vers `/login`
+     * (constat C6). Un domaine chargé pour une route qui n'affiche rien est du temps pris au
+     * premier affichage de la page d'arrivée, qui charge déjà le sien.
+     */
     '/profile': ['auth', 'profil'],
     '/verify-email': ['auth'],
     '/welcome': ['auth', 'profil'],
