@@ -862,6 +862,27 @@ jobs:
       # Les lots de gestion reçoivent une liste de fichiers, pas un `--shard`. Le script refuse de
       # rendre une liste si un fichier de test n'appartient à aucun lot : sans ce contrôle, un
       # fichier ajouté plus tard ne s'exécuterait nulle part et tous les lots resteraient verts.
+      # ⚠️ `--global-timeout` BORNE PLAYWRIGHT SOUS LE PLAFOND DU JOB, et c'est ce qui permet de
+      # savoir ce qui a bloqué.
+      #
+      # 📍 Mesuré le 12/10/2026 : le lot `gestion-3b` est resté 35 minutes sur un run de PR, et
+      # `timeout-minutes: 30` l'a tué. Un job tué par ce plafond est annulé DUR : les étapes
+      # suivantes, `if: always()` comprises, ne s'exécutent PAS. Constaté sur ce run — six lots
+      # ont déposé leur rapport, `gestion-3b` AUCUN, et son journal répond 404. On perd donc toute
+      # trace exactement dans le cas où l'on en a besoin, et le seul recours est de rejouer le lot
+      # en espérant une reproduction.
+      #
+      # Avec ce délai, c'est Playwright qui s'arrête de lui-même : il écrit son rapport JSON et
+      # ses traces, l'étape « Refuser un test instable » lit le rapport, et l'artefact part. Le
+      # test fautif est NOMMÉ au lieu d'être cherché.
+      #
+      # 20 minutes : les sept lots tiennent entre 3 min 11 et 6 min 03 sur les huit derniers runs,
+      # soit plus du triple du pire cas, et il reste huit minutes sous le plafond du job pour
+      # l'envoi du rapport.
+      #
+      # ⚠️ Cela ne RÉDUIT pas l'attente d'un lot coincé — ce n'est pas l'objet. Le coût vient de
+      # `playwright.config.ts` : `workers: 1`, `timeout: 120000` par test et `retries: 2` en CI
+      # font qu'un seul test en délai dépassé coûte six minutes.
       - name: Run Playwright tests
         run: |
           fichiers=()
@@ -869,7 +890,8 @@ jobs:
             read -ra fichiers <<< "$(node scripts/lot-playwright.mjs ${{ matrix.lot.cle }})"
           fi
           NUXT_SERVER_LOG=/tmp/nuxt-server.log \
-            npx playwright test --project=${{ matrix.lot.projet }} ${{ matrix.lot.args }} "${fichiers[@]}"
+            npx playwright test --global-timeout 1200000 \
+              --project=${{ matrix.lot.projet }} ${{ matrix.lot.args }} "${fichiers[@]}"
 
       # ⚠️ UN TEST INSTABLE PASSAIT VERT SANS TRACE. `retries: 2` le rejoue jusqu'à ce qu'il
       # réussisse, et le rapport HTML est un artefact qu'il faut télécharger pour le voir : un test
