@@ -314,6 +314,29 @@
             </div>
           </div>
 
+          <!-- L'avancement a échoué à se charger — constat F2.
+               Il prend la place du bloc plutôt que de le laisser disparaître : un comptoir sans
+               son avancement, et sans un mot, se lit comme un comptoir qui n'en a pas. Le bouton
+               évite d'avoir à recharger la page entière pour réessayer. -->
+          <UAlert
+            v-else-if="selectedMeal && erreurStats"
+            class="mb-6"
+            icon="i-heroicons-exclamation-triangle"
+            color="warning"
+            variant="soft"
+            :title="$t('gestion.meals.error_loading_stats')"
+            :description="$t('gestion.meals.error_loading_stats_description')"
+            :actions="[
+              {
+                label: $t('common.retry'),
+                color: 'warning',
+                variant: 'outline',
+                loading: loadingStats,
+                onClick: () => fetchMealStats(),
+              },
+            ]"
+          />
+
           <!-- Étape 2: Recherche de personne (si un repas est sélectionné) -->
           <div v-if="selectedMeal" class="space-y-4">
             <div>
@@ -607,7 +630,16 @@ const searchQuery = ref('')
 const searchResults = ref<any[]>([])
 const validatingIds = ref<string[]>([])
 const mealStats = ref<any>(null)
-const loadingStats = ref(false)
+/*
+ * L'échec du chargement des statistiques, distinct de leur absence — constat F2.
+ *
+ * ⚠️ `mealStats` à `null` disait DEUX choses à la fois : « pas encore chargé » et « le chargement
+ * a échoué ». Le bloc de progression étant monté sous `v-if="selectedMeal && mealStats"`, un 403
+ * après perte de session, un 500 ou une coupure réseau le faisaient **disparaître sans un mot** :
+ * le `catch` d'origine ne journalisait même pas. L'organisateur voyait le comptoir sans son
+ * avancement et n'avait aucune raison de penser à recharger.
+ */
+const erreurStats = ref(false)
 const pendingModalOpen = ref(false)
 const pendingType = ref<'volunteer' | 'artist' | 'participant' | 'organizer'>('volunteer')
 const pendingList = ref<any[]>([])
@@ -774,23 +806,33 @@ const searchPeople = () => {
 }
 
 // Charger les statistiques du repas sélectionné
+const { execute: executeFetchMealStats, loading: loadingStats } = useApiAction<
+  unknown,
+  { stats: any }
+>(() => `/api/editions/${editionId}/meals/${selectedMeal.value?.id}/stats`, {
+  method: 'GET',
+  errorMessages: { default: t('gestion.meals.error_loading_stats') },
+  onSuccess: (reponse: any) => {
+    mealStats.value = reponse?.stats ?? null
+    erreurStats.value = false
+  },
+  onError: () => {
+    // Les statistiques affichées seraient celles d'AVANT l'échec, et rien ne le dirait : on les
+    // retire, et l'encart prend leur place pour en donner la cause.
+    mealStats.value = null
+    erreurStats.value = true
+  },
+})
+
 const fetchMealStats = async () => {
+  // ⚠️ L'endpoint cite `selectedMeal`, donc il n'existe pas tant qu'aucun repas n'est choisi :
+  // sans cette garde, l'appel partirait sur une URL contenant `undefined`.
   if (!selectedMeal.value) {
     mealStats.value = null
+    erreurStats.value = false
     return
   }
-
-  loadingStats.value = true
-  try {
-    const data = await $fetch<{ data: { stats: any } }>(
-      `/api/editions/${editionId}/meals/${selectedMeal.value.id}/stats`
-    )
-    mealStats.value = data.data?.stats || null
-  } catch {
-    mealStats.value = null
-  } finally {
-    loadingStats.value = false
-  }
+  await executeFetchMealStats()
 }
 
 // Valider un repas

@@ -306,6 +306,28 @@
             :libelle="t('common.loading')"
           />
 
+          <!-- L'échec passe AVANT le vide — constat F2.
+               Dans l'autre ordre, « Aucun participant » l'emporterait : la liste est vide dans
+               les deux cas, et c'est précisément ce qui rendait la panne indiscernable d'une
+               donnée. -->
+          <UAlert
+            v-else-if="erreurParticipants"
+            icon="i-heroicons-exclamation-triangle"
+            color="warning"
+            variant="soft"
+            :title="$t('gestion.meals.error_loading_participants')"
+            :description="$t('gestion.meals.error_loading_participants_description')"
+            :actions="[
+              {
+                label: $t('common.retry'),
+                color: 'warning',
+                variant: 'outline',
+                loading,
+                onClick: () => fetchParticipants(),
+              },
+            ]"
+          />
+
           <div v-else-if="formattedParticipants.length === 0" class="text-center py-8">
             <p class="text-gray-500 dark:text-gray-400">
               {{ $t('edition.meals.no_participants') }}
@@ -419,7 +441,16 @@ const router = useRouter()
 const filtresInitiaux = filtresDepuisUrl(route.query)
 
 // État
-const loading = ref(false)
+/*
+ * L'échec du chargement des participants, distinct d'une liste vide — constat F2.
+ *
+ * ⚠️ Le `catch` d'origine posait `participants = []` : l'écran affichait alors son état vide,
+ * « Aucun participant », que l'organisateur lit comme « personne n'a de repas ». Un 403 après
+ * perte de session, un 500 ou une coupure réseau produisaient donc une AFFIRMATION FAUSSE sur
+ * les données, et non un signe de panne. C'est le seul endroit de cet écran où l'on peut faire la
+ * différence : la liste vide et l'échec ont la même forme une fois rendus.
+ */
+const erreurParticipants = ref(false)
 const participants = ref<any[]>([])
 const pagination = ref({
   page: filtresInitiaux.page,
@@ -738,20 +769,24 @@ const parametresDesFiltres = (): Record<string, string> => {
   return params
 }
 
-const fetchParticipants = async () => {
-  loading.value = true
-  try {
-    const params: Record<string, string> = {
+const { execute: fetchParticipants, loading } = useApiAction(
+  () => `/api/editions/${editionId.value}/meals/participants`,
+  {
+    method: 'GET',
+    // ⚠️ Une FONCTION : les filtres et la page changent entre deux appels, et un objet serait lu
+    // une seule fois, au `setup`.
+    query: () => ({
       ...parametresDesFiltres(),
       page: pagination.value.page.toString(),
       pageSize: pagination.value.pageSize.toString(),
-    }
-
-    const response = await $fetch(`/api/editions/${editionId.value}/meals/participants`, {
-      params,
-    })
-
-    if (response.success) {
+    }),
+    errorMessages: { default: t('gestion.meals.error_loading_participants') },
+    // 📍 La réponse N'EST PAS déballée par le composable : elle porte cinq clés
+    // (`success`, `data`, `pagination`, `availableDates`, `stats`), et le déballage ne s'applique
+    // qu'à l'enveloppe stricte `{ success, data, message }`. On lit donc `response.data`.
+    onSuccess: (response: any) => {
+      if (!response?.success) return
+      erreurParticipants.value = false
       participants.value = response.data || []
       // Mapper les propriétés de pagination (API: limit/totalCount -> Frontend: pageSize/total)
       pagination.value.page = response.pagination.page
@@ -765,14 +800,15 @@ const fetchParticipants = async () => {
       // les jours de l'édition n'arrivent qu'avec cette réponse.
       selectedDate.value = dateConnue(selectedDate.value, availableDates.value)
       stats.value = response.stats || null
-    }
-  } catch (error: any) {
-    console.error('Failed to fetch participants:', error)
-    participants.value = []
-  } finally {
-    loading.value = false
+    },
+    onError: () => {
+      // On vide la liste — garder celle d'avant l'échec, filtrée autrement, serait pire —, mais
+      // le drapeau empêche l'écran de conclure « aucun participant ».
+      participants.value = []
+      erreurParticipants.value = true
+    },
   }
-}
+)
 
 // Options pour le select de génération des informations restauration
 const cateringDateOptions = computed(() => {
