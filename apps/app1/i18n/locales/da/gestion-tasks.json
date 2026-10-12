@@ -24,6 +24,7 @@
       "group_name_placeholder": "F.eks.: Logistisk forberedelse",
       "group_not_found": "Denne gruppe findes ikke eller er blevet slettet",
       "legacy_assignees_warning": "Nogle tildelte er ikke længere arrangører eller accepterede frivillige. Fravælg dem, hvis du ikke længere ønsker at beholde dem.",
+      "move_removes_tags": "Hvis opgaven flyttes, fjernes dens {count} mærkat(er): mærkater hører til den gruppe, hvor de blev oprettet.",
       "move_to_group": "Flyt til gruppe",
       "new_group": "Ny gruppe",
       "new_task": "Ny opgave",

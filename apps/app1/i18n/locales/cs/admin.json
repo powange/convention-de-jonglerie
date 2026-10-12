@@ -136,7 +136,7 @@
     "backup_create_success": "Záloha byla úspěšně vytvořena",
     "backup_create_success_description": "Záloha {filename} byla úspěšně vytvořena.",
     "backup_creating": "Tvorba probíhá...",
-    "backup_delete_confirm": "[TODO] Opravdu chcete odstranit zálohu {filename}?",
+    "backup_delete_confirm": "Záloha {filename}, vytvořená {date} a o velikosti {size}, bude nevratně odstraněna.",
     "backup_delete_error": "Chyba při mazání zálohy",
     "backup_delete_success": "Záloha byla úspěšně odstraněna",
     "backup_delete_success_description": "Záloha {filename} byla úspěšně odstraněna",

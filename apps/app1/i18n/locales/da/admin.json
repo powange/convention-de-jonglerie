@@ -136,7 +136,7 @@
     "backup_create_success": "Backup oprettet med succes",
     "backup_create_success_description": "Backup {filename} er oprettet med succes",
     "backup_creating": "Opretter...",
-    "backup_delete_confirm": "[TODO] Er du sikker på, at du vil slette backup {filename}?",
+    "backup_delete_confirm": "Backuppen {filename}, oprettet den {date} og på {size}, slettes permanent.",
     "backup_delete_error": "Fejl ved sletning af backup",
     "backup_delete_success": "Backup slettet med succes",
     "backup_delete_success_description": "Backup {filename} er slettet med succes",

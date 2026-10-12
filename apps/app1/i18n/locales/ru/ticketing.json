@@ -213,6 +213,11 @@
       "phases_toutes": "Все периоды"
     },
     "my_ticket": {
+      "cancelled_badge": "Отменён",
+      "cancelled_description": "Он больше не даёт права на вход и будет отклонён на контроле доступа. Свяжитесь с организаторами, если считаете это ошибкой.",
+      "cancelled_title": "Этот билет отменён",
+      "details_title": "Сведения о билете",
+      "entry_validated": "Вход подтверждён",
       "how_to_use_description": "Покажите этот QR-код на входе для валидации билета.",
       "how_to_use_title": "Как использовать этот QR-код"
     },
@@ -310,6 +315,7 @@
     },
     "origin_site": "Создано на сайте",
     "participant": {
+      "canceled_order_after_entry_description": "Этот заказ был отменён после прохода на входе. Уже подтверждённые входы остаются в силе; ни один другой билет этого заказа подтвердить нельзя.",
       "entry_validated": "Вход уже подтвержден",
       "first_name": "Имя",
       "last_name": "Фамилия",
@@ -348,6 +354,13 @@
       "list": {
         "delete_button": "Удалить",
         "delete_confirm": "Вы уверены, что хотите удалить квоту '{name}'?",
+        "delete_confirm_with_links": "Вы уверены, что хотите удалить квоту «{name}»? Её связи ({count}) исчезнут вместе с ней, без возможности возврата: {detail}.",
+        "delete_links_artists": "шоу: {count}",
+        "delete_links_custom_fields": "своих полей: {count}",
+        "delete_links_options": "опций: {count}",
+        "delete_links_organizers": "организаторов: {count}",
+        "delete_links_tiers": "тарифов: {count}",
+        "delete_links_volunteers": "команд волонтёров: {count}",
         "delete_title": "Удалить квоту",
         "description": "Определите здесь квоты для ограничения доступа к определённым услугам (шоу, мероприятия, входы и т.д.)",
         "description_label": "описание",

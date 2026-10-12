@@ -142,6 +142,8 @@
       "experience": "Doświadczenie",
       "experience_details": "Szczegóły doświadczenia",
       "export_ical": "Eksportuj iCal",
+      "export_ics_default_title": "Zmiana wolontariusza",
+      "export_ics_team_prefix": "Zespół",
       "export_pdf": "Eksportuj PDF",
       "has_experience": "Ma doświadczenie",
       "has_minors": "Z osobami niepełnoletnimi",

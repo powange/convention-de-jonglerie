@@ -24,6 +24,7 @@
       "group_name_placeholder": "z. B.: Logistische Vorbereitung",
       "group_not_found": "Diese Gruppe existiert nicht oder wurde gelöscht",
       "legacy_assignees_warning": "Einige zugewiesene Personen sind keine Organisatoren oder akzeptierten Freiwilligen mehr. Heben Sie ihre Auswahl auf, falls Sie sie nicht behalten möchten.",
+      "move_removes_tags": "Beim Verschieben der Aufgabe werden ihre {count} Etikett(en) entfernt: Etiketten gehören zu der Gruppe, in der sie erstellt wurden.",
       "move_to_group": "In Gruppe verschieben",
       "new_group": "Neue Gruppe",
       "new_task": "Neue Aufgabe",

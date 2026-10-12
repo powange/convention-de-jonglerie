@@ -1,5 +1,16 @@
 {
   "profile": {
+    "current_password_for_email": "Aktuelles Passwort",
+    "current_password_for_email_help": "Eine Änderung der E-Mail-Adresse erfordert dein Passwort: über diese Adresse erhältst du den Zugriff auf dein Konto zurück.",
+    "pending_email_code_placeholder": "Sechsstelliger Code",
+    "pending_email_confirm": "Adresse bestätigen",
+    "pending_email_confirm_failed": "Die Bestätigung ist fehlgeschlagen",
+    "pending_email_confirmed": "Deine neue Adresse ist bestätigt",
+    "pending_email_description": "Ein sechsstelliger Code wurde gerade an {email} gesendet. Dein Konto behält seine aktuelle Adresse, bis du ihn hier eingibst.",
+    "pending_email_resend": "Code erneut senden",
+    "pending_email_resend_failed": "Das erneute Senden ist fehlgeschlagen",
+    "pending_email_resent": "Ein neuer Code ist unterwegs",
+    "pending_email_title": "Adresse wartet auf Bestätigung",
     "sidebar": {
       "title": "Mein Profil",
       "personal_info": "Persönliche Informationen",
@@ -73,14 +84,14 @@
       "system_notifications": "Systembenachrichtigungen",
       "system_notifications_desc": "Wichtige Updates und Wartung",
       "volunteer_reminders": "Erinnerungen an Freiwilligenschichten",
-      "volunteer_reminders_desc": "[TODO] Benachrichtigungen 30 Minuten vor Ihren Schichten",
+      "volunteer_reminders_desc": "Erinnerung 30 Minuten vor deinen Schichten, Veröffentlichung des Plans und Änderungen, die deine Schichten betreffen",
       "messenger_messages": "Nachrichten",
       "messenger_messages_desc": "Nachrichten aus Team-Chats, von Teamleitungen und Organisatoren"
     },
     "oauth_password_info": "Du hast dich mit Google angemeldet. Du kannst ein Passwort festlegen, um dich mit deiner E-Mail anzumelden.",
     "optional_section_title": "Optionaler Bereich",
     "password_changed": "Passwort geändert",
-    "password_updated": "[TODO] Dein Passwort wurde aktualisiert",
+    "password_updated": "Deine anderen Geräte wurden abgemeldet. Dieses bleibt angemeldet.",
     "passwords_dont_match": "Die Passwörter stimmen nicht überein",
     "personal_info": "Persönliche Informationen",
     "phone": "Telefon",

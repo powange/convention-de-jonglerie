@@ -24,6 +24,7 @@
       "group_name_placeholder": "Např.: Logistická příprava",
       "group_not_found": "Tato skupina neexistuje nebo byla smazána",
       "legacy_assignees_warning": "Někteří přiřazení uživatelé již nejsou organizátory ani přijatými dobrovolníky. Pokud je nechcete zachovat, zrušte jejich výběr.",
+      "move_removes_tags": "Přesunutí úkolu odstraní jeho {count} štítk(y): štítky patří ke skupině, ve které byly vytvořeny.",
       "move_to_group": "Přesunout do skupiny",
       "new_group": "Nová skupina",
       "new_task": "Nový úkol",

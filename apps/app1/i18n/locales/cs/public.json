@@ -142,6 +142,8 @@
       "experience": "Zkušenosti",
       "experience_details": "Podrobnosti o experimentu",
       "export_ical": "Export do iCal",
+      "export_ics_default_title": "Dobrovolnická směna",
+      "export_ics_team_prefix": "Tým",
       "export_pdf": "Exportovat PDF",
       "has_experience": "Má zkušenosti",
       "has_minors": "Doprovod nezletilých osob",

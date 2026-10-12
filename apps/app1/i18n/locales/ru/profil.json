@@ -1,5 +1,16 @@
 {
   "profile": {
+    "current_password_for_email": "Текущий пароль",
+    "current_password_for_email_help": "Для смены адреса эл. почты нужен ваш пароль: именно этот адрес позволяет вернуть доступ к аккаунту.",
+    "pending_email_code_placeholder": "Шестизначный код",
+    "pending_email_confirm": "Подтвердить адрес",
+    "pending_email_confirm_failed": "Подтверждение не удалось",
+    "pending_email_confirmed": "Ваш новый адрес подтверждён",
+    "pending_email_description": "Шестизначный код только что отправлен на {email}. Ваш аккаунт сохраняет текущий адрес, пока вы не введёте код здесь.",
+    "pending_email_resend": "Отправить код снова",
+    "pending_email_resend_failed": "Повторная отправка не удалась",
+    "pending_email_resent": "Новый код только что отправлен",
+    "pending_email_title": "Адрес ожидает подтверждения",
     "sidebar": {
       "title": "Мой профиль",
       "personal_info": "Личная информация",
@@ -73,14 +84,14 @@
       "system_notifications": "Системные уведомления",
       "system_notifications_desc": "Важные обновления и обслуживание",
       "volunteer_reminders": "Напоминания о сменах волонтёров",
-      "volunteer_reminders_desc": "[TODO] Уведомления за 30 минут до ваших смен",
+      "volunteer_reminders_desc": "Напоминание за 30 минут до ваших смен, публикация расписания и изменения, затрагивающие ваши смены",
       "messenger_messages": "Сообщения",
       "messenger_messages_desc": "Сообщения из командных чатов, от ответственных и от организаторов"
     },
     "oauth_password_info": "Вы вошли через Google. Вы можете установить пароль для входа с помощью электронной почты.",
     "optional_section_title": "Дополнительный раздел",
     "password_changed": "Пароль изменен",
-    "password_updated": "[TODO] Ваш пароль обновлен",
+    "password_updated": "Ваши другие устройства были отключены. Это устройство остаётся в системе.",
     "passwords_dont_match": "Пароли не совпадают",
     "personal_info": "Личная информация",
     "phone": "Телефон",

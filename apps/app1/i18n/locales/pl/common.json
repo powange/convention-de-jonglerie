@@ -216,8 +216,8 @@
     "about_this_edition": "O tej edycji",
     "add_comment_placeholder": "Dodaj komentarz...",
     "add_lost_item": "Dodaj znalezioną rzecz",
-    "all_items_returned": "[TODO] Tous les objets ont été restitués",
-    "all_items_returned_description": "[TODO] Tous les objets signalés pour cette édition ont retrouvé leur propriétaire. Utilisez « Afficher les objets restitués » pour les revoir.",
+    "all_items_returned": "Wszystkie przedmioty zostały zwrócone",
+    "all_items_returned_description": "Wszystkie przedmioty zgłoszone dla tej edycji wróciły do właścicieli. Użyj „Pokaż zwrócone przedmioty”, aby je ponownie zobaczyć.",
     "artist_space": "Moja strefa artysty",
     "artists": {
       "title": "Artyści"

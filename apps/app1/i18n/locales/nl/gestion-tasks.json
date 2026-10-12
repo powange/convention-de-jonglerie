@@ -24,6 +24,7 @@
       "group_name_placeholder": "Bijv.: Logistieke voorbereiding",
       "group_not_found": "Deze groep bestaat niet of is verwijderd",
       "legacy_assignees_warning": "Sommige toegewezen personen zijn niet langer organisatoren of geaccepteerde vrijwilligers. Vink ze uit als je ze niet meer wilt behouden.",
+      "move_removes_tags": "Het verplaatsen van de taak verwijdert haar {count} label(s): labels horen bij de groep waarin ze zijn gemaakt.",
       "move_to_group": "Verplaatsen naar groep",
       "new_group": "Nieuwe groep",
       "new_task": "Nieuwe taak",

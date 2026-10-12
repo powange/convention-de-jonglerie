@@ -142,6 +142,8 @@
       "experience": "Erfahrung",
       "experience_details": "Erfahrungsdetails",
       "export_ical": "iCal exportieren",
+      "export_ics_default_title": "Helferschicht",
+      "export_ics_team_prefix": "Team",
       "export_pdf": "PDF exportieren",
       "has_experience": "Hat Erfahrung",
       "has_minors": "Begleitet von Minderjährigen",

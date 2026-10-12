@@ -24,6 +24,7 @@
       "donate_button": "{count} koffie(s) aanbieden",
       "donations_paused": "Donaties zijn momenteel gepauzeerd. Bedankt voor uw eerdere steun!",
       "error": "Kan geen betalingssessie aanmaken",
+      "fees_pending": "De Stripe-kosten van {count} donatie(s) zijn nog niet bekend: het ontvangen bedrag wordt binnenkort bijgesteld.",
       "price_per_coffee": "€ 1 per koffie",
       "quantity_label": "Aantal koffies",
       "stripe_fees_label": "aan Stripe-kosten",

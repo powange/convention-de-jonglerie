@@ -24,6 +24,7 @@
       "donate_button": "Darovat {count} kávu/káv",
       "donations_paused": "Dary jsou momentálně pozastaveny. Děkujeme za vaši dosavadní podporu!",
       "error": "Nelze vytvořit platební relaci",
+      "fees_pending": "Poplatky Stripe za {count} dar(y) nejsou ještě známy: přijatá částka bude brzy upravena.",
       "price_per_coffee": "1 € za kávu",
       "quantity_label": "Počet káv",
       "stripe_fees_label": "poplatků Stripe",

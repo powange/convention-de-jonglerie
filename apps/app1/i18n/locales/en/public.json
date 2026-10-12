@@ -142,6 +142,8 @@
       "experience": "Experience",
       "experience_details": "Experience details",
       "export_ical": "Export iCal",
+      "export_ics_default_title": "Volunteer shift",
+      "export_ics_team_prefix": "Team",
       "export_pdf": "Export PDF",
       "has_experience": "Has experience",
       "has_minors": "Accompanied by minors",

@@ -5,8 +5,8 @@
     "closed_notice": "Anketa je uzavřena. Můžete si prohlédnout výsledky, ale již nemůžete hlasovat.",
     "duration_minutes": "{duration} min",
     "edition_info": "{conventionName} — {editionName}",
-    "load_error": "[TODO] Impossible de charger le sondage",
-    "load_error_description": "[TODO] Le sondage n'a pas pu être récupéré. Votre lien reste valide : il n'y a qu'à réessayer.",
+    "load_error": "Průzkum nelze načíst",
+    "load_error_description": "Průzkum se nepodařilo získat. Váš odkaz zůstává platný: stačí to zkusit znovu.",
     "manage": {
       "close_survey": "Uzavřít anketu",
       "copy_link": "Kopírovat odkaz",

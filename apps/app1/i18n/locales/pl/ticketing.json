@@ -213,6 +213,11 @@
       "phases_toutes": "Wszystkie okresy"
     },
     "my_ticket": {
+      "cancelled_badge": "Anulowany",
+      "cancelled_description": "Nie daje już prawa wejścia i zostanie odrzucony przy kontroli dostępu. Skontaktuj się z organizatorami, jeśli uważasz, że to pomyłka.",
+      "cancelled_title": "Ten bilet został anulowany",
+      "details_title": "Szczegóły biletu",
+      "entry_validated": "Wejście potwierdzone",
       "how_to_use_description": "Pokaż ten kod QR przy wejściu, aby zwalidować swój bilet.",
       "how_to_use_title": "Jak używać tego kodu QR"
     },
@@ -310,6 +315,7 @@
     },
     "origin_site": "Utworzone na stronie",
     "participant": {
+      "canceled_order_after_entry_description": "To zamówienie zostało anulowane po przejściu przy wejściu. Już potwierdzone wejścia pozostają ważne; żaden kolejny bilet z tego zamówienia nie może zostać potwierdzony.",
       "entry_validated": "Wejście już zwalidowane",
       "first_name": "Imię",
       "last_name": "Nazwisko",
@@ -348,6 +354,13 @@
       "list": {
         "delete_button": "Usuń",
         "delete_confirm": "Czy na pewno chcesz usunąć limit '{name}'?",
+        "delete_confirm_with_links": "Czy na pewno chcesz usunąć limit '{name}'? Jego {count} powiązani(e) znikną razem z nim, bez możliwości powrotu: {detail}.",
+        "delete_links_artists": "{count} pokaz(y)",
+        "delete_links_custom_fields": "{count} pol(e) własne",
+        "delete_links_options": "{count} opcj(e)",
+        "delete_links_organizers": "{count} organizator(ów)",
+        "delete_links_tiers": "{count} taryf(y)",
+        "delete_links_volunteers": "{count} zespo(ły) wolontariuszy",
         "delete_title": "Usuń limit",
         "description": "Zdefiniuj tutaj limity, aby ograniczyć dostęp do określonych usług (spektakle, zajęcia, wejścia itp.)",
         "description_label": "opis",

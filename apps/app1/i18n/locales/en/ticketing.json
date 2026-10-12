@@ -213,6 +213,11 @@
       "phases_toutes": "All periods"
     },
     "my_ticket": {
+      "cancelled_badge": "Cancelled",
+      "cancelled_description": "It no longer grants entry and will be refused at the access control. Contact the organisers if you believe this is a mistake.",
+      "cancelled_title": "This ticket has been cancelled",
+      "details_title": "Ticket details",
+      "entry_validated": "Entry validated",
       "how_to_use_description": "Show this QR code at the entrance to validate your ticket.",
       "how_to_use_title": "How to use this QR code"
     },
@@ -310,6 +315,7 @@
     },
     "origin_site": "Created on the site",
     "participant": {
+      "canceled_order_after_entry_description": "This order was cancelled after entry. Entries already validated remain valid; no further ticket from this order can be validated.",
       "entry_validated": "Entry already validated",
       "first_name": "First Name",
       "last_name": "Last Name",
@@ -348,6 +354,13 @@
       "list": {
         "delete_button": "Delete",
         "delete_confirm": "Are you sure you want to delete the quota '{name}'?",
+        "delete_confirm_with_links": "Are you sure you want to delete the quota '{name}'? Its {count} link(s) will disappear with it, with no way back: {detail}.",
+        "delete_links_artists": "{count} show(s)",
+        "delete_links_custom_fields": "{count} custom field(s)",
+        "delete_links_options": "{count} option(s)",
+        "delete_links_organizers": "{count} organiser(s)",
+        "delete_links_tiers": "{count} tier(s)",
+        "delete_links_volunteers": "{count} volunteer team(s)",
         "delete_title": "Delete quota",
         "description": "Define quotas here to limit access to certain services (shows, activities, entries, etc.)",
         "description_label": "description",

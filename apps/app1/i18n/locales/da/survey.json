@@ -5,8 +5,8 @@
     "closed_notice": "Afstemningen er lukket. Du kan se resultaterne, men du kan ikke længere stemme.",
     "duration_minutes": "{duration} min",
     "edition_info": "{conventionName} — {editionName}",
-    "load_error": "[TODO] Impossible de charger le sondage",
-    "load_error_description": "[TODO] Le sondage n'a pas pu être récupéré. Votre lien reste valide : il n'y a qu'à réessayer.",
+    "load_error": "Undersøgelsen kunne ikke indlæses",
+    "load_error_description": "Undersøgelsen kunne ikke hentes. Dit link er stadig gyldigt: prøv blot igen.",
     "manage": {
       "close_survey": "Luk afstemning",
       "copy_link": "Kopiér link",

@@ -1,5 +1,16 @@
 {
   "profile": {
+    "current_password_for_email": "Поточний пароль",
+    "current_password_for_email_help": "Для зміни адреси ел. пошти потрібен ваш пароль: саме ця адреса дозволяє повернути доступ до облікового запису.",
+    "pending_email_code_placeholder": "Шестизначний код",
+    "pending_email_confirm": "Підтвердити адресу",
+    "pending_email_confirm_failed": "Підтвердження не вдалося",
+    "pending_email_confirmed": "Вашу нову адресу підтверджено",
+    "pending_email_description": "Шестизначний код щойно надіслано на {email}. Ваш обліковий запис зберігає поточну адресу, доки ви не введете код тут.",
+    "pending_email_resend": "Надіслати код знову",
+    "pending_email_resend_failed": "Повторне надсилання не вдалося",
+    "pending_email_resent": "Новий код щойно надіслано",
+    "pending_email_title": "Адреса очікує підтвердження",
     "sidebar": {
       "title": "Мій профіль",
       "personal_info": "Особиста інформація",
@@ -73,14 +84,14 @@
       "system_notifications": "Системні сповіщення",
       "system_notifications_desc": "Важливі оновлення та обслуговування",
       "volunteer_reminders": "Нагадування про волонтерські зміни",
-      "volunteer_reminders_desc": "[TODO] Сповіщення за 30 хвилин до ваших змін",
+      "volunteer_reminders_desc": "Нагадування за 30 хвилин до ваших змін, публікація розкладу та зміни, що стосуються ваших змін",
       "messenger_messages": "Повідомлення",
       "messenger_messages_desc": "Повідомлення з командних чатів, від відповідальних і від організаторів"
     },
     "oauth_password_info": "Ви увійшли через Google. Ви можете встановити пароль для входу за допомогою електронної пошти.",
     "optional_section_title": "Додатковий розділ",
     "password_changed": "Пароль змінено",
-    "password_updated": "[TODO] Ваш пароль оновлено",
+    "password_updated": "Ваші інші пристрої вийшли з системи. Цей залишається в системі.",
     "passwords_dont_match": "Паролі не співпадають",
     "personal_info": "Особиста інформація",
     "phone": "Телефон",

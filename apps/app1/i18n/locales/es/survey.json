@@ -5,8 +5,8 @@
     "closed_notice": "La encuesta está cerrada. Puede consultar los resultados pero ya no puede votar.",
     "duration_minutes": "{duration} min",
     "edition_info": "{conventionName} — {editionName}",
-    "load_error": "[TODO] Impossible de charger le sondage",
-    "load_error_description": "[TODO] Le sondage n'a pas pu être récupéré. Votre lien reste valide : il n'y a qu'à réessayer.",
+    "load_error": "No se ha podido cargar la encuesta",
+    "load_error_description": "No se ha podido recuperar la encuesta. Tu enlace sigue siendo válido: solo tienes que volver a intentarlo.",
     "manage": {
       "close_survey": "Cerrar encuesta",
       "copy_link": "Copiar enlace",

@@ -213,6 +213,11 @@
       "phases_toutes": "Tutti i periodi"
     },
     "my_ticket": {
+      "cancelled_badge": "Annullato",
+      "cancelled_description": "Non dà più diritto d'ingresso e sarà rifiutato al controllo accessi. Contatta gli organizzatori se pensi che sia un errore.",
+      "cancelled_title": "Questo biglietto è stato annullato",
+      "details_title": "Dettagli del biglietto",
+      "entry_validated": "Ingresso convalidato",
       "how_to_use_description": "Mostra questo codice QR all'ingresso per convalidare il tuo biglietto.",
       "how_to_use_title": "Come utilizzare questo codice QR"
     },
@@ -310,6 +315,7 @@
     },
     "origin_site": "Creato sul sito",
     "participant": {
+      "canceled_order_after_entry_description": "Questo ordine è stato annullato dopo il passaggio all'ingresso. Gli ingressi già convalidati restano validi; nessun altro biglietto di questo ordine può essere convalidato.",
       "entry_validated": "Ingresso già convalidato",
       "first_name": "Nome",
       "last_name": "Cognome",
@@ -348,6 +354,13 @@
       "list": {
         "delete_button": "Elimina",
         "delete_confirm": "Sei sicuro di voler eliminare la quota '{name}'?",
+        "delete_confirm_with_links": "Vuoi davvero eliminare la quota '{name}'? Le sue {count} associazione(i) spariranno con lei, senza ritorno: {detail}.",
+        "delete_links_artists": "{count} spettacolo(i)",
+        "delete_links_custom_fields": "{count} campo(i) personalizzato(i)",
+        "delete_links_options": "{count} opzione(i)",
+        "delete_links_organizers": "{count} organizzatore(i)",
+        "delete_links_tiers": "{count} tariffa(e)",
+        "delete_links_volunteers": "{count} squadra(e) di volontari",
         "delete_title": "Elimina quota",
         "description": "Definisci qui le quote per limitare l'accesso a determinate prestazioni (spettacoli, attività, ingressi, ecc.)",
         "description_label": "descrizione",

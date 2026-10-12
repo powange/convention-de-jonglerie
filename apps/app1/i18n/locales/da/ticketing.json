@@ -213,6 +213,11 @@
       "phases_toutes": "Alle perioder"
     },
     "my_ticket": {
+      "cancelled_badge": "Annulleret",
+      "cancelled_description": "Den giver ikke længere ret til adgang og vil blive afvist ved adgangskontrollen. Kontakt arrangørerne, hvis du mener, at det er en fejl.",
+      "cancelled_title": "Denne billet er annulleret",
+      "details_title": "Billetoplysninger",
+      "entry_validated": "Adgang valideret",
       "how_to_use_description": "Vis denne QR-kode ved indgangen for at validere din billet.",
       "how_to_use_title": "Sådan bruges denne QR-kode"
     },
@@ -310,6 +315,7 @@
     },
     "origin_site": "Oprettet på sitet",
     "participant": {
+      "canceled_order_after_entry_description": "Denne ordre blev annulleret efter passagen ved indgangen. Allerede validerede adgange forbliver gyldige; ingen yderligere billet fra denne ordre kan valideres.",
       "entry_validated": "Adgang allerede valideret",
       "first_name": "Fornavn",
       "last_name": "Efternavn",
@@ -348,6 +354,13 @@
       "list": {
         "delete_button": "Slet",
         "delete_confirm": "Er du sikker på, at du vil slette kvoten '{name}'?",
+        "delete_confirm_with_links": "Er du sikker på, at du vil slette kvoten '{name}'? Dens {count} tilknytning(er) forsvinder med den, uden mulighed for at vende tilbage: {detail}.",
+        "delete_links_artists": "{count} forestilling(er)",
+        "delete_links_custom_fields": "{count} brugerdefineret/-de felt(er)",
+        "delete_links_options": "{count} tilvalg",
+        "delete_links_organizers": "{count} arrangør(er)",
+        "delete_links_tiers": "{count} billettype(r)",
+        "delete_links_volunteers": "{count} frivilligteam(s)",
         "delete_title": "Slet kvote",
         "description": "Definer kvoter her for at begrænse adgangen til bestemte ydelser (shows, aktiviteter, adgange osv.)",
         "description_label": "beskrivelse",

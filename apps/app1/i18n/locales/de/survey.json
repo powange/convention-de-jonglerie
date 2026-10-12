@@ -5,8 +5,8 @@
     "closed_notice": "Die Umfrage ist geschlossen. Sie können die Ergebnisse einsehen, aber nicht mehr abstimmen.",
     "duration_minutes": "{duration} Min.",
     "edition_info": "{conventionName} — {editionName}",
-    "load_error": "[TODO] Impossible de charger le sondage",
-    "load_error_description": "[TODO] Le sondage n'a pas pu être récupéré. Votre lien reste valide : il n'y a qu'à réessayer.",
+    "load_error": "Die Umfrage konnte nicht geladen werden",
+    "load_error_description": "Die Umfrage konnte nicht abgerufen werden. Dein Link bleibt gültig: versuche es einfach erneut.",
     "manage": {
       "close_survey": "Umfrage schließen",
       "copy_link": "Link kopieren",

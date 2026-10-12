@@ -24,6 +24,7 @@
       "group_name_placeholder": "E.g.: Logistics preparation",
       "group_not_found": "This group does not exist or has been deleted",
       "legacy_assignees_warning": "Some assignees are no longer organizers or accepted volunteers. Uncheck them if you no longer wish to keep them.",
+      "move_removes_tags": "Moving the task will remove its {count} tag(s): tags belong to the group where they were created.",
       "move_to_group": "Move to group",
       "new_group": "New group",
       "new_task": "New task",
