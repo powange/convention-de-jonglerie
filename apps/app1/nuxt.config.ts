@@ -530,6 +530,17 @@ export default defineNuxtConfig({
       recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '', // reCAPTCHA site key for client-side widget
       firebaseVapidKey: process.env.NUXT_PUBLIC_FIREBASE_VAPID_KEY || '', // Firebase VAPID public key for FCM
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || '', // Base URL of the site
+      /*
+       * L'adresse du responsable du traitement, affichée par la politique de confidentialité.
+       *
+       * Elle y était écrite EN DUR, au milieu d'une ligne dont l'autre moitié passait par i18n.
+       * C'est une donnée susceptible de changer — et sa valeur n'est pas la même selon qui
+       * héberge l'application — alors qu'une modification demandait de toucher au gabarit.
+       *
+       * Le repli reste l'adresse actuelle : sans lui, une instance qui ne déclare rien
+       * n'afficherait AUCUN moyen de contact sur la page qui l'exige.
+       */
+      contactEmail: process.env.NUXT_PUBLIC_CONTACT_EMAIL || 'powange@gmail.com',
       // Firebase configuration (varies by environment)
       firebaseApiKey: process.env.NUXT_PUBLIC_FIREBASE_API_KEY || '',
       firebaseAuthDomain: process.env.NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',

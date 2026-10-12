@@ -81,7 +81,8 @@
         <h2 class="text-2xl font-semibold mb-4">{{ t('privacy.sections.contact.title') }}</h2>
         <p>{{ t('privacy.sections.contact.content') }}</p>
         <p class="font-medium">
-          {{ t('privacy.sections.contact.email_label') }}: powange@gmail.com
+          {{ t('privacy.sections.contact.email_label') }}:
+          <a :href="`mailto:${adresseDeContact}`" class="underline">{{ adresseDeContact }}</a>
         </p>
       </section>
     </div>
@@ -97,22 +98,30 @@
 <script setup lang="ts">
 const { t } = useI18n()
 
-// Métadonnées de la page
-definePageMeta({
-  title: 'Politique de confidentialité',
-  description: 'Politique de confidentialité et protection des données personnelles',
+/*
+ * L'ONGLET ET LA DESCRIPTION ÉTAIENT EN FRANÇAIS POUR LES TREIZE LANGUES — constat F4.
+ *
+ * Tout le corps de cette page passe par i18n ; son titre de page, non. Un lecteur anglophone
+ * lisait donc « Politique de confidentialité » dans son onglet, et les moteurs indexaient la
+ * description française quelle que soit la version servie.
+ *
+ * ⚠️ Et la chaîne était écrite TROIS FOIS : dans `definePageMeta.title`, dans sa `description`, et
+ * dans `useHead`. Les deux premières ne servaient à rien — `useHead` les écrase — mais leur
+ * présence faisait croire que corriger l'une suffisait.
+ *
+ * `useSeoMeta` remplace le tout : il pose le titre et la description, et refuse les clés inventées
+ * que `useHead` accepterait en silence.
+ */
+useSeoMeta({
+  title: () => t('privacy.title'),
+  description: () => t('privacy.meta_description'),
+  robots: 'index, follow',
 })
 
-// SEO
-useHead({
-  title: 'Politique de confidentialité',
-  meta: [
-    {
-      name: 'description',
-      content:
-        'Politique de confidentialité et protection des données personnelles sur Convention de Jonglerie',
-    },
-    { name: 'robots', content: 'index, follow' },
-  ],
-})
+/*
+ * L'adresse du responsable du traitement, lue de la configuration et non du gabarit.
+ *
+ * Elle y était en dur, au milieu d'une ligne dont l'autre moitié passait déjà par i18n.
+ */
+const adresseDeContact = useRuntimeConfig().public.contactEmail
 </script>
