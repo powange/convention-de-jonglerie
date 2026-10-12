@@ -105,6 +105,15 @@ export const prismaMock = {
   ticketingOptionQuota: createModelMock(),
   ticketingTierCustomField: createModelMock(),
   ticketingTierCustomFieldQuota: createModelMock(),
+  /*
+   * Les deux tables de liaison d'un champ personnalisé — articles à remettre et tarifs. Leur
+   * absence expliquait qu'AUCUN des points d'API qui les écrivent n'ait de test : un modèle
+   * manquant ne rend pas `undefined` ici, il fait lever « n'est pas une fonction » dès le
+   * `beforeEach`, avant toute assertion. Le code devient intestable, ce qui se lit à tort comme
+   * une absence de tests. Septième occurrence de ce piège dans ce dépôt.
+   */
+  ticketingTierCustomFieldHandoutItem: createModelMock(),
+  ticketingTierCustomFieldAssociation: createModelMock(),
   ticketingCounter: createModelMock(),
   // Journal des mouvements d'entrée : écrit par validate-entry et invalidate-entry.
   entryValidationLog: createModelMock(),

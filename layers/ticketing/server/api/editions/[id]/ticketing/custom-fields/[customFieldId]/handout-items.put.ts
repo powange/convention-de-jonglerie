@@ -5,6 +5,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { exigerArticlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
+import { dedoublonnerAssociations } from '~~/shared/utils/dedoublonnage-associations'
 
 const bodySchema = z.object({
   // Liste d'associations : un article par ligne, avec éventuellement une
@@ -53,7 +54,18 @@ export default wrapApiHandler(
     // même pour les champs personnalisés HelloAsso. Seules les propriétés du
     // champ lui-même (label, type, etc.) sont protégées.
 
-    const { items } = bodySchema.parse(await readBody(event))
+    const { items: recus } = bodySchema.parse(await readBody(event))
+
+    /*
+     * ⚠️ DÉDOUBLONNÉ SUR (article, choix) — constat O3. Le corps partait tel quel dans
+     * `createMany`, et l'unicité `(customFieldId, handoutItemId, choiceValue)` ne protège PAS la
+     * ligne « tous les choix » : sous MySQL, deux NULL sont distincts. Deux fois le même article
+     * sans choix précis créaient donc deux lignes identiques — prouvé en base.
+     */
+    const items = dedoublonnerAssociations(recus, (item) => [
+      item.handoutItemId,
+      item.choiceValue || null,
+    ])
 
     if (items.length > 0) {
       const ids = Array.from(new Set(items.map((i) => i.handoutItemId)))

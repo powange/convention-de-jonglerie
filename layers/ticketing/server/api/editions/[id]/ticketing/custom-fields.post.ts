@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { Prisma } from '#server/utils/prisma'
+import { dedoublonnerAssociations } from '~~/shared/utils/dedoublonnage-associations'
 
 const bodySchema = z.object({
   label: z.string().min(1),
@@ -68,10 +69,19 @@ export default wrapApiHandler(
         })
       }
 
+      /*
+       * ⚠️ LES DEUX LISTES SONT DÉDOUBLONNÉES SUR LEUR CLÉ D'UNICITÉ — constat O3. Le corps
+       * partait tel quel dans `createMany`, et `choiceValue` étant nullable, l'unicité ne
+       * protège pas la ligne « tous les choix » : deux NULL sont distincts sous MySQL. Deux fois
+       * le même quota, ou le même article, sans choix précis créaient deux lignes identiques.
+       */
       // Associer aux quotas si fournis
       if (body.quotas && body.quotas.length > 0) {
         await tx.ticketingTierCustomFieldQuota.createMany({
-          data: body.quotas.map((q) => ({
+          data: dedoublonnerAssociations(body.quotas, (q) => [
+            q.quotaId,
+            q.choiceValue || null,
+          ]).map((q) => ({
             customFieldId: cf.id,
             quotaId: q.quotaId,
             choiceValue: q.choiceValue || null,
@@ -82,7 +92,10 @@ export default wrapApiHandler(
       // Associer aux articles à remettre si fournis
       if (body.handoutItems && body.handoutItems.length > 0) {
         await tx.ticketingTierCustomFieldHandoutItem.createMany({
-          data: body.handoutItems.map((ri) => ({
+          data: dedoublonnerAssociations(body.handoutItems, (ri) => [
+            ri.handoutItemId,
+            ri.choiceValue || null,
+          ]).map((ri) => ({
             customFieldId: cf.id,
             handoutItemId: ri.handoutItemId,
             choiceValue: ri.choiceValue || null,

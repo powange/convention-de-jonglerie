@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { Prisma } from '#server/utils/prisma'
+import { dedoublonnerAssociations } from '~~/shared/utils/dedoublonnage-associations'
 
 const bodySchema = z.object({
   label: z.string().min(1),
@@ -140,10 +141,17 @@ export default wrapApiHandler(
         where: { customFieldId },
       })
 
+      /*
+       * ⚠️ DÉDOUBLONNÉ SUR (quota, choix) — constat O3, comme la création du champ. `choiceValue`
+       * étant nullable, l'unicité ne protège pas la ligne « tous les choix » sous MySQL.
+       */
       // Créer les nouvelles associations avec les quotas
       if (body.quotas && body.quotas.length > 0) {
         await tx.ticketingTierCustomFieldQuota.createMany({
-          data: body.quotas.map((q) => ({
+          data: dedoublonnerAssociations(body.quotas, (q) => [
+            q.quotaId,
+            q.choiceValue || null,
+          ]).map((q) => ({
             customFieldId: cf.id,
             quotaId: q.quotaId,
             choiceValue: q.choiceValue || null,
@@ -160,7 +168,10 @@ export default wrapApiHandler(
         })
         if (body.handoutItems.length > 0) {
           await tx.ticketingTierCustomFieldHandoutItem.createMany({
-            data: body.handoutItems.map((ri) => ({
+            data: dedoublonnerAssociations(body.handoutItems, (ri) => [
+              ri.handoutItemId,
+              ri.choiceValue || null,
+            ]).map((ri) => ({
               customFieldId: cf.id,
               handoutItemId: ri.handoutItemId,
               choiceValue: ri.choiceValue || null,

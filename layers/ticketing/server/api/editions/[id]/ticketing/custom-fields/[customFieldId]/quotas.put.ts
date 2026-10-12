@@ -6,6 +6,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
+import { dedoublonnerAssociations } from '~~/shared/utils/dedoublonnage-associations'
 
 const bodySchema = z.object({
   quotas: z.array(
@@ -53,19 +54,26 @@ export default wrapApiHandler(
     const body = bodySchema.parse(await readBody(event))
 
     /**
-     * Dédoublonnage sur le COUPLE (quota, choix).
+     * Dédoublonnage sur le COUPLE (quota, choix) — constat O3.
      *
      * L'unicité en base porte sur `(customFieldId, quotaId, choiceValue)` : le même quota peut
      * légitimement apparaître deux fois s'il vise deux réponses différentes. Dédoublonner sur le
      * seul quota en perdrait une.
+     *
+     * 📍 La clé était composée ici à la main, et c'était la troisième écriture de cette règle
+     * dans le dépôt — avec deux comportements différents sur l'occurrence retenue. Elle vient
+     * maintenant d'un seul endroit.
+     *
+     * 📍 Et la chaîne VIDE est désormais traitée comme « tous les choix » (`|| null`), comme aux
+     * quatre autres points d'écriture. Ce point-ci était le seul à l'écrire telle quelle
+     * (`?? null`), donc à la ranger comme un choix nommé — alors que sa clé de dédoublonnage,
+     * elle, la confondait déjà avec `null`. Les deux moitiés étaient en désaccord ; un choix
+     * dont le libellé est vide n'existe pas.
      */
-    const vues = new Set<string>()
-    const associations = body.quotas.filter((association) => {
-      const cle = `${association.quotaId}::${association.choiceValue ?? ''}`
-      if (vues.has(cle)) return false
-      vues.add(cle)
-      return true
-    })
+    const associations = dedoublonnerAssociations(body.quotas, (association) => [
+      association.quotaId,
+      association.choiceValue || null,
+    ])
 
     await assertQuotasDeLEdition(
       editionId,
@@ -79,7 +87,7 @@ export default wrapApiHandler(
           data: associations.map(({ quotaId, choiceValue }) => ({
             customFieldId,
             quotaId,
-            choiceValue: choiceValue ?? null,
+            choiceValue: choiceValue || null,
           })),
         })
       }

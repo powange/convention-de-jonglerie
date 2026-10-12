@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { dedoublonnerAssociations } from '~~/shared/utils/dedoublonnage-associations'
 
 const bodySchema = z.object({
   tierIds: z.array(z.number()).optional(),
@@ -99,7 +100,20 @@ export default wrapApiHandler(
 
       // 6. Créer les nouvelles associations d'articles à remettre
       if (handoutItems && handoutItems.length > 0) {
-        for (const item of handoutItems) {
+        /*
+         * ⚠️ DÉDOUBLONNÉ SUR (article, choix) — constat O3. L'unicité
+         * `(customFieldId, handoutItemId, choiceValue)` ne protège pas la ligne « tous les
+         * choix » : deux NULL sont distincts sous MySQL. Cette boucle créait donc deux lignes
+         * identiques pour un corps qui répétait un article sans choix précis.
+         *
+         * La clé porte sur `choiceValue || null`, la valeur NORMALISÉE — celle qui sera écrite
+         * quelques lignes plus bas. Sur la valeur brute, la paire `['', null]` passerait et
+         * produirait les deux lignes identiques qu'on cherche à empêcher.
+         */
+        for (const item of dedoublonnerAssociations(handoutItems, (candidat) => [
+          candidat.handoutItemId,
+          candidat.choiceValue || null,
+        ])) {
           // Vérifier que l'article existe et appartient à l'édition
           const existingItem = await tx.ticketingHandoutItem.findFirst({
             where: {
