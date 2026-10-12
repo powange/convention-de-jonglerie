@@ -260,9 +260,13 @@
         "organizer": "Організатор"
       },
       "phase": "Етап",
+      "phase_event": "[TODO] Événement",
+      "phase_setup": "[TODO] Montage",
+      "phase_teardown": "[TODO] Démontage",
       "plates_set_aside": "{count} порцію відкладено | {count} порції відкладено",
       "previous_day": "Попередній день",
       "progress": "Прогрес",
+      "remaining_count": "[TODO] {count} restant | {count} restants",
       "saved_description": "Прийом їжі синхронізовано з волонтерами та артистами",
       "saved_title": "Збережено",
       "search_person": "Знайти особу",

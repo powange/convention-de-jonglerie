@@ -260,9 +260,13 @@
         "organizer": "Organisator"
       },
       "phase": "Fase",
+      "phase_event": "[TODO] Événement",
+      "phase_setup": "[TODO] Montage",
+      "phase_teardown": "[TODO] Démontage",
       "plates_set_aside": "{count} bord apart gezet | {count} borden apart gezet",
       "previous_day": "Vorige dag",
       "progress": "Voortgang",
+      "remaining_count": "[TODO] {count} restant | {count} restants",
       "saved_description": "De maaltijd is gesynchroniseerd met de vrijwilligers en artiesten",
       "saved_title": "Opgeslagen",
       "search_person": "Zoek een persoon",

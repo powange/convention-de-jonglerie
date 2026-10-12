@@ -260,9 +260,13 @@
         "organizer": "Organizador"
       },
       "phase": "Fase",
+      "phase_event": "[TODO] Événement",
+      "phase_setup": "[TODO] Montage",
+      "phase_teardown": "[TODO] Démontage",
       "plates_set_aside": "{count} plato reservado | {count} platos reservados",
       "previous_day": "Día anterior",
       "progress": "Progreso",
+      "remaining_count": "[TODO] {count} restant | {count} restants",
       "saved_description": "La comida se ha sincronizado con los voluntarios y artistas",
       "saved_title": "Guardado",
       "search_person": "Buscar una persona",

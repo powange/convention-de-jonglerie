@@ -260,9 +260,13 @@
         "organizer": "Organizátor"
       },
       "phase": "Fáze",
+      "phase_event": "[TODO] Événement",
+      "phase_setup": "[TODO] Montage",
+      "phase_teardown": "[TODO] Démontage",
       "plates_set_aside": "{count} talíř stranou | {count} talíře stranou",
       "previous_day": "Předchozí den",
       "progress": "Postup",
+      "remaining_count": "[TODO] {count} restant | {count} restants",
       "saved_description": "Jídlo bylo synchronizováno s dobrovolníky a umělci",
       "saved_title": "Uloženo",
       "search_person": "Hledat osobu",

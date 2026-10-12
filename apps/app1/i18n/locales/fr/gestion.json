@@ -277,9 +277,13 @@
         "organizer": "Organisateur"
       },
       "phase": "Phase",
+      "phase_event": "Événement",
+      "phase_setup": "Montage",
+      "phase_teardown": "Démontage",
       "plates_set_aside": "{count} assiette mise de côté | {count} assiettes mises de côté",
       "previous_day": "Jour précédent",
       "progress": "Avancement",
+      "remaining_count": "{count} restant | {count} restants",
       "saved_description": "Le repas a été synchronisé avec les bénévoles et artistes",
       "saved_title": "Sauvegardé",
       "search_person": "Rechercher une personne",

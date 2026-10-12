@@ -260,9 +260,13 @@
         "organizer": "Организатор"
       },
       "phase": "Этап",
+      "phase_event": "[TODO] Événement",
+      "phase_setup": "[TODO] Montage",
+      "phase_teardown": "[TODO] Démontage",
       "plates_set_aside": "{count} порция отложена | {count} порции отложены",
       "previous_day": "Предыдущий день",
       "progress": "Прогресс",
+      "remaining_count": "[TODO] {count} restant | {count} restants",
       "saved_description": "Приём пищи синхронизирован с волонтёрами и артистами",
       "saved_title": "Сохранено",
       "search_person": "Найти человека",
