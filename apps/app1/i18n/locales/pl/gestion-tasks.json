@@ -24,6 +24,7 @@
       "group_name_placeholder": "Np.: Przygotowanie logistyczne",
       "group_not_found": "Ta grupa nie istnieje lub została usunięta",
       "legacy_assignees_warning": "Niektórzy przypisani użytkownicy nie są już organizatorami ani zaakceptowanymi wolontariuszami. Odznacz ich, jeśli nie chcesz ich już zachować.",
+      "move_removes_tags": "Przeniesienie zadania usunie jego {count} etykiet(y): etykiety należą do grupy, w której zostały utworzone.",
       "move_to_group": "Przenieś do grupy",
       "new_group": "Nowa grupa",
       "new_task": "Nowe zadanie",

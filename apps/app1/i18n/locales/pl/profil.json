@@ -1,5 +1,16 @@
 {
   "profile": {
+    "current_password_for_email": "Aktualne hasło",
+    "current_password_for_email_help": "Zmiana adresu e-mail wymaga Twojego hasła: to właśnie ten adres pozwala odzyskać kontrolę nad kontem.",
+    "pending_email_code_placeholder": "Sześciocyfrowy kod",
+    "pending_email_confirm": "Potwierdź adres",
+    "pending_email_confirm_failed": "Potwierdzenie nie udało się",
+    "pending_email_confirmed": "Twój nowy adres został potwierdzony",
+    "pending_email_description": "Sześciocyfrowy kod został właśnie wysłany na {email}. Twoje konto zachowuje obecny adres, dopóki go tu nie wpiszesz.",
+    "pending_email_resend": "Wyślij kod ponownie",
+    "pending_email_resend_failed": "Ponowne wysłanie nie udało się",
+    "pending_email_resent": "Nowy kod został właśnie wysłany",
+    "pending_email_title": "Adres oczekujący na potwierdzenie",
     "sidebar": {
       "title": "Mój profil",
       "personal_info": "Dane osobowe",
@@ -73,14 +84,14 @@
       "system_notifications": "Powiadomienia systemowe",
       "system_notifications_desc": "Ważne aktualizacje i konserwacja",
       "volunteer_reminders": "Przypomnienia o zmianach wolontariackich",
-      "volunteer_reminders_desc": "[TODO] Powiadomienia 30 minut przed Twoimi zmianami",
+      "volunteer_reminders_desc": "Przypomnienie 30 minut przed Twoimi zmianami, publikacja grafiku i zmiany dotyczące Twoich zmian",
       "messenger_messages": "Wiadomości",
       "messenger_messages_desc": "Wiadomości z czatów zespołowych, od liderów i od organizatorów"
     },
     "oauth_password_info": "Zalogowałeś się przez Google. Możesz ustawić hasło, aby logować się za pomocą swojego adresu e-mail.",
     "optional_section_title": "Sekcja opcjonalna",
     "password_changed": "Hasło zmienione",
-    "password_updated": "[TODO] Twoje hasło zostało zaktualizowane",
+    "password_updated": "Twoje pozostałe urządzenia zostały wylogowane. To urządzenie pozostaje zalogowane.",
     "passwords_dont_match": "Hasła nie pasują",
     "personal_info": "Informacje osobiste",
     "phone": "Telefon",

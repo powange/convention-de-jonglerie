@@ -1,5 +1,16 @@
 {
   "profile": {
+    "current_password_for_email": "Nuvarande lösenord",
+    "current_password_for_email_help": "Att byta e-postadress kräver ditt lösenord: det är den adressen som gör att du kan ta tillbaka kontrollen över ditt konto.",
+    "pending_email_code_placeholder": "Sexsiffrig kod",
+    "pending_email_confirm": "Bekräfta adressen",
+    "pending_email_confirm_failed": "Bekräftelsen misslyckades",
+    "pending_email_confirmed": "Din nya adress är bekräftad",
+    "pending_email_description": "En sexsiffrig kod har just skickats till {email}. Ditt konto behåller sin nuvarande adress tills du anger koden här.",
+    "pending_email_resend": "Skicka koden igen",
+    "pending_email_resend_failed": "Det nya utskicket misslyckades",
+    "pending_email_resent": "En ny kod har just skickats",
+    "pending_email_title": "Adress väntar på bekräftelse",
     "sidebar": {
       "title": "Min profil",
       "personal_info": "Personlig information",
@@ -73,14 +84,14 @@
       "system_notifications": "Systemnotiser",
       "system_notifications_desc": "Viktiga uppdateringar och underhåll",
       "volunteer_reminders": "Påminnelser om volontärpass",
-      "volunteer_reminders_desc": "[TODO] Notiser 30 minuter före dina pass",
+      "volunteer_reminders_desc": "Påminnelse 30 minuter före dina pass, publicering av schemat och ändringar som rör dina pass",
       "messenger_messages": "Meddelanden",
       "messenger_messages_desc": "Meddelanden från lagchattar, från ansvariga och från arrangörer"
     },
     "oauth_password_info": "Du har loggat in via Google. Du kan ange ett lösenord för att logga in med din e-post.",
     "optional_section_title": "Frivillig information",
     "password_changed": "Lösenord ändrat",
-    "password_updated": "[TODO] Ditt lösenord har uppdaterats",
+    "password_updated": "Dina andra enheter har loggats ut. Den här förblir inloggad.",
     "passwords_dont_match": "Lösenorden stämmer inte överens",
     "personal_info": "Personlig information",
     "phone": "Telefon",

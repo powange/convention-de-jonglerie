@@ -1,5 +1,16 @@
 {
   "profile": {
+    "current_password_for_email": "Aktuální heslo",
+    "current_password_for_email_help": "Změna e-mailové adresy vyžaduje vaše heslo: právě tato adresa umožňuje získat zpět přístup k vašemu účtu.",
+    "pending_email_code_placeholder": "Šestimístný kód",
+    "pending_email_confirm": "Potvrdit adresu",
+    "pending_email_confirm_failed": "Potvrzení se nezdařilo",
+    "pending_email_confirmed": "Vaše nová adresa je potvrzena",
+    "pending_email_description": "Na {email} byl právě odeslán šestimístný kód. Váš účet si ponechává současnou adresu, dokud ho sem nezadáte.",
+    "pending_email_resend": "Odeslat kód znovu",
+    "pending_email_resend_failed": "Opětovné odeslání se nezdařilo",
+    "pending_email_resent": "Právě byl odeslán nový kód",
+    "pending_email_title": "Adresa čeká na potvrzení",
     "sidebar": {
       "title": "Můj profil",
       "personal_info": "Osobní údaje",
@@ -73,14 +84,14 @@
       "system_notifications": "Systémová oznámení",
       "system_notifications_desc": "Důležité aktualizace a údržba",
       "volunteer_reminders": "Připomínky dobrovolnických směn",
-      "volunteer_reminders_desc": "[TODO] Oznámení 30 minut před vašimi směnami",
+      "volunteer_reminders_desc": "Připomenutí 30 minut před vašimi směnami, zveřejnění rozpisu a změny týkající se vašich směn",
       "messenger_messages": "Zprávy",
       "messenger_messages_desc": "Zprávy z týmových chatů, od vedoucích a od organizátorů"
     },
     "oauth_password_info": "Přihlásili jste se přes Google. Heslo pro přihlášení si můžete nastavit pomocí e-mailu.",
     "optional_section_title": "Nepovinné informace",
     "password_changed": "Změna hesla",
-    "password_updated": "[TODO] Vaše heslo bylo aktualizováno",
+    "password_updated": "Vaše ostatní zařízení byla odhlášena. Toto zůstává přihlášené.",
     "passwords_dont_match": "Hesla se neshodují",
     "personal_info": "Osobní údaje",
     "phone": "Telefon",

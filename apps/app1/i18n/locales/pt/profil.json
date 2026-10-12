@@ -1,5 +1,16 @@
 {
   "profile": {
+    "current_password_for_email": "Palavra-passe atual",
+    "current_password_for_email_help": "Mudar de endereço de e-mail exige a sua palavra-passe: é esse endereço que permite retomar o controlo da sua conta.",
+    "pending_email_code_placeholder": "Código de seis dígitos",
+    "pending_email_confirm": "Confirmar o endereço",
+    "pending_email_confirm_failed": "A confirmação falhou",
+    "pending_email_confirmed": "O seu novo endereço está confirmado",
+    "pending_email_description": "Acabou de ser enviado um código de seis dígitos para {email}. A sua conta mantém o endereço atual até que o introduza aqui.",
+    "pending_email_resend": "Reenviar o código",
+    "pending_email_resend_failed": "O reenvio falhou",
+    "pending_email_resent": "Acabou de ser enviado um novo código",
+    "pending_email_title": "Endereço à espera de confirmação",
     "sidebar": {
       "title": "O meu perfil",
       "personal_info": "Informações pessoais",
@@ -73,14 +84,14 @@
       "system_notifications": "Notificações do sistema",
       "system_notifications_desc": "Atualizações importantes e manutenção",
       "volunteer_reminders": "Lembretes de turnos de voluntariado",
-      "volunteer_reminders_desc": "[TODO] Notificações 30 minutos antes dos seus turnos",
+      "volunteer_reminders_desc": "Lembrete 30 minutos antes dos seus turnos, publicação do horário e alterações que afetem os seus turnos",
       "messenger_messages": "Mensagens",
       "messenger_messages_desc": "Mensagens das conversas de equipa, dos responsáveis e dos organizadores"
     },
     "oauth_password_info": "Iniciou sessão com o Google. Pode definir uma palavra-passe para iniciar sessão com o seu email.",
     "optional_section_title": "Seção opcional",
     "password_changed": "Palavra-passe alterada",
-    "password_updated": "[TODO] A sua palavra-passe foi actualizada",
+    "password_updated": "Os seus outros dispositivos foram desligados. Este continua ligado.",
     "passwords_dont_match": "As palavras-passe não coincidem",
     "personal_info": "Informações pessoais",
     "phone": "Telefone",

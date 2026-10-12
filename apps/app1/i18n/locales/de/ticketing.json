@@ -213,6 +213,11 @@
       "phases_toutes": "Alle Zeiträume"
     },
     "my_ticket": {
+      "cancelled_badge": "Storniert",
+      "cancelled_description": "Es berechtigt nicht mehr zum Eintritt und wird an der Zugangskontrolle abgewiesen. Wende dich an die Organisatoren, wenn du einen Fehler vermutest.",
+      "cancelled_title": "Dieses Ticket wurde storniert",
+      "details_title": "Ticketdetails",
+      "entry_validated": "Eintritt bestätigt",
       "how_to_use_description": "Zeigen Sie diesen QR-Code am Eingang, um Ihr Ticket zu validieren.",
       "how_to_use_title": "So verwenden Sie diesen QR-Code"
     },
@@ -310,6 +315,7 @@
     },
     "origin_site": "Auf der Website erstellt",
     "participant": {
+      "canceled_order_after_entry_description": "Diese Bestellung wurde nach dem Eintritt storniert. Bereits bestätigte Eintritte bleiben gültig; kein weiteres Ticket dieser Bestellung kann bestätigt werden.",
       "entry_validated": "Eintritt bereits validiert",
       "first_name": "Vorname",
       "last_name": "Nachname",
@@ -348,6 +354,13 @@
       "list": {
         "delete_button": "Löschen",
         "delete_confirm": "Möchten Sie das Kontingent '{name}' wirklich löschen?",
+        "delete_confirm_with_links": "Möchtest du das Kontingent '{name}' wirklich löschen? Seine {count} Verknüpfung(en) verschwinden damit, ohne Weg zurück: {detail}.",
+        "delete_links_artists": "{count} Show(s)",
+        "delete_links_custom_fields": "{count} eigene(s) Feld(er)",
+        "delete_links_options": "{count} Option(en)",
+        "delete_links_organizers": "{count} Organisator(en)",
+        "delete_links_tiers": "{count} Tarif(e)",
+        "delete_links_volunteers": "{count} Helferteam(s)",
         "delete_title": "Kontingent löschen",
         "description": "Definieren Sie hier Kontingente, um den Zugang zu bestimmten Leistungen einzuschränken (Shows, Aktivitäten, Eintritte usw.)",
         "description_label": "Beschreibung",

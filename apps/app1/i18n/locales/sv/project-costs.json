@@ -24,6 +24,7 @@
       "donate_button": "Bjud på {count} kaffe",
       "donations_paused": "Donationer är för närvarande pausade. Tack för ditt tidigare stöd!",
       "error": "Kan inte skapa betalningssession",
+      "fees_pending": "Stripe-avgifterna för {count} gåva/gåvor är ännu inte kända: det mottagna beloppet justeras inom kort.",
       "price_per_coffee": "1 € per kaffe",
       "quantity_label": "Antal kaffekoppar",
       "stripe_fees_label": "i Stripe-avgifter",

@@ -5,8 +5,8 @@
     "closed_notice": "Опитування закрите. Ви можете переглянути результати, але більше не можете голосувати.",
     "duration_minutes": "{duration} хв",
     "edition_info": "{conventionName} — {editionName}",
-    "load_error": "[TODO] Impossible de charger le sondage",
-    "load_error_description": "[TODO] Le sondage n'a pas pu être récupéré. Votre lien reste valide : il n'y a qu'à réessayer.",
+    "load_error": "Не вдалося завантажити опитування",
+    "load_error_description": "Не вдалося отримати опитування. Ваше посилання залишається дійсним: достатньо спробувати ще раз.",
     "manage": {
       "close_survey": "Закрити опитування",
       "copy_link": "Копіювати посилання",

@@ -142,6 +142,8 @@
       "experience": "Experiencia",
       "experience_details": "Detalles de experiencia",
       "export_ical": "Exportar iCal",
+      "export_ics_default_title": "Turno de voluntariado",
+      "export_ics_team_prefix": "Equipo",
       "export_pdf": "Exportar PDF",
       "has_experience": "Tiene experiencia",
       "has_minors": "Acompañado de menores",

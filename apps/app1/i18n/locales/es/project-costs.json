@@ -24,6 +24,7 @@
       "donate_button": "Invitar {count} café(s)",
       "donations_paused": "Las donaciones están actualmente suspendidas. ¡Gracias por su apoyo anterior!",
       "error": "No se pudo crear la sesión de pago",
+      "fees_pending": "Las comisiones de Stripe de {count} donación(es) aún no se conocen: el importe recibido se ajustará en breve.",
       "price_per_coffee": "1 € por café",
       "quantity_label": "Número de cafés",
       "stripe_fees_label": "en comisiones Stripe",

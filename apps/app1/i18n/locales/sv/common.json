@@ -216,8 +216,8 @@
     "about_this_edition": "Om denna utgåva",
     "add_comment_placeholder": "Lägg till en kommentar...",
     "add_lost_item": "Lägg till ett upphittat objekt",
-    "all_items_returned": "[TODO] Tous les objets ont été restitués",
-    "all_items_returned_description": "[TODO] Tous les objets signalés pour cette édition ont retrouvé leur propriétaire. Utilisez « Afficher les objets restitués » pour les revoir.",
+    "all_items_returned": "Alla föremål har återlämnats",
+    "all_items_returned_description": "Alla föremål som rapporterats för den här upplagan har hittat tillbaka till sina ägare. Använd ”Visa återlämnade föremål” för att se dem igen.",
     "artist_space": "Mitt artistutrymme",
     "artists": {
       "title": "Artister"

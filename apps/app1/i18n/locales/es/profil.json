@@ -1,5 +1,16 @@
 {
   "profile": {
+    "current_password_for_email": "Contraseña actual",
+    "current_password_for_email_help": "Cambiar de dirección de correo requiere tu contraseña: es esa dirección la que permite recuperar el control de tu cuenta.",
+    "pending_email_code_placeholder": "Código de seis cifras",
+    "pending_email_confirm": "Confirmar la dirección",
+    "pending_email_confirm_failed": "La confirmación ha fallado",
+    "pending_email_confirmed": "Tu nueva dirección está confirmada",
+    "pending_email_description": "Se acaba de enviar un código de seis cifras a {email}. Tu cuenta conserva su dirección actual hasta que lo introduzcas aquí.",
+    "pending_email_resend": "Reenviar el código",
+    "pending_email_resend_failed": "El reenvío ha fallado",
+    "pending_email_resent": "Acaba de salir un nuevo código",
+    "pending_email_title": "Dirección pendiente de confirmación",
     "sidebar": {
       "title": "Mi perfil",
       "personal_info": "Información personal",
@@ -73,14 +84,14 @@
       "system_notifications": "Notificaciones del sistema",
       "system_notifications_desc": "Actualizaciones importantes y mantenimiento",
       "volunteer_reminders": "Recordatorios de turnos de voluntariado",
-      "volunteer_reminders_desc": "[TODO] Notificaciones 30 minutos antes de sus turnos",
+      "volunteer_reminders_desc": "Recordatorio 30 minutos antes de tus turnos, publicación del horario y cambios que afecten a tus turnos",
       "messenger_messages": "Mensajería",
       "messenger_messages_desc": "Mensajes de los chats de equipo, de los responsables y de los organizadores"
     },
     "oauth_password_info": "Has iniciado sesión con Google. Puedes establecer una contraseña para iniciar sesión con tu correo electrónico.",
     "optional_section_title": "Sección opcional",
     "password_changed": "Contraseña cambiada",
-    "password_updated": "[TODO] Tu contraseña ha sido actualizada",
+    "password_updated": "Tus otros dispositivos se han desconectado. Este sigue conectado.",
     "passwords_dont_match": "Las contraseñas no coinciden",
     "personal_info": "Información personal",
     "phone": "Teléfono",

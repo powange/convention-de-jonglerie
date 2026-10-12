@@ -142,6 +142,8 @@
       "experience": "Erfaring",
       "experience_details": "Erfaringsdetaljer",
       "export_ical": "Eksporter iCal",
+      "export_ics_default_title": "Frivilligvagt",
+      "export_ics_team_prefix": "Team",
       "export_pdf": "Eksporter PDF",
       "has_experience": "Har erfaring",
       "has_minors": "Ledsaget af mindreårige",

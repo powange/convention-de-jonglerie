@@ -213,6 +213,11 @@
       "phases_toutes": "Alla perioder"
     },
     "my_ticket": {
+      "cancelled_badge": "Avbokad",
+      "cancelled_description": "Den ger inte längre rätt till inträde och kommer att avvisas vid insläppet. Kontakta arrangörerna om du tror att det är ett misstag.",
+      "cancelled_title": "Den här biljetten har avbokats",
+      "details_title": "Biljettuppgifter",
+      "entry_validated": "Inträde validerat",
       "how_to_use_description": "Visa upp denna QR-kod vid entrén för att validera din biljett.",
       "how_to_use_title": "Så här använder du denna QR-kod"
     },
@@ -310,6 +315,7 @@
     },
     "origin_site": "Skapad på webbplatsen",
     "participant": {
+      "canceled_order_after_entry_description": "Den här ordern avbokades efter passagen vid insläppet. Redan validerade inträden förblir giltiga; ingen ytterligare biljett från den här ordern kan valideras.",
       "entry_validated": "Posten är redan validerad",
       "first_name": "Förnamn",
       "last_name": "Efternamn",
@@ -348,6 +354,13 @@
       "list": {
         "delete_button": "Ta bort",
         "delete_confirm": "Är du säker på att du vill ta bort kvoten '{name}'?",
+        "delete_confirm_with_links": "Är du säker på att du vill radera kvoten '{name}'? Dess {count} koppling(ar) försvinner med den, utan återvändo: {detail}.",
+        "delete_links_artists": "{count} föreställning(ar)",
+        "delete_links_custom_fields": "{count} eget/egna fält",
+        "delete_links_options": "{count} tillval",
+        "delete_links_organizers": "{count} arrangör(er)",
+        "delete_links_tiers": "{count} biljettyp(er)",
+        "delete_links_volunteers": "{count} volontärteam",
         "delete_title": "Ta bort kvot",
         "description": "Definiera kvoter här för att begränsa tillgången till vissa tjänster (föreställningar, aktiviteter, inträden osv.)",
         "description_label": "beskrivning",

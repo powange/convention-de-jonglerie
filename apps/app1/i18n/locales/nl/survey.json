@@ -5,8 +5,8 @@
     "closed_notice": "De enquête is gesloten. U kunt de resultaten bekijken maar niet meer stemmen.",
     "duration_minutes": "{duration} min",
     "edition_info": "{conventionName} — {editionName}",
-    "load_error": "[TODO] Impossible de charger le sondage",
-    "load_error_description": "[TODO] Le sondage n'a pas pu être récupéré. Votre lien reste valide : il n'y a qu'à réessayer.",
+    "load_error": "Kan de enquête niet laden",
+    "load_error_description": "De enquête kon niet worden opgehaald. Je link blijft geldig: probeer het gewoon opnieuw.",
     "manage": {
       "close_survey": "Enquête sluiten",
       "copy_link": "Link kopiëren",

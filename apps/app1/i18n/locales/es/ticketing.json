@@ -213,6 +213,11 @@
       "phases_toutes": "Todos los periodos"
     },
     "my_ticket": {
+      "cancelled_badge": "Anulada",
+      "cancelled_description": "Ya no da derecho de entrada y será rechazada en el control de acceso. Contacta con los organizadores si crees que es un error.",
+      "cancelled_title": "Esta entrada ha sido anulada",
+      "details_title": "Detalles de la entrada",
+      "entry_validated": "Entrada validada",
       "how_to_use_description": "Presente este código QR en la entrada para validar su entrada.",
       "how_to_use_title": "Cómo usar este código QR"
     },
@@ -310,6 +315,7 @@
     },
     "origin_site": "Creado en el sitio",
     "participant": {
+      "canceled_order_after_entry_description": "Este pedido se anuló después del paso por la entrada. Las entradas ya validadas siguen siéndolo; ninguna otra entrada de este pedido puede validarse.",
       "entry_validated": "Entrada ya validada",
       "first_name": "Nombre",
       "last_name": "Apellido",
@@ -348,6 +354,13 @@
       "list": {
         "delete_button": "Eliminar",
         "delete_confirm": "¿Está seguro de que desea eliminar la cuota '{name}'?",
+        "delete_confirm_with_links": "¿Seguro que quieres eliminar el cupo '{name}'? Sus {count} asociación(es) desaparecerán con él, sin vuelta atrás: {detail}.",
+        "delete_links_artists": "{count} espectáculo(s)",
+        "delete_links_custom_fields": "{count} campo(s) personalizado(s)",
+        "delete_links_options": "{count} opción(es)",
+        "delete_links_organizers": "{count} organizador(es)",
+        "delete_links_tiers": "{count} tarifa(s)",
+        "delete_links_volunteers": "{count} equipo(s) de voluntarios",
         "delete_title": "Eliminar cuota",
         "description": "Defina aquí las cuotas para limitar el acceso a ciertos servicios (espectáculos, actividades, entradas, etc.)",
         "description_label": "descripción",

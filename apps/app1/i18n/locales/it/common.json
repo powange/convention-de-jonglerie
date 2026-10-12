@@ -216,8 +216,8 @@
     "about_this_edition": "A proposito di questa edizione",
     "add_comment_placeholder": "Aggiungi un commento...",
     "add_lost_item": "Aggiungi oggetto smarrito",
-    "all_items_returned": "[TODO] Tous les objets ont été restitués",
-    "all_items_returned_description": "[TODO] Tous les objets signalés pour cette édition ont retrouvé leur propriétaire. Utilisez « Afficher les objets restitués » pour les revoir.",
+    "all_items_returned": "Tutti gli oggetti sono stati restituiti",
+    "all_items_returned_description": "Tutti gli oggetti segnalati per questa edizione hanno ritrovato il proprietario. Usa «Mostra gli oggetti restituiti» per rivederli.",
     "artist_space": "Il mio spazio artista",
     "artists": {
       "title": "Artisti"

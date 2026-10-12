@@ -213,6 +213,11 @@
       "phases_toutes": "Všechna období"
     },
     "my_ticket": {
+      "cancelled_badge": "Zrušeno",
+      "cancelled_description": "Již neopravňuje ke vstupu a bude při kontrole vstupu odmítnuta. Obraťte se na organizátory, pokud si myslíte, že jde o omyl.",
+      "cancelled_title": "Tato vstupenka byla zrušena",
+      "details_title": "Podrobnosti vstupenky",
+      "entry_validated": "Vstup potvrzen",
       "how_to_use_description": "U vstupu předložte tento QR kód a ověřte si platnost vstupenky.",
       "how_to_use_title": "Jak používat tento QR kód"
     },
@@ -310,6 +315,7 @@
     },
     "origin_site": "Vytvořeno na webu",
     "participant": {
+      "canceled_order_after_entry_description": "Tato objednávka byla zrušena po průchodu u vstupu. Již potvrzené vstupy zůstávají platné; žádná další vstupenka z této objednávky nemůže být potvrzena.",
       "entry_validated": "Položka již byla ověřena",
       "first_name": "Jméno",
       "last_name": "Příjmení",
@@ -348,6 +354,13 @@
       "list": {
         "delete_button": "Odstranit",
         "delete_confirm": "Opravdu chcete odstranit kvótu '{name}'?",
+        "delete_confirm_with_links": "Opravdu chcete odstranit kvótu '{name}'? Jejích {count} propojení s ní zmizí, bez možnosti vrácení: {detail}.",
+        "delete_links_artists": "{count} představení",
+        "delete_links_custom_fields": "{count} vlastní(ch) pol(e)",
+        "delete_links_options": "{count} vol(by)",
+        "delete_links_organizers": "{count} organizátor(ů)",
+        "delete_links_tiers": "{count} tarif(ů)",
+        "delete_links_volunteers": "{count} tým(ů) dobrovolníků",
         "delete_title": "Odstranit kvótu",
         "description": "Definujte zde kvóty pro omezení přístupu k určitým službám (představení, aktivity, vstupy atd.)",
         "description_label": "popis",

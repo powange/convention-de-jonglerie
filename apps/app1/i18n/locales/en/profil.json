@@ -1,5 +1,16 @@
 {
   "profile": {
+    "current_password_for_email": "Current password",
+    "current_password_for_email_help": "Changing your email address requires your password: that address is what lets you regain control of your account.",
+    "pending_email_code_placeholder": "Six-digit code",
+    "pending_email_confirm": "Confirm address",
+    "pending_email_confirm_failed": "Confirmation failed",
+    "pending_email_confirmed": "Your new address is confirmed",
+    "pending_email_description": "A six-digit code has just been sent to {email}. Your account keeps its current address until you enter it here.",
+    "pending_email_resend": "Resend the code",
+    "pending_email_resend_failed": "Resending failed",
+    "pending_email_resent": "A new code has just been sent",
+    "pending_email_title": "Address awaiting confirmation",
     "sidebar": {
       "title": "My profile",
       "personal_info": "Personal information",
@@ -73,14 +84,14 @@
       "system_notifications": "System notifications",
       "system_notifications_desc": "Important updates and maintenance",
       "volunteer_reminders": "Volunteer slot reminders",
-      "volunteer_reminders_desc": "[TODO] Notifications 30 minutes before your slots",
+      "volunteer_reminders_desc": "Reminder 30 minutes before your shifts, schedule publication, and changes affecting your shifts",
       "messenger_messages": "Messages",
       "messenger_messages_desc": "Messages from team chats, team leaders and organisers"
     },
     "oauth_password_info": "You signed in with Google. You can set a password to sign in with your email.",
     "optional_section_title": "Optional Information",
     "password_changed": "Password changed",
-    "password_updated": "[TODO] Your password has been updated",
+    "password_updated": "Your other devices have been signed out. This one stays signed in.",
     "passwords_dont_match": "Passwords don't match",
     "personal_info": "Personal information",
     "phone": "Phone",

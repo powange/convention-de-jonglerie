@@ -216,8 +216,8 @@
     "about_this_edition": "Über diese Auflage",
     "add_comment_placeholder": "Kommentar hinzufügen...",
     "add_lost_item": "Fundsache hinzufügen",
-    "all_items_returned": "[TODO] Tous les objets ont été restitués",
-    "all_items_returned_description": "[TODO] Tous les objets signalés pour cette édition ont retrouvé leur propriétaire. Utilisez « Afficher les objets restitués » pour les revoir.",
+    "all_items_returned": "Alle Gegenstände wurden zurückgegeben",
+    "all_items_returned_description": "Alle für diese Ausgabe gemeldeten Gegenstände haben ihre Besitzer wiedergefunden. Mit „Zurückgegebene Gegenstände anzeigen“ kannst du sie erneut sehen.",
     "artist_space": "Mein Künstlerbereich",
     "artists": {
       "title": "Künstler"

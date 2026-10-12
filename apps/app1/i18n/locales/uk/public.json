@@ -142,6 +142,8 @@
       "experience": "Досвід",
       "experience_details": "Деталі досвіду",
       "export_ical": "Експорт iCal",
+      "export_ics_default_title": "Зміна волонтера",
+      "export_ics_team_prefix": "Команда",
       "export_pdf": "Експорт PDF",
       "has_experience": "Має досвід",
       "has_minors": "У супроводі неповнолітніх",

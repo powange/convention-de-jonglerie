@@ -136,7 +136,7 @@
     "backup_create_success": "Säkerhetskopian har skapats framgångsrikt",
     "backup_create_success_description": "Säkerhetskopian {filename} har skapats framgångsrikt",
     "backup_creating": "Skapande pågår...",
-    "backup_delete_confirm": "[TODO] Är du säker på att du vill ta bort säkerhetskopian {filename}?",
+    "backup_delete_confirm": "Säkerhetskopian {filename}, skapad den {date} och på {size}, tas bort permanent.",
     "backup_delete_error": "Fel vid borttagning av säkerhetskopia",
     "backup_delete_success": "Säkerhetskopian har raderats framgångsrikt",
     "backup_delete_success_description": "Säkerhetskopian {filename} har raderats framgångsrikt",

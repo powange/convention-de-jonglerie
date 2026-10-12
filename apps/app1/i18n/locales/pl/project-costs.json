@@ -24,6 +24,7 @@
       "donate_button": "Postaw {count} kawę/kaw",
       "donations_paused": "Darowizny są obecnie wstrzymane. Dziękujemy za dotychczasowe wsparcie!",
       "error": "Nie udało się utworzyć sesji płatności",
+      "fees_pending": "Opłaty Stripe za {count} darowizn(y) nie są jeszcze znane: otrzymana kwota zostanie wkrótce skorygowana.",
       "price_per_coffee": "1 € za kawę",
       "quantity_label": "Liczba kaw",
       "stripe_fees_label": "prowizji Stripe",

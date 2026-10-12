@@ -136,7 +136,7 @@
     "backup_create_success": "Kopia zapasowa utworzona pomyślnie",
     "backup_create_success_description": "Kopia zapasowa {filename} została utworzona pomyślnie",
     "backup_creating": "Tworzenie...",
-    "backup_delete_confirm": "[TODO] Czy na pewno chcesz usunąć kopię zapasową {filename}?",
+    "backup_delete_confirm": "Kopia zapasowa {filename}, utworzona {date} i o rozmiarze {size}, zostanie trwale usunięta.",
     "backup_delete_error": "Błąd podczas usuwania kopii zapasowej",
     "backup_delete_success": "Kopia zapasowa usunięta pomyślnie",
     "backup_delete_success_description": "Kopia zapasowa {filename} została usunięta pomyślnie",

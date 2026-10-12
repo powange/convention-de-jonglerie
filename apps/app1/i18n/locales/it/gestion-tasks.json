@@ -24,6 +24,7 @@
       "group_name_placeholder": "Es.: Preparazione logistica",
       "group_not_found": "Questo gruppo non esiste o è stato eliminato",
       "legacy_assignees_warning": "Alcuni assegnatari non fanno più parte degli organizzatori o dei volontari accettati. Deseleziona se non desideri più mantenerli.",
+      "move_removes_tags": "Spostare l'attività rimuoverà le sue {count} etichetta(e): le etichette appartengono al gruppo in cui sono state create.",
       "move_to_group": "Sposta nel gruppo",
       "new_group": "Nuovo gruppo",
       "new_task": "Nuova attività",

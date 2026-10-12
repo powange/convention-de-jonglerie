@@ -24,6 +24,7 @@
       "group_name_placeholder": "Ex.: Preparação logística",
       "group_not_found": "Este grupo não existe ou foi eliminado",
       "legacy_assignees_warning": "Alguns atribuídos já não são organizadores ou voluntários aceitos. Desmarque-os se já não desejar mantê-los.",
+      "move_removes_tags": "Mover a tarefa irá remover as suas {count} etiqueta(s): as etiquetas pertencem ao grupo onde foram criadas.",
       "move_to_group": "Mover para o grupo",
       "new_group": "Novo grupo",
       "new_task": "Nova tarefa",

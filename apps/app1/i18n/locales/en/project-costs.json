@@ -24,6 +24,7 @@
       "donate_button": "Buy {count} coffee(s)",
       "donations_paused": "Donations are currently paused. Thank you for your past support!",
       "error": "Unable to create payment session",
+      "fees_pending": "The Stripe fees for {count} donation(s) are not known yet: the amount received will be adjusted shortly.",
       "price_per_coffee": "€1 per coffee",
       "quantity_label": "Number of coffees",
       "stripe_fees_label": "in Stripe fees",

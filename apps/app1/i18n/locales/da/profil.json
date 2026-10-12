@@ -1,5 +1,16 @@
 {
   "profile": {
+    "current_password_for_email": "Nuværende adgangskode",
+    "current_password_for_email_help": "Skift af e-mailadresse kræver din adgangskode: det er den adresse, der gør det muligt at få kontrollen over din konto tilbage.",
+    "pending_email_code_placeholder": "Sekscifret kode",
+    "pending_email_confirm": "Bekræft adressen",
+    "pending_email_confirm_failed": "Bekræftelsen mislykkedes",
+    "pending_email_confirmed": "Din nye adresse er bekræftet",
+    "pending_email_description": "En sekscifret kode er netop sendt til {email}. Din konto beholder sin nuværende adresse, indtil du indtaster koden her.",
+    "pending_email_resend": "Send koden igen",
+    "pending_email_resend_failed": "Den nye afsendelse mislykkedes",
+    "pending_email_resent": "En ny kode er netop sendt",
+    "pending_email_title": "Adresse afventer bekræftelse",
     "sidebar": {
       "title": "Min profil",
       "personal_info": "Personlige oplysninger",
@@ -73,14 +84,14 @@
       "system_notifications": "Systemnotifikationer",
       "system_notifications_desc": "Vigtige opdateringer og vedligeholdelse",
       "volunteer_reminders": "Påmindelser om frivilligvagter",
-      "volunteer_reminders_desc": "[TODO] Notifikationer 30 minutter før dine vagter",
+      "volunteer_reminders_desc": "Påmindelse 30 minutter før dine vagter, offentliggørelse af planen og ændringer, der berører dine vagter",
       "messenger_messages": "Beskeder",
       "messenger_messages_desc": "Beskeder fra teamsamtaler, teamledere og arrangører"
     },
     "oauth_password_info": "Du loggede ind med Google. Du kan indstille en adgangskode for at logge ind med din email.",
     "optional_section_title": "Valgfri sektion",
     "password_changed": "Adgangskode ændret",
-    "password_updated": "[TODO] Din adgangskode er blevet opdateret",
+    "password_updated": "Dine andre enheder er blevet logget ud. Denne forbliver logget ind.",
     "passwords_dont_match": "Adgangskoderne matcher ikke",
     "personal_info": "Personlige oplysninger",
     "phone": "Telefon",

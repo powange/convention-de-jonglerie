@@ -24,6 +24,7 @@
       "donate_button": "Giv {count} kaffe(r)",
       "donations_paused": "Donationer er i øjeblikket sat på pause. Tak for din tidligere støtte!",
       "error": "Kan ikke oprette betalingssession",
+      "fees_pending": "Stripe-gebyrerne for {count} donation(er) kendes endnu ikke: det modtagne beløb justeres snarest.",
       "price_per_coffee": "1 € pr. kaffe",
       "quantity_label": "Antal kaffer",
       "stripe_fees_label": "i Stripe-gebyrer",

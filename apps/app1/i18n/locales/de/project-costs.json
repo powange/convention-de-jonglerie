@@ -24,6 +24,7 @@
       "donate_button": "{count} Kaffee(s) spendieren",
       "donations_paused": "Spenden sind derzeit pausiert. Vielen Dank für Ihre bisherige Unterstützung!",
       "error": "Zahlungssitzung konnte nicht erstellt werden",
+      "fees_pending": "Die Stripe-Gebühren für {count} Spende(n) sind noch nicht bekannt: der erhaltene Betrag wird in Kürze angepasst.",
       "price_per_coffee": "1 € pro Kaffee",
       "quantity_label": "Anzahl Kaffees",
       "stripe_fees_label": "an Stripe-Gebühren",

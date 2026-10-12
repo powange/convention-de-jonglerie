@@ -1,5 +1,16 @@
 {
   "profile": {
+    "current_password_for_email": "Huidig wachtwoord",
+    "current_password_for_email_help": "Een ander e-mailadres instellen vraagt je wachtwoord: met dat adres krijg je de controle over je account terug.",
+    "pending_email_code_placeholder": "Code van zes cijfers",
+    "pending_email_confirm": "Adres bevestigen",
+    "pending_email_confirm_failed": "De bevestiging is mislukt",
+    "pending_email_confirmed": "Je nieuwe adres is bevestigd",
+    "pending_email_description": "Er is net een code van zes cijfers naar {email} gestuurd. Je account houdt zijn huidige adres totdat je die hier invult.",
+    "pending_email_resend": "Code opnieuw versturen",
+    "pending_email_resend_failed": "Het opnieuw versturen is mislukt",
+    "pending_email_resent": "Er is net een nieuwe code verstuurd",
+    "pending_email_title": "Adres wacht op bevestiging",
     "sidebar": {
       "title": "Mijn profiel",
       "personal_info": "Persoonlijke gegevens",
@@ -73,14 +84,14 @@
       "system_notifications": "Systeemmeldingen",
       "system_notifications_desc": "Belangrijke updates en onderhoud",
       "volunteer_reminders": "Herinneringen vrijwilligersdiensten",
-      "volunteer_reminders_desc": "[TODO] Meldingen 30 minuten voor uw diensten",
+      "volunteer_reminders_desc": "Herinnering 30 minuten voor je diensten, publicatie van het schema en wijzigingen die je diensten raken",
       "messenger_messages": "Berichten",
       "messenger_messages_desc": "Berichten uit teamgesprekken, van teamleiders en organisatoren"
     },
     "oauth_password_info": "Je bent ingelogd met Google. Je kunt een wachtwoord instellen om in te loggen met je e-mail.",
     "optional_section_title": "Optionele sectie",
     "password_changed": "Wachtwoord gewijzigd",
-    "password_updated": "[TODO] Je wachtwoord is bijgewerkt",
+    "password_updated": "Je andere apparaten zijn afgemeld. Dit apparaat blijft aangemeld.",
     "passwords_dont_match": "Wachtwoorden komen niet overeen",
     "personal_info": "Persoonlijke informatie",
     "phone": "Telefoon",

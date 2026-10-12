@@ -136,7 +136,7 @@
     "backup_create_success": "Backup erfolgreich erstellt",
     "backup_create_success_description": "Das Backup {filename} wurde erfolgreich erstellt",
     "backup_creating": "Erstelle...",
-    "backup_delete_confirm": "[TODO] Sind Sie sicher, dass Sie das Backup {filename} löschen möchten?",
+    "backup_delete_confirm": "Das Backup {filename}, erstellt am {date} und {size} groß, wird endgültig gelöscht.",
     "backup_delete_error": "Fehler beim Löschen des Backups",
     "backup_delete_success": "Backup erfolgreich gelöscht",
     "backup_delete_success_description": "Das Backup {filename} wurde erfolgreich gelöscht",
