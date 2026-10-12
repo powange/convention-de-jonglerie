@@ -188,10 +188,22 @@ export default wrapApiHandler(
           }
         }, 10000)
 
+        /*
+         * ⚠️ L'ARRÊT EST MAINTENANT TRANSMIS À LA GÉNÉRATION — constat O1.
+         *
+         * `cleanup` posait `isCancelled` et fermait le tuyau, mais aucun signal n'atteignait
+         * `generateImportJson` ni `runAgentExploration` : leur seul effet était de ne pas ENVOYER
+         * le résultat. La génération continuait jusqu'au bout — appels au modèle et
+         * téléchargements compris —, pour un résultat jeté. Une passe programme sur neuf
+         * journées est mesurée à 24 min 30 s.
+         */
+        const arret = new AbortController()
+
         // Gestion de la déconnexion client
         const cleanup = () => {
           console.log('[GENERATE-STREAM] Client déconnecté')
           isCancelled = true
+          arret.abort()
           safeClose()
         }
 
@@ -218,6 +230,7 @@ export default wrapApiHandler(
                 editionStartDate,
                 editionEndDate,
                 programDates,
+                signal: arret.signal,
               })
             } else {
               // Exploration Intelligente (EI)
@@ -228,6 +241,7 @@ export default wrapApiHandler(
                 provider,
                 detectServices,
                 conventionConnue,
+                signal: arret.signal,
               })
             }
 

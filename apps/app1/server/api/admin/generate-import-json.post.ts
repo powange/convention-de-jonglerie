@@ -175,6 +175,33 @@ export interface GenerateImportOptions {
    * raccourcit la séance d'autant. Absent ou vide vaut « toutes celles de l'édition ».
    */
   programDates?: string[]
+  /**
+   * L'arrêt demandé par l'appelant — constat O1.
+   *
+   * ⚠️ FERMER L'ONGLET N'ARRÊTAIT RIEN. Le flux SSE détectait bien la déconnexion, posait un
+   * drapeau et fermait le tuyau — mais aucun signal n'atteignait cette génération : elle
+   * continuait jusqu'au bout, appels au modèle compris, pour un résultat jeté. Une passe
+   * programme sur neuf journées est mesurée à 24 min 30 s ; un rechargement de page la laissait
+   * tourner en entier, occupant le modèle local ou facturant Anthropic.
+   */
+  signal?: AbortSignal
+}
+
+/**
+ * Lève dès que l'appelant a demandé l'arrêt — constat O1.
+ *
+ * ⚠️ UN `throw` ET NON UN `return` : cette génération enchaîne une dizaine d'étapes dont chacune
+ * nourrit la suivante. Sortir par un retour vide laisserait les étapes suivantes travailler sur
+ * rien et produire un résultat partiel qui ressemble à un succès. L'erreur remonte au flux SSE,
+ * qui n'envoie de toute façon plus rien à un client parti.
+ *
+ * Le nom de l'étape est dans le message : c'est la seule façon de savoir, dans le journal, à quel
+ * moment l'abandon a été pris en compte — et donc ce qui a été payé au modèle avant lui.
+ */
+function exigerQueLArretNAitPasEteDemande(signal: AbortSignal | undefined, etape: string): void {
+  if (signal?.aborted) {
+    throw new Error(`Génération interrompue par le client (étape : ${etape})`)
+  }
 }
 
 /**
@@ -193,6 +220,7 @@ export async function generateImportJson(
   const {
     taskId,
     onProgress,
+    signal,
     previewedImageUrl,
     provider,
     detectServices = true,
@@ -241,6 +269,7 @@ export async function generateImportJson(
   // bas — description, dates, fuseau — donc proposées comme différences alors que personne
   // n'avait demandé les informations générales.
   if (extractInfos && facebookUrls.length > 0) {
+    exigerQueLArretNAitPasEteDemande(signal, 'scraping_facebook')
     updateStep(taskId, 'scraping_facebook', onProgress)
   }
 
@@ -269,6 +298,7 @@ export async function generateImportJson(
 
   // Étape 1b: Si pas de données Facebook, essayer JugglingEdge
   if (extractInfos && !prefilledJson && jugglingEdgeUrls.length > 0) {
+    exigerQueLArretNAitPasEteDemande(signal, 'scraping_jugglingedge')
     updateStep(taskId, 'scraping_jugglingedge', onProgress)
 
     for (const url of jugglingEdgeUrls) {
@@ -323,10 +353,14 @@ export async function generateImportJson(
   )
 
   if (otherUrls.length > 0) {
+    exigerQueLArretNAitPasEteDemande(signal, 'fetching_urls')
     updateStep(taskId, 'fetching_urls', onProgress)
   }
 
   for (const url of otherUrls) {
+    // Une page par itération, chacune jusqu'à trente secondes : c'est le bon endroit pour
+    // s'arrêter sans attendre la fin de la liste.
+    exigerQueLArretNAitPasEteDemande(signal, `fetching_urls:${url}`)
     // Les pages nourrissent aussi bien l'extraction générale que la détection des services.
     // Si ni l'une ni l'autre n'est demandée, seule la page du programme reste utile.
     if (!extractInfos && !detectServices && url !== programUrl) continue
@@ -342,9 +376,11 @@ export async function generateImportJson(
           `[GENERATE-IMPORT] HTML récupéré via browserless pour ${url}: ${html.length} caractères`
         )
       } else {
+        // `signal` en plus du délai : `fetchWithTimeout` combine les deux depuis le constat O1
+        // — il écrasait auparavant celui de l'appelant, en silence.
         const response = await fetchWithTimeout(
           url,
-          { headers: BROWSER_HEADERS },
+          { headers: BROWSER_HEADERS, signal },
           AI_TIMEOUTS.URL_FETCH
         )
         if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`)
@@ -403,6 +439,7 @@ export async function generateImportJson(
     console.log("[GENERATE-IMPORT] Informations générales non demandées, pas d'appel au modèle")
     generatedJson = JSON.stringify({ edition: {} }, null, 2)
   } else if (prefilledJson && otherContents.length === 0) {
+    exigerQueLArretNAitPasEteDemande(signal, 'generating_json')
     updateStep(taskId, 'generating_json', onProgress)
     // Cas 1: Uniquement Facebook, pas d'IA - retourne le JSON tel quel
     console.log("[GENERATE-IMPORT] Facebook seul, pas d'IA")
@@ -457,6 +494,7 @@ export async function generateImportJson(
   // (étape ignorée si la recherche des services est désactivée)
   const detecterServices = detectServices
   if (detecterServices) {
+    exigerQueLArretNAitPasEteDemande(signal, 'extracting_features')
     updateStep(taskId, 'extracting_features', onProgress)
   }
 
@@ -586,6 +624,7 @@ export async function generateImportJson(
       // Sans les bornes, le modèle n'a aucun moyen de dater des journées désignées par leur nom,
       // et rien ne permettrait d'écarter celles qui tombent hors de l'édition.
       if (/^\d{4}-\d{2}-\d{2}$/.test(debut) && /^\d{4}-\d{2}-\d{2}$/.test(fin)) {
+        exigerQueLArretNAitPasEteDemande(signal, 'extracting_program')
         updateStep(taskId, 'extracting_program', onProgress)
         const resultat = await extractProgramDays(
           effectiveConfig,

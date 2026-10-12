@@ -13,6 +13,7 @@
       "ai_provider": "Fournisseur IA",
       "apply_program_items": "Appliquer {count} élément(s)",
       "apply_selected": "Appliquer {count} modification(s)",
+      "cancel_search": "Annuler la recherche",
       "current_value": "Valeur actuelle",
       "description": "Rechercher des mises à jour via l'IA depuis les liens externes",
       "differences_found": "{count} différence(s) détectée(s)",

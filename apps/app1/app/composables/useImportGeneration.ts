@@ -79,6 +79,11 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
 
   // État de génération
   const generating = ref(false)
+  /*
+   * Le flux SSE en cours, s'il y en a un — constat O1. C'est lui que `annuler()` ferme, ce qui
+   * fait abandonner la génération côté serveur.
+   */
+  const fluxCourant = ref<EventSource | null>(null)
   const generateError = ref('')
   const generationMethod = ref<GenerationMethod>('simple')
   // Recherche des services (caractéristiques de l'édition) via IA — activée par défaut
@@ -244,6 +249,15 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
 
       // withCredentials: true pour envoyer les cookies de session
       const eventSource = new EventSource(sseUrl, { withCredentials: true })
+      /*
+       * ⚠️ LA RÉFÉRENCE EST GARDÉE POUR POUVOIR ANNULER — constat O1.
+       *
+       * Fermer ce flux déclenche l'évènement `close` côté serveur, qui abandonne désormais la
+       * génération (appels au modèle compris). Jusqu'ici la seule façon d'arrêter était de
+       * quitter la page — et cela n'arrêtait RIEN : le serveur fermait son tuyau et continuait
+       * de travailler, pour un résultat jeté.
+       */
+      fluxCourant.value = eventSource
       let result: GenerationResult | null = null
 
       let minuterieSilence: ReturnType<typeof setTimeout> | null = null
@@ -465,6 +479,21 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
     }
   }
 
+  /**
+   * Arrête la génération en cours — constat O1.
+   *
+   * ⚠️ FERMER LE FLUX EST CE QUI ARRÊTE LE TRAVAIL, et non un simple geste d'interface : le
+   * serveur écoute la déconnexion et abandonne alors sa génération. Avant ce lot, aucun bouton
+   * n'existait et quitter la page ne faisait qu'arrêter l'AFFICHAGE — la passe continuait,
+   * jusqu'à 24 min 30 s mesurées sur neuf journées de programme, en occupant le modèle local ou
+   * en facturant Anthropic pour un résultat que personne ne lirait.
+   */
+  const annuler = () => {
+    fluxCourant.value?.close()
+    fluxCourant.value = null
+    generating.value = false
+  }
+
   return {
     // État
     generating,
@@ -497,6 +526,7 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
 
     // Actions
     generate,
+    annuler,
     resetState,
     loadProviders,
   }
