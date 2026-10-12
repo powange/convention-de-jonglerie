@@ -192,6 +192,30 @@ describe('association des quotas — les trois cibles', () => {
       ])
     })
 
+    it('⚠️ DÉDOUBLONNE LA CHAÎNE VIDE AVEC `null` — elles donnent la MÊME ligne', async () => {
+      /*
+       * ⚠️⚠️ CE CAS A ATTRAPÉ UN DÉFAUT DE LA CORRECTION ELLE-MÊME (constat O3). `choiceValue`
+       * est normalisé avant d'être écrit : `''` et `null` aboutissent tous deux à NULL, donc à
+       * une ligne « tous les choix ». Une clé de dédoublonnage calculée sur la valeur BRUTE les
+       * voyait différentes, laissait passer les deux, et créait les deux lignes identiques que
+       * l'index unique ne refuse pas sous MySQL — le défaut recréé par son propre correctif.
+       *
+       * Et ce point d'API écrivait jusqu'ici `?? null`, seul des cinq à ranger la chaîne vide
+       * comme un choix NOMMÉ, alors que sa clé la confondait déjà avec `null` : les deux moitiés
+       * étaient en désaccord.
+       */
+      await envoyer({
+        quotas: [
+          { quotaId: 3, choiceValue: '' },
+          { quotaId: 3, choiceValue: null },
+        ],
+      })
+
+      expect(prismaMock.ticketingTierCustomFieldQuota.createMany.mock.calls[0][0].data).toEqual([
+        { customFieldId: 42, quotaId: 3, choiceValue: null },
+      ])
+    })
+
     it('écrit `null` pour une association valable quelle que soit la réponse', async () => {
       // `null` et « pas de clé » doivent aboutir au même état : le choix absent n'est pas une
       // réponse vide, c'est l'absence de condition.
