@@ -226,6 +226,63 @@ export async function rafraichirUtilisateurDeSession(
   return true
 }
 
+/**
+ * Fait suivre à CETTE session la nouvelle génération du compte — constat F1.
+ *
+ * ## Le défaut
+ *
+ * Changer son mot de passe incrémente `sessionVersion`, ce qui ferme **toutes** les sessions du
+ * compte — c'est voulu : le geste par lequel on reprend la main serait vain si l'appareil qu'on
+ * soupçonne restait connecté. Mais l'appareil **courant** tombait avec les autres, et l'écran ne
+ * le disait pas : il affichait « Mot de passe mis à jour », vidait le formulaire et restait là.
+ * Le magasin gardait `user` et `sessionVerifiee`, donc le middleware laissait passer toutes les
+ * navigations suivantes — et chaque appel d'API répondait 401, traduit en « identifiants
+ * invalides » sur des écrans sans rapport, jusqu'à ce que la personne recharge la page.
+ *
+ * ## ⚠️ POURQUOI PAS `ouvrirSession`
+ *
+ * Elle rouvrirait la session : `ouvertureAt` repartirait de maintenant, et le plafond ABSOLU avec
+ * lui. Une session de vingt-neuf jours redeviendrait neuve à l'occasion d'un changement de mot de
+ * passe — soit exactement le défaut que `rafraichirUtilisateurDeSession` documente juste au-dessus
+ * pour les modifications de profil.
+ *
+ * On ne déplace donc QUE la génération : `expireAt`, `dureeSecondes`, `ouvertureAt` et
+ * `persistant` restent intacts, la primitive fusionnant à plat. Les autres appareils portent
+ * toujours l'ancienne génération, et restent fermés.
+ *
+ * ⚠️ Et le cookie est reposé avec SON échéance : sans cette configuration, `setUserSession`
+ * retombe sur le défaut et transformerait un cookie de session en cookie daté — « se souvenir de
+ * moi » coché à la place de la personne.
+ *
+ * @returns `true` si la session a suivi, `false` s'il n'y avait pas de session à déplacer — et
+ * l'appelant doit alors fermer la session, pour ne pas en laisser vivre une à l'ancienne
+ * génération.
+ */
+export async function suivreLaGenerationDeSession(
+  event: H3Event,
+  nouvelleGeneration: number,
+  primitives: PrimitivesDeSession = PRIMITIVES_PAR_DEFAUT
+): Promise<boolean> {
+  // Pas de cookie entrant : rien à déplacer, et surtout rien à CRÉER (cf. `getAuthSession`).
+  if (!aUneSessionDansLaRequete(event)) return false
+
+  const session = await primitives.lire(event)
+  if (!(session as { user?: unknown })?.user) return false
+
+  const echeance = (session as EcheanceDeSession)?.expireAt
+  const persistant = (session as EcheanceDeSession)?.persistant === true
+  // Même garde que le rafraîchissement : une session persistante sans échéance est antérieure au
+  // dispositif glissant, et un `new Date(undefined)` produirait une déconnexion immédiate.
+  if (persistant && typeof echeance !== 'number') return false
+
+  await primitives.ecrire(
+    event,
+    { sessionVersion: nouvelleGeneration },
+    cookiePourEcheance(echeance as number, persistant)
+  )
+  return true
+}
+
 export function clearAuthSession(event: H3Event) {
   return clearUserSession(event)
 }

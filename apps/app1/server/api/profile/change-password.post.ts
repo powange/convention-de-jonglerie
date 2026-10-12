@@ -6,6 +6,7 @@ import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers
 import { requireAuth } from '#server/utils/auth-utils'
 import { oublierSessionDuCompte } from '#server/utils/cache-session'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { suivreLaGenerationDeSession } from '#server/utils/session-helpers'
 import { changePasswordSchema, validateAndSanitize } from '#server/utils/validation-schemas'
 
 export default wrapApiHandler(
@@ -72,19 +73,39 @@ export default wrapApiHandler(
      * l'appareil qu'on soupçonne restait connecté. Le middleware compare ce numéro dans la
      * lecture du compte qu'il fait déjà à chaque requête — aucune requête de plus.
      */
-    await prisma.user.update({
+    const compteAJour = await prisma.user.update({
       where: { id: user.id },
       data: {
         password: hashedNewPassword,
         sessionVersion: { increment: 1 },
       },
+      // La nouvelle génération est lue ici plutôt que recalculée : `increment` est résolu par la
+      // base, et une lecture séparée pourrait tomber entre deux changements.
+      select: { sessionVersion: true },
     })
 
     // La génération vient de changer : le cache du middleware doit la relire, sinon les sessions
     // ouvertes ailleurs resteraient acceptées le temps de son expiration.
     oublierSessionDuCompte(user.id)
 
-    await clearUserSession(event)
+    /*
+     * ⚠️ L'APPAREIL COURANT GARDE SA SESSION — constat F1.
+     *
+     * Ici se trouvait un `clearUserSession(event)` : la session courante tombait avec les autres,
+     * et l'écran ne le disait pas. Il affichait « Mot de passe mis à jour », vidait le formulaire
+     * et restait là ; le magasin gardait `user`, donc le middleware laissait passer les
+     * navigations suivantes — et chaque appel d'API répondait 401, traduit en « identifiants
+     * invalides » sur des écrans sans rapport, jusqu'à un rechargement de la page.
+     *
+     * On fait donc suivre à CETTE session la nouvelle génération. Les autres appareils portent
+     * l'ancienne et restent fermés : l'intention du geste est préservée, sans que la personne qui
+     * l'accomplit en fasse les frais.
+     *
+     * 📍 Le repli n'est pas décoratif : si la session n'a pas pu suivre, la laisser vivre à
+     * l'ancienne génération donnerait exactement le défaut d'avant. On ferme alors, comme avant.
+     */
+    const sessionConservee = await suivreLaGenerationDeSession(event, compteAJour.sessionVersion)
+    if (!sessionConservee) await clearUserSession(event)
 
     return createSuccessResponse(null, 'Mot de passe mis à jour avec succès')
   },

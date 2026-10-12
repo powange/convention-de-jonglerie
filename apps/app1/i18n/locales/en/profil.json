@@ -81,7 +81,7 @@
     "optional_section_title": "Optional Information",
     "password_changed": "Password changed",
     "password_digit_required": "Password must contain at least one digit",
-    "password_updated": "Your password has been updated",
+    "password_updated": "[TODO] Your password has been updated",
     "password_uppercase_required": "Password must contain at least one uppercase letter",
     "passwords_dont_match": "Passwords don't match",
     "personal_info": "Personal information",
