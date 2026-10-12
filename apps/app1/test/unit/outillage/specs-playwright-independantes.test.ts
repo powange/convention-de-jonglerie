@@ -84,6 +84,23 @@ describe('Playwright — les deux specs du profil sont indépendantes', () => {
     expect(config.slice(debut)).toContain('workers: 1')
   })
 
+  it('⚠️ les deux inscriptions ne tournent PAS en même temps', () => {
+    /*
+     * Les deux setups lisent le code de vérification dans LE MÊME journal, et l'aide y prend « le
+     * dernier » — juste seulement si une inscription tourne à la fois. En parallèle, chacun pouvait
+     * saisir le code de l'autre.
+     *
+     * 📍 Mesuré, pas supposé : la première version de ce lot a fait tomber la CI, et la garde
+     * d'instabilité a nommé « create account and authenticate ». La dépendance les sérialise.
+     */
+    const config = sansCommentaires(CONFIG)
+    const debut = config.indexOf("name: 'setup-langue',")
+    const fin = config.indexOf("name: 'data-setup',")
+    expect(debut).toBeGreaterThan(-1)
+    expect(fin).toBeGreaterThan(debut)
+    expect(config.slice(debut, fin)).toContain("dependencies: ['setup']")
+  })
+
   it('⚠️ la CI appelle bien les DEUX projets authentifiés', () => {
     // Le mode de panne le plus coûteux : un projet que la matrice n'appelle pas n'est pas joué, et
     // AUCUN test n'échoue pour le dire.

@@ -93,6 +93,26 @@ export default defineConfig<ConfigOptions>({
     {
       name: 'setup-langue',
       testMatch: /auth-langue\.setup\.ts/,
+      /*
+       * ⚠️⚠️ APRÈS LE SETUP PRINCIPAL, ET CE N'EST PAS UN DÉTAIL D'ORDONNANCEMENT.
+       *
+       * Les deux inscriptions lisent le code de vérification dans LE MÊME JOURNAL, et
+       * `getVerificationCodeFromLogs` y prend « le DERNIER code » — ce qui n'est juste que si une
+       * seule inscription tourne à la fois. Lancés en parallèle, les deux setups pouvaient saisir
+       * le code de l'autre.
+       *
+       * 📍 Ce n'est pas une hypothèse : la première version de ce lot a fait tomber la CI, et la
+       * garde d'instabilité a nommé le coupable — « 1 test instable : create account and
+       * authenticate ». Il avait échoué puis réussi à la reprise, ce qui est exactement la
+       * signature d'une course.
+       *
+       * 📍 LE CORRECTIF DE FOND SERAIT AILLEURS : la ligne de journal ne porte que le code, pas
+       * l'adresse (`generateVerificationCode` ne connaît pas le destinataire). La faire porter
+       * l'adresse rendrait l'aide juste au lieu de chanceuse, et permettrait n'importe quel nombre
+       * d'inscriptions simultanées. C'est un changement côté serveur, hors du périmètre de ce
+       * constat — noté, pas fait.
+       */
+      dependencies: ['setup'],
       // Même délai que le setup principal, et pour la même raison : en local, la première visite
       // d'une page compile le serveur de développement.
       timeout: 120000,
