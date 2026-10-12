@@ -136,7 +136,7 @@
     "backup_create_success": "Backup created successfully",
     "backup_create_success_description": "Backup {filename} has been created successfully",
     "backup_creating": "Creating...",
-    "backup_delete_confirm": "Are you sure you want to delete backup {filename}?",
+    "backup_delete_confirm": "[TODO] Are you sure you want to delete backup {filename}?",
     "backup_delete_error": "Error deleting backup",
     "backup_delete_success": "Backup deleted successfully",
     "backup_delete_success_description": "Backup {filename} has been deleted successfully",
