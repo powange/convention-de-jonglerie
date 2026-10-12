@@ -128,248 +128,291 @@ export default wrapApiHandler(
         // Sauvegarder les commandes et items en BDD
         console.log('💾 Nombre de commandes à sauvegarder:', result.data?.length || 0)
         if (result.data && result.data.length > 0) {
-          await prisma.$transaction(async (tx) => {
-            // Récupérer tous les tarifs de l'édition pour faire la correspondance
-            const tiers = await tx.ticketingTier.findMany({
-              where: { editionId },
-            })
-            console.log('📊 Nombre de tarifs disponibles:', tiers.length)
-
-            for (const order of result.data) {
-              // Le statut suit la source : « Annulée » quand HelloAsso a annulé toutes les lignes.
-              const statut = statutDeCommandeHelloAsso(
-                order.items.map((item) => annuleeALaSource(item.state))
-              )
-
-              // Créer ou mettre à jour la commande
-              const savedOrder = await tx.ticketingOrder.upsert({
-                where: {
-                  externalTicketingId_helloAssoOrderId: {
-                    externalTicketingId: config.id,
-                    helloAssoOrderId: order.id,
-                  },
-                },
-                create: {
-                  externalTicketingId: config.id,
-                  helloAssoOrderId: order.id,
-                  editionId,
-                  payerFirstName: order.payer.firstName,
-                  payerLastName: order.payer.lastName,
-                  payerEmail: order.payer.email,
-                  amount: orderTotal(order),
-                  status: statut,
-                  paymentMethod: 'card', // HelloAsso = paiement par carte
-                  orderDate: new Date(order.date), // Date de la commande HelloAsso
-                },
-                update: {
-                  payerFirstName: order.payer.firstName,
-                  payerLastName: order.payer.lastName,
-                  payerEmail: order.payer.email,
-                  amount: orderTotal(order),
-                  status: statut,
-                  paymentMethod: 'card', // HelloAsso = paiement par carte
-                  orderDate: new Date(order.date), // Mettre à jour la date si elle a changé
-                },
+          /*
+           * ⚠️ LE PLAFOND DE LA TRANSACTION EST DÉSORMAIS CHOISI, et non hérité — constat O1.
+           *
+           * `$transaction` était appelé sans second argument : il prenait donc le défaut de Prisma,
+           * **5 s**, que personne n'avait décidé. Or cette transaction est la plus lourde du
+           * module — une boucle d'upserts sur toutes les commandes de l'édition.
+           *
+           * 📊 Recompté branche par branche sur la base de développement, commandes importées
+           * seulement : édition 9 ≈ 847 requêtes (le pire cas), éditions 1/17/21/22 entre 64 et
+           * 398. La lecture des options remontée plus bas en retire 105 sur l'édition 9.
+           *
+           * ⚠️ CE N'EST PAS LA CORRECTION D'UNE PANNE CONSTATÉE : aucun dépassement n'a été
+           * observé. C'est une échéance — le nombre de requêtes croît avec les billets, et le
+           * défaut se manifesterait comme un import qui échoue en bloc, au guichet, un jour
+           * d'affluence. 15 s laissent une marge de l'ordre de dix fois le pire cas mesuré, sans
+           * ouvrir une fenêtre de verrou sans limite.
+           *
+           * 📍 CE QUE CELA NE RÈGLE PAS, et qui demande une décision : tout l'import tient dans
+           * UNE transaction. La découper par commande bornerait le verrou pour de bon, mais
+           * changerait la sémantique — un échec laisserait un import partiel au lieu de ne rien
+           * laisser. C'est un choix de produit, pas un réglage.
+           */
+          await prisma.$transaction(
+            async (tx) => {
+              // Récupérer tous les tarifs de l'édition pour faire la correspondance
+              const tiers = await tx.ticketingTier.findMany({
+                where: { editionId },
               })
 
-              // Créer ou mettre à jour les items
-              for (const item of order.items) {
-                // Trouver le tarif correspondant par l'ID HelloAsso du tarif
-                const matchingTier = tiers.find((tier) => {
-                  // Utiliser le tierId de HelloAsso si disponible
-                  if (item.tierId && tier.helloAssoTierId === item.tierId) {
-                    return true
-                  }
-                  // Sinon, fallback sur le nom (et ignorer le prix pour les tarifs libres)
-                  return tier.name === item.name || tier.name === item.priceCategory
-                })
+              /*
+               * ⚠️ LES OPTIONS SE LISENT ICI, UNE FOIS — constat O1.
+               *
+               * Cette lecture était DANS la boucle des lignes de commande : chaque billet portant au
+               * moins une option relançait le même `findMany` sur toute l'édition, repas inclus.
+               * Les tarifs, eux, étaient déjà chargés une fois — l'asymétrie n'avait aucune raison.
+               *
+               * 📊 Mesuré sur la base de développement, sur les seules commandes IMPORTÉES (la
+               * boucle n'écrit que ce que HelloAsso rend) :
+               *
+               *   édition 9 → 228 lignes dont 106 avec options → 106 lectures, 105 ÉVITABLES
+               *   éditions 1, 17, 21, 22 → 0 ligne avec option → 0 lecture
+               *
+               * Le défaut ne se manifeste donc aujourd'hui que sur une édition, mais il grandit avec
+               * le nombre de billets à options — et chaque lecture évitée raccourcit la fenêtre de
+               * verrou de la transaction, qui est l'autre moitié du même constat.
+               */
+              const availableOptions = await tx.ticketingOption.findMany({
+                where: { editionId },
+                include: { meals: true },
+              })
+              console.log('📊 Nombre de tarifs disponibles:', tiers.length)
 
-                // Log pour déboguer
-                if (!matchingTier) {
-                  console.log('❌ Aucun tarif trouvé pour:', {
-                    itemType: item.type,
-                    itemTierId: item.tierId,
-                    itemName: item.name,
-                    itemPriceCategory: item.priceCategory,
-                    itemAmount: item.amount,
-                    availableTiers: tiers.map((t) => ({
-                      helloAssoTierId: t.helloAssoTierId,
-                      name: t.name,
-                      price: t.price,
-                    })),
-                  })
-                } else {
-                  console.log('✅ Tarif trouvé:', {
-                    tierName: matchingTier.name,
-                    itemName: item.name,
-                    itemTierId: item.tierId,
-                  })
-                }
+              for (const order of result.data) {
+                // Le statut suit la source : « Annulée » quand HelloAsso a annulé toutes les lignes.
+                const statut = statutDeCommandeHelloAsso(
+                  order.items.map((item) => annuleeALaSource(item.state))
+                )
 
-                // Vérifier si l'item existe déjà
-                const existingItem = await tx.ticketingOrderItem.findFirst({
+                // Créer ou mettre à jour la commande
+                const savedOrder = await tx.ticketingOrder.upsert({
                   where: {
-                    orderId: savedOrder.id,
-                    helloAssoItemId: item.id,
+                    externalTicketingId_helloAssoOrderId: {
+                      externalTicketingId: config.id,
+                      helloAssoOrderId: order.id,
+                    },
+                  },
+                  create: {
+                    externalTicketingId: config.id,
+                    helloAssoOrderId: order.id,
+                    editionId,
+                    payerFirstName: order.payer.firstName,
+                    payerLastName: order.payer.lastName,
+                    payerEmail: order.payer.email,
+                    amount: orderTotal(order),
+                    status: statut,
+                    paymentMethod: 'card', // HelloAsso = paiement par carte
+                    orderDate: new Date(order.date), // Date de la commande HelloAsso
+                  },
+                  update: {
+                    payerFirstName: order.payer.firstName,
+                    payerLastName: order.payer.lastName,
+                    payerEmail: order.payer.email,
+                    amount: orderTotal(order),
+                    status: statut,
+                    paymentMethod: 'card', // HelloAsso = paiement par carte
+                    orderDate: new Date(order.date), // Mettre à jour la date si elle a changé
                   },
                 })
 
-                let savedItemId: number
-
-                if (existingItem) {
-                  // Mettre à jour l'item existant
-                  // Note: customFields contient UNIQUEMENT les vrais champs personnalisés
-                  // Les options sont gérées dans TicketingOrderItemOption
-                  //
-                  // `state` est le seul champ que le fournisseur ne réécrit pas toujours : une
-                  // annulation faite ICI doit lui survivre. Sans cette réserve, on annulait un
-                  // billet, quelqu'un appuyait sur « Synchroniser », et le billet redevenait valide
-                  // sans que rien ne le signale. C'est précisément ce qui interdisait d'annuler le
-                  // billet d'une commande HelloAsso — alors que la plateforme, elle, ne sait pas
-                  // rembourser partiellement une commande.
-                  //
-                  // `canceledAt` fait le départ : nul, l'annulation vient de la source et elle
-                  // gouverne ; renseigné, elle vient d'ici. Lever l'annulation le remet à nul, et la
-                  // source reprend la main d'elle-même — aucun état à démêler.
-                  const annuleIci = existingItem.canceledAt !== null
-
-                  await tx.ticketingOrderItem.update({
-                    where: { id: existingItem.id },
-                    data: {
-                      tierId: matchingTier?.id,
-                      firstName: item.user?.firstName || order.payer.firstName,
-                      lastName: item.user?.lastName || order.payer.lastName,
-                      email: item.user?.email || order.payer.email,
-                      name: item.name || null,
-                      type: item.type,
-                      amount: item.amount,
-                      ...(annuleIci ? {} : { state: item.state }),
-                      // Ce que la source dit de l'annulation, qu'on suive son état ou non : sa date,
-                      // moitié de la détection d'un double remboursement, et le remboursement
-                      // qu'elle vaut. Voir `suitesDeLAnnulationSource`.
-                      ...suitesDeLAnnulationSource(
-                        existingItem,
-                        annuleeALaSource(item.state),
-                        new Date()
-                      ),
-                      qrCode: item.qrCode,
-                      customFields: item.customFields || undefined,
-                    },
+                // Créer ou mettre à jour les items
+                for (const item of order.items) {
+                  // Trouver le tarif correspondant par l'ID HelloAsso du tarif
+                  const matchingTier = tiers.find((tier) => {
+                    // Utiliser le tierId de HelloAsso si disponible
+                    if (item.tierId && tier.helloAssoTierId === item.tierId) {
+                      return true
+                    }
+                    // Sinon, fallback sur le nom (et ignorer le prix pour les tarifs libres)
+                    return tier.name === item.name || tier.name === item.priceCategory
                   })
-                  savedItemId = existingItem.id
-                } else {
-                  // Créer un nouvel item
-                  // Note: customFields contient UNIQUEMENT les vrais champs personnalisés
-                  // Les options sont gérées dans TicketingOrderItemOption
-                  const newItem = await tx.ticketingOrderItem.create({
-                    data: {
+
+                  // Log pour déboguer
+                  if (!matchingTier) {
+                    console.log('❌ Aucun tarif trouvé pour:', {
+                      itemType: item.type,
+                      itemTierId: item.tierId,
+                      itemName: item.name,
+                      itemPriceCategory: item.priceCategory,
+                      itemAmount: item.amount,
+                      availableTiers: tiers.map((t) => ({
+                        helloAssoTierId: t.helloAssoTierId,
+                        name: t.name,
+                        price: t.price,
+                      })),
+                    })
+                  } else {
+                    console.log('✅ Tarif trouvé:', {
+                      tierName: matchingTier.name,
+                      itemName: item.name,
+                      itemTierId: item.tierId,
+                    })
+                  }
+
+                  // Vérifier si l'item existe déjà
+                  const existingItem = await tx.ticketingOrderItem.findFirst({
+                    where: {
                       orderId: savedOrder.id,
                       helloAssoItemId: item.id,
-                      tierId: matchingTier?.id,
-                      firstName: item.user?.firstName || order.payer.firstName,
-                      lastName: item.user?.lastName || order.payer.lastName,
-                      email: item.user?.email || order.payer.email,
-                      name: item.name || null,
-                      type: item.type,
-                      amount: item.amount,
-                      state: item.state,
-                      // Une ligne déjà annulée à sa première synchronisation : même règle. Sa date
-                      // d'annulation n'était pas posée, et l'alerte de double remboursement ne
-                      // pouvait donc jamais s'allumer sur elle.
-                      ...suitesDeLAnnulationSource(null, annuleeALaSource(item.state), new Date()),
-                      qrCode: item.qrCode,
-                      customFields: item.customFields || undefined,
-                    },
-                  })
-                  savedItemId = newItem.id
-                }
-
-                // Synchroniser les options sélectionnées
-                if (item.options && item.options.length > 0) {
-                  // Récupérer toutes les options de l'édition avec leurs repas
-                  const availableOptions = await tx.ticketingOption.findMany({
-                    where: { editionId },
-                    include: {
-                      meals: true,
                     },
                   })
 
-                  for (const selectedOption of item.options) {
-                    // Chercher l'option correspondante :
-                    // 1. Par helloAssoOptionId (si l'option vient de HelloAsso)
-                    // 2. Par ID (si l'option a été créée manuellement)
-                    const matchingOption = availableOptions.find((opt) => {
-                      // D'abord chercher par helloAssoOptionId
-                      if (opt.helloAssoOptionId === String(selectedOption.optionId)) {
-                        return true
-                      }
-                      // Sinon, chercher par ID de l'option locale
-                      if (opt.id === selectedOption.optionId) {
-                        return true
-                      }
-                      return false
+                  let savedItemId: number
+
+                  if (existingItem) {
+                    // Mettre à jour l'item existant
+                    // Note: customFields contient UNIQUEMENT les vrais champs personnalisés
+                    // Les options sont gérées dans TicketingOrderItemOption
+                    //
+                    // `state` est le seul champ que le fournisseur ne réécrit pas toujours : une
+                    // annulation faite ICI doit lui survivre. Sans cette réserve, on annulait un
+                    // billet, quelqu'un appuyait sur « Synchroniser », et le billet redevenait valide
+                    // sans que rien ne le signale. C'est précisément ce qui interdisait d'annuler le
+                    // billet d'une commande HelloAsso — alors que la plateforme, elle, ne sait pas
+                    // rembourser partiellement une commande.
+                    //
+                    // `canceledAt` fait le départ : nul, l'annulation vient de la source et elle
+                    // gouverne ; renseigné, elle vient d'ici. Lever l'annulation le remet à nul, et la
+                    // source reprend la main d'elle-même — aucun état à démêler.
+                    const annuleIci = existingItem.canceledAt !== null
+
+                    await tx.ticketingOrderItem.update({
+                      where: { id: existingItem.id },
+                      data: {
+                        tierId: matchingTier?.id,
+                        firstName: item.user?.firstName || order.payer.firstName,
+                        lastName: item.user?.lastName || order.payer.lastName,
+                        email: item.user?.email || order.payer.email,
+                        name: item.name || null,
+                        type: item.type,
+                        amount: item.amount,
+                        ...(annuleIci ? {} : { state: item.state }),
+                        // Ce que la source dit de l'annulation, qu'on suive son état ou non : sa date,
+                        // moitié de la détection d'un double remboursement, et le remboursement
+                        // qu'elle vaut. Voir `suitesDeLAnnulationSource`.
+                        ...suitesDeLAnnulationSource(
+                          existingItem,
+                          annuleeALaSource(item.state),
+                          new Date()
+                        ),
+                        qrCode: item.qrCode,
+                        customFields: item.customFields || undefined,
+                      },
                     })
+                    savedItemId = existingItem.id
+                  } else {
+                    // Créer un nouvel item
+                    // Note: customFields contient UNIQUEMENT les vrais champs personnalisés
+                    // Les options sont gérées dans TicketingOrderItemOption
+                    const newItem = await tx.ticketingOrderItem.create({
+                      data: {
+                        orderId: savedOrder.id,
+                        helloAssoItemId: item.id,
+                        tierId: matchingTier?.id,
+                        firstName: item.user?.firstName || order.payer.firstName,
+                        lastName: item.user?.lastName || order.payer.lastName,
+                        email: item.user?.email || order.payer.email,
+                        name: item.name || null,
+                        type: item.type,
+                        amount: item.amount,
+                        state: item.state,
+                        // Une ligne déjà annulée à sa première synchronisation : même règle. Sa date
+                        // d'annulation n'était pas posée, et l'alerte de double remboursement ne
+                        // pouvait donc jamais s'allumer sur elle.
+                        ...suitesDeLAnnulationSource(
+                          null,
+                          annuleeALaSource(item.state),
+                          new Date()
+                        ),
+                        qrCode: item.qrCode,
+                        customFields: item.customFields || undefined,
+                      },
+                    })
+                    savedItemId = newItem.id
+                  }
 
-                    if (matchingOption) {
-                      // Upsert l'association orderItem <-> option
-                      await tx.ticketingOrderItemOption.upsert({
-                        where: {
-                          orderItemId_optionId: {
+                  // Synchroniser les options sélectionnées
+                  if (item.options && item.options.length > 0) {
+                    for (const selectedOption of item.options) {
+                      // Chercher l'option correspondante :
+                      // 1. Par helloAssoOptionId (si l'option vient de HelloAsso)
+                      // 2. Par ID (si l'option a été créée manuellement)
+                      const matchingOption = availableOptions.find((opt) => {
+                        // D'abord chercher par helloAssoOptionId
+                        if (opt.helloAssoOptionId === String(selectedOption.optionId)) {
+                          return true
+                        }
+                        // Sinon, chercher par ID de l'option locale
+                        if (opt.id === selectedOption.optionId) {
+                          return true
+                        }
+                        return false
+                      })
+
+                      if (matchingOption) {
+                        // Upsert l'association orderItem <-> option
+                        await tx.ticketingOrderItemOption.upsert({
+                          where: {
+                            orderItemId_optionId: {
+                              orderItemId: savedItemId,
+                              optionId: matchingOption.id,
+                            },
+                          },
+                          create: {
                             orderItemId: savedItemId,
                             optionId: matchingOption.id,
+                            amount: selectedOption.amount || 0,
+                            customFields: selectedOption.customFields || undefined,
                           },
-                        },
-                        create: {
-                          orderItemId: savedItemId,
-                          optionId: matchingOption.id,
-                          amount: selectedOption.amount || 0,
-                          customFields: selectedOption.customFields || undefined,
-                        },
-                        update: {
-                          amount: selectedOption.amount || 0,
-                          customFields: selectedOption.customFields || undefined,
-                        },
-                      })
+                          update: {
+                            amount: selectedOption.amount || 0,
+                            customFields: selectedOption.customFields || undefined,
+                          },
+                        })
 
-                      // Créer les accès repas si l'option donne accès à des repas
-                      if (matchingOption.meals && matchingOption.meals.length > 0) {
-                        for (const mealRelation of matchingOption.meals) {
-                          // Vérifier si l'accès existe déjà
-                          const existingMealAccess = await tx.ticketingOrderItemMeal.findUnique({
-                            where: {
-                              orderItemId_mealId: {
-                                orderItemId: savedItemId,
-                                mealId: mealRelation.mealId,
-                              },
-                            },
-                          })
-
-                          if (!existingMealAccess) {
-                            await tx.ticketingOrderItemMeal.create({
-                              data: {
-                                orderItemId: savedItemId,
-                                mealId: mealRelation.mealId,
+                        // Créer les accès repas si l'option donne accès à des repas
+                        if (matchingOption.meals && matchingOption.meals.length > 0) {
+                          for (const mealRelation of matchingOption.meals) {
+                            // Vérifier si l'accès existe déjà
+                            const existingMealAccess = await tx.ticketingOrderItemMeal.findUnique({
+                              where: {
+                                orderItemId_mealId: {
+                                  orderItemId: savedItemId,
+                                  mealId: mealRelation.mealId,
+                                },
                               },
                             })
+
+                            if (!existingMealAccess) {
+                              await tx.ticketingOrderItemMeal.create({
+                                data: {
+                                  orderItemId: savedItemId,
+                                  mealId: mealRelation.mealId,
+                                },
+                              })
+                            }
                           }
                         }
+                      } else {
+                        console.log('⚠️ Option HelloAsso non trouvée:', {
+                          optionId: selectedOption.optionId,
+                          optionName: selectedOption.name,
+                          availableOptions: availableOptions.map((o) => ({
+                            id: o.id,
+                            helloAssoOptionId: o.helloAssoOptionId,
+                            name: o.name,
+                          })),
+                        })
                       }
-                    } else {
-                      console.log('⚠️ Option HelloAsso non trouvée:', {
-                        optionId: selectedOption.optionId,
-                        optionName: selectedOption.name,
-                        availableOptions: availableOptions.map((o) => ({
-                          id: o.id,
-                          helloAssoOptionId: o.helloAssoOptionId,
-                          name: o.name,
-                        })),
-                      })
                     }
                   }
                 }
               }
-            }
-          })
+            },
+            { timeout: 15_000 }
+          )
         }
 
         // Mettre à jour la date de dernière synchronisation
