@@ -4,7 +4,15 @@ import { synchronisationUnique } from '../../../../../utils/synchronisation-uniq
 import { requireAuth } from '#server/utils/auth-utils'
 import { getHelloAssoTiersAndOptions } from '#server/utils/editions/ticketing/helloasso'
 import { decrypt } from '#server/utils/encryption'
+import { createLogger } from '#server/utils/logger'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+
+/*
+ * ⚠️ UN JOURNAL À NIVEAUX — constat O3. Ce point d'API comptait douze `console.log`, dont un
+ * déversement complet indenté du retour de HelloAsso. `LOG_LEVEL` vaut `info` en production :
+ * tout ce qui est en `debug` en disparaît.
+ */
+const journal = createLogger('HELLOASSO-TARIFS')
 
 export default wrapApiHandler(
   async (event) => {
@@ -37,8 +45,7 @@ export default wrapApiHandler(
 
     const haConfig = config.helloAssoConfig
 
-    console.log("🎫 [Endpoint] Récupération des tarifs HelloAsso pour l'édition:", editionId)
-    console.log('🎫 [Endpoint] Configuration HelloAsso ID:', haConfig.id)
+    journal.debug('récupération des tarifs', { edition: editionId, configuration: haConfig.id })
 
     // Une seule synchronisation à la fois par édition. Deux appels concurrents — deux onglets,
     // un rechargement — écrivaient les mêmes lignes en parallèle et se bloquaient jusqu'au
@@ -49,11 +56,13 @@ export default wrapApiHandler(
         // Déchiffrer le client secret
         const clientSecret = decrypt(haConfig.clientSecret)
 
-        console.log('🎫 [Endpoint] Client ID:', haConfig.clientId)
-        console.log('🎫 [Endpoint] Client Secret déchiffré:', clientSecret ? '✓ OK' : '✗ ERREUR')
-        console.log('🎫 [Endpoint] Organization Slug:', haConfig.organizationSlug)
-        console.log('🎫 [Endpoint] Form Type:', haConfig.formType)
-        console.log('🎫 [Endpoint] Form Slug:', haConfig.formSlug)
+        journal.debug('identifiants et formulaire', {
+          clientId: haConfig.clientId,
+          secretDechiffre: Boolean(clientSecret),
+          organizationSlug: haConfig.organizationSlug,
+          formType: haConfig.formType,
+          formSlug: haConfig.formSlug,
+        })
 
         // Récupérer les tarifs et options via l'utilitaire
         const result = await getHelloAssoTiersAndOptions(
@@ -69,9 +78,15 @@ export default wrapApiHandler(
         )
 
         // Logger le retour complet de l'API HelloAsso
-        console.log('🎫 [HelloAsso API] Retour complet:', JSON.stringify(result, null, 2))
-        console.log('🎫 [HelloAsso API] Nombre de tarifs reçus:', result.tiers?.length || 0)
-        console.log("🎫 [HelloAsso API] Nombre d'options reçues:", result.options?.length || 0)
+        /*
+         * ⚠️ LE SECOND DÉVERSEMENT COMPLET INDENTÉ — constat O3. Même défaut que dans
+         * `helloasso.ts` : des centaines de lignes physiques par appel. En `debug`, et compact.
+         */
+        journal.debug('retour complet de HelloAsso', result)
+        journal.info('tarifs et options reçus', {
+          tarifs: result.tiers?.length || 0,
+          options: result.options?.length || 0,
+        })
 
         // Sauvegarder les tarifs en BDD
         // Utiliser une transaction pour synchroniser les tarifs
@@ -93,7 +108,7 @@ export default wrapApiHandler(
             { cle: (t) => t.helloAssoTierId, rienDeRecu: 'aucun tarif' }
           )
           if (refus) {
-            console.warn(`⚠️ Synchronisation HelloAsso (édition ${editionId}) : ${refus}`)
+            journal.warn('synchronisation partielle', { edition: editionId, raison: refus })
           }
           /*
            * Un tarif retiré chez HelloAsso mais qui porte des billets VENDUS ici est conservé.
@@ -120,18 +135,16 @@ export default wrapApiHandler(
           const tiersSupprimables = tiersToDelete.filter((t) => !idsVendus.has(t.id))
 
           if (tiersConserves.length > 0) {
-            console.warn(
-              `⚠️ Synchronisation HelloAsso (édition ${editionId}) : ${tiersConserves.length} ` +
-                `tarif(s) retiré(s) chez HelloAsso mais conservé(s) ici, des billets les utilisent :`,
-              tiersConserves.map((t) => t.name)
-            )
+            journal.warn('tarifs retirés chez HelloAsso mais conservés ici (billets vendus)', {
+              edition: editionId,
+              tarifs: tiersConserves.map((t) => t.name),
+            })
           }
 
           if (tiersSupprimables.length > 0) {
-            console.log(
-              `🗑️ Suppression de ${tiersSupprimables.length} tarif(s) obsolète(s):`,
-              tiersSupprimables.map((t) => t.name)
-            )
+            journal.info('suppression de tarifs obsolètes', {
+              tarifs: tiersSupprimables.map((t) => t.name),
+            })
             await tx.ticketingTier.deleteMany({
               where: {
                 id: { in: tiersSupprimables.map((t) => t.id) },
@@ -288,13 +301,15 @@ export default wrapApiHandler(
             { cle: (o) => o.helloAssoOptionId, rienDeRecu: 'aucune option' }
           )
           if (refusOptions) {
-            console.warn(`⚠️ Synchronisation HelloAsso (édition ${editionId}) : ${refusOptions}`)
+            journal.warn('synchronisation partielle des options', {
+              edition: editionId,
+              raison: refusOptions,
+            })
           }
           if (optionsToDelete.length > 0) {
-            console.log(
-              `🗑️ Suppression de ${optionsToDelete.length} option(s) obsolète(s):`,
-              optionsToDelete.map((o) => o.name)
-            )
+            journal.info('suppression d’options obsolètes', {
+              options: optionsToDelete.map((o) => o.name),
+            })
             await tx.ticketingOption.deleteMany({
               where: {
                 id: { in: optionsToDelete.map((o) => o.id) },
@@ -409,7 +424,7 @@ export default wrapApiHandler(
 
         return result
       } catch (error: unknown) {
-        console.error('HelloAsso tiers fetch error:', error)
+        journal.error('échec de la récupération des tarifs', error)
 
         // L'utilitaire gère déjà les erreurs, on les relance simplement
         throw error
