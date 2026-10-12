@@ -12,6 +12,14 @@ const testResultsAuth = path.join(
 )
 
 const authFile = path.join(testResultsAuth, 'user.json')
+/*
+ * La session d'un SECOND compte, pour la seule spec qui change la langue du profil — constat CI·4.
+ *
+ * ⚠️ `PUT /api/profile/update` remplace le profil entier : partagé avec `profile.spec.ts`, un
+ * unique compte voyait ses allergies effacées par le réglage de la langue, et inversement. Une
+ * mise à jour perdue, que seul un `workers: 1` sur tout le projet tenait à distance.
+ */
+const authFileLangue = path.join(testResultsAuth, 'user-langue.json')
 const credentialsFile = path.join(testResultsAuth, 'credentials.json')
 const conventionStateFile = path.join(testResultsAuth, 'convention-state.json')
 
@@ -81,6 +89,35 @@ export default defineConfig<ConfigOptions>({
       timeout: 120000,
       use: { ...devices['Desktop Chrome'], locale: 'fr-FR' },
     },
+    // Setup du second compte, celui de la spec de la langue — cf. `authFileLangue`.
+    {
+      name: 'setup-langue',
+      testMatch: /auth-langue\.setup\.ts/,
+      /*
+       * ⚠️⚠️ APRÈS LE SETUP PRINCIPAL, ET CE N'EST PAS UN DÉTAIL D'ORDONNANCEMENT.
+       *
+       * Les deux inscriptions lisent le code de vérification dans LE MÊME JOURNAL, et
+       * `getVerificationCodeFromLogs` y prend « le DERNIER code » — ce qui n'est juste que si une
+       * seule inscription tourne à la fois. Lancés en parallèle, les deux setups pouvaient saisir
+       * le code de l'autre.
+       *
+       * 📍 Ce n'est pas une hypothèse : la première version de ce lot a fait tomber la CI, et la
+       * garde d'instabilité a nommé le coupable — « 1 test instable : create account and
+       * authenticate ». Il avait échoué puis réussi à la reprise, ce qui est exactement la
+       * signature d'une course.
+       *
+       * 📍 LE CORRECTIF DE FOND SERAIT AILLEURS : la ligne de journal ne porte que le code, pas
+       * l'adresse (`generateVerificationCode` ne connaît pas le destinataire). La faire porter
+       * l'adresse rendrait l'aide juste au lieu de chanceuse, et permettrait n'importe quel nombre
+       * d'inscriptions simultanées. C'est un changement côté serveur, hors du périmètre de ce
+       * constat — noté, pas fait.
+       */
+      dependencies: ['setup'],
+      // Même délai que le setup principal, et pour la même raison : en local, la première visite
+      // d'une page compile le serveur de développement.
+      timeout: 120000,
+      use: { ...devices['Desktop Chrome'], locale: 'fr-FR' },
+    },
     // Data setup : crée convention + édition via API
     {
       name: 'data-setup',
@@ -102,23 +139,43 @@ export default defineConfig<ConfigOptions>({
     {
       name: 'authenticated',
       testMatch: /authenticated\//,
+      // ⚠️ La spec de la langue est EXCLUE : elle a son propre compte et son propre projet, parce
+      // qu'elle écrivait le même profil que `profile.spec.ts` — cf. `authFileLangue`. Sans cette
+      // exclusion, `testMatch` l'attraperait ici aussi et elle tournerait deux fois, sur les deux
+      // comptes, ce qui ramènerait exactement le conflit qu'on vient de supprimer.
+      testIgnore: /langue-du-profil\.spec\.ts/,
       dependencies: ['setup'],
       /*
-       * ⚠️ UN SEUL TRAVAILLEUR : tous ces tests partagent LE compte E2E — c'est le cas d'école que
-       * la documentation de `testProject.workers` décrit. Mesuré avant d'y toucher :
-       * `profile.spec.ts` (allergies, contact d'urgence) et `langue-du-profil.spec.ts` (langue)
-       * appellent tous deux `PUT /api/profile/update`, qui attend un profil COMPLET. En parallèle,
-       * la seconde écriture écrase les champs de la première — une mise à jour perdue, et un test
-       * qui échoue sur une valeur qu'il a bien envoyée.
+       * ⚠️ PLUS DE `workers: 1` ICI, et c'est tout l'objet du constat CI·4.
        *
-       * `fullyParallel: false` ne suffirait PAS ici : il n'ordonne que les tests d'un même
-       * fichier, et les deux fichiers en conflit continueraient de tourner ensemble.
+       * Il tenait à distance une mise à jour perdue entre `profile.spec.ts` et
+       * `langue-du-profil.spec.ts` : `PUT /api/profile/update` attend un profil COMPLET et écrase
+       * ce qu'on ne lui envoie pas, si bien qu'en parallèle la seconde écriture effaçait les champs
+       * de la première. Les deux specs ont désormais DEUX COMPTES distincts, et plus un seul
+       * fichier de ce projet n'écrit le profil.
+       *
+       * 📍 Lire le profil avant d'écrire n'aurait PAS suffi — la spec de la langue le faisait déjà,
+       * et deux lectures-modifications-écritures entrelacées perdent toujours l'une des deux.
+       *
+       * 📍 ET LE GAIN DE TEMPS EST NUL, mesuré : ce projet tourne dans le lot `publics`, à 105 s,
+       * le plus court des huit, quand le chemin critique de la CI est le job des tests Nuxt à
+       * 7 min 56. Ce qui est gagné est la disparition d'un piège, pas des secondes.
        */
-      workers: 1,
       use: {
         ...devices['Desktop Chrome'],
         locale: 'fr-FR',
         storageState: authFile,
+      },
+    },
+    // La spec de la langue, sur SON compte — cf. `authFileLangue`.
+    {
+      name: 'authenticated-langue',
+      testMatch: /authenticated\/langue-du-profil\.spec\.ts/,
+      dependencies: ['setup-langue'],
+      use: {
+        ...devices['Desktop Chrome'],
+        locale: 'fr-FR',
+        storageState: authFileLangue,
       },
     },
     // Tests de gestion d'édition (dépend du data setup, séquentiel car état partagé)
@@ -144,4 +201,4 @@ export default defineConfig<ConfigOptions>({
   ],
 })
 
-export { authFile, credentialsFile, conventionStateFile }
+export { authFile, authFileLangue, credentialsFile, conventionStateFile }
