@@ -205,6 +205,26 @@
             {{ $t('gestion.ai_update.launch_search') }}
           </UButton>
 
+          <!--
+            Bouton d'annulation — constat O1.
+
+            ⚠️ IL N'EN EXISTAIT AUCUN : la seule façon d'arrêter était de quitter la page, et
+            cela n'arrêtait RIEN côté serveur. Fermer le flux, lui, fait abandonner la génération
+            — appels au modèle compris.
+
+            Affiché seulement pendant la génération : un bouton d'annulation permanent sur un
+            écran au repos fait hésiter sur ce qu'il annulerait.
+          -->
+          <UButton
+            v-if="generating"
+            color="neutral"
+            variant="subtle"
+            icon="i-heroicons-x-mark"
+            @click="annuler"
+          >
+            {{ $t('gestion.ai_update.cancel_search') }}
+          </UButton>
+
           <!-- Progression -->
           <AdminImportGenerationProgress
             v-if="generating || stepHistory.length > 0"
@@ -506,6 +526,7 @@ const {
   formatSubStepWrapper,
   isCurrentStep,
   generate,
+  annuler,
   availableProviders,
   selectedProvider,
   loadingProviders,

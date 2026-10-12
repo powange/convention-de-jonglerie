@@ -275,7 +275,16 @@ function getSystemPrompt(aiProvider: string, conventionConnue = false): string {
 async function callAgentLLM(
   config: any,
   systemPrompt: string,
-  conversationHistory: Array<{ role: string; content: string }>
+  conversationHistory: Array<{ role: string; content: string }>,
+  /**
+   * L'arrêt demandé par le client — constat O1.
+   *
+   * ⚠️ IL DOIT ÊTRE UN PARAMÈTRE : cette fonction est au niveau du module, hors de la portée du
+   * `signal` de `runAgentExploration`. L'y lire sans le passer ne compilerait pas — et c'est
+   * précisément ce qui fait qu'une annulation « branchée » ne l'est pas : le signal s'arrête à la
+   * première fonction qui ne le reçoit pas.
+   */
+  signal?: AbortSignal
 ): Promise<{
   action: 'fetch' | 'generate'
   url?: string
@@ -330,15 +339,18 @@ async function callAgentLLM(
       timeout: AI_TIMEOUTS.LLM_REQUEST,
     })
 
-    const message = await client.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 4096,
-      system: systemPrompt,
-      messages: conversationHistory.map((m) => ({
-        role: m.role as 'user' | 'assistant',
-        content: m.content,
-      })),
-    })
+    const message = await client.messages.create(
+      {
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages: conversationHistory.map((m) => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+        })),
+      },
+      { signal }
+    )
 
     responseText = message.content
       .filter((block) => block.type === 'text')
@@ -546,7 +558,9 @@ async function fetchAndExtractContent(
   maxPageContentSize: number,
   /** Service de navigateur sans interface, ou `null` s'il est indisponible. */
   browserlessUrl: string | null,
-  facebookData?: { event: FacebookScraperResult | null; prefilledJson: any | null }
+  facebookData?: { event: FacebookScraperResult | null; prefilledJson: any | null },
+  /** L'arrêt demandé par le client — même raison que pour `callAgentLLM`. */
+  signal?: AbortSignal
 ): Promise<{
   success: boolean
   content?: string
@@ -644,7 +658,7 @@ async function fetchAndExtractContent(
       // Fetch classique pour les autres URLs ou si les scrapers ont échoué
       const response = await fetchWithTimeout(
         url,
-        { headers: BROWSER_HEADERS },
+        { headers: BROWSER_HEADERS, signal },
         AI_TIMEOUTS.URL_FETCH
       )
 
@@ -704,6 +718,16 @@ export interface AgentExplorationOptions {
   detectServices?: boolean
   /** Vrai quand la convention d'accueil est déjà choisie : le modèle n'en produit pas le bloc. */
   conventionConnue?: boolean
+  /**
+   * L'arrêt demandé par l'appelant — constat O1.
+   *
+   * ⚠️ FERMER L'ONGLET N'ARRÊTAIT RIEN. Le flux SSE détectait bien la déconnexion, posait un
+   * drapeau et fermait le tuyau — mais aucun signal n'atteignait cette génération : elle
+   * continuait jusqu'au bout, appels au modèle compris, pour un résultat jeté. Une passe
+   * programme sur neuf journées est mesurée à 24 min 30 s ; un rechargement de page la laissait
+   * tourner en entier, occupant le modèle local ou facturant Anthropic.
+   */
+  signal?: AbortSignal
 }
 
 /**
@@ -720,7 +744,22 @@ export async function runAgentExploration(
     provider,
     detectServices = true,
     conventionConnue = false,
+    signal,
   } = options
+
+  /**
+   * Lève dès que l'appelant a demandé l'arrêt — constat O1.
+   *
+   * ⚠️ UN `throw` ET NON UN `return` : l'exploration enchaîne des tours dont chacun nourrit le
+   * suivant. Sortir par un retour laisserait les étapes suivantes travailler sur un historique
+   * tronqué et produire un résultat partiel qui ressemble à un succès. L'erreur remonte au flux
+   * SSE, qui n'envoie de toute façon plus rien à un client parti.
+   */
+  const exigerQueLArretNAitPasEteDemande = (etape: string): void => {
+    if (signal?.aborted) {
+      throw new Error(`Exploration interrompue par le client (étape : ${etape})`)
+    }
+  }
 
   // Helper pour envoyer les événements de progression (polling + SSE)
   const notifyStep = (
@@ -842,6 +881,7 @@ export async function runAgentExploration(
   const externalLinksToExplore: string[] = []
 
   for (let i = 0; i < urls.length; i++) {
+    exigerQueLArretNAitPasEteDemande(`page de départ ${i + 1}/${urls.length}`)
     const url = urls[i]
     // L'indice vient de la longueur du tableau : ce garde-fou ne se déclenche pas, il dit au
     // compilateur ce que la boucle garantit déjà.
@@ -863,7 +903,8 @@ export async function runAgentExploration(
       logs,
       maxPageContentSize,
       browserlessUrl,
-      facebookData
+      facebookData,
+      signal
     )
     if (result.success && result.content) {
       collectedContent.push(result.content)
@@ -924,6 +965,7 @@ export async function runAgentExploration(
     }
 
     for (let i = 0; i < externalLinksToExplore.length; i++) {
+      exigerQueLArretNAitPasEteDemande(`lien externe ${i + 1}/${externalLinksToExplore.length}`)
       const extUrl = externalLinksToExplore[i]
       if (!extUrl) continue
 
@@ -957,7 +999,8 @@ export async function runAgentExploration(
         logs,
         maxPageContentSize,
         browserlessUrl,
-        facebookData
+        facebookData,
+        signal
       )
 
       if (result.success && result.content) {
@@ -1046,6 +1089,11 @@ INSTRUCTIONS:
     consecutiveInvalidRequests < MAX_CONSECUTIVE_INVALID
   ) {
     iteration++
+    /*
+     * Un tour = un appel au modèle plus, souvent, le téléchargement d'une page. C'est la
+     * frontière la plus utile : on ne paie jamais plus d'un tour après le départ du client.
+     */
+    exigerQueLArretNAitPasEteDemande(`iteration ${iteration}`)
     const progressPercent = 40 + Math.round((iteration / maxAdditionalIterations) * 50) // Phase 2-3 = 40-90%
     if (taskId) {
       updateTaskStatus(taskId, 'processing', progressPercent)
@@ -1063,7 +1111,7 @@ INSTRUCTIONS:
 
     // Appeler le LLM
     const systemPrompt = getSystemPrompt(configToUse.aiProvider || 'lmstudio', conventionConnue)
-    const agentResponse = await callAgentLLM(configToUse, systemPrompt, conversationHistory)
+    const agentResponse = await callAgentLLM(configToUse, systemPrompt, conversationHistory, signal)
 
     /**
      * Le verdict porte sur la page lue au tour PRÉCÉDENT : c'est celle que le modèle vient de
@@ -1129,7 +1177,8 @@ INSTRUCTIONS:
         visitedUrls,
         logs,
         maxPageContentSize,
-        browserlessUrl
+        browserlessUrl,
+        signal
       )
 
       if (result.success && result.content) {
@@ -1240,7 +1289,12 @@ Complète les champs vides avec les informations des sources. Réponds UNIQUEMEN
       content: forcePrompt,
     })
 
-    const finalResponse = await callAgentLLM(configToUse, systemPromptToUse, conversationHistory)
+    const finalResponse = await callAgentLLM(
+      configToUse,
+      systemPromptToUse,
+      conversationHistory,
+      signal
+    )
     console.log('[AGENT] Réponse au forçage:', finalResponse)
 
     if (finalResponse.json) {

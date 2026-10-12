@@ -200,10 +200,24 @@ export async function fetchWithTimeout(
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), timeout)
 
+  /*
+   * ⚠️ LE SIGNAL DE L'APPELANT EST RESPECTÉ, et il était SILENCIEUSEMENT ÉCRASÉ — constat O1 de
+   * l'import IA. `signal: controller.signal` remplaçait purement et simplement celui que
+   * l'appelant avait mis dans `options` : passer un `AbortSignal` ici n'avait aucun effet, sans
+   * le moindre avertissement. C'est le genre de défaut qui fait croire une annulation branchée
+   * alors qu'elle ne l'est pas.
+   *
+   * `AbortSignal.any` combine les deux : la requête s'arrête à l'expiration OU à l'annulation,
+   * selon ce qui vient d'abord. Node le fournit depuis la version 20.
+   */
+  const signal = options.signal
+    ? AbortSignal.any([controller.signal, options.signal])
+    : controller.signal
+
   try {
     const response = await fetch(url, {
       ...options,
-      signal: controller.signal,
+      signal,
     })
     return response
   } finally {
