@@ -5,6 +5,8 @@
     "closed_notice": "Опрос закрыт. Вы можете просмотреть результаты, но больше не можете голосовать.",
     "duration_minutes": "{duration} мин",
     "edition_info": "{conventionName} — {editionName}",
+    "load_error": "[TODO] Impossible de charger le sondage",
+    "load_error_description": "[TODO] Le sondage n'a pas pu être récupéré. Votre lien reste valide : il n'y a qu'à réessayer.",
     "manage": {
       "close_survey": "Закрыть опрос",
       "copy_link": "Копировать ссылку",
