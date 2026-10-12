@@ -216,6 +216,8 @@
     "about_this_edition": "Om denne udgave",
     "add_comment_placeholder": "Tilføj en kommentar...",
     "add_lost_item": "Tilføj hittegods",
+    "all_items_returned": "[TODO] Tous les objets ont été restitués",
+    "all_items_returned_description": "[TODO] Tous les objets signalés pour cette édition ont retrouvé leur propriétaire. Utilisez « Afficher les objets restitués » pour les revoir.",
     "artist_space": "Mit kunstnerområde",
     "artists": {
       "title": "Kunstnere"

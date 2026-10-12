@@ -216,6 +216,8 @@
     "about_this_edition": "Про це видання",
     "add_comment_placeholder": "Додати коментар...",
     "add_lost_item": "Додати загублений предмет",
+    "all_items_returned": "[TODO] Tous les objets ont été restitués",
+    "all_items_returned_description": "[TODO] Tous les objets signalés pour cette édition ont retrouvé leur propriétaire. Utilisez « Afficher les objets restitués » pour les revoir.",
     "artist_space": "Мій простір артиста",
     "artists": {
       "title": "Артисти"

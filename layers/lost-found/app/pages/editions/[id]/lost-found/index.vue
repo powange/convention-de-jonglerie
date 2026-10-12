@@ -170,22 +170,34 @@
         v-else
         class="py-24 min-h-[320px] flex flex-col items-center justify-center text-center gap-4"
       >
-        <UIcon name="i-heroicons-magnifying-glass" class="w-14 h-14 text-gray-400" />
-        <div>
+        <UIcon
+          :name="tousRestitues ? 'i-heroicons-check-circle' : 'i-heroicons-magnifying-glass'"
+          class="w-14 h-14 text-gray-400"
+        />
+        <div :data-etat-vide="etatVide">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ $t('edition.no_lost_items') }}
+            {{ tousRestitues ? $t('edition.all_items_returned') : $t('edition.no_lost_items') }}
           </h3>
+          <!-- ⚠️ LA BRANCHE QUI MANQUAIT — constat F3.
+               Ce ternaire avait DEUX BRANCHES IDENTIQUES : `no_items_reported` des deux côtés.
+               Quelqu'un avait donc voulu distinguer les deux cas, et ne l'avait pas fait. Les
+               objets restitués étant masqués par défaut, une édition dont TOUT a été rendu
+               affichait « Aucun objet n'a été signalé pour cette édition » — alors que la liste
+               en contient, et que le bouton pour les montrer est juste au-dessus. -->
           <p class="text-gray-500 max-w-prose">
             {{
               !hasEditionStarted
                 ? t('edition.items_appear_when_started')
-                : lostFoundItems.length > 0
-                  ? t('edition.no_items_reported')
+                : tousRestitues
+                  ? t('edition.all_items_returned_description')
                   : t('edition.no_items_reported')
             }}
           </p>
         </div>
-        <!-- Bouton 'Afficher les objets restitués' supprimé selon demande -->
+        <!-- 📍 PAS DE BOUTON ICI, et c'est délibéré. Il en existait un, retiré sur demande — le
+             commentaire qui l'actait vivait à cet endroit. Et il serait de toute façon le DOUBLON
+             de « Afficher les objets restitués », qui s'affiche quelques lignes plus haut dès
+             qu'il y a un objet restitué : c'est-à-dire exactement dans ce cas-ci. -->
       </div>
 
       <!-- Modal d'ajout d'objet trouvé -->
@@ -360,6 +372,13 @@ const { execute: fetchLostFoundItems, loading } = useApiAction(
 
 // Filtrage des items (masquer les RETURNED par défaut)
 const hasReturnedItems = computed(() => lostFoundItems.value.some((i) => i.status === 'RETURNED'))
+/**
+ * Lequel des deux vides on regarde — la règle elle-même vit dans `etat-vide-des-objets.ts`,
+ * fonction pure testée hors Nuxt. Voir son commentaire pour le pourquoi.
+ */
+const etatVide = computed(() => etatVideDesObjets(lostFoundItems.value, showReturned.value))
+const tousRestitues = computed(() => etatVide.value === 'tout-restitue')
+
 const filteredItems = computed(() => {
   if (showReturned.value) return lostFoundItems.value
   return lostFoundItems.value.filter((i) => i.status !== 'RETURNED')
