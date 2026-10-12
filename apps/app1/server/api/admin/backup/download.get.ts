@@ -1,4 +1,5 @@
-import { readFile } from 'fs/promises'
+import { createReadStream } from 'fs'
+import { stat } from 'fs/promises'
 import path from 'path'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
@@ -23,17 +24,35 @@ export default wrapApiHandler(
     const backupPath = path.join(process.cwd(), 'backups', safeFilename)
 
     try {
-      const fileContent = await readFile(backupPath)
+      /*
+       * ⚠️ L'ARCHIVE PART EN FLUX, et ne passe plus par la mémoire — constat O2.
+       *
+       * `readFile` chargeait le fichier ENTIER dans un Buffer avant de le rendre. Le point d'API
+       * d'envoi voisin explique lui-même qu'« une archive complète pèse couramment plusieurs
+       * centaines de Mo » — et c'est pour cela qu'il a été réécrit en flux. Le téléchargement,
+       * son symétrique, ne l'avait pas été : deux administrateurs qui téléchargent en même temps
+       * doublaient l'empreinte, et une archive de 500 Mo demandait 500 Mo de tas.
+       *
+       * `stat` avant d'ouvrir : c'est lui qui donne le `Content-Length` — sans quoi le navigateur
+       * n'affiche aucune progression, ce que le Buffer fournissait gratuitement. Et il sert de
+       * contrôle d'existence, donc le 404 continue de se déclencher avant l'ouverture du flux.
+       */
+      const infos = await stat(backupPath)
 
       // Définir le Content-Type selon le type de fichier
       const contentType = filename.endsWith('.tar.gz') ? 'application/gzip' : 'application/sql'
 
-      // Définir les en-têtes pour le téléchargement
+      /*
+       * ⚠️ `safeFilename` ET NON `filename` dans l'en-tête — second point du constat. Le nom
+       * reçu y était recopié brut : un `"` ou un saut de ligne dans le paramètre permettait d'y
+       * injecter ce qu'on voulait, alors que la version assainie existait déjà deux lignes plus
+       * haut pour construire le chemin.
+       */
       setHeader(event, 'Content-Type', contentType)
-      setHeader(event, 'Content-Disposition', `attachment; filename="${filename}"`)
-      setHeader(event, 'Content-Length', fileContent.length)
+      setHeader(event, 'Content-Disposition', `attachment; filename="${safeFilename}"`)
+      setHeader(event, 'Content-Length', infos.size)
 
-      return fileContent
+      return sendStream(event, createReadStream(backupPath))
     } catch (fileError: any) {
       if (fileError.code === 'ENOENT') {
         throw createError({
