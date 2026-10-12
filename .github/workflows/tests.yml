@@ -883,6 +883,16 @@ jobs:
       # ⚠️ Cela ne RÉDUIT pas l'attente d'un lot coincé — ce n'est pas l'objet. Le coût vient de
       # `playwright.config.ts` : `workers: 1`, `timeout: 120000` par test et `retries: 2` en CI
       # font qu'un seul test en délai dépassé coûte six minutes.
+      # Ce que le runner a sous le capot, dit PAR LE RUNNER — constat CI·5. Deux décisions en
+      # dépendent et ont été prises sans ce chiffre jusqu'ici : le nombre de travailleurs
+      # Playwright (`workers: '50%'`) et l'éventuel passage de MySQL en tmpfs (CI·6), qui prendrait
+      # sur cette mémoire. Trois lignes de journal, lisibles sur chaque run plutôt que supposées.
+      - name: Ressources du runner
+        run: |
+          echo "cœurs logiques : $(nproc)"
+          free -m | awk 'NR<=2 {print}'
+          df -h / | tail -1
+
       - name: Run Playwright tests
         run: |
           fichiers=()
