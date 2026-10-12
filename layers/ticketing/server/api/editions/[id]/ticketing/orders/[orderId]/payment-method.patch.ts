@@ -57,6 +57,35 @@ export default wrapApiHandler(
         })
       }
 
+      /*
+       * ⚠️ UNE COMMANDE IMPORTÉE N'EST PAS MODIFIABLE ICI — constat D8.
+       *
+       * La synchronisation réécrit `paymentMethod: 'card'` à CHAQUE passage : une correction
+       * posée ici serait silencieusement effacée au prochain import, en laissant au passage un
+       * `checkNumber` orphelin. Le point d'API acceptait pourtant la requête, et répondait
+       * « Méthode de paiement mise à jour avec succès ».
+       *
+       * 📍 L'ÉCRAN, LUI, NE L'OFFRAIT DÉJÀ PAS : le menu d'actions de la liste des commandes est
+       * gardé par `!order.externalTicketing`, et la pastille cliquable n'apparaît que si le
+       * moyen de paiement est VIDE — ce que la synchronisation ne laisse jamais. Cette garde ne
+       * retire donc rien à personne : elle aligne le serveur sur ce que l'interface promet, pour
+       * qu'une requête fabriquée à la main ne puisse pas écrire un état qui ne survivra pas.
+       *
+       * Mesuré sur la base de développement : 600 commandes importées, 600 en `card`, zéro
+       * numéro de chèque. Aucune n'a jamais été corrigée.
+       *
+       * 409 et non 403 : ce n'est pas une question de droits — la même personne peut corriger
+       * une commande de guichet — mais un conflit avec la source qui fait foi.
+       */
+      if (order.externalTicketingId !== null) {
+        throw createError({
+          status: 409,
+          message:
+            'Le moyen de paiement d’une commande importée est celui de la billetterie externe : ' +
+            'il serait écrasé à la prochaine synchronisation',
+        })
+      }
+
       // Mettre à jour la méthode de paiement
       await prisma.ticketingOrder.update({
         where: { id: orderId },
