@@ -14,14 +14,33 @@
   <div class="space-y-6">
     <!-- Affichage pour un billet -->
     <div v-if="isTicket && participant && 'ticket' in participant" class="space-y-6">
-      <!-- Alerte pour les commandes annulées -->
+      <!--
+        Alerte pour les commandes annulées — constat D3.
+
+        ⚠️ LA PHRASE ÉTAIT AU PRÉSENT ET CONTREDISAIT LES DEUX LIGNES QU'ELLE SURPLOMBE. Elle
+        annonçait « Les billets ne peuvent pas être validés » au-dessus d'un « Entrée déjà
+        validée » et d'un « Statut du billet : Valide » en vert.
+
+        📊 Et ce n'est pas un cas de bord : c'est le cas RÉEL, mesuré. Dans ce système, annuler
+        est un geste de comptabilité d'après-coup — les deux commandes remboursées de la base
+        l'ont été TROIS JOURS après la fin de leur édition, et leurs billets avaient été validés
+        pendant l'événement, légitimement. La personne est venue, elle a été remboursée ensuite.
+
+        Le texte dépend donc de ce qui s'est passé : rien n'a été validé → les billets ne
+        pourront pas l'être ; une entrée l'a été → on le dit, et on dit que plus aucune ne le
+        sera.
+      -->
       <UAlert
         v-if="isRefunded"
         icon="i-heroicons-exclamation-triangle"
         color="error"
         variant="soft"
         :title="$t('ticketing.orders.order_canceled')"
-        :description="$t('ticketing.participant.canceled_order_description')"
+        :description="
+          auMoinsUneEntreeValidee
+            ? $t('ticketing.participant.canceled_order_after_entry_description')
+            : $t('ticketing.participant.canceled_order_description')
+        "
       />
 
       <!--
@@ -1387,6 +1406,20 @@ const participantItems = computed(() => {
     ) || []
   )
 })
+
+/**
+ * Au moins une entrée de cette commande a-t-elle déjà été validée ? — constat D3.
+ *
+ * Sert au seul libellé de l'alerte d'annulation : une commande remboursée APRÈS l'événement
+ * porte des billets légitimement validés, et lui annoncer qu'ils « ne peuvent pas être validés »
+ * contredit ce que la fiche affiche juste en dessous.
+ *
+ * 📍 Sur `participantItems` et non sur toutes les lignes : un don ou une adhésion ne se valide
+ * pas, et n'a donc rien à dire sur une entrée.
+ */
+const auMoinsUneEntreeValidee = computed(() =>
+  participantItems.value.some((item) => item.entryValidated)
+)
 
 const donationItems = computed(() => {
   if (!props.participant || !('ticket' in props.participant)) return []

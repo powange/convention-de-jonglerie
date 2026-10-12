@@ -449,7 +449,8 @@
         "with_info": "Avec informations"
       },
       "artist_guest": "Artiste invité",
-      "canceled_order_description": "Cette commande a été annulée. Les billets ne peuvent pas être validés.",
+      "canceled_order_after_entry_description": "Cette commande a été annulée après le passage à l'entrée. Les entrées déjà validées le restent ; plus aucun billet de cette commande ne peut être validé.",
+      "canceled_order_description": "Cette commande a été annulée. Les billets ne peuvent plus être validés.",
       "confirm_payment_title": "Confirmer le paiement",
       "entry_validated": "Entrée déjà validée",
       "first_name": "Prénom",
