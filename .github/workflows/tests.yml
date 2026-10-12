@@ -701,7 +701,15 @@ jobs:
           - { cle: gestion-2b, projet: edition-management }
           - { cle: gestion-3a, projet: edition-management }
           - { cle: gestion-3b, projet: edition-management }
-          - { cle: publics, projet: public, args: --project=authenticated }
+          # ⚠️ TROIS PROJETS DANS CE LOT, et le troisième n'est pas décoratif : la spec de la
+          # langue du profil a son propre compte depuis le constat CI·4, donc son propre projet.
+          # L'oublier ici la ferait disparaître de la CI SANS QU'AUCUN TEST N'ÉCHOUE — elle ne
+          # serait simplement plus jouée.
+          - {
+              cle: publics,
+              projet: public,
+              args: --project=authenticated --project=authenticated-langue,
+            }
 
     # Ces trois variables n'existaient que dans playwright.yml et restent portées par ce seul job :
     # au niveau workflow elles toucheraient lint, typecheck, build et test, qui n'en ont que faire.
