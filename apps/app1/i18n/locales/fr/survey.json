@@ -5,6 +5,8 @@
     "closed_notice": "Le sondage est fermé. Vous pouvez consulter les résultats mais ne pouvez plus voter.",
     "duration_minutes": "{duration} min",
     "edition_info": "{conventionName} — {editionName}",
+    "load_error": "Impossible de charger le sondage",
+    "load_error_description": "Le sondage n'a pas pu être récupéré. Votre lien reste valide : il n'y a qu'à réessayer.",
     "no_applications": "Aucune candidature en attente",
     "no_applications_description": "Il n'y a pas de candidature à évaluer pour le moment.",
     "not_found": "Sondage non trouvé",

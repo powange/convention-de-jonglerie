@@ -5,6 +5,8 @@
     "closed_notice": "The survey is closed. You can view the results but can no longer vote.",
     "duration_minutes": "{duration} min",
     "edition_info": "{conventionName} — {editionName}",
+    "load_error": "[TODO] Impossible de charger le sondage",
+    "load_error_description": "[TODO] Le sondage n'a pas pu être récupéré. Votre lien reste valide : il n'y a qu'à réessayer.",
     "manage": {
       "close_survey": "Close survey",
       "copy_link": "Copy link",

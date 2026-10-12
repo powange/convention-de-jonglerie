@@ -1,12 +1,13 @@
 <template>
   <div class="max-w-3xl mx-auto px-4 py-8">
     <!-- Loading -->
-    <div v-if="loading" class="py-16 text-center">
+    <div v-if="loading" data-etat="chargement" class="py-16 text-center">
       <p class="text-gray-500">{{ $t('common.loading') }}</p>
     </div>
 
-    <!-- Not found -->
-    <div v-else-if="error" class="py-16 text-center">
+    <!-- Le lien lui-même est en cause : 404. C'est le SEUL cas où demander un nouveau lien a
+         un sens — et c'est précisément pourquoi il ne doit pas servir de message à tout. -->
+    <div v-else-if="echec === 'introuvable'" data-etat="lien-invalide" class="py-16 text-center">
       <UIcon name="i-heroicons-exclamation-triangle" class="size-16 text-gray-400 mx-auto mb-4" />
       <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
         {{ $t('survey.not_found') }}
@@ -14,8 +15,29 @@
       <p class="text-gray-500">{{ $t('survey.not_found_description') }}</p>
     </div>
 
+    <!-- Tout le reste : panne, coupure, 500. Le lien est bon ; il n'y a qu'à réessayer.
+         ⚠️ Sans cette distinction, un votant lisait « lien invalide ou expiré » et allait en
+         réclamer un nouveau à l'organisateur — qui le régénérait, INVALIDANT celui de tous les
+         autres votants (`token.post.ts`). Une panne passagère coûtait le lien de tout le jury. -->
+    <div v-else-if="echec === 'panne'" data-etat="panne" class="py-16 text-center">
+      <UIcon name="i-heroicons-cloud-arrow-down" class="size-16 text-gray-400 mx-auto mb-4" />
+      <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+        {{ $t('survey.load_error') }}
+      </h2>
+      <p class="text-gray-500 mb-4">{{ $t('survey.load_error_description') }}</p>
+      <UButton
+        color="neutral"
+        variant="outline"
+        data-action="reessayer"
+        :loading="loading"
+        @click="fetchSurvey"
+      >
+        {{ $t('common.retry') }}
+      </UButton>
+    </div>
+
     <!-- Survey content -->
-    <div v-else-if="surveyData">
+    <div v-else-if="surveyData" data-etat="sondage">
       <!-- Header -->
       <div class="mb-8">
         <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">
@@ -145,7 +167,22 @@ const token = route.params.token as string
 
 // State
 const loading = ref(true)
-const error = ref(false)
+/*
+ * POURQUOI L'ÉCHEC N'EST PLUS UN BOOLÉEN — constat F2.
+ *
+ * `error = true` pour n'importe quelle exception, et un seul état d'erreur à l'écran : « Ce lien
+ * de sondage est invalide ou a expiré ». Un votant dont la session venait d'expirer, une coupure
+ * réseau ou un 500 lisaient donc qu'ils avaient un MAUVAIS LIEN.
+ *
+ * ⚠️⚠️ ET CE MESSAGE COÛTAIT LE LIEN DE TOUT LE JURY. Le votant allait réclamer un nouveau lien à
+ * l'organisateur, qui le régénérait — ce qui invalide celui de tous les autres votants
+ * (`server/api/.../token.post.ts`). Une panne passagère se soldait par une invalidation
+ * collective, et personne ne pouvait faire le lien entre les deux.
+ *
+ * Trois sorties désormais : `introuvable` (404, le lien est bien en cause), `panne` (le reste, on
+ * réessaie), et pour un 401 aucune des deux — on ramène à la connexion avec retour sur la page.
+ */
+const echec = ref<'introuvable' | 'panne' | null>(null)
 const surveyData = ref<SurveyData | null>(null)
 const myVotes = ref<Record<number, number>>({})
 const resultsMap = ref<Map<number, { avgScore: number | null; voteCount: number }>>(new Map())
@@ -160,9 +197,11 @@ useHead({
 })
 
 // Fetch survey data
+const { buildLoginUrl } = useReturnTo()
+
 const fetchSurvey = async () => {
   loading.value = true
-  error.value = false
+  echec.value = null
   try {
     const data = await $fetch(`/api/survey/${token}`)
     surveyData.value = data
@@ -176,8 +215,21 @@ const fetchSurvey = async () => {
       }
       resultsMap.value = map
     }
-  } catch {
-    error.value = true
+  } catch (e: unknown) {
+    const code =
+      (e as { statusCode?: number; status?: number })?.statusCode ??
+      (e as { status?: number })?.status
+    if (code === 401) {
+      // La session a expiré pendant que la page restait ouverte — le cas le plus fréquent ici,
+      // un sondage se lisant longuement. Le middleware `auth-protected` ne l'a pas vu : il
+      // s'exécute à la navigation, pas pendant la vie de la page.
+      //
+      // 📍 On ne pose PAS d'état d'erreur avant de partir : l'écran afficherait un message
+      // d'échec le temps de la redirection, sur une page qu'on quitte.
+      await navigateTo(buildLoginUrl(route.fullPath))
+      return
+    }
+    echec.value = code === 404 ? 'introuvable' : 'panne'
   } finally {
     loading.value = false
   }
