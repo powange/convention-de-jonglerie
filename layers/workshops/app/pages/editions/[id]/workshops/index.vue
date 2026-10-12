@@ -159,7 +159,9 @@
                 </p>
                 <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                   <UiUserAvatar :user="workshop.creator" size="sm" />
-                  <span>Proposé par {{ workshop.creator.pseudo }}</span>
+                  <span>{{
+                    $t('workshops.proposed_by', { pseudo: workshop.creator.pseudo })
+                  }}</span>
                 </div>
               </div>
             </UCard>
@@ -199,13 +201,13 @@
           </div>
           <div>
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ editingWorkshop ? 'Modifier le workshop' : 'Ajouter un workshop' }}
+              {{ editingWorkshop ? $t('workshops.edit_workshop') : $t('workshops.add_workshop') }}
             </h3>
             <p class="text-sm text-gray-500 dark:text-gray-400">
               {{
                 editingWorkshop
-                  ? 'Modifiez les informations du workshop'
-                  : 'Créez un nouveau workshop pour les participants'
+                  ? $t('workshops.edit_workshop_description')
+                  : $t('workshops.add_workshop_description')
               }}
             </p>
           </div>
@@ -215,10 +217,10 @@
       <template #body>
         <div class="space-y-6">
           <!-- Titre -->
-          <UFormField label="Titre" required class="w-full">
+          <UFormField :label="$t('workshops.workshop_title')" required class="w-full">
             <UInput
               v-model="formData.title"
-              placeholder="Nom du workshop"
+              :placeholder="$t('workshops.title_name_placeholder')"
               icon="i-heroicons-academic-cap"
               class="w-full"
               autofocus
@@ -226,10 +228,10 @@
           </UFormField>
 
           <!-- Description -->
-          <UFormField label="Description" class="w-full">
+          <UFormField :label="$t('workshops.workshop_description')" class="w-full">
             <UTextarea
               v-model="formData.description"
-              placeholder="Décrivez le workshop, son contenu et ce que les participants vont apprendre..."
+              :placeholder="$t('workshops.description_long_placeholder')"
               :rows="4"
               resize
               class="w-full"
@@ -262,7 +264,7 @@
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-clock" class="w-4 h-4 text-green-600" />
                 <h4 class="text-sm font-medium text-green-800 dark:text-green-200">
-                  Horaires du workshop
+                  {{ $t('workshops.schedule_title') }}
                 </h4>
               </div>
               <div
@@ -280,8 +282,12 @@
             >
               <UIcon name="i-heroicons-information-circle" class="w-3.5 h-3.5" />
               <span>
-                Période de l'édition : {{ formatDate(edition.startDate) }} -
-                {{ formatDate(edition.endDate) }}
+                {{
+                  $t('workshops.edition_period', {
+                    start: formatDate(edition.startDate),
+                    end: formatDate(edition.endDate),
+                  })
+                }}
               </span>
             </div>
 
@@ -310,7 +316,9 @@
 
             <!-- Raccourcis durée -->
             <div class="flex flex-wrap gap-2">
-              <span class="text-xs text-gray-500 dark:text-gray-400 mr-2">Durée rapide :</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400 mr-2">{{
+                $t('workshops.quick_duration')
+              }}</span>
               <UButton
                 v-for="duration in quickDurations"
                 :key="duration.label"
@@ -343,19 +351,19 @@
             <div class="flex items-center gap-2 mb-3">
               <UIcon name="i-heroicons-users" class="w-4 h-4 text-purple-600" />
               <h4 class="text-sm font-medium text-purple-800 dark:text-purple-200">
-                Nombre de participants
+                {{ $t('workshops.participants_title') }}
               </h4>
             </div>
 
             <!-- Nombre de participants -->
-            <UFormField label="Maximum de participants (optionnel)">
+            <UFormField :label="$t('workshops.max_participants_optional')">
               <div class="flex items-center gap-3">
                 <UInput
                   v-model.number="formData.maxParticipants"
                   type="number"
                   min="1"
                   max="9999"
-                  placeholder="Illimité"
+                  :placeholder="$t('workshops.unlimited')"
                   icon="i-heroicons-users"
                   class="w-32"
                 />
@@ -377,7 +385,7 @@
               <template #hint>
                 <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                   <UIcon name="i-heroicons-information-circle" class="w-3 h-3" />
-                  <span>Laisser vide pour autoriser un nombre illimité de participants</span>
+                  <span>{{ $t('workshops.max_participants_hint') }}</span>
                 </div>
               </template>
             </UFormField>
@@ -386,9 +394,11 @@
       </template>
       <template #footer>
         <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="closeModal"> Annuler </UButton>
+          <UButton variant="ghost" @click="closeModal">
+            {{ $t('common.cancel') }}
+          </UButton>
           <UButton color="primary" :loading="saving" :disabled="!isFormValid" @click="saveWorkshop">
-            {{ editingWorkshop ? 'Modifier' : 'Ajouter' }}
+            {{ editingWorkshop ? $t('common.edit') : $t('common.add') }}
           </UButton>
         </div>
       </template>
@@ -416,7 +426,7 @@ const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
-const { t: $t } = useI18n()
+const { t: $t, locale } = useI18n()
 const confirmation = useConfirmation()
 
 const editionId = parseInt(route.params.id as string)
@@ -557,11 +567,15 @@ const dateValidationError = computed(() => {
   const editionEnd = new Date(edition.value.endDate)
 
   if (workshopStart < editionStart) {
-    return `Le workshop ne peut pas commencer avant le début de l'édition (${formatDate(edition.value.startDate)})`
+    return $t('workshops.error_start_before_edition', {
+      date: formatDate(edition.value.startDate),
+    })
   }
 
   if (workshopStart > editionEnd) {
-    return `Le workshop ne peut pas commencer après la fin de l'édition (${formatDate(edition.value.endDate)})`
+    return $t('workshops.error_start_after_edition', {
+      date: formatDate(edition.value.endDate),
+    })
   }
 
   // Sans heure de fin annoncée, il n'y a rien de plus à vérifier.
@@ -570,11 +584,13 @@ const dateValidationError = computed(() => {
   const workshopEnd = new Date(versInstant(formData.value.endDateTime, fuseau.value))
 
   if (workshopEnd <= workshopStart) {
-    return 'La date de fin doit être après la date de début'
+    return $t('workshops.error_end_before_start')
   }
 
   if (workshopEnd > editionEnd) {
-    return `Le workshop ne peut pas finir après la fin de l'édition (${formatDate(edition.value.endDate)})`
+    return $t('workshops.error_end_after_edition', {
+      date: formatDate(edition.value.endDate),
+    })
   }
 
   return null
@@ -627,16 +643,18 @@ const calculatedDuration = computed(() => {
 
   if (diffHours < 1) {
     const diffMinutes = Math.round(diffMs / (1000 * 60))
-    return `${diffMinutes} min`
+    return $t('workshops.duration_minutes', { count: diffMinutes })
   } else if (diffHours === 1) {
-    return '1 heure'
+    return $t('workshops.duration_hours', { count: 1 })
   } else if (diffHours < 24) {
     const hours = Math.floor(diffHours)
     const minutes = Math.round((diffHours - hours) * 60)
-    return minutes > 0 ? `${hours}h${minutes}` : `${hours} heures`
+    return minutes > 0
+      ? $t('workshops.duration_hours_minutes', { hours, minutes })
+      : $t('workshops.duration_hours', { count: hours })
   } else {
     const days = Math.floor(diffHours / 24)
-    return `${days} jour${days > 1 ? 's' : ''}`
+    return $t('workshops.duration_days', { count: days })
   }
 })
 
@@ -703,9 +721,9 @@ const workshopsByDay = computed(() => {
 
 // Reçoit aussi bien une journée de la frise (`2026-08-01`) que les bornes de l'édition, qui sont
 // des instants : `formaterJournee` distingue les deux plutôt que de dater la première en UTC.
-const formatDate = (dateStr: string) => formaterJournee(dateStr, fuseau.value, 'fr-FR')
+const formatDate = (dateStr: string) => formaterJournee(dateStr, fuseau.value, locale.value)
 
-const formatTime = (dateTimeStr: string) => formaterHeure(dateTimeStr, fuseau.value, 'fr-FR')
+const formatTime = (dateTimeStr: string) => formaterHeure(dateTimeStr, fuseau.value, locale.value)
 
 /**
  * « sam. 26/09 » — le jour porté par la fiche elle-même.
@@ -714,7 +732,7 @@ const formatTime = (dateTimeStr: string) => formaterHeure(dateTimeStr, fuseau.va
  * favoris, une fiche n'annonçait plus que son horaire, sans dire quel jour.
  */
 const formatJourCourt = (dateTimeStr: string) =>
-  formaterJournee(dateTimeStr, fuseau.value, 'fr-FR', {
+  formaterJournee(dateTimeStr, fuseau.value, locale.value, {
     weekday: 'short',
     day: '2-digit',
     month: '2-digit',
@@ -724,7 +742,7 @@ const { execute: fetchWorkshops, loading } = useApiAction(
   () => `/api/editions/${editionId}/workshops`,
   {
     method: 'GET',
-    errorMessages: { default: 'Erreur lors du chargement des workshops' },
+    errorMessages: { default: $t('workshops.error_loading_workshops') },
     onSuccess: (response: any) => {
       workshops.value = response as any[]
     },
@@ -833,8 +851,8 @@ const { execute: executeCreateWorkshop, loading: isCreating } = useApiAction(
   {
     method: 'POST',
     body: buildWorkshopBody,
-    successMessage: { title: 'Workshop ajouté avec succès' },
-    errorMessages: { default: 'Erreur lors de la sauvegarde' },
+    successMessage: { title: $t('workshops.workshop_added') },
+    errorMessages: { default: $t('workshops.error_saving') },
     onSuccess: onWorkshopSaved,
   }
 )
@@ -845,8 +863,8 @@ const { execute: executeUpdateWorkshop, loading: isUpdating } = useApiAction(
   {
     method: 'PUT',
     body: buildWorkshopBody,
-    successMessage: { title: 'Workshop modifié avec succès' },
-    errorMessages: { default: 'Erreur lors de la sauvegarde' },
+    successMessage: { title: $t('workshops.workshop_updated') },
+    errorMessages: { default: $t('workshops.error_saving') },
     onSuccess: onWorkshopSaved,
   }
 )
@@ -866,8 +884,8 @@ const { execute: executeDeleteWorkshop } = useApiActionById(
   (id) => `/api/editions/${editionId}/workshops/${id}`,
   {
     method: 'DELETE',
-    successMessage: { title: 'Workshop supprimé avec succès' },
-    errorMessages: { default: 'Erreur lors de la suppression' },
+    successMessage: { title: $t('workshops.workshop_deleted') },
+    errorMessages: { default: $t('workshops.error_deleting') },
     refreshOnSuccess: () => fetchWorkshops(),
   }
 )
