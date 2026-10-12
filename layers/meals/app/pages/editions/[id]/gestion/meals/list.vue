@@ -796,7 +796,7 @@ const cateringDateOptions = computed(() => {
     ) {
       const dateValue = currentDate.toISOString().split('T')[0]
       options.push({
-        label: `${formatDate(currentDate)} (Montage)`,
+        label: `${formatDate(currentDate)} (${t('gestion.meals.phase_setup')})`,
         value: dateValue,
       })
       currentDate.setDate(currentDate.getDate() + 1)
@@ -808,7 +808,7 @@ const cateringDateOptions = computed(() => {
   while (currentEventDate.toISOString().split('T')[0] <= endDate.toISOString().split('T')[0]) {
     const dateValue = currentEventDate.toISOString().split('T')[0]
     options.push({
-      label: `${formatDate(currentEventDate)} (Événement)`,
+      label: `${formatDate(currentEventDate)} (${t('gestion.meals.phase_event')})`,
       value: dateValue,
     })
     currentEventDate.setDate(currentEventDate.getDate() + 1)
@@ -827,7 +827,7 @@ const cateringDateOptions = computed(() => {
     ) {
       const dateValue = currentDate.toISOString().split('T')[0]
       options.push({
-        label: `${formatDate(currentDate)} (Démontage)`,
+        label: `${formatDate(currentDate)} (${t('gestion.meals.phase_teardown')})`,
         value: dateValue,
       })
       currentDate.setDate(currentDate.getDate() + 1)

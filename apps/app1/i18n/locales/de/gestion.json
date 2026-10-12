@@ -260,9 +260,13 @@
         "organizer": "Organisator"
       },
       "phase": "Phase",
+      "phase_event": "[TODO] Événement",
+      "phase_setup": "[TODO] Montage",
+      "phase_teardown": "[TODO] Démontage",
       "plates_set_aside": "{count} Teller zurückgestellt | {count} Teller zurückgestellt",
       "previous_day": "Vorheriger Tag",
       "progress": "Fortschritt",
+      "remaining_count": "[TODO] {count} restant | {count} restants",
       "saved_description": "Die Mahlzeit wurde mit den Helfern und Künstlern abgeglichen",
       "saved_title": "Gespeichert",
       "search_person": "Person suchen",

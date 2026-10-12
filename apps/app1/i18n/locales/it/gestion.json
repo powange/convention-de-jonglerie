@@ -260,9 +260,13 @@
         "organizer": "Organizzatore"
       },
       "phase": "Fase",
+      "phase_event": "[TODO] Événement",
+      "phase_setup": "[TODO] Montage",
+      "phase_teardown": "[TODO] Démontage",
       "plates_set_aside": "{count} piatto messo da parte | {count} piatti messi da parte",
       "previous_day": "Giorno precedente",
       "progress": "Avanzamento",
+      "remaining_count": "[TODO] {count} restant | {count} restants",
       "saved_description": "Il pasto è stato sincronizzato con i volontari e gli artisti",
       "saved_title": "Salvato",
       "search_person": "Cerca una persona",

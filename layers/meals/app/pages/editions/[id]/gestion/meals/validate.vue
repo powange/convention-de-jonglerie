@@ -166,15 +166,11 @@
                     class="text-xs text-primary-600 dark:text-primary-400 mt-1 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity"
                   >
                     {{
-                      mealStats.breakdown.volunteers.total -
-                      mealStats.breakdown.volunteers.validated
-                    }}
-                    restant{{
-                      mealStats.breakdown.volunteers.total -
-                        mealStats.breakdown.volunteers.validated >
-                      1
-                        ? 's'
-                        : ''
+                      $t('gestion.meals.remaining_count', {
+                        count:
+                          mealStats.breakdown.volunteers.total -
+                          mealStats.breakdown.volunteers.validated,
+                      })
                     }}
                   </div>
                   <!-- Toujours visible, contrairement au « restants » qui n'apparaît qu'au survol :
@@ -212,11 +208,11 @@
                     v-if="mealStats.breakdown.artists.total > mealStats.breakdown.artists.validated"
                     class="text-xs text-primary-600 dark:text-primary-400 mt-1 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity"
                   >
-                    {{ mealStats.breakdown.artists.total - mealStats.breakdown.artists.validated }}
-                    restant{{
-                      mealStats.breakdown.artists.total - mealStats.breakdown.artists.validated > 1
-                        ? 's'
-                        : ''
+                    {{
+                      $t('gestion.meals.remaining_count', {
+                        count:
+                          mealStats.breakdown.artists.total - mealStats.breakdown.artists.validated,
+                      })
                     }}
                   </div>
                   <!-- Toujours visible, contrairement au « restants » qui n'apparaît qu'au survol :
@@ -259,15 +255,11 @@
                     class="text-xs text-primary-600 dark:text-primary-400 mt-1 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity"
                   >
                     {{
-                      mealStats.breakdown.participants.total -
-                      mealStats.breakdown.participants.validated
-                    }}
-                    restant{{
-                      mealStats.breakdown.participants.total -
-                        mealStats.breakdown.participants.validated >
-                      1
-                        ? 's'
-                        : ''
+                      $t('gestion.meals.remaining_count', {
+                        count:
+                          mealStats.breakdown.participants.total -
+                          mealStats.breakdown.participants.validated,
+                      })
                     }}
                   </div>
                 </button>
@@ -298,15 +290,11 @@
                     class="text-xs text-primary-600 dark:text-primary-400 mt-1 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity"
                   >
                     {{
-                      mealStats.breakdown.organizers.total -
-                      mealStats.breakdown.organizers.validated
-                    }}
-                    restant{{
-                      mealStats.breakdown.organizers.total -
-                        mealStats.breakdown.organizers.validated >
-                      1
-                        ? 's'
-                        : ''
+                      $t('gestion.meals.remaining_count', {
+                        count:
+                          mealStats.breakdown.organizers.total -
+                          mealStats.breakdown.organizers.validated,
+                      })
                     }}
                   </div>
                   <!-- Toujours visible, contrairement au « restants » qui n'apparaît qu'au survol :

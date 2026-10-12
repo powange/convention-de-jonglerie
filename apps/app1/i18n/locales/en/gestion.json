@@ -260,9 +260,13 @@
         "organizer": "Organiser"
       },
       "phase": "Phase",
+      "phase_event": "[TODO] Événement",
+      "phase_setup": "[TODO] Montage",
+      "phase_teardown": "[TODO] Démontage",
       "plates_set_aside": "{count} plate set aside | {count} plates set aside",
       "previous_day": "Previous day",
       "progress": "Progress",
+      "remaining_count": "[TODO] {count} restant | {count} restants",
       "saved_description": "The meal has been synchronised with the volunteers and artists",
       "saved_title": "Saved",
       "search_person": "Search for a person",

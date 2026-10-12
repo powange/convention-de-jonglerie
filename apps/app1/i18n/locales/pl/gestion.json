@@ -260,9 +260,13 @@
         "organizer": "Organizator"
       },
       "phase": "Faza",
+      "phase_event": "[TODO] Événement",
+      "phase_setup": "[TODO] Montage",
+      "phase_teardown": "[TODO] Démontage",
       "plates_set_aside": "{count} talerz odłożony | {count} talerze odłożone",
       "previous_day": "Poprzedni dzień",
       "progress": "Postęp",
+      "remaining_count": "[TODO] {count} restant | {count} restants",
       "saved_description": "Posiłek został zsynchronizowany z wolontariuszami i artystami",
       "saved_title": "Zapisano",
       "search_person": "Wyszukaj osobę",

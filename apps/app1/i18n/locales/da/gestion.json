@@ -260,9 +260,13 @@
         "organizer": "Arrangør"
       },
       "phase": "Fase",
+      "phase_event": "[TODO] Événement",
+      "phase_setup": "[TODO] Montage",
+      "phase_teardown": "[TODO] Démontage",
       "plates_set_aside": "{count} tallerken sat til side | {count} tallerkener sat til side",
       "previous_day": "Forrige dag",
       "progress": "Fremskridt",
+      "remaining_count": "[TODO] {count} restant | {count} restants",
       "saved_description": "Måltidet er blevet synkroniseret med de frivillige og kunstnerne",
       "saved_title": "Gemt",
       "search_person": "Søg efter en person",
