@@ -67,6 +67,11 @@
             size="lg"
             class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
           />
+          <!-- Les exigences cochées au fil de la saisie, et la barre de force : le même composant
+               que `register`, `login`, l'invitation et `reset-password`. Cet écran était le seul à
+               exiger trois règles sans jamais les afficher — on découvrait laquelle manquait en
+               soumettant. -->
+          <AuthPasswordRequirements :password="passwordState.newPassword" />
         </UFormField>
 
         <UFormField :label="t('auth.confirm_new_password')" name="confirmPassword">
@@ -207,6 +212,8 @@ import { z } from 'zod'
 
 import { useAuthStore } from '~/stores/auth'
 
+import { schemaMotDePasse } from '~~/shared/utils/regles-mot-de-passe'
+
 definePageMeta({
   layout: 'profile',
   middleware: 'auth-protected',
@@ -223,13 +230,26 @@ const deleteLoading = ref(false)
 
 // --- Mot de passe ---
 
+/*
+ * ⚠️ LES RÈGLES VIENNENT DU MODULE PARTAGÉ — constat F2.
+ *
+ * Cet écran gardait sa propre copie : trois règles écrites en dur, et deux clés d'erreur à lui
+ * dans le domaine du profil au lieu de celles du domaine des erreurs — pour des libellés français
+ * rigoureusement identiques. Ces deux clés sont supprimées par ce lot.
+ *
+ * ⚠️ Et elles ne sont PAS nommées ici, délibérément : `check-i18n` cherche les clés dans le texte
+ * des fichiers, commentaires compris. Les citer les ferait compter comme encore employées, et
+ * l'outil signalerait ensuite comme MANQUANT ce que ce lot vient d'enlever. Le piège a mordu six
+ * fois dans ce dépôt.
+ *
+ * `regles-mot-de-passe.ts` a précisément été écrit pour que « le serveur comme l'interface »
+ * dépendent de la même liste, et `register`, `login`, l'invitation et `reset-password` l'emploient
+ * déjà. Le jour où une règle change, cet écran-ci acceptait ou refusait autre chose que le
+ * serveur : c'est la divergence que le module existe pour empêcher.
+ */
 const passwordSchema = computed(() => {
   const baseSchema = {
-    newPassword: z
-      .string()
-      .min(8, t('errors.password_too_short'))
-      .regex(/(?=.*[A-Z])/, t('profile.password_uppercase_required'))
-      .regex(/(?=.*\d)/, t('profile.password_digit_required')),
+    newPassword: schemaMotDePasse(t),
     confirmPassword: z.string(),
   }
 
