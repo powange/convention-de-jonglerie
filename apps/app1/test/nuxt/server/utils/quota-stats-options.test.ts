@@ -117,9 +117,16 @@ describe('quotas — les options', () => {
   it('ne dédouble pas un billet compté à la fois par son tarif et par son option', async () => {
     prismaMock.ticketingOrderItemOption.findMany.mockResolvedValue([selection(7, 3)])
 
+    // Le billet 7 porte son tarif, et le quota vise ce tarif : c'est ce qui le fait compter DEUX
+    // fois si l'ensemble ne dédouble pas. (Forme portée au constat O2 — cf. le commentaire du
+    // fichier `quota-stats-personnes`.)
+    prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
+      { id: 7, tierId: 9, customFields: [], entryValidated: false },
+    ])
+
     const stats = await statsAvec({
       options: [{ optionId: 3 }],
-      tiers: [{ tier: { orderItems: [{ id: 7, entryValidated: false }] } }],
+      tiers: [{ tierId: 9 }],
     })
 
     // Un billet est UNE place, quel que soit le nombre de raisons de le compter.

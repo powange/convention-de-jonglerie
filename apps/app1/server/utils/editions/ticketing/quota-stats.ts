@@ -19,20 +19,28 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
   const quotas = await prisma.ticketingQuota.findMany({
     where: { editionId },
     include: {
+      /*
+       * ⚠️ L'IDENTIFIANT DU TARIF SUFFIT — constat O2.
+       *
+       * Cet `include` était imbriqué jusqu'aux lignes de commande :
+       * `tiers.tier.orderItems` avec le filtre `billetsQuiComptent`. Chaque association
+       * tarif↔quota tirait donc la liste COMPLÈTE des billets de son tarif — et les mêmes
+       * lignes revenaient autant de fois qu'il y avait d'associations.
+       *
+       * 📊 Chronométré sur la base de développement (trois appels, le premier à froid) :
+       *
+       *   édition  1 : 13 quotas, 269 lignes, 26 assoc. tarif →  263 / 82 / 92 ms
+       *   édition 22 : 14 quotas, 506 lignes,  9 assoc. tarif →   58 / 38 / 48 ms
+       *
+       * L'édition 22 a DEUX FOIS plus de lignes et reste deux fois plus rapide : le coût suit
+       * les associations, pas le volume de billets. C'est bien cette duplication qu'il fallait
+       * retirer, et non le nombre de billets lus.
+       *
+       * Les lignes sont déjà chargées une fois plus bas (`allOrderItems`, même filtre
+       * `billetsQuiComptent`) : on les regroupe par tarif en mémoire.
+       */
       tiers: {
-        include: {
-          tier: {
-            include: {
-              // `billetsQuiComptent` plutôt qu'un filtre écrit ici : la règle ne regardait que
-              // l'état de la LIGNE et jamais le statut de sa commande, si bien qu'une commande
-              // remboursée gardait sa place dans les quotas — deux en production. Une règle
-              // recopiée finit toujours par diverger de son original.
-              orderItems: {
-                where: billetsQuiComptent(editionId),
-              },
-            },
-          },
-        },
+        select: { tierId: true },
       },
       // L'identifiant suffit : le rapprochement se fait par clé étrangère, plus par le nom.
       options: {
@@ -68,10 +76,40 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
     where: billetsQuiComptent(editionId),
     select: {
       id: true,
+      // `tierId` est neuf : il remplace l'`include` imbriqué des quotas (cf. le commentaire
+      // ci-dessus). Même filtre, donc exactement le même ensemble de lignes.
+      tierId: true,
       customFields: true,
       entryValidated: true,
     },
   })
+
+  /**
+   * Les billets par tarif, regroupés une fois.
+   *
+   * Remplace la lecture que chaque association tarif↔quota refaisait pour son propre tarif —
+   * constat O2. Les lignes sans tarif (un don HelloAsso n'en porte pas) n'entrent dans aucun
+   * groupe, ce qui est exactement le comportement de l'ancien `include`.
+   */
+  const billetsParTarif = new Map<number, typeof allOrderItems>()
+  for (const billet of allOrderItems) {
+    /*
+     * ⚠️ `undefined` EST ÉCARTÉ AUTANT QUE `null`. Une ligne sans tarif — un don HelloAsso en
+     * est un — et une association sans tarif tomberaient sinon dans le MÊME groupe (`get(null)`
+     * retrouvant `set(null)`), et le don occuperait une place.
+     *
+     * 📍 CE QUE CETTE GARDE NE FAIT PAS, et un sabotage l'a montré : elle ne protège aucun
+     * scénario de production. `tierId` est une clé étrangère obligatoire sur l'association, et
+     * Prisma rend `null` et jamais `undefined` sur la ligne. Elle est défensive, et c'est par
+     * cette coïncidence `undefined`↔`undefined` que trois tests de ce calcul ont continué de
+     * passer après le changement en ne prouvant plus rien — d'où le cas qui l'éprouve
+     * explicitement dans `quota-stats-tarifs.test.ts`.
+     */
+    if (billet.tierId === null || billet.tierId === undefined) continue
+    const groupe = billetsParTarif.get(billet.tierId)
+    if (groupe) groupe.push(billet)
+    else billetsParTarif.set(billet.tierId, [billet])
+  }
 
   /**
    * Les options réellement prises, par billet.
@@ -226,7 +264,7 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
 
     // 1. Compter les participants via les tarifs
     for (const tierQuota of quota.tiers) {
-      for (const orderItem of tierQuota.tier.orderItems) {
+      for (const orderItem of billetsParTarif.get(tierQuota.tierId) ?? []) {
         matchingOrderItemIds.add(orderItem.id)
         if (orderItem.entryValidated) {
           validatedOrderItemIds.add(orderItem.id)

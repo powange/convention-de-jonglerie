@@ -116,13 +116,20 @@ describe('quotas — la place qu’occupent les personnes sans billet', () => {
    */
   it('ne confond pas un organisateur et un billet portant le même identifiant', async () => {
     prismaMock.editionOrganizer.findMany.mockResolvedValue([{ id: 42, entryValidated: true }])
+    /*
+     * ⚠️ LE BILLET PORTE SON `tierId`, et le quota vise ce tarif — constat O2. Le décor donnait
+     * auparavant les lignes DANS le quota (`tiers: [{ tier: { orderItems: […] } }]`), forme que
+     * le calcul n'emploie plus : il regroupe `allOrderItems` par `tierId`. Laissé tel quel, ce
+     * test continuait de passer **par coïncidence** — `tierId` valait `undefined` des deux côtés,
+     * donc le groupe se trouvait quand même, et le cas ne prouvait plus rien.
+     */
     prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
-      { id: 42, customFields: [], entryValidated: true },
+      { id: 42, tierId: 9, customFields: [], entryValidated: true },
     ])
 
     const stats = await statsAvec({
       organizers: [{ organizerId: 42 }],
-      tiers: [{ tier: { orderItems: [{ id: 42, entryValidated: true }] } }],
+      tiers: [{ tierId: 9 }],
     })
 
     // Une place pour le billet, une pour l'organisateur : deux, et non une.
@@ -292,15 +299,16 @@ describe('quotas — la place qu’occupent les personnes sans billet', () => {
     prismaMock.editionArtist.findMany.mockResolvedValue([
       { id: 1, entryValidated: false, shows: [] },
     ])
+    // Même remarque que plus haut : le billet porte son `tierId`, et le quota vise ce tarif.
     prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
-      { id: 1, customFields: [], entryValidated: false },
+      { id: 1, tierId: 9, customFields: [], entryValidated: false },
     ])
 
     const stats = await statsAvec({
       organizers: [{ organizerId: null }],
       volunteers: [{ teamId: null }],
       artists: [{ showId: null }],
-      tiers: [{ tier: { orderItems: [{ id: 1, entryValidated: false }] } }],
+      tiers: [{ tierId: 9 }],
     })
 
     expect(stats.currentCount).toBe(4)
@@ -316,7 +324,7 @@ describe('quotas — la place qu’occupent les personnes sans billet', () => {
      * Une règle recopiée à la main dans trois `where` : c'est exactement ce que le helper existe
      * pour éviter.
      */
-    await statsAvec({ tiers: [{ tier: { orderItems: [] } }] })
+    await statsAvec({ tiers: [{ tierId: 9 }] })
 
     const attendu = {
       state: { in: ['Processed', 'Pending'] },
