@@ -136,7 +136,7 @@
     "backup_create_success": "Copia de seguridad creada con éxito",
     "backup_create_success_description": "La copia de seguridad {filename} se ha creado con éxito",
     "backup_creating": "Creando...",
-    "backup_delete_confirm": "¿Está seguro de que desea eliminar la copia de seguridad {filename}?",
+    "backup_delete_confirm": "[TODO] ¿Está seguro de que desea eliminar la copia de seguridad {filename}?",
     "backup_delete_error": "Error al eliminar la copia de seguridad",
     "backup_delete_success": "Copia de seguridad eliminada con éxito",
     "backup_delete_success_description": "La copia de seguridad {filename} se ha eliminado con éxito",

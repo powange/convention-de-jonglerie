@@ -136,7 +136,7 @@
     "backup_create_success": "Backup succesvol aangemaakt",
     "backup_create_success_description": "Backup {filename} is succesvol aangemaakt",
     "backup_creating": "Aanmaken...",
-    "backup_delete_confirm": "Weet u zeker dat u backup {filename} wilt verwijderen?",
+    "backup_delete_confirm": "[TODO] Weet u zeker dat u backup {filename} wilt verwijderen?",
     "backup_delete_error": "Fout bij het verwijderen van de backup",
     "backup_delete_success": "Backup succesvol verwijderd",
     "backup_delete_success_description": "Backup {filename} is succesvol verwijderd",

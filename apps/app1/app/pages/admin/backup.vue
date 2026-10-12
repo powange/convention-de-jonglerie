@@ -300,7 +300,7 @@
               variant="outline"
               size="xs"
               :disabled="isDeletingBackup(backup.filename)"
-              @click="deleteBackup(backup.filename)"
+              @click="deleteBackup(backup)"
             >
               <UIcon name="i-heroicons-trash" class="h-3 w-3" />
               {{ $t('common.delete') }}
@@ -852,12 +852,29 @@ const { execute: executeDeleteBackup, isLoading: isDeletingBackup } = useApiActi
 
 const confirmation = useConfirmation()
 
-const deleteBackup = (filename: string) => {
+const deleteBackup = (backup: Backup) => {
+  /*
+   * ⚠️ LA MODALE DIT CE QUI VA DISPARAÎTRE — constat F1 de l'administration.
+   *
+   * Elle ne nommait que le FICHIER. Or une liste de sauvegardes contient plusieurs archives dont
+   * les noms se ressemblent — ils ne diffèrent que par leur horodatage —, et c'est la date et la
+   * taille qui permettent de reconnaître celle qu'on veut vraiment perdre. Les deux sont
+   * affichées dans la ligne, juste à côté du bouton : ne pas les reprendre dans la confirmation
+   * obligeait à mémoriser la ligne avant de cliquer.
+   *
+   * 📍 `couleurConfirmer: 'error'` : la restauration voisine a son bouton rouge, celui-ci était
+   * resté à la couleur par défaut pour une action tout aussi définitive.
+   */
   confirmation.demanderConfirmation({
     titre: t('common.delete'),
-    description: t('admin.backup_delete_confirm', { filename }),
+    description: t('admin.backup_delete_confirm', {
+      filename: backup.filename,
+      date: formatDate(backup.createdAt),
+      size: formatFileSize(backup.size),
+    }),
     libelleConfirmer: t('common.delete'),
-    agir: () => executeDeleteBackup(filename),
+    couleurConfirmer: 'error',
+    agir: () => executeDeleteBackup(backup.filename),
   })
 }
 

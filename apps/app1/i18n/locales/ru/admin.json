@@ -136,7 +136,7 @@
     "backup_create_success": "Резервная копия успешно создана",
     "backup_create_success_description": "Резервная копия {filename} успешно создана",
     "backup_creating": "Создание...",
-    "backup_delete_confirm": "Вы уверены, что хотите удалить резервную копию {filename}?",
+    "backup_delete_confirm": "[TODO] Вы уверены, что хотите удалить резервную копию {filename}?",
     "backup_delete_error": "Ошибка при удалении резервной копии",
     "backup_delete_success": "Резервная копия успешно удалена",
     "backup_delete_success_description": "Резервная копия {filename} успешно удалена",

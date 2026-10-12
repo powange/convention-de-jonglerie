@@ -136,7 +136,7 @@
     "backup_create_success": "Sauvegarde créée avec succès",
     "backup_create_success_description": "La sauvegarde {filename} a été créée avec succès",
     "backup_creating": "Création en cours...",
-    "backup_delete_confirm": "Êtes-vous sûr de vouloir supprimer la sauvegarde {filename} ?",
+    "backup_delete_confirm": "La sauvegarde {filename}, créée le {date} et pesant {size}, sera définitivement supprimée.",
     "backup_delete_error": "Erreur lors de la suppression de la sauvegarde",
     "backup_delete_success": "Sauvegarde supprimée avec succès",
     "backup_delete_success_description": "La sauvegarde {filename} a été supprimée avec succès",
