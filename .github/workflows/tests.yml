@@ -367,11 +367,37 @@ jobs:
           MYSQL_PASSWORD: convention_password
         ports:
           - 3306:3306
+        # ⚠️ RÉPERTOIRE DE DONNÉES EN MÉMOIRE — constat CI·6, dont la prémisse a dû être corrigée.
+        #
+        # 📊 CE QUE LA FICHE ANNONÇAIT, ET QUI N'EST PLUS VRAI : « le job rejoue 96 migrations puis
+        # des milliers d'INSERT » sur le disque du runner. Mesuré sur les cinq derniers runs :
+        # l'étape « Appliquer les migrations et le seed » est **sautée** (`skipped`) — le job
+        # `base-de-test` la garde derrière un cache, et sur un cache touché les lots ne font plus
+        # que restaurer un dump. Le « 96 s contre 3 s » de la fiche porte donc sur une étape qui ne
+        # tourne plus. Ne pas attendre ce gain-là.
+        #
+        # Ce qui reste du travail disque de MySQL, relevé sur cinq runs :
+        #   Initialize containers                   25 à 48 s  (dont l'amorçage du data dir)
+        #   Setup database schema (tests DB)        15 à 20 s
+        #   Restaurer la base de test                3 à 11 s
+        #
+        # ⚠️⚠️ `size=2g` N'EST PAS DÉCORATIF : sans taille explicite, Docker monte un tmpfs de
+        # **64 Mo**, et la restauration échouerait en route sur « No space left on device ». La base
+        # est pourtant minuscule (53 ko de dump compressé) — ce sont les journaux de rejeu et
+        # `ibdata1` d'InnoDB qui demandent quelques centaines de mégaoctets.
+        #
+        # La mémoire tient : la sonde « Ressources du runner » relève 15 988 Mo dont 13 889 Mo
+        # disponibles, et **chaque job a son propre runner** — ces 2 Go sont donc par job, pas
+        # cumulés sur le run.
+        #
+        # Une base en RAM ne survit pas au conteneur : sans conséquence ici, rien n'est conservé
+        # d'un job à l'autre (c'est l'artefact de dump qui porte l'état).
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
+          --tmpfs=/var/lib/mysql:rw,size=2g
 
     steps:
       - name: Checkout code
@@ -459,11 +485,14 @@ jobs:
           MYSQL_DATABASE: convention_db_test
         ports:
           - 3306:3306
+        # Répertoire de données en mémoire, comme le service du job `test` — cf. le commentaire
+        # qui s'y trouve pour la taille imposée et pour la prémisse corrigée de la fiche CI·6.
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
+          --tmpfs=/var/lib/mysql:rw,size=2g
 
     steps:
       - name: Checkout code
@@ -699,11 +728,14 @@ jobs:
           MYSQL_DATABASE: convention_db_test
         ports:
           - 3306:3306
+        # Répertoire de données en mémoire, comme le service du job `test` — cf. le commentaire
+        # qui s'y trouve pour la taille imposée et pour la prémisse corrigée de la fiche CI·6.
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
+          --tmpfs=/var/lib/mysql:rw,size=2g
 
     steps:
       - name: Checkout code
@@ -885,13 +917,20 @@ jobs:
       # font qu'un seul test en délai dépassé coûte six minutes.
       # Ce que le runner a sous le capot, dit PAR LE RUNNER — constat CI·5. Deux décisions en
       # dépendent et ont été prises sans ce chiffre jusqu'ici : le nombre de travailleurs
-      # Playwright (`workers: '50%'`) et l'éventuel passage de MySQL en tmpfs (CI·6), qui prendrait
-      # sur cette mémoire. Trois lignes de journal, lisibles sur chaque run plutôt que supposées.
+      # Playwright (`workers: '50%'`) et le passage de MySQL en tmpfs (CI·6), qui prend sur cette
+      # mémoire — 2 Go par job. Trois lignes de journal, lisibles sur chaque run plutôt que
+      # supposées.
       - name: Ressources du runner
         run: |
           echo "cœurs logiques : $(nproc)"
           free -m | awk 'NR<=2 {print}'
           df -h / | tail -1
+          # Et ce que le tmpfs de MySQL occupe réellement (constat CI·6) : la fiche demandait de
+          # vérifier qu'une base en RAM ne mange pas la mémoire du job. Le service tourne déjà.
+          docker ps --filter ancestor=mysql:8.0 --format '{{.ID}}' | while read -r c; do
+            echo "tmpfs du service MySQL :"
+            docker exec "$c" df -h /var/lib/mysql | tail -1
+          done
 
       - name: Run Playwright tests
         run: |
