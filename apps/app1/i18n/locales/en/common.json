@@ -216,6 +216,8 @@
     "about_this_edition": "About this edition",
     "add_comment_placeholder": "Add a comment...",
     "add_lost_item": "Add lost item",
+    "all_items_returned": "[TODO] Tous les objets ont été restitués",
+    "all_items_returned_description": "[TODO] Tous les objets signalés pour cette édition ont retrouvé leur propriétaire. Utilisez « Afficher les objets restitués » pour les revoir.",
     "artist_space": "My artist space",
     "artists": {
       "title": "Artists"

@@ -216,6 +216,8 @@
     "about_this_edition": "O tomto vydání",
     "add_comment_placeholder": "Přidat komentář...",
     "add_lost_item": "Přidání nalezeného objektu",
+    "all_items_returned": "[TODO] Tous les objets ont été restitués",
+    "all_items_returned_description": "[TODO] Tous les objets signalés pour cette édition ont retrouvé leur propriétaire. Utilisez « Afficher les objets restitués » pour les revoir.",
     "artist_space": "Můj prostor umělce",
     "artists": {
       "title": "Umělci"
