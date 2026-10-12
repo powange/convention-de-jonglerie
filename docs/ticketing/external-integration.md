@@ -33,10 +33,10 @@ enum ExternalTicketingStatus   { ACTIVE  INACTIVE  ERROR }
 Tous les identifiants sont chiffrés en base (AES-256-GCM, `server/utils/encryption.ts`, forme
 `iv:chiffré:authTag` en base64) et déchiffrés au moment de l'appel.
 
-| Modèle             | Champs chiffrés                                        |
-| ------------------ | ------------------------------------------------------ |
-| `HelloAssoConfig`  | `clientSecret`                                         |
-| `InfomaniakConfig` | `apiKey`, `apiKeyGuichet`, `applicationPassword`       |
+| Modèle             | Champs chiffrés                                                       |
+| ------------------ | --------------------------------------------------------------------- |
+| `HelloAssoConfig`  | `clientSecret`                                                        |
+| `InfomaniakConfig` | `apiKey`, `apiKeyGuichet`, `applicationPassword`                      |
 | `SumupConfig`      | `affiliateKey` (en `Text` : la forme chiffrée dépasse 191 caractères) |
 
 `SumupConfig` n'est pas une billetterie : c'est l'encaissement par carte au guichet, via le lien
@@ -46,13 +46,13 @@ l'application SumUp n'accepte ses paramètres que dans l'URL. Le compromis est a
 
 ## L'état de chaque prestataire
 
-| Prestataire  | Configuration | Test de connexion | Import des tarifs | Import des commandes |
-| ------------ | ------------- | ----------------- | ----------------- | -------------------- |
-| `HELLOASSO`  | oui           | oui               | **oui**           | **oui**              |
-| `INFOMANIAK` | oui           | oui               | non               | **non**              |
-| `BILLETWEB`  | l'énumération seule | non         | non               | non                  |
-| `WEEZEVENT`  | l'énumération seule | non         | non               | non                  |
-| `OTHER`      | l'énumération seule | non         | non               | non                  |
+| Prestataire  | Configuration       | Test de connexion | Import des tarifs | Import des commandes |
+| ------------ | ------------------- | ----------------- | ----------------- | -------------------- |
+| `HELLOASSO`  | oui                 | oui               | **oui**           | **oui**              |
+| `INFOMANIAK` | oui                 | oui               | non               | **non**              |
+| `BILLETWEB`  | l'énumération seule | non               | non               | non                  |
+| `WEEZEVENT`  | l'énumération seule | non               | non               | non                  |
+| `OTHER`      | l'énumération seule | non               | non               | non                  |
 
 **Infomaniak se configure de bout en bout et n'importe jamais rien.** Les fonctions
 `getInfomaniakOrders` et `getInfomaniakTickets` existent, mais leur seul appelant est
@@ -70,11 +70,11 @@ survit (voir [les tarifs](tiers.md)).
 
 **Ce qui est supprimé** — tout ce qui porte un identifiant fournisseur absent de la réponse.
 
-| Objet                    | Garde contre une réponse incomplète                          |
-| ------------------------ | ------------------------------------------------------------ |
-| Tarifs                   | `decisionSuppression` : refuse de supprimer si la réponse ne contient **aucun** tarif |
-| Options                  | **aucune**                                                   |
-| Champs personnalisés     | suppression des orphelins, sans garde équivalente            |
+| Objet                | Garde contre une réponse incomplète                                                   |
+| -------------------- | ------------------------------------------------------------------------------------- |
+| Tarifs               | `decisionSuppression` : refuse de supprimer si la réponse ne contient **aucun** tarif |
+| Options              | **aucune**                                                                            |
+| Champs personnalisés | suppression des orphelins, sans garde équivalente                                     |
 
 La garde des tarifs est motivée dans son propre fichier : la cascade emporte les quotas, les articles
 à remettre et les liens de champs personnalisés — « le travail saisi ici, et que HelloAsso ne pourra
@@ -118,27 +118,46 @@ Ces deux valeurs sont forcées **en création comme en mise à jour**. Donc :
 
 ### Le coût
 
-Une transaction interactive unique, sans `timeout` explicite : Prisma applique donc **5 s** par
-défaut, et un dépassement (`P2028`) annule **tout** l'import. Sur l'édition la plus fournie d'une
-copie de production — 201 commandes, 271 lignes — la boucle émet environ **743 requêtes**, soit
-~0,73 s. La marge est confortable aujourd'hui ; elle se réduit avec le volume, avec la latence du
-lien vers la base, et parce qu'une écriture coûte plus qu'une lecture.
+Une transaction interactive unique, avec un `timeout` **explicite de 15 s** depuis le constat O1 :
+un dépassement (`P2028`) annulerait **tout** l'import.
+
+⚠️ **Les chiffres publiés ici étaient faux, par un comptage non croisé.** Ils annonçaient
+« 201 commandes, 271 lignes, ~743 requêtes, ~0,73 s » pour l'édition la plus fournie. Or la boucle
+n'écrit que les commandes **rendues par HelloAsso**, c'est-à-dire celles portant un
+`externalTicketingId` : le reste est saisi au guichet et n'entre jamais dans cette transaction. Et
+le `~0,73 s` était déduit du chiffre erroné, jamais mesuré.
+
+Recompté branche par branche sur une copie de la base, commandes importées seulement :
+
+| édition | requêtes émises par la boucle                                                               |
+| ------- | ------------------------------------------------------------------------------------------- |
+| 9       | ≈ **847** (le pire cas ; jusqu'à ~925 au premier import, les accès repas étant alors créés) |
+| 17      | ≈ 398                                                                                       |
+| 21      | ≈ 330                                                                                       |
+| 1       | ≈ 319                                                                                       |
+| 22      | ≈ 64                                                                                        |
+
+Ce ne sont donc pas les lignes qui coûtent, mais les **options** et les **accès repas**, qui
+multiplient les requêtes par ligne.
+
+📍 La lecture des options a été remontée **hors de la boucle** au même constat : elle était relancée
+pour chaque billet portant une option — 106 fois sur l'édition 9, dont 105 inutilement.
 
 ## Les points d'API
 
-| Route                                    | Droit                              | Rôle                              |
-| ---------------------------------------- | ---------------------------------- | --------------------------------- |
-| `GET    …/ticketing/external`             | `canManageTicketingById`           | la configuration (sans les secrets) |
-| `POST   …/ticketing/external`             | `canManageTicketingById`           | créer ou remplacer la configuration |
-| `DELETE …/ticketing/external`             | `canManageTicketingById`           | supprimer la configuration        |
-| `POST   …/ticketing/helloasso/test`       | `canManageTicketingById`           | tester les identifiants           |
-| `POST   …/ticketing/helloasso/tiers`      | `canManageTicketingById`           | synchroniser tarifs / options / champs |
-| `GET    …/ticketing/helloasso/orders`     | `canManageTicketingById`           | **importer** les commandes        |
-| `POST   …/ticketing/helloasso/orders`     | `canManageTicketingById`           | lire une page de commandes        |
-| `GET    …/ticketing/helloasso/raw`        | **administration globale**         | la réponse brute du fournisseur   |
-| `POST   …/ticketing/infomaniak/test`      | `canManageTicketingById`           | tester les identifiants           |
-| `GET    …/ticketing/infomaniak/raw`       | **administration globale**         | la réponse brute du fournisseur   |
-| `GET/PUT/DELETE …/ticketing/sumup/config` | `canManageTicketing`               | l'encaissement par carte          |
+| Route                                     | Droit                      | Rôle                                   |
+| ----------------------------------------- | -------------------------- | -------------------------------------- |
+| `GET    …/ticketing/external`             | `canManageTicketingById`   | la configuration (sans les secrets)    |
+| `POST   …/ticketing/external`             | `canManageTicketingById`   | créer ou remplacer la configuration    |
+| `DELETE …/ticketing/external`             | `canManageTicketingById`   | supprimer la configuration             |
+| `POST   …/ticketing/helloasso/test`       | `canManageTicketingById`   | tester les identifiants                |
+| `POST   …/ticketing/helloasso/tiers`      | `canManageTicketingById`   | synchroniser tarifs / options / champs |
+| `GET    …/ticketing/helloasso/orders`     | `canManageTicketingById`   | **importer** les commandes             |
+| `POST   …/ticketing/helloasso/orders`     | `canManageTicketingById`   | lire une page de commandes             |
+| `GET    …/ticketing/helloasso/raw`        | **administration globale** | la réponse brute du fournisseur        |
+| `POST   …/ticketing/infomaniak/test`      | `canManageTicketingById`   | tester les identifiants                |
+| `GET    …/ticketing/infomaniak/raw`       | **administration globale** | la réponse brute du fournisseur        |
+| `GET/PUT/DELETE …/ticketing/sumup/config` | `canManageTicketing`       | l'encaissement par carte               |
 
 Le corps de `POST …/ticketing/external` : `provider` (obligatoire), puis un bloc `helloAsso`
 (`clientId`, `clientSecret?`, `organizationSlug`, `formType`, `formSlug`) ou `infomaniak`
