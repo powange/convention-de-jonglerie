@@ -650,6 +650,7 @@
       "reservation_location": "Standort",
       "reservation_location_help": "Gibt an, woher das Material entnommen wird (rein informativ, keine Mengenbegrenzung).",
       "reservation_location_placeholder": "Z.B.: Hauptbühne, hinten rechts",
+      "reservations_load_error": "[TODO] Impossible de charger les réservations de cet objet",
       "reservations_title": "Reservierungen",
       "responsible_contact_placeholder": "Oder: Name und Telefonnummer",
       "responsible_help": "Ein Pseudonym, Vor- oder Nachname sucht unter den Personen dieser Ausgabe — Organisatoren, Freiwillige und Künstler; eine vollständige E-Mail-Adresse findet jedes Konto der Website. Andernfalls genügen ein Name und eine Kontaktangabe.",

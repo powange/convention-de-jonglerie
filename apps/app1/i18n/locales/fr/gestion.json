@@ -692,6 +692,7 @@
       "reservation_location": "Emplacement d'utilisation",
       "reservation_location_help": "Où le matériel doit être amené pendant la réservation. À la fin, il retourne à son lieu de rangement.",
       "reservation_location_placeholder": "Ex: Scène principale, fond droit",
+      "reservations_load_error": "Impossible de charger les réservations de cet objet",
       "reservations_title": "Réservations",
       "responsible_contact_placeholder": "Ou : nom et téléphone",
       "responsible_help": "Un pseudo, un prénom ou un nom cherche parmi les gens de l'édition — organisateurs, bénévoles et artistes ; l'adresse e-mail complète trouve n'importe quel compte du site. Sinon, un nom et un contact suffisent.",

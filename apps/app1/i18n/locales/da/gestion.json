@@ -650,6 +650,7 @@
       "reservation_location": "Placering",
       "reservation_location_help": "Angiver hvor materialet hentes (rent informativt, ingen mængdebegrænsning).",
       "reservation_location_placeholder": "F.eks.: Hovedscene, bag til højre",
+      "reservations_load_error": "[TODO] Impossible de charger les réservations de cet objet",
       "reservations_title": "Reservationer",
       "responsible_contact_placeholder": "Eller: navn og telefonnummer",
       "responsible_help": "Et kaldenavn, fornavn eller efternavn søger blandt personerne i denne udgave — arrangører, frivillige og artister; en fuld e-mailadresse finder enhver konto på sitet. Ellers er et navn og en kontakt nok.",

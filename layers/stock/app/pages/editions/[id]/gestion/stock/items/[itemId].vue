@@ -282,12 +282,12 @@
           </div>
         </template>
 
-        <div v-if="!item.reservations.length" class="text-sm text-gray-500 italic text-center py-4">
+        <div v-if="!totalDesReservations" class="text-sm text-gray-500 italic text-center py-4">
           {{ $t('gestion.stock.no_reservations') }}
         </div>
         <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
           <li
-            v-for="r in item.reservations"
+            v-for="r in reservationsAffichees"
             :key="r.id"
             class="py-3 flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3"
           >
@@ -347,6 +347,27 @@
             </div>
           </li>
         </ul>
+        <!-- La pagination n'apparaît qu'au-delà d'une page — constat E3. L'historique est
+             conservé en entier, délibérément : il est désormais paginé, pas tronqué. -->
+        <div
+          v-if="totalDesReservations > RESERVATIONS_PAR_PAGE"
+          class="flex justify-center pt-4"
+          data-zone="pagination-reservations"
+        >
+          <!-- ⚠️ `page`, et NON `model-value` : le modèle de `UPagination` s'appelle `page` et
+               émet `update:page`. Un `:model-value` y serait accepté sans erreur et IGNORÉ —
+               la pagination s'afficherait, resterait sur la page 1, et ne changerait rien.
+               Vérifié sur la métadonnée du composant, pas supposé. -->
+          <UPagination
+            :page="pageDesReservations"
+            :items-per-page="RESERVATIONS_PAR_PAGE"
+            :total="totalDesReservations"
+            :disabled="chargementDesReservations"
+            :sibling-count="1"
+            show-edges
+            @update:page="allerALaPageDesReservations"
+          />
+        </div>
       </UCard>
     </div>
 
@@ -453,9 +474,39 @@ interface StockItemFull {
   zone: { id: number; name: string; color: string } | null
   marker: { id: number; name: string } | null
   reservations: StockReservation[]
+  // Le total, que la fiche ne charge plus en entier — cf. `reservationsAffichees`.
+  _count?: { reservations: number }
 }
 
 const item = ref<StockItemFull | null>(null)
+
+/**
+ * LES RÉSERVATIONS SONT PAGINÉES — constat E3.
+ *
+ * ⚠️ La fiche les chargeait TOUTES, sans borne, alors que son point d'API annonçait « ses
+ * réservations actives et futures ». Le détail n'en rend plus que la première page et le TOTAL ;
+ * les suivantes viennent de `…/stock-items/[itemId]/reservations`.
+ *
+ * 📍 Mesuré avant d'y toucher : **0 réservation** en base de développement. Ce n'est donc pas la
+ * correction d'une panne mais une échéance — et l'historique est paginé plutôt que borné aux
+ * réservations à venir, parce que cet écran montre délibérément tout le passé. C'est la décision
+ * prise le 12/10 entre trois branches.
+ */
+const RESERVATIONS_PAR_PAGE = 20
+const pageDesReservations = ref(1)
+/** Les réservations affichées : celles du détail en page 1, celles du point d'API ensuite. */
+const reservationsChargees = ref<StockReservation[] | null>(null)
+const reservationsAffichees = computed(
+  () => reservationsChargees.value ?? item.value?.reservations ?? []
+)
+/*
+ * Le total vient du serveur, et le repli sur la longueur de la première page n'est pas décoratif :
+ * sans lui, une réponse d'un serveur plus ancien — ou un bouchon de test incomplet — ferait
+ * afficher « 0 réservation » sous une liste qui en montre vingt.
+ */
+const totalDesReservations = computed(
+  () => item.value?._count?.reservations ?? item.value?.reservations?.length ?? 0
+)
 
 /**
  * Le groupe de cet objet gère-t-il les réservations&nbsp;?
@@ -631,6 +682,30 @@ async function fetchItem() {
   } finally {
     loading.value = false
   }
+}
+
+const { execute: chargerLesReservations, loading: chargementDesReservations } = useApiAction(
+  () => `/api/editions/${editionId}/stock-items/${itemId.value}/reservations`,
+  {
+    method: 'GET',
+    query: () => ({ page: pageDesReservations.value, limit: RESERVATIONS_PAR_PAGE }),
+    errorMessages: { default: t('gestion.stock.reservations_load_error') },
+    // 📍 La réponse porte `pagination` en plus de `success`/`data`, donc le composable ne la
+    // déballe pas — on lit `response.data`.
+    onSuccess: (response: any) => {
+      reservationsChargees.value = response?.data ?? []
+    },
+  }
+)
+
+/** Changer de page : la première revient au contenu du détail, pour ne pas la redemander. */
+async function allerALaPageDesReservations(page: number) {
+  pageDesReservations.value = page
+  if (page === 1) {
+    reservationsChargees.value = null
+    return
+  }
+  await chargerLesReservations()
 }
 
 async function fetchMapData() {

@@ -650,6 +650,7 @@
       "reservation_location": "Locatie",
       "reservation_location_help": "Geeft aan waar het materiaal wordt opgehaald (puur informatief, geen beperking op hoeveelheid).",
       "reservation_location_placeholder": "Bijv.: Hoofdpodium, rechtsachter",
+      "reservations_load_error": "[TODO] Impossible de charger les réservations de cet objet",
       "reservations_title": "Reserveringen",
       "responsible_contact_placeholder": "Of: naam en telefoonnummer",
       "responsible_help": "Een gebruikersnaam, voornaam of achternaam zoekt onder de mensen van deze editie — organisatoren, vrijwilligers en artiesten; een volledig e-mailadres vindt elk account op de site. Anders volstaan een naam en een contact.",

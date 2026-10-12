@@ -650,6 +650,7 @@
       "reservation_location": "Ubicación",
       "reservation_location_help": "Indica de dónde se tomará el material (puramente informativo, sin restricción de cantidad).",
       "reservation_location_placeholder": "Ej.: Escenario principal, fondo derecha",
+      "reservations_load_error": "[TODO] Impossible de charger les réservations de cet objet",
       "reservations_title": "Reservas",
       "responsible_contact_placeholder": "O: nombre y teléfono",
       "responsible_help": "Un apodo, un nombre o un apellido busca entre las personas de esta edición — organizadores, voluntarios y artistas; una dirección de correo completa encuentra cualquier cuenta del sitio. Si no, basta con un nombre y un contacto.",

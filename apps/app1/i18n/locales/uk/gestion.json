@@ -650,6 +650,7 @@
       "reservation_location": "Розміщення",
       "reservation_location_help": "Вказує, звідки буде взято обладнання (лише інформативно, без обмеження кількості).",
       "reservation_location_placeholder": "Напр.: Головна сцена, ззаду справа",
+      "reservations_load_error": "[TODO] Impossible de charger les réservations de cet objet",
       "reservations_title": "Бронювання",
       "responsible_contact_placeholder": "Або: ім'я і телефон",
       "responsible_help": "Псевдонім, ім'я або прізвище шукають серед учасників цього випуску — організаторів, волонтерів і артистів; повна адреса електронної пошти знайде будь-який акаунт на сайті. В інших випадках достатньо імені та контакту.",
