@@ -28,10 +28,22 @@ const VERROU = join(process.cwd(), 'package-lock.json')
  * transitives (`axios`, `brace-expansion`, `fast-uri`, `js-yaml`, `joi`, `image-size`…), le compte
  * passe de **156 à 147** et les critiques de **1 à 0**.
  *
- * ⚠️ **Aucune version déclarée n'a changé** : seul `package-lock.json` est modifié. Les vingt-et-une
- * dépendances de production directes vulnérables — dont `nodemailer` (8 avis, injection d'en-têtes
- * CRLF et SSRF) et `sharp` — relèvent de lots suivants, et six d'entre elles demandent un
- * changement de majeure.
+ * ⚠️ **Aucune version déclarée n'a changé par CE lot** : seul `package-lock.json` était modifié.
+ *
+ * 📍 **MISE À JOUR DU 15/10/2026 — les « lots suivants » ont eu lieu.** Ce paragraphe annonçait
+ * que `nodemailer` et `sharp` relevaient de lots ultérieurs ; les deux sont faits, et chacun a
+ * appris quelque chose qui ne se devinait pas :
+ *
+ * - `sharp` est passé en 0.35.5 et **n'a d'abord RIEN fermé** : `@nuxt/image → ipx@3.1.1` exige
+ *   `sharp ^0.34.3` et gardait sa propre copie vulnérable. Il a fallu `ipx@4.0.0`, qui **déclare**
+ *   `sharp ^0.35.5` — donc sans rien forcer.
+ * - `nodemailer` est passé en 10.1.1, ses 11 avis sont levés, et `@types/nodemailer` a été
+ *   **retiré** : la ligne 10 embarque ses propres définitions, et garder les types tiers (écrits
+ *   pour la ligne 7) ferait écran avec eux.
+ * - L'override `vue`, en revanche, **ne peut pas être monté** : fermer la XSS casse l'association
+ *   libellé↔champ de `UFormField`, qui repose sur le `useId()` de Vue. Mesuré depuis : cette XSS
+ *   n'est de toute façon pas atteignable ici, faute d'attribut dont le NOM vienne d'une entrée
+ *   non fiable.
  *
  * ## ⚠️⚠️ POURQUOI `npm audit fix` N'EST PAS UTILISÉ
  *
