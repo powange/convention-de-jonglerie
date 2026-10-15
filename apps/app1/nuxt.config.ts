@@ -32,6 +32,39 @@ const backupUploadSecurity = {
 export default defineNuxtConfig({
   hooks: {
     /**
+     * L'accueil ne précharge plus l'application entière au repos.
+     *
+     * ## Le défaut, mesuré sur la production
+     *
+     * La page d'accueil émettait **299 `<link rel="prefetch">` pour 849 Ko compressés**, en plus
+     * des 392 Ko du premier affichage. Soit 1 241 Ko tirés par une seule visite — et sur un
+     * forfait mobile, pendant une convention, cela triple le coût d'ouverture de l'accueil.
+     *
+     * ## ⚠️ ET CE N'EST PAS `nuxtLink` QUI EN EST LA CAUSE
+     *
+     * `app.defaults.nuxtLink` est déjà réglé sur `prefetchOn: { interaction: true }` plus bas dans
+     * ce fichier. Mesuré : l'accueil ne porte que **5 liens `<a>`** et émettait pourtant 299
+     * indications — cinq liens ne peuvent pas en produire 299. Elles viennent d'ici, du manifeste
+     * de build, que le rendeur parcourt pour émettre ses indications de ressources.
+     *
+     * ## Pourquoi `prefetch` et JAMAIS `preload`
+     *
+     * Nuxt met les DEUX drapeaux à `true` sur toutes les entrées — mesuré, 794 sur 794 — et c'est
+     * le rendeur qui tranche : `modulepreload` pour ce que la page courante utilise (`preload`),
+     * `prefetch` pour tout le reste. Effacer `preload` ralentirait donc le premier affichage,
+     * c'est-à-dire l'inverse du but.
+     *
+     * Le préchargement ciblé ne disparaît pas : `nuxtLink` continue de précharger un lien dès que
+     * le visiteur s'en approche. On remplace un préchargement en bloc de 298 fichiers par un
+     * préchargement de ce que la personne s'apprête réellement à ouvrir.
+     */
+    'build:manifest'(manifest) {
+      for (const entree of Object.values(manifest)) {
+        ;(entree as Record<string, unknown>).prefetch = false
+      }
+    },
+
+    /**
      * Injection CSRF dans le `$fetch` global (Double Submit Cookie).
      *
      * Nuxt 4.5+ génère `#build/fetch` avec `export const $fetch = globalThis.$fetch`
