@@ -1582,8 +1582,7 @@ const comptageDeLaListe = useApiActionById(
     // Les DEUX chargements : les comptages changent, donc les manquants aussi. Ne rafraîchir que
     // les listes laisserait l'onglet voisin annoncer un manque qui vient d'être comblé.
     onSuccess: async () => {
-      await chargerObjets()
-      await chargerListes()
+      await Promise.all([chargerObjets(), chargerListes()])
     },
   }
 )

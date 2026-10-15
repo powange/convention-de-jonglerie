@@ -1458,8 +1458,7 @@ onMounted(async () => {
   }
 })
 
-await fetchAll()
-await fetchTags()
+await Promise.all([fetchAll(), fetchTags()])
 
 const groupModalOpen = ref(false)
 const itemModalOpen = ref(false)
@@ -1545,7 +1544,8 @@ const nbEmpruntesSelectionnes = computed(() => {
 
 async function apresModificationParLot() {
   clearSelection()
-  await fetchAll()
+  // `refreshPlanning()` fait déjà `Promise.all([fetchAll(), fetchPlanning()])` : le
+  // `fetchAll()` qui précédait appelait donc le même point d'API DEUX FOIS, à la file.
   await refreshPlanning()
 }
 

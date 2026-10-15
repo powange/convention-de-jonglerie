@@ -659,8 +659,7 @@ const { execute: executeUnassign } = useApiAction(
     silentSuccess: true,
     errorMessages: { default: 'Impossible de désassigner le bénévole' },
     onSuccess: async () => {
-      await fetchTeamAssignments()
-      await fetchVolunteersInfo()
+      await Promise.all([fetchTeamAssignments(), fetchVolunteersInfo()])
       if (volunteerTableRef.value?.refreshApplications) {
         await volunteerTableRef.value.refreshApplications()
       }
@@ -710,8 +709,7 @@ const { execute: executeToggleLeader } = useApiAction(
     silentSuccess: true,
     errorMessages: { default: 'Impossible de modifier le statut de responsable' },
     onSuccess: async () => {
-      await fetchTeamAssignments()
-      await fetchVolunteersInfo()
+      await Promise.all([fetchTeamAssignments(), fetchVolunteersInfo()])
       const { volunteerName, teamName, wasLeader } = leaderMeta.value
       succes(
         wasLeader

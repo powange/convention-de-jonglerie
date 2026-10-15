@@ -479,8 +479,7 @@ onMounted(async () => {
     }
   }
 
-  await fetchShowCall()
-  await fetchApplications()
+  await Promise.all([fetchShowCall(), fetchApplications()])
   fetchSurveyResults()
 })
 

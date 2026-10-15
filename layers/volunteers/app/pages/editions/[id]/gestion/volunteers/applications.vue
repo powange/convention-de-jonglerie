@@ -272,8 +272,7 @@ const checkIfMobile = () => {
 const handleVolunteerAdded = async () => {
   succes(t('volunteers.volunteer_added_success'))
   // Recharger les données
-  await fetchVolunteersInfo()
-  await fetchTeamAssignments()
+  await Promise.all([fetchVolunteersInfo(), fetchTeamAssignments()])
   // Rafraîchir le tableau si la méthode existe
   if (volunteerTableRef.value?.refreshApplications) {
     await volunteerTableRef.value.refreshApplications()
