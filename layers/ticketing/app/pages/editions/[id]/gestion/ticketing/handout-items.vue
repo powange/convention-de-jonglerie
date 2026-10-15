@@ -1099,6 +1099,29 @@ const openCustomFieldItemsModal = (cf: any) => {
   customFieldItemsModalOpen.value = true
 }
 
+/**
+ * Les onze chargeurs de cet écran partaient à la file, et depuis les deux endroits ci-dessous :
+ * le temps avant affichage était leur SOMME au lieu de celui du plus lent. Les lancer ensemble ne
+ * change rien à la gestion des erreurs — chacun absorbe déjà la sienne, donc `Promise.all` ne rejette
+ * jamais ici.
+ *
+ * ⚠️ Les deux blocs étaient écrits DEUX FOIS, à l’identique. Ajouter un chargeur en oubliant la
+ * seconde copie laissait l’écran incomplet dans le seul cas du passage en super-admin.
+ */
+const chargerTout = async () => {
+  await Promise.all([
+    loadHandoutItems(),
+    loadVolunteerHandoutItems(),
+    loadOrganizerItems(),
+    loadEditionOrganizers(),
+    loadTiers(),
+    loadOptions(),
+    loadCustomFields(),
+    ...(edition.value?.artistsEnabled ? [loadArtistItems(), loadShows(), loadArtists()] : []),
+    ...(edition.value?.mealsEnabled ? [loadMeals()] : []),
+  ])
+}
+
 onMounted(async () => {
   if (!edition.value) {
     try {
@@ -1108,42 +1131,14 @@ onMounted(async () => {
     }
   }
   if (canAccess.value) {
-    await loadHandoutItems()
-    await loadVolunteerHandoutItems()
-    await loadOrganizerItems()
-    await loadEditionOrganizers()
-    await loadTiers()
-    await loadOptions()
-    await loadCustomFields()
-    if (edition.value?.artistsEnabled) {
-      await loadArtistItems()
-      await loadShows()
-      await loadArtists()
-    }
-    if (edition.value?.mealsEnabled) {
-      await loadMeals()
-    }
+    await chargerTout()
   }
 })
 
 // Recharger quand les permissions changent (mode super admin)
 watch(canAccess, async (newValue, oldValue) => {
   if (newValue && !oldValue) {
-    await loadHandoutItems()
-    await loadVolunteerHandoutItems()
-    await loadOrganizerItems()
-    await loadEditionOrganizers()
-    await loadTiers()
-    await loadOptions()
-    await loadCustomFields()
-    if (edition.value?.artistsEnabled) {
-      await loadArtistItems()
-      await loadShows()
-      await loadArtists()
-    }
-    if (edition.value?.mealsEnabled) {
-      await loadMeals()
-    }
+    await chargerTout()
   }
 })
 </script>

@@ -91,7 +91,7 @@
     "@fullcalendar/vue3": "^6.1.20",
     "@internationalized/date": "^3.12.0",
     "@nuxt/eslint": "^1.15.2",
-    "@nuxt/image": "^2.0.0",
+    "@nuxt/image": "^2.1.0",
     "@nuxt/scripts": "^0.13.2",
     "@nuxt/test-utils": "^4.0.0",
     "@nuxt/ui": "^4.8.1",
@@ -113,7 +113,7 @@
     "facebook-event-scraper": "^0.2.6",
     "fast-xml-parser": "^5.10.1",
     "firebase": "12.9.0",
-    "firebase-admin": "13.6.1",
+    "firebase-admin": "13.10.0",
     "html2canvas": "^1.4.1",
     "html5-qrcode": "^2.3.8",
     "i18n-iso-countries": "^7.14.0",
@@ -133,7 +133,7 @@
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
-    "sharp": "0.34.5",
+    "sharp": "0.35.5",
     "sortablejs": "^1.15.7",
     "stripe": "^20.4.1",
     "tsx": "^4.21.0",
@@ -180,7 +180,8 @@
     "wait-on": "^9.0.4"
   },
   "overrides": {
-    "vue": "3.5.38",
+    "vue": "3.5.44",
+    "ipx": "4.0.0",
     "@nuxt/devtools": "4.0.0-beta.2"
   },
   "engines": {
@@ -193,7 +194,7 @@
     "esbuild@0.25.12": true,
     "prisma@7.9.0": true,
     "protobufjs@7.5.8": true,
-    "sharp@0.34.5": true,
+    "sharp@0.35.5": true,
     "unrs-resolver@1.11.1": true,
     "vue-demi@0.14.10": true,
     "@firebase/util@1.13.0": true,
