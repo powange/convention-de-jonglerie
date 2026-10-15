@@ -70,6 +70,8 @@ export const MERGE_USER_SELECT = {
   prenom: true,
   password: true,
   authProvider: true,
+  googleId: true,
+  facebookId: true,
   phone: true,
   pronouns: true,
   preferredLanguage: true,
@@ -97,6 +99,8 @@ type MergeUser = {
   prenom: string | null
   password: string | null
   authProvider: string
+  googleId: string | null
+  facebookId: string | null
   phone: string | null
   pronouns: string | null
   dietaryPreference: string
@@ -275,6 +279,25 @@ export function buildProfilePatch(
     patch.authProvider = source.authProvider
     patch.isEmailVerified = source.isEmailVerified
   }
+
+  /*
+   * Les identifiants de fournisseur s'HÉRITENT, et HORS de l'arbitrage `credentials` ci-dessus.
+   *
+   * Sans cela, fusionner ferait perdre un accès : le compte absorbé est supprimé, et avec lui son
+   * `googleId`. L'utilisateur se connecterait ensuite par ce bouton pour tomber… sur la création
+   * d'un compte neuf, soit exactement le défaut que ces colonnes ferment. La cible reprend donc
+   * le lien que le source emportait.
+   *
+   * 📍 C'est possible parce que la suppression du source précède cette mise à jour dans la
+   * transaction : la contrainte d'unicité est déjà libérée. Même mécanisme que pour `email`.
+   *
+   * ⚠️ UNIQUEMENT SI LA CIBLE N'EN A PAS. Quand les deux comptes portent un identifiant pour le
+   * même fournisseur, la colonne étant unique, un seul peut survivre : la cible garde le sien.
+   * Le lien du source est alors réellement perdu — c'est une limite de la fusion, pas un oubli,
+   * et l'utilisateur garde l'autre fournisseur et le mot de passe pour entrer.
+   */
+  if (!target.googleId && source.googleId) patch.googleId = source.googleId
+  if (!target.facebookId && source.facebookId) patch.facebookId = source.facebookId
 
   if (choices.pseudo === 'source') patch.pseudo = source.pseudo
 

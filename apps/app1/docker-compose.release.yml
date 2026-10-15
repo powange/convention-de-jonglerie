@@ -13,7 +13,24 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
-      - '3308:3306'
+      # ⚠️ LIÉ À LA BOUCLE LOCALE, ET NON À TOUTES LES INTERFACES.
+      #
+      # Sans l'adresse devant, Docker publie sur 0.0.0.0 : la base est alors joignable depuis
+      # l'extérieur de la machine, avec un mot de passe qui circule sans TLS — l'adaptateur ne reçoit
+      # que `connectionLimit` et `bigIntAsNumber`, aucun réglage `ssl`.
+      #
+      # ⚠️ ET `ufw` NE PROTÉGEAIT PAS DE ÇA : les ports publiés par Docker contournent ses règles,
+      # qui s'insèrent après la chaîne `DOCKER`. Seule `DOCKER-USER` filtre un port publié. C'est
+      # exactement ce qui fait croire qu'on est couvert.
+      #
+      # 🔬 Vérifié avant de restreindre : RIEN ne se sert de ce port publié. L'application et les
+      # sauvegardes (`backup/create.post.ts`, via `mysqldump`) joignent la base par le nom de service
+      # du réseau Docker — `entrypoint.sh` fait `DATABASE_HOST="${DATABASE_HOST:-database}"`. Les
+      # seules mentions du numéro dans le dépôt sont de la documentation et le dev d'`app2`.
+      #
+      # La boucle locale plutôt que la suppression de la ligne : l'accès reste possible depuis
+      # l'hôte, pour une migration ou un dump à la main, ce qui est probablement sa raison d'être.
+      - '127.0.0.1:3308:3306'
     healthcheck:
       test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '--silent']
       timeout: 2s

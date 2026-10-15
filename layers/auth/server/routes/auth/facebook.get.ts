@@ -108,45 +108,76 @@ export default defineEventHandler(async (event) => {
     `https://graph.facebook.com/me?fields=${encodeURIComponent(fields)}&access_token=${encodeURIComponent(accessToken)}`
   )
 
+  /*
+   * `id` est l'identifiant STABLE du compte Facebook. Il était déjà demandé dans `fields`
+   * ci-dessus, et on le jetait. C'est lui, et non l'adresse, qui identifie un compte.
+   */
+  const providerId = userInfo?.id as string | undefined
   const email = userInfo?.email as string | undefined
   const name = (userInfo?.name as string | undefined) || ''
   const givenName = (userInfo?.first_name as string | undefined) || ''
   const familyName = (userInfo?.last_name as string | undefined) || ''
   const picture = (userInfo?.picture?.data?.url as string | undefined) || ''
 
-  // Facebook peut ne pas renvoyer d'email selon la configuration/permissions
-  if (!email) {
-    console.error('Facebook OAuth: email indisponible dans userinfo (permission email manquante ?)')
-    return sendRedirect(event, '/login')
-  }
+  /*
+   * ⚠️ L'IDENTIFIANT DE FOURNISSEUR D'ABORD, L'ADRESSE EN SECOURS.
+   *
+   * La recherche se faisait uniquement par adresse, et l'adresse change. Un utilisateur qui
+   * modifiait la sienne obtenait au bouton suivant un compte NEUF, sans ses billets, ses
+   * candidatures ni ses conventions. En silence, sans erreur affichée.
+   *
+   * 📍 ET CETTE RECHERCHE PASSE AVANT LA GARDE SUR L'ADRESSE, délibérément. Facebook peut ne
+   * PAS renvoyer d'adresse — selon les permissions accordées, et cela se produit. On refusait
+   * alors la connexion d'un utilisateur parfaitement connu. Un identifiant déjà enregistré suffit
+   * désormais à le reconnaître : l'adresse ne redevient indispensable que pour CRÉER un compte,
+   * puisqu'on ne sait pas en fabriquer un sans elle.
+   */
+  let dbUser = providerId
+    ? await prisma.user.findUnique({ where: { facebookId: providerId } })
+    : null
 
-  // Essayer de retrouver l'utilisateur par email
-  let dbUser = await prisma.user.findUnique({ where: { email } })
-
-  // Créer l'utilisateur si inexistant
   if (!dbUser) {
-    const [prenomRaw, ...rest] = name.trim().split(/\s+/)
-    const prenom = (givenName || prenomRaw || email.split('@')[0]).trim()
-    const nom = (familyName || rest.join(' ') || 'Facebook').trim()
-    // `split` rend `string | undefined` pour TypeScript, et `uniquePseudo` attend une chaîne.
-    // Une adresse a toujours une partie locale ; le repli sur l'adresse entière dit la même
-    // chose qu'un `!`, sans affirmer au compilateur ce qu'il ne peut pas vérifier.
-    const basePseudo = email.split('@')[0] ?? email
-    const pseudo = await uniquePseudo(basePseudo)
+    /*
+     * ⚠️ TOUT CE QUI A BESOIN D'UNE ADRESSE EST IMBRIQUÉ ICI, et c'est ce qui rend le typage
+     * juste : `email` y est forcément une chaîne, et `dbUser` est forcément renseigné à la
+     * sortie — toute branche rend la main ou l'affecte. Deux gardes séparées laissaient `email`
+     * en `string | undefined` et `dbUser` en possiblement nul.
+     */
+    if (!email) {
+      console.error(
+        'Facebook OAuth: email indisponible dans userinfo (permission email manquante ?)'
+      )
+      return sendRedirect(event, '/login')
+    }
 
-    dbUser = await prisma.user.create({
-      data: {
-        email,
-        emailHash: getEmailHash(email),
-        pseudo,
-        nom,
-        prenom,
-        password: null, // Pas de mot de passe pour les utilisateurs OAuth
-        authProvider: 'facebook',
-        isEmailVerified: true,
-        ...(picture ? { profilePicture: picture } : {}),
-      },
-    })
+    dbUser = await prisma.user.findUnique({ where: { email } })
+
+    // Créer l'utilisateur si inexistant
+    if (!dbUser) {
+      const [prenomRaw, ...rest] = name.trim().split(/\s+/)
+      const prenom = (givenName || prenomRaw || email.split('@')[0]).trim()
+      const nom = (familyName || rest.join(' ') || 'Facebook').trim()
+      // `split` rend `string | undefined` pour TypeScript, et `uniquePseudo` attend une chaîne.
+      // Une adresse a toujours une partie locale ; le repli sur l'adresse entière dit la même
+      // chose qu'un `!`, sans affirmer au compilateur ce qu'il ne peut pas vérifier.
+      const basePseudo = email.split('@')[0] ?? email
+      const pseudo = await uniquePseudo(basePseudo)
+
+      dbUser = await prisma.user.create({
+        data: {
+          email,
+          emailHash: getEmailHash(email),
+          pseudo,
+          nom,
+          prenom,
+          password: null, // Pas de mot de passe pour les utilisateurs OAuth
+          authProvider: 'facebook',
+          ...(providerId ? { facebookId: providerId } : {}),
+          isEmailVerified: true,
+          ...(picture ? { profilePicture: picture } : {}),
+        },
+      })
+    }
   }
 
   // Mettre à jour la photo de profil si elle est vide et que Facebook fournit une image
@@ -162,8 +193,17 @@ export default defineEventHandler(async (event) => {
   }
 
   // Mettre à jour la date de dernière connexion et le authProvider si nécessaire
-  const updateData: { lastLoginAt: Date; authProvider?: string } = {
+  const updateData: { lastLoginAt: Date; authProvider?: string; facebookId?: string } = {
     lastLoginAt: new Date(),
+  }
+
+  /*
+   * Le rattrapage des comptes d'avant ce lot, et il se fait TOUT SEUL. Même raisonnement que pour
+   * Google, `=== null` compris : si le compte porte déjà un autre identifiant, l'écraser volerait
+   * le lien du premier.
+   */
+  if (providerId && dbUser.facebookId === null) {
+    updateData.facebookId = providerId
   }
 
   // Si l'utilisateur a été créé manuellement (authProvider = MANUAL),

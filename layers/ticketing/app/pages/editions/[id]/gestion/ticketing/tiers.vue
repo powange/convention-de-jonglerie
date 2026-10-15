@@ -186,8 +186,7 @@ onMounted(async () => {
   }
 
   if (canAccess.value) {
-    await loadData()
-    await loadCustomFields()
+    await Promise.all([loadData(), loadCustomFields()])
   }
 })
 
@@ -255,8 +254,7 @@ const { execute: refreshData, loading: refreshing } = useApiAction(
       default: 'Impossible de synchroniser les données',
     },
     onSuccess: async () => {
-      await loadData()
-      await loadCustomFields()
+      await Promise.all([loadData(), loadCustomFields()])
     },
   }
 )
@@ -271,8 +269,7 @@ const canAccess = computed(() => {
 // Recharger les données quand les permissions changent (mode super admin)
 watch(canAccess, async (newValue, oldValue) => {
   if (newValue && !oldValue) {
-    await loadData()
-    await loadCustomFields()
+    await Promise.all([loadData(), loadCustomFields()])
   }
 })
 </script>
