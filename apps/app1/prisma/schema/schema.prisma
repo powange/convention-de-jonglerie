@@ -20,6 +20,24 @@ model User {
   prenom                 String?
   password               String?
   authProvider           String    @default("email") // "email", "google", "facebook"
+  googleId               String?   @unique
+  facebookId             String?   @unique
+
+  /// Les deux champs juste au-dessus portent l'identifiant STABLE du compte chez le
+  /// fournisseur — `sub` pour Google, `id` pour Facebook.
+  ///
+  /// ⚠️ `authProvider` ne sert PAS à retrouver un compte : c'est une étiquette du mode de
+  /// création. La liaison OAuth reposait donc uniquement sur `email`, et `email` change. Un
+  /// utilisateur qui modifiait son adresse — ou dont Google en renvoyait une autre — obtenait au
+  /// bouton suivant un compte NEUF : sans ses billets, ses candidatures ni ses conventions. En
+  /// silence, sans erreur affichée. Le seul recours était la fusion de comptes côté
+  /// administrateur, soit la réparation à la main de quelque chose qui se produisait déjà.
+  ///
+  /// 📍 NULLABLE ET SANS RATTRAPAGE, délibérément. Les deux fournisseurs renvoyaient déjà ces
+  /// identifiants et on les jetait : il n'existe aucune donnée à reconstituer. Les comptes
+  /// existants partent donc à NULL et s'inscrivent d'eux-mêmes à leur prochaine connexion, quand
+  /// la recherche par adresse les retrouve. Un script de reprise ne POURRAIT rien faire — ces
+  /// valeurs n'ont jamais été conservées.
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
   lastLoginAt            DateTime?

@@ -113,6 +113,12 @@ export default defineEventHandler(async (event) => {
     headers: { Authorization: `Bearer ${accessToken}` },
   })
 
+  /*
+   * `sub` est l'identifiant STABLE du compte Google. Il était déjà renvoyé — le scope contient
+   * `openid` — et on le jetait. C'est lui, et non l'adresse, qui identifie un compte : une
+   * adresse change, `sub` non.
+   */
+  const providerId = userInfo?.sub as string | undefined
   const email = userInfo?.email as string | undefined
   const name = (userInfo?.name as string | undefined) || ''
   const givenName = (userInfo?.given_name as string | undefined) || ''
@@ -123,8 +129,24 @@ export default defineEventHandler(async (event) => {
     return sendRedirect(event, '/login')
   }
 
-  // Essayer de retrouver l'utilisateur par email
-  let dbUser = await prisma.user.findUnique({ where: { email } })
+  /*
+   * ⚠️ L'IDENTIFIANT DE FOURNISSEUR D'ABORD, L'ADRESSE EN SECOURS.
+   *
+   * La recherche se faisait uniquement par adresse, et l'adresse change. Un utilisateur qui
+   * modifiait la sienne — ici ou chez Google — obtenait au bouton suivant un compte NEUF, sans
+   * ses billets, ses candidatures ni ses conventions. En silence, sans erreur affichée.
+   *
+   * 📍 L'ordre compte, et pas seulement pour le cas nominal. Si l'adresse `b@x` appartient
+   * désormais à un AUTRE compte Google, chercher par `sub` d'abord rend le bon compte ; chercher
+   * par adresse d'abord rendrait celui de quelqu'un d'autre.
+   *
+   * La recherche par adresse reste indispensable : elle rattrape les comptes créés avant ce lot,
+   * qui n'ont pas encore d'identifiant enregistré.
+   */
+  let dbUser = providerId ? await prisma.user.findUnique({ where: { googleId: providerId } }) : null
+  if (!dbUser) {
+    dbUser = await prisma.user.findUnique({ where: { email } })
+  }
 
   // Variable pour savoir si c'est une nouvelle inscription
   let isNewUser = false
@@ -150,6 +172,7 @@ export default defineEventHandler(async (event) => {
         prenom,
         password: null, // Pas de mot de passe pour les utilisateurs OAuth
         authProvider: 'google',
+        ...(providerId ? { googleId: providerId } : {}),
         isEmailVerified: true,
         ...(picture ? { profilePicture: picture } : {}),
       },
@@ -169,8 +192,22 @@ export default defineEventHandler(async (event) => {
   }
 
   // Mettre à jour la date de dernière connexion et le authProvider si nécessaire
-  const updateData: { lastLoginAt: Date; authProvider?: string } = {
+  const updateData: { lastLoginAt: Date; authProvider?: string; googleId?: string } = {
     lastLoginAt: new Date(),
+  }
+
+  /*
+   * Le rattrapage des comptes d'avant ce lot, et il se fait TOUT SEUL : le compte retrouvé par
+   * adresse enregistre son identifiant ici, et la connexion suivante passe par la recherche
+   * stable. Aucun script de reprise n'était possible — nous n'avons jamais eu ces valeurs.
+   *
+   * ⚠️ `=== null` ET NON `!== providerId` : si le compte porte DÉJÀ un autre identifiant, c'est
+   * que cette adresse est passée à un second compte Google. L'écraser volerait le lien du
+   * premier. On ne touche donc qu'un champ vide, et l'anomalie reste visible au lieu d'être
+   * recouverte.
+   */
+  if (providerId && dbUser.googleId === null) {
+    updateData.googleId = providerId
   }
 
   // Si l'utilisateur a été créé manuellement (authProvider = MANUAL),
