@@ -81,6 +81,7 @@
             :variant="viewMode === 'agenda' ? 'solid' : 'ghost'"
             icon="i-heroicons-calendar"
             size="sm"
+            data-vue-agenda
             @click="changeViewMode('agenda')"
           >
             {{ $t('homepage.agenda') }}
