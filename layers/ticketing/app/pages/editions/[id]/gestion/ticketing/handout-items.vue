@@ -88,6 +88,30 @@
           >
             <template #tiers>
               <UiSqueletteDeListe v-if="loadingTiers" :lignes="3" :libelle="$t('common.loading')" />
+              <!-- ⚠️ CETTE BRANCHE PASSE AVANT LA BRANCHE VIDE, et c’est tout l’enjeu.
+                   La liste est vide dans les DEUX cas — panne de chargement ou absence réelle —, donc
+                   dans l’autre ordre « aucun élément » l’emporterait et rendrait la panne
+                   indiscernable d’une donnée. Même correctif que sur les repas (#838). -->
+              <UiEtatVide
+                v-else-if="erreurTiers"
+                compact
+                icone="i-heroicons-exclamation-triangle"
+                classe-icone="text-amber-500"
+                :titre="$t('errors.loading_error')"
+                class="bg-amber-50 dark:bg-amber-950/30 rounded-lg"
+              >
+                <template #action>
+                  <UButton
+                    size="xs"
+                    color="neutral"
+                    variant="soft"
+                    icon="i-heroicons-arrow-path"
+                    @click="loadTiers()"
+                  >
+                    {{ $t('common.retry') }}
+                  </UButton>
+                </template>
+              </UiEtatVide>
               <UiEtatVide
                 v-else-if="tiers.length === 0"
                 compact
@@ -150,6 +174,27 @@
                 :lignes="3"
                 :libelle="$t('common.loading')"
               />
+              <!-- Avant la branche vide : même raison qu’au premier bloc. -->
+              <UiEtatVide
+                v-else-if="erreurOptions"
+                compact
+                icone="i-heroicons-exclamation-triangle"
+                classe-icone="text-amber-500"
+                :titre="$t('errors.loading_error')"
+                class="bg-amber-50 dark:bg-amber-950/30 rounded-lg"
+              >
+                <template #action>
+                  <UButton
+                    size="xs"
+                    color="neutral"
+                    variant="soft"
+                    icon="i-heroicons-arrow-path"
+                    @click="loadOptions()"
+                  >
+                    {{ $t('common.retry') }}
+                  </UButton>
+                </template>
+              </UiEtatVide>
               <UiEtatVide
                 v-else-if="ticketingOptions.length === 0"
                 compact
@@ -210,6 +255,27 @@
                 :lignes="3"
                 :libelle="$t('common.loading')"
               />
+              <!-- Avant la branche vide : même raison qu’au premier bloc. -->
+              <UiEtatVide
+                v-else-if="erreurCustomFields"
+                compact
+                icone="i-heroicons-exclamation-triangle"
+                classe-icone="text-amber-500"
+                :titre="$t('errors.loading_error')"
+                class="bg-amber-50 dark:bg-amber-950/30 rounded-lg"
+              >
+                <template #action>
+                  <UButton
+                    size="xs"
+                    color="neutral"
+                    variant="soft"
+                    icon="i-heroicons-arrow-path"
+                    @click="loadCustomFields()"
+                  >
+                    {{ $t('common.retry') }}
+                  </UButton>
+                </template>
+              </UiEtatVide>
               <UiEtatVide
                 v-else-if="customFields.length === 0"
                 compact
@@ -328,6 +394,27 @@
                   :lignes="3"
                   :libelle="$t('common.loading')"
                 />
+                <!-- Avant la branche vide : même raison qu’au premier bloc. -->
+                <UiEtatVide
+                  v-else-if="erreurEditionOrganizers"
+                  compact
+                  icone="i-heroicons-exclamation-triangle"
+                  classe-icone="text-amber-500"
+                  :titre="$t('errors.loading_error')"
+                  class="bg-amber-50 dark:bg-amber-950/30 rounded-lg"
+                >
+                  <template #action>
+                    <UButton
+                      size="xs"
+                      color="neutral"
+                      variant="soft"
+                      icon="i-heroicons-arrow-path"
+                      @click="loadEditionOrganizers()"
+                    >
+                      {{ $t('common.retry') }}
+                    </UButton>
+                  </template>
+                </UiEtatVide>
                 <UiEtatVide
                   v-else-if="editionOrganizers.length === 0"
                   compact
@@ -430,6 +517,27 @@
                   :lignes="3"
                   :libelle="$t('common.loading')"
                 />
+                <!-- Avant la branche vide : même raison qu’au premier bloc. -->
+                <UiEtatVide
+                  v-else-if="erreurShows"
+                  compact
+                  icone="i-heroicons-exclamation-triangle"
+                  classe-icone="text-amber-500"
+                  :titre="$t('errors.loading_error')"
+                  class="bg-amber-50 dark:bg-amber-950/30 rounded-lg"
+                >
+                  <template #action>
+                    <UButton
+                      size="xs"
+                      color="neutral"
+                      variant="soft"
+                      icon="i-heroicons-arrow-path"
+                      @click="loadShows()"
+                    >
+                      {{ $t('common.retry') }}
+                    </UButton>
+                  </template>
+                </UiEtatVide>
                 <UiEtatVide
                   v-else-if="shows.length === 0"
                   compact
@@ -494,6 +602,27 @@
                   :lignes="3"
                   :libelle="$t('common.loading')"
                 />
+                <!-- Avant la branche vide : même raison qu’au premier bloc. -->
+                <UiEtatVide
+                  v-else-if="erreurArtists"
+                  compact
+                  icone="i-heroicons-exclamation-triangle"
+                  classe-icone="text-amber-500"
+                  :titre="$t('errors.loading_error')"
+                  class="bg-amber-50 dark:bg-amber-950/30 rounded-lg"
+                >
+                  <template #action>
+                    <UButton
+                      size="xs"
+                      color="neutral"
+                      variant="soft"
+                      icon="i-heroicons-arrow-path"
+                      @click="loadArtists()"
+                    >
+                      {{ $t('common.retry') }}
+                    </UButton>
+                  </template>
+                </UiEtatVide>
                 <UiEtatVide
                   v-else-if="artists.length === 0"
                   compact
@@ -550,6 +679,27 @@
                   :lignes="3"
                   :libelle="$t('common.loading')"
                 />
+                <!-- Avant la branche vide : même raison qu’au premier bloc. -->
+                <UiEtatVide
+                  v-else-if="erreurMeals"
+                  compact
+                  icone="i-heroicons-exclamation-triangle"
+                  classe-icone="text-amber-500"
+                  :titre="$t('errors.loading_error')"
+                  class="bg-amber-50 dark:bg-amber-950/30 rounded-lg"
+                >
+                  <template #action>
+                    <UButton
+                      size="xs"
+                      color="neutral"
+                      variant="soft"
+                      icon="i-heroicons-arrow-path"
+                      @click="loadMeals()"
+                    >
+                      {{ $t('common.retry') }}
+                    </UButton>
+                  </template>
+                </UiEtatVide>
                 <UiEtatVide
                   v-else-if="enabledMealsGrouped.length === 0"
                   compact
@@ -804,10 +954,12 @@ const organizerItemsModalTarget = ref<any>(null)
 
 // Organisateurs présents sur l'édition (pour la liste « par organisateur »).
 const loadingEditionOrganizers = ref(true)
+const erreurEditionOrganizers = ref(false)
 const editionOrganizers = ref<any[]>([])
 
 // Spectacles de l'édition (pour l'onglet Artistes).
 const loadingShows = ref(true)
+const erreurShows = ref(false)
 const shows = ref<any[]>([])
 const showItemsModalOpen = ref(false)
 const showItemsModalTarget = ref<any>(null)
@@ -819,6 +971,7 @@ const artistItemsModalOpen = ref(false)
 
 // Artistes de l'édition, pour les articles demandés à l'un d'eux en particulier.
 const loadingArtists = ref(true)
+const erreurArtists = ref(false)
 const artists = ref<any[]>([])
 const perArtistItemsModalOpen = ref(false)
 const perArtistItemsModalTarget = ref<any>(null)
@@ -826,22 +979,26 @@ const perArtistItemsModalTarget = ref<any>(null)
 // Repas de l'édition (pour l'onglet Repas). On n'affiche que les repas
 // activés (`enabled === true`) sur la page de gestion des repas.
 const loadingMeals = ref(true)
+const erreurMeals = ref(false)
 const meals = ref<any[]>([])
 const mealItemsModalOpen = ref(false)
 const mealItemsModalTarget = ref<any>(null)
 
 // Tarifs / Options / Champs personnalisés
 const loadingTiers = ref(true)
+const erreurTiers = ref(false)
 const tiers = ref<any[]>([])
 const tierItemsModalOpen = ref(false)
 const tierItemsModalTarget = ref<any>(null)
 
 const loadingOptions = ref(true)
+const erreurOptions = ref(false)
 const ticketingOptions = ref<any[]>([])
 const optionItemsModalOpen = ref(false)
 const optionItemsModalTarget = ref<any>(null)
 
 const loadingCustomFields = ref(true)
+const erreurCustomFields = ref(false)
 const customFields = ref<any[]>([])
 const customFieldItemsModalOpen = ref(false)
 const customFieldItemsModalTarget = ref<any>(null)
@@ -952,8 +1109,12 @@ const loadEditionOrganizers = async () => {
       `/api/editions/${editionId}/organizers/edition-organizers`
     )
     editionOrganizers.value = response.data?.organizers || []
+    erreurEditionOrganizers.value = false
   } catch {
-    // Erreur silencieuse
+    // On vide la liste ET on lève le drapeau : sans lui, l’écran conclurait « aucun
+    // élément » alors que c’est le chargement qui a échoué.
+    editionOrganizers.value = []
+    erreurEditionOrganizers.value = true
   } finally {
     loadingEditionOrganizers.value = false
   }
@@ -984,8 +1145,12 @@ const loadShows = async () => {
   try {
     const response = await $fetch<{ data: { shows: any[] } }>(`/api/editions/${editionId}/shows`)
     shows.value = response.data?.shows || []
+    erreurShows.value = false
   } catch {
-    // Erreur silencieuse
+    // On vide la liste ET on lève le drapeau : sans lui, l’écran conclurait « aucun
+    // élément » alors que c’est le chargement qui a échoué.
+    shows.value = []
+    erreurShows.value = true
   } finally {
     loadingShows.value = false
   }
@@ -999,8 +1164,12 @@ const loadArtists = async () => {
       `/api/editions/${editionId}/artists`
     )
     artists.value = response.data?.artists || []
+    erreurArtists.value = false
   } catch {
-    // Erreur silencieuse
+    // On vide la liste ET on lève le drapeau : sans lui, l’écran conclurait « aucun
+    // élément » alors que c’est le chargement qui a échoué.
+    artists.value = []
+    erreurArtists.value = true
   } finally {
     loadingArtists.value = false
   }
@@ -1030,8 +1199,12 @@ const loadMeals = async () => {
       `/api/editions/${editionId}/volunteers/meals`
     )
     meals.value = response.data?.meals || []
+    erreurMeals.value = false
   } catch {
-    // Erreur silencieuse
+    // On vide la liste ET on lève le drapeau : sans lui, l’écran conclurait « aucun
+    // élément » alors que c’est le chargement qui a échoué.
+    meals.value = []
+    erreurMeals.value = true
   } finally {
     loadingMeals.value = false
   }
@@ -1050,8 +1223,12 @@ const loadTiers = async () => {
       `/api/editions/${editionId}/ticketing/tiers`
     )
     tiers.value = response.data?.tiers || []
+    erreurTiers.value = false
   } catch {
-    // Erreur silencieuse
+    // On vide la liste ET on lève le drapeau : sans lui, l’écran conclurait « aucun
+    // élément » alors que c’est le chargement qui a échoué.
+    tiers.value = []
+    erreurTiers.value = true
   } finally {
     loadingTiers.value = false
   }
@@ -1069,8 +1246,12 @@ const loadOptions = async () => {
       `/api/editions/${editionId}/ticketing/options`
     )
     ticketingOptions.value = response.data?.options || []
+    erreurOptions.value = false
   } catch {
-    // Erreur silencieuse
+    // On vide la liste ET on lève le drapeau : sans lui, l’écran conclurait « aucun
+    // élément » alors que c’est le chargement qui a échoué.
+    ticketingOptions.value = []
+    erreurOptions.value = true
   } finally {
     loadingOptions.value = false
   }
@@ -1088,8 +1269,12 @@ const loadCustomFields = async () => {
       `/api/editions/${editionId}/ticketing/custom-fields`
     )
     customFields.value = response.data?.customFields || []
+    erreurCustomFields.value = false
   } catch {
-    // Erreur silencieuse
+    // On vide la liste ET on lève le drapeau : sans lui, l’écran conclurait « aucun
+    // élément » alors que c’est le chargement qui a échoué.
+    customFields.value = []
+    erreurCustomFields.value = true
   } finally {
     loadingCustomFields.value = false
   }
