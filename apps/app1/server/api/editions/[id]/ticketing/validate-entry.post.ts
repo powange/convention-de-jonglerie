@@ -272,6 +272,44 @@ export default wrapApiHandler(
 
         // Envoyer des notifications uniquement si de nouvelles validations ont été effectuées
         if (result.count > 0) {
+          /*
+           * Les organisateurs habilités à gérer les artistes, pour les prévenir de l'arrivée.
+           *
+           * ⚠️ LUE UNE SEULE FOIS, HORS DE LA BOUCLE. Elle ne dépend que de `editionId`, qui est
+           * le paramètre de route : à l'intérieur, elle relisait la MÊME ligne à chaque artiste
+           * scanné, avec ses trois jointures imbriquées. Scanner cinq artistes ensemble faisait
+           * cinq fois la même requête, sur le chemin le plus sensible à la latence du dépôt —
+           * le guichet, à l'entrée d'une convention.
+           *
+           * ⚠️ Ce n'est PAS `EditionOrganizer` : ce modèle décrit un organisateur PRÉSENT sur
+           * l'édition — son QR code, sa validation d'entrée — et ne porte ni `userId` ni droits.
+           * La requête précédente nommait les deux, et Prisma refusait donc la requête entière :
+           * scanner le billet d'un artiste rendait 500.
+           *
+           * Le droit vit à deux endroits, comme partout ailleurs dans le dépôt : sur
+           * l'organisateur de la CONVENTION, et sur la permission propre à l'ÉDITION. Voir
+           * `canManageArtistsById`, dont c'est la même lecture.
+           */
+          const habilitations = await prisma.edition.findUnique({
+            where: { id: editionId },
+            select: {
+              creatorId: true,
+              convention: {
+                select: {
+                  authorId: true,
+                  organizers: {
+                    where: { canManageArtists: true },
+                    select: { userId: true },
+                  },
+                },
+              },
+              organizerPermissions: {
+                where: { canManageArtists: true },
+                select: { organizer: { select: { userId: true } } },
+              },
+            },
+          })
+
           // Envoyer des notifications aux responsables artistes
           // Pour chaque artiste validé
           for (const artistId of body.participantIds) {
@@ -305,38 +343,6 @@ export default wrapApiHandler(
               })
 
               if (!artist) continue
-
-              /*
-               * Les organisateurs habilités à gérer les artistes, pour les prévenir de l'arrivée.
-               *
-               * ⚠️ Ce n'est PAS `EditionOrganizer` : ce modèle décrit un organisateur PRÉSENT sur
-               * l'édition — son QR code, sa validation d'entrée — et ne porte ni `userId` ni
-               * droits. La requête précédente nommait les deux, et Prisma refusait donc la
-               * requête entière : scanner le billet d'un artiste rendait 500.
-               *
-               * Le droit vit à deux endroits, comme partout ailleurs dans le dépôt : sur
-               * l'organisateur de la CONVENTION, et sur la permission propre à l'ÉDITION. Voir
-               * `canManageArtistsById`, dont c'est la même lecture.
-               */
-              const habilitations = await prisma.edition.findUnique({
-                where: { id: editionId },
-                select: {
-                  creatorId: true,
-                  convention: {
-                    select: {
-                      authorId: true,
-                      organizers: {
-                        where: { canManageArtists: true },
-                        select: { userId: true },
-                      },
-                    },
-                  },
-                  organizerPermissions: {
-                    where: { canManageArtists: true },
-                    select: { organizer: { select: { userId: true } } },
-                  },
-                },
-              })
 
               // Le créateur de l'édition et l'auteur de la convention en répondent aussi, sans
               // qu'aucune case ne soit cochée. Un `Set` évite de notifier deux fois qui cumule.
