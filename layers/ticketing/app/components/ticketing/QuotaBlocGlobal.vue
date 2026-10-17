@@ -15,6 +15,26 @@
     <div v-if="loading" class="text-center py-4">
       <UIcon name="i-heroicons-arrow-path" class="h-5 w-5 text-gray-400 animate-spin" />
     </div>
+    <!-- ⚠️ AVANT la branche vide du bas : sans ce drapeau, une panne de chargement s'affichait
+         comme « aucun quota ». Les deux cas donnent une liste vide, donc le `v-else` l'emportait
+         et l'organisateur pouvait croire qu'il n'avait rien configuré. -->
+    <div v-else-if="erreur" class="py-4 text-center">
+      <UIcon
+        name="i-heroicons-exclamation-triangle"
+        class="h-5 w-5 text-amber-500 mx-auto mb-2 block"
+      />
+      <p class="text-sm text-dimmed">{{ $t('errors.loading_error') }}</p>
+      <UButton
+        class="mt-2"
+        size="xs"
+        color="neutral"
+        variant="soft"
+        icon="i-heroicons-arrow-path"
+        @click="emit('reessayer')"
+      >
+        {{ $t('common.retry') }}
+      </UButton>
+    </div>
     <div v-else-if="quotas.length" class="flex flex-wrap gap-1 mt-2">
       <UBadge v-for="quota in quotas" :key="quota.id" color="warning" variant="subtle">
         {{ quota.title }}
@@ -45,7 +65,14 @@ defineProps<{
   libelleEdition: string
   quotas: Array<{ id: number; title: string }>
   loading: boolean
+  /**
+   * Le chargement a échoué — DISTINCT de `quotas` vide.
+   *
+   * Sans ce drapeau, le `v-else` du bas annonçait « aucun quota » sur une panne. Même raison que
+   * dans `QuotaAssociationList`, et même correctif que sur les repas (#838).
+   */
+  erreur?: boolean
 }>()
 
-const emit = defineEmits<{ editer: [] }>()
+const emit = defineEmits<{ editer: []; reessayer: [] }>()
 </script>

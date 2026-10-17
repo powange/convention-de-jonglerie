@@ -3,6 +3,30 @@
     <UIcon name="i-heroicons-arrow-path" class="h-6 w-6 text-gray-400 animate-spin" />
   </div>
 
+  <!-- ⚠️ CETTE BRANCHE PASSE AVANT LA BRANCHE VIDE, et c'est tout l'enjeu.
+       La liste est vide dans les DEUX cas — panne de chargement ou absence réelle. Dans l'autre
+       ordre, `messageVide` l'emporterait et annoncerait « aucun tarif » alors que c'est la
+       requête qui a échoué. Une panne deviendrait une affirmation sur les données, et
+       l'organisateur pourrait croire qu'il n'a rien configuré. Même correctif que sur les repas
+       (#838) et les articles à remettre (#853). -->
+  <div v-else-if="erreur" class="py-8 text-center">
+    <UIcon
+      name="i-heroicons-exclamation-triangle"
+      class="h-6 w-6 text-amber-500 mx-auto mb-2 block"
+    />
+    <p class="text-sm text-dimmed">{{ $t('errors.loading_error') }}</p>
+    <UButton
+      class="mt-3"
+      size="xs"
+      color="neutral"
+      variant="soft"
+      icon="i-heroicons-arrow-path"
+      @click="emit('reessayer')"
+    >
+      {{ $t('common.retry') }}
+    </UButton>
+  </div>
+
   <p v-else-if="!elements.length" class="text-sm text-dimmed py-8 text-center">
     {{ messageVide }}
   </p>
@@ -109,9 +133,19 @@ export interface ElementAssociable {
 defineProps<{
   elements: ElementAssociable[]
   loading: boolean
+  /**
+   * Le chargement a échoué.
+   *
+   * ⚠️ DISTINCT DE `elements` VIDE, et c'est toute la raison d'être de cette prop : la liste est
+   * vide dans les deux cas, et sans ce drapeau l'écran annonçait « aucun tarif » sur une panne.
+   * Les six onglets de la page des quotas absorbaient leur erreur en silence — leurs commentaires
+   * disaient « l'onglet reste vide plutôt que de casser la page », en arbitrant entre vide et
+   * plantage alors qu'il existe une troisième réponse : dire que ça a échoué.
+   */
+  erreur?: boolean
   messageVide: string
   libelleEdition: string
 }>()
 
-const emit = defineEmits<{ editer: [id: number | string] }>()
+const emit = defineEmits<{ editer: [id: number | string]; reessayer: [] }>()
 </script>
