@@ -443,6 +443,30 @@
               <p class="text-sm text-gray-500">{{ $t('ticketing.access_control.loading') }}</p>
             </div>
 
+            <!-- ⚠️ AVANT la branche vide : la liste est vide dans les DEUX cas, donc dans
+                 l'autre ordre « aucune validation » l'emporterait et un opérateur pourrait
+                 conclure que personne n'est passé alors que la requête a échoué. -->
+            <UiEtatVide
+              v-else-if="erreurValidations"
+              compact
+              icone="i-heroicons-exclamation-triangle"
+              classe-icone="text-amber-500"
+              :titre="$t('errors.loading_error')"
+              class="bg-amber-50 dark:bg-amber-950/30 rounded-lg"
+            >
+              <template #action>
+                <UButton
+                  size="xs"
+                  color="neutral"
+                  variant="soft"
+                  icon="i-heroicons-arrow-path"
+                  @click="loadRecentValidations()"
+                >
+                  {{ $t('common.retry') }}
+                </UButton>
+              </template>
+            </UiEtatVide>
+
             <UiEtatVide
               v-else-if="recentValidations.length === 0"
               compact
@@ -602,6 +626,32 @@
               est passé —, pas un simple « il n'y a rien ». Le neutre par défaut de `UiEtatVide`
               dirait la mauvaise chose.
             -->
+            <!-- ⚠️⚠️ AVANT LE VIDE VERT, et c'est ici que cela compte le plus de tout l'écran.
+                 Ce vide-là n'annonce pas « il n'y a rien » mais « tout le monde est passé », en
+                 vert et avec une coche. Sur une panne de chargement, l'écran affirmait donc que
+                 TOUT ALLAIT BIEN. Un vide rassurant n'invite pas à vérifier — c'est pire qu'un
+                 vide neutre. Le toast de `useApiAction` disparaît ; ce panneau, non. -->
+            <UiEtatVide
+              v-else-if="erreurVolontairesNonValides"
+              compact
+              icone="i-heroicons-exclamation-triangle"
+              classe-icone="text-amber-500"
+              :titre="$t('errors.loading_error')"
+              class="bg-amber-50 dark:bg-amber-950/30 rounded-lg"
+            >
+              <template #action>
+                <UButton
+                  size="xs"
+                  color="neutral"
+                  variant="soft"
+                  icon="i-heroicons-arrow-path"
+                  @click="loadVolunteersNotValidated()"
+                >
+                  {{ $t('common.retry') }}
+                </UButton>
+              </template>
+            </UiEtatVide>
+
             <UiEtatVide
               v-else-if="volunteersNotValidated.length === 0"
               compact
@@ -917,6 +967,23 @@ const personnesAValiderEnBloc = computed(() => personnes.value.filter(meriteUnGe
 const validationEnBloc = ref<string | null>(null)
 const recentValidations = ref<any[]>([])
 const loadingValidations = ref(false)
+/**
+ * Le chargement des validations récentes a échoué.
+ *
+ * ⚠️ DISTINCT d'une liste vide. Sans ce drapeau, l'écran annonçait « aucune validation pour le
+ * moment » sur une panne — au guichet, à l'entrée d'une convention, où un opérateur peut en
+ * conclure que personne n'est encore passé.
+ */
+const erreurValidations = ref(false)
+/**
+ * Le chargement des bénévoles non validés a échoué.
+ *
+ * ⚠️ Ici le défaut n'est PAS un silence — `useApiAction` affiche bien un toast d'erreur — mais une
+ * CONTRADICTION : le panneau continuait d'afficher « tous les bénévoles sont validés », en vert et
+ * avec une coche. Le toast est fugace, le panneau reste. Un vide rassurant est pire qu'un vide
+ * neutre : il n'invite pas à vérifier.
+ */
+const erreurVolontairesNonValides = ref(false)
 const stats = ref({
   validatedToday: 0,
   totalValidated: 0,
@@ -1730,7 +1797,9 @@ const loadRecentValidations = async () => {
   try {
     const result: any = await $fetch(`/api/editions/${editionId}/ticketing/recent-validations`)
     recentValidations.value = result.data.validations
+    erreurValidations.value = false
   } catch {
+    erreurValidations.value = true
     // Erreur silencieuse lors du chargement des validations récentes
   } finally {
     loadingValidations.value = false
@@ -1853,6 +1922,13 @@ const { execute: loadVolunteersNotValidated, loading: loadingVolunteersNotValida
     errorMessages: { default: t('ticketing.access_control.load_volunteers_error') },
     onSuccess: (response: any) => {
       volunteersNotValidated.value = response?.volunteers || []
+      erreurVolontairesNonValides.value = false
+    },
+    // Le toast d'erreur de `useApiAction` ne suffit pas : il disparaît, et le panneau derrière
+    // continuerait d'affirmer que tout le monde est validé.
+    onError: () => {
+      volunteersNotValidated.value = []
+      erreurVolontairesNonValides.value = true
     },
   })
 
