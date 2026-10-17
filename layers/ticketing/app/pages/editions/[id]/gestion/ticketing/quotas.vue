@@ -39,8 +39,35 @@
           sans quoi il clignoterait à chaque ouverture de la page, en annonçant l'absence de
           quotas pendant qu'on les charge.
         -->
+        <!-- ⚠️ CETTE BRANCHE PASSE AVANT LA BRANCHE VIDE, et c'est tout l'enjeu : la liste est
+             vide dans les DEUX cas, donc dans l'autre ordre « aucun quota » l'emporterait et
+             rendrait la panne indiscernable d'une absence réelle. -->
         <div
-          v-if="!loadingQuotas && quotas.length === 0"
+          v-if="!loadingQuotas && erreurQuotas"
+          class="border-t border-gray-200 dark:border-gray-800 pt-8"
+        >
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            {{ $t('gestion.ticketing.assign_quotas_title') }}
+          </h2>
+          <UAlert
+            icon="i-heroicons-exclamation-triangle"
+            color="warning"
+            variant="soft"
+            :title="$t('errors.loading_error')"
+            :actions="[
+              {
+                label: $t('common.retry'),
+                icon: 'i-heroicons-arrow-path',
+                color: 'neutral',
+                variant: 'soft',
+                onClick: () => loadQuotas(),
+              },
+            ]"
+          />
+        </div>
+
+        <div
+          v-else-if="!loadingQuotas && quotas.length === 0"
           class="border-t border-gray-200 dark:border-gray-800 pt-8"
         >
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -81,8 +108,10 @@
               <TicketingQuotaAssociationList
                 :elements="tarifsAssociables"
                 :loading="loadingTiers"
+                :erreur="erreurTiers"
                 :message-vide="$t('gestion.ticketing.assign_quotas_no_tier')"
                 :libelle-edition="$t('gestion.ticketing.assign_quotas_edit')"
+                @reessayer="loadTiers"
                 @editer="ouvrirQuotasDuTarif"
               />
             </template>
@@ -91,8 +120,10 @@
               <TicketingQuotaAssociationList
                 :elements="optionsAssociables"
                 :loading="loadingOptions"
+                :erreur="erreurOptions"
                 :message-vide="$t('gestion.ticketing.assign_quotas_no_option')"
                 :libelle-edition="$t('gestion.ticketing.assign_quotas_edit_option')"
+                @reessayer="loadOptions"
                 @editer="ouvrirQuotasDeLOption"
               />
             </template>
@@ -109,6 +140,8 @@
                   :libelle-edition="$t('gestion.ticketing.assign_quotas_edit_organizers')"
                   :quotas="quotasGlobauxOrganisateurs"
                   :loading="loadingOrganisateurs"
+                  :erreur="erreurOrganisateurs"
+                  @reessayer="loadOrganisateurs"
                   @editer="ouvrirQuotasGlobauxOrganisateurs"
                 />
 
@@ -123,8 +156,10 @@
                   <TicketingQuotaAssociationList
                     :elements="organisateursAssociables"
                     :loading="loadingOrganisateurs"
+                    :erreur="erreurOrganisateurs"
                     :message-vide="$t('gestion.organizers.no_organizers_on_edition')"
                     :libelle-edition="$t('gestion.ticketing.assign_quotas_edit_organizer')"
+                    @reessayer="loadOrganisateurs"
                     @editer="ouvrirQuotasDeLOrganisateur"
                   >
                     <!-- Le nom d'une personne, rendu par le composant qui en porte la règle,
@@ -162,6 +197,8 @@
                   :libelle-edition="$t('gestion.ticketing.assign_quotas_edit_volunteers')"
                   :quotas="quotasGlobauxBenevoles"
                   :loading="loadingBenevoles"
+                  :erreur="erreurBenevoles"
+                  @reessayer="loadBenevoles"
                   @editer="ouvrirQuotasGlobauxBenevoles"
                 />
 
@@ -176,8 +213,10 @@
                   <TicketingQuotaAssociationList
                     :elements="equipesAssociables"
                     :loading="loadingBenevoles"
+                    :erreur="erreurBenevoles"
                     :message-vide="$t('gestion.ticketing.assign_quotas_no_team')"
                     :libelle-edition="$t('gestion.ticketing.assign_quotas_edit_team')"
+                    @reessayer="loadBenevoles"
                     @editer="ouvrirQuotasDeLEquipe"
                   />
                 </div>
@@ -195,6 +234,8 @@
                   :libelle-edition="$t('gestion.ticketing.assign_quotas_edit_artists')"
                   :quotas="quotasGlobauxArtistes"
                   :loading="loadingArtistes"
+                  :erreur="erreurArtistes"
+                  @reessayer="loadArtistes"
                   @editer="ouvrirQuotasGlobauxArtistes"
                 />
 
@@ -209,8 +250,10 @@
                   <TicketingQuotaAssociationList
                     :elements="spectaclesAssociables"
                     :loading="loadingArtistes"
+                    :erreur="erreurArtistes"
                     :message-vide="$t('gestion.shows.no_shows')"
                     :libelle-edition="$t('gestion.ticketing.assign_quotas_edit_show')"
+                    @reessayer="loadArtistes"
                     @editer="ouvrirQuotasDuSpectacle"
                   />
                 </div>
@@ -221,8 +264,10 @@
               <TicketingQuotaAssociationList
                 :elements="champsAssociables"
                 :loading="loadingChamps"
+                :erreur="erreurChamps"
                 :message-vide="$t('gestion.ticketing.assign_quotas_no_custom_field')"
                 :libelle-edition="$t('gestion.ticketing.assign_quotas_edit_custom_field')"
+                @reessayer="loadChamps"
                 @editer="ouvrirQuotasDuChamp"
               >
                 <!-- Les quotas d'un champ se lisent PAR RÉPONSE : c'est la réponse qui décide
@@ -491,6 +536,7 @@ useSeoMeta({
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 const loadingQuotas = ref(true)
+const erreurQuotas = ref(false)
 const quotas = ref<any[]>([])
 
 // Gestion de la billetterie (droit dédié, au niveau édition ou convention) — la même garde que
@@ -505,8 +551,11 @@ const loadQuotas = async () => {
   try {
     const response = await $fetch<any>(`/api/editions/${editionId}/ticketing/quotas`)
     quotas.value = Array.isArray(response?.data?.quotas) ? response.data.quotas : []
+    erreurQuotas.value = false
   } catch {
-    // Erreur silencieuse : la liste reste vide plutôt que de casser la page.
+    // On lève le drapeau : sans lui, l’écran annonce « aucun élément »
+    // alors que c’est le chargement qui a échoué.
+    erreurQuotas.value = true
   } finally {
     loadingQuotas.value = false
   }
@@ -580,15 +629,20 @@ const cibleCourante = computed(() =>
 
 const tiers = ref<TicketingTier[]>([])
 const loadingTiers = ref(true)
+const erreurTiers = ref(false)
 const options = ref<TicketingOption[]>([])
 const loadingOptions = ref(true)
+const erreurOptions = ref(false)
 
 const loadTiers = async () => {
   loadingTiers.value = true
   try {
     tiers.value = await fetchTiers(editionId)
+    erreurTiers.value = false
   } catch {
-    // Erreur silencieuse : l'onglet reste vide plutôt que de casser la page.
+    // On lève le drapeau : sans lui, l’écran annonce « aucun élément »
+    // alors que c’est le chargement qui a échoué.
+    erreurTiers.value = true
   } finally {
     loadingTiers.value = false
   }
@@ -598,8 +652,11 @@ const loadOptions = async () => {
   loadingOptions.value = true
   try {
     options.value = await fetchOptions(editionId)
+    erreurOptions.value = false
   } catch {
-    // Erreur silencieuse, même raison.
+    // On lève le drapeau : sans lui, l’écran annonce « aucun élément »
+    // alors que c’est le chargement qui a échoué.
+    erreurOptions.value = true
   } finally {
     loadingOptions.value = false
   }
@@ -648,6 +705,7 @@ interface AssociationOrganisateur {
 const associationsOrganisateurs = ref<AssociationOrganisateur[]>([])
 const organisateurs = ref<any[]>([])
 const loadingOrganisateurs = ref(true)
+const erreurOrganisateurs = ref(false)
 
 const loadOrganisateurs = async () => {
   loadingOrganisateurs.value = true
@@ -660,8 +718,11 @@ const loadOrganisateurs = async () => {
     ])
     associationsOrganisateurs.value = associations?.data?.quotas ?? []
     organisateurs.value = inscrits?.data?.organizers ?? []
+    erreurOrganisateurs.value = false
   } catch {
-    // Erreur silencieuse, même raison que pour les autres onglets.
+    // On lève le drapeau : sans lui, l’écran annonce « aucun élément »
+    // alors que c’est le chargement qui a échoué.
+    erreurOrganisateurs.value = true
   } finally {
     loadingOrganisateurs.value = false
   }
@@ -764,6 +825,7 @@ const grouperParCle = <C,>(associations: Array<AssociationParCle<C>>) => {
 const associationsBenevoles = ref<Array<AssociationParCle<string>>>([])
 const equipes = ref<any[]>([])
 const loadingBenevoles = ref(true)
+const erreurBenevoles = ref(false)
 
 const loadBenevoles = async () => {
   loadingBenevoles.value = true
@@ -777,8 +839,11 @@ const loadBenevoles = async () => {
       cle: association.teamId,
     }))
     equipes.value = listeEquipes?.data?.teams ?? listeEquipes?.teams ?? []
+    erreurBenevoles.value = false
   } catch {
-    // Erreur silencieuse, même raison que pour les autres onglets.
+    // On lève le drapeau : sans lui, l’écran annonce « aucun élément »
+    // alors que c’est le chargement qui a échoué.
+    erreurBenevoles.value = true
   } finally {
     loadingBenevoles.value = false
   }
@@ -823,6 +888,7 @@ const ouvrirQuotasDeLEquipe = (id: number | string) => {
 const associationsArtistes = ref<Array<AssociationParCle<number>>>([])
 const spectacles = ref<any[]>([])
 const loadingArtistes = ref(true)
+const erreurArtistes = ref(false)
 
 const loadArtistes = async () => {
   loadingArtistes.value = true
@@ -836,8 +902,11 @@ const loadArtistes = async () => {
       cle: association.showId,
     }))
     spectacles.value = listeSpectacles?.data?.shows ?? []
+    erreurArtistes.value = false
   } catch {
-    // Erreur silencieuse, même raison que pour les autres onglets.
+    // On lève le drapeau : sans lui, l’écran annonce « aucun élément »
+    // alors que c’est le chargement qui a échoué.
+    erreurArtistes.value = true
   } finally {
     loadingArtistes.value = false
   }
@@ -948,14 +1017,18 @@ interface LigneDeDetail {
 
 const champs = ref<ChampPersonnalise[]>([])
 const loadingChamps = ref(true)
+const erreurChamps = ref(false)
 
 const loadChamps = async () => {
   loadingChamps.value = true
   try {
     const reponse = await $fetch<any>(`/api/editions/${editionId}/ticketing/custom-fields`)
     champs.value = Array.isArray(reponse?.data?.customFields) ? reponse.data.customFields : []
+    erreurChamps.value = false
   } catch {
-    // Erreur silencieuse, même raison que pour les autres onglets.
+    // On lève le drapeau : sans lui, l’écran annonce « aucun élément »
+    // alors que c’est le chargement qui a échoué.
+    erreurChamps.value = true
   } finally {
     loadingChamps.value = false
   }
