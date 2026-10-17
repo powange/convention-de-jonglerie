@@ -26,7 +26,9 @@ export default wrapApiHandler(
     const offer = await prisma.carpoolOffer.findUnique({
       where: { id: offerId },
       include: {
-        user: true,
+        // ⚠️ `user: true` retiré : ce handler ne lit que `offer.userId`, un scalaire de l'offre.
+        // L'include ramenait toute la ligne du PROPRIÉTAIRE de l'offre — donc d'une autre
+        // personne que le demandeur — mot de passe compris, sans que rien ne la consomme.
         bookings: true,
       },
     })

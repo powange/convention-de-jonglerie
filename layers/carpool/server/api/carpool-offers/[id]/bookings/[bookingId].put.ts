@@ -4,7 +4,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
-import { userWithProfileSelect } from '#server/utils/prisma-select-helpers'
+import { userBasicSelect, userWithProfileSelect } from '#server/utils/prisma-select-helpers'
 import { validateResourceId } from '#server/utils/validation-helpers'
 
 /**
@@ -37,7 +37,10 @@ export default wrapApiHandler(
     // Récupérer l'offre et la réservation
     const offer = await prisma.carpoolOffer.findUnique({
       where: { id: offerId },
-      include: { user: true, bookings: true },
+      // `offer.user` sert ici — mais seulement `.id` et `.pseudo`, ce que couvre exactement
+      // l'aide du dépôt. Sans elle, toute la ligne du propriétaire était lue, mot de passe
+      // compris, pour en afficher le pseudo dans une notification.
+      include: { user: { select: userBasicSelect }, bookings: true },
     })
     if (!offer) {
       throw createError({ status: 404, message: 'Offre introuvable' })

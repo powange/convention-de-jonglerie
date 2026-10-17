@@ -27,7 +27,12 @@ export default wrapApiHandler(
       prisma.passwordResetToken,
       { token },
       {
-        include: { user: true },
+        /*
+         * ⚠️ PAS D'`include: { user: true }` ICI — même raison qu'au frère
+         * `accept-invitation.post.ts`. Ce handler ne lit que `resetToken.userId`, un scalaire du
+         * jeton. L'include lisait la ligne `User` entière, empreinte bcrypt comprise, pour la
+         * jeter — sur le parcours de réinitialisation de mot de passe.
+         */
         errorMessage: 'Token de réinitialisation invalide',
         status: 400,
       }
