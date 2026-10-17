@@ -33,7 +33,16 @@ export default wrapApiHandler(
       prisma.passwordResetToken,
       { token },
       {
-        include: { user: true },
+        /*
+         * ⚠️ PAS D'`include: { user: true }` ICI, et ce n'est pas un oubli.
+         *
+         * Il y en avait un, et rien ne le consommait : ce handler ne lit que
+         * `invitationToken.userId`, une colonne scalaire du jeton lui-même. L'include lisait donc
+         * la ligne `User` ENTIÈRE — empreinte bcrypt du mot de passe comprise — pour la jeter.
+         *
+         * Sur le parcours d'invitation, c'est-à-dire là où un mot de passe se pose. Lire un
+         * secret qu'on n'utilise pas est une exposition gratuite.
+         */
         errorMessage: "Lien d'invitation invalide",
         status: 400,
       }

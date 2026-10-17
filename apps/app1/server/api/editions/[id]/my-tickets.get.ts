@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { benevoleAccepteEtPresentSurPlace } from '#server/utils/ticketing/benevoles-presents'
 import { estUnBilletAnnule } from '#server/utils/ticketing/billets-qui-comptent'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -85,7 +86,13 @@ export default wrapApiHandler(
         ...benevoleAccepteEtPresentSurPlace(editionId),
       },
       include: {
-        user: true,
+        /*
+         * ⚠️ UN `select` ET NON `user: true`. L'include ramenait toute la ligne `User` — mot de
+         * passe compris — alors que la réponse n'en reprend que le prénom, le nom et l'adresse,
+         * recomposés à la main plus bas. Le `CLAUDE.md` impose d'ailleurs les aides du dépôt, et
+         * d'étendre par spread quand il manque un champ : `userWithNameSelect` n'a pas `email`.
+         */
+        user: { select: { ...userWithNameSelect, email: true } },
       },
     })
 
@@ -119,7 +126,13 @@ export default wrapApiHandler(
         editionId,
       },
       include: {
-        user: true,
+        /*
+         * ⚠️ UN `select` ET NON `user: true`. L'include ramenait toute la ligne `User` — mot de
+         * passe compris — alors que la réponse n'en reprend que le prénom, le nom et l'adresse,
+         * recomposés à la main plus bas. Le `CLAUDE.md` impose d'ailleurs les aides du dépôt, et
+         * d'étendre par spread quand il manque un champ : `userWithNameSelect` n'a pas `email`.
+         */
+        user: { select: { ...userWithNameSelect, email: true } },
       },
     })
 
@@ -152,7 +165,8 @@ export default wrapApiHandler(
       include: {
         organizer: {
           include: {
-            user: true,
+            // Même raison qu'au-dessus, un niveau plus bas.
+            user: { select: { ...userWithNameSelect, email: true } },
           },
         },
       },
