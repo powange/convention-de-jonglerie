@@ -381,7 +381,6 @@
               :items="quotas.map((q) => ({ label: q.title, value: q.id }))"
               value-key="value"
               multiple
-              searchable
               :placeholder="$t('ticketing.tiers.modal.quotas_placeholder')"
               class="w-full"
             >

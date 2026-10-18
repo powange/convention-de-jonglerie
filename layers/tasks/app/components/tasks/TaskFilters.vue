@@ -47,8 +47,7 @@
         v-model="selectedAssignees"
         :items="assigneeItems"
         multiple
-        searchable
-        :searchable-placeholder="$t('common.search')"
+        :search-input="{ placeholder: $t('common.search') }"
         :placeholder="$t('tasks.filters.assignee_placeholder')"
         size="sm"
         class="min-w-44"

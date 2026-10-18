@@ -288,7 +288,6 @@
             :items="mealsOptions"
             value-key="value"
             multiple
-            searchable
             :placeholder="$t('ticketing.tiers.modal.meals_placeholder')"
             class="w-full"
           >
