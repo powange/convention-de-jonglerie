@@ -38,10 +38,28 @@ export interface SessionMeUser {
   id: number
   email: string
   emailHash: string
+  /**
+   * L'adresse DEMANDÉE et pas encore confirmée.
+   *
+   * ⚠️ Ce champ MANQUAIT à cette interface alors que `session/me.get.ts` le sélectionne et le
+   * renvoie — et que son propre commentaire explique pourquoi : « sans ce champ, l'écran du profil
+   * ne pourrait pas rappeler qu'un changement est en cours ». Le contrat déclaré omettait donc un
+   * champ dont l'absence casse un écran, ce qui est l'inverse de ce qu'un contrat doit faire.
+   *
+   * 📍 Le client le lisait en contournant le type — `(authStore.user as any)?.pendingEmail`, à
+   * trois endroits de `profile/informations.vue`. Ces `as any` sont le symptôme : on ne caste pas
+   * un champ qui est déclaré.
+   *
+   * 📍 Et il est apparu en corrigeant `impersonation` : une fois ce champ-là honnête, le
+   * compilateur a pu désigner le suivant. Une fiction en masquait une autre.
+   */
+  pendingEmail: string | null
   pseudo: string
   nom: string | null
   prenom: string | null
   phone: string | null
+  /** Les pronoms affichés à côté du nom. Sélectionné et renvoyé, comme `pendingEmail`. */
+  pronouns: string | null
   profilePicture: string | null
   isGlobalAdmin: boolean
   isVolunteer: boolean
