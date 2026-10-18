@@ -1,4 +1,4 @@
-import { createError } from 'h3'
+import { createError, type H3Event } from 'h3'
 
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 
