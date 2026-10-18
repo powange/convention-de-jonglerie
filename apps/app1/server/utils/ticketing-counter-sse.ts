@@ -3,6 +3,15 @@ import type { TicketingCounter } from '#server/types/prisma'
 /**
  * Interface pour les connexions SSE des compteurs
  */
+/*
+ * 📍 `push` n'accepte QUE cette forme, et plus `string | EventStreamMessage`.
+ *
+ * Mesuré : `broadcastUpdate` construit `const message: EventStreamMessage = { event, data }` et
+ * c'est le seul `push` du gestionnaire — aucune chaîne n'est jamais envoyée. L'union était donc
+ * plus large que l'usage, et c'est elle qui empêchait le flux du compteur de satisfaire
+ * l'interface : avec `strictFunctionTypes`, un paramètre plus ÉTROIT est refusé sur une propriété
+ * de type fonction.
+ */
 interface EventStreamMessage {
   event?: string
   data: string
@@ -22,7 +31,15 @@ interface CounterStreamConnection {
    * `undefined` est toléré : un flux qui oublie de répondre est traité comme un succès, faute de
    * mieux — exactement comme avant. Seul un `false` explicite fait retirer la connexion.
    */
-  push: (message: string | EventStreamMessage) => boolean | undefined
+  push: (message: EventStreamMessage) => boolean | undefined
+  /**
+   * Ferme le flux côté serveur.
+   *
+   * ⚠️ Appelé par `disconnectSession`, dans un `try/catch` qui journalise et continue. Le flux du
+   * compteur ne la fournissait PAS : l'appel levait donc une `TypeError` avalée par ce catch, la
+   * connexion était retirée du gestionnaire — et le flux restait OUVERT côté client, vivant mais
+   * muet. Déconnecté pour le serveur, toujours branché pour le navigateur.
+   */
   close: () => void
 }
 
