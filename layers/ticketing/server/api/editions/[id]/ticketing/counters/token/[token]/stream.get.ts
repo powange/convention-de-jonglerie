@@ -46,8 +46,44 @@ export default wrapApiHandler(
 
     const eventStream = createEventStream(event)
 
+    /*
+     * ⚠️ UN ADAPTATEUR, et non `eventStream` tel quel. Deux raisons, et la seconde est un défaut.
+     *
+     * 1. `EventStream` de h3 est une CLASSE À MEMBRES PRIVÉS — donc nominale : elle ne peut jamais
+     *    satisfaire structurellement `CounterStreamConnection`, quelles que soient ses méthodes.
+     *    Le type disait vrai, il n'y avait pas à le contourner.
+     * 2. Son `push` rend `Promise<void>`, jamais un booléen. Or `aEtePousse()` ne retire la
+     *    connexion que sur un `false` EXPLICITE : une promesse étant toujours véridique, aucune
+     *    connexion morte n'était jamais retirée SUR CE FLUX. Le correctif documenté dans
+     *    `ticketing-counter-sse.ts` n'avait donc été appliqué qu'au flux principal, et le compteur
+     *    affiché au guichet continuait de surévaluer les connexions par jeton.
+     *
+     * L'adaptateur tient un drapeau de fermeture et répond d'après le dernier état connu. Un
+     * échec asynchrone le met à jour, de sorte que la diffusion SUIVANTE retire la connexion —
+     * `push` ne pouvant pas attendre sans ralentir la diffusion pour tout le monde.
+     */
+    let fluxFerme = false
+    eventStream.onClosed(() => {
+      fluxFerme = true
+    })
+
+    const connexion = {
+      push: (message: { event?: string; data: string; id?: string; retry?: number }): boolean => {
+        if (fluxFerme) return false
+        eventStream.push(message).catch((erreur) => {
+          console.error('[Counter SSE] Envoi refusé sur le flux par jeton :', erreur)
+          fluxFerme = true
+        })
+        return true
+      },
+      close: () => {
+        fluxFerme = true
+        void eventStream.close()
+      },
+    }
+
     // Ajouter cette connexion au compteur et stocker l'ID avec le sessionId
-    const connectionId = addCounterConnection(editionId, counter.id, eventStream, sessionId)
+    const connectionId = addCounterConnection(editionId, counter.id, connexion, sessionId)
 
     console.log(`[Counter SSE] onClosed handler enregistré pour ${connectionId}`)
 

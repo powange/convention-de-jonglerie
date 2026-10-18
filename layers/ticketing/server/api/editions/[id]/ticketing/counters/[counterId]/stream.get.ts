@@ -61,7 +61,12 @@ export default wrapApiHandler(
            * plus là — au guichet, où l'on compte justement sur ce chiffre pour savoir si un
            * collègue tient l'autre entrée.
            */
-          push: (message: { event?: string; data: string }): boolean => {
+          push: (message: {
+            event?: string
+            data: string
+            id?: string
+            retry?: number
+          }): boolean => {
             if (isControllerClosed) {
               console.log(
                 `[Counter SSE] Tentative d'envoi sur controller fermé pour counter ${counterId}`
@@ -82,6 +87,22 @@ export default wrapApiHandler(
           onClosed: (callback: () => void) => {
             event.node.req.on('close', callback)
             event.node.req.on('aborted', callback)
+          },
+          /*
+           * ⚠️ Cette méthode MANQUAIT, et `disconnectSession` l'appelle.
+           *
+           * Son `try/catch` journalisait la `TypeError` et continuait : la connexion quittait le
+           * gestionnaire, mais le flux restait OUVERT côté client — vivant et muet. Le navigateur
+           * ne pouvait pas savoir qu'il avait été déconnecté ; il cessait simplement de recevoir.
+           */
+          close: () => {
+            if (isControllerClosed) return
+            isControllerClosed = true
+            try {
+              controller.close()
+            } catch {
+              // Déjà fermé par le client : rien à faire, et rien à signaler.
+            }
           },
         }
 

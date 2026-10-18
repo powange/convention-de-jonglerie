@@ -16,7 +16,7 @@
 # le commentaire du job `typecheck` dans .github/workflows/tests.yml).
 #
 # Clé : <nombre>\t<chemin>\tTS<code>\t<message>. Pas de numéro de ligne, il bouge pour rien.
-# Total gelé : 42 erreur(s) sur 25 entrée(s).
+# Total gelé : 40 erreur(s) sur 23 entrée(s).
 9	apps/app1/app/components/convention/EditionsGrid.vue	TS2345	Argument of type 'Edition' is not assignable to parameter of type 'DashboardEdition'.
 1	apps/app1/app/components/edition/Form.vue	TS2345	Argument of type 'string | boolean' is not assignable to parameter of type 'boolean'.
 2	apps/app1/app/components/organizer/RightsFields.vue	TS2345	Argument of type '"canManageTreasury"' is not assignable to parameter of type '"canEdit" | "canDelete" | "canManageVolunteers" | "canManageArtists" | "canManageMeals" | "canManageTicketing" | "canManageTasks" | "canManageStock" | "canManageWorkshops" | "canManageFAQ"'.
@@ -40,5 +40,3 @@
 1	layers/auth/app/pages/auth/complete-profile.vue	TS2345	Argument of type 'unknown' is not assignable to parameter of type 'Partial<User>'.
 1	layers/ticketing/app/pages/editions/[id]/gestion/ticketing/access-control.vue	TS2345	Argument of type '(TitreAffiche & { commande?: number | undefined; })[]' is not assignable to parameter of type 'SectionDeFiche[]'.
 1	layers/ticketing/app/pages/editions/[id]/gestion/ticketing/access-control.vue	TS2345	Argument of type 'GroupeAValider' is not assignable to parameter of type 'PersonneRapprochee'.
-1	layers/ticketing/server/api/editions/[id]/ticketing/counters/[counterId]/stream.get.ts	TS2345	Argument of type '{ push: (message: { event?: string; data: string; }) => boolean; onClosed: (callback: () => void) => void; }' is not assignable to parameter of type 'CounterStreamConnection'.
-1	layers/ticketing/server/api/editions/[id]/ticketing/counters/token/[token]/stream.get.ts	TS2345	Argument of type 'EventStream$1' is not assignable to parameter of type 'CounterStreamConnection'.
