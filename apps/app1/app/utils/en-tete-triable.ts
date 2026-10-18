@@ -43,8 +43,23 @@ import type { Column } from '@tanstack/vue-table'
  * ⚠️ Un `accessorKey` ou un `accessorFn` est INDISPENSABLE : sans valeur à comparer, TanStack
  * n'a rien à trier et le clic ne fait rien — en silence. Un `id` seul avec un gabarit de cellule
  * ne suffit pas.
+ *
+ * ## ⚠️ GÉNÉRIQUE SUR LE TYPE DE LIGNE, ET SURTOUT PAS `Column<never>`
+ *
+ * La signature d'origine était `column: Column<never>`. Ce `never` n'était pas un choix : c'était
+ * un type inféré, figé par accident lors de l'extraction des cinq copies. Or `Column<T>` est
+ * **invariant** en `T` chez TanStack — `T` y apparaît en position d'entrée comme de sortie — donc
+ * `Column<never>` n'accepte littéralement rien d'autre que lui-même. Même `Column<any>` échoue.
+ *
+ * Conséquence mesurée : **40 erreurs TS2345 sur 6 fichiers**, soit 30 % de toute la dette de
+ * typage gelée du dépôt, pour cette seule ligne. Et elles sont restées invisibles des semaines
+ * parce que la porte de typage de la CI mourait en rupture de mémoire (cf. #859).
+ *
+ * 📍 Le corps n'emploie que `getIsSorted()` et `toggleSorting()`, qui ne dépendent pas de `T` :
+ * rendre la fonction générique est donc strictement plus permissif, et rien qui compilait avant
+ * ne peut cesser de compiler.
  */
-export function enTeteTriable(column: Column<never>, libelle: string) {
+export function enTeteTriable<T>(column: Column<T>, libelle: string) {
   const sens = column.getIsSorted()
 
   /*
