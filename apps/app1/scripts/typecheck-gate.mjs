@@ -12,6 +12,54 @@
  * bloquent, celles du reste du dépôt attendent leur tour.
  */
 
+/**
+ * Le journal a-t-il été écrit JUSQU'AU BOUT ?
+ *
+ * ⚠️ Sans cette question, toutes les portes ci-dessous rendent un vert sur un journal mort. C'est
+ * arrivé, et pendant des semaines : l'étape faisait `npm run typecheck > typecheck.log 2>&1
+ * || true`, `vue-tsc` mourait en rupture de mémoire vers 115 s au plafond de tas par défaut de
+ * 4 Go, et le journal ne contenait AUCUNE ligne `error TS`. Les portes cherchaient donc un motif
+ * dans un fichier vide, ne le trouvaient pas, et concluaient « ✅ aucune erreur » — job `success`.
+ * Mesuré sur les cinq derniers passages de `main` : 1 855 à 1 906 octets, zéro `error TS`,
+ * `FATAL ERROR` dans les cinq.
+ *
+ * 📍 Le `|| true` annulait la garde qu'il était censé protéger : il transformait un plantage en
+ * succès silencieux, et rendait un OOM indiscernable d'un dépôt propre.
+ *
+ * ⚠️ Et cette fonction ne doit SURTOUT PAS se prouver par la présence d'erreurs. Un journal
+ * complet sur un dépôt sain n'en contient aucune : une garde qui exigerait d'en voir tomberait
+ * le jour où la dette atteindrait zéro — c'est-à-dire au seul moment où elle serait inutile.
+ * Elle cherche donc des traces de PLANTAGE, et traite « des erreurs de type » comme un
+ * aboutissement normal.
+ *
+ * @param {string} journal - sortie brute de `nuxt typecheck`
+ * @param {number} codeSortie - code de sortie du processus
+ * @returns {{ abouti: boolean, raison: string }}
+ */
+export function diagnostiquerAboutissement(journal, codeSortie) {
+  // Les marques que Node laisse en mourant. Elles sont dans le journal, pas dans le code de sortie.
+  const plantages = [
+    [/JavaScript heap out of memory/, 'rupture de mémoire (tas JavaScript saturé)'],
+    [/Ineffective mark-compacts near heap limit/, 'rupture de mémoire (plafond de tas atteint)'],
+    [/FATAL ERROR:/, 'erreur fatale de Node'],
+    [/Allocation failed/, 'échec d’allocation mémoire'],
+    [/Segmentation fault|SIGSEGV/, 'défaut de segmentation'],
+    [/----- Native stack trace -----/, 'trace native : le processus a été interrompu'],
+  ]
+
+  for (const [motif, raison] of plantages) {
+    if (motif.test(journal)) return { abouti: false, raison }
+  }
+
+  // Tué par un signal : 128 + n. L'OOM de Node rend 134 (SIGABRT), un `kill` en rend 137.
+  if (codeSortie >= 128) {
+    return { abouti: false, raison: `processus tué par le signal ${codeSortie - 128}` }
+  }
+
+  // 0 = rien à signaler ; 1 et 2 = des erreurs de type, ce qui est un passage ABOUTI.
+  return { abouti: true, raison: `typage mené à terme (code ${codeSortie})` }
+}
+
 /** Le journal cite les chemins depuis `apps/app1` ; git les donne depuis la racine. */
 export function normaliserChemin(chemin) {
   return chemin.startsWith('../../') ? chemin.slice('../../'.length) : `apps/app1/${chemin}`
@@ -70,6 +118,28 @@ export function developperRepertoires(chemins, fs) {
 
 // ── Ligne de commande ──────────────────────────────────────────────────────────
 if (import.meta.url === `file://${process.argv[1]}`) {
+  // Mode « le journal est-il complet ? », à passer AVANT toute porte qui lit ce journal.
+  //   typecheck-gate.mjs --aboutissement <journal> <code de sortie>
+  if (process.argv[2] === '--aboutissement') {
+    const [, , , journalArg, codeArg] = process.argv
+    if (!journalArg || codeArg === undefined) {
+      console.error('usage : typecheck-gate.mjs --aboutissement <journal> <code de sortie>')
+      process.exit(2)
+    }
+    const { readFileSync: lire } = await import('node:fs')
+    const { abouti, raison } = diagnostiquerAboutissement(lire(journalArg, 'utf8'), Number(codeArg))
+    if (!abouti) {
+      console.error(`::error::Le typage n'a PAS abouti : ${raison}.`)
+      console.error(
+        'Toute porte qui lit ce journal rendrait un faux vert : un journal mort ne contient aucune'
+      )
+      console.error('ligne `error TS`, ce qui se lit comme un dépôt propre. Corriger la cause.')
+      process.exit(1)
+    }
+    console.log(`✅ ${raison}. Le journal peut servir de base aux portes.`)
+    process.exit(0)
+  }
+
   const [journalPath, fichiersPath, codesArg] = process.argv.slice(2)
   if (!journalPath || !fichiersPath) {
     console.error('usage : typecheck-gate.mjs <journal> <fichiers-modifiés> [codes séparés par ,]')

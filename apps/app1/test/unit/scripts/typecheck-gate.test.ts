@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest'
 // @ts-expect-error — module .mjs sans déclarations, importé pour son comportement
 import {
   developperRepertoires,
+  diagnostiquerAboutissement,
   erreursBloquantes,
   normaliserChemin,
 } from '../../../scripts/typecheck-gate.mjs'
@@ -15,6 +16,64 @@ import {
 const LIGNE_REELLE =
   "../../layers/workshops/server/api/editions/[id]/workshops/[workshopId].put.ts(24,7): error TS2345: Argument of type '{ id: number; editionId: number; }' is not assignable to parameter of type 'number'."
 const FICHIER_REEL = 'layers/workshops/server/api/editions/[id]/workshops/[workshopId].put.ts'
+
+/**
+ * Le journal réellement produit par la CI pendant des semaines : 1 891 octets, aucune ligne
+ * `error TS`, et un plantage mémoire au milieu. Recopié de l'artefact `typecheck-log` du passage
+ * 39060512481 sur `main` plutôt que réécrit, pour que le test porte sur la vraie sortie.
+ */
+const JOURNAL_OOM_REEL = `
+> typecheck
+> nuxt typecheck
+
+[warn] [nuxt-site-config] [Nuxt Site Config] Invalid config provided, please correct:
+
+<--- Last few GCs --->
+
+[2211:0x259f4000]   114567 ms: Scavenge 4076.9 (4099.7) -> 4072.1 (4117.2) MB, pooled: 0 MB
+[2211:0x259f4000]   115955 ms: Mark-Compact (reduce) 4086.1 (4117.5) -> 4070.0 (4090.2) MB
+
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0x931db0  [node]
+`
+
+describe('Le journal de typage doit être complet avant qu’une porte le lise', () => {
+  it('attrape le VRAI journal d’OOM qui a rendu la porte vacante', () => {
+    const { abouti, raison } = diagnostiquerAboutissement(JOURNAL_OOM_REEL, 134)
+
+    expect(abouti).toBe(false)
+    expect(raison).toMatch(/mémoire/)
+  })
+
+  it('⚠️ et l’attrape même si le code de sortie prétend que tout va bien', () => {
+    // C'est exactement ce que faisait le `|| true` de l'étape : il forçait 0.
+    expect(diagnostiquerAboutissement(JOURNAL_OOM_REEL, 0).abouti).toBe(false)
+  })
+
+  it('laisse passer un journal abouti QUI CONTIENT des erreurs de type', () => {
+    // Des milliers d'erreurs préexistantes : leur présence est normale, ce n'est pas un plantage.
+    const journal = `${LIGNE_REELLE}\nFound 1 error in 1 file.`
+
+    expect(diagnostiquerAboutissement(journal, 2).abouti).toBe(true)
+  })
+
+  it('📍 et laisse passer un journal abouti SANS aucune erreur', () => {
+    /*
+     * Le cas qui compte pour la durée de vie de cette garde. Si elle se prouvait par la présence
+     * d'erreurs, elle tomberait le jour où la dette atteindrait zéro — au seul moment où elle
+     * n'aurait plus rien à dire. Elle cherche donc des traces de plantage, pas des erreurs.
+     */
+    expect(diagnostiquerAboutissement('> typecheck\n> nuxt typecheck\n', 0).abouti).toBe(true)
+  })
+
+  it('attrape un processus tué par un signal, journal muet compris', () => {
+    // Un `kill -9` ne laisse rien dans le journal : seul le code de sortie le dit.
+    expect(diagnostiquerAboutissement('', 137).abouti).toBe(false)
+    expect(diagnostiquerAboutissement('', 137).raison).toMatch(/signal 9/)
+  })
+})
 
 describe('Garde-fou de typage sur les fichiers modifiés', () => {
   it('rend les chemins comparables à ceux de git', () => {

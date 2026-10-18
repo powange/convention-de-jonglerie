@@ -189,7 +189,9 @@ jobs:
   # le build (esbuild, sans typecheck) et ESLint ne voient pas — ex. `edition is not defined`.
   typecheck:
     runs-on: ubuntu-22.04
-    timeout-minutes: 10
+    # 20 et non 10 : le job mourait à 2 min 30 en rupture de mémoire, donc sa durée passée ne dit
+    # rien de celle d'un typage qui va jusqu'au bout. À réduire une fois la vraie durée mesurée.
+    timeout-minutes: 20
     env:
       NODE_ENV: test
     needs: setup
@@ -215,8 +217,21 @@ jobs:
           # sans que rien ne devienne rouge.
           lier-layers: 'true'
 
-      # Deux filets, et un seul journal.
+      # TROIS filets, et un seul journal — mais d'abord une question qu'on avait oublié de poser :
+      # CE JOURNAL A-T-IL ÉTÉ ÉCRIT JUSQU'AU BOUT ?
       #
+      # 0. ⚠️ L'ABOUTISSEMENT, et c'est le filet qui tient les deux autres. Pendant des semaines,
+      #    cette étape faisait `npm run typecheck > typecheck.log 2>&1 || true` : `vue-tsc` mourait
+      #    en rupture de mémoire vers 115 s au plafond de tas par défaut de 4 Go, **le `|| true`
+      #    avalait le plantage**, et le journal ne contenait AUCUNE ligne `error TS`. Les deux
+      #    portes ci-dessous cherchaient donc un motif dans un fichier mort, ne le trouvaient pas,
+      #    et concluaient « ✅ aucune erreur » — job `success`. Mesuré sur les cinq derniers
+      #    passages de `main` : 1 855 à 1 906 octets, zéro `error TS`, `FATAL ERROR` dans les cinq.
+      #    Autrement dit la porte n'inspectait RIEN, aucune classe d'erreur, pas même celles
+      #    qu'elle gate explicitement.
+      #    📍 La leçon, qui dépasse ce fichier : une garde qui lit un journal doit d'abord prouver
+      #    que le journal a été écrit, jamais se contenter d'y chercher un motif. Un `|| true` sur
+      #    la commande qui produit la preuve annule la garde qu'il est censé protéger.
       # 1. Sur TOUT le dépôt : les "Cannot find name" (TS2304/TS2552), la classe des bugs
       #    `edition is not defined`. Le typecheck complet remonte des milliers d'erreurs
       #    préexistantes qu'on ne traite pas ici ; les gater toutes rendrait la CI rouge en
@@ -225,29 +240,51 @@ jobs:
       #    La dette existante est ainsi gelée plutôt que soldée. Sans ce second filet, un objet
       #    passé là où un entier était attendu a atteint la production et renvoyé sept erreurs 500
       #    à un utilisateur — alors que `nuxt typecheck` le signalait déjà.
+      - name: Typecheck — produire le journal
+        env:
+          # 8 Go. `vue-tsc` mourait au plafond par défaut de 4 Go. Cette valeur n'est pas choisie
+          # au hasard : le step `build` de ce même workflow tourne déjà avec elle et passe, donc
+          # le runner la supporte — c'est une mesure, pas une estimation.
+          NODE_OPTIONS: '--max-old-space-size=8192'
+        run: |
+          # ⚠️ PAS de `|| true` ici : c'est lui qui rendait le plantage invisible. On capture le
+          # code de sortie pour que l'étape d'aboutissement puisse le lire — un processus tué par
+          # un signal ne laisse parfois RIEN dans le journal, et seul ce code le dit.
+          set +e
+          npm run typecheck > typecheck.log 2>&1
+          echo $? > typecheck.code
+          set -e
+          echo "Code de sortie du typage : $(cat typecheck.code)"
+          echo "Taille du journal : $(wc -c < typecheck.log) octets, $(wc -l < typecheck.log) lignes"
+          echo "Lignes d'erreur de type : $(grep -cE 'error TS[0-9]+' typecheck.log || true)"
+
+      # Le journal est conservé, et il l'est AVANT toute porte : si l'une d'elles échoue, on veut
+      # pouvoir lire ce sur quoi elle s'est prononcée. C'est la seule mesure fiable de la dette de
+      # typage — sur un poste de développement, un `node_modules` à la racine (reliquat d'une
+      # installation ancienne, le `package.json` racine ne déclarant aucune dépendance) permet aux
+      # fichiers de `layers/` de résoudre leurs paquets, ce qu'ils ne peuvent pas faire ici. Deux
+      # comptages faits sur ces bases donnaient des ordres de grandeur différents ; celui-ci fait foi.
+      - name: Conserver le journal de typage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: typecheck-log
+          path: |
+            apps/app1/typecheck.log
+            apps/app1/typecheck.code
+          retention-days: 14
+
+      - name: Typecheck — le journal doit avoir ABOUTI (sinon tout le reste est un faux vert)
+        run: node scripts/typecheck-gate.mjs --aboutissement typecheck.log "$(cat typecheck.code)"
+
       - name: Typecheck — échoue sur les noms non définis (TS2304/TS2552)
         run: |
-          npm run typecheck > typecheck.log 2>&1 || true
           if grep -qE "error TS(2304|2552)" typecheck.log; then
             echo "::error::Référence(s) à des noms non définis détectée(s) :"
             grep -E "error TS(2304|2552)" typecheck.log || true
             exit 1
           fi
           echo "✅ Aucune référence non définie (TS2304/TS2552)."
-
-      # Le journal est conservé : sans lui, la dette de typage n'est mesurable que sur un poste
-      # de développement, dont l'environnement diffère de celui-ci. Un `node_modules` à la racine
-      # y existe par accident d'une installation ancienne — le `package.json` racine ne déclare
-      # aucune dépendance — et les fichiers de `layers/` y résolvent leurs paquets, alors qu'ici
-      # ils ne le peuvent pas. Deux comptages faits sur ces bases donnaient des ordres de grandeur
-      # différents ; celui-ci fait foi.
-      - name: Conserver le journal de typage
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: typecheck-log
-          path: apps/app1/typecheck.log
-          retention-days: 14
 
       - name: Typecheck — échoue sur les erreurs de type des fichiers modifiés (TS2345)
         if: github.event_name == 'pull_request'
