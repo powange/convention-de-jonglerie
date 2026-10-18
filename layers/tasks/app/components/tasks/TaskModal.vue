@@ -42,8 +42,7 @@
             :items="userItems"
             multiple
             :placeholder="$t('gestion.task.task_assignees_placeholder')"
-            searchable
-            :searchable-placeholder="$t('common.search')"
+            :search-input="{ placeholder: $t('common.search') }"
             :filter-fields="['label', 'description']"
             class="w-full"
             :ui="{ content: 'min-w-fit' }"
@@ -90,8 +89,7 @@
             :items="tagItems"
             multiple
             :placeholder="$t('gestion.task.task_tags_placeholder')"
-            searchable
-            :searchable-placeholder="$t('common.search')"
+            :search-input="{ placeholder: $t('common.search') }"
             class="w-full"
             :ui="{ content: 'min-w-fit' }"
           >

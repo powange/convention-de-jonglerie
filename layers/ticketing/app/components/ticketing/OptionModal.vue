@@ -119,7 +119,6 @@
             :items="tiers.map((tier) => ({ label: tier.name, value: tier.id }))"
             value-key="value"
             multiple
-            searchable
             :disabled="isHelloAssoOption"
             :placeholder="$t('ticketing.options.modal.tiers_placeholder')"
             class="w-full"
@@ -144,7 +143,6 @@
             :items="mealsOptions"
             value-key="value"
             multiple
-            searchable
             :placeholder="$t('ticketing.options.modal.meals_placeholder')"
             class="w-full"
           >

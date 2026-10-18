@@ -519,8 +519,7 @@
             :items="optionsDeTags"
             multiple
             :placeholder="t('gestion.stock.tags.filter_placeholder')"
-            searchable
-            :searchable-placeholder="t('common.search')"
+            :search-input="{ placeholder: t('common.search') }"
             class="w-64"
             :aria-label="t('gestion.stock.tags.filter_label')"
             :ui="{ content: 'min-w-fit' }"
