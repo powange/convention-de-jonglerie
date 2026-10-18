@@ -16,7 +16,7 @@
 # le commentaire du job `typecheck` dans .github/workflows/tests.yml).
 #
 # Clé : <nombre>\t<chemin>\tTS<code>\t<message>. Pas de numéro de ligne, il bouge pour rien.
-# Total gelé : 132 erreur(s) sur 64 entrée(s).
+# Total gelé : 92 erreur(s) sur 58 entrée(s).
 9	apps/app1/app/components/convention/EditionsGrid.vue	TS2345	Argument of type 'Edition' is not assignable to parameter of type 'DashboardEdition'.
 1	apps/app1/app/components/edition/Form.vue	TS2345	Argument of type 'string | boolean' is not assignable to parameter of type 'boolean'.
 1	apps/app1/app/components/edition/zones/MarkerModal.vue	TS2345	Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
@@ -25,9 +25,7 @@
 1	apps/app1/app/components/ui/ImageUpload.vue	TS2345	Argument of type '"artist" | "profile" | "treasury" | "lost-found" | "edition" | "convention" | "show" | "generic"' is not assignable to parameter of type '"profile" | "lost-found" | "edition" | "convention" | "show" | undefined'.
 1	apps/app1/app/components/ui/ImageUpload.vue	TS2345	Argument of type 'File | undefined' is not assignable to parameter of type 'File'.
 1	apps/app1/app/pages/conventions/[id]/editions/add.vue	TS2345	Argument of type 'EditionFormData' is not assignable to parameter of type 'Omit<Edition, "id" | "creatorId" | "creator">'.
-3	apps/app1/app/pages/editions/[id]/gestion/organizers.vue	TS2345	Argument of type 'Column<any, unknown>' is not assignable to parameter of type 'Column<never, unknown>'.
 1	apps/app1/app/pages/editions/[id]/gestion/treasury/index.vue	TS2345	Argument of type '(l: TreasuryLine) => string' is not assignable to parameter of type '(ligne: LigneTresorerieCsv) => string'.
-5	apps/app1/app/pages/editions/[id]/gestion/treasury/index.vue	TS2345	Argument of type 'Column<TreasuryLine, unknown>' is not assignable to parameter of type 'Column<never, unknown>'.
 2	apps/app1/app/stores/editions.ts	TS2345	Argument of type '{ params: { [key: string]: string; }; }' is not assignable to parameter of type 'O'.
 1	apps/app1/app/utils/date.ts	TS2345	Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
 1	apps/app1/server/api/admin/generate-import-json-agent.post.ts	TS2345	Argument of type 'AbortSignal | undefined' is not assignable to parameter of type '{ event: FacebookScraperResult | null; prefilledJson: any; } | undefined'.
@@ -65,12 +63,9 @@
 5	apps/app1/test/nuxt/server/utils/suppression-image-fichier.test.ts	TS2345	Argument of type '{ entityId: number; dossier: "editions"; }' is not assignable to parameter of type 'ImageDeletionOptions'.
 2	apps/app1/test/nuxt/server/utils/suppression-image-fichier.test.ts	TS2345	Argument of type '{ entityId: number; dossier: "profiles"; }' is not assignable to parameter of type 'ImageDeletionOptions'.
 1	apps/app1/test/nuxt/server/volunteers/rappel-creneau-une-seule-fois.test.ts	TS2345	Argument of type 'number | undefined' is not assignable to parameter of type 'number | bigint'.
-8	layers/artists/app/pages/editions/[id]/gestion/artists/index.vue	TS2345	Argument of type 'Column<any, unknown>' is not assignable to parameter of type 'Column<never, unknown>'.
 1	layers/auth/app/pages/auth/complete-profile.vue	TS2345	Argument of type 'unknown' is not assignable to parameter of type 'Partial<User>'.
 1	layers/auth/server/api/auth/request-password-reset.post.ts	TS2345	Argument of type 'string | null' is not assignable to parameter of type 'string'.
 1	layers/lost-found/server/api/editions/[id]/lost-found/index.get.ts	TS2345	Argument of type 'H3Event<EventHandlerRequest>' is not assignable to parameter of type '{ context?: { user?: { id: number; } | undefined; } | undefined; }'.
-6	layers/stock/app/pages/editions/[id]/gestion/stock/[groupId].vue	TS2345	Argument of type 'Column<any, unknown>' is not assignable to parameter of type 'Column<never, unknown>'.
-10	layers/stock/app/pages/editions/[id]/gestion/stock/missing.vue	TS2345	Argument of type 'Column<ObjetManquant, unknown>' is not assignable to parameter of type 'Column<never, unknown>'.
 1	layers/ticketing/app/pages/editions/[id]/gestion/ticketing/access-control.vue	TS2345	Argument of type '(TitreAffiche & { commande?: number | undefined; })[]' is not assignable to parameter of type 'SectionDeFiche[]'.
 1	layers/ticketing/app/pages/editions/[id]/gestion/ticketing/access-control.vue	TS2345	Argument of type 'GroupeAValider' is not assignable to parameter of type 'PersonneRapprochee'.
 1	layers/ticketing/server/api/editions/[id]/ticketing/counters/[counterId]/stream.get.ts	TS2345	Argument of type '{ push: (message: { event?: string; data: string; }) => boolean; onClosed: (callback: () => void) => void; }' is not assignable to parameter of type 'CounterStreamConnection'.
@@ -79,5 +74,4 @@
 1	layers/ticketing/server/api/editions/[id]/ticketing/order-items/[itemId]/discount-paid-back.patch.ts	TS2345	Argument of type '"billet"' is not assignable to parameter of type 'ResourceType'.
 1	layers/ticketing/server/api/editions/[id]/ticketing/order-items/[itemId]/discount.patch.ts	TS2345	Argument of type '"billet"' is not assignable to parameter of type 'ResourceType'.
 1	layers/ticketing/server/api/editions/[id]/ticketing/order-items/[itemId]/refund.patch.ts	TS2345	Argument of type '"billet"' is not assignable to parameter of type 'ResourceType'.
-8	layers/volunteers/app/components/edition/volunteer/Table.vue	TS2345	Argument of type 'Column<any, unknown>' is not assignable to parameter of type 'Column<never, unknown>'.
 1	layers/workshops/server/api/editions/[id]/workshops/extract-from-image.post.ts	TS2345	Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
