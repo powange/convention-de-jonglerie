@@ -78,13 +78,41 @@ export interface LoginResponse {
 /**
  * GET /api/session/me
  */
+/**
+ * L'emprunt d'identité en cours, tel que le serveur le RANGE et le RENVOIE.
+ *
+ * ## ⚠️ CETTE FORME ÉTAIT UNE FICTION
+ *
+ * `SessionMeResponse.impersonation` déclarait `{ originalUserId, originalPseudo, impersonatedAt }`
+ * — trois champs dont **deux n'existent nulle part**. Le serveur renvoie l'objet rangé par
+ * `setImpersonationCookie`, qui porte `originalUserPseudo` et `startedAt` ; le magasin client lit
+ * ces mêmes noms. Le contrat déclaré ne décrivait donc ni ce qui est produit, ni ce qui est
+ * consommé.
+ *
+ * 📍 Et personne ne s'en est aperçu parce que les deux bouts le contournent :
+ * `initFromSession(sessionData: any)` côté client, et un retour non vérifié côté serveur. C'est
+ * exactement pourquoi le compilateur n'avait rien d'utile à dire ici — on ne lui avait rien donné
+ * de vrai à comparer.
+ *
+ * ⚠️ `originalUserNom` et `originalUserPrenom` sont NULLABLES : `User.nom` et `User.prenom` sont
+ * `String?` en base. La déclaration ambiante de `#auth-utils` les annonçait non nuls, ce qui était
+ * un second mensonge — moins visible, mais du même ordre.
+ */
+export interface SessionImpersonation {
+  active: boolean
+  originalUserId: number
+  originalUserEmail: string
+  originalUserPseudo: string
+  originalUserNom: string | null
+  originalUserPrenom: string | null
+  targetUserId: number
+  targetUserEmail: string
+  startedAt: string
+}
+
 export interface SessionMeResponse {
   user: SessionMeUser
-  impersonation: {
-    originalUserId: number
-    originalPseudo: string
-    impersonatedAt: string
-  } | null
+  impersonation: SessionImpersonation | null
 }
 
 // ============================================================================
