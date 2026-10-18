@@ -160,7 +160,13 @@ class FirebaseAdminService {
             error?.code === 'messaging/invalid-registration-token' ||
             error?.code === 'messaging/registration-token-not-registered'
           ) {
-            invalidTokens.push(tokens[idx])
+            /*
+             * `sendEachForMulticast` rend une réponse PAR token et dans l'ordre : `idx` est donc
+             * toujours un index valide de `tokens`. On le vérifie plutôt que de le forcer — un
+             * `undefined` poussé ici partirait dans un `deleteMany({ token: { in: … } })`.
+             */
+            const token = tokens[idx]
+            if (token) invalidTokens.push(token)
           }
         }
       })

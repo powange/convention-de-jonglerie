@@ -28,8 +28,10 @@ const ADRESSE = /\b(?:https?:\/\/|www\.)[^\s<>]+/gi
 function retirerPonctuationFinale(adresse: string): string {
   let fin = adresse.length
   while (fin > 0) {
-    const car = adresse[fin - 1]
-    if ('.,;:!?\'"'.includes(car)) {
+    // `fin > 0` garantit l'index à l'exécution, mais TypeScript ne propage rien depuis la
+    // condition de boucle : `adresse[fin - 1]` reste `string | undefined`.
+    const car = adresse[fin - 1] ?? ''
+    if (car && '.,;:!?\'"'.includes(car)) {
       fin--
       continue
     }

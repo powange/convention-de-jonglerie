@@ -103,7 +103,14 @@ export const GENERIC_TIME_PATTERNS: TimePattern[] = [
  * Valide que l'heure est entre 6h et 23h (heures raisonnables pour une convention)
  */
 export function extractTimeFromMatch(match: RegExpExecArray): string | null {
-  const hours = parseInt(match[1], 10)
+  /*
+   * ⚠️ `?? ''` plutôt qu'un cast. Le premier groupe est obligatoire dans tous les motifs qui
+   * appellent cette fonction, donc l'absence est inatteignable — mais `parseInt('')` rend `NaN`,
+   * que la validation ci-dessous rejette déjà en rendant `null`. Le comportement est donc
+   * identique à celui d'origine, y compris si un motif changeait pour rendre le groupe optionnel :
+   * on retomberait sur « aucune heure trouvée » au lieu de lever.
+   */
+  const hours = parseInt(match[1] ?? '', 10)
   const minutes = match[2] ? parseInt(match[2], 10) : 0
 
   // Valider l'heure (entre 6h et 23h pour une convention)
@@ -170,7 +177,9 @@ export function extractStartTime(content: string): string | null {
   if (allTimes.length > 0) {
     // Prendre une heure raisonnable pour un début (entre 8h et 14h de préférence)
     const earlyTimes = allTimes.filter((t) => {
-      const h = parseInt(t.split(':')[0], 10)
+      // `split` rend toujours au moins un élément : l'absence est impossible, mais on l'écrit
+      // plutôt que de la forcer — et `parseInt('')` donnerait `NaN`, donc `false`.
+      const h = parseInt(t.split(':')[0] ?? '', 10)
       return h >= 8 && h <= 14
     })
     const fallbackTime = earlyTimes[0] || allTimes[0]
@@ -196,7 +205,9 @@ export function extractEndTime(content: string): string | null {
   if (allTimes.length > 0) {
     // Prendre une heure raisonnable pour une fin (entre 16h et 22h de préférence)
     const lateTimes = allTimes.filter((t) => {
-      const h = parseInt(t.split(':')[0], 10)
+      // `split` rend toujours au moins un élément : l'absence est impossible, mais on l'écrit
+      // plutôt que de la forcer — et `parseInt('')` donnerait `NaN`, donc `false`.
+      const h = parseInt(t.split(':')[0] ?? '', 10)
       return h >= 16 && h <= 22
     })
     const fallbackTime = lateTimes[lateTimes.length - 1] || allTimes[allTimes.length - 1]

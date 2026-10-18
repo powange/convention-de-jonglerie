@@ -152,7 +152,9 @@ const modalTitle = computed(() =>
             v-model="form.markerTypes"
             multiple
             :items="markerTypes"
-            :icon="form.markerTypes.length > 0 ? getZoneTypeIcon(form.markerTypes[0]) : undefined"
+            :icon="
+              form.markerTypes.length > 0 ? getZoneTypeIcon(form.markerTypes[0] ?? '') : undefined
+            "
             :ui="{ content: 'z-[60]' }"
             class="w-full"
           />

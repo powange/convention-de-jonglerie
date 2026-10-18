@@ -94,9 +94,17 @@ describe('rappel de créneau — une seule fois', () => {
      */
     await tache.run({ payload: {} } as any)
 
-    const ordreMarque = prismaMock.volunteerAssignment.updateMany.mock.invocationCallOrder[0]
-    const ordreEnvoi = mockNotifier.mock.invocationCallOrder[0]
-    expect(ordreMarque).toBeLessThan(ordreEnvoi)
+    // ⚠️ Les deux appels d'abord : sans cela, un bouchon jamais appelé donne un `undefined` et
+    // `toBeLessThan` échoue sur un message qui parle d'ordre au lieu d'absence.
+    expect(
+      prismaMock.volunteerAssignment.updateMany,
+      'le marquage n’a pas eu lieu'
+    ).toHaveBeenCalled()
+    expect(mockNotifier, 'la notification n’a pas été envoyée').toHaveBeenCalled()
+
+    const [ordreMarque] = prismaMock.volunteerAssignment.updateMany.mock.invocationCallOrder
+    const [ordreEnvoi] = mockNotifier.mock.invocationCallOrder
+    expect(ordreMarque!).toBeLessThan(ordreEnvoi!)
 
     expect(prismaMock.volunteerAssignment.updateMany).toHaveBeenCalledWith({
       where: { id: 'aff-1', reminderSentAt: null },
