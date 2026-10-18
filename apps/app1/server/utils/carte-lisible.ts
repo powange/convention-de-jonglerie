@@ -34,8 +34,25 @@ export interface DrapeauxDeCarte {
  * carte à voir, ce qui n'est pas son affaire tant qu'elle n'est pas publiée. C'est déjà le choix du
  * programme.
  */
+/*
+ * ⚠️ `H3Event` ET NON une forme structurelle du genre `{ context?: { user?: { id: number } } }`.
+ *
+ * C'est ce qui était écrit, et ça ne peut PAS fonctionner — pour une raison qui mérite d'être
+ * notée, parce qu'elle n'est pas intuitive. Un type cible dont TOUTES les propriétés sont
+ * optionnelles est un « type faible » aux yeux de TypeScript, et il exige alors que la source
+ * partage au moins un nom de propriété. Or `H3EventContext` déclare `params`, `matchedRoute`,
+ * `sessions` et `clientAddress` — jamais `user` —, si bien que le contrôle échouait malgré son
+ * `extends Record<string, any>` :
+ *
+ *     Types of property 'context' are incompatible.
+ *       Type 'H3EventContext' has no properties in common with type '{ user?: { id: number } }'.
+ *
+ * Six points d'API passaient donc un vrai `event` à une signature qui ne pouvait pas l'accepter.
+ * L'intention — « je ne lis que `context.user` » — était bonne, mais elle n'est pas exprimable
+ * ainsi ; les autres utils de ce dossier typent `H3Event`, et c'est l'idiome à suivre.
+ */
 export async function assurerCarteLisible(
-  event: { context?: { user?: { id: number } } },
+  event: H3Event,
   editionId: number,
   edition: DrapeauxDeCarte
 ): Promise<void> {

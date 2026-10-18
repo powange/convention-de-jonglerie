@@ -16,6 +16,11 @@ vi.mock('../../../../../server/utils/auth-utils', () => ({
   }),
 }))
 
+/*
+ * ⚠️ `mockEvent as any` à chaque appel, comme dans les 85 autres fichiers de test de ce dépôt :
+ * un objet synthétique n'est pas un `H3Event`, il lui manque `__is_event__`, `node`, `_handled`
+ * et le reste de la classe. Ce fichier l'avait oublié, d'où six erreurs TS2345.
+ */
 describe('/api/profile/has-password', () => {
   const mockUser = {
     id: 1,
@@ -39,7 +44,7 @@ describe('/api/profile/has-password', () => {
       password: '$2a$10$hashedpassword',
     })
 
-    const result = await hasPasswordHandler(mockEvent)
+    const result = await hasPasswordHandler(mockEvent as any)
 
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
@@ -63,7 +68,7 @@ describe('/api/profile/has-password', () => {
       password: null,
     })
 
-    const result = await hasPasswordHandler(mockEvent)
+    const result = await hasPasswordHandler(mockEvent as any)
 
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
       where: { id: 2 },
@@ -81,7 +86,7 @@ describe('/api/profile/has-password', () => {
       context: {},
     }
 
-    await expect(hasPasswordHandler(mockEvent)).rejects.toThrow('Non authentifié')
+    await expect(hasPasswordHandler(mockEvent as any)).rejects.toThrow('Non authentifié')
 
     expect(prismaMock.user.findUnique).not.toHaveBeenCalled()
   })
@@ -95,7 +100,7 @@ describe('/api/profile/has-password', () => {
 
     prismaMock.user.findUnique.mockResolvedValue(null)
 
-    await expect(hasPasswordHandler(mockEvent)).rejects.toThrow('Utilisateur non trouvé')
+    await expect(hasPasswordHandler(mockEvent as any)).rejects.toThrow('Utilisateur non trouvé')
 
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
       where: { id: 999 },
@@ -115,7 +120,7 @@ describe('/api/profile/has-password', () => {
     const dbError = new Error('Database connection error')
     prismaMock.user.findUnique.mockRejectedValue(dbError)
 
-    await expect(hasPasswordHandler(mockEvent)).rejects.toThrow('Erreur serveur interne')
+    await expect(hasPasswordHandler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
   })
 
   it('devrait retourner hasPassword: false pour un mot de passe vide (edge case)', async () => {
@@ -129,7 +134,7 @@ describe('/api/profile/has-password', () => {
       password: '',
     })
 
-    const result = await hasPasswordHandler(mockEvent)
+    const result = await hasPasswordHandler(mockEvent as any)
 
     expect(result.data).toEqual({
       hasPassword: false,

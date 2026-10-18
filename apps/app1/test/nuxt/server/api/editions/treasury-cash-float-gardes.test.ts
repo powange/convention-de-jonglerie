@@ -30,9 +30,18 @@ import { global } from '../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma
 
-const evenement = (params: Record<string, string> = {}) => ({
-  context: { params: { id: '21', ...params }, user: { id: 3 } },
-})
+/*
+ * ⚠️ Le `as any` est posé ICI, une fois, et non à chacun des huit appels.
+ *
+ * Un objet synthétique n'est pas un `H3Event` : il lui manque `__is_event__`, `node`, `_handled`
+ * et le reste de la classe. Les 85 autres fichiers de test de ce dépôt écrivent `mockEvent as any`
+ * au point d'appel ; ce fichier-ci l'avait simplement oublié, d'où sept erreurs TS2345 pour un
+ * seul helper. Le concentrer sur la fabrique garde les huit appels lisibles.
+ */
+const evenement = (params: Record<string, string> = {}) =>
+  ({
+    context: { params: { id: '21', ...params }, user: { id: 3 } },
+  }) as any
 
 /**
  * Les gardes du fonds de caisse, et l'invariant qui justifie sa table séparée.
