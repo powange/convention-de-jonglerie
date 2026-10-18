@@ -35,6 +35,28 @@ import { describe, it, expect } from 'vitest'
  *
  * Elles sont nommées une par une, jamais couvertes par un motif : une liste d'exceptions large
  * finit par exempter ce qu'elle devait surveiller.
+ *
+ * ## ⚠️ `session/me.get.ts` A QUITTÉ CETTE LISTE — sa raison était FAUSSE (18/10/2026)
+ *
+ * Elle disait : « le point qui EXPOSE la session : il la lit par nature, et doit répondre sur une
+ * session que le middleware n'a pas hydratée ». Les deux moitiés sont fausses :
+ *
+ * - `/api/session/me` n'est PAS dans `server/constants/public-routes.ts`. Le middleware la traite
+ *   donc comme toute route `/api/` protégée : il descelle la session, vérifie que le compte existe
+ *   (`sessionRecevable`), pose `event.context.user`, et lève un 401 s'il n'y a pas de session. Un
+ *   commentaire de `session-helpers.ts` le mesure déjà : « en production, `GET /api/session/me`
+ *   sans session répondait 401 ». Le gestionnaire ne peut donc JAMAIS s'exécuter sur un contexte
+ *   non hydraté ;
+ * - « il la lit par nature » confond ce qu'il RENVOIE avec ce qu'il LIT. Il renvoie le compte
+ *   rechargé en base, pas la session : celle-ci ne lui servait qu'à retrouver un `id` que le
+ *   contexte portait déjà.
+ *
+ * Conséquence : un descellement de cookie en trop **à chaque chargement de page**, sur l'un des
+ * points les plus traversés du site. Et un `(session.user as any).id`, le type de
+ * `requireUserSession` ne garantissant pas l'`id`.
+ *
+ * 📍 La leçon porte sur les listes d'exceptions elles-mêmes : celle-ci NOMME ses raisons, ce qui
+ * vaut mieux qu'un motif large — mais une raison écrite n'est pas une raison vérifiée.
  */
 
 const RACINES = [
@@ -49,8 +71,6 @@ const RACINES = [
  * Le défaut par défaut est `requireAuth`.
  */
 const EXCEPTIONS: Record<string, string> = {
-  'apps/app1/server/api/session/me.get.ts':
-    "Le point qui EXPOSE la session : il la lit par nature, et doit répondre sur une session que le middleware n'a pas hydratée.",
   'apps/app1/server/api/users/search.get.ts':
     'Relevé le 09/10/2026, à traiter avec le constat auth-profil A1 qui touche déjà ce fichier.',
   'layers/workshops/server/api/editions/[id]/workshops/can-create.get.ts':
