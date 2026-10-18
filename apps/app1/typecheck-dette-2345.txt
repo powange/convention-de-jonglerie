@@ -16,7 +16,7 @@
 # le commentaire du job `typecheck` dans .github/workflows/tests.yml).
 #
 # Clé : <nombre>\t<chemin>\tTS<code>\t<message>. Pas de numéro de ligne, il bouge pour rien.
-# Total gelé : 47 erreur(s) sur 30 entrée(s).
+# Total gelé : 46 erreur(s) sur 29 entrée(s).
 9	apps/app1/app/components/convention/EditionsGrid.vue	TS2345	Argument of type 'Edition' is not assignable to parameter of type 'DashboardEdition'.
 1	apps/app1/app/components/edition/Form.vue	TS2345	Argument of type 'string | boolean' is not assignable to parameter of type 'boolean'.
 2	apps/app1/app/components/organizer/RightsFields.vue	TS2345	Argument of type '"canManageTreasury"' is not assignable to parameter of type '"canEdit" | "canDelete" | "canManageVolunteers" | "canManageArtists" | "canManageMeals" | "canManageTicketing" | "canManageTasks" | "canManageStock" | "canManageWorkshops" | "canManageFAQ"'.
@@ -29,7 +29,6 @@
 1	apps/app1/server/api/conventions/[id]/organizers/[organizerId].patch.ts	TS2345	Argument of type 'ConventionOrganizerUpdateInput' is not assignable to parameter of type 'Record<string, boolean>'.
 1	apps/app1/server/api/editions/[id]/index.delete.ts	TS2345	Argument of type '{ entityId: number; dossier: "editions"; }' is not assignable to parameter of type 'ImageDeletionOptions'.
 1	apps/app1/server/api/feedback/index.post.ts	TS2345	Argument of type '{ method: "POST"; body: URLSearchParams; }' is not assignable to parameter of type 'O'.
-1	apps/app1/server/api/session/me.get.ts	TS2345	Argument of type '(event: H3Event<EventHandlerRequest>) => Promise<{ user: User; impersonation: SessionImpersonation | null; }>' is not assignable to parameter of type '(event: H3Event<EventHandlerRequest>) => SessionMeResponse | Promise<SessionMeResponse>'.
 1	apps/app1/server/routes/uploads/[...path].get.ts	TS2345	Argument of type 'string' is not assignable to parameter of type 'number'.
 2	apps/app1/server/utils/program-validation.ts	TS2345	Argument of type '{ message: string; path: readonly ["markerId"]; }' is not assignable to parameter of type 'string | { params?: Record<string, any> | undefined; path?: PropertyKey[] | undefined; abort?: boolean | undefined; when?: ((payload: ParsePayload<unknown>) => boolean) | undefined; error?: string | ... 1 more ... | undefined; message?: string | undefined; } | undefined'.
 2	apps/app1/server/utils/program-validation.ts	TS2345	Argument of type '{ message: string; path: readonly ["markerId"]; }' is not assignable to parameter of type 'string | { path?: PropertyKey[] | undefined; params?: Record<string, any> | undefined; abort?: boolean | undefined; when?: ((payload: ParsePayload<unknown>) => boolean) | undefined; error?: string | ... 1 more ... | undefined; message?: string | undefined; } | undefined'.
