@@ -19,6 +19,7 @@ export type ResourceType =
   | 'équipe'
   | 'spectacle'
   | 'artiste'
+  | 'billet'
   | 'bénévole'
   | 'notification'
   | 'tier'
@@ -61,6 +62,7 @@ const RESOURCE_MESSAGES: Record<ResourceType, string> = {
   équipe: "ID d'équipe invalide",
   spectacle: 'ID de spectacle invalide',
   artiste: "ID d'artiste invalide",
+  billet: 'ID de billet invalide',
   bénévole: 'ID de bénévole invalide',
   notification: 'ID de notification invalide',
   tier: 'ID de tier invalide',
