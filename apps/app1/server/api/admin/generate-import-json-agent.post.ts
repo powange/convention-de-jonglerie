@@ -1170,7 +1170,23 @@ INSTRUCTIONS:
         continue
       }
 
-      // Fetch la page
+      /*
+       * ⚠️ `facebookData` ET `signal`, dans cet ordre — les DEUX, et c'est tout l'objet du
+       * correctif.
+       *
+       * Cet appel-ci n'en passait qu'un, et dans le mauvais emplacement : `signal` atterrissait
+       * dans le paramètre `facebookData`. Les deux autres appels à cette fonction (exploration
+       * initiale et liens externes) étaient corrects ; seul ce parcours-ci — celui où l'AGENT
+       * demande lui-même une page, par `FETCH_URL` — était touché. Deux conséquences, toutes
+       * deux invisibles :
+       *
+       * 1. aucun signal n'atteignait ces requêtes, donc l'annulation demandée par le client ne
+       *    les interrompait pas. C'est exactement ce que l'en-tête de `signal` décrit plus haut :
+       *    « une annulation "branchée" ne l'est pas » ;
+       * 2. un `prefilledJson` extrait d'un événement Facebook ou JugglingEdge sur ce parcours
+       *    était écrit sur l'objet `AbortSignal` reçu à sa place, et donc perdu — alors qu'il est
+       *    relu plus bas pour être injecté dans le prompt.
+       */
       const result = await fetchAndExtractContent(
         urlToFetch,
         taskId,
@@ -1178,6 +1194,7 @@ INSTRUCTIONS:
         logs,
         maxPageContentSize,
         browserlessUrl,
+        facebookData,
         signal
       )
 

@@ -128,7 +128,9 @@ export default defineEventHandler(async (event) => {
   }
 
   setHeader(event, 'Content-Type', typeMime(path))
-  setHeader(event, 'Content-Length', emplacement.taille.toString())
+  // h3 type `Content-Length` en `number` : lui passer la chaîne n'avait aucun effet à
+  // l'exécution — un en-tête HTTP est une chaîne de toute façon — mais inversait le contrat.
+  setHeader(event, 'Content-Length', emplacement.taille)
   // `private` pour ce qui vient d'être mis derrière un droit : un cache partagé le servirait
   // sinon à quelqu'un qui ne l'a pas.
   setHeader(

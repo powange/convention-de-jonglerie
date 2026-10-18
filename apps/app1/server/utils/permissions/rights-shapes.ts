@@ -77,8 +77,17 @@ export function readEditionRights(
  * Seuls les droits explicitement présents sont écrits : `undefined` veut dire « non fourni », et
  * le confondre avec `false` retirerait un droit que personne n'a demandé à retirer.
  */
+/*
+ * 📍 La cible est annoncée `Record<string, unknown>`, et non `Record<string, boolean>`.
+ *
+ * `Record<string, boolean>` affirmait que TOUTES les propriétés de la cible sont booléennes. Or
+ * la seule cible réelle est un `Prisma.ConventionOrganizerUpdateInput`, qui porte aussi
+ * `title: string | null` : l'appel du point de modification des droits d'un organisateur était
+ * donc refusé, alors qu'il est juste. Ce que cette fonction écrit, elle, reste bien des booléens
+ * — la boucle ci-dessous ne pose que `value`, qui en est un.
+ */
 export function applyConventionRights(
-  target: Record<string, boolean>,
+  target: Record<string, unknown>,
   rights: Record<string, boolean | undefined> | null | undefined
 ): void {
   for (const right of CONVENTION_RIGHTS) {
