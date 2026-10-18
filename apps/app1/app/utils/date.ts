@@ -151,13 +151,53 @@ export const formatDateRange = (
 
 /**
  * Convertit une string datetime-local en objet Date (temps local)
+ *
  * @param datetimeLocal - String au format "YYYY-MM-DDTHH:MM"
  * @returns Objet Date en temps local
+ * @throws si la chaîne n'est pas au format attendu
+ *
+ * ## ⚠️ POURQUOI ELLE VALIDE SON ENTRÉE PLUTÔT QUE DE FAIRE CONFIANCE
+ *
+ * La version d'origine déstructurait sans vérifier, et se cassait de **trois façons différentes**
+ * selon la malformation — dont deux silencieuses :
+ *
+ * | entrée | ce qui se passait |
+ * | --- | --- |
+ * | `''` (champ vide) | `timePart` vaut `undefined` → `Cannot read properties of undefined` |
+ * | `'2026-06-15'` (sans `T`) | idem, une `TypeError` cryptique |
+ * | `'2026-06-15T10'` | `minute` vaut `undefined` → **`Invalid Date` EN SILENCE** |
+ *
+ * Et le chemin du champ vide était atteignable : `setDuration()` de la page des ateliers assigne
+ * `versChampLocal(edition.startDate, fuseau)`, qui **rend `''` quand l'instant est invalide**, puis
+ * relit la valeur aussitôt. Un clic sur une durée rapide avec une édition partiellement chargée
+ * levait donc une `TypeError` dans le gestionnaire — peu probable, mais sans message exploitable.
+ *
+ * Le remède n'est pas de deviner une date : c'est de refuser clairement. Passer autre chose qu'un
+ * `datetime-local` est une erreur de programmation, et un message nommant la valeur reçue vaut
+ * mieux qu'un `Invalid Date` qui se propage dans un formulaire.
  */
 export const parseDateTimeLocal = (datetimeLocal: string): Date => {
   const [datePart, timePart] = datetimeLocal.split('T')
-  const [year, month, day] = datePart.split('-').map(Number)
-  const [hour, minute] = timePart.split(':').map(Number)
+  const [year, month, day] = (datePart ?? '').split('-').map(Number)
+  const [hour, minute] = (timePart ?? '').split(':').map(Number)
+
+  /*
+   * ⚠️ Les cinq comparaisons sont écrites UNE PAR UNE, et ce n'est pas de la verbosité : un
+   * `[year, …].some((n) => n === undefined)` est vrai à l'exécution mais **ne restreint pas le
+   * type** — TypeScript ne propage rien depuis un prédicat passé à `.some()`, et le `new Date()`
+   * ci-dessous resterait en erreur. Le test groupé sur `NaN`, lui, n'a pas besoin de restreindre.
+   */
+  if (
+    year === undefined ||
+    month === undefined ||
+    day === undefined ||
+    hour === undefined ||
+    minute === undefined ||
+    [year, month, day, hour, minute].some(Number.isNaN)
+  ) {
+    throw new Error(`parseDateTimeLocal attend « YYYY-MM-DDTHH:MM », reçu « ${datetimeLocal} »`)
+  }
+
   return new Date(year, month - 1, day, hour, minute)
 }
 

@@ -292,6 +292,42 @@ describe('date utils', () => {
       expect(date.getMinutes()).toBe(30)
     })
 
+    /*
+     * Les trois malformations que la version d'origine traitait mal, et dont DEUX étaient
+     * silencieuses. Le chemin de la chaîne vide était atteignable : `setDuration()` de la page des
+     * ateliers assignait `versChampLocal(...)`, qui rend `''` sur un instant invalide, puis
+     * relisait la valeur aussitôt — une `TypeError` dans un gestionnaire de clic.
+     */
+    it.each([
+      ['une chaîne vide', ''],
+      ['une date sans heure', '2024-06-15'],
+      ['une heure tronquée', '2024-06-15T10'],
+      ['du texte', 'pas une date'],
+    ])('refuse %s, avec un message qui nomme la valeur', (_quoi, entree) => {
+      expect(() => parseDateTimeLocal(entree)).toThrow(/YYYY-MM-DDTHH:MM/)
+      expect(() => parseDateTimeLocal(entree)).toThrow(new RegExp(entree || '«\\s*»'))
+    })
+
+    it('⚠️ ne rend JAMAIS une `Invalid Date` en silence', () => {
+      /*
+       * Le pire des trois cas d'origine : `'2024-06-15T10'` rendait une `Invalid Date` sans rien
+       * signaler, qui se propageait ensuite dans le formulaire. Une exception est préférable — on
+       * sait d'où elle vient.
+       */
+      for (const entree of ['', '2024-06-15', '2024-06-15T10', '2024-13-99T99:99']) {
+        let rendu: Date | null = null
+        try {
+          rendu = parseDateTimeLocal(entree)
+        } catch {
+          continue // refusé franchement : c'est le comportement voulu
+        }
+        expect(
+          Number.isNaN(rendu.getTime()),
+          `« ${entree} » a rendu une Invalid Date au lieu de lever`
+        ).toBe(false)
+      }
+    })
+
     it('gère minuit', () => {
       const date = parseDateTimeLocal('2024-01-01T00:00')
       expect(date.getFullYear()).toBe(2024)

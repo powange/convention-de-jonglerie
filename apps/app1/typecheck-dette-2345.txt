@@ -16,7 +16,7 @@
 # le commentaire du job `typecheck` dans .github/workflows/tests.yml).
 #
 # Clé : <nombre>\t<chemin>\tTS<code>\t<message>. Pas de numéro de ligne, il bouge pour rien.
-# Total gelé : 91 erreur(s) sur 57 entrée(s).
+# Total gelé : 90 erreur(s) sur 56 entrée(s).
 9	apps/app1/app/components/convention/EditionsGrid.vue	TS2345	Argument of type 'Edition' is not assignable to parameter of type 'DashboardEdition'.
 1	apps/app1/app/components/edition/Form.vue	TS2345	Argument of type 'string | boolean' is not assignable to parameter of type 'boolean'.
 1	apps/app1/app/components/edition/zones/MarkerModal.vue	TS2345	Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
@@ -27,7 +27,6 @@
 1	apps/app1/app/pages/conventions/[id]/editions/add.vue	TS2345	Argument of type 'EditionFormData' is not assignable to parameter of type 'Omit<Edition, "id" | "creatorId" | "creator">'.
 1	apps/app1/app/pages/editions/[id]/gestion/treasury/index.vue	TS2345	Argument of type '(l: TreasuryLine) => string' is not assignable to parameter of type '(ligne: LigneTresorerieCsv) => string'.
 2	apps/app1/app/stores/editions.ts	TS2345	Argument of type '{ params: { [key: string]: string; }; }' is not assignable to parameter of type 'O'.
-1	apps/app1/app/utils/date.ts	TS2345	Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
 1	apps/app1/server/api/admin/generate-import-json-agent.post.ts	TS2345	Argument of type 'AbortSignal | undefined' is not assignable to parameter of type '{ event: FacebookScraperResult | null; prefilledJson: any; } | undefined'.
 1	apps/app1/server/api/conventions/[id]/index.delete.ts	TS2345	Argument of type '{ entityId: number; dossier: "conventions"; }' is not assignable to parameter of type 'ImageDeletionOptions'.
 1	apps/app1/server/api/conventions/[id]/organizers/[organizerId].patch.ts	TS2345	Argument of type 'ConventionOrganizerUpdateInput' is not assignable to parameter of type 'Record<string, boolean>'.
