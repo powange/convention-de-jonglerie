@@ -271,14 +271,17 @@
                       />
                     </template>
                   </UInput>
+                  <!--
+                    ⚠️ PAS de `value-key` : `v-model` est un `computed` qui échange des OBJETS
+                    (le get rend l'option, le set lit `value?.value`). L'ajouter viderait le pays.
+                    Cf. le même champ dans `edition/Form.vue`, où Playwright l'a attrapé.
+                  -->
                   <USelectMenu
                     v-else
                     v-model="selectedCountry"
                     :items="countrySelectOptions"
                     :placeholder="$t('common.select')"
                     class="w-full"
-                    value-attribute="value"
-                    option-attribute="label"
                     @change="handleCountryChange"
                   >
                     <template #default>
@@ -288,10 +291,12 @@
                       </div>
                       <span v-else class="text-gray-400">{{ $t('common.select') }}</span>
                     </template>
-                    <template #option="{ option }">
+                    <!-- `#item` et non `#option` : inconnu de Nuxt UI 4, donc ignoré en
+                         silence — l'icône du pays ne s'affichait pas dans la liste. -->
+                    <template #item="{ item }">
                       <div class="flex items-center gap-2">
-                        <UIcon :name="option.icon" class="w-4 h-4" />
-                        <span>{{ option.label }}</span>
+                        <UIcon :name="item.icon" class="w-4 h-4" />
+                        <span>{{ item.label }}</span>
                       </div>
                     </template>
                   </USelectMenu>

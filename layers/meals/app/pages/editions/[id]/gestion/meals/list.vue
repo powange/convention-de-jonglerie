@@ -50,8 +50,8 @@
               <USelect
                 v-model="selectedCateringDate"
                 :items="cateringDateOptions"
-                value-attribute="value"
-                option-attribute="label"
+                value-key="value"
+                label-key="label"
                 :placeholder="t('edition.volunteers.select_date')"
                 :ui="{ content: 'min-w-fit' }"
                 class="min-w-[200px]"

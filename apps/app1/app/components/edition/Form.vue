@@ -314,6 +314,16 @@
                         />
                       </template>
                     </UInput>
+                    <!--
+                      ⚠️ PAS de `value-key` ici, et ce n'est pas un oubli. `v-model` est lié à
+                      un `computed` dont le get rend l'OBJET option et dont le set lit
+                      `value?.value` : le composant échange des objets. `valueKey` ferait émettre
+                      la chaîne, `value?.value` vaudrait `undefined`, `state.country` resterait
+                      vide — et la validation bloquerait le stepper sans jamais afficher le bouton
+                      de soumission. Mesuré : c'est ce qui est arrivé, et Playwright l'a attrapé.
+                      Le `value-attribute` d'avant était INERTE, d'où le fait que ça marchait.
+                      `label-key` est omis aussi : il vaut déjà `'label'` par défaut.
+                    -->
                     <USelectMenu
                       v-else
                       v-model="selectedCountry"
@@ -321,8 +331,6 @@
                       :placeholder="$t('common.select')"
                       size="lg"
                       class="w-full"
-                      value-attribute="value"
-                      option-attribute="label"
                       @change="handleCountryChange"
                     >
                       <template #default>
@@ -332,10 +340,12 @@
                         </div>
                         <span v-else class="text-gray-400">{{ $t('common.select') }}</span>
                       </template>
-                      <template #option="{ option }">
+                      <!-- `#item` et non `#option` : ce dernier est inconnu de Nuxt UI 4, donc
+                           ignoré en silence — l'icône du pays ne s'affichait pas dans la liste. -->
+                      <template #item="{ item }">
                         <div class="flex items-center gap-2">
-                          <UIcon :name="option.icon" class="w-4 h-4" />
-                          <span>{{ option.label }}</span>
+                          <UIcon :name="item.icon" class="w-4 h-4" />
+                          <span>{{ item.label }}</span>
                         </div>
                       </template>
                     </USelectMenu>

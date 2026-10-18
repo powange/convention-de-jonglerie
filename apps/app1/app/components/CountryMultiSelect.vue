@@ -1,25 +1,46 @@
 <template>
   <div class="relative">
+    <!--
+      `search-input` ET NON `searchable` + `searchable-placeholder`, qui sont deux props de
+      Nuxt UI v2. Même panne muette que les créneaux plus bas : une prop non déclarée est acceptée
+      sans un mot, et le texte traduit n'atteignait jamais l'écran — le champ de recherche
+      affichait le placeholder par défaut de Nuxt UI, dans les 13 langues. `searchable` lui-même
+      était inerte, mais sans conséquence visible : `searchInput` vaut déjà `true`.
+    -->
+    <!--
+      ⚠️ PAS de `value-key`, bien que les props et émissions soient déclarées `string[]` et que ce
+      composant émette en réalité des OBJETS — `server/api/editions/index.get.ts` compense
+      d'ailleurs en extrayant `item.value`. Ce mensonge de typage est réel, mais le corriger est un
+      changement de COMPORTEMENT et non un renommage : `valueKey` vaut `undefined` par défaut sur
+      `USelectMenu`, donc l'ajouter change le contrat. Traité à part, avec le retrait de la
+      compensation serveur. Ce lot ne touche qu'au rendu.
+    -->
     <USelectMenu
       v-model="selectedCountries"
       :items="data || []"
       multiple
       :placeholder="dynamicPlaceholder"
       :loading="status === 'pending'"
-      searchable
-      :searchable-placeholder="$t('components.country_select.search_country_placeholder')"
-      value-attribute="value"
-      option-attribute="label"
+      :search-input="{
+        placeholder: $t('components.country_select.search_country_placeholder'),
+      }"
       class="w-full"
       :ui="{ content: 'min-w-fit' }"
     >
-      <template #option="{ option }">
+      <!--
+        ⚠️ `#item` ET NON `#option`, et `#empty` ET NON `#option-empty`.
+        Les deux noms d'avant ne sont pas invalides : ils sont INCONNUS, donc ignorés EN SILENCE.
+        C'est pourquoi les drapeaux ne s'affichaient pas dans la liste déroulante, et pourquoi
+        « aucun pays trouvé » ne s'affichait jamais. Métadonnée de `USelectMenu` à l'appui :
+        les créneaux sont `item`, `item-leading`, `item-label`, `item-trailing`, `empty`.
+      -->
+      <template #item="{ item }">
         <div class="flex items-center gap-2">
-          <FlagIcon :code="getCountryCode(option.value)" />
-          <span>{{ option.label }}</span>
+          <FlagIcon :code="getCountryCode(item.value)" />
+          <span>{{ item.label }}</span>
         </div>
       </template>
-      <template #option-empty>
+      <template #empty>
         <span class="text-sm text-gray-500">{{
           $t('components.country_select.no_countries_found')
         }}</span>
