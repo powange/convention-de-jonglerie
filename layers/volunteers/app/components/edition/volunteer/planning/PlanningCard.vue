@@ -45,8 +45,8 @@
             <USelect
               v-model="selectedTeams"
               :items="teamFilterOptions"
-              option-attribute="label"
-              value-attribute="value"
+              label-key="label"
+              value-key="value"
               multiple
               size="sm"
               class="min-w-[200px]"
@@ -59,8 +59,8 @@
             <USelect
               v-model="selectedGranularity"
               :items="granularityOptions"
-              option-attribute="label"
-              value-attribute="value"
+              label-key="label"
+              value-key="value"
               size="sm"
               class="min-w-[120px]"
             />

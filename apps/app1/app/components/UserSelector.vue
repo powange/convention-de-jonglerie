@@ -7,7 +7,7 @@
         :items="displayedItems"
         :loading="searchingUsers"
         ignore-filter
-        option-attribute="label"
+        label-key="label"
         :placeholder="placeholder"
         icon="i-heroicons-user"
         :ui="{ content: 'min-w-fit' }"
