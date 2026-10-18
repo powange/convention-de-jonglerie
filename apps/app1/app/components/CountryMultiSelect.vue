@@ -7,6 +7,14 @@
       affichait le placeholder par défaut de Nuxt UI, dans les 13 langues. `searchable` lui-même
       était inerte, mais sans conséquence visible : `searchInput` vaut déjà `true`.
     -->
+    <!--
+      ⚠️ PAS de `value-key`, bien que les props et émissions soient déclarées `string[]` et que ce
+      composant émette en réalité des OBJETS — `server/api/editions/index.get.ts` compense
+      d'ailleurs en extrayant `item.value`. Ce mensonge de typage est réel, mais le corriger est un
+      changement de COMPORTEMENT et non un renommage : `valueKey` vaut `undefined` par défaut sur
+      `USelectMenu`, donc l'ajouter change le contrat. Traité à part, avec le retrait de la
+      compensation serveur. Ce lot ne touche qu'au rendu.
+    -->
     <USelectMenu
       v-model="selectedCountries"
       :items="data || []"
@@ -16,8 +24,6 @@
       :search-input="{
         placeholder: $t('components.country_select.search_country_placeholder'),
       }"
-      value-key="value"
-      label-key="label"
       class="w-full"
       :ui="{ content: 'min-w-fit' }"
     >

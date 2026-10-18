@@ -314,6 +314,16 @@
                         />
                       </template>
                     </UInput>
+                    <!--
+                      ⚠️ PAS de `value-key` ici, et ce n'est pas un oubli. `v-model` est lié à
+                      un `computed` dont le get rend l'OBJET option et dont le set lit
+                      `value?.value` : le composant échange des objets. `valueKey` ferait émettre
+                      la chaîne, `value?.value` vaudrait `undefined`, `state.country` resterait
+                      vide — et la validation bloquerait le stepper sans jamais afficher le bouton
+                      de soumission. Mesuré : c'est ce qui est arrivé, et Playwright l'a attrapé.
+                      Le `value-attribute` d'avant était INERTE, d'où le fait que ça marchait.
+                      `label-key` est omis aussi : il vaut déjà `'label'` par défaut.
+                    -->
                     <USelectMenu
                       v-else
                       v-model="selectedCountry"
@@ -321,8 +331,6 @@
                       :placeholder="$t('common.select')"
                       size="lg"
                       class="w-full"
-                      value-key="value"
-                      label-key="label"
                       @change="handleCountryChange"
                     >
                       <template #default>

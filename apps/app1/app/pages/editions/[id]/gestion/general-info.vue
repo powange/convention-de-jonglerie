@@ -271,14 +271,17 @@
                       />
                     </template>
                   </UInput>
+                  <!--
+                    ⚠️ PAS de `value-key` : `v-model` est un `computed` qui échange des OBJETS
+                    (le get rend l'option, le set lit `value?.value`). L'ajouter viderait le pays.
+                    Cf. le même champ dans `edition/Form.vue`, où Playwright l'a attrapé.
+                  -->
                   <USelectMenu
                     v-else
                     v-model="selectedCountry"
                     :items="countrySelectOptions"
                     :placeholder="$t('common.select')"
                     class="w-full"
-                    value-key="value"
-                    label-key="label"
                     @change="handleCountryChange"
                   >
                     <template #default>

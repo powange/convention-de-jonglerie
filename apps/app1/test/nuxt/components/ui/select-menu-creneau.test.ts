@@ -123,6 +123,61 @@ const monterAvecRecherche = (props: Record<string, unknown>) =>
     })
   )
 
+/**
+ * ⚠️ `valueKey` N'EST PAS UN RENOMMAGE DE `value-attribute` : il change la FORME ÉMISE.
+ *
+ * `value-attribute` est un nom de Nuxt UI v2, donc inconnu, donc inerte : les composants qui le
+ * portaient émettaient l'OBJET entier. Le « traduire » en `valueKey` fait émettre le champ — et
+ * casse tout code bâti sur l'objet.
+ *
+ * C'est arrivé : trois `USelectMenu` ont reçu `value-key="value"` alors que leur `v-model` est un
+ * `computed` dont le set lit `value?.value`. Celui-ci est devenu `undefined`, le pays restait
+ * vide, la validation bloquait le stepper de création d'édition et le bouton de soumission
+ * n'apparaissait jamais. Seul Playwright l'a vu ; aucun test unitaire ne couvrait la forme.
+ *
+ * 📍 `USelect` se comporte autrement : son `valueKey` vaut DÉJÀ `'value'` par défaut, là où celui
+ * de `USelectMenu` vaut `undefined`. Poser `value-key="value"` sur un `USelect` est donc sans
+ * effet, et sur un `USelectMenu` ça change le contrat. Le deuxième cas ci-dessous le fixe.
+ */
+describe('USelectMenu — `valueKey` change la forme émise, il ne renomme rien', () => {
+  const premiereEmission = async (props: Record<string, unknown>) => {
+    const emissions: unknown[] = []
+    const composant = await mountSuspended(
+      defineComponent({
+        setup() {
+          return () =>
+            h(USelectMenu as any, {
+              modelValue: undefined,
+              items: [{ label: 'Gala', value: 42 }],
+              defaultOpen: true,
+              portal: false,
+              'onUpdate:modelValue': (v: unknown) => emissions.push(v),
+              ...props,
+            })
+        },
+      })
+    )
+
+    const entrees = composant.findAll('[role="option"]')
+    expect(entrees.length, 'aucune entrée à cliquer : le menu n’est pas ouvert').toBeGreaterThan(0)
+    await entrees[0]!.trigger('click')
+
+    return emissions
+  }
+
+  it('SANS `valueKey`, le modèle reçoit l’OBJET entier', async () => {
+    const emissions = await premiereEmission({})
+
+    expect(emissions[0]).toEqual({ label: 'Gala', value: 42 })
+  })
+
+  it('AVEC `valueKey`, le modèle reçoit le CHAMP — ce n’est pas le même contrat', async () => {
+    const emissions = await premiereEmission({ valueKey: 'value' })
+
+    expect(emissions[0]).toBe(42)
+  })
+})
+
 describe('USelectMenu — le placeholder du champ de recherche', () => {
   it('`search-input` porte bien le placeholder', async () => {
     const composant = await monterAvecRecherche({
