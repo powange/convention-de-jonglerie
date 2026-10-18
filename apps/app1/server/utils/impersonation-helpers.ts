@@ -1,20 +1,17 @@
 import { useSession } from 'h3'
 
+import type { SessionImpersonation } from '#shared/types/api'
 import type { H3Event } from 'h3'
 
 const IMPERSONATION_SESSION_NAME = 'impersonation'
 
-export interface ImpersonationData {
-  active: boolean
-  originalUserId: number
-  originalUserEmail: string
-  originalUserPseudo: string
-  originalUserNom: string | null
-  originalUserPrenom: string | null
-  targetUserId: number
-  targetUserEmail: string
-  startedAt: string
-}
+/*
+ * ⚠️ UNE SEULE définition, dans `shared/types/api.ts`. Il y en avait trois, et elles ne
+ * s'accordaient pas : celle-ci, une déclaration ambiante de `#auth-utils` qui annonçait
+ * `originalUserNom`/`originalUserPrenom` NON nuls, et une troisième dans
+ * `SessionMeResponse.impersonation` dont deux champs sur trois n'existaient nulle part.
+ */
+export type ImpersonationData = SessionImpersonation
 
 function getSessionConfig() {
   const password = useRuntimeConfig().session?.password || useRuntimeConfig().sessionPassword

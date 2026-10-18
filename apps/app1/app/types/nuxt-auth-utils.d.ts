@@ -6,13 +6,25 @@ declare module '#auth-utils' {
     [key: string]: unknown
   }
 
+  /*
+   * ⚠️ RECOPIE DÉLIBÉRÉE de `SessionImpersonation` (`shared/types/api.ts`), et non un import.
+   *
+   * Un `import type` fonctionnerait ici — le bloc en contient déjà un pour `H3Event` —, mais une
+   * déclaration de module ambiante a déjà coûté 93 erreurs `TS2305` à ce dépôt en masquant la
+   * résolution de Nuxt (voir le commentaire en pied de fichier). On ne la remanie pas sans pouvoir
+   * typechecker, et le typage ne tourne pas en local.
+   *
+   * 📍 `originalUserNom` et `originalUserPrenom` étaient déclarés NON nuls ici, alors que
+   * `User.nom` et `User.prenom` sont `String?` en base. Corrigé. Un test de garde vérifie que
+   * cette recopie et la définition partagée ne divergent pas.
+   */
   export interface ImpersonationData {
     active: boolean
     originalUserId: number
     originalUserEmail: string
     originalUserPseudo: string
-    originalUserNom: string
-    originalUserPrenom: string
+    originalUserNom: string | null
+    originalUserPrenom: string | null
     targetUserId: number
     targetUserEmail: string
     startedAt: string
