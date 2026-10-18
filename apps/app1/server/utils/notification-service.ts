@@ -1,5 +1,6 @@
 import { sendEmail, generateNotificationEmailHtml, getSiteUrl } from './emailService'
 import { CHEMIN_DES_PREFERENCES, texteDeCourriel } from './habillage-courriel'
+import { nomDeSalutation } from './nom-de-salutation'
 import {
   isNotificationAllowed,
   isEmailNotificationAllowed,
@@ -226,7 +227,7 @@ export const NotificationService = {
           })
 
           if (user?.email) {
-            const prenom = user.prenom || user.pseudo || 'Utilisateur'
+            const prenom = nomDeSalutation(user)
             const preferredLanguage = user.preferredLanguage || 'fr'
 
             // Traduire le contenu de l'email selon la langue préférée

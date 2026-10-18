@@ -16,7 +16,7 @@
 # le commentaire du job `typecheck` dans .github/workflows/tests.yml).
 #
 # Clé : <nombre>\t<chemin>\tTS<code>\t<message>. Pas de numéro de ligne, il bouge pour rien.
-# Total gelé : 92 erreur(s) sur 58 entrée(s).
+# Total gelé : 91 erreur(s) sur 57 entrée(s).
 9	apps/app1/app/components/convention/EditionsGrid.vue	TS2345	Argument of type 'Edition' is not assignable to parameter of type 'DashboardEdition'.
 1	apps/app1/app/components/edition/Form.vue	TS2345	Argument of type 'string | boolean' is not assignable to parameter of type 'boolean'.
 1	apps/app1/app/components/edition/zones/MarkerModal.vue	TS2345	Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
@@ -64,7 +64,6 @@
 2	apps/app1/test/nuxt/server/utils/suppression-image-fichier.test.ts	TS2345	Argument of type '{ entityId: number; dossier: "profiles"; }' is not assignable to parameter of type 'ImageDeletionOptions'.
 1	apps/app1/test/nuxt/server/volunteers/rappel-creneau-une-seule-fois.test.ts	TS2345	Argument of type 'number | undefined' is not assignable to parameter of type 'number | bigint'.
 1	layers/auth/app/pages/auth/complete-profile.vue	TS2345	Argument of type 'unknown' is not assignable to parameter of type 'Partial<User>'.
-1	layers/auth/server/api/auth/request-password-reset.post.ts	TS2345	Argument of type 'string | null' is not assignable to parameter of type 'string'.
 1	layers/lost-found/server/api/editions/[id]/lost-found/index.get.ts	TS2345	Argument of type 'H3Event<EventHandlerRequest>' is not assignable to parameter of type '{ context?: { user?: { id: number; } | undefined; } | undefined; }'.
 1	layers/ticketing/app/pages/editions/[id]/gestion/ticketing/access-control.vue	TS2345	Argument of type '(TitreAffiche & { commande?: number | undefined; })[]' is not assignable to parameter of type 'SectionDeFiche[]'.
 1	layers/ticketing/app/pages/editions/[id]/gestion/ticketing/access-control.vue	TS2345	Argument of type 'GroupeAValider' is not assignable to parameter of type 'PersonneRapprochee'.

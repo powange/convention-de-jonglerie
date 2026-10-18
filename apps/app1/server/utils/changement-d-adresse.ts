@@ -7,6 +7,7 @@ import {
   getSiteUrl,
   sendEmail,
 } from '#server/utils/emailService'
+import { nomDeSalutation } from '#server/utils/nom-de-salutation'
 
 /**
  * Le changement d'adresse de courriel, en deux temps — constat B2.
@@ -161,7 +162,7 @@ async function envoyerLesDeuxMessages(options: {
   avis?: boolean
 }) {
   const { compte, nouvelleAdresse, code, avis = true } = options
-  const prenom = compte.prenom || compte.pseudo || 'Utilisateur'
+  const prenom = nomDeSalutation(compte)
 
   // Le code, à la nouvelle adresse : c'est elle qu'il s'agit de prouver.
   try {

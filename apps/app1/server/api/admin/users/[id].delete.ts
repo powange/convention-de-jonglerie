@@ -4,6 +4,7 @@ import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { oublierSessionDuCompte } from '#server/utils/cache-session'
 import { sendEmail, generateAccountDeletionEmailHtml } from '#server/utils/emailService'
+import { nomDeSalutation } from '#server/utils/nom-de-salutation'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateResourceId } from '#server/utils/validation-helpers'
 
@@ -130,14 +131,14 @@ export default wrapApiHandler(
      */
     try {
       const emailHtml = await generateAccountDeletionEmailHtml(
-        deletedUser.prenom || '',
+        nomDeSalutation(deletedUser),
         deletionReason
       )
       const emailSent = await sendEmail({
         to: deletedUser.email,
         subject: `⚠️  Suppression de votre compte - ${deletionReason.title}`,
         html: emailHtml,
-        text: `Bonjour ${deletedUser.prenom}, votre compte a été supprimé. Motif: ${deletionReason.title} - ${deletionReason.message}`,
+        text: `Bonjour ${nomDeSalutation(deletedUser)}, votre compte a été supprimé. Motif: ${deletionReason.title} - ${deletionReason.message}`,
       })
 
       if (emailSent) {

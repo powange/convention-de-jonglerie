@@ -7,6 +7,7 @@ import {
   generateVerificationEmailHtml,
   getSiteUrl,
 } from '#server/utils/emailService'
+import { nomDeSalutation } from '#server/utils/nom-de-salutation'
 import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
 import { emailRateLimiter } from '#server/utils/rate-limiter'
 import { sanitizeEmail } from '#server/utils/validation-helpers'
@@ -58,7 +59,7 @@ export default wrapApiHandler(
       },
     })
 
-    const prenom = user.prenom || user.pseudo || 'Utilisateur'
+    const prenom = nomDeSalutation(user)
     const siteUrl = getSiteUrl()
 
     // Envoyer l'email de vérification
@@ -67,7 +68,7 @@ export default wrapApiHandler(
       to: cleanEmail,
       subject: '🤹 Nouveau code de vérification - Conventions de Jonglerie',
       html: emailHtml,
-      text: `Bonjour ${user.prenom}, votre nouveau code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier : ${siteUrl}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
+      text: `Bonjour ${prenom}, votre nouveau code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier : ${siteUrl}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
     })
 
     if (!emailSent) {

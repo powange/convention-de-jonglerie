@@ -4,6 +4,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { createFutureDate, TOKEN_DURATIONS } from '#server/utils/date-utils'
 import { sendEmail } from '#server/utils/emailService'
+import { nomDeSalutation } from '#server/utils/nom-de-salutation'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { emailRateLimiter } from '#server/utils/rate-limiter'
 import { validateConventionId } from '#server/utils/validation-helpers'
@@ -84,7 +85,7 @@ export default wrapApiHandler(
     })
 
     // Envoyer l'email avec le code
-    const emailHtml = generateClaimEmailHtml(code, convention.name, user.prenom || user.pseudo)
+    const emailHtml = generateClaimEmailHtml(code, convention.name, nomDeSalutation(user))
     await sendEmail({
       to: convention.email,
       subject: `Code de revendication pour ${convention.name}`,

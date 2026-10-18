@@ -7,6 +7,7 @@ import {
   generateVerificationEmailHtml,
   getSiteUrl,
 } from '#server/utils/emailService'
+import { nomDeSalutation } from '#server/utils/nom-de-salutation'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userAdminSelect } from '#server/utils/prisma-select-helpers'
 import { validateUserId } from '#server/utils/validation-helpers'
@@ -50,7 +51,7 @@ export default wrapApiHandler(
 
     // Envoyer un email de vérification
     const siteUrl = getSiteUrl()
-    const displayName = existingUser.prenom || existingUser.pseudo
+    const displayName = nomDeSalutation(existingUser)
     const emailHtml = await generateVerificationEmailHtml(
       verificationCode,
       displayName,
