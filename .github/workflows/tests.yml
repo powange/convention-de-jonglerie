@@ -236,10 +236,21 @@ jobs:
       #    `edition is not defined`. Le typecheck complet remonte des milliers d'erreurs
       #    préexistantes qu'on ne traite pas ici ; les gater toutes rendrait la CI rouge en
       #    permanence.
-      # 2. Sur les SEULS fichiers que la branche modifie : les TS2345 (argument du mauvais type).
-      #    La dette existante est ainsi gelée plutôt que soldée. Sans ce second filet, un objet
-      #    passé là où un entier était attendu a atteint la production et renvoyé sept erreurs 500
-      #    à un utilisateur — alors que `nuxt typecheck` le signalait déjà.
+      # 2. Les TS2345 (argument du mauvais type) ABSENTES de la dette gelée, partout dans le
+      #    dépôt. Sans ce filet, un objet passé là où un entier était attendu a atteint la
+      #    production et renvoyé sept erreurs 500 à un utilisateur — alors que `nuxt typecheck`
+      #    le signalait déjà.
+      #    📍 Il se limitait auparavant aux fichiers que la branche modifie, ce qui conflait deux
+      #    choses : « cette erreur est nouvelle » et « cette erreur est dans un fichier que j'ai
+      #    touché ». Mesuré sur les 120 derniers commits une fois la porte rendue opérante :
+      #    **15 d'entre eux (1 sur 8) auraient été refusés** pour une dette qu'ils n'avaient pas
+      #    écrite — dont une PR dont le diff ne passait même pas près de la ligne fautive. La
+      #    dette est donc gelée dans `apps/app1/typecheck-dette-2345.txt`, et seules les erreurs
+      #    nouvelles bloquent. Deux gains au passage : la porte couvre désormais TOUT le dépôt et
+      #    non les seuls fichiers touchés, et elle tourne aussi sur `main` et non sur les seules
+      #    PR, donc une régression poussée directement ne passe plus.
+      #    ⚠️ Et le compteur DOIT descendre : une entrée corrigée devient périmée et fait échouer
+      #    la porte tant qu'on ne l'a pas retirée. Sans cela la liste ne diminuerait jamais.
       - name: Typecheck — produire le journal
         env:
           # 8 Go. `vue-tsc` mourait au plafond par défaut de 4 Go. Cette valeur n'est pas choisie
@@ -286,14 +297,8 @@ jobs:
           fi
           echo "✅ Aucune référence non définie (TS2304/TS2552)."
 
-      - name: Typecheck — échoue sur les erreurs de type des fichiers modifiés (TS2345)
-        if: github.event_name == 'pull_request'
-        run: |
-          git fetch --no-tags origin "${{ github.base_ref }}"
-          git diff --name-only "origin/${{ github.base_ref }}...HEAD" > fichiers-modifies.txt
-          echo "Fichiers modifiés par la branche :"
-          cat fichiers-modifies.txt
-          node scripts/typecheck-gate.mjs typecheck.log fichiers-modifies.txt 2345
+      - name: Typecheck — échoue sur les TS2345 NOUVELLES (dette gelée ailleurs)
+        run: node scripts/typecheck-gate.mjs --dette typecheck.log typecheck-dette-2345.txt 2345
 
   # Job pour valider que le build fonctionne
   build:

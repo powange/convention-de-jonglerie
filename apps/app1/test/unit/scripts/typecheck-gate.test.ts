@@ -2,10 +2,12 @@ import { describe, it, expect } from 'vitest'
 
 // @ts-expect-error — module .mjs sans déclarations, importé pour son comportement
 import {
-  developperRepertoires,
+  comparerALaDette,
+  compterErreurs,
   diagnostiquerAboutissement,
-  erreursBloquantes,
+  lireDette,
   normaliserChemin,
+  serialiserDette,
 } from '../../../scripts/typecheck-gate.mjs'
 
 /**
@@ -75,101 +77,126 @@ describe('Le journal de typage doit être complet avant qu’une porte le lise',
   })
 })
 
-describe('Garde-fou de typage sur les fichiers modifiés', () => {
-  it('rend les chemins comparables à ceux de git', () => {
-    // Le journal cite depuis `apps/app1` ; git depuis la racine.
+describe('Chemins', () => {
+  it('rend les chemins du journal comparables à ceux de git', () => {
+    // Le journal cite depuis `apps/app1` ; git et la liste de dette, depuis la racine.
     expect(normaliserChemin('../../layers/a/b.ts')).toBe('layers/a/b.ts')
     expect(normaliserChemin('server/api/c.ts')).toBe('apps/app1/server/api/c.ts')
-  })
-
-  it('bloque l’erreur qui a atteint la production', () => {
-    expect(erreursBloquantes(LIGNE_REELLE, [FICHIER_REEL], ['2345'])).toHaveLength(1)
-  })
-
-  it('laisse passer la même erreur sur un fichier non touché', () => {
-    // C'est tout l'objet du gel : la dette existante ne bloque personne.
-    expect(erreursBloquantes(LIGNE_REELLE, ['apps/app1/autre.ts'], ['2345'])).toHaveLength(0)
-  })
-
-  it('ignore les codes hors de la liste', () => {
-    const autre = LIGNE_REELLE.replace('TS2345', 'TS2339')
-    expect(erreursBloquantes(autre, [FICHIER_REEL], ['2345'])).toHaveLength(0)
-  })
-
-  it('ne compte qu’une fois une erreur répétée', () => {
-    // `nuxt typecheck` sort chaque erreur deux fois ; la lire en double ferait douter du compte.
-    const journal = [LIGNE_REELLE, 'bruit', LIGNE_REELLE].join('\n')
-    expect(erreursBloquantes(journal, [FICHIER_REEL], ['2345'])).toHaveLength(1)
-  })
-
-  it('ne se laisse pas abuser par un chemin qui contient celui d’un fichier modifié', () => {
-    const voisin = LIGNE_REELLE.replace('[workshopId].put.ts', '[workshopId].put.extra.ts')
-    expect(erreursBloquantes(voisin, [FICHIER_REEL], ['2345'])).toHaveLength(0)
   })
 })
 
 /**
- * Le faux vert du 8 septembre 2026.
- *
- * `git status --short` réduit un répertoire entièrement nouveau à une seule entrée — le dossier,
- * pas les fichiers. La porte, qui compare des chemins de fichiers, n'en reconnaissait aucun et
- * annonçait « aucune erreur » sur du code jamais examiné. Deux `TS2345` sont passées ainsi.
+ * Deux vraies lignes du journal de CI, et elles ne sont pas choisies au hasard : `EditionsGrid`
+ * porte NEUF erreurs au message identique à des lignes différentes. C'est ce cas qui impose de
+ * compter, plutôt que de se contenter de la paire (fichier, message).
  */
-describe('developperRepertoires', () => {
-  const disque = (arborescence: Record<string, string[]>) => ({
-    existe: (chemin: string) =>
-      chemin in arborescence || Object.values(arborescence).flat().includes(chemin),
-    estRepertoire: (chemin: string) => chemin in arborescence,
-    lister: (chemin: string) => arborescence[chemin] ?? [],
+const GRILLE =
+  "app/components/convention/EditionsGrid.vue(%L%,36): error TS2345: Argument of type 'Edition' is not assignable to parameter of type 'DashboardEdition'."
+const journalGrille = (lignes: number[]) =>
+  lignes.map((l) => GRILLE.replace('%L%', String(l))).join('\n')
+
+describe('Compter les erreurs pour les geler', () => {
+  it('regroupe par (fichier, code, message) et compte', () => {
+    const comptes = compterErreurs(journalGrille([10, 20, 30]), ['2345'])
+
+    expect(comptes.size).toBe(1)
+    expect([...comptes.values()][0]).toBe(3)
   })
 
-  const ARBRE = {
-    'layers/stock/server/api/stock-tags': [
-      'layers/stock/server/api/stock-tags/index.get.ts',
-      'layers/stock/server/api/stock-tags/index.post.ts',
-    ],
-  }
+  it('⚠️ ignore les répétitions à l’identique que `nuxt typecheck` produit', () => {
+    // Le journal réel comptait 166 lignes pour 132 erreurs : compter le brut gonflerait la dette.
+    const avecDoublons = `${journalGrille([10, 20])}\n${journalGrille([10, 20])}`
 
-  it('remplace un répertoire par les fichiers qu’il contient', () => {
-    expect(developperRepertoires(['layers/stock/server/api/stock-tags'], disque(ARBRE))).toEqual([
-      'layers/stock/server/api/stock-tags/index.get.ts',
-      'layers/stock/server/api/stock-tags/index.post.ts',
-    ])
+    expect([...compterErreurs(avecDoublons, ['2345']).values()][0]).toBe(2)
   })
 
-  it('laisse les fichiers tels quels', () => {
-    expect(developperRepertoires(['apps/app1/server/utils/a.ts'], disque(ARBRE))).toEqual([
-      'apps/app1/server/utils/a.ts',
-    ])
+  it('📍 la clé ne contient PAS le numéro de ligne', () => {
+    /*
+     * Le cas qui décide de la durée de vie de la liste : ajouter une ligne en haut du fichier
+     * décale toutes les erreurs sans qu'aucune soit créée ni corrigée. Une clé calée sur la ligne
+     * rendrait la liste entièrement périmée à ce moment-là, et la porte exigerait de la
+     * régénérer pour rien.
+     */
+    const avant = compterErreurs(journalGrille([10, 20]), ['2345'])
+    const apres = compterErreurs(journalGrille([11, 21]), ['2345'])
+
+    expect(serialiserDette(apres)).toBe(serialiserDette(avant))
   })
 
-  it('mêle sans peine fichiers et répertoires', () => {
-    const resultat = developperRepertoires(
-      ['apps/app1/a.ts', 'layers/stock/server/api/stock-tags'],
-      disque(ARBRE)
-    )
+  it('ne retient que les codes demandés', () => {
+    const autre = 'server/a.ts(1,1): error TS2322: Type X is not assignable to type Y.'
 
-    expect(resultat).toHaveLength(3)
-    expect(resultat[0]).toBe('apps/app1/a.ts')
+    expect(compterErreurs(autre, ['2345']).size).toBe(0)
+    expect(compterErreurs(autre, ['2322']).size).toBe(1)
   })
 
-  it('garde un chemin qui n’existe plus', () => {
-    // Un fichier supprimé figure dans la liste des modifications : il reste tel quel, et ne
-    // correspondra simplement à aucune erreur.
-    expect(developperRepertoires(['apps/app1/supprime.ts'], disque({}))).toEqual([
-      'apps/app1/supprime.ts',
-    ])
+  it('fait l’aller-retour par le fichier de dette, commentaires compris', () => {
+    const comptes = compterErreurs(journalGrille([10, 20, 30]), ['2345'])
+    const fichier = `# un commentaire\n\n${serialiserDette(comptes)}\n`
+
+    expect(lireDette(fichier)).toEqual(comptes)
+  })
+})
+
+describe('La porte ne bloque que ce qui n’est pas gelé', () => {
+  const dette = serialiserDette(compterErreurs(journalGrille([10, 20, 30]), ['2345']))
+
+  it('laisse passer la dette gelée, à l’identique', () => {
+    const r = comparerALaDette(journalGrille([10, 20, 30]), dette, ['2345'])
+
+    expect(r.nouvelles).toEqual([])
+    expect(r.perimees).toEqual([])
+    expect(r.gelees).toBe(3)
   })
 
-  it('rend le fichier attendu à la porte, là où le dossier ne disait rien', () => {
-    // Le bout à bout : sans développement, la ligne d'erreur n'était rattachée à rien.
-    const ligne =
-      '../../layers/stock/server/api/stock-tags/index.post.ts(12,5): error TS2345: Argument…'
-    const dossier = ['layers/stock/server/api/stock-tags']
+  it('laisse passer la dette gelée même décalée de quelques lignes', () => {
+    const r = comparerALaDette(journalGrille([12, 22, 32]), dette, ['2345'])
 
-    expect(erreursBloquantes(ligne, dossier, ['2345'])).toHaveLength(0)
-    expect(
-      erreursBloquantes(ligne, developperRepertoires(dossier, disque(ARBRE)), ['2345'])
-    ).toHaveLength(1)
+    expect(r.nouvelles).toEqual([])
+    expect(r.perimees).toEqual([])
+  })
+
+  it('BLOQUE une erreur absente de la liste', () => {
+    const neuve = `${journalGrille([10, 20, 30])}\nserver/api/neuf.ts(1,1): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.`
+    const r = comparerALaDette(neuve, dette, ['2345'])
+
+    expect(r.nouvelles).toHaveLength(1)
+    expect(r.nouvelles[0]).toContain('neuf.ts')
+  })
+
+  it('⚠️ BLOQUE une erreur de PLUS sur une entrée déjà gelée', () => {
+    /*
+     * Sans le compte, ce cas passerait : la paire (fichier, message) est déjà dans la liste. Or
+     * c'est bien une régression — une colonne de tableau de plus qui ne typerait pas.
+     */
+    const r = comparerALaDette(journalGrille([10, 20, 30, 40]), dette, ['2345'])
+
+    expect(r.nouvelles).toHaveLength(1)
+    expect(r.nouvelles[0]).toContain('× 4 au lieu de 3')
+  })
+
+  it('📍 BLOQUE une entrée PÉRIMÉE, pour que le compteur descende', () => {
+    /*
+     * C'est le mécanisme demandé : corriger une erreur rend son entrée périmée, et la porte le
+     * dit au lieu de se taire. Sans cela, la liste ne diminuerait jamais et finirait par décrire
+     * un dépôt qui n'existe plus.
+     */
+    const r = comparerALaDette(journalGrille([10, 20]), dette, ['2345'])
+
+    expect(r.nouvelles).toEqual([])
+    expect(r.perimees).toHaveLength(1)
+    expect(r.perimees[0]).toContain('1 entrée(s) à retirer')
+  })
+
+  it('📍 et ne dit RIEN quand la dette atteint zéro', () => {
+    /*
+     * Le cas final. Une garde qui se prouverait par la présence d'erreurs tomberait ici — au seul
+     * moment où elle n'aurait plus rien à signaler. Journal vide et liste vide : tout va bien.
+     */
+    const r = comparerALaDette('', '', ['2345'])
+
+    expect(r.nouvelles).toEqual([])
+    expect(r.perimees).toEqual([])
+    expect(r.gelees).toBe(0)
   })
 })
