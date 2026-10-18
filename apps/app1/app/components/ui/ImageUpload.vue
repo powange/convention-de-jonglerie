@@ -389,10 +389,12 @@ const onDragLeave = () => {
 
 const onDrop = async (event: DragEvent) => {
   isDragOver.value = false
-  const droppedFiles = event.dataTransfer?.files
-  if (!droppedFiles || droppedFiles.length === 0) return
+  // ⚠️ On teste l'ÉLÉMENT et non la longueur : TypeScript ne propage rien depuis `.length`, si
+  // bien que `droppedFiles[0]` restait `File | undefined`. Une garde au lieu de deux, et le type
+  // est juste.
+  const file = event.dataTransfer?.files?.[0]
+  if (!file) return
 
-  const file = droppedFiles[0]
   const ok = await selectFile(file)
   if (ok && props.autoUpload) {
     await upload()

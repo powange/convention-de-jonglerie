@@ -25,14 +25,20 @@ export default wrapApiHandler(
 
     const { files, metadata } = await readBody<RequestBody>(event)
 
-    if (!files || files.length === 0) {
+    /*
+     * ⚠️ On teste L'ÉLÉMENT, pas la longueur. `files.length === 0` garantit bien son existence à
+     * l'exécution, mais TypeScript ne propage rien depuis un test sur `.length` : `files[0]`
+     * restait `ServerFile | undefined` et les appels suivants étaient en erreur `TS2345`.
+     * Vérifier directement l'élément narrowe ET remplace deux gardes par une.
+     */
+    const file = files?.[0]
+    if (!file) {
       throw createError({
         status: 400,
         message: 'Aucun fichier fourni',
       })
     }
 
-    const file = files[0] // Prendre le premier fichier
     validateUploadedFile(file)
     const { entityId, editionId } = metadata
     const targetEditionId = entityId || editionId
