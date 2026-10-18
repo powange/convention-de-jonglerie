@@ -16,14 +16,13 @@
 # le commentaire du job `typecheck` dans .github/workflows/tests.yml).
 #
 # Clé : <nombre>\t<chemin>\tTS<code>\t<message>. Pas de numéro de ligne, il bouge pour rien.
-# Total gelé : 90 erreur(s) sur 56 entrée(s).
+# Total gelé : 85 erreur(s) sur 53 entrée(s).
 9	apps/app1/app/components/convention/EditionsGrid.vue	TS2345	Argument of type 'Edition' is not assignable to parameter of type 'DashboardEdition'.
 1	apps/app1/app/components/edition/Form.vue	TS2345	Argument of type 'string | boolean' is not assignable to parameter of type 'boolean'.
 1	apps/app1/app/components/edition/zones/MarkerModal.vue	TS2345	Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
 1	apps/app1/app/components/edition/zones/ZoneModal.vue	TS2345	Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
 2	apps/app1/app/components/organizer/RightsFields.vue	TS2345	Argument of type '"canManageTreasury"' is not assignable to parameter of type '"canEdit" | "canDelete" | "canManageVolunteers" | "canManageArtists" | "canManageMeals" | "canManageTicketing" | "canManageTasks" | "canManageStock" | "canManageWorkshops" | "canManageFAQ"'.
 1	apps/app1/app/components/ui/ImageUpload.vue	TS2345	Argument of type '"artist" | "profile" | "treasury" | "lost-found" | "edition" | "convention" | "show" | "generic"' is not assignable to parameter of type '"profile" | "lost-found" | "edition" | "convention" | "show" | undefined'.
-1	apps/app1/app/components/ui/ImageUpload.vue	TS2345	Argument of type 'File | undefined' is not assignable to parameter of type 'File'.
 1	apps/app1/app/pages/conventions/[id]/editions/add.vue	TS2345	Argument of type 'EditionFormData' is not assignable to parameter of type 'Omit<Edition, "id" | "creatorId" | "creator">'.
 1	apps/app1/app/pages/editions/[id]/gestion/treasury/index.vue	TS2345	Argument of type '(l: TreasuryLine) => string' is not assignable to parameter of type '(ligne: LigneTresorerieCsv) => string'.
 2	apps/app1/app/stores/editions.ts	TS2345	Argument of type '{ params: { [key: string]: string; }; }' is not assignable to parameter of type 'O'.
@@ -37,8 +36,6 @@
 1	apps/app1/server/api/editions/[id]/posts/index.post.ts	TS2345	Argument of type 'H3Event<EventHandlerRequest>' is not assignable to parameter of type '{ context?: { user?: { id: number; } | undefined; } | undefined; }'.
 1	apps/app1/server/api/editions/[id]/zones/index.get.ts	TS2345	Argument of type 'H3Event<EventHandlerRequest>' is not assignable to parameter of type '{ context?: { user?: { id: number; } | undefined; } | undefined; }'.
 1	apps/app1/server/api/feedback/index.post.ts	TS2345	Argument of type '{ method: "POST"; body: URLSearchParams; }' is not assignable to parameter of type 'O'.
-2	apps/app1/server/api/files/generic.post.ts	TS2345	Argument of type 'ServerFile | undefined' is not assignable to parameter of type 'ServerFile'.
-2	apps/app1/server/api/files/lost-found.post.ts	TS2345	Argument of type 'ServerFile | undefined' is not assignable to parameter of type 'ServerFile'.
 1	apps/app1/server/api/messenger/conversations/index.get.ts	TS2345	Argument of type 'string | null' is not assignable to parameter of type 'number'.
 1	apps/app1/server/api/messenger/conversations/index.get.ts	TS2345	Argument of type 'string | null' is not assignable to parameter of type 'string'.
 1	apps/app1/server/api/messenger/conversations/index.get.ts	TS2345	Argument of type 'string' is not assignable to parameter of type 'number'.
