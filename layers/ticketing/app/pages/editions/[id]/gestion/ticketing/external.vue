@@ -1188,7 +1188,6 @@ const { execute: executerEnregistrementHelloAsso } = useApiAction(
       helloAssoOrganizationSlug.value = config.organizationSlug
       helloAssoFormType.value = config.formType
       helloAssoFormSlug.value = config.formSlug
-      hasHelloAssoConfig.value = true
       configModalRef.value?.setSaving(false)
       // Fermer la modal
       showConfigModal.value = false
