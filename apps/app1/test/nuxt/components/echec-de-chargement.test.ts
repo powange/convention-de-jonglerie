@@ -40,11 +40,22 @@ describe('UiEchecDeChargement', () => {
      * dans les fichiers eux-mêmes, et c'est bien le CÂBLAGE des deux clés qui est éprouvé.
      */
     const attendus = [messagesDErreur('fr'), messagesDErreur('en')]
+    /*
+     * ⚠️ On exige que chaque jeu attendu PORTE les deux clés avant de les chercher dans le texte.
+     * Sans cela, une locale amputée passait `undefined` à `includes()`, qui cherche alors la
+     * chaîne « undefined » : le `.some()` rendait `false` et l'échec parlait du composant, là où
+     * le défaut était une traduction manquante.
+     */
+    for (const m of attendus) {
+      expect(m.chunk_load_failed_title, 'titre absent de la locale attendue').toBeTruthy()
+      expect(m.chunk_load_failed_description, 'description absente de la locale').toBeTruthy()
+    }
+
     expect(
       attendus.some(
         (m) =>
-          texte.includes(m.chunk_load_failed_title) &&
-          texte.includes(m.chunk_load_failed_description)
+          texte.includes(m.chunk_load_failed_title!) &&
+          texte.includes(m.chunk_load_failed_description!)
       )
     ).toBe(true)
     // Et la clé n'est pas restée brute, ce qui serait le symptôme d'un domaine i18n absent.

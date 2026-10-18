@@ -220,11 +220,23 @@ let cacheTimestamp: number = 0
 /**
  * Valeurs par défaut de context length selon le provider
  */
-const DEFAULT_CONTEXT_LENGTHS: Record<string, number> = {
+/*
+ * ⚠️ `satisfies` et NON une annotation `Record<string, number>`.
+ *
+ * Annoté `Record<string, number>`, cet objet voyait chacun de ses accès rendre
+ * `number | undefined` — `noUncheckedIndexedAccess` traite un index de `Record` comme
+ * potentiellement absent, même sur une clé littérale qui est là, sous les yeux, trois lignes plus
+ * haut. D'où trois erreurs `TS2345` pour un objet parfaitement défini.
+ *
+ * `satisfies` garde l'intention — toutes les valeurs sont des nombres — sans élargir les clés :
+ * `DEFAULT_CONTEXT_LENGTHS.lmstudio` est un `number`, et une faute de frappe sur un nom de clé
+ * reste une erreur de compilation. Les trois accès sont littéraux, aucun n'est dynamique.
+ */
+const DEFAULT_CONTEXT_LENGTHS = {
   lmstudio: 4096, // Valeur conservative pour modèles locaux
   ollama: 4096,
   anthropic: 200000, // Claude a un très grand contexte
-}
+} satisfies Record<string, number>
 
 /**
  * Récupère le context length du modèle LM Studio via l'API /v1/models

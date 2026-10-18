@@ -234,9 +234,23 @@ export default wrapApiHandler(
         { gereBenevoles, gereArtistes }
       )
 
-    const responsablesParEquipe = new Map<number, Set<number>>()
+    /*
+     * ⚠️ `string` et NON `number`, des deux côtés. `Conversation.teamId` est `String?` en base, et
+     * `utilisateursResponsablesDeLEquipe` attend bien un `teamId: string`.
+     *
+     * La version d'origine déclarait `Map<number, …>` et forçait le filtre avec un prédicat
+     * `(id): id is number`. TypeScript **rejette** ce prédicat — `number` n'est pas assignable à
+     * `string | null` —, d'où un `TS2677` sur la ligne du filtre, puis trois `TS2345` en cascade
+     * parce qu'il conserve alors le type d'origine. **Un seul mot faux pour quatre erreurs.**
+     *
+     * 📍 Le comportement, lui, était correct : une `Map` compare ses clés par identité de valeur,
+     * et comme l'écriture et la lecture emploient toutes deux la même chaîne, les recherches
+     * aboutissaient. Ce n'était donc pas un défaut visible — c'était un typage qui mentait, ce qui
+     * est pire à sa façon : il rendait le compilateur inutile sur tout ce bloc.
+     */
+    const responsablesParEquipe = new Map<string, Set<number>>()
     for (const teamId of new Set(
-      conversations.map((c) => c.teamId).filter((id): id is number => id !== null)
+      conversations.map((c) => c.teamId).filter((id): id is string => id !== null)
     )) {
       responsablesParEquipe.set(
         teamId,

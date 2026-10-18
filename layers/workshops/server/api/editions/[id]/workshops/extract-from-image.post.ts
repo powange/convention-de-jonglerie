@@ -78,8 +78,34 @@ export default wrapApiHandler(
       })
     }
 
-    const imageType = base64Match[1] as 'png' | 'jpeg' | 'gif' | 'webp'
+    const typeBrut = base64Match[1]
     const base64Data = base64Match[2]
+
+    /*
+     * ⚠️ Les deux groupes sont obligatoires dans la regex ci-dessus, donc inatteignables à vide
+     * — mais on le VÉRIFIE au lieu de le forcer. La version d'origine employait
+     * `base64Match[1] as 'png' | 'jpeg' | 'gif' | 'webp'`, et ce cast masquait deux choses à la
+     * fois : l'absence possible, et le fait que la REGEX ACCEPTE `jpg`, qui n'est pas dans cette
+     * union.
+     */
+    if (!typeBrut || !base64Data) {
+      throw createError({
+        status: 400,
+        message: "Format d'image invalide. Utilisez une image encodée en base64",
+      })
+    }
+
+    /*
+     * ⚠️ `jpg` → `jpeg`, et ce n'est pas cosmétique. `image/jpg` N'EST PAS un type MIME valide :
+     * `ai-providers.ts` construit `media_type: \`image/${imageType}\`` et
+     * `data:image/${imageType};base64,…`, et l'API d'Anthropic refuse `image/jpg` — elle n'accepte
+     * que `image/jpeg`, `image/png`, `image/gif` et `image/webp`. Une image annoncée en `jpg`
+     * faisait donc échouer l'extraction avec une erreur d'API, sans message exploitable.
+     *
+     * On normalise ICI, au seul endroit où le type est extrait, plutôt que chez chacun des quatre
+     * fournisseurs.
+     */
+    const imageType = typeBrut === 'jpg' ? 'jpeg' : typeBrut
 
     // Récupérer la configuration IA depuis la BDD
     const effectiveConfig = await getEffectiveAIConfigAsync()

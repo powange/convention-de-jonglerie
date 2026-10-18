@@ -127,7 +127,7 @@ const modalTitle = computed(() => (props.zone ? t('map.edit_zone') : t('gestion.
             v-model="form.zoneTypes"
             multiple
             :items="zoneTypes"
-            :icon="form.zoneTypes.length > 0 ? getZoneTypeIcon(form.zoneTypes[0]) : undefined"
+            :icon="form.zoneTypes.length > 0 ? getZoneTypeIcon(form.zoneTypes[0] ?? '') : undefined"
             :ui="{ content: 'z-[60]' }"
             class="w-full"
           />

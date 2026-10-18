@@ -16,11 +16,9 @@
 # le commentaire du job `typecheck` dans .github/workflows/tests.yml).
 #
 # Clé : <nombre>\t<chemin>\tTS<code>\t<message>. Pas de numéro de ligne, il bouge pour rien.
-# Total gelé : 85 erreur(s) sur 53 entrée(s).
+# Total gelé : 67 erreur(s) sur 40 entrée(s).
 9	apps/app1/app/components/convention/EditionsGrid.vue	TS2345	Argument of type 'Edition' is not assignable to parameter of type 'DashboardEdition'.
 1	apps/app1/app/components/edition/Form.vue	TS2345	Argument of type 'string | boolean' is not assignable to parameter of type 'boolean'.
-1	apps/app1/app/components/edition/zones/MarkerModal.vue	TS2345	Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
-1	apps/app1/app/components/edition/zones/ZoneModal.vue	TS2345	Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
 2	apps/app1/app/components/organizer/RightsFields.vue	TS2345	Argument of type '"canManageTreasury"' is not assignable to parameter of type '"canEdit" | "canDelete" | "canManageVolunteers" | "canManageArtists" | "canManageMeals" | "canManageTicketing" | "canManageTasks" | "canManageStock" | "canManageWorkshops" | "canManageFAQ"'.
 1	apps/app1/app/components/ui/ImageUpload.vue	TS2345	Argument of type '"artist" | "profile" | "treasury" | "lost-found" | "edition" | "convention" | "show" | "generic"' is not assignable to parameter of type '"profile" | "lost-found" | "edition" | "convention" | "show" | undefined'.
 1	apps/app1/app/pages/conventions/[id]/editions/add.vue	TS2345	Argument of type 'EditionFormData' is not assignable to parameter of type 'Omit<Edition, "id" | "creatorId" | "creator">'.
@@ -36,29 +34,19 @@
 1	apps/app1/server/api/editions/[id]/posts/index.post.ts	TS2345	Argument of type 'H3Event<EventHandlerRequest>' is not assignable to parameter of type '{ context?: { user?: { id: number; } | undefined; } | undefined; }'.
 1	apps/app1/server/api/editions/[id]/zones/index.get.ts	TS2345	Argument of type 'H3Event<EventHandlerRequest>' is not assignable to parameter of type '{ context?: { user?: { id: number; } | undefined; } | undefined; }'.
 1	apps/app1/server/api/feedback/index.post.ts	TS2345	Argument of type '{ method: "POST"; body: URLSearchParams; }' is not assignable to parameter of type 'O'.
-1	apps/app1/server/api/messenger/conversations/index.get.ts	TS2345	Argument of type 'string | null' is not assignable to parameter of type 'number'.
-1	apps/app1/server/api/messenger/conversations/index.get.ts	TS2345	Argument of type 'string | null' is not assignable to parameter of type 'string'.
-1	apps/app1/server/api/messenger/conversations/index.get.ts	TS2345	Argument of type 'string' is not assignable to parameter of type 'number'.
 1	apps/app1/server/api/session/me.get.ts	TS2345	Argument of type '(event: H3Event<EventHandlerRequest>) => Promise<{ user: User; impersonation: ImpersonationData | null; }>' is not assignable to parameter of type '(event: H3Event<EventHandlerRequest>) => SessionMeResponse | Promise<SessionMeResponse>'.
 1	apps/app1/server/api/session/me.get.ts	TS2345	Argument of type '(event: H3Event<EventHandlerRequest>) => Promise<{ user: any; impersonation: ImpersonationData | null; }>' is not assignable to parameter of type '(event: H3Event<EventHandlerRequest>) => SessionMeResponse | Promise<SessionMeResponse>'.
 1	apps/app1/server/routes/uploads/[...path].get.ts	TS2345	Argument of type 'string' is not assignable to parameter of type 'number'.
-3	apps/app1/server/utils/ai-config.ts	TS2345	Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
-1	apps/app1/server/utils/firebase-admin.ts	TS2345	Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
 2	apps/app1/server/utils/program-validation.ts	TS2345	Argument of type '{ message: string; path: readonly ["markerId"]; }' is not assignable to parameter of type 'string | { params?: Record<string, any> | undefined; path?: PropertyKey[] | undefined; abort?: boolean | undefined; when?: ((payload: ParsePayload<unknown>) => boolean) | undefined; error?: string | ... 1 more ... | undefined; message?: string | undefined; } | undefined'.
 2	apps/app1/server/utils/program-validation.ts	TS2345	Argument of type '{ message: string; path: readonly ["markerId"]; }' is not assignable to parameter of type 'string | { path?: PropertyKey[] | undefined; params?: Record<string, any> | undefined; abort?: boolean | undefined; when?: ((payload: ParsePayload<unknown>) => boolean) | undefined; error?: string | ... 1 more ... | undefined; message?: string | undefined; } | undefined'.
-3	apps/app1/server/utils/time-extraction-patterns.ts	TS2345	Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
-1	apps/app1/shared/utils/liens-message.ts	TS2345	Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
-2	apps/app1/test/nuxt/components/echec-de-chargement.test.ts	TS2345	Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
 1	apps/app1/test/nuxt/features/favorites.test.ts	TS2345	Argument of type 'any' is not assignable to parameter of type 'never'.
 1	apps/app1/test/nuxt/features/favorites.test.ts	TS2345	Argument of type '{ type: string; message: string; timestamp: Date; }' is not assignable to parameter of type 'never'.
-1	apps/app1/test/nuxt/server/api/admin/droits-et-suppression-de-compte.test.ts	TS2345	Argument of type 'number | undefined' is not assignable to parameter of type 'number | bigint'.
 1	apps/app1/test/nuxt/server/api/editions/shows-call/[showCallId].put.test.ts	TS2345	Argument of type '(a: number, b: number) => number' is not assignable to parameter of type '(a: unknown, b: unknown) => number'.
 7	apps/app1/test/nuxt/server/api/editions/treasury-cash-float-gardes.test.ts	TS2345	Argument of type '{ context: { params: { id: string; }; user: { id: number; }; }; }' is not assignable to parameter of type 'H3Event<EventHandlerRequest>'.
 5	apps/app1/test/nuxt/server/api/profile/has-password.get.test.ts	TS2345	Argument of type '{ context: { user: { id: number; email: string; pseudo: string; isGlobalAdmin: boolean; }; }; }' is not assignable to parameter of type 'H3Event<EventHandlerRequest>'.
 1	apps/app1/test/nuxt/server/api/profile/has-password.get.test.ts	TS2345	Argument of type '{ context: {}; }' is not assignable to parameter of type 'H3Event<EventHandlerRequest>'.
 5	apps/app1/test/nuxt/server/utils/suppression-image-fichier.test.ts	TS2345	Argument of type '{ entityId: number; dossier: "editions"; }' is not assignable to parameter of type 'ImageDeletionOptions'.
 2	apps/app1/test/nuxt/server/utils/suppression-image-fichier.test.ts	TS2345	Argument of type '{ entityId: number; dossier: "profiles"; }' is not assignable to parameter of type 'ImageDeletionOptions'.
-1	apps/app1/test/nuxt/server/volunteers/rappel-creneau-une-seule-fois.test.ts	TS2345	Argument of type 'number | undefined' is not assignable to parameter of type 'number | bigint'.
 1	layers/auth/app/pages/auth/complete-profile.vue	TS2345	Argument of type 'unknown' is not assignable to parameter of type 'Partial<User>'.
 1	layers/lost-found/server/api/editions/[id]/lost-found/index.get.ts	TS2345	Argument of type 'H3Event<EventHandlerRequest>' is not assignable to parameter of type '{ context?: { user?: { id: number; } | undefined; } | undefined; }'.
 1	layers/ticketing/app/pages/editions/[id]/gestion/ticketing/access-control.vue	TS2345	Argument of type '(TitreAffiche & { commande?: number | undefined; })[]' is not assignable to parameter of type 'SectionDeFiche[]'.
@@ -69,4 +57,3 @@
 1	layers/ticketing/server/api/editions/[id]/ticketing/order-items/[itemId]/discount-paid-back.patch.ts	TS2345	Argument of type '"billet"' is not assignable to parameter of type 'ResourceType'.
 1	layers/ticketing/server/api/editions/[id]/ticketing/order-items/[itemId]/discount.patch.ts	TS2345	Argument of type '"billet"' is not assignable to parameter of type 'ResourceType'.
 1	layers/ticketing/server/api/editions/[id]/ticketing/order-items/[itemId]/refund.patch.ts	TS2345	Argument of type '"billet"' is not assignable to parameter of type 'ResourceType'.
-1	layers/workshops/server/api/editions/[id]/workshops/extract-from-image.post.ts	TS2345	Argument of type 'string | undefined' is not assignable to parameter of type 'string'.

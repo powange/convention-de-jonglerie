@@ -198,10 +198,19 @@ describe('DELETE /api/admin/users/[id]', () => {
      */
     await supprimer({} as any)
 
-    const ordreSuppression = prismaMock.user.delete.mock.invocationCallOrder[0]
-    const ordreCourriel = mockSendEmail.mock.invocationCallOrder[0]
+    /*
+     * ⚠️ On vérifie D'ABORD que les deux ont été appelés. `invocationCallOrder[0]` vaut `undefined`
+     * quand un bouchon n'a jamais servi, et `expect(undefined).toBeLessThan(undefined)` échoue
+     * alors sur un message qui ne dit pas que l'appel MANQUE — on cherche un problème d'ordre là
+     * où il n'y a pas d'appel du tout.
+     */
+    expect(prismaMock.user.delete, 'la suppression n’a pas été appelée').toHaveBeenCalled()
+    expect(mockSendEmail, 'le courriel n’a pas été envoyé').toHaveBeenCalled()
 
-    expect(ordreSuppression).toBeLessThan(ordreCourriel)
+    const [ordreSuppression] = prismaMock.user.delete.mock.invocationCallOrder
+    const [ordreCourriel] = mockSendEmail.mock.invocationCallOrder
+
+    expect(ordreSuppression!).toBeLessThan(ordreCourriel!)
   })
 
   it('refuse de supprimer un administrateur global', async () => {
