@@ -31,7 +31,25 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Comptage des tâches assignées, ave
     compterMesTachesDeLEdition(prismaTest, editionId, userId)
 
   beforeEach(async () => {
-    const t = Date.now() + Math.floor(Math.random() * 1000)
+    /*
+     * ⚠️ UN SUFFIXE RÉELLEMENT UNIQUE, et non `Date.now() + Math.floor(Math.random() * 1000)`.
+     *
+     * Cette fenêtre de mille valeurs était trop étroite : `beforeEach` tourne une fois par cas, et
+     * deux exécutions à quelques millisecondes d'écart tombent facilement sur la MÊME somme —
+     * 1000 + 500 et 1002 + 498 donnent tous deux 1500. Ce fichier ne nettoyant rien derrière lui,
+     * la seconde création heurtait alors la ligne laissée par la première :
+     *
+     *     Unique constraint failed on `User_email_key`
+     *     Duplicate entry 'mes-taches-moi-1792360638515@example.com'
+     *
+     * La CI est devenue rouge sur un lot qui ne touchait ni les tâches ni les comptes. Une
+     * instabilité statistique de ce genre coûte plus qu'un test manquant : elle apprend à ne plus
+     * croire le rouge.
+     *
+     * 📍 `Math.random().toString(36)` garde la précision complète du tirage, là où
+     * `Math.floor(… * 1000)` la jetait. Le motif existe déjà ailleurs dans ce dossier.
+     */
+    const t = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
 
     const creerCompte = async (suffixe: string) => {
       const email = `mes-taches-${suffixe}-${t}@example.com`
