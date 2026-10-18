@@ -17,9 +17,22 @@ export interface SectionDeFiche {
   commande?: number
   /** Les lignes à cocher d'avance : celles qui appartiennent à la personne cherchée. */
   preselection?: number[]
-  /** Le reste — participant, remboursement… — voyage sans être regardé ici. */
-  [autre: string]: unknown
 }
+
+/*
+ * ⚠️ PAS d'`[autre: string]: unknown` ici, et le retirer ne perd RIEN.
+ *
+ * L'intention — « le reste, participant, remboursement…, voyage sans être regardé » — est juste,
+ * mais une index signature ne l'exprime pas : elle l'EXIGE. TypeScript n'admet une interface
+ * concrète comme satisfaisant une index signature que si celle-ci y est déclarée explicitement,
+ * si bien que `TitreAffiche` — le type réel des sections de la page — était refusé :
+ *
+ *     Index signature for type 'string' is missing in type 'TitreAffiche & { commande?: number }'
+ *
+ * Or la contrainte est générique (`<T extends SectionDeFiche>`) : le reste voyage de toute façon,
+ * puisque c'est `T` qui est rendu, pas `SectionDeFiche`. Le code marchait grâce à un
+ * `as TitreAffiche[]` posé par l'appelant ; c'est ce cast qui a disparu.
+ */
 
 /**
  * Réunit les sections de billets qui relèvent d'une même commande.

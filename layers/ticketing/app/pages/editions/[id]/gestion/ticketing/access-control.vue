@@ -1375,7 +1375,7 @@ function ouvrirValidationGroupee(personne: GroupeAValider) {
     titresAValider(personne)
       .map(entreeDuTitre)
       .filter((e): e is TitreAffiche & { commande?: number } => e !== null)
-  ) as TitreAffiche[]
+  )
 
   // Un titre introuvable dans les résultats ne doit pas ouvrir une fiche vide.
   if (sections.length === 0) return

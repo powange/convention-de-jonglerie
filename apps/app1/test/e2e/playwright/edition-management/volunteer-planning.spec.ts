@@ -29,25 +29,35 @@ test.describe.serial('Bénévoles — planning et affectations', () => {
   test('créer un créneau via API et le voir dans GET time-slots', async ({ page }) => {
     const { editionId } = loadState()
     /*
-     * Le créneau doit tomber sur le PREMIER JOUR de l'édition, pas seulement dans sa plage.
+     * Le créneau tombe EXACTEMENT au début de l'édition, date LUE depuis l'API.
      *
-     * Le planning s'ouvre sur ce premier jour, « Précédent » désactivé, et ne rend pas les
-     * suivants : il faudrait cliquer « Suivant ». Or l'édition de test commence à J+7 à L'HEURE
-     * DE L'EXÉCUTION (data.setup.ts:34-37), et le créneau était placé à J+7,5 — soit douze heures
-     * plus tard. Lancé avant midi UTC, il restait sur le premier jour ; lancé après, il basculait
-     * au lendemain et « Accueil E2E » n'était plus affiché. Le test ne passait donc que le matin :
-     * vert à 11 h 20 sur la PR #555, rouge à 12 h 07 et 12 h 28 sur la #556, pour des lots
-     * identiques.
+     * Le planning s'ouvre sur le premier jour de l'édition, « Précédent » désactivé, et ne rend
+     * pas les suivants : un créneau placé un jour plus loin n'est pas affiché du tout.
      *
-     * Une heure après le début, et non douze : le créneau reste le même jour que celui sur lequel
-     * le calendrier s'ouvre.
+     * Les deux versions précédentes CALCULAIENT cette date au lieu de la lire, et chacune a laissé
+     * une fenêtre horaire où le test tombait sur des lots pourtant identiques :
      *
-     * ⚠️ Il reste une fenêtre non couverte : une exécution démarrée entre 23 h et minuit UTC
-     * ferait de nouveau basculer le créneau au lendemain. La corriger pour de bon demande de
-     * normaliser les dates de `data.setup.ts` à minuit, ce qui touche TOUS les lots et mérite sa
-     * propre vérification.
+     * - `début + 12 h` → rouge dès que l'exécution passait midi UTC : vert à 11 h 20 sur la #555,
+     *   rouge à 12 h 07 et 12 h 28 sur la #556 ;
+     * - `début + 1 h` → rouge entre 23 h et minuit UTC, ce qui est arrivé à 23 h 03 sur la #871.
+     *
+     * Au même INSTANT que le début de l'édition, le créneau tombe dans la journée sur laquelle le
+     * calendrier s'ouvre, quels que soient le fuseau du navigateur et la règle de découpage — il
+     * n'y a plus de fenêtre à couvrir. Le point d'API refuse `startDateTime < editionStart` mais
+     * admet l'égalité (`volunteer-time-slots/index.post.ts:94`).
+     *
+     * ⚠️ LUE, et non recalculée ici : `data.setup.ts` l'obtient par `setDate(getDate() + 7)`, qui
+     * conserve l'heure locale, là où cette spec ajoutait `7 * 24 * 3600_000`, qui conserve la
+     * durée. Les deux diffèrent d'une heure de part et d'autre d'un changement d'heure — et le
+     * début de l'édition de test tombe le 25 octobre 2026, qui en est un.
      */
-    const start = new Date(Date.now() + 7 * 24 * 3600_000 + 3600_000)
+    const edition = await page.request.get(`${BASE}/api/editions/${editionId}`)
+    expect(edition.ok(), `GET edition a échoué: ${await edition.text()}`).toBe(true)
+    const editionBody = await edition.json()
+    const debutEdition = editionBody?.data?.startDate ?? editionBody?.startDate
+    expect(debutEdition, "startDate absente de la réponse de l'édition").toBeTruthy()
+
+    const start = new Date(debutEdition)
     const end = new Date(start.getTime() + 4 * 3600_000)
 
     const response = await apiPost(page, `${BASE}/api/editions/${editionId}/volunteer-time-slots`, {

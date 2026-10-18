@@ -170,7 +170,20 @@ export function cleDuTitre(
  * a DÉJÀ compté ce qui reste : les titres validés, eux, restent visibles dans les quatre listes de
  * la recherche, juste en dessous.
  */
-export function titresAValider(personne: PersonneRapprochee): TitreRapprochable[] {
+/*
+ * 📍 Le paramètre ne demande QUE `titres`, et non une `PersonneRapprochee` entière.
+ *
+ * Cette fonction ne lit rien d'autre : exiger `cle`, `motif`, `libelle` et `aValider` fermait la
+ * porte à l'écran de contrôle d'accès, qui l'appelle avec un `GroupeAValider` — une forme plus
+ * étroite, construite pour l'encart de validation groupée. Le code marchait, grâce à un
+ * `as TitreAffiche[]` posé en bout d'expression ; c'est ce cast qui a disparu.
+ *
+ * ⚠️ Une surface minimale n'est PAS toujours exprimable ainsi : si toutes les propriétés étaient
+ * optionnelles, ce serait un « type faible » et TypeScript exigerait que la source en partage au
+ * moins une — c'est ce qui a fait échouer `{ context?: { user?: … } }` sur un `H3Event`. Ici
+ * `titres` est REQUISE, donc le piège ne s'applique pas.
+ */
+export function titresAValider(personne: { titres: TitreRapprochable[] }): TitreRapprochable[] {
   return personne.titres.filter((titre) => !titre.entryValidated)
 }
 
