@@ -9,6 +9,7 @@ import {
   generateVerificationEmailHtml,
   getSiteUrl,
 } from '#server/utils/emailService'
+import { nomDeSalutation } from '#server/utils/nom-de-salutation'
 import { registerRateLimiter } from '#server/utils/rate-limiter'
 import { sanitizeEmail, sanitizeString } from '#server/utils/validation-helpers'
 import { registerSchema } from '#server/utils/validation-schemas'
@@ -124,7 +125,7 @@ export default wrapApiHandler(
     const siteUrl = getSiteUrl()
 
     // Envoyer l'email de vérification
-    const displayName = cleanPrenom || cleanPseudo
+    const displayName = nomDeSalutation({ prenom: cleanPrenom, pseudo: cleanPseudo })
     const emailHtml = await generateVerificationEmailHtml(verificationCode, displayName, cleanEmail)
     const emailSent = await sendEmail({
       to: cleanEmail,

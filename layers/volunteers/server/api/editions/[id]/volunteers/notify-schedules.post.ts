@@ -4,6 +4,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { apresLaReponse, enTranches } from '#server/utils/apres-la-reponse'
 import { requireAuth } from '#server/utils/auth-utils'
 import { generateVolunteerScheduleEmailHtml, getSiteUrl } from '#server/utils/emailService'
+import { nomDeSalutation } from '#server/utils/nom-de-salutation'
 import { NotificationService } from '#server/utils/notification-service'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -212,7 +213,7 @@ export default wrapApiHandler(
         })
 
         // Envoyer l'email
-        const prenom = volunteer.user.prenom || volunteer.user.pseudo || 'Bénévole'
+        const prenom = nomDeSalutation(volunteer.user)
 
         // Préparer les créneaux pour l'email avec le format attendu
         const emailTimeSlots = assignments.map((assignment) => {

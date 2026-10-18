@@ -133,11 +133,18 @@ describe('Props et créneaux de Nuxt UI v2', () => {
       const sansCommentaires = contenu.replace(/<!--[\s\S]*?-->/g, '')
       if (!motif.test(sansCommentaires)) continue
 
-      sansCommentaires.split('\n').forEach((ligne, i) => {
-        if (motif.test(ligne)) {
-          coupables.push(`${relative(MONOREPO, chemin)}:${i + 1}`)
-        }
-      })
+      /*
+       * ⚠️ Par POSITION dans le fichier, pas ligne par ligne. Tous les motifs ci-dessus tiennent
+       * aujourd'hui sur une ligne, donc la boucle par ligne fonctionnait — mais le trou était
+       * latent : un `<template\n  #option>` aurait correspondu au fichier et à aucune ligne, la
+       * liste serait restée vide et le test aurait passé. La garde voisine des salutations portait
+       * le même défaut, et c'est un sabotage qui l'a révélé là-bas.
+       */
+      const global = new RegExp(motif.source, `${motif.flags.replace('g', '')}g`)
+      for (const trouve of sansCommentaires.matchAll(global)) {
+        const ligne = sansCommentaires.slice(0, trouve.index).split('\n').length
+        coupables.push(`${relative(MONOREPO, chemin)}:${ligne}`)
+      }
     }
 
     expect(
