@@ -685,6 +685,14 @@ const setDuration = (hours: number) => {
     }
   }
 
+  /*
+   * ⚠️ On revérifie, parce que `versChampLocal` rend une CHAÎNE VIDE quand l'instant est invalide
+   * — une édition partiellement chargée suffit. Sans ce garde, la ligne suivante passait `''` à
+   * `addHoursToDateTimeLocal`, qui levait une `TypeError` dans ce gestionnaire de clic. Mieux vaut
+   * ne rien faire que casser le formulaire : l'organisateur saisira la date de début lui-même.
+   */
+  if (!formData.value.startDateTime) return
+
   // Utiliser l'utilitaire pour ajouter des heures
   formData.value.endDateTime = addHoursToDateTimeLocal(formData.value.startDateTime, hours)
 }
