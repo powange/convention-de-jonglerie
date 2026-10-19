@@ -94,6 +94,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
+import type { User } from '~/types'
+
 const { t } = useI18n()
 const authStore = useAuthStore()
 
@@ -130,18 +132,30 @@ const buildPayload = () => ({
 })
 
 // Action pour sauvegarder les catégories
-const { execute: executeSave, loading } = useApiAction('/api/profile/categories', {
-  method: 'PUT',
-  body: buildPayload,
-  successMessage: { title: t('profile.user_categories.save_success') },
-  errorMessages: { default: t('profile.user_categories.save_error') },
-  onSuccess: async (updatedUser) => {
-    // Mettre à jour le store
-    authStore.updateUser(updatedUser)
-    // Rediriger vers la destination finale ou la page d'accueil
-    await redirectToFinalDestination()
-  },
-})
+/*
+ * 📍 Le second paramètre de type DÉCLARE ce que le point d'API rend, et c'est tout l'objet du
+ * correctif.
+ *
+ * Sans lui, `TResult` vaut `unknown` : `onSuccess` recevait donc un `unknown`, que
+ * `authStore.updateUser` — qui attend un `Partial<User>` — refusait. `PUT /api/profile/categories`
+ * rend bien un utilisateur partiel : sa sélection Prisma ne porte que des champs de `User`
+ * (identité, catégories, dates), rien de calculé.
+ */
+const { execute: executeSave, loading } = useApiAction<unknown, Partial<User>>(
+  '/api/profile/categories',
+  {
+    method: 'PUT',
+    body: buildPayload,
+    successMessage: { title: t('profile.user_categories.save_success') },
+    errorMessages: { default: t('profile.user_categories.save_error') },
+    onSuccess: async (updatedUser) => {
+      // Mettre à jour le store
+      authStore.updateUser(updatedUser)
+      // Rediriger vers la destination finale ou la page d'accueil
+      await redirectToFinalDestination()
+    },
+  }
+)
 
 const saveCategories = () => {
   executeSave()
