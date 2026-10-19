@@ -6,7 +6,15 @@ import type { Convention, Edition, User } from '#server/types/prisma'
 
 import { isHttpError } from '#server/types/api'
 
-interface OptionsCommunes {
+/**
+ * Ce qu'il faut savoir pour retrouver un FICHIER : son entité et son dossier, rien d'autre.
+ *
+ * Exportée parce que `deletePhysicalImageFile` ne demande que cela — voir son en-tête. Les deux
+ * champs supplémentaires d'`ImageDeletionOptions` (`entityType`, `imageField`) ne servent qu'à la
+ * mise à jour de la BASE, et les exiger de qui ne touche pas à la base fermait la porte aux
+ * appelants corrects.
+ */
+export interface OptionsCommunes {
   entityId: number
   /**
    * Le dossier du montage où vit le fichier, sous `NUXT_FILE_STORAGE_MOUNT`.
@@ -122,9 +130,23 @@ function estUnFichierDeNotreStockage(imageUrl: string): boolean {
  * `<dossier>/<id>`. C'est déjà elle qui supprime l'ancienne image lors d'un REMPLACEMENT, et ce
  * chemin-là fonctionnait : il n'y avait pas de règle à écrire, seulement une à réemployer.
  */
+/*
+ * 📍 Le paramètre ne demande QUE `OptionsCommunes`, et non une `ImageDeletionOptions` entière.
+ *
+ * Cette fonction ne lit rien d'autre que `options.entityId` et `options.dossier` — les deux
+ * champs ci-dessous, et la ligne qui délègue à `deleteOldFile` le montre. Exiger en plus
+ * `entityType` et `imageField`, qui ne concernent que la mise à jour de la base, refusait les
+ * neuf appels qui passent la forme JUSTE : les deux points de suppression (convention, édition)
+ * et les sept cas de `suppression-image-fichier.test.ts`.
+ *
+ * Rien ne cassait à l'exécution — un type s'efface à la compilation —, mais le contrat décrivait
+ * une exigence qui n'existe pas, et c'est lui qui avait tort. Rétrécir un paramètre ne peut
+ * refuser aucun appelant : ceux qui passent une `ImageDeletionOptions` complète la satisfont
+ * encore, dont l'appel interne de `handleImageDeletion`.
+ */
 export async function deletePhysicalImageFile(
   imageUrl: string | null,
-  options: ImageDeletionOptions
+  options: OptionsCommunes
 ): Promise<void> {
   if (!imageUrl) return
 

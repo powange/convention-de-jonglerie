@@ -1,4 +1,19 @@
 import { getRequestIP } from 'h3'
+/*
+ * 📍 `$fetch` d'ofetch, et non le global de Nitro — comme le font déjà les deux points OAuth
+ * (`layers/auth/server/routes/auth/google.get.ts`, `facebook.get.ts`) pour la même raison.
+ *
+ * Le global de Nitro est typé pour les routes INTERNES : sa signature est
+ * `<T, R extends NitroFetchRequest, O extends NitroFetchOptions<R>>`. Ne préciser que `T` —
+ * ici le type de la réponse de reCAPTCHA — fait que TypeScript emploie les VALEURS PAR DÉFAUT
+ * de `R` et `O` au lieu de les inférer : l'argument devait alors satisfaire
+ * `NitroFetchOptions<NitroFetchRequest>` à la lettre, et un corps `URLSearchParams` y était
+ * refusé. Celui d'ofetch ne prend pas ses options en paramètre de type, donc rien ne se dégrade.
+ *
+ * Aucun changement à l'exécution : le global de Nitro EST ofetch, muni d'une `baseURL` qui ne
+ * s'applique qu'aux URL relatives — et celle-ci est absolue.
+ */
+import { $fetch } from 'ofetch'
 import { z } from 'zod'
 
 import type { FeedbackType } from '#server/types/prisma'

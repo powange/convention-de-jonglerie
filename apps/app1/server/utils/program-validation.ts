@@ -17,7 +17,13 @@ const zoneOuRepere = (d: { zoneId?: number | null; markerId?: number | null }) =
 
 const REGLE_ZONE_OU_REPERE = {
   message: 'Choisissez une zone ou un repère, pas les deux',
-  path: ['markerId'] as const,
+  /*
+   * ⚠️ PAS d'`as const` : il rendrait le tableau `readonly`, et `refine` attend un
+   * `PropertyKey[]` mutable. Les deux schémas qui emploient cette règle produisaient donc deux
+   * erreurs chacun, soit quatre, pour une immuabilité dont personne n'avait besoin : Zod ne fait
+   * que lire ce chemin.
+   */
+  path: ['markerId'],
 }
 
 /**
