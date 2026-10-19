@@ -3,6 +3,28 @@
  * Documentation : https://etickets.infomaniak.com/docs/app/index.html
  */
 
+/*
+ * 📍 `$fetch` d'ofetch, et non le global de Nitro — les six appels de ce fichier visent une API
+ * EXTERNE, comme ceux de `feedback/index.post.ts` et des deux points OAuth.
+ *
+ * Le global de Nitro est typé pour les routes INTERNES : sa signature est
+ * `<T, R extends NitroFetchRequest, O extends NitroFetchOptions<R>>`. Ne préciser que `T` — ici
+ * le type de la réponse attendue — fait employer les VALEURS PAR DÉFAUT de `R` et `O` au lieu de
+ * les inférer, et l'argument doit alors satisfaire `NitroFetchOptions<NitroFetchRequest>` à la
+ * lettre.
+ *
+ * ⚠️ C'est aussi ce typage qui faisait décrocher le compilateur : la ligne 81 a rendu un
+ * TS2589 — « Type instantiation is excessively deep and possibly infinite » —, et c'est en
+ * abandonnant à cette limite que le compilateur a produit le TS2345 qui l'accompagnait. Ni l'un
+ * ni l'autre n'était là au relevé précédent, pour un fichier qui n'avait pas changé : une limite
+ * de ressources se déplace quand le reste du dépôt bouge, et ce qu'elle fait apparaître ressemble
+ * à une régression sans en être une.
+ *
+ * Rien ne change à l'exécution : le global de Nitro EST ofetch, muni d'une `baseURL` qui ne
+ * s'applique qu'aux URL relatives — les six appels d'ici sont absolus.
+ */
+import { $fetch } from 'ofetch'
+
 const INFOMANIAK_API_URL = 'https://etickets.infomaniak.com/api/shop'
 
 export interface InfomaniakEvent {
