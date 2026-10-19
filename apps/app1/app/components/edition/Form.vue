@@ -1176,8 +1176,16 @@ watch(
 )
 
 // Mise à jour d'un service booléen (évite syntaxe TS dans template)
-function setServiceValue(key: string, value: boolean) {
-  ;(state as any)[key] = value
+/*
+ * Le paramètre accepte ce que `UCheckbox` émet RÉELLEMENT : `boolean | string`.
+ *
+ * Son `update:model-value` peut rendre `'indeterminate'`, et le déclarer `boolean` obligeait le
+ * gabarit à mentir. On normalise donc ici, par `=== true` : un service est accordé ou ne l'est
+ * pas, et un état intermédiaire — qui ne se produit pas, aucune case ne posant `indeterminate` —
+ * ne doit en aucun cas se lire comme un oui.
+ */
+function setServiceValue(key: string, value: boolean | string) {
+  ;(state as any)[key] = value === true
 }
 
 // Préparer le calendrier de fin : se placer sur la date de début si définie

@@ -389,7 +389,12 @@
 
 <script setup lang="ts">
 import { fuseauUtilisable, journeeDans } from '~~/shared/utils/fuseau-edition'
-import { CONVENTION_RIGHTS, rightLabelKey } from '~~/shared/utils/organizer-rights'
+import {
+  CONVENTION_RIGHTS,
+  EDITION_RIGHTS,
+  rightLabelKey,
+  type EditionRight,
+} from '~~/shared/utils/organizer-rights'
 
 interface EditionLite {
   id: number
@@ -400,18 +405,31 @@ interface EditionLite {
   timezone?: string | null
   convention?: { name: string }
 }
-interface PerEditionRight {
-  editionId: number
-  canEdit?: boolean
-  canDelete?: boolean
-  canManageVolunteers?: boolean
-  canManageArtists?: boolean
-  canManageMeals?: boolean
-  canManageTicketing?: boolean
-  canManageTasks?: boolean
-  canManageStock?: boolean
-  canManageWorkshops?: boolean
-  canManageFAQ?: boolean
+/*
+ * ⚠️ DÉRIVÉE de `EDITION_RIGHTS`, et surtout pas réécrite à la main.
+ *
+ * Elle l'était, et les onze droits y figuraient à DIX : `canManageTreasury` manquait. Il manquait
+ * aussi dans les unions de `hasEditionFlag` et `toggleEdition`, dans l'entrée vierge que celle-ci
+ * crée, et dans sa condition de nettoyage — cinq endroits, la même liste cinq fois.
+ *
+ * Le dernier faisait mal. Accorder la trésorerie à UNE édition créait l'entrée, y écrivait le
+ * droit, puis le nettoyage — qui n'examinait que les dix AUTRES drapeaux — les trouvait tous faux
+ * et SUPPRIMAIT l'entrée. L'interrupteur revenait donc tout seul à l'arrêt, et rien n'était
+ * enregistré : accorder la trésorerie édition par édition était impossible. Elle était par
+ * ailleurs perdue sans bruit dès qu'elle restait le dernier droit coché d'une édition.
+ *
+ * C'est exactement ce que l'en-tête de `server/utils/permissions/rights-shapes.ts` raconte
+ * s'être déjà produit — « un droit oublié […] se cochait dans le formulaire, semblait
+ * s'enregistrer, et se retrouvait décoché au retour. C'est arrivé à la trésorerie, sur quatre
+ * fichiers à la fois. » Deuxième fois, donc, et pour la même raison : une liste recopiée.
+ */
+type PerEditionRight = { editionId: number } & Partial<Record<EditionRight, boolean>>
+
+/** Une entrée neuve, tous droits à l'arrêt — les ONZE, puisqu'ils viennent de la liste. */
+function entreeVierge(editionId: number): PerEditionRight {
+  const entree: PerEditionRight = { editionId }
+  for (const droit of EDITION_RIGHTS) entree[droit] = false
+  return entree
 }
 interface ModelValue {
   title: string | null
@@ -633,71 +651,33 @@ function updateRight(key: string, value: any) {
   )
   if (!syncingFromParent) emit('update:modelValue', JSON.parse(JSON.stringify(localValue)))
 }
-function hasEditionFlag(
-  editionId: number,
-  field:
-    | 'canEdit'
-    | 'canDelete'
-    | 'canManageVolunteers'
-    | 'canManageArtists'
-    | 'canManageMeals'
-    | 'canManageTicketing'
-    | 'canManageTasks'
-    | 'canManageStock'
-    | 'canManageWorkshops'
-    | 'canManageFAQ'
-) {
-  return !!localValue.perEdition.find((p) => p.editionId === editionId && (p as any)[field])
+function hasEditionFlag(editionId: number, field: EditionRight) {
+  // Plus d'`as any` : le champ est désormais une clé connue de l'entrée.
+  return !!localValue.perEdition.find((p) => p.editionId === editionId && p[field])
 }
-function toggleEdition(
-  editionId: number,
-  field:
-    | 'canEdit'
-    | 'canDelete'
-    | 'canManageVolunteers'
-    | 'canManageArtists'
-    | 'canManageMeals'
-    | 'canManageTicketing'
-    | 'canManageTasks'
-    | 'canManageStock'
-    | 'canManageWorkshops'
-    | 'canManageFAQ',
-  value: any
-) {
+function toggleEdition(editionId: number, field: EditionRight, value: unknown) {
   const boolVal = !!value
   let entry = localValue.perEdition.find((p) => p.editionId === editionId)
   if (!entry && boolVal) {
-    entry = {
-      editionId,
-      canEdit: false,
-      canDelete: false,
-      canManageVolunteers: false,
-      canManageArtists: false,
-      canManageMeals: false,
-      canManageTicketing: false,
-      canManageTasks: false,
-      canManageStock: false,
-      canManageWorkshops: false,
-      canManageFAQ: false,
-    }
+    entry = entreeVierge(editionId)
     localValue.perEdition.push(entry)
   }
   if (!entry) return
-  ;(entry as any)[field] = boolVal
-  // cleaning
-  if (
-    !entry.canEdit &&
-    !entry.canDelete &&
-    !entry.canManageVolunteers &&
-    !entry.canManageArtists &&
-    !entry.canManageMeals &&
-    !entry.canManageTicketing &&
-    !entry.canManageTasks &&
-    !entry.canManageStock &&
-    !entry.canManageWorkshops &&
-    !entry.canManageFAQ
-  ) {
-    localValue.perEdition = localValue.perEdition.filter((p) => p !== entry)
+
+  // 📍 Capturée dans une constante : `entry` est un `let`, et son rétrécissement se perdrait
+  // dans la fermeture du `every` ci-dessous — qui la verrait de nouveau `undefined`.
+  const entree = entry
+  entree[field] = boolVal
+
+  /*
+   * Une entrée dont AUCUN droit n'est accordé n'a pas de raison d'être envoyée : on la retire.
+   *
+   * ⚠️ `EDITION_RIGHTS.every`, et non onze conditions à la main. C'est ici que le droit de
+   * trésorerie se perdait : la liste écrite à la main n'en comptait que dix, si bien qu'une
+   * entrée ne portant QUE ce droit était jugée vide et supprimée aussitôt que créée.
+   */
+  if (EDITION_RIGHTS.every((droit) => !entree[droit])) {
+    localValue.perEdition = localValue.perEdition.filter((p) => p !== entree)
   }
   if (!syncingFromParent) emit('update:modelValue', JSON.parse(JSON.stringify(localValue)))
 }

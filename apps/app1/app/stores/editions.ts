@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-import type { Edition, ConventionOrganizer, HttpError } from '~/types'
+import type { Edition, ConventionOrganizer, EditionFormData, HttpError } from '~/types'
 
 import { useAuthStore } from '../stores/auth' // Use relative path
 
@@ -203,6 +203,26 @@ export const useEditionStore = defineStore('editions', {
           })
         }
 
+        /*
+         * ⚠️ DEUX ERREURS TS2345 GELÉES ICI, et une tentative de correction REVENUE EN ARRIÈRE.
+         *
+         * Le diagnostic est établi : `$fetch` est générique sur trois paramètres, et n'en préciser
+         * qu'UN désactive l'inférence des deux autres, qui retombent sur leurs défauts —
+         * `R = NitroFetchRequest`, soit l'union de TOUTES les routes du dépôt.
+         * `AvailableRouterMethod<R>` distribue dessus, le compilateur décroche
+         * (« TS2589 — Type instantiation is excessively deep »), et le TS2345 sur les options n'est
+         * que l'ombre de ce décrochage.
+         *
+         * Donner la route en second paramètre de type FAIT disparaître le décrochage de cette
+         * ligne — mesuré. Mais il réapparaît ailleurs : les TS2589 du dépôt sont passés de 3 à 5,
+         * celui de ce fichier s'est déplacé de la ligne 206 à la 257, et deux TS2345 NOUVELLES sont
+         * apparues, dont une dans `pages/editions/[id]/edit.vue`, que ce lot ne touche pas. La
+         * limite est un BUDGET D'INSTANCIATION global : la réduire ici la fait consommer là.
+         *
+         * Treize appels de ce fichier emploient ce motif, et cinq fichiers du dépôt décrochent. Ce
+         * n'est donc pas une ligne à corriger au passage mais un lot à part, où l'on mesure l'effet
+         * sur le dépôt ENTIER avant de conclure. Ces deux erreurs restent dans la dette gelée.
+         */
         const response = await $fetch<PaginatedResponse>('/api/editions', {
           params: queryParams,
         })
@@ -276,7 +296,20 @@ export const useEditionStore = defineStore('editions', {
       }
     },
 
-    async addEdition(editionData: Omit<Edition, 'id' | 'creator' | 'creatorId'>) {
+    /*
+     * 📍 `EditionFormData`, et non `Omit<Edition, …>`.
+     *
+     * Cette action ne lit rien : elle transmet le corps à `POST /api/editions`. Annoncer une
+     * édition complète privée de trois champs affirmait que l'appelant fournit aussi `latitude`,
+     * `_count` et tout le reste — ce que le formulaire ne fait pas, et n'a pas à faire.
+     *
+     * ⚠️ Les deux pages de création annonçaient d'ailleurs DEUX types différents pour la même
+     * charge, `EditionFormData` d'un côté et `Edition` de l'autre, sans que rien ne proteste :
+     * `EditionForm` déclare `defineEmits(['submit'])`, donc sans typage, et l'annotation du
+     * gestionnaire n'est qu'une affirmation que personne ne vérifie. Elles sont désormais
+     * d'accord, sur le nom que ce dépôt donne déjà à cette charge.
+     */
+    async addEdition(editionData: EditionFormData) {
       this.loading = true
       this.error = null
       try {
@@ -773,6 +806,7 @@ export const useEditionStore = defineStore('editions', {
           })
         }
 
+        // Même erreur gelée qu'au premier appel, et pour la même raison : voir son en-tête.
         const response = await $fetch<PaginatedResponse>('/api/editions', {
           params: queryParams,
         })

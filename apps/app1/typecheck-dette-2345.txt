@@ -16,13 +16,7 @@
 # le commentaire du job `typecheck` dans .github/workflows/tests.yml).
 #
 # Clé : <nombre>\t<chemin>\tTS<code>\t<message>. Pas de numéro de ligne, il bouge pour rien.
-# Total gelé : 21 erreur(s) sur 11 entrée(s).
-9	apps/app1/app/components/convention/EditionsGrid.vue	TS2345	Argument of type 'Edition' is not assignable to parameter of type 'DashboardEdition'.
-1	apps/app1/app/components/edition/Form.vue	TS2345	Argument of type 'string | boolean' is not assignable to parameter of type 'boolean'.
-2	apps/app1/app/components/organizer/RightsFields.vue	TS2345	Argument of type '"canManageTreasury"' is not assignable to parameter of type '"canEdit" | "canDelete" | "canManageVolunteers" | "canManageArtists" | "canManageMeals" | "canManageTicketing" | "canManageTasks" | "canManageStock" | "canManageWorkshops" | "canManageFAQ"'.
-1	apps/app1/app/components/ui/ImageUpload.vue	TS2345	Argument of type '"artist" | "profile" | "treasury" | "lost-found" | "edition" | "convention" | "show" | "generic"' is not assignable to parameter of type '"profile" | "lost-found" | "edition" | "convention" | "show" | undefined'.
-1	apps/app1/app/pages/conventions/[id]/editions/add.vue	TS2345	Argument of type 'EditionFormData' is not assignable to parameter of type 'Omit<Edition, "id" | "creatorId" | "creator">'.
-1	apps/app1/app/pages/editions/[id]/gestion/treasury/index.vue	TS2345	Argument of type '(l: TreasuryLine) => string' is not assignable to parameter of type '(ligne: LigneTresorerieCsv) => string'.
+# Total gelé : 6 erreur(s) sur 5 entrée(s).
 2	apps/app1/app/stores/editions.ts	TS2345	Argument of type '{ params: { [key: string]: string; }; }' is not assignable to parameter of type 'O'.
 1	apps/app1/test/nuxt/features/favorites.test.ts	TS2345	Argument of type 'any' is not assignable to parameter of type 'never'.
 1	apps/app1/test/nuxt/features/favorites.test.ts	TS2345	Argument of type '{ type: string; message: string; timestamp: Date; }' is not assignable to parameter of type 'never'.
