@@ -204,28 +204,27 @@ export const useEditionStore = defineStore('editions', {
         }
 
         /*
-         * 📍 La ROUTE est donnée en second paramètre de type, et ce n'est pas cosmétique.
+         * ⚠️ DEUX ERREURS TS2345 GELÉES ICI, et une tentative de correction REVENUE EN ARRIÈRE.
          *
-         * `$fetch` est générique sur trois paramètres : le type de la réponse, la requête, et les
-         * options. N'en préciser qu'UN désactive l'inférence des deux autres, qui retombent sur
-         * leurs valeurs par défaut — `R = NitroFetchRequest`, soit l'union de TOUTES les routes du
-         * dépôt. `AvailableRouterMethod<R>` distribue alors sur cette union et recalcule un
-         * appariement récursif pour chacune : le compilateur décrochait, rendait
-         * « TS2589 — Type instantiation is excessively deep and possibly infinite », et le
-         * TS2345 sur les options n'était que l'ombre de ce décrochage.
+         * Le diagnostic est établi : `$fetch` est générique sur trois paramètres, et n'en préciser
+         * qu'UN désactive l'inférence des deux autres, qui retombent sur leurs défauts —
+         * `R = NitroFetchRequest`, soit l'union de TOUTES les routes du dépôt.
+         * `AvailableRouterMethod<R>` distribue dessus, le compilateur décroche
+         * (« TS2589 — Type instantiation is excessively deep »), et le TS2345 sur les options n'est
+         * que l'ombre de ce décrochage.
          *
-         * La route littérale réduit ce calcul à un seul appariement. Rien ne change à
-         * l'exécution : un paramètre de type n'existe pas après compilation.
+         * Donner la route en second paramètre de type FAIT disparaître le décrochage de cette
+         * ligne — mesuré. Mais il réapparaît ailleurs : les TS2589 du dépôt sont passés de 3 à 5,
+         * celui de ce fichier s'est déplacé de la ligne 206 à la 257, et deux TS2345 NOUVELLES sont
+         * apparues, dont une dans `pages/editions/[id]/edit.vue`, que ce lot ne touche pas. La
+         * limite est un BUDGET D'INSTANCIATION global : la réduire ici la fait consommer là.
          *
-         * ⚠️ Et SURTOUT PAS d'`import { $fetch } from 'ofetch'` ici, contrairement aux appels vers
-         * une API externe : la route est INTERNE, et en rendu serveur le `$fetch` de Nitro la
-         * court-circuite sans requête HTTP. Celui d'ofetch tenterait un appel réseau sur une URL
-         * relative, qui n'a pas de base côté serveur.
+         * Treize appels de ce fichier emploient ce motif, et cinq fichiers du dépôt décrochent. Ce
+         * n'est donc pas une ligne à corriger au passage mais un lot à part, où l'on mesure l'effet
+         * sur le dépôt ENTIER avant de conclure. Ces deux erreurs restent dans la dette gelée.
          */
-        const response = await $fetch<PaginatedResponse, '/api/editions'>('/api/editions', {
-          // `query`, et non `params` : ofetch marque ce dernier « @deprecated use query instead »
-          // et les fusionne tous deux dans la chaîne de requête — le changement est un synonyme.
-          query: queryParams,
+        const response = await $fetch<PaginatedResponse>('/api/editions', {
+          params: queryParams,
         })
         if (opts?.append) {
           this.editions = [...this.editions, ...response.data]
@@ -807,10 +806,9 @@ export const useEditionStore = defineStore('editions', {
           })
         }
 
-        // Mêmes raisons qu'au premier appel : route littérale pour éviter le décrochage du
-        // compilateur, et `query` plutôt que `params`.
-        const response = await $fetch<PaginatedResponse, '/api/editions'>('/api/editions', {
-          query: queryParams,
+        // Même erreur gelée qu'au premier appel, et pour la même raison : voir son en-tête.
+        const response = await $fetch<PaginatedResponse>('/api/editions', {
+          params: queryParams,
         })
         this.allEditions = response.data
         this.processAllEditions()

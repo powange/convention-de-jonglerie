@@ -31,7 +31,16 @@ export const useImageUrl = () => {
      * neuvième type ajouté là-bas reproduise exactement ce décalage.
      */
     type: UploadEndpoint['type'] = 'convention',
-    entityId?: number
+    /*
+     * ⚠️ `number | string`, comme `UploadEndpoint['id']`.
+     *
+     * `ImageUpload` passe `props.endpoint.id`, qui admet les deux — un identifiant d'édition est
+     * un nombre, celui d'un objet trouvé peut être une chaîne. Ce décalage était MASQUÉ par celui
+     * du paramètre précédent : un seul diagnostic est rendu par appel, et corriger le `type` a
+     * fait apparaître celui-ci sur la même ligne. Les chemins construits plus bas interpolent
+     * cette valeur, donc les deux formes y fonctionnent telles quelles.
+     */
+    entityId?: number | string
   ): string | null => {
     if (!filename) {
       return null
