@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import favoriteHandler from '../../../server/api/editions/[id]/favorite.post'
+import favoritesHandler from '../../../server/api/editions/favorites.get'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -8,30 +9,25 @@ const prismaMock = (globalThis as any).prisma
 // Mock du handler favoris
 
 /*
- * ⚠️ TREIZE DES DIX-NEUF CAS DE CE FICHIER N'ÉPROUVENT PAS L'APPLICATION.
+ * Les deux points d'API des favoris : y ajouter/retirer une édition, et lister les favoris.
  *
- * Relevé le 19 octobre 2026, en traitant les deux TS2345 ci-dessous. Ce fichier n'importe qu'UN
- * morceau de code du dépôt, `favoriteHandler`, et seul le premier bloc — « API - Ajouter/Retirer
- * des favoris », six cas — s'en sert. Les cinq autres blocs construisent des objets sur place et
- * vérifient ce qu'ils viennent d'écrire :
+ * ⚠️ TREIZE CAS ONT ÉTÉ RETIRÉS DE CE FICHIER le 19 octobre 2026, et c'est le fait à retenir.
  *
- * • « Filtrage et recherche » appelle `Array.prototype.filter` et vérifie qu'il a filtré ;
- * • « Performance et cache » met une valeur dans une `Map` et la relit ;
- * • « Intégration avec d'autres fonctionnalités » pousse dans un tableau, puis compte 1 élément,
- *   et construit une chaîne CSV à la main pour la comparer à elle-même — alors que ce dépôt a un
- *   utilitaire CSV partagé (`shared/utils/csv.ts`) que ce cas n'appelle pas ;
- * • « Interface utilisateur » n'atteint aucun composant : il réécrit la règle d'affichage dans
- *   le cas qui l'éprouve ;
- * • « Validation et sécurité » configure le bouchon Prisma, APPELLE LE BOUCHON lui-même, et
- *   vérifie qu'il a bien rendu ce qu'on venait de lui dire de rendre. Le gestionnaire n'est pas
- *   sollicité, et aucune validation du dépôt n'est traversée ;
- * • « Store » pousse dans un objet fabriqué sur place et compte ses éléments.
+ * Il en comptait dix-neuf, dont treize qui ne traversaient AUCUN code du dépôt : ils
+ * construisaient des objets sur place et vérifiaient ce qu'ils venaient d'écrire. L'un appelait
+ * `Array.prototype.filter` et constatait qu'il avait filtré, un autre mettait une valeur dans une
+ * `Map` et la relisait, un troisième fabriquait une chaîne CSV à la main pour la comparer à
+ * elle-même. Le plus net configurait le bouchon Prisma, APPELAIT LE BOUCHON, et vérifiait qu'il
+ * avait rendu ce qu'on venait de lui dire de rendre.
  *
- * Ils seraient donc VERTS quoi que fasse l'application, y compris si la fonctionnalité des favoris
- * était entièrement retirée. Ils sont laissés en place faute de décision : les supprimer touche
- * treize cas et relève d'un choix sur la stratégie de tests, pas d'un correctif de typage. Le
- * constat est écrit ici pour qu'on ne se fie pas à ce fichier en croyant la fonctionnalité
- * couverte.
+ * Deux d'entre eux décrivaient même des fonctionnalités QUI N'EXISTENT PAS — un export CSV des
+ * favoris et une limite du nombre de favoris —, ce qui est pire qu'un test inutile : cela laisse
+ * croire à du code qui n'a jamais été écrit.
+ *
+ * Pendant ce temps, `favorites.get.ts` et `favorites.vue` n'étaient couverts par rien. L'illusion
+ * de couverture était donc double : treize cas verts quoi que fasse l'application, et deux
+ * surfaces réelles sans un seul test. Le bloc « Lister les favoris » ci-dessous ferme la première
+ * des deux ; la page reste à couvrir.
  */
 describe('Système de favoris', () => {
   const mockUser = {
@@ -180,269 +176,75 @@ describe('Système de favoris', () => {
     })
   })
 
-  describe('Store - Gestion des favoris côté client', () => {
-    it('devrait mettre à jour localement les favoris de façon optimiste', async () => {
+  /*
+   * `GET /api/editions/favorites` — la liste des favoris, qui n'avait AUCUN test.
+   *
+   * Le fichier en comptait pourtant dix-neuf : treize ne traversaient aucun code du dépôt, et
+   * deux d'entre eux décrivaient même des fonctionnalités qui n'existent pas (un export CSV des
+   * favoris, une limite du nombre de favoris). Pendant ce temps, ce point d'API et la page
+   * `favorites.vue` n'étaient couverts par rien. C'est l'illusion de couverture qu'on retire ici.
+   */
+  describe('API - Lister les favoris', () => {
+    /** Ce que le `select` du gestionnaire ramène : des identifiants, et rien d'autre. */
+    const compteAvecFavoris = { favoriteEditions: [{ id: 3 }, { id: 7 }] }
+
+    const evenement = { context: { user: mockUser } }
+
+    it('rend les identifiants des éditions favorites', async () => {
+      prismaMock.user.findUnique.mockResolvedValue(compteAvecFavoris)
+
+      const resultat = await favoritesHandler(evenement as any)
+
+      expect(resultat).toEqual({ success: true, data: { favoriteIds: [3, 7] } })
+    })
+
+    it('rend une liste VIDE quand la personne n’a aucun favori', async () => {
       /*
-       * Mock d'un store simplifié.
-       *
-       * 📍 `favoritedBy` est ANNOTÉ : un `[]` nu s'infère `never[]`, et plus rien ne peut y être
-       * poussé — pas même avec un `as any`, puisque c'est le tableau et non la valeur qui refuse.
-       * C'est la cause des deux TS2345 de ce fichier, l'autre étant ligne ~400.
+       * Et non `null` ou une absence de champ : la page s'en sert pour décider de l'état de chaque
+       * bouton, et un `undefined` y ferait disparaître l'état au lieu de le montrer éteint.
        */
-      const mockStore = {
-        editions: [
-          {
-            id: 1,
-            name: 'Convention Test',
-            favoritedBy: [] as { id: number; pseudo?: string }[],
-          },
-        ],
-        toggleFavorite: vi.fn(),
-      }
+      prismaMock.user.findUnique.mockResolvedValue({ favoriteEditions: [] })
 
-      const mockFetch = vi.fn().mockResolvedValue({
-        message: 'Edition added to favorites',
-        isFavorited: true,
+      const resultat = await favoritesHandler(evenement as any)
+
+      expect(resultat).toEqual({ success: true, data: { favoriteIds: [] } })
+    })
+
+    it('⚠️ ne demande à la base QUE les identifiants', async () => {
+      /*
+       * La page n'a besoin que de cela. Élargir ce `select` ramènerait chaque édition entière —
+       * son affiche, son adresse, ses relations — à chaque chargement de page, pour n'en lire que
+       * l'`id`. Le cas fixe donc la forme de la requête, pas seulement sa réponse.
+       */
+      prismaMock.user.findUnique.mockResolvedValue(compteAvecFavoris)
+
+      await favoritesHandler(evenement as any)
+
+      expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
+        where: { id: mockUser.id },
+        select: { favoriteEditions: { select: { id: true } } },
       })
-
-      // Simuler l'ajout optimiste
-      const editionId = 1
-      const userId = 1
-      const edition = mockStore.editions.find((e) => e.id === editionId)
-
-      if (edition) {
-        // Ajout optimiste
-        edition.favoritedBy.push({ id: userId, pseudo: 'testuser' })
-      }
-
-      expect(edition?.favoritedBy).toHaveLength(1)
-      expect(edition?.favoritedBy[0].id).toBe(userId)
     })
 
-    it("devrait annuler la mise à jour optimiste en cas d'erreur", async () => {
-      const mockStore = {
-        editions: [
-          {
-            id: 1,
-            name: 'Convention Test',
-            favoritedBy: [{ id: 1, pseudo: 'testuser' }],
-          },
-        ],
-      }
+    it('répond 404 quand le compte n’existe plus en base', async () => {
+      /*
+       * Branche atteignable malgré le middleware d'authentification : la suppression peut survenir
+       * ENTRE son contrôle et cette lecture. Mieux vaut un 404 explicite qu'une liste vide, qui
+       * se lirait « aucun favori » et ferait croire à une perte de données.
+       */
+      prismaMock.user.findUnique.mockResolvedValue(null)
 
-      const mockFetch = vi.fn().mockRejectedValue(new Error('Network error'))
-
-      const editionId = 1
-      const userId = 1
-      const edition = mockStore.editions.find((e) => e.id === editionId)
-
-      // Simuler la suppression optimiste
-      if (edition) {
-        const userIndex = edition.favoritedBy.findIndex((u) => u.id === userId)
-        if (userIndex > -1) {
-          edition.favoritedBy.splice(userIndex, 1)
-        }
-      }
-
-      expect(edition?.favoritedBy).toHaveLength(0)
-
-      // En cas d'erreur, restaurer l'état précédent
-      try {
-        await mockFetch()
-      } catch (error) {
-        // Restaurer l'état
-        if (edition) {
-          edition.favoritedBy.push({ id: 1, pseudo: 'testuser' } as any)
-        }
-      }
-
-      expect(edition?.favoritedBy).toHaveLength(1)
-    })
-  })
-
-  describe('Validation et sécurité', () => {
-    it("devrait valider que l'édition existe avant de l'ajouter aux favoris", async () => {
-      prismaMock.user.findUnique.mockResolvedValue(mockUser)
-      prismaMock.edition.findUnique.mockResolvedValue(null)
-
-      // Simuler une validation d'existence d'édition
-      const editionExists = await prismaMock.edition.findUnique({
-        where: { id: 999 },
-      })
-
-      expect(editionExists).toBeNull()
+      await expect(favoritesHandler(evenement as any)).rejects.toMatchObject({ statusCode: 404 })
     })
 
-    it("devrait empêcher un utilisateur d'ajouter la même édition plusieurs fois", async () => {
-      const userWithFavorites = {
-        ...mockUser,
-        favoriteEditions: [mockEdition],
-      }
+    it('le témoin : rien n’est rendu sans avoir interrogé la base', async () => {
+      // Sans ce cas, les précédents seraient satisfaits par un gestionnaire qui rendrait une
+      // constante sans jamais lire la base — le bouchon serait alors inutile et muet.
+      prismaMock.user.findUnique.mockResolvedValue(compteAvecFavoris)
 
-      prismaMock.user.findUnique.mockResolvedValue(userWithFavorites)
+      await favoritesHandler(evenement as any)
 
-      const isAlreadyFavorited = userWithFavorites.favoriteEditions.some(
-        (edition) => edition.id === mockEdition.id
-      )
-
-      expect(isAlreadyFavorited).toBe(true)
-    })
-
-    it('devrait limiter le nombre de favoris par utilisateur', async () => {
-      const maxFavorites = 100
-      const tooManyFavorites = Array.from({ length: 101 }, (_, i) => ({
-        id: i + 1,
-        name: `Edition ${i + 1}`,
-      }))
-
-      const userWithTooManyFavorites = {
-        ...mockUser,
-        favoriteEditions: tooManyFavorites,
-      }
-
-      const canAddMoreFavorites = userWithTooManyFavorites.favoriteEditions.length < maxFavorites
-
-      expect(canAddMoreFavorites).toBe(false)
-    })
-  })
-
-  describe('Interface utilisateur', () => {
-    it('devrait afficher le bon état du bouton favori', () => {
-      const user = { id: 1, pseudo: 'testuser' }
-      const editionWithFavorite = {
-        id: 1,
-        name: 'Convention Test',
-        favoritedBy: [user],
-      }
-
-      const editionWithoutFavorite = {
-        id: 2,
-        name: 'Convention Test 2',
-        favoritedBy: [],
-      }
-
-      const isFavorited1 = editionWithFavorite.favoritedBy.some((u) => u.id === user.id)
-      const isFavorited2 = editionWithoutFavorite.favoritedBy.some((u) => u.id === user.id)
-
-      expect(isFavorited1).toBe(true)
-      expect(isFavorited2).toBe(false)
-    })
-
-    it('devrait afficher un message de confirmation approprié', () => {
-      const messages = {
-        added: 'Édition ajoutée aux favoris',
-        removed: 'Édition retirée des favoris',
-        error: 'Erreur lors de la mise à jour des favoris',
-      }
-
-      expect(messages.added).toBe('Édition ajoutée aux favoris')
-      expect(messages.removed).toBe('Édition retirée des favoris')
-      expect(messages.error).toBe('Erreur lors de la mise à jour des favoris')
-    })
-  })
-
-  describe('Filtrage et recherche', () => {
-    it('devrait permettre de filtrer les éditions favorites', async () => {
-      const allEditions = [
-        { id: 1, name: 'Convention A', favoritedBy: [{ id: 1 }] },
-        { id: 2, name: 'Convention B', favoritedBy: [] },
-        { id: 3, name: 'Convention C', favoritedBy: [{ id: 1 }] },
-      ]
-
-      const userId = 1
-      const favoriteEditions = allEditions.filter((edition) =>
-        edition.favoritedBy.some((u) => u.id === userId)
-      )
-
-      expect(favoriteEditions).toHaveLength(2)
-      expect(favoriteEditions[0].id).toBe(1)
-      expect(favoriteEditions[1].id).toBe(3)
-    })
-
-    it('devrait permettre de rechercher dans les favoris', () => {
-      const favoriteEditions = [
-        { id: 1, name: 'Convention Jonglerie Paris' },
-        { id: 2, name: 'Festival Cirque Lyon' },
-        { id: 3, name: 'Convention Jonglage Toulouse' },
-      ]
-
-      const searchTerm = 'jongl'
-      const filteredFavorites = favoriteEditions.filter((edition) =>
-        edition.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-
-      expect(filteredFavorites).toHaveLength(2)
-      expect(filteredFavorites[0].name).toContain('Jonglerie')
-      expect(filteredFavorites[1].name).toContain('Jonglage')
-    })
-  })
-
-  describe('Performance et cache', () => {
-    it('devrait mettre en cache la liste des favoris', () => {
-      const cacheKey = 'user_1_favorites'
-      const favorites = [
-        { id: 1, name: 'Convention A' },
-        { id: 2, name: 'Convention B' },
-      ]
-
-      // Mock d'un simple cache en mémoire
-      const cache = new Map()
-      cache.set(cacheKey, favorites)
-
-      const cachedFavorites = cache.get(cacheKey)
-      expect(cachedFavorites).toEqual(favorites)
-    })
-
-    it('devrait invalider le cache après modification', () => {
-      const cache = new Map()
-      const cacheKey = 'user_1_favorites'
-
-      // Ajouter au cache
-      cache.set(cacheKey, [{ id: 1, name: 'Convention A' }])
-      expect(cache.has(cacheKey)).toBe(true)
-
-      // Simuler modification des favoris
-      cache.delete(cacheKey)
-      expect(cache.has(cacheKey)).toBe(false)
-    })
-  })
-
-  describe("Intégration avec d'autres fonctionnalités", () => {
-    it('devrait synchroniser les favoris avec les notifications', () => {
-      // Même cause qu'au premier cas : un `[]` nu s'infère `never[]`.
-      const user = {
-        id: 1,
-        notifications: [] as { type: string; message: string; timestamp: Date }[],
-      }
-      const favoriteEdition = { id: 1, name: 'Convention Test' }
-
-      // Simuler l'ajout d'une notification quand on ajoute aux favoris
-      const notification = {
-        type: 'favorite_added',
-        message: `${favoriteEdition.name} ajoutée aux favoris`,
-        timestamp: new Date(),
-      }
-
-      user.notifications.push(notification)
-
-      expect(user.notifications).toHaveLength(1)
-      expect(user.notifications[0].type).toBe('favorite_added')
-    })
-
-    it('devrait exporter les favoris', () => {
-      const favorites = [
-        { id: 1, name: 'Convention Paris', startDate: '2024-06-01' },
-        { id: 2, name: 'Convention Lyon', startDate: '2024-07-01' },
-      ]
-
-      // Simuler export CSV
-      const csvHeaders = 'id,name,startDate\n'
-      const csvData = favorites.map((f) => `${f.id},"${f.name}",${f.startDate}`).join('\n')
-      const csvExport = csvHeaders + csvData
-
-      expect(csvExport).toContain('Convention Paris')
-      expect(csvExport).toContain('Convention Lyon')
-      expect(csvExport).toContain('2024-06-01')
+      expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1)
     })
   })
 })
