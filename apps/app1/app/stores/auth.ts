@@ -84,12 +84,41 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     async register(email: string, password: string, pseudo: string, nom: string, prenom: string) {
-      const response = await $fetch('/api/auth/register', {
+      /*
+       * 📍 Le type de la réponse est DÉCLARÉ, et ce n'est pas qu'une politesse.
+       *
+       * `TypedInternalResponse<Route, Default>` ne court-circuite que si `Default` est un objet.
+       * Sans paramètre de type, `Default` vaut `unknown` — qui n'en est pas un —, et le
+       * compilateur part alors dans `MatchedRoutes`, l'appariement RÉCURSIF de la route contre
+       * toutes celles du dépôt. C'est ce qui lui faisait rendre ici
+       * « TS2589 — Type instantiation is excessively deep ».
+       *
+       * Déclarer le type RETIRE ce travail au lieu de le déplacer — contrairement à la tentative
+       * revenue en arrière sur `stores/editions.ts`, qui ne faisait que changer la branche
+       * instanciée. Et l'enveloppe est écrite en ligne, comme partout côté client : aucun fichier
+       * de `app/` n'importe les types de `server/`, et ce lot n'ouvre pas cette porte.
+       */
+      const response = await $fetch<{
+        success: boolean
+        message?: string
+        data: { requiresVerification: boolean; email: string }
+      }>('/api/auth/register', {
         method: 'POST',
         body: { email, password, pseudo, nom, prenom },
       })
       return response
     },
+    /*
+     * ⚠️ CET APPEL RESTE SANS TYPE, et c'est délibéré — comme celui de `/api/session/me` plus bas.
+     *
+     * Les déclarer demanderait d'abord de trancher une question plus large : `this.user` est un
+     * `User`, `LoginResponse.user` un `SessionUser`, et `SessionMeResponse.user` un
+     * `SessionMeUser`. Trois types pour la même personne, dont les champs ne s'alignent pas.
+     * Poser le type ici échangerait donc un décrochage du compilateur contre plusieurs erreurs
+     * d'affectation — c'est un lot à part, qui commence par décider lequel des trois fait foi.
+     *
+     * Le `as any` ci-dessous est la trace de ce désalignement, et il ne part pas avec ce lot.
+     */
     async login(identifier: string, password: string, rememberMe: boolean = false) {
       const response = await $fetch('/api/auth/login', {
         method: 'POST',
@@ -128,7 +157,9 @@ export const useAuthStore = defineStore('auth', {
 
       // IMPORTANT: D'abord effacer la session serveur, PUIS nettoyer le store
       try {
-        await $fetch('/api/auth/logout', {
+        // Même raison qu'à `register` : sans type déclaré, le compilateur apparie la route
+        // récursivement. Le résultat n'est pas lu — c'est la session serveur qui compte.
+        await $fetch<{ success: boolean; data: null }>('/api/auth/logout', {
           method: 'POST',
           body: deviceId ? { deviceId } : {},
         })
