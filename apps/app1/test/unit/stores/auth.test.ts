@@ -197,7 +197,13 @@ describe('useAuthStore', () => {
 
   describe('Action register', () => {
     it("devrait appeler l'API d'inscription avec les bonnes données", async () => {
-      const mockResponse = { message: 'Inscription réussie' }
+      // La VRAIE forme de la réponse : `createSuccessResponse` enveloppe, et le point d'API
+      // rend `requiresVerification` et l'adresse. Le bouchon annonçait un objet qui n'existe pas.
+      const mockResponse = {
+        success: true,
+        message: 'Inscription réussie',
+        data: { requiresVerification: true, email: 'test@example.com' },
+      }
       vi.mocked($fetch).mockResolvedValue(mockResponse)
 
       const result = await authStore.register(
