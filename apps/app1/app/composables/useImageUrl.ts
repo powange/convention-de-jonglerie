@@ -1,3 +1,5 @@
+import type { UploadEndpoint } from '~/types/upload'
+
 /**
  * Composable pour gérer les URLs d'images
  * Gère la construction des URLs depuis les noms de fichiers stockés en DB
@@ -12,7 +14,23 @@ export const useImageUrl = () => {
    */
   const getImageUrl = (
     filename: string | null | undefined,
-    type: 'convention' | 'edition' | 'show' | 'profile' | 'lost-found' = 'convention',
+    /*
+     * 📍 LES HUIT types de dépôt, repris de `UploadEndpoint` plutôt que réécrits à cinq.
+     *
+     * `ImageUpload` passe ici `props.endpoint.type`, qui en compte huit : les cinq ci-dessous,
+     * plus `treasury`, `artist` et `generic`. La liste à cinq refusait donc trois valeurs que ce
+     * composant lui donne pour de bon.
+     *
+     * ⚠️ MESURÉ, et non déduit : aucun aperçu n'était cassé pour autant. Les trois points d'API
+     * correspondants (`/api/files/treasury`, `/api/files/artist`, `/api/files/generic`) rendent
+     * un `imageUrl` qui commence déjà par `/uploads/`, et `ImageUpload` le renvoie tel quel AVANT
+     * d'arriver ici. Le `default` ci-dessous ne les sert donc jamais en pratique — il reste le
+     * repli de dernier recours, pour un nom de fichier nu dont on ne saurait pas le dossier.
+     *
+     * Reprendre le type de `UploadEndpoint` plutôt que d'en recopier les membres évite qu'un
+     * neuvième type ajouté là-bas reproduise exactement ce décalage.
+     */
+    type: UploadEndpoint['type'] = 'convention',
     entityId?: number
   ): string | null => {
     if (!filename) {

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-import type { Edition, ConventionOrganizer, HttpError } from '~/types'
+import type { Edition, ConventionOrganizer, EditionFormData, HttpError } from '~/types'
 
 import { useAuthStore } from '../stores/auth' // Use relative path
 
@@ -203,8 +203,29 @@ export const useEditionStore = defineStore('editions', {
           })
         }
 
-        const response = await $fetch<PaginatedResponse>('/api/editions', {
-          params: queryParams,
+        /*
+         * 📍 La ROUTE est donnée en second paramètre de type, et ce n'est pas cosmétique.
+         *
+         * `$fetch` est générique sur trois paramètres : le type de la réponse, la requête, et les
+         * options. N'en préciser qu'UN désactive l'inférence des deux autres, qui retombent sur
+         * leurs valeurs par défaut — `R = NitroFetchRequest`, soit l'union de TOUTES les routes du
+         * dépôt. `AvailableRouterMethod<R>` distribue alors sur cette union et recalcule un
+         * appariement récursif pour chacune : le compilateur décrochait, rendait
+         * « TS2589 — Type instantiation is excessively deep and possibly infinite », et le
+         * TS2345 sur les options n'était que l'ombre de ce décrochage.
+         *
+         * La route littérale réduit ce calcul à un seul appariement. Rien ne change à
+         * l'exécution : un paramètre de type n'existe pas après compilation.
+         *
+         * ⚠️ Et SURTOUT PAS d'`import { $fetch } from 'ofetch'` ici, contrairement aux appels vers
+         * une API externe : la route est INTERNE, et en rendu serveur le `$fetch` de Nitro la
+         * court-circuite sans requête HTTP. Celui d'ofetch tenterait un appel réseau sur une URL
+         * relative, qui n'a pas de base côté serveur.
+         */
+        const response = await $fetch<PaginatedResponse, '/api/editions'>('/api/editions', {
+          // `query`, et non `params` : ofetch marque ce dernier « @deprecated use query instead »
+          // et les fusionne tous deux dans la chaîne de requête — le changement est un synonyme.
+          query: queryParams,
         })
         if (opts?.append) {
           this.editions = [...this.editions, ...response.data]
@@ -276,7 +297,20 @@ export const useEditionStore = defineStore('editions', {
       }
     },
 
-    async addEdition(editionData: Omit<Edition, 'id' | 'creator' | 'creatorId'>) {
+    /*
+     * 📍 `EditionFormData`, et non `Omit<Edition, …>`.
+     *
+     * Cette action ne lit rien : elle transmet le corps à `POST /api/editions`. Annoncer une
+     * édition complète privée de trois champs affirmait que l'appelant fournit aussi `latitude`,
+     * `_count` et tout le reste — ce que le formulaire ne fait pas, et n'a pas à faire.
+     *
+     * ⚠️ Les deux pages de création annonçaient d'ailleurs DEUX types différents pour la même
+     * charge, `EditionFormData` d'un côté et `Edition` de l'autre, sans que rien ne proteste :
+     * `EditionForm` déclare `defineEmits(['submit'])`, donc sans typage, et l'annotation du
+     * gestionnaire n'est qu'une affirmation que personne ne vérifie. Elles sont désormais
+     * d'accord, sur le nom que ce dépôt donne déjà à cette charge.
+     */
+    async addEdition(editionData: EditionFormData) {
       this.loading = true
       this.error = null
       try {
@@ -773,8 +807,10 @@ export const useEditionStore = defineStore('editions', {
           })
         }
 
-        const response = await $fetch<PaginatedResponse>('/api/editions', {
-          params: queryParams,
+        // Mêmes raisons qu'au premier appel : route littérale pour éviter le décrochage du
+        // compilateur, et `query` plutôt que `params`.
+        const response = await $fetch<PaginatedResponse, '/api/editions'>('/api/editions', {
+          query: queryParams,
         })
         this.allEditions = response.data
         this.processAllEditions()

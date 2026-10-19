@@ -19,8 +19,22 @@
     <!-- Grille d'éditions -->
     <div v-if="editions.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <EditionCard v-for="edition in editions" :key="edition.id" :edition="edition" show-status>
-        <template #actions="{ edition: ed }">
-          <UDropdownMenu :items="getEditionActions(ed)">
+        <!--
+          ⚠️ On lit `edition` du `v-for`, et NON le paramètre du slot.
+        
+          `EditionCard` déclare sa prop `edition: Edition` et la redonne telle quelle à ses
+          slots. Or cette grille lui passe des `DashboardEdition`, qui portent un `_count` —
+          les quatre totaux affichés juste en dessous — qu'`Edition` ne déclare pas. Repasser
+          par le slot EFFAÇAIT donc précisément ce que ces compteurs lisent, et les cinq
+          appels ci-dessous recevaient un type qui ne promet pas `_count` : neuf erreurs
+          TS2345 à eux seuls.
+        
+          La variable du `v-for` est le MÊME objet — la carte redonne sa propre prop, sans
+          transformation (`<slot name="actions" :edition="edition" />`) — mais avec son vrai
+          type. Rien ne change à l'exécution ; on cesse seulement de mentir au compilateur.
+        -->
+        <template #actions>
+          <UDropdownMenu :items="getEditionActions(edition)">
             <UButton
               :aria-label="$t('common.actions')"
               color="neutral"
@@ -31,48 +45,49 @@
           </UDropdownMenu>
         </template>
 
-        <template #footer-actions="{ edition: ed }">
+        <!-- Mêmes raisons que pour `#actions` ci-dessus. -->
+        <template #footer-actions>
           <div class="flex items-center justify-between w-full">
             <!-- Compteurs -->
             <div class="flex items-center gap-3 text-sm text-gray-500">
               <span
-                v-if="getVolunteersCount(ed) > 0"
+                v-if="getVolunteersCount(edition) > 0"
                 class="flex items-center gap-1"
                 :title="t('edition.volunteers.title')"
               >
                 <UIcon name="i-heroicons-hand-raised" class="text-primary-600" size="16" />
-                {{ getVolunteersCount(ed) }}
+                {{ getVolunteersCount(edition) }}
               </span>
               <span
-                v-if="getArtistsCount(ed) > 0"
+                v-if="getArtistsCount(edition) > 0"
                 class="flex items-center gap-1"
                 :title="t('edition.artists.title')"
               >
                 <UIcon name="i-heroicons-star" class="text-amber-500" size="16" />
-                {{ getArtistsCount(ed) }}
+                {{ getArtistsCount(edition) }}
               </span>
               <span
-                v-if="getOrganizersCount(ed) > 0"
+                v-if="getOrganizersCount(edition) > 0"
                 class="flex items-center gap-1"
                 :title="t('conventions.organizers')"
               >
                 <UIcon name="i-heroicons-shield-check" class="text-indigo-500" size="16" />
-                {{ getOrganizersCount(ed) }}
+                {{ getOrganizersCount(edition) }}
               </span>
               <span
-                v-if="getParticipantsCount(ed) > 0"
+                v-if="getParticipantsCount(edition) > 0"
                 class="flex items-center gap-1"
                 :title="t('common.participants')"
               >
                 <UIcon name="i-heroicons-ticket" class="text-success-600" size="16" />
-                {{ getParticipantsCount(ed) }}
+                {{ getParticipantsCount(edition) }}
               </span>
             </div>
             <!-- Actions -->
             <div class="flex items-center gap-2">
               <USelect
-                v-if="canEditEdition(ed.id)"
-                :model-value="ed.status"
+                v-if="canEditEdition(edition.id)"
+                :model-value="edition.status"
                 :items="statusOptions"
                 value-key="value"
                 size="xs"
@@ -80,12 +95,12 @@
                 @update:model-value="
                   emit(
                     'statusChange',
-                    ed.id,
+                    edition.id,
                     $event as 'PLANNED' | 'PUBLISHED' | 'OFFLINE' | 'CANCELLED'
                   )
                 "
               />
-              <NuxtLink :to="`/editions/${ed.id}`">
+              <NuxtLink :to="`/editions/${edition.id}`">
                 <UButton
                   icon="i-heroicons-eye"
                   size="sm"

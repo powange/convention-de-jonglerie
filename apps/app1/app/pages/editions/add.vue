@@ -20,7 +20,7 @@ import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import { useEditionStore } from '~/stores/editions'
-import type { Edition, HttpError } from '~/types'
+import type { EditionFormData, HttpError } from '~/types'
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -45,7 +45,9 @@ const initialData = computed(() => {
   return undefined
 })
 
-const handleAddEdition = async (formData: Edition) => {
+// `EditionFormData`, comme l'autre page de création : c'est ce que `EditionForm` émet. Son
+// `defineEmits(['submit'])` n'étant pas typé, les deux pages avaient pu diverger sans erreur.
+const handleAddEdition = async (formData: EditionFormData) => {
   try {
     await editionStore.addEdition(formData)
     toast.add({

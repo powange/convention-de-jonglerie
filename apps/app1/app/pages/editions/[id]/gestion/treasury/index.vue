@@ -1432,10 +1432,12 @@ function exporterCsv() {
   // Le fichier n'emporte que les colonnes AFFICHÉES. Attention : masquer « Montant » retire les
   // trois colonnes chiffrées — engagé, réglé, prévisionnel —, ce qui est bien ce que demande
   // « n'exporter que les colonnes sélectionnées », mais mérite d'être su.
+  // Plus d'`as` : `tresorerieVersCsv` est générique sur la ligne, donc `lineTitle` y entre tel
+  // qu'il est écrit. Voir l'en-tête de `preparerLignesTresorerie`.
   const contenu = tresorerieVersCsv(
     lignes,
     t,
-    lineTitle as (l: TreasuryLine) => string,
+    lineTitle,
     colonnesTresorerieVisibles(visibiliteDesColonnes.value)
   )
 

@@ -170,10 +170,23 @@ function indexDesColonnes(choisies?: readonly IdColonneTresorerie[]): number[] |
   )
 }
 
-export function preparerLignesTresorerie(
-  lignes: readonly LigneTresorerieCsv[],
+/*
+ * 📍 GÉNÉRIQUE sur la ligne, et pas seulement `LigneTresorerieCsv`.
+ *
+ * `titreDeLaLigne` est fourni par l'appelant, et un paramètre de fonction est CONTRAVARIANT :
+ * exiger `(ligne: LigneTresorerieCsv) => string` imposait un rappel capable de traiter N'IMPORTE
+ * QUELLE ligne de cette forme, là où la page en fournit un qui lit `source` — un champ que porte
+ * sa `TreasuryLine` mais pas `LigneTresorerieCsv`. La page contournait donc par un
+ * `as (l: TreasuryLine) => string`, qui affirmait l'inverse de ce que `strictFunctionTypes`
+ * refuse, et c'est ce cast qui a disparu.
+ *
+ * Avec `L`, le type de la ligne et celui du rappel sont le MÊME : chacun reste précis, et rien
+ * n'est affirmé de travers. C'est déjà l'idiome de ce module — voir `GroupeDeCode<L>`.
+ */
+export function preparerLignesTresorerie<L extends LigneTresorerieCsv>(
+  lignes: readonly L[],
   t: Traducteur,
-  titreDeLaLigne: (ligne: LigneTresorerieCsv) => string,
+  titreDeLaLigne: (ligne: L) => string,
   colonnes?: readonly IdColonneTresorerie[]
 ): string[][] {
   const oui = t('common.yes')
@@ -221,10 +234,10 @@ export function preparerLignesTresorerie(
 }
 
 /** Le fichier complet, prêt à être téléchargé. */
-export function tresorerieVersCsv(
-  lignes: readonly LigneTresorerieCsv[],
+export function tresorerieVersCsv<L extends LigneTresorerieCsv>(
+  lignes: readonly L[],
   t: Traducteur,
-  titreDeLaLigne: (ligne: LigneTresorerieCsv) => string,
+  titreDeLaLigne: (ligne: L) => string,
   colonnes?: readonly IdColonneTresorerie[]
 ): string {
   // La MÊME liste des deux côtés : la passer à l'un et pas à l'autre décalerait tout le fichier.

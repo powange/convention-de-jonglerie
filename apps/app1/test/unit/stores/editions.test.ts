@@ -121,7 +121,10 @@ describe('useEditionStore', () => {
       await editionStore.fetchEditions()
 
       expect($fetch).toHaveBeenCalledWith('/api/editions', {
-        params: {
+        // `query` et non `params` : le magasin emploie désormais le nom non déprécié, ofetch
+        // fusionnant les deux dans la chaîne de requête. Ces deux cas épinglaient le nom de
+        // l'option, pas le comportement.
+        query: {
           page: '1',
           limit: '12',
         },
@@ -153,7 +156,10 @@ describe('useEditionStore', () => {
       await editionStore.fetchEditions(filters)
 
       expect($fetch).toHaveBeenCalledWith('/api/editions', {
-        params: {
+        // `query` et non `params` : le magasin emploie désormais le nom non déprécié, ofetch
+        // fusionnant les deux dans la chaîne de requête. Ces deux cas épinglaient le nom de
+        // l'option, pas le comportement.
+        query: {
           page: '2',
           limit: '24',
           name: 'test',
