@@ -11,7 +11,16 @@ const prismaMock = (globalThis as any).prisma
  * n'en double aucune. `safeNotify` est réduit à un passe-plat : son rôle est d'avaler les erreurs,
  * pas de décider qui reçoit quoi.
  */
-const annonceEmise = vi.hoisted(() => vi.fn())
+/*
+ * 📍 Le bouchon est TYPÉ, et non son appelant.
+ *
+ * `vi.fn()` nu rend des `calls` en `unknown[][]`, si bien que le destinataire lu plus bas était
+ * `unknown` et qu'aucun comparateur de tri ne pouvait l'accepter. Annoter l'appelant aurait
+ * demandé un `as` ; déclarer la forme de l'annonce ici la rend juste partout où on la relit.
+ */
+const annonceEmise = vi.hoisted(() =>
+  vi.fn<(destinataire: number, appel: string, edition: string | null, nombre: number) => unknown>()
+)
 vi.mock('#server/utils/notification-service', () => ({
   safeNotify: (travail: () => unknown) => Promise.resolve(travail()),
   NotificationHelpers: {
@@ -356,9 +365,9 @@ describe('/api/editions/[id]/shows-call/[showCallId] PUT', () => {
       await laisserPasserLaDiffusion()
 
       expect(annonceEmise).toHaveBeenCalledTimes(45)
-      const destinataires = annonceEmise.mock.calls.map((appel: unknown[]) => appel[0])
+      const destinataires = annonceEmise.mock.calls.map((appel) => appel[0])
       expect(new Set(destinataires).size).toBe(45)
-      expect(destinataires.sort((a: number, b: number) => a - b)).toEqual(artistes.map((a) => a.id))
+      expect(destinataires.sort((a, b) => a - b)).toEqual(artistes.map((a) => a.id))
       // Le nom de l'appel et celui de l'édition accompagnent bien chaque annonce.
       expect(annonceEmise).toHaveBeenCalledWith(100, mockShowCall.name, mockEdition.name, 1)
     })

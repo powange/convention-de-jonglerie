@@ -7,6 +7,32 @@ const prismaMock = (globalThis as any).prisma
 
 // Mock du handler favoris
 
+/*
+ * ⚠️ TREIZE DES DIX-NEUF CAS DE CE FICHIER N'ÉPROUVENT PAS L'APPLICATION.
+ *
+ * Relevé le 19 octobre 2026, en traitant les deux TS2345 ci-dessous. Ce fichier n'importe qu'UN
+ * morceau de code du dépôt, `favoriteHandler`, et seul le premier bloc — « API - Ajouter/Retirer
+ * des favoris », six cas — s'en sert. Les cinq autres blocs construisent des objets sur place et
+ * vérifient ce qu'ils viennent d'écrire :
+ *
+ * • « Filtrage et recherche » appelle `Array.prototype.filter` et vérifie qu'il a filtré ;
+ * • « Performance et cache » met une valeur dans une `Map` et la relit ;
+ * • « Intégration avec d'autres fonctionnalités » pousse dans un tableau, puis compte 1 élément,
+ *   et construit une chaîne CSV à la main pour la comparer à elle-même — alors que ce dépôt a un
+ *   utilitaire CSV partagé (`shared/utils/csv.ts`) que ce cas n'appelle pas ;
+ * • « Interface utilisateur » n'atteint aucun composant : il réécrit la règle d'affichage dans
+ *   le cas qui l'éprouve ;
+ * • « Validation et sécurité » configure le bouchon Prisma, APPELLE LE BOUCHON lui-même, et
+ *   vérifie qu'il a bien rendu ce qu'on venait de lui dire de rendre. Le gestionnaire n'est pas
+ *   sollicité, et aucune validation du dépôt n'est traversée ;
+ * • « Store » pousse dans un objet fabriqué sur place et compte ses éléments.
+ *
+ * Ils seraient donc VERTS quoi que fasse l'application, y compris si la fonctionnalité des favoris
+ * était entièrement retirée. Ils sont laissés en place faute de décision : les supprimer touche
+ * treize cas et relève d'un choix sur la stratégie de tests, pas d'un correctif de typage. Le
+ * constat est écrit ici pour qu'on ne se fie pas à ce fichier en croyant la fonctionnalité
+ * couverte.
+ */
 describe('Système de favoris', () => {
   const mockUser = {
     id: 1,
@@ -156,13 +182,19 @@ describe('Système de favoris', () => {
 
   describe('Store - Gestion des favoris côté client', () => {
     it('devrait mettre à jour localement les favoris de façon optimiste', async () => {
-      // Mock d'un store simplifié
+      /*
+       * Mock d'un store simplifié.
+       *
+       * 📍 `favoritedBy` est ANNOTÉ : un `[]` nu s'infère `never[]`, et plus rien ne peut y être
+       * poussé — pas même avec un `as any`, puisque c'est le tableau et non la valeur qui refuse.
+       * C'est la cause des deux TS2345 de ce fichier, l'autre étant ligne ~400.
+       */
       const mockStore = {
         editions: [
           {
             id: 1,
             name: 'Convention Test',
-            favoritedBy: [],
+            favoritedBy: [] as { id: number; pseudo?: string }[],
           },
         ],
         toggleFavorite: vi.fn(),
@@ -180,7 +212,7 @@ describe('Système de favoris', () => {
 
       if (edition) {
         // Ajout optimiste
-        edition.favoritedBy.push({ id: userId, pseudo: 'testuser' } as any)
+        edition.favoritedBy.push({ id: userId, pseudo: 'testuser' })
       }
 
       expect(edition?.favoritedBy).toHaveLength(1)
@@ -377,7 +409,11 @@ describe('Système de favoris', () => {
 
   describe("Intégration avec d'autres fonctionnalités", () => {
     it('devrait synchroniser les favoris avec les notifications', () => {
-      const user = { id: 1, notifications: [] }
+      // Même cause qu'au premier cas : un `[]` nu s'infère `never[]`.
+      const user = {
+        id: 1,
+        notifications: [] as { type: string; message: string; timestamp: Date }[],
+      }
       const favoriteEdition = { id: 1, name: 'Convention Test' }
 
       // Simuler l'ajout d'une notification quand on ajoute aux favoris
