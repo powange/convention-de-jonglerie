@@ -62,7 +62,19 @@ const IMPORTE = candidat({
   motifIa: null,
 })
 
+/**
+ * ⚠️ LA FORME RÉELLE DU SERVEUR, `success: true` COMPRIS.
+ *
+ * Sans ce drapeau, le bouchon ment : `unwrapApiResponse` (dans `useApiAction`) ne retire le niveau
+ * `data` QUE si la réponse porte `success === true`, `data`, et rien d'autre. Un bouchon qui rend
+ * `{ data: … }` seul n'est donc pas déballé, `reponse.data` existe encore, et la page semble
+ * marcher — alors qu'en vrai elle reçoit l'objet déjà déballé et lève sur `reponse.data.candidats`.
+ *
+ * C'est exactement le défaut qui est passé en production : les tests étaient verts parce que le
+ * bouchon ne reproduisait pas la forme du serveur.
+ */
 const REPONSE_CANDIDATS = {
+  success: true,
   data: {
     candidats: [candidat(), IMPORTE],
     sources: [
@@ -94,9 +106,26 @@ const fetchBouchon = vi.hoisted(() => {
     if (String(url).includes('/candidats')) return (globalThis as any).__reponseVeille
     if (String(url).includes('/verdict')) {
       if ((globalThis as any).__verdictEchoue) throw new Error('refusé')
-      return { data: {} }
+      return { success: true, data: {} }
     }
-    if (String(url).includes('/rafraichir')) return { data: { bilans: [] } }
+    if (String(url).includes('/rafraichir')) return { success: true, data: { bilans: [] } }
+    if (String(url).includes('/classer')) {
+      return {
+        success: true,
+        data: {
+          bilan: {
+            soumis: 0,
+            classes: 0,
+            illisibles: 0,
+            echecs: 0,
+            premiereErreur: null,
+            parAvis: { CONVENTION: 0, HORS_SUJET: 0, INCERTAIN: 0 },
+          },
+          restants: 0,
+          fournisseur: 'anthropic',
+        },
+      }
+    }
     return {}
   })
   /*
@@ -228,6 +257,7 @@ describe('Page /admin/veille', () => {
      */
     const AVEC_ET = 'https://jugglingedge.com/event.php?EventID=8123&lang=fr'
     ;(globalThis as any).__reponseVeille = {
+      success: true,
       data: {
         ...REPONSE_CANDIDATS.data,
         candidats: [candidat({ url: AVEC_ET })],
