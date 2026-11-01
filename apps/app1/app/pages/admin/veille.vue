@@ -130,6 +130,29 @@
           >
             {{ t('admin.veille.verdict.refuse') }}
           </UButton>
+          <!-- Désactivé au-delà de la limite, plutôt que d'envoyer « les cinq premiers » : un
+               choix arbitraire ferait disparaître le reste sans que rien ne le dise. L'infobulle
+               nomme la limite, l'opérateur réduit sa sélection, et rien n'est perdu. -->
+          <UTooltip
+            :text="
+              selection.length > MAX_URLS_IMPORT
+                ? t('admin.veille.selection.import_limit', {
+                    max: MAX_URLS_IMPORT,
+                    count: selection.length,
+                  })
+                : t('admin.veille.selection.import')
+            "
+          >
+            <UButton
+              color="primary"
+              variant="soft"
+              icon="i-heroicons-arrow-down-tray"
+              :disabled="selection.length > MAX_URLS_IMPORT"
+              :to="lienImport([...selection])"
+            >
+              {{ t('admin.veille.selection.import') }}
+            </UButton>
+          </UTooltip>
           <UButton color="neutral" variant="outline" @click="selection = []">
             {{ t('admin.veille.selection.clear') }}
           </UButton>
@@ -229,6 +252,20 @@
               <!-- shrink-0 : sans lui ce bloc se fait comprimer par le texte de gauche et les
                    boutons se chevauchent. -->
               <div class="flex flex-col gap-2 shrink-0">
+                <!-- `data-importer` : visé par identité dans les tests, comme les autres repères
+                     de cet écran. Un lien et non un bouton : la cible est une autre page, donc
+                     ouvrable dans un nouvel onglet par un clic du milieu. -->
+                <UTooltip :text="t('admin.veille.import_one')">
+                  <UButton
+                    data-importer="true"
+                    color="primary"
+                    variant="soft"
+                    size="sm"
+                    icon="i-heroicons-arrow-down-tray"
+                    :aria-label="t('admin.veille.import_one')"
+                    :to="lienImport([candidat.url])"
+                  />
+                </UTooltip>
                 <UTooltip :text="t('admin.veille.verdict.convention')">
                   <UButton
                     color="success"
@@ -375,6 +412,29 @@ function nomDeLaSource(cle: string) {
   // Une source retirée du registre laisse des candidats derrière elle : afficher sa clé brute
   // vaut mieux qu'une case vide, qui laisserait croire à une donnée manquante.
   return sources.value.find((source) => source.cle === cle)?.nom ?? cle
+}
+
+/**
+ * Le plafond d'URL de la page d'import.
+ *
+ * ⚠️ Ce n'est pas un choix d'affichage : c'est le défaut de `parseAndValidateUrls`
+ * (`useUrlValidation.ts`), qui REJETTE tout le lot au-delà. Envoyer six URL ne ferait donc pas
+ * importer cinq conventions, mais échouer les six — d'où le bouton désactivé plutôt qu'un envoi
+ * tronqué en silence.
+ *
+ * 📍 Si la limite change là-bas, elle doit changer ici. Un test la verrouille des deux côtés.
+ */
+const MAX_URLS_IMPORT = 5
+
+/**
+ * Le lien vers la page d'import, pré-rempli.
+ *
+ * Le paramètre est RÉPÉTÉ (`?urls=…&urls=…`) et non joint par un séparateur : c'est la page
+ * d'import qui joint par un retour à la ligne, parce que son champ attend une URL par ligne. Un
+ * séparateur choisi ici — virgule, point-virgule — produirait une seule URL invalide.
+ */
+function lienImport(urls: string[]) {
+  return { path: '/admin/import-edition', query: { urls } }
 }
 
 function couleurDuVerdict(verdict: Verdict) {
