@@ -4,6 +4,7 @@
  */
 
 import type { FacebookImportJson } from './facebook-event-scraper'
+import type { CandidatExterne, SourceEvenements } from './sources-evenements'
 
 // ============================================
 // TYPES
@@ -104,17 +105,95 @@ export function isJugglingEdgeEventUrl(url: string): boolean {
 }
 
 /**
- * Décode les entités HTML (comme &#039; -> ')
+ * Les entités nommées que ce site emploie réellement, en minuscules.
+ *
+ * ⚠️ MESURÉ sur `events.php` le 1er novembre 2026 : le JSON-LD des lignes rend
+ * `Th&uuml;ringer H&uuml;tte`, `Schlierseestra&szlig;e`, `Rh&ouml;n`. L'ancien décodeur ne traitait
+ * que cinq entités nommées et les numériques : tous les accents allemands, nordiques et portugais
+ * de l'agenda restaient donc écrits `&uuml;` dans les adresses — sur un agenda qui couvre douze
+ * pays, ce n'est pas un cas marginal.
+ *
+ * Les majuscules ne sont PAS listées : elles se déduisent de la casse de l'entité (`&Uuml;` → `Ü`),
+ * ce qui évite de tenir deux tables qui pourraient diverger.
+ */
+const ENTITES_NOMMEES: Record<string, string> = {
+  agrave: 'à',
+  aacute: 'á',
+  acirc: 'â',
+  atilde: 'ã',
+  auml: 'ä',
+  aring: 'å',
+  aelig: 'æ',
+  ccedil: 'ç',
+  egrave: 'è',
+  eacute: 'é',
+  ecirc: 'ê',
+  euml: 'ë',
+  igrave: 'ì',
+  iacute: 'í',
+  icirc: 'î',
+  iuml: 'ï',
+  ntilde: 'ñ',
+  ograve: 'ò',
+  oacute: 'ó',
+  ocirc: 'ô',
+  otilde: 'õ',
+  ouml: 'ö',
+  oslash: 'ø',
+  ugrave: 'ù',
+  uacute: 'ú',
+  ucirc: 'û',
+  uuml: 'ü',
+  yacute: 'ý',
+  yuml: 'ÿ',
+  eth: 'ð',
+  thorn: 'þ',
+  szlig: 'ß',
+  // Mesurées sur l'agenda du 1er novembre 2026 : `&lrm;` 45 fois, `&Scaron;` 2, `&ndash;` 1,
+  // `&rsquo;` 1. Les trois dernières sont typographiques et reviendront ailleurs ; `&lrm;` est une
+  // marque de sens d'écriture, retirée après décodage là où elle polluerait un libellé.
+  lrm: '\u200e',
+  rlm: '\u200f',
+  scaron: 'š',
+  ndash: '–',
+  mdash: '—',
+  lsquo: '\u2018',
+  rsquo: '\u2019',
+  ldquo: '\u201c',
+  rdquo: '\u201d',
+  hellip: '…',
+  quot: '"',
+  apos: "'",
+  nbsp: ' ',
+  amp: '&',
+  lt: '<',
+  gt: '>',
+}
+
+/**
+ * Décode les entités HTML : numériques (`&#039;`, `&#x27;`) et nommées (`&uuml;`, `&amp;`).
+ *
+ * 📍 UNE SEULE PASSE, là où l'ancienne version enchaînait des `replace`. L'enchaînement décodait
+ * `&amp;` d'abord, si bien qu'un texte doublement encodé — `&amp;uuml;`, qui veut dire le TEXTE
+ * `&uuml;` — devenait `&uuml;` puis `ü` : on inventait un accent que la source n'avait pas écrit.
+ * Une passe unique ne peut pas se relire elle-même.
+ *
+ * Une entité inconnue est laissée TELLE QUELLE plutôt que remplacée par un caractère de
+ * remplacement : mieux vaut un `&hellip;` visible, qui se corrige, qu'un `?` qui se confond avec
+ * une vraie donnée.
  */
 function decodeHtmlEntities(text: string): string {
-  return text
-    .replace(/&#039;/g, "'")
-    .replace(/&quot;/g, '"')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(parseInt(dec, 10)))
+  return text.replace(/&(#x?[0-9a-fA-F]+|[a-zA-Z]+);/g, (tout, corps: string) => {
+    if (corps.startsWith('#')) {
+      const hexa = corps[1] === 'x' || corps[1] === 'X'
+      const code = parseInt(hexa ? corps.slice(2) : corps.slice(1), hexa ? 16 : 10)
+      return Number.isNaN(code) ? tout : String.fromCodePoint(code)
+    }
+    const caractere = ENTITES_NOMMEES[corps.toLowerCase()]
+    if (!caractere) return tout
+    // `&Uuml;` → `Ü`. Les entités sans majuscule (`&amp;`) ne sont pas concernées.
+    return /^[A-Z]/.test(corps) ? caractere.toUpperCase() : caractere
+  })
 }
 
 /**
@@ -646,4 +725,115 @@ export function formatJugglingEdgeDataAsContent(
   content += `\n=== FIN DONNÉES JUGGLINGEDGE ===\n`
 
   return content
+}
+
+// ============================================
+// LA LISTE DES ÉVÉNEMENTS (agenda)
+// ============================================
+
+/** L'agenda lu par défaut. Le sous-domaine `fr.` rend les noms de pays en français. */
+const JUGGLINGEDGE_URL_LISTE = 'https://fr.jugglingedge.com/events.php'
+
+/**
+ * Analyse la page d'agenda et rend ses candidats.
+ *
+ * Séparée de la récupération réseau à dessein : c'est l'analyse qui casse quand le site change de
+ * gabarit, et on veut pouvoir l'éprouver sur un HTML figé plutôt que sur le réseau — un test qui
+ * dépend d'un site tiers échoue les jours où ce site est lent, et passe les jours où il a changé
+ * sans qu'on l'ait vu.
+ *
+ * ## Ce que la page donne, mesuré le 1er novembre 2026 sur 45 lignes
+ *
+ * Chaque ligne est un `<tr id="EventRow…">` qui porte **son propre JSON-LD** — nom, date de début,
+ * adresse, et surtout l'URL **canonique** de l'événement. Les deux colonnes que le JSON-LD n'a pas
+ * sont dans le tableau : la durée en jours, et le pays.
+ *
+ * 📍 L'URL vient du JSON-LD, JAMAIS de l'attribut `href` de la ligne. Les liens de la page sont
+ * relatifs (`/event.php?EventID=6542`) : résolus sur `fr.jugglingedge.com`, ils désigneraient le
+ * même événement sous un autre hôte que `jugglingedge.com`. Or le refus d'un administrateur
+ * s'attache à l'URL — deux URL pour un événement feraient réapparaître ce qu'on a écarté, et
+ * `isJugglingEdgeEventUrl` ne reconnaît d'ailleurs pas le sous-domaine `fr.`.
+ *
+ * ⚠️ Une ligne sans URL canonique est ÉCARTÉE plutôt que rafistolée : sans clé, elle ne peut être
+ * ni dédoublonnée, ni refusée durablement. Le compte des écartées est journalisé, pour qu'un
+ * changement de gabarit se voie au lieu de vider la liste en silence.
+ */
+export function analyserListeJugglingEdge(html: string): CandidatExterne[] {
+  const candidats: CandidatExterne[] = []
+  let ecartees = 0
+
+  for (const ligne of html.matchAll(/<tr id="EventRow(\d+)">([\s\S]*?)<\/tr>/g)) {
+    const identifiant = ligne[1] ?? null
+    const corps = ligne[2] ?? ''
+
+    const bloc = corps.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)
+    let ld: Record<string, unknown> | null = null
+    if (bloc?.[1]) {
+      try {
+        ld = JSON.parse(bloc[1])
+      } catch {
+        ld = null
+      }
+    }
+
+    const url = typeof ld?.url === 'string' ? ld.url : null
+    if (!url) {
+      ecartees++
+      continue
+    }
+
+    const lieu = (ld?.location ?? null) as { name?: unknown; address?: unknown } | null
+    const jours = corps.match(/<td class="Number">\s*(\d+)\s*<\/td>/)
+    // Le libellé du lien de filtrage par région porte le nom du pays, suivi d'une marque
+    // de sens d'écriture (`&lrm;`) qu'on retire.
+    const pays = corps.match(/<a href="\/events\.php\?Region=[^"]*">([\s\S]*?)<\/a>/)
+
+    candidats.push({
+      url,
+      identifiantSource: identifiant,
+      titre: decodeHtmlEntities(typeof ld?.name === 'string' ? ld.name : '').trim(),
+      debut: typeof ld?.startDate === 'string' ? ld.startDate : null,
+      jours: jours?.[1] ? Number.parseInt(jours[1], 10) : null,
+      pays: pays?.[1] ? decodeHtmlEntities(pays[1]).replace(/‎|‏/g, '').trim() : null,
+      lieu: typeof lieu?.name === 'string' ? decodeHtmlEntities(lieu.name).trim() : null,
+      adresse: typeof lieu?.address === 'string' ? decodeHtmlEntities(lieu.address).trim() : null,
+    })
+  }
+
+  if (ecartees > 0) {
+    console.warn(`[JUGGLINGEDGE] ${ecartees} ligne(s) d'agenda sans URL canonique, écartée(s)`)
+  }
+  return candidats
+}
+
+/** Va chercher l'agenda et l'analyse. Rend une liste vide plutôt que d'échouer. */
+export async function listerEvenementsJugglingEdge(): Promise<CandidatExterne[]> {
+  try {
+    const response = await fetch(JUGGLINGEDGE_URL_LISTE, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      },
+    })
+    if (!response.ok) {
+      console.error(`[JUGGLINGEDGE] Agenda, erreur HTTP : ${response.status}`)
+      return []
+    }
+    const candidats = analyserListeJugglingEdge(await response.text())
+    console.log(`[JUGGLINGEDGE] Agenda : ${candidats.length} candidat(s)`)
+    return candidats
+  } catch (erreur) {
+    console.error('[JUGGLINGEDGE] Agenda illisible :', erreur)
+    return []
+  }
+}
+
+/** JugglingEdge comme source d'événements. La première ; l'écran n'en suppose aucune en propre. */
+export const sourceJugglingEdge: SourceEvenements = {
+  cle: 'jugglingedge',
+  nom: 'JugglingEdge',
+  urlDeLaListe: JUGGLINGEDGE_URL_LISTE,
+  lister: listerEvenementsJugglingEdge,
+  reconnaitUrl: isJugglingEdgeEventUrl,
 }
