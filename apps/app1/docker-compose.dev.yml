@@ -70,6 +70,18 @@ services:
         BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:24-slim}
     container_name: convention-app-dev
     working_dir: /app/apps/app1
+    # Plafond mémoire du conteneur — garde-fou contre l'arrêt brutal de WSL.
+    #
+    # `NODE_OPTIONS` plus bas autorise 6 Go de tas, et les workers de Vitest en HÉRITENT : chacun
+    # peut donc réclamer son propre tas de 6 Go. Sans plafond, la suite Nuxt a fait tomber WSL
+    # entier — mesuré alors que `.wslconfig` n'allouait que 8 Go à toute la machine virtuelle
+    # (depuis porté à 32 Go, pour 64 Go physiques).
+    #
+    # Avec cette limite, c'est le CONTENEUR qui est tué, avec un code OOM lisible dans
+    # `docker compose ps`, au lieu de la machine qui s'arrête sans rien dire. Le serveur de dev
+    # s'arrête donc aussi — c'est le compromis assumé : une panne localisée et nommée vaut mieux
+    # qu'une session entière perdue.
+    mem_limit: 16g
     # Note: pas de user: spécifié pour éviter les problèmes de permissions avec les volumes
     # Exécuter les migrations Prisma (idempotent) puis démarrer Nuxt en mode dev.
     # Optimisé pour réduire les temps de démarrage avec gestion des permissions
