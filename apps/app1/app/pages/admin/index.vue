@@ -299,6 +299,39 @@
           </UCard>
         </NuxtLink>
 
+        <!-- Veille des conventions -->
+        <NuxtLink to="/admin/veille" class="block">
+          <UCard class="hover:shadow-lg transition-shadow cursor-pointer">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="p-2 bg-sky-100 dark:bg-sky-900/30 rounded-lg">
+                    <UIcon
+                      name="i-heroicons-magnifying-glass-circle"
+                      class="h-6 w-6 text-sky-600 dark:text-sky-400"
+                    />
+                  </div>
+                  <h3 class="font-semibold text-lg">{{ $t('admin.veille.title') }}</h3>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                  {{ $t('admin.veille.description') }}
+                </p>
+                <div class="flex items-center gap-4 text-sm text-gray-500">
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-check-circle" class="h-4 w-4" />
+                    {{ $t('admin.veille.verdict.convention') }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-x-circle" class="h-4 w-4" />
+                    {{ $t('admin.veille.verdict.refuse') }}
+                  </span>
+                </div>
+              </div>
+              <UIcon name="i-heroicons-arrow-right" class="h-5 w-5 text-gray-400" />
+            </div>
+          </UCard>
+        </NuxtLink>
+
         <!-- Configuration IA -->
         <NuxtLink to="/admin/ai-config" class="block">
           <UCard class="hover:shadow-lg transition-shadow cursor-pointer">
