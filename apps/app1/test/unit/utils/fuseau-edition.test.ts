@@ -67,6 +67,24 @@ describe('versInstant', () => {
     // 25 octobre 2026 : 2 h 30 survient deux fois. La première, encore en heure d'été, l'emporte.
     expect(versInstant('2026-10-25T02:30', 'Europe/Paris')).toBe('2026-10-25T00:30:00.000Z')
   })
+
+  /**
+   * ⚠️ LE CHOIX DE L'HEURE DOUBLÉE NE DOIT DÉPLACER QUE LES HEURES DOUBLÉES.
+   *
+   * Le cas ci-dessus est obtenu en reculant d'une heure quand la lecture locale est inchangée.
+   * Appliqué trop largement, ce geste décalerait d'une heure des horaires parfaitement ordinaires
+   * — un défaut bien plus grave que celui qu'il corrige, puisqu'il toucherait tous les créneaux au
+   * lieu d'une nuit par an. Ces cas bornent le voisinage de la transition.
+   */
+  it('⚠️ ne déplace AUCUNE heure non ambiguë, même au bord de la transition', () => {
+    // Avant la transition : 1 h 30 n'existe qu'une fois, en heure d'été (UTC+2).
+    expect(versInstant('2026-10-25T01:30', 'Europe/Paris')).toBe('2026-10-24T23:30:00.000Z')
+    // Après : 3 h 30 n'existe qu'une fois, en heure d'hiver (UTC+1).
+    expect(versInstant('2026-10-25T03:30', 'Europe/Paris')).toBe('2026-10-25T02:30:00.000Z')
+    // Et un jour quelconque, loin de tout changement d'heure.
+    expect(versInstant('2026-08-01T02:30', 'Europe/Paris')).toBe('2026-08-01T00:30:00.000Z')
+    expect(versInstant('2026-12-01T02:30', 'Europe/Paris')).toBe('2026-12-01T01:30:00.000Z')
+  })
 })
 
 describe('versChampLocal', () => {
