@@ -499,6 +499,28 @@ const showDuplicateModal = ref(false)
 // Génération depuis URLs
 const urlsInput = ref('')
 
+/**
+ * Les URL passées en paramètre de route, pour arriver ici depuis un autre écran.
+ *
+ * C'est ce qui permet à la veille des conventions (`/admin/veille`) d'envoyer un candidat retenu
+ * dans ce formulaire sans copier-coller. Le paramètre se répète pour plusieurs URL
+ * (`?urls=…&urls=…`), et une valeur seule est acceptée tout autant.
+ *
+ * 📍 Le champ attend **une URL par ligne** : les valeurs sont donc jointes par un retour à la
+ * ligne. `parseAndValidateUrls` découpe sur `\n` et sur rien d'autre — une virgule produirait une
+ * seule URL invalide.
+ *
+ * ⚠️ Lu une seule fois, à l'initialisation, et jamais sur un `watch` de la route : réécrire le
+ * champ à chaque changement de route effacerait ce que l'opérateur est en train de taper.
+ */
+const urlsDeLaRoute = useRoute().query.urls
+if (urlsDeLaRoute) {
+  const urls = (Array.isArray(urlsDeLaRoute) ? urlsDeLaRoute : [urlsDeLaRoute]).filter(
+    (valeur): valeur is string => typeof valeur === 'string' && valeur.trim().length > 0
+  )
+  if (urls.length > 0) urlsInput.value = urls.join('\n')
+}
+
 // État pour le test des URLs
 const testResults = ref<any[]>([])
 const selectedTestUrl = ref<string>('')

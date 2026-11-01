@@ -899,11 +899,14 @@
         "hide_imported": "Masquer les déjà importés",
         "source": "Source"
       },
+      "import_one": "Importer cette convention",
       "open_source": "Voir sur l'agenda",
       "refresh": "Relire les agendas",
       "selection": {
         "clear": "Tout désélectionner",
-        "count": "{count} sélectionné(s)"
+        "count": "{count} sélectionné(s)",
+        "import": "Importer la sélection",
+        "import_limit": "L'import accepte {max} URL au maximum, et rejette le lot entier au-delà. Réduisez la sélection ({count} actuellement)."
       },
       "stats": {
         "refused": "Refusés",

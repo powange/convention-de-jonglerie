@@ -174,4 +174,59 @@ describe('Page /admin/veille', () => {
     expect(rechargement).toBeDefined()
     expect(rechargement!.options.query.verdict).toBe('REFUSE')
   })
+
+  it('⚠️ le bouton d’import porte l’URL DU CANDIDAT, dans le paramètre que la page d’import lit', async () => {
+    /*
+     * Le pendant de `admin.import-edition.urls-param.test.ts`, qui prouve l'autre bout de la
+     * chaîne. Ici on vérifie l'émission : un lien vers la bonne page, portant l'URL de SA ligne.
+     *
+     * Le sens dangereux est un lien qui pointerait tous vers la même URL — celle du premier
+     * candidat, par exemple, si le gabarit refermait mal sa boucle. L'opérateur importerait alors
+     * la mauvaise convention sans que rien ne le signale, puisque la page d'import se remplirait
+     * bel et bien. D'où la comparaison des DEUX liens entre eux.
+     */
+    const wrapper = await monter()
+
+    const liens = wrapper.findAll('[data-importer]')
+    expect(liens).toHaveLength(2)
+
+    /*
+     * Comparé après DÉCODAGE : Vue Router n'encode pas tout — il laisse par exemple le `?` d'une
+     * valeur de paramètre tel quel. Asserter sur une forme encodée précise ferait donc tomber le
+     * cas pour une raison qui n'a rien à voir avec ce qu'il éprouve.
+     */
+    const url = (index: number) =>
+      decodeURIComponent((liens[index]!.element as HTMLAnchorElement).getAttribute('href') ?? '')
+
+    expect(url(0)).toContain('/admin/import-edition')
+    expect(url(0)).toContain(candidat().url)
+    expect(url(1)).toContain(IMPORTE.url)
+    expect(url(0)).not.toBe(url(1))
+  })
+
+  it('⚠️ garde ENTIÈRE une URL source qui contient un `&`', async () => {
+    /*
+     * Le cas dangereux, et il est réel : un agenda peut servir
+     * `event.php?EventID=1&lang=fr`. Si le `&` n'était pas encodé dans le lien, il séparerait un
+     * second paramètre de requête — la page d'import recevrait une URL TRONQUÉE
+     * (`…?EventID=1`), tenterait l'import de cette adresse-là, et personne ne verrait la
+     * différence : l'URL reste plausible et le formulaire se remplit bel et bien.
+     */
+    const AVEC_ET = 'https://jugglingedge.com/event.php?EventID=8123&lang=fr'
+    ;(globalThis as any).__reponseVeille = {
+      data: {
+        ...REPONSE_CANDIDATS.data,
+        candidats: [candidat({ url: AVEC_ET })],
+      },
+    }
+
+    const wrapper = await monter()
+
+    const lien = wrapper.find('[data-importer]')
+    const href = (lien.element as HTMLAnchorElement).getAttribute('href') ?? ''
+    // Le `&` doit être encodé dans le lien, sinon il coupe le paramètre…
+    expect(href).not.toContain('&lang=fr')
+    // …et l'URL doit se retrouver entière après décodage.
+    expect(decodeURIComponent(href)).toContain(AVEC_ET)
+  })
 })
