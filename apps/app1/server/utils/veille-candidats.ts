@@ -1,6 +1,7 @@
 import { cleDeRapprochement } from './veille-sources'
 
 import type { CandidatExterne } from './sources-evenements'
+import type { AvisIa } from './veille-classement'
 
 /**
  * Le rangement des candidats de la veille, et les verdicts qu'on leur pose.
@@ -147,6 +148,10 @@ export interface CandidatPourEcran {
   verdict: Verdict
   verdictLe: Date | null
   decouvertLe: Date
+  /** L'avis du modèle, ou `null` s'il ne l'a pas encore vu. Un AVIS, jamais une décision. */
+  avisIa: AvisIa | null
+  avisIaLe: Date | null
+  motifIa: string | null
   /** Calculé, jamais rangé : voir l'énumération `VerdictCandidat` du schéma. */
   dejaImporte: boolean
 }
@@ -156,6 +161,14 @@ export interface FiltresCandidats {
   verdict?: Verdict
   source?: string
   pays?: string
+  /**
+   * L'avis du modèle, ou `AUCUN` pour ceux qu'il n'a pas encore vus.
+   *
+   * ⚠️ `AUCUN` ne peut pas s'écrire comme une valeur absente : « pas de filtre » et « filtrer sur
+   * l'absence d'avis » sont deux demandes différentes, et les confondre rendrait la file des non
+   * classés inatteignable — donc le reste à faire invisible.
+   */
+  avisIa?: AvisIa | 'AUCUN'
   /** Masquer ceux dont une édition existe déjà. Appliqué APRÈS la base, le calcul n'y vivant pas. */
   masquerImportes?: boolean
 }
@@ -176,6 +189,9 @@ export async function listerCandidats(
         ...(filtres.verdict ? { verdict: filtres.verdict } : {}),
         ...(filtres.source ? { source: filtres.source } : {}),
         ...(filtres.pays ? { pays: filtres.pays } : {}),
+        // `AUCUN` se traduit en `null`, et non en « pas de filtre » : c'est la file de ce qui
+        // reste à soumettre au modèle, et elle doit pouvoir être demandée explicitement.
+        ...(filtres.avisIa ? { avisIa: filtres.avisIa === 'AUCUN' ? null : filtres.avisIa } : {}),
       },
       orderBy: [{ debut: 'asc' }, { titre: 'asc' }],
     }),

@@ -32,12 +32,35 @@ model CandidatEvenement {
   verdict   VerdictCandidat @default(A_EXAMINER)
   verdictLe DateTime?
 
+  // ──────────────────────────────────────────────────────────────────────────────────────────
+  // L'avis de la classification automatique — DANS SES PROPRES CHAMPS.
+  //
+  // ⚠️ Il ne touche JAMAIS `verdict`, et c'est l'invariant de tout le module. Écrire l'avis de
+  // l'IA dans le verdict humain laisserait une relance automatique écraser une décision prise à
+  // la main : un refus reviendrait au balayage suivant, soit exactement ce que la fonctionnalité
+  // existe pour empêcher.
+  //
+  // 📍 L'avis TRIE, il ne MASQUE pas. Un candidat qu'elle juge hors sujet reste `A_EXAMINER` et
+  // reste atteignable par un filtre dédié : une convention mal classée doit rester rattrapable,
+  // sans quoi la classification ferait disparaître du travail en silence.
+  avisIa   AvisIa?
+  avisIaLe DateTime?
+
+  // Ce que le modèle a répondu pour justifier son avis, tel quel.
+  //
+  // Ce n'est pas de la décoration : c'est ce qui permet de juger un faux négatif sans rouvrir la
+  // page d'origine. Un avis sans motif oblige à tout revérifier, donc annule le gain.
+  motifIa String? @db.Text
+
   decouvertLe DateTime @default(now())
   majLe       DateTime @updatedAt
 
   // Par source et par verdict : ce que l'écran filtre. Et par date de début pour l'ordre d'affichage.
   @@index([source, verdict])
   @@index([verdict, debut])
+  // Les candidats que l'IA n'a pas encore vus, qui sont précisément ceux qu'un balayage doit
+  // prendre : `avisIa IS NULL` combiné au verdict humain.
+  @@index([verdict, avisIa])
 }
 
 // ⚠️ PAS de valeur « déjà importé » ici, et c'est délibéré.
@@ -52,10 +75,26 @@ model CandidatEvenement {
 // dates, lieu — et on laisse le verdict tel quel. C'est exactement ce que « ne pas me le reproposer
 // à chaque fois » demande.
 //
-// Le verdict d'une classification automatique, lui, viendra dans ses propres champs : il doit TRIER
-// sans masquer, pour qu'une convention mal classée reste rattrapable.
+// Le verdict d'une classification automatique vit dans ses propres champs (`avisIa`) : il doit
+// TRIER sans masquer, pour qu'une convention mal classée reste rattrapable.
 enum VerdictCandidat {
   A_EXAMINER // Vu, pas encore jugé
   CONVENTION // Retenu : à importer
   REFUSE // Écarté par un humain, définitivement
+}
+
+// L'avis de la classification automatique. Un AVIS, pas une décision.
+//
+// ⚠️ `INCERTAIN` n'est pas une commodité, c'est le cœur du dispositif. Sans lui, le modèle est
+// forcé de trancher sur un titre ambigu — « Festival des Arts du Cirque », qui peut être une
+// convention de jonglerie comme un spectacle de rue — et il tranchera, avec aplomb. Une troisième
+// valeur rend le doute LISIBLE, et c'est elle qu'un humain va regarder en premier.
+//
+// 📍 L'absence de valeur (`NULL`) veut dire « pas encore soumis au modèle », et ne se confond donc
+// avec aucun avis. C'est ce qui permet à un balayage de reprendre où il s'est arrêté sans
+// repasser — et sans refacturer — ce qu'il a déjà vu.
+enum AvisIa {
+  CONVENTION // Le modèle y voit une convention de jonglerie
+  HORS_SUJET // Le modèle n'y voit pas une convention de jonglerie
+  INCERTAIN // Le modèle ne tranche pas : à regarder en premier
 }
