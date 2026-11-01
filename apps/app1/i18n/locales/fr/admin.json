@@ -887,17 +887,34 @@
       "description": "Les événements repérés sur des agendas extérieurs, à trancher avant import. Un refus est définitif : un balayage ultérieur ne le repropose pas.",
       "empty": "Aucun candidat pour ces filtres",
       "error": {
+        "classify": "Impossible de lancer la classification",
+        "classify_partial": "{classes} classé(s), {echecs} en échec : {erreur}",
         "load": "Impossible de charger les candidats",
         "refresh": "Impossible de relire les agendas",
         "refresh_partial": "Source(s) illisible(s) : {sources}. Leur absence de nouveautés ne signifie pas qu’elles n’ont plus d’événements.",
         "verdict_partial": "{reussis} verdict(s) enregistré(s), {echecs} en échec"
       },
       "filter": {
+        "ai_opinion": "Avis de l’IA",
         "all_countries": "Tous les pays",
+        "all_opinions": "Tous les avis",
         "all_sources": "Toutes les sources",
         "country": "Pays",
         "hide_imported": "Masquer les déjà importés",
         "source": "Source"
+      },
+      "ia": {
+        "classified": "{count} candidat(s) classé(s) par l’IA",
+        "classify": "Classer par l’IA",
+        "classify_hint": "Soumet {lot} candidat(s) au modèle, un appel par événement. {restants} restent à classer — relancez autant de fois que nécessaire.",
+        "nothing_to_classify": "Tous les candidats à examiner ont déjà un avis du modèle",
+        "opinion": {
+          "AUCUN": "Pas encore classé",
+          "CONVENTION": "IA : convention",
+          "HORS_SUJET": "IA : hors sujet",
+          "INCERTAIN": "IA : incertain"
+        },
+        "unreadable": "{classes} classé(s), {illisibles} réponse(s) illisible(s) — rien n’a été écrit pour celles-là"
       },
       "import_one": "Importer cette convention",
       "open_source": "Voir sur l'agenda",

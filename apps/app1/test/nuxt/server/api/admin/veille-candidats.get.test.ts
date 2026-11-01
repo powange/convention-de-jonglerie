@@ -64,6 +64,9 @@ describe('GET /api/admin/veille/candidats', () => {
     mockRequireAdmin.mockResolvedValue({ id: 1, isGlobalAdmin: true })
     prismaMock.candidatEvenement.findMany.mockResolvedValue([])
     prismaMock.candidatEvenement.groupBy.mockResolvedValue([])
+    // Les comptes par avis : `AUCUN` est compté à part, `groupBy` ne rendant pas de ligne pour
+    // les `NULL` sur tous les moteurs.
+    prismaMock.candidatEvenement.count.mockResolvedValue(0)
     prismaMock.edition.findMany.mockResolvedValue([])
   })
 
@@ -161,6 +164,39 @@ describe('GET /api/admin/veille/candidats', () => {
     const resultat = await appeler()
 
     expect(resultat.data.sources.map((s: any) => s.cle)).toContain('jugglingedge')
+  })
+
+  it('⚠️ traduit `avisIa=AUCUN` en `null`, et non en « pas de filtre »', async () => {
+    /*
+     * LE cas du lot de classification. `AUCUN` désigne la file des candidats que le modèle n'a pas
+     * encore vus — donc le travail qui reste. S'il était confondu avec l'absence de filtre, la
+     * requête partirait sans contrainte et l'écran afficherait TOUT : la file des non classés
+     * deviendrait inatteignable, donc le reste à faire invisible. Aucune erreur, aucun test rouge.
+     */
+    await appeler({ avisIa: 'AUCUN' })
+
+    const where = prismaMock.candidatEvenement.findMany.mock.calls[0][0].where
+    expect(where).toHaveProperty('avisIa', null)
+  })
+
+  it('📍 filtre sur un avis nommé, et ignore un avis inventé', async () => {
+    /*
+     * Même règle que pour les verdicts : une valeur inconnue ne filtre pas, plutôt que de rendre
+     * une liste vide qu'on prendrait pour « il n'y a rien ».
+     */
+    await appeler({ avisIa: 'HORS_SUJET' })
+    expect(prismaMock.candidatEvenement.findMany.mock.calls[0][0].where.avisIa).toBe('HORS_SUJET')
+
+    vi.clearAllMocks()
+    prismaMock.candidatEvenement.findMany.mockResolvedValue([])
+    prismaMock.candidatEvenement.groupBy.mockResolvedValue([])
+    prismaMock.candidatEvenement.count.mockResolvedValue(0)
+    prismaMock.edition.findMany.mockResolvedValue([])
+
+    await appeler({ avisIa: 'TOTALEMENT_INVENTE' })
+    expect(prismaMock.candidatEvenement.findMany.mock.calls[0][0].where).not.toHaveProperty(
+      'avisIa'
+    )
   })
 
   it('📍 compte par verdict sur TOUTE la table, sans les filtres', async () => {

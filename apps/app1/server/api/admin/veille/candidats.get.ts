@@ -54,6 +54,26 @@ export default wrapApiHandler(
       _count: { _all: true },
     })
 
+    /*
+     * Les comptes par avis de modèle, pris de la même façon : sur toute la table, sans les filtres.
+     *
+     * ⚠️ Restreints à `verdict: A_EXAMINER`, et c'est délibéré : l'avis ne sert à trier que ce qui
+     * n'est pas encore tranché. Compter les avis sur des candidats déjà retenus ou refusés par un
+     * humain gonflerait les nombres avec du travail déjà fait, et le « reste à classer » affiché
+     * serait faux.
+     *
+     * 📍 `groupBy` ne rend AUCUNE ligne pour les `NULL` de `avisIa` sur certains moteurs, et c'est
+     * précisément la file des non classés — la plus utile. Elle est donc comptée à part.
+     */
+    const [parAvis, sansAvis] = await Promise.all([
+      prisma.candidatEvenement.groupBy({
+        by: ['avisIa'],
+        where: { verdict: 'A_EXAMINER' },
+        _count: { _all: true },
+      }),
+      prisma.candidatEvenement.count({ where: { verdict: 'A_EXAMINER', avisIa: null } }),
+    ])
+
     return createSuccessResponse({
       candidats,
       // Toutes les sources déclarées, même celles qui n'ont encore rien rapporté : leur absence
@@ -79,6 +99,14 @@ export default wrapApiHandler(
       comptes: Object.fromEntries(
         VERDICTS.map((v) => [v, parVerdict.find((ligne) => ligne.verdict === v)?._count._all ?? 0])
       ),
+      comptesAvis: {
+        CONVENTION: parAvis.find((l) => l.avisIa === 'CONVENTION')?._count._all ?? 0,
+        HORS_SUJET: parAvis.find((l) => l.avisIa === 'HORS_SUJET')?._count._all ?? 0,
+        INCERTAIN: parAvis.find((l) => l.avisIa === 'INCERTAIN')?._count._all ?? 0,
+        // Ce qui reste à soumettre au modèle. C'est le seul de ces quatre nombres sur lequel
+        // l'opérateur peut agir, d'où son comptage à part plutôt qu'au travers du `groupBy`.
+        AUCUN: sansAvis,
+      },
     })
   },
   { operationName: 'ListerCandidatsVeille' }
