@@ -7,6 +7,14 @@ import { SOURCES } from '#server/utils/veille-sources'
 const VERDICTS: readonly Verdict[] = ['A_EXAMINER', 'CONVENTION', 'REFUSE']
 
 /**
+ * Les avis de modèle acceptés en filtre, plus `AUCUN` pour ceux qu'il n'a pas encore vus.
+ *
+ * ⚠️ `AUCUN` doit être une valeur à part entière : c'est la file de ce qui reste à soumettre, et
+ * la confondre avec « pas de filtre » rendrait le reste à faire invisible depuis l'écran.
+ */
+const AVIS: readonly string[] = ['CONVENTION', 'HORS_SUJET', 'INCERTAIN', 'AUCUN']
+
+/**
  * Les candidats de la veille, pour l'écran d'administration.
  *
  * Rend aussi de quoi peupler les filtres — sources déclarées, pays rencontrés, comptes par verdict.
@@ -23,8 +31,14 @@ export default wrapApiHandler(
       ? (verdictDemande as Verdict)
       : undefined
 
+    const avisDemande = String(requete.avisIa ?? '')
+    const avisIa = AVIS.includes(avisDemande)
+      ? (avisDemande as 'CONVENTION' | 'HORS_SUJET' | 'INCERTAIN' | 'AUCUN')
+      : undefined
+
     const candidats = await listerCandidats({
       verdict,
+      avisIa,
       source: requete.source ? String(requete.source) : undefined,
       pays: requete.pays ? String(requete.pays) : undefined,
       masquerImportes: requete.masquerImportes === 'true',
