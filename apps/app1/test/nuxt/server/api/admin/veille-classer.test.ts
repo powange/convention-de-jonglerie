@@ -48,7 +48,7 @@ describe('POST /api/admin/veille/classer', () => {
     const resultat = await appeler({})
 
     expect(mockClasser).toHaveBeenCalledTimes(1)
-    expect(mockClasser.mock.calls[0][0]).toBe(20)
+    expect(mockClasser.mock.calls[0]![0]).toBe(20)
     expect(resultat.data.bilan).toEqual(BILAN)
   })
 
@@ -85,7 +85,7 @@ describe('POST /api/admin/veille/classer', () => {
 
     expect(mockConfig).toHaveBeenCalledTimes(2)
     // Et la config lue est bien celle passée au moteur, pas un objet reconstruit au passage.
-    expect(mockClasser.mock.calls[0][1]).toMatchObject({ aiProvider: 'anthropic' })
+    expect(mockClasser.mock.calls[0]![1]).toMatchObject({ aiProvider: 'anthropic' })
   })
 
   it('refuse un visiteur qui n’est pas administrateur global', async () => {

@@ -113,7 +113,7 @@ describe('classerUnCandidat', () => {
 
     await classerUnCandidat(candidat(), {})
 
-    const promptUtilisateur = modele.repondre.mock.calls[0][1] as string
+    const promptUtilisateur = modele.repondre.mock.calls[0]![1] as string
     expect(promptUtilisateur).toContain('Allemagne')
     expect(promptUtilisateur).toContain('3 jour')
     expect(promptUtilisateur).toContain('Jonglierfestival Freiburg')
