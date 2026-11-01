@@ -1,3 +1,5 @@
+import { cleDeRapprochement } from './veille-sources'
+
 import type { CandidatExterne } from './sources-evenements'
 
 /**
@@ -91,4 +93,102 @@ export async function poserVerdict(url: string, verdict: Verdict): Promise<void>
     where: { url },
     data: { verdict, verdictLe: new Date() },
   })
+}
+
+/**
+ * Les clés de rapprochement des événements DÉJÀ importés, lues sur les éditions existantes.
+ *
+ * ## ⚠️ Pourquoi un ensemble de clés et non une comparaison d'URL
+ *
+ * MESURÉ : les éditions importées depuis JugglingEdge portent leur URL d'origine sur `www.` ou
+ * `fr.`, là où l'énumération de l'agenda canonicalise sans sous-domaine. Trois écritures pour un
+ * même événement — une comparaison de chaînes n'en apparierait aucune, et l'écran reproposerait
+ * indéfiniment ce qui est déjà en base. Le rapprochement passe donc par la clé que chaque source
+ * sait calculer (voir `veille-sources.ts`).
+ *
+ * 📍 Les TROIS champs d'origine sont lus, pas seulement `jugglingEdgeUrl` : une convention a pu
+ * être importée depuis son événement Facebook ou son site officiel, et l'agenda peut la lister
+ * quand même. Ne regarder qu'un champ reviendrait à la reproposer.
+ */
+export async function clesDesEvenementsImportes(): Promise<Set<string>> {
+  const editions = await prisma.edition.findMany({
+    where: {
+      OR: [
+        { jugglingEdgeUrl: { not: null } },
+        { facebookUrl: { not: null } },
+        { officialWebsiteUrl: { not: null } },
+      ],
+    },
+    select: { jugglingEdgeUrl: true, facebookUrl: true, officialWebsiteUrl: true },
+  })
+
+  const cles = new Set<string>()
+  for (const edition of editions) {
+    for (const url of [edition.jugglingEdgeUrl, edition.facebookUrl, edition.officialWebsiteUrl]) {
+      if (!url) continue
+      const cle = cleDeRapprochement(url)
+      if (cle) cles.add(cle)
+    }
+  }
+  return cles
+}
+
+/** Un candidat tel que l'écran le reçoit : ce qu'on a rangé, plus ce qui se calcule. */
+export interface CandidatPourEcran {
+  id: number
+  source: string
+  url: string
+  titre: string
+  debut: Date | null
+  jours: number | null
+  pays: string | null
+  lieu: string | null
+  adresse: string | null
+  verdict: Verdict
+  verdictLe: Date | null
+  decouvertLe: Date
+  /** Calculé, jamais rangé : voir l'énumération `VerdictCandidat` du schéma. */
+  dejaImporte: boolean
+}
+
+/** Les filtres que l'écran applique. Une valeur absente ne filtre pas. */
+export interface FiltresCandidats {
+  verdict?: Verdict
+  source?: string
+  pays?: string
+  /** Masquer ceux dont une édition existe déjà. Appliqué APRÈS la base, le calcul n'y vivant pas. */
+  masquerImportes?: boolean
+}
+
+/**
+ * Liste les candidats, en marquant ceux dont une édition existe déjà.
+ *
+ * ⚠️ `dejaImporte` se CALCULE à chaque appel, et n'est pas rangé en base. Le ranger obligerait à le
+ * tenir à jour, et il se périmerait au premier import fait depuis un autre écran — une donnée
+ * fausse mais plausible, qu'aucune alerte ne signalerait.
+ */
+export async function listerCandidats(
+  filtres: FiltresCandidats = {}
+): Promise<CandidatPourEcran[]> {
+  const [rangees, importees] = await Promise.all([
+    prisma.candidatEvenement.findMany({
+      where: {
+        ...(filtres.verdict ? { verdict: filtres.verdict } : {}),
+        ...(filtres.source ? { source: filtres.source } : {}),
+        ...(filtres.pays ? { pays: filtres.pays } : {}),
+      },
+      orderBy: [{ debut: 'asc' }, { titre: 'asc' }],
+    }),
+    clesDesEvenementsImportes(),
+  ])
+
+  const enrichis = rangees.map((candidat) => ({
+    ...candidat,
+    dejaImporte: (() => {
+      const cle = cleDeRapprochement(candidat.url)
+      return cle ? importees.has(cle) : false
+    })(),
+  })) as CandidatPourEcran[]
+
+  return filtres.masquerImportes ? enrichis.filter((c) => !c.dejaImporte) : enrichis
 }
