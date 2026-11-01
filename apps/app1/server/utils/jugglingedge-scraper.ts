@@ -829,6 +829,32 @@ export async function listerEvenementsJugglingEdge(): Promise<CandidatExterne[]>
   }
 }
 
+/**
+ * Ramène les écritures d'une même URL JugglingEdge à une clé commune.
+ *
+ * ⚠️ MESURÉ sur les onze éditions déjà importées : elles portent `www.jugglingedge.com` ou
+ * `fr.jugglingedge.com`, là où l'énumération de l'agenda canonicalise sur `jugglingedge.com`. Trois
+ * écritures, un seul événement — et c'est l'`EventID` qui l'identifie, pas l'hôte.
+ *
+ * On accepte donc TOUT sous-domaine de `jugglingedge.com` : chez cette source, ils ne servent qu'à
+ * choisir la langue de l'interface et désignent la même fiche. Le nom du paramètre est comparé sans
+ * tenir compte de la casse, l'agenda écrivant `EventID` mais rien ne garantissant qu'une URL collée
+ * à la main respecte cette graphie.
+ */
+export function cleDeRapprochementJugglingEdge(url: string): string | null {
+  try {
+    const analysee = new URL(url)
+    if (!/(^|\.)jugglingedge\.com$/i.test(analysee.hostname)) return null
+    if (!analysee.pathname.toLowerCase().includes('event.php')) return null
+    for (const [nom, valeur] of analysee.searchParams) {
+      if (nom.toLowerCase() === 'eventid' && valeur.trim()) return `jugglingedge:${valeur.trim()}`
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
 /** JugglingEdge comme source d'événements. La première ; l'écran n'en suppose aucune en propre. */
 export const sourceJugglingEdge: SourceEvenements = {
   cle: 'jugglingedge',
@@ -836,4 +862,5 @@ export const sourceJugglingEdge: SourceEvenements = {
   urlDeLaListe: JUGGLINGEDGE_URL_LISTE,
   lister: listerEvenementsJugglingEdge,
   reconnaitUrl: isJugglingEdgeEventUrl,
+  cleDeRapprochement: cleDeRapprochementJugglingEdge,
 }

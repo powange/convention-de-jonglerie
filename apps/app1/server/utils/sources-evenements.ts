@@ -61,6 +61,27 @@ export interface SourceEvenements {
   urlDeLaListe: string
   /** Énumère la liste. Rend un tableau vide plutôt que d'échouer sur une page illisible. */
   lister: () => Promise<CandidatExterne[]>
-  /** Reconnaît une de ses URL d'événement — ce qui permet de savoir de quelle source vient une URL. */
   reconnaitUrl: (url: string) => boolean
+  /**
+   * Ramène deux ÉCRITURES de la même URL à une clé commune, pour le rapprochement.
+   *
+   * ## ⚠️ POURQUOI C'EST À LA SOURCE DE LE FAIRE, et pas à une règle générale
+   *
+   * MESURÉ le 1er novembre 2026 sur les onze éditions déjà importées depuis JugglingEdge : elles
+   * stockent leur URL d'origine sur DEUX hôtes — `www.jugglingedge.com` pour la plupart,
+   * `fr.jugglingedge.com` pour au moins deux — tandis que l'énumération de l'agenda canonicalise
+   * sur `jugglingedge.com`, sans sous-domaine. Trois écritures pour le même événement.
+   *
+   * Une comparaison de chaînes n'en apparierait AUCUNE : le calcul « déjà importé » ne trouverait
+   * jamais rien, et l'écran reproposerait indéfiniment des conventions déjà en base — sans qu'aucune
+   * erreur ne le signale.
+   *
+   * Une règle générale du type « retirer un sous-domaine de deux lettres » marcherait ici et
+   * apparierait à tort, ailleurs, deux ressources distinctes — et un faux appariement est le sens
+   * dangereux : il ferait passer pour importé ce qui ne l'est pas, donc disparaître un candidat.
+   * Chaque source sait, elle, ce qui désigne le même événement chez elle.
+   *
+   * Rend `null` quand l'URL ne relève pas de cette source, ou qu'elle n'y est pas identifiable.
+   */
+  cleDeRapprochement: (url: string) => string | null
 }
