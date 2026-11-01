@@ -24,6 +24,9 @@ export const prismaMock = {
   user: createModelMock(),
   passwordResetToken: createModelMock(),
 
+  // Veille des conventions : les candidats repérés dans les agendas extérieurs.
+  candidatEvenement: createModelMock(),
+
   // Modèles principaux
   convention: createModelMock(),
   conventionOrganizer: createModelMock(),

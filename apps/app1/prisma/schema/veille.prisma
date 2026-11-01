@@ -1,0 +1,61 @@
+// Veille des conventions : les événements repérés dans les agendas de sites extérieurs
+// (JugglingEdge en premier), en attente d'un jugement humain avant import.
+//
+// Le contrat d'une source vit dans `server/utils/sources-evenements.ts` ; la table ci-dessous ne
+// range que ce qu'une source a dit et ce qu'un administrateur en a décidé.
+
+model CandidatEvenement {
+  id Int @id @default(autoincrement())
+
+  // La clé de la source qui l'a vu (`SourceEvenements.cle`), p. ex. `jugglingedge`.
+  source String @db.VarChar(40)
+
+  // ⚠️ L'URL CANONIQUE, et la clé de tout le dispositif — d'où l'unicité.
+  //
+  // C'est elle que l'on compare aux éditions déjà importées, et c'est à elle que s'attache le
+  // refus d'un administrateur. Une source qui désignerait le même événement sous deux URL ferait
+  // réapparaître ce qu'on a écarté : les sources doivent donc rendre l'URL que le site donne
+  // lui-même, jamais celle qu'on a suivie pour y arriver.
+  url String @unique @db.VarChar(500)
+
+  // Son identifiant chez la source, quand elle en expose un. Pour le journal, pas pour la clé.
+  identifiantSource String? @db.VarChar(60)
+
+  // Ce que la source a dit, sans normalisation : le pays est écrit comme elle l'écrit.
+  titre   String    @db.VarChar(300)
+  debut   DateTime?
+  jours   Int? // Durée annoncée. Indice pour le tri, jamais un verdict.
+  pays    String?   @db.VarChar(120)
+  lieu    String?   @db.VarChar(300)
+  adresse String?   @db.Text
+
+  verdict   VerdictCandidat @default(A_EXAMINER)
+  verdictLe DateTime?
+
+  decouvertLe DateTime @default(now())
+  majLe       DateTime @updatedAt
+
+  // Par source et par verdict : ce que l'écran filtre. Et par date de début pour l'ordre d'affichage.
+  @@index([source, verdict])
+  @@index([verdict, debut])
+}
+
+// ⚠️ PAS de valeur « déjà importé » ici, et c'est délibéré.
+//
+// Qu'un événement soit déjà importé se CALCULE, en comparant son URL aux champs d'origine des
+// éditions (`jugglingEdgeUrl`, `facebookUrl`, `officialWebsiteUrl`). Le ranger comme un verdict
+// obligerait à le tenir à jour, et il se périmerait au premier import fait depuis un autre écran —
+// une donnée fausse mais plausible, qu'aucune alerte ne signalerait.
+//
+// 📍 `REFUSE` est le verdict d'un HUMAIN, et il est définitif : l'énumération d'une source ne doit
+// jamais le réécrire. Quand un agenda re-liste un événement, on met à jour ce qu'il décrit — titre,
+// dates, lieu — et on laisse le verdict tel quel. C'est exactement ce que « ne pas me le reproposer
+// à chaque fois » demande.
+//
+// Le verdict d'une classification automatique, lui, viendra dans ses propres champs : il doit TRIER
+// sans masquer, pour qu'une convention mal classée reste rattrapable.
+enum VerdictCandidat {
+  A_EXAMINER // Vu, pas encore jugé
+  CONVENTION // Retenu : à importer
+  REFUSE // Écarté par un humain, définitivement
+}
