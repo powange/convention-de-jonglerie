@@ -101,6 +101,20 @@ vi.stubGlobal('$fetch', fetchBouchon)
 
 const page = () => import('../../../app/pages/admin/veille.vue').then((m) => m.default)
 
+/**
+ * Monte la page, `UTooltip` neutralisé.
+ *
+ * ⚠️ `UTooltip` réclame un `TooltipProviderContext`, que `UApp` fournit en vrai mais qu'un montage
+ * isolé n'a pas : sans ce bouchon, chaque infobulle lève `Injection Symbol(TooltipProviderContext)
+ * not found` — cinq erreurs NON GÉRÉES qui font échouer le fichier entier, y compris les cas qui
+ * n'ont rien à voir. Le bouchon est un passe-plat : le bouton qu'il contient reste rendu et
+ * cliquable, et l'infobulle n'est pas ce que ces cas éprouvent.
+ */
+const monter = async () =>
+  mountSuspended(await page(), {
+    global: { stubs: { UTooltip: { template: '<div><slot /></div>' } } },
+  })
+
 describe('Page /admin/veille', () => {
   beforeEach(() => {
     appels.liste = []
@@ -115,7 +129,7 @@ describe('Page /admin/veille', () => {
      * cas resteraient verts. Et le filtre de départ compte : arriver sur « refusés » mettrait
      * sous les yeux la pile où il n'y a rien à faire.
      */
-    await mountSuspended(await page())
+    await monter()
 
     const chargement = appels.liste.find((appel) => appel.url.includes('/candidats'))
     expect(chargement).toBeDefined()
@@ -123,7 +137,7 @@ describe('Page /admin/veille', () => {
   })
 
   it('⚠️ affiche les compteurs RENDUS PAR L’API, et non la longueur de la liste', async () => {
-    const wrapper = await mountSuspended(await page())
+    const wrapper = await monter()
 
     const compteurs = wrapper.findAll('.text-2xl').map((noeud) => noeud.text())
     expect(compteurs).toEqual(['12', '3', '40'])
@@ -137,19 +151,23 @@ describe('Page /admin/veille', () => {
      * posée, échoue ici. Le sens « partout » est le dangereux — il fait disparaître du travail
      * derrière le filtre de masquage.
      */
-    const wrapper = await mountSuspended(await page())
+    const wrapper = await monter()
 
-    const html = wrapper.html()
-    const pastilles = html.split('check-badge').length - 1
-    expect(pastilles).toBe(1)
+    /*
+     * Visé par ATTRIBUT et non par nom d'icône : `check-badge` n'apparaît pas tel quel dans le
+     * HTML rendu, et un compte à zéro se lisait alors comme « aucune pastille » — un faux
+     * négatif qui aurait fait corriger la page au lieu du test.
+     */
+    expect(wrapper.findAll('[data-deja-importe]')).toHaveLength(1)
   })
 
   it('📍 recharge avec le verdict de l’onglet choisi', async () => {
-    const wrapper = await mountSuspended(await page())
+    const wrapper = await monter()
     appels.liste = []
 
-    // La troisième carte est l'onglet « refusés ».
-    await wrapper.findAll('.cursor-pointer')[2]!.trigger('click')
+    // Visé par IDENTITÉ et non par position : `.cursor-pointer[2]` désignait un autre élément,
+    // et un index survit à un réagencement du gabarit sans que rien ne le signale.
+    await wrapper.find('[data-onglet="REFUSE"]').trigger('click')
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     const rechargement = appels.liste.find((appel) => appel.url.includes('/candidats'))

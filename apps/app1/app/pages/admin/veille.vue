@@ -51,6 +51,7 @@
       <UCard
         v-for="onglet in onglets"
         :key="onglet.verdict"
+        :data-onglet="onglet.verdict"
         class="cursor-pointer transition-shadow hover:shadow-lg"
         :class="filtres.verdict === onglet.verdict ? 'ring-2 ring-primary-500' : 'ring-0'"
         @click="choisirOnglet(onglet.verdict)"
@@ -170,8 +171,11 @@
                     variant="soft"
                     :label="t(`admin.veille.verdict_label.${candidat.verdict}`)"
                   />
+                  <!-- `data-deja-importe` : de quoi viser cette pastille par IDENTITÉ et non par
+                       position ou par nom d'icône, qui changent sans prévenir. -->
                   <UBadge
                     v-if="candidat.dejaImporte"
+                    data-deja-importe="true"
                     color="info"
                     variant="subtle"
                     icon="i-heroicons-check-badge"
@@ -313,12 +317,26 @@ const paysRencontres = ref<string[]>([])
 const comptes = ref<Record<Verdict, number>>({ A_EXAMINER: 0, CONVENTION: 0, REFUSE: 0 })
 const selection = ref<string[]>([])
 
+/**
+ * La valeur de l'entrée « tous » des deux filtres.
+ *
+ * ⚠️ PAS la chaîne vide. Reka UI, sous `USelect`, la REFUSE comme valeur d'option — elle est
+ * réservée à l'effacement de la sélection, qui fait réapparaître le `placeholder` :
+ *
+ *     A <SelectItem /> must have a value prop that is not an empty string.
+ *
+ * Et ce n'est pas une broutille de test : l'erreur est levée pendant le `setup` de l'item, donc
+ * elle emportait le RENDU de la page. Ni le lint, ni le typage, ni la suite unitaire ne la
+ * voyaient — seul le test de page l'a attrapée.
+ */
+const TOUS = '*'
+
 const filtres = reactive({
   // On arrive sur ce qui demande une décision : c'est le seul onglet où il y a quelque chose à
   // faire, et les deux autres servent à revenir sur un verdict.
   verdict: 'A_EXAMINER' as Verdict,
-  source: '',
-  pays: '',
+  source: TOUS,
+  pays: TOUS,
   masquerImportes: false,
 })
 
@@ -344,12 +362,12 @@ const onglets = computed(() => [
 ])
 
 const choixDeSource = computed(() => [
-  { value: '', label: t('admin.veille.filter.all_sources') },
+  { value: TOUS, label: t('admin.veille.filter.all_sources') },
   ...sources.value.map((source) => ({ value: source.cle, label: source.nom })),
 ])
 
 const choixDePays = computed(() => [
-  { value: '', label: t('admin.veille.filter.all_countries') },
+  { value: TOUS, label: t('admin.veille.filter.all_countries') },
   ...paysRencontres.value.map((pays) => ({ value: pays, label: pays })),
 ])
 
@@ -374,8 +392,10 @@ const { execute: charger, loading: chargement } = useApiAction('/api/admin/veill
   method: 'GET',
   query: () => ({
     verdict: filtres.verdict,
-    ...(filtres.source ? { source: filtres.source } : {}),
-    ...(filtres.pays ? { pays: filtres.pays } : {}),
+    // Comparer à `TOUS` et non tester la véracité : la sentinelle est une chaîne non vide, donc
+    // vraie — on enverrait `source=*`, que le serveur refuserait en 400 comme source inconnue.
+    ...(filtres.source !== TOUS ? { source: filtres.source } : {}),
+    ...(filtres.pays !== TOUS ? { pays: filtres.pays } : {}),
     ...(filtres.masquerImportes ? { masquerImportes: 'true' } : {}),
   }),
   errorMessages: { default: t('admin.veille.error.load') },
@@ -458,7 +478,9 @@ const { execute: lancerRafraichissement, loading: rafraichissement } = useApiAct
   '/api/admin/veille/rafraichir',
   {
     method: 'POST',
-    body: () => (filtres.source ? { source: filtres.source } : {}),
+    // Même raison qu'au chargement : `TOUS` est une chaîne non vide, donc vraie. Sans cette
+    // comparaison, on demanderait à relire la source `*`, que le serveur refuse en 400.
+    body: () => (filtres.source !== TOUS ? { source: filtres.source } : {}),
     silentSuccess: true, // Le compte rendu nomme les sources en échec, ce qu'un toast générique perdrait
     errorMessages: { default: t('admin.veille.error.refresh') },
     onSuccess: (reponse: any) => {
