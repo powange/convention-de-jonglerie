@@ -591,12 +591,19 @@ const { execute: charger, loading: chargement } = useApiAction('/api/admin/veill
     ...(filtres.masquerImportes ? { masquerImportes: 'true' } : {}),
   }),
   errorMessages: { default: t('admin.veille.error.load') },
+  /*
+   * ⚠️ PAS de `reponse.data.…` ici. `useApiAction` DÉBALLE la réponse avant de la passer :
+   * `unwrapApiResponse` reconnaît la forme `{ success: true, data }` que rend
+   * `createSuccessResponse`, et ne remet que le contenu de `data`. Lire `reponse.data` donnait
+   * donc `undefined`, et l'accès suivant levait — dans le `try` de `useApiAction`, donc le toast
+   * affiché était « Impossible de charger les candidats » ALORS QUE L'API AVAIT RÉPONDU.
+   */
   onSuccess: (reponse: any) => {
-    candidats.value = reponse.data.candidats
-    sources.value = reponse.data.sources
-    paysRencontres.value = reponse.data.pays
-    comptes.value = reponse.data.comptes
-    comptesAvis.value = reponse.data.comptesAvis
+    candidats.value = reponse.candidats
+    sources.value = reponse.sources
+    paysRencontres.value = reponse.pays
+    comptes.value = reponse.comptes
+    comptesAvis.value = reponse.comptesAvis
     // Une sélection qui survit à un rechargement désignerait des lignes absentes de l'écran, et
     // un verdict groupé porterait alors sur ce que l'opérateur ne voit plus.
     selection.value = []
@@ -677,8 +684,9 @@ const { execute: lancerRafraichissement, loading: rafraichissement } = useApiAct
     silentSuccess: true, // Le compte rendu nomme les sources en échec, ce qu'un toast générique perdrait
     errorMessages: { default: t('admin.veille.error.refresh') },
     onSuccess: (reponse: any) => {
+      // Déjà déballé par `useApiAction` : voir la note du chargement ci-dessus.
       const bilans: { source: string; lus: number; nouveaux: number; erreur: string | null }[] =
-        reponse.data.bilans
+        reponse.bilans
       const enEchec = bilans.filter((bilan) => bilan.erreur)
       const nouveaux = bilans.reduce((total, bilan) => total + bilan.nouveaux, 0)
 
@@ -714,7 +722,8 @@ const { execute: lancerClassement, loading: classementEnCours } = useApiAction(
     silentSuccess: true, // Le compte rendu distingue trois issues, qu'un toast générique perdrait
     errorMessages: { default: t('admin.veille.error.classify') },
     onSuccess: (reponse: any) => {
-      const bilan = reponse.data.bilan as {
+      // Déjà déballé par `useApiAction` : voir la note du chargement.
+      const bilan = reponse.bilan as {
         soumis: number
         classes: number
         illisibles: number
