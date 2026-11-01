@@ -303,9 +303,13 @@
                 </div>
               </div>
 
-              <!-- shrink-0 : sans lui ce bloc se fait comprimer par le texte de gauche et les
-                   boutons se chevauchent. -->
-              <div class="flex flex-col gap-2 shrink-0">
+              <!-- Les quatre actions EN LIGNE.
+                   `shrink-0` : sans lui ce bloc se fait comprimer par le texte de gauche et les
+                   boutons se chevauchent.
+                   `flex-wrap` + `justify-end` : quatre boutons côte à côte tiennent au large, mais
+                   pas sur un téléphone étroit — ils passent alors sur deux rangs plutôt que de
+                   pousser la ligne au-delà de l'écran. -->
+              <div class="flex flex-row flex-wrap justify-end gap-2 shrink-0">
                 <!-- `data-importer` : visé par identité dans les tests, comme les autres repères
                      de cet écran. Un lien et non un bouton : la cible est une autre page, donc
                      ouvrable dans un nouvel onglet par un clic du milieu. -->
