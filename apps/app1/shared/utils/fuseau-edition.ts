@@ -63,8 +63,45 @@ export const versInstant = (dateHeureLocale: string, fuseau?: string | null): st
   //
   // Une heure inexistante — 2 h 30 la nuit où l'on passe de 2 h à 3 h — n'entre pas dans ce cas :
   // luxon la reporte après le saut plutôt que de la refuser, ce qui est le comportement voulu.
-  // La nuit inverse, où la même heure survient deux fois, retient la première.
-  return dt.isValid ? dt.toUTC().toISO()! : ''
+  if (!dt.isValid) return ''
+  return premiereDesHeuresDoublees(dt).toUTC().toISO()!
+}
+
+/**
+ * La nuit où l'on repasse de 3 h à 2 h, « 2 h 30 » survient DEUX fois. On retient la première.
+ *
+ * ## ⚠️ POURQUOI CE CHOIX EST ÉCRIT ICI, et non laissé à luxon
+ *
+ * Il l'était : le commentaire de `versInstant` affirmait « retient la première », mais rien ne
+ * l'implémentait — on faisait confiance à la façon dont luxon tranche l'ambiguïté. Or **cette
+ * façon a changé sous nos pieds**. La CI de ce dépôt était verte le 19 octobre 2026 sur ce même
+ * commit ; elle est rouge depuis, pour un résultat passé de la première à la seconde occurrence,
+ * sans qu'aucune ligne de code, ni luxon (3.7.2, conforme au verrouillage), ni la version de Node
+ * (mesuré sur 24.21.0, 24.22.0 et 24.22.1 : les trois rendent la seconde), ni le fuseau de la
+ * machine (identique sous quatre fuseaux) n'aient bougé. **La cause du basculement n'a pas été
+ * trouvée** — et c'est précisément pour cela que le choix ne doit plus en dépendre : ce qui a
+ * basculé une fois peut rebasculer, et un test qui dépend d'une bibliothèque tierce pour une
+ * décision métier n'est pas un test de notre décision.
+ *
+ * Conséquence concrète du basculement, tant qu'il durait : un créneau de bénévole saisi à 2 h 30
+ * cette nuit-là était enregistré **une heure plus tard** que ce que le code annonçait.
+ *
+ * ## Comment
+ *
+ * Les deux occurrences diffèrent de l'écart d'offset. Reculer d'une heure depuis l'instant rendu
+ * par luxon : si la lecture locale est INCHANGÉE, c'est qu'on était sur la seconde occurrence et
+ * qu'on vient de trouver la première. Sinon, l'heure n'était pas doublée et on ne touche à rien.
+ *
+ * ⚠️ Ce raisonnement suppose un écart d'UNE heure, ce qui couvre l'Europe, l'Amérique du Nord et
+ * la quasi-totalité des fuseaux. Les rares zones à décalage d'une demi-heure (Lord Howe, +30 min)
+ * ne sont pas couvertes : on y retombe sur le choix de luxon, faute de pouvoir l'éprouver.
+ */
+const premiereDesHeuresDoublees = (instant: DateTime): DateTime => {
+  const uneHeureAvant = instant.minus({ hours: 1 })
+  const MEME_LECTURE = "yyyy-MM-dd'T'HH:mm"
+  return uneHeureAvant.toFormat(MEME_LECTURE) === instant.toFormat(MEME_LECTURE)
+    ? uneHeureAvant
+    : instant
 }
 
 /**
