@@ -16,18 +16,27 @@ import { CLAUDE_MODELS } from './anthropic'
  * donc réelle et connue, pas oubliée.
  */
 
-/** La configuration telle que `getEffectiveAIConfigAsync()` la rend, réduite à ce qu'un appel texte lit. */
+/**
+ * La configuration telle que `getEffectiveAIConfigAsync()` la rend, réduite à ce qu'un appel texte
+ * lit.
+ *
+ * ⚠️ `| null` sur chaque champ, et ce n'est pas de la permissivité : la configuration vient de la
+ * base, où une valeur non renseignée est `null` et non `undefined`. Déclarer `string | undefined`
+ * rendait cette interface INCOMPATIBLE avec sa propre source — un TS2345 que le typage de la CI a
+ * attrapé, et que ni le lint ni les tests ne voyaient puisque `null` se comporte comme `undefined`
+ * devant les `||` ci-dessous.
+ */
 export interface ConfigAppelTexte {
-  aiProvider?: string
-  lmstudioBaseUrl?: string
-  lmstudioTextModel?: string
-  lmstudioModel?: string
-  anthropicApiKey?: string
+  aiProvider?: string | null
+  lmstudioBaseUrl?: string | null
+  lmstudioTextModel?: string | null
+  lmstudioModel?: string | null
+  anthropicApiKey?: string | null
   /** Pour fixer le modèle au point d'appel ; voir le défaut ci-dessous. */
-  anthropicModel?: string
-  ollamaBaseUrl?: string
-  ollamaModel?: string
-  llmMaxTokens?: number
+  anthropicModel?: string | null
+  ollamaBaseUrl?: string | null
+  ollamaModel?: string | null
+  llmMaxTokens?: number | null
 }
 
 /**
