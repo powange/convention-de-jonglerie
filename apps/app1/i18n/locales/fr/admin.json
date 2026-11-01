@@ -881,6 +881,51 @@
     "validate_email": "Valider l'email",
     "validate_email_error": "Erreur lors de la validation de l'email",
     "validated_artist_entries": "Entrées artiste validées",
+    "veille": {
+      "already_imported": "Déjà importé",
+      "days": "{count} jour(s)",
+      "description": "Les événements repérés sur des agendas extérieurs, à trancher avant import. Un refus est définitif : un balayage ultérieur ne le repropose pas.",
+      "empty": "Aucun candidat pour ces filtres",
+      "error": {
+        "load": "Impossible de charger les candidats",
+        "refresh": "Impossible de relire les agendas",
+        "refresh_partial": "Source(s) illisible(s) : {sources}. Leur absence de nouveautés ne signifie pas qu’elles n’ont plus d’événements.",
+        "verdict_partial": "{reussis} verdict(s) enregistré(s), {echecs} en échec"
+      },
+      "filter": {
+        "all_countries": "Tous les pays",
+        "all_sources": "Toutes les sources",
+        "country": "Pays",
+        "hide_imported": "Masquer les déjà importés",
+        "source": "Source"
+      },
+      "open_source": "Voir sur l'agenda",
+      "refresh": "Relire les agendas",
+      "selection": {
+        "clear": "Tout désélectionner",
+        "count": "{count} sélectionné(s)"
+      },
+      "stats": {
+        "refused": "Refusés",
+        "retained": "Retenus",
+        "to_review": "À examiner"
+      },
+      "success": {
+        "refresh": "{count} nouveau(x) candidat(s)",
+        "verdict": "{count} verdict(s) enregistré(s)"
+      },
+      "title": "Veille des conventions",
+      "verdict": {
+        "convention": "C'est une convention de jonglerie",
+        "refuse": "Ce n'en est pas une",
+        "reset": "Remettre à examiner"
+      },
+      "verdict_label": {
+        "A_EXAMINER": "À examiner",
+        "CONVENTION": "Retenu",
+        "REFUSE": "Refusé"
+      }
+    },
     "verified": "Vérifié",
     "verified_emails": "Emails vérifiés",
     "very_old_logs_deleted": "Anciens logs supprimés",
