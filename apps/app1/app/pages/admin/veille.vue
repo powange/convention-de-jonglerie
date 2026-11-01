@@ -34,14 +34,39 @@
         </p>
       </div>
 
-      <UButton
-        icon="i-heroicons-arrow-path"
-        :loading="rafraichissement"
-        class="shrink-0"
-        @click="rafraichir()"
-      >
-        {{ t('admin.veille.refresh') }}
-      </UButton>
+      <div class="flex flex-wrap items-center gap-2 shrink-0">
+        <!-- Le nombre de restants vient de l'API, et c'est ce qui rend le bouton honnête : sans
+             lui, on ne saurait pas s'il reste du travail — le nombre de lignes affichées est
+             filtré, donc sans rapport avec la file réelle. -->
+        <UTooltip
+          :text="
+            restantsAClasser > 0
+              ? t('admin.veille.ia.classify_hint', {
+                  restants: restantsAClasser,
+                  lot: LOT_CLASSEMENT,
+                })
+              : t('admin.veille.ia.nothing_to_classify')
+          "
+        >
+          <UButton
+            color="primary"
+            variant="soft"
+            icon="i-heroicons-sparkles"
+            :loading="classementEnCours"
+            :disabled="restantsAClasser === 0"
+            @click="classer()"
+          >
+            {{ t('admin.veille.ia.classify') }}
+            <UBadge v-if="restantsAClasser > 0" color="neutral" variant="subtle" size="sm">
+              {{ restantsAClasser }}
+            </UBadge>
+          </UButton>
+        </UTooltip>
+
+        <UButton icon="i-heroicons-arrow-path" :loading="rafraichissement" @click="rafraichir()">
+          {{ t('admin.veille.refresh') }}
+        </UButton>
+      </div>
     </div>
 
     <!-- Les trois verdicts, qui font aussi office d'onglets. Les comptes viennent de l'API et
@@ -76,6 +101,7 @@
         <UFormField :label="t('admin.veille.filter.source')" class="flex-1">
           <USelect
             v-model="filtres.source"
+            data-filtre="source"
             :items="choixDeSource"
             value-key="value"
             class="w-full"
@@ -86,7 +112,22 @@
         <UFormField :label="t('admin.veille.filter.country')" class="flex-1">
           <USelect
             v-model="filtres.pays"
+            data-filtre="pays"
             :items="choixDePays"
+            value-key="value"
+            class="w-full"
+            @update:model-value="recharger"
+          />
+        </UFormField>
+
+        <!-- Le filtre par avis du modèle. C'est lui qui rend un faux négatif RATTRAPABLE : les
+             candidats que l'IA écarte restent « à examiner », et cette entrée est le chemin pour
+             aller les relire. Sans elle, l'avis masquerait au lieu de trier. -->
+        <UFormField :label="t('admin.veille.filter.ai_opinion')" class="flex-1">
+          <USelect
+            v-model="filtres.avisIa"
+            data-filtre="avisIa"
+            :items="choixDAvis"
             value-key="value"
             class="w-full"
             @update:model-value="recharger"
@@ -194,6 +235,19 @@
                     variant="soft"
                     :label="t(`admin.veille.verdict_label.${candidat.verdict}`)"
                   />
+                  <!-- L'avis du modèle, avec son MOTIF en infobulle. Le motif n'est pas de la
+                       décoration : c'est ce qui permet de juger un faux négatif sans rouvrir la
+                       page d'origine. Un avis sans motif oblige à tout revérifier, donc annule le
+                       gain de la classification. -->
+                  <UTooltip v-if="candidat.avisIa" :text="candidat.motifIa || '—'">
+                    <UBadge
+                      data-avis-ia="true"
+                      :color="couleurDeLAvis(candidat.avisIa)"
+                      variant="outline"
+                      icon="i-heroicons-sparkles"
+                      :label="t(`admin.veille.ia.opinion.${candidat.avisIa}`)"
+                    />
+                  </UTooltip>
                   <!-- `data-deja-importe` : de quoi viser cette pastille par IDENTITÉ et non par
                        position ou par nom d'icône, qui changent sans prévenir. -->
                   <UBadge
@@ -320,6 +374,16 @@ const toast = useToast()
 
 type Verdict = 'A_EXAMINER' | 'CONVENTION' | 'REFUSE'
 
+/** L'avis du modèle. Un AVIS, jamais une décision : il ne remplace pas `verdict`. */
+type AvisIa = 'CONVENTION' | 'HORS_SUJET' | 'INCERTAIN'
+
+/** Le filtre « tous les avis », et celui des candidats que le modèle n'a pas encore vus. */
+const TOUS_AVIS = '*'
+const SANS_AVIS = 'AUCUN'
+
+/** Le nombre de candidats qu'un clic soumet au modèle, aligné sur le défaut du point d'API. */
+const LOT_CLASSEMENT = 20
+
 /**
  * Ce que rend `/api/admin/veille/candidats`. Décrit ici parce que le gabarit lit chaque champ :
  * sans cette forme, les références seraient inférées à `never[]` et la vingtaine d'accès du
@@ -338,6 +402,10 @@ interface CandidatVeille {
   verdict: Verdict
   verdictLe: string | null
   decouvertLe: string
+  /** L'avis du modèle, ou `null` s'il ne l'a pas encore vu. */
+  avisIa: AvisIa | null
+  avisIaLe: string | null
+  motifIa: string | null
   /** Calculé par l'API à chaque appel, jamais rangé en base. */
   dejaImporte: boolean
 }
@@ -352,6 +420,19 @@ const candidats = ref<CandidatVeille[]>([])
 const sources = ref<SourceDeclaree[]>([])
 const paysRencontres = ref<string[]>([])
 const comptes = ref<Record<Verdict, number>>({ A_EXAMINER: 0, CONVENTION: 0, REFUSE: 0 })
+/**
+ * Les comptes par avis, pour le filtre, et `AUCUN` = ce qui reste à soumettre au modèle.
+ *
+ * 📍 Rendus par l'API et pris sur toute la table, restreints aux candidats encore à examiner :
+ * déduits de la liste affichée, ils compteraient ce qu'on a déjà sous les yeux et le « reste à
+ * classer » du bouton serait faux.
+ */
+const comptesAvis = ref<Record<AvisIa | 'AUCUN', number>>({
+  CONVENTION: 0,
+  HORS_SUJET: 0,
+  INCERTAIN: 0,
+  AUCUN: 0,
+})
 const selection = ref<string[]>([])
 
 /**
@@ -374,6 +455,9 @@ const filtres = reactive({
   verdict: 'A_EXAMINER' as Verdict,
   source: TOUS,
   pays: TOUS,
+  // Tous les avis au départ : arriver filtré sur un avis cacherait les candidats que le modèle
+  // n'a pas encore vus, qui sont justement ceux qu'il reste à traiter.
+  avisIa: TOUS_AVIS as AvisIa | typeof TOUS_AVIS | typeof SANS_AVIS,
   masquerImportes: false,
 })
 
@@ -407,6 +491,51 @@ const choixDePays = computed(() => [
   { value: TOUS, label: t('admin.veille.filter.all_countries') },
   ...paysRencontres.value.map((pays) => ({ value: pays, label: pays })),
 ])
+
+/**
+ * Les entrées du filtre par avis du modèle, avec leur compte.
+ *
+ * ⚠️ `SANS_AVIS` est une entrée à PART, et non l'absence de filtre : c'est la file de ce qui reste
+ * à soumettre, et la confondre avec « tous » rendrait le reste à faire inatteignable.
+ *
+ * 📍 `HORS_SUJET` est l'entrée qui rend un faux négatif rattrapable. Les candidats que le modèle
+ * écarte restent « à examiner » ; c'est par là qu'on va les relire. Sans cette entrée, l'avis
+ * masquerait au lieu de trier — et une convention écartée à tort ne serait jamais revue.
+ */
+const choixDAvis = computed(() => [
+  { value: TOUS_AVIS, label: t('admin.veille.filter.all_opinions') },
+  {
+    value: SANS_AVIS,
+    label: `${t('admin.veille.ia.opinion.AUCUN')} (${comptesAvis.value.AUCUN})`,
+  },
+  {
+    value: 'CONVENTION',
+    label: `${t('admin.veille.ia.opinion.CONVENTION')} (${comptesAvis.value.CONVENTION})`,
+  },
+  {
+    value: 'INCERTAIN',
+    label: `${t('admin.veille.ia.opinion.INCERTAIN')} (${comptesAvis.value.INCERTAIN})`,
+  },
+  {
+    value: 'HORS_SUJET',
+    label: `${t('admin.veille.ia.opinion.HORS_SUJET')} (${comptesAvis.value.HORS_SUJET})`,
+  },
+])
+
+/** Ce qui reste à soumettre au modèle, parmi les candidats encore à examiner. */
+const restantsAClasser = computed(() => comptesAvis.value.AUCUN)
+
+function couleurDeLAvis(avis: AvisIa) {
+  // Même forme que `couleurDuVerdict` : sans annotation, TypeScript infère l'union de littéraux
+  // qu'attend `UBadge`, et la typer `Record<string, string>` casserait le contrôle.
+  const couleurs = {
+    CONVENTION: 'success',
+    HORS_SUJET: 'error',
+    // Ni vert ni rouge : c'est précisément l'avis sur lequel un humain doit se pencher.
+    INCERTAIN: 'warning',
+  } as const
+  return couleurs[avis] ?? 'neutral'
+}
 
 function nomDeLaSource(cle: string) {
   // Une source retirée du registre laisse des candidats derrière elle : afficher sa clé brute
@@ -456,6 +585,9 @@ const { execute: charger, loading: chargement } = useApiAction('/api/admin/veill
     // vraie — on enverrait `source=*`, que le serveur refuserait en 400 comme source inconnue.
     ...(filtres.source !== TOUS ? { source: filtres.source } : {}),
     ...(filtres.pays !== TOUS ? { pays: filtres.pays } : {}),
+    // `SANS_AVIS` part tel quel vers l'API, qui l'accepte comme valeur : « pas de filtre » et
+    // « filtrer sur l'absence d'avis » sont deux demandes différentes.
+    ...(filtres.avisIa !== TOUS_AVIS ? { avisIa: filtres.avisIa } : {}),
     ...(filtres.masquerImportes ? { masquerImportes: 'true' } : {}),
   }),
   errorMessages: { default: t('admin.veille.error.load') },
@@ -464,6 +596,7 @@ const { execute: charger, loading: chargement } = useApiAction('/api/admin/veill
     sources.value = reponse.data.sources
     paysRencontres.value = reponse.data.pays
     comptes.value = reponse.data.comptes
+    comptesAvis.value = reponse.data.comptesAvis
     // Une sélection qui survit à un rechargement désignerait des lignes absentes de l'écran, et
     // un verdict groupé porterait alors sur ce que l'opérateur ne voit plus.
     selection.value = []
@@ -571,6 +704,63 @@ const { execute: lancerRafraichissement, loading: rafraichissement } = useApiAct
 
 function rafraichir() {
   lancerRafraichissement()
+}
+
+const { execute: lancerClassement, loading: classementEnCours } = useApiAction(
+  '/api/admin/veille/classer',
+  {
+    method: 'POST',
+    body: () => ({ limite: LOT_CLASSEMENT }),
+    silentSuccess: true, // Le compte rendu distingue trois issues, qu'un toast générique perdrait
+    errorMessages: { default: t('admin.veille.error.classify') },
+    onSuccess: (reponse: any) => {
+      const bilan = reponse.data.bilan as {
+        soumis: number
+        classes: number
+        illisibles: number
+        echecs: number
+        premiereErreur: string | null
+      }
+
+      /*
+       * Trois issues, trois messages, et c'est voulu : « 0 classé » peut vouloir dire qu'il n'y
+       * avait rien à faire, que le modèle a répondu hors format, ou qu'il n'a pas répondu du tout.
+       * Les confondre enverrait chercher la panne du mauvais côté — ou n'enverrait chercher nulle
+       * part, ce qui est pire.
+       */
+      if (bilan.echecs > 0) {
+        toast.add({
+          title: t('admin.veille.error.classify_partial', {
+            classes: bilan.classes,
+            echecs: bilan.echecs,
+            erreur: bilan.premiereErreur ?? '',
+          }),
+          color: 'warning',
+        })
+      } else if (bilan.illisibles > 0) {
+        toast.add({
+          title: t('admin.veille.ia.unreadable', {
+            classes: bilan.classes,
+            illisibles: bilan.illisibles,
+          }),
+          color: 'warning',
+        })
+      } else {
+        toast.add({
+          title: t('admin.veille.ia.classified', { count: bilan.classes }),
+          color: 'success',
+        })
+      }
+
+      // Recharger dans tous les cas : les avis viennent d'être écrits, et les comptes du filtre
+      // comme le « reste à classer » du bouton en dépendent.
+      charger()
+    },
+  }
+)
+
+function classer() {
+  lancerClassement()
 }
 
 // Au montage, jamais pendant le `setup` : un appel lancé pendant le `setup` interrompt le rendu

@@ -1,5 +1,6 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { nextTick } from 'vue'
 
 /**
  * L'écran de veille des conventions : ce qu'il affiche, et ce qu'il demande au serveur.
@@ -40,6 +41,12 @@ const candidat = (surcharges: Record<string, unknown> = {}) => ({
   verdict: 'A_EXAMINER',
   verdictLe: null,
   decouvertLe: '2026-11-01T00:00:00.000Z',
+  // Le premier candidat porte un avis du modèle, le second non : les deux sens sont ainsi
+  // présents dans le jeu de base, et une pastille posée partout comme une pastille jamais posée
+  // échouent toutes deux.
+  avisIa: 'HORS_SUJET',
+  avisIaLe: '2026-11-01T01:00:00.000Z',
+  motifIa: 'Spectacle de cirque, pas de pratique collective',
   dejaImporte: false,
   ...surcharges,
 })
@@ -49,6 +56,10 @@ const IMPORTE = candidat({
   url: 'https://jugglingedge.com/event.php?EventID=7000',
   titre: 'Déjà en base',
   dejaImporte: true,
+  // Pas encore vu par le modèle.
+  avisIa: null,
+  avisIaLe: null,
+  motifIa: null,
 })
 
 const REPONSE_CANDIDATS = {
@@ -64,6 +75,9 @@ const REPONSE_CANDIDATS = {
     pays: ['Allemagne', 'France'],
     // Volontairement sans rapport avec la longueur de la liste ci-dessus (2).
     comptes: { A_EXAMINER: 12, CONVENTION: 3, REFUSE: 40 },
+    // Volontairement sans rapport avec la liste (2 candidats) ni avec les comptes par verdict :
+    // une confusion entre les trois sources de nombres se verrait.
+    comptesAvis: { CONVENTION: 5, HORS_SUJET: 7, INCERTAIN: 2, AUCUN: 380 },
   },
 }
 
@@ -228,5 +242,40 @@ describe('Page /admin/veille', () => {
     expect(href).not.toContain('&lang=fr')
     // …et l'URL doit se retrouver entière après décodage.
     expect(decodeURIComponent(href)).toContain(AVEC_ET)
+  })
+
+  it('⚠️ n’affiche la pastille d’avis que pour les candidats que le modèle a VUS', async () => {
+    /*
+     * Le jeu de base contient un candidat avec avis et un sans. Une pastille posée partout — par
+     * exemple sur un `v-if` oublié — comme une pastille jamais posée échouent ici.
+     *
+     * Le sens dangereux est celui qui AFFICHE un avis là où il n'y en a pas : l'opérateur
+     * croirait que le modèle a tranché, et ne relancerait jamais la classification sur ce
+     * candidat.
+     */
+    const wrapper = await monter()
+
+    expect(wrapper.findAll('[data-avis-ia]')).toHaveLength(1)
+  })
+
+  /*
+   * 📍 LE CAS « AUCUN » N'EST PAS ICI, ET C'EST DÉLIBÉRÉ.
+   *
+   * Que `AUCUN` vaille « filtrer sur l'absence d'avis » et non « pas de filtre » est une règle qui
+   * vit côté SERVEUR, et elle y est éprouvée (`veille-candidats.get.test.ts`). La piloter d'ici
+   * demanderait de simuler un choix dans un `USelect`, qui ne rend pas de `<select>` natif : trois
+   * tentatives — `findAll('select')`, `setValue`, `$emit` sur le composant trouvé par attribut —
+   * n'ont rien déclenché. Plutôt que de tordre le test jusqu'à ce qu'il passe, la règle est
+   * éprouvée là où elle est écrite.
+   */
+
+  it('📍 le « reste à classer » vient des comptes de l’API, pas de la liste affichée', async () => {
+    /*
+     * 380 restants pour 2 lignes à l'écran : si le bouton comptait les lignes, il annoncerait 2 et
+     * l'opérateur croirait le travail presque fini.
+     */
+    const wrapper = await monter()
+
+    expect(wrapper.html()).toContain('380')
   })
 })
