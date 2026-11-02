@@ -342,6 +342,7 @@ model Edition {
   creator                          User?                         @relation("CreatedEditions", fields: [creatorId], references: [id])
   organizerPermissions             EditionOrganizerPermission[]
   editionPosts                     EditionPost[]
+  analysisSources                  EditionAnalysisSource[]
   lostFoundItems                   LostFoundItem[]
   favoritedBy                      User[]                        @relation("FavoriteEditions")
   attendingUsers                   User[]                        @relation("AttendingEditions")

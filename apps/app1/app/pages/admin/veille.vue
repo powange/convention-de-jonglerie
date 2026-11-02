@@ -557,7 +557,7 @@ function nomDeLaSource(cle: string) {
  *
  * 📍 Si la limite change là-bas, elle doit changer ici. Un test la verrouille des deux côtés.
  */
-const MAX_URLS_IMPORT = 5
+const MAX_URLS_IMPORT = 10
 
 /**
  * Le lien vers la page d'import, pré-rempli.

@@ -60,7 +60,7 @@ import { construireElementsDeJournee, type ElementLu } from '~~/shared/utils/pro
 import { decouperParJournee } from '~~/shared/utils/program-page-slicing'
 
 const requestSchema = z.object({
-  urls: z.array(z.string().url()).min(1).max(5),
+  urls: z.array(z.string().url()).min(1).max(10),
   // Image trouvée lors du test (pour éviter de refaire une requête qui retourne une URL différente)
   previewedImageUrl: z.string().url().optional(),
 })

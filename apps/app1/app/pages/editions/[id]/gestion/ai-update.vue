@@ -86,6 +86,95 @@
             <UCheckbox v-model="jugglingEdgeSelected" :disabled="!jugglingEdgeUrlInput" />
           </div>
         </div>
+
+        <!-- Sources supplémentaires.
+             Les liens ci-dessus viennent des champs de l'édition ; ceux-ci sont libres — un
+             article, un PDF d'informations pratiques, une page de programme annexe. Ils sont
+             CONSERVÉS d'une analyse à l'autre : une source utile le reste, et la ressaisir à
+             chaque séance ferait renoncer à s'en servir. -->
+        <div class="pt-3 border-t border-gray-200 dark:border-gray-700 mt-3">
+          <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">
+            {{ $t('gestion.ai_update.extra_sources') }}
+          </p>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+            {{ $t('gestion.ai_update.extra_sources_hint') }}
+          </p>
+
+          <div v-if="sourcesSupplementaires.length > 0" class="space-y-2 mb-3">
+            <div
+              v-for="source in sourcesSupplementaires"
+              :key="source.id"
+              data-source-sup="true"
+              class="flex items-center gap-3"
+            >
+              <UIcon name="i-heroicons-link" class="size-5 text-gray-400 shrink-0" />
+              <div class="flex-1 min-w-0">
+                <p v-if="source.label" class="text-sm text-gray-900 dark:text-white truncate">
+                  {{ source.label }}
+                </p>
+                <a
+                  :href="source.url"
+                  target="_blank"
+                  rel="noopener"
+                  class="text-xs text-primary-500 hover:underline truncate block"
+                >
+                  {{ source.url }}
+                </a>
+              </div>
+              <UTooltip :text="$t('common.delete')">
+                <UButton
+                  color="error"
+                  variant="ghost"
+                  size="xs"
+                  icon="i-heroicons-trash"
+                  :aria-label="$t('common.delete')"
+                  :loading="sourceEnCours === source.id"
+                  @click="retirerSource(source.id)"
+                />
+              </UTooltip>
+              <UCheckbox
+                :model-value="source.actif"
+                :aria-label="source.label || source.url"
+                @update:model-value="basculerSource(source)"
+              />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2 sm:flex-row">
+            <UInput
+              v-model="nouvelleSourceUrl"
+              data-nouvelle-source="true"
+              placeholder="https://..."
+              class="flex-1"
+              size="sm"
+              @keyup.enter="ajouterSource"
+            />
+            <UInput
+              v-model="nouvelleSourceLabel"
+              :placeholder="$t('gestion.ai_update.extra_source_label')"
+              class="sm:w-48"
+              size="sm"
+            />
+            <UButton
+              size="sm"
+              color="primary"
+              variant="soft"
+              icon="i-heroicons-plus"
+              :loading="ajoutEnCours"
+              :disabled="!nouvelleSourceUrl.trim() || sourcesSupplementaires.length >= maxSources"
+              @click="ajouterSource"
+            >
+              {{ $t('common.add') }}
+            </UButton>
+          </div>
+
+          <p
+            v-if="sourcesSupplementaires.length >= maxSources"
+            class="text-xs text-amber-600 dark:text-amber-400 mt-2"
+          >
+            {{ $t('gestion.ai_update.extra_sources_full', { max: maxSources }) }}
+          </p>
+        </div>
       </UCard>
 
       <!-- Actions -->
@@ -195,11 +284,26 @@
             </div>
           </UFormField>
 
+          <!-- Un bouton désactivé sans explication se lit comme une panne. L'encart dit combien
+               de liens sont cochés et combien l'analyse accepte, pour qu'on sache quoi décocher. -->
+          <UAlert
+            v-if="tropDUrls"
+            icon="i-heroicons-exclamation-triangle"
+            color="warning"
+            variant="soft"
+            :title="
+              $t('gestion.ai_update.too_many_urls', {
+                count: selectedUrls.length,
+                max: MAX_URLS_ANALYSE,
+              })
+            "
+          />
+
           <UButton
             color="warning"
             icon="i-heroicons-sparkles"
             :loading="generating"
-            :disabled="selectedUrls.length === 0 || !perimetreValide"
+            :disabled="selectedUrls.length === 0 || !perimetreValide || tropDUrls"
             @click="searchForUpdates"
           >
             {{ $t('gestion.ai_update.launch_search') }}
@@ -583,6 +687,9 @@ const perimetreValide = computed(
 
 onMounted(() => {
   loadProviders()
+  // Au montage, jamais pendant le `setup` : un appel lancé pendant le `setup` interrompt le rendu
+  // et laisse une page blanche, sans message.
+  chargerSources()
   if (!edition.value) {
     editionStore.fetchEditionById(editionId, { force: true })
   }
@@ -674,13 +781,128 @@ const { execute: saveJugglingEdgeUrl, loading: savingJugglingEdgeUrl } = useApiA
   }
 )
 
+/**
+ * Les sources d'information SUPPLÉMENTAIRES, conservées sur l'édition.
+ *
+ * Les liens plus haut viennent des champs de l'édition ; ceux-ci sont libres et persistés, parce
+ * qu'une source utile le reste d'une analyse à l'autre. Les ressaisir à chaque séance ferait
+ * renoncer à s'en servir.
+ */
+interface SourceSupplementaire {
+  id: number
+  url: string
+  label: string | null
+  actif: boolean
+}
+
+const sourcesSupplementaires = ref<SourceSupplementaire[]>([])
+const maxSources = ref(20)
+const nouvelleSourceUrl = ref('')
+const nouvelleSourceLabel = ref('')
+const ajoutEnCours = ref(false)
+const sourceEnCours = ref<number | null>(null)
+
+const { execute: chargerSources } = useApiAction(`/api/editions/${editionId}/analysis-sources`, {
+  method: 'GET',
+  silent: true, // Une édition sans source est le cas courant : rien à annoncer.
+  onSuccess: (reponse: any) => {
+    // ⚠️ Pas de `reponse.data` : `useApiAction` déballe déjà les réponses `createSuccessResponse`.
+    sourcesSupplementaires.value = reponse.sources
+    maxSources.value = reponse.max
+  },
+})
+
+const { execute: envoyerSource } = useApiAction(`/api/editions/${editionId}/analysis-sources`, {
+  method: 'POST',
+  body: () => ({
+    url: nouvelleSourceUrl.value.trim(),
+    label: nouvelleSourceLabel.value.trim() || undefined,
+  }),
+  silentSuccess: true, // Le message diffère selon qu'on ajoute ou qu'on retrouve un doublon.
+  errorMessages: { default: t('gestion.ai_update.extra_source_error') },
+  onSuccess: (reponse: any) => {
+    if (reponse.deja) {
+      useToast().add({ title: t('gestion.ai_update.extra_source_duplicate'), color: 'warning' })
+    } else {
+      sourcesSupplementaires.value = reponse.sources
+      useToast().add({ title: t('gestion.ai_update.extra_source_added'), color: 'success' })
+    }
+    // Vidés dans les DEUX cas : après un doublon, laisser l'URL en place ferait croire que l'ajout
+    // a échoué et inviterait à recliquer indéfiniment.
+    nouvelleSourceUrl.value = ''
+    nouvelleSourceLabel.value = ''
+  },
+})
+
+async function ajouterSource() {
+  if (!nouvelleSourceUrl.value.trim() || ajoutEnCours.value) return
+  ajoutEnCours.value = true
+  try {
+    await envoyerSource()
+  } finally {
+    ajoutEnCours.value = false
+  }
+}
+
+/**
+ * Bascule l'activation d'une source.
+ *
+ * 📍 L'état local est posé AVANT l'appel, pour que la case suive le doigt — puis remis en place si
+ * le serveur refuse. Attendre la réponse ferait une case qui ne réagit pas, et l'organisateur
+ * cliquerait deux fois.
+ */
+async function basculerSource(source: SourceSupplementaire) {
+  const avant = source.actif
+  source.actif = !avant
+  try {
+    await $fetch(`/api/editions/${editionId}/analysis-sources/${source.id}`, {
+      method: 'PATCH',
+      body: { actif: source.actif },
+    })
+  } catch {
+    source.actif = avant
+    useToast().add({ title: t('gestion.ai_update.extra_source_error'), color: 'error' })
+  }
+}
+
+async function retirerSource(id: number) {
+  sourceEnCours.value = id
+  try {
+    await $fetch(`/api/editions/${editionId}/analysis-sources/${id}`, { method: 'DELETE' })
+    sourcesSupplementaires.value = sourcesSupplementaires.value.filter((s) => s.id !== id)
+  } catch {
+    useToast().add({ title: t('gestion.ai_update.extra_source_error'), color: 'error' })
+  } finally {
+    sourceEnCours.value = null
+  }
+}
+
 const selectedUrls = computed(() => {
   const urls = externalUrls.value.filter((l) => l.selected).map((l) => l.url)
   if (jugglingEdgeSelected.value && jugglingEdgeUrlInput.value.trim()) {
     urls.push(jugglingEdgeUrlInput.value.trim())
   }
+  // Les sources supplémentaires ACTIVES, après les liens de l'édition : elles complètent, elles ne
+  // remplacent pas.
+  for (const source of sourcesSupplementaires.value) {
+    if (source.actif) urls.push(source.url)
+  }
   return urls
 })
+
+/**
+ * Le plafond d'URL qu'une analyse accepte.
+ *
+ * ⚠️ Ce n'est pas un choix d'affichage : au-delà, le serveur REFUSE la requête entière
+ * (`Maximum 10 URLs autorisées`). Sans garde ici, cocher une source de trop ferait échouer
+ * l'analyse après l'attente, sans que rien n'ait prévenu — et l'édition peut à elle seule fournir
+ * six liens avant même qu'on en ajoute.
+ *
+ * 📍 Si la limite change côté serveur, elle doit changer ici. Un test la verrouille des deux côtés.
+ */
+const MAX_URLS_ANALYSE = 10
+
+const tropDUrls = computed(() => selectedUrls.value.length > MAX_URLS_ANALYSE)
 
 // Résultat et différences
 const updateResult = ref<any>(null)
