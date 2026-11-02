@@ -822,10 +822,10 @@ const { execute: envoyerSource } = useApiAction(`/api/editions/${editionId}/anal
   errorMessages: { default: t('gestion.ai_update.extra_source_error') },
   onSuccess: (reponse: any) => {
     if (reponse.deja) {
-      toast.add({ title: t('gestion.ai_update.extra_source_duplicate'), color: 'warning' })
+      useToast().add({ title: t('gestion.ai_update.extra_source_duplicate'), color: 'warning' })
     } else {
       sourcesSupplementaires.value = reponse.sources
-      toast.add({ title: t('gestion.ai_update.extra_source_added'), color: 'success' })
+      useToast().add({ title: t('gestion.ai_update.extra_source_added'), color: 'success' })
     }
     // Vidés dans les DEUX cas : après un doublon, laisser l'URL en place ferait croire que l'ajout
     // a échoué et inviterait à recliquer indéfiniment.
@@ -861,7 +861,7 @@ async function basculerSource(source: SourceSupplementaire) {
     })
   } catch {
     source.actif = avant
-    toast.add({ title: t('gestion.ai_update.extra_source_error'), color: 'error' })
+    useToast().add({ title: t('gestion.ai_update.extra_source_error'), color: 'error' })
   }
 }
 
@@ -871,7 +871,7 @@ async function retirerSource(id: number) {
     await $fetch(`/api/editions/${editionId}/analysis-sources/${id}`, { method: 'DELETE' })
     sourcesSupplementaires.value = sourcesSupplementaires.value.filter((s) => s.id !== id)
   } catch {
-    toast.add({ title: t('gestion.ai_update.extra_source_error'), color: 'error' })
+    useToast().add({ title: t('gestion.ai_update.extra_source_error'), color: 'error' })
   } finally {
     sourceEnCours.value = null
   }
