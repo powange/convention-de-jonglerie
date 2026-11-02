@@ -57,7 +57,7 @@ import {
 } from '#server/utils/web-content-extractor'
 
 const requestSchema = z.object({
-  urls: z.array(z.string().url()).min(1).max(5),
+  urls: z.array(z.string().url()).min(1).max(10),
 })
 
 /**

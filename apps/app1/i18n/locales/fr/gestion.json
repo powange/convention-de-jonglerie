@@ -18,6 +18,13 @@
       "description": "Rechercher des mises à jour via l'IA depuis les liens externes",
       "differences_found": "{count} différence(s) détectée(s)",
       "external_links": "Liens externes à analyser",
+      "extra_source_added": "Source ajoutée",
+      "extra_source_duplicate": "Cette adresse est déjà dans la liste",
+      "extra_source_error": "Impossible d'enregistrer cette source",
+      "extra_source_label": "Libellé (facultatif)",
+      "extra_sources": "Sources supplémentaires",
+      "extra_sources_full": "Limite de {max} sources atteinte. Supprimez-en une pour en ajouter une autre.",
+      "extra_sources_hint": "D'autres pages qui décrivent la convention : un article, un PDF d'informations pratiques, une page de programme annexe. Elles sont conservées d'une analyse à l'autre.",
       "field": {
         "titre": "Titre",
         "description": "Description",
@@ -64,6 +71,7 @@
       "search_updates": "Recherche de mises à jour",
       "search_updates_description": "L'IA va analyser les liens sélectionnés et comparer les informations trouvées avec les données actuelles de l'édition.",
       "title": "Mise à jour IA",
+      "too_many_urls": "{count} liens cochés, l'analyse en accepte {max}. Décochez-en pour pouvoir la lancer.",
       "updates_applied": "Mises à jour appliquées avec succès"
     },
     "artists": {

@@ -97,10 +97,10 @@ export default wrapApiHandler(
       })
     }
 
-    if (urls.length > 5) {
+    if (urls.length > 10) {
       throw createError({
         status: 400,
-        message: 'Maximum 5 URLs autorisées',
+        message: 'Maximum 10 URLs autorisées',
       })
     }
 

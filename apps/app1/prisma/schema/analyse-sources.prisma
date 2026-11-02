@@ -1,0 +1,41 @@
+// Les sources d'information SUPPLÉMENTAIRES d'une édition, pour l'analyse assistée.
+//
+// L'écran `/editions/[id]/gestion/ai-update` propose déjà les liens que l'édition porte dans ses
+// propres champs — site officiel, Facebook, Instagram, billetterie, programme, JugglingEdge. Cette
+// table accueille les AUTRES : un article, un PDF d'informations pratiques, une page de programme
+// annexe, tout ce qui aide à décrire la convention sans avoir sa place dans un champ dédié.
+
+model EditionAnalysisSource {
+  id        Int @id @default(autoincrement())
+  editionId Int
+
+  // L'adresse à relire. Longue de préférence à tronquée : certains agendas et documents partagés
+  // produisent des URL à rallonge, et une coupure silencieuse donnerait une page introuvable.
+  url String @db.VarChar(1000)
+
+  // Ce que l'organisateur veut voir à l'écran pour s'y retrouver. Facultatif : une URL parlante se
+  // suffit, et exiger un libellé ferait renoncer à ajouter un lien pour trois secondes de saisie.
+  label String? @db.VarChar(120)
+
+  // Proposée cochée à l'ouverture de l'écran, ou non. Une source utile une fois — un compte rendu
+  // de l'an dernier, par exemple — se garde sans être relue à chaque analyse : la décocher par
+  // défaut évite de la payer à chaque séance tout en la gardant sous la main.
+  actif Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  edition Edition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+
+  // ⚠️ La MÊME URL ne peut pas être ajoutée deux fois à une édition. Sans cette contrainte, un
+  // double clic ou un collage répété la ferait relire — et facturer — deux fois dans la même
+  // analyse, sans que rien ne le signale : deux lignes identiques à l'écran passent pour un
+  // affichage redondant, pas pour un doublon de traitement.
+  //
+  // 📍 Sur un PRÉFIXE de 500 caractères, et non sur la colonne entière : MySQL plafonne une clé à
+  // 3072 octets, soit 768 caractères en utf8mb4, et `VarChar(1000)` dépasse. Deux URL identiques
+  // sur 500 caractères désignent la même page dans tous les cas réels.
+  @@unique([editionId, url(length: 500)])
+  // Ce que l'écran lit : les sources d'une édition, les actives d'abord.
+  @@index([editionId, actif])
+}
