@@ -97,10 +97,17 @@ model EditionArtist {
   /// la personne l'ait jamais accepté. Le prix est connu — un artiste invité deux fois le ressaisit
   /// — et il est moins élevé que celui d'une donnée bancaire qui circule.
   ///
-  /// 📍 PREMIÈRES DONNÉES BANCAIRES DU DÉPÔT. Elles ne sont lisibles que par qui gère les artistes
-  /// de l'édition (`canManageArtistsById`), comme les montants et les justificatifs du même
-  /// onglet. Aucun autre point d'API ne les rend : tous les autres lecteurs de cette table
-  /// emploient un `select` explicite, seule la liste de gestion est en `include`.
+  /// 📍 PREMIÈRES DONNÉES BANCAIRES DU DÉPÔT. Lisibles par qui gère les artistes de l'édition
+  /// (`canManageArtistsById`), comme les montants et les justificatifs du même onglet.
+  ///
+  /// ⚠️ ET, DEPUIS LE 17/11/2026, par qui gère la TRÉSORERIE (`canManageTreasuryById`), pour le
+  /// seul point d'API des versements à faire (`/treasury/payouts`). Décision explicite de
+  /// l'utilisateur, et non un effet de bord : c'est le trésorier qui exécute les virements, lui
+  /// refuser l'IBAN lui ferait voir un versement à faire sans pouvoir le faire.
+  ///
+  /// La garde reste étroite : ce point d'API est le seul de la trésorerie à rendre des IBAN, et
+  /// la lecture générale (`/treasury`) n'en rend toujours aucun — elle alimente aussi des écrans
+  /// de consultation. Tous les autres lecteurs de cette table emploient un `select` explicite.
   ///
   /// Stockées NORMALISÉES — majuscules, sans espaces — par `shared/utils/coordonnees-bancaires.ts`,
   /// de sorte que deux saisies du même compte se comparent.

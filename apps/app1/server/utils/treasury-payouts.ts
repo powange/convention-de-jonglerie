@@ -1,5 +1,3 @@
-import type { TreasuryLine } from './treasury-compute'
-
 import { normaliserCoordonneeBancaire } from '~~/shared/utils/coordonnees-bancaires'
 
 /**
@@ -30,12 +28,14 @@ export interface LigneAVerser {
 
 /** Un destinataire et ce qu'on lui doit. */
 export interface DestinataireDeVersement {
-  /** La clé de regroupement : l'IBAN normalisé s'il existe, sinon l'identifiant du bénéficiaire. */
+  /** La clé de regroupement : l'IBAN normalisé s'il existe, sinon l'identité du destinataire. */
   cle: string
-  payeeId: number
+  destinataireId: string
   label: string
   iban: string | null
   bic: string | null
+  /** `mixte` quand un même compte reçoit à la fois une facture et une somme due à un artiste. */
+  origine: 'payee' | 'artist' | 'mixte'
   montant: number
   lignes: LigneAVerser[]
 }
@@ -45,81 +45,93 @@ export interface VersementsAFaire {
   destinataires: DestinataireDeVersement[]
 }
 
-/** Le carnet, réduit à ce dont le regroupement a besoin. */
-export interface BeneficiaireConnu {
-  id: number
+/** Un destinataire déjà résolu : d'où qu'il vienne, le regroupement n'a besoin que de cela. */
+export interface DestinataireResolu {
+  /** Identité de repli quand il n'y a pas d'IBAN. Préfixée par origine : `payee:7`, `artist:12`. */
+  id: string
   label: string
   iban: string | null
   bic: string | null
+  /** D'où vient ce montant, pour que l'écran puisse le dire. */
+  origine: 'payee' | 'artist'
+}
+
+/** Un montant à verser, son destinataire déjà résolu. */
+export interface ElementAVerser {
+  cle: string
+  libelle: string
+  montant: number
+  code: { code: string; label: string } | null
+  destinataire: DestinataireResolu
 }
 
 /**
- * Regroupe les dépenses à régler, par destinataire.
+ * Regroupe les montants à verser, par destinataire.
  *
- * ## ⚠️ L'ASYMÉTRIE AVEC LES AVANCES, et elle est volontaire
+ * ## ⚠️ DEUX ORIGINES, UN SEUL REGROUPEMENT
  *
- * `avancesARembourser` EXCLUT les lignes prévisionnelles : rien n'est encore sorti de la poche de
- * personne, il n'y a donc rien à rembourser. Ici c'est **l'inverse** : une dépense prévisionnelle à
- * régler est exactement ce qu'on doit payer. L'exclure viderait la carte de sa raison d'être — un
- * devis signé non encore viré est le cas le plus courant.
+ * Les montants viennent de deux mondes qui ne se ressemblent pas : les dépenses de trésorerie
+ * pointant un bénéficiaire du carnet, et les sommes dues aux artistes — cachets, défraiements,
+ * consommables — qui vivent sur leur fiche d'édition avec leurs propres drapeaux de paiement.
  *
- * C'est pourquoi le montant retenu est `settled + pending`, et non `settled` seul : une ligne
- * prévisionnelle porte son montant dans `pending`, et ne regarder que `settled` l'y ferait compter
- * pour zéro. Le total serait alors juste — et dramatiquement sous-évalué.
+ * Ils sont résolus AVANT d'arriver ici, en `DestinataireResolu`. Cette fonction ne sait donc rien
+ * de l'un ni de l'autre : elle groupe, additionne et trie. Y faire entrer la connaissance des deux
+ * modèles l'aurait rendue impossible à éprouver sans les deux à la fois.
  *
  * ## La clé de regroupement
  *
- * 📍 L'IBAN NORMALISÉ quand il existe, et non l'identifiant du bénéficiaire. Deux fiches distinctes
- * peuvent porter le même compte — un prestataire saisi deux fois sous deux noms —, et c'est UN
- * virement qu'il faut faire, pas deux. Sans IBAN, on retombe sur l'identifiant : deux fiches sans
- * coordonnées restent séparées, faute de quoi on les fusionnerait sur la foi d'une homonymie.
+ * 📍 L'IBAN NORMALISÉ quand il existe, et non l'identité du destinataire — et c'est ce qui fait
+ * qu'un artiste et un prestataire partageant un compte reçoivent UN virement. Deux fiches
+ * distinctes peuvent porter le même IBAN : un prestataire saisi deux fois, ou un collectif qui
+ * facture pour l'un de ses membres.
+ *
+ * Sans IBAN, on retombe sur l'identité : deux destinataires sans coordonnées restent séparés,
+ * faute de quoi on les fusionnerait sur la foi d'une homonymie.
  */
-export function versementsAFaire(
-  lines: TreasuryLine[],
-  carnet: BeneficiaireConnu[]
-): VersementsAFaire {
-  const parId = new Map(carnet.map((beneficiaire) => [beneficiaire.id, beneficiaire]))
+export function versementsAFaire(elements: ElementAVerser[]): VersementsAFaire {
   const parDestinataire = new Map<string, DestinataireDeVersement>()
 
-  for (const line of lines) {
-    // `disbursed` : déjà versé, il n'y a plus rien à faire. `settled` serait un MONTANT ici.
-    if (line.kind !== 'EXPENSE' || !line.payeeId || line.disbursed) continue
+  for (const element of elements) {
+    // Un montant nul n'est pas un virement : l'afficher ferait chercher une erreur qui n'existe pas.
+    if (element.montant <= 0) continue
 
-    const beneficiaire = parId.get(line.payeeId)
-    // Un bénéficiaire absent du carnet ne devrait pas arriver — la clé étrangère l'empêche —, mais
-    // l'ignorer silencieusement ferait disparaître un montant dû. On le garde sous son identifiant.
-    const label = beneficiaire?.label ?? `#${line.payeeId}`
-    const iban = beneficiaire?.iban ? normaliserCoordonneeBancaire(beneficiaire.iban) : null
-
-    const cle = iban ? `i:${iban}` : `p:${line.payeeId}`
-    const montant = line.settled + (line.pending ?? 0)
+    const iban = element.destinataire.iban
+      ? normaliserCoordonneeBancaire(element.destinataire.iban)
+      : null
+    const cle = iban ? `i:${iban}` : `d:${element.destinataire.id}`
 
     /*
      * ⚠️ LES LIGNES SONT COLLECTÉES ICI, dans la boucle qui applique déjà la règle — et non
-     * regroupées une seconde fois côté client. Le filtre et la clé sont subtils : les recopier
-     * ailleurs ferait deux règles à tenir en accord, et un détail qui ne somme pas à son propre
-     * total ne se remarque qu'en recomptant à la main.
+     * regroupées une seconde fois côté client. Un détail qui ne somme pas à son propre total ne se
+     * remarque qu'en recomptant à la main.
      */
     const ligne: LigneAVerser = {
-      cle: line.key,
-      libelle: line.title,
-      montant,
-      code: line.code ? { code: line.code.code, label: line.code.label } : null,
+      cle: element.cle,
+      libelle: element.libelle,
+      montant: element.montant,
+      code: element.code,
     }
 
     const deja = parDestinataire.get(cle)
     if (deja) {
-      deja.montant += montant
+      deja.montant += element.montant
       deja.lignes.push(ligne)
+      /*
+       * 📍 Un destinataire regroupé sur son IBAN peut venir des DEUX origines. On retient alors
+       * « mixte », pour que l'écran ne prétende pas que ce virement est seulement celui d'un
+       * artiste alors qu'il solde aussi une facture.
+       */
+      if (deja.origine !== element.destinataire.origine) deja.origine = 'mixte'
       continue
     }
     parDestinataire.set(cle, {
       cle,
-      payeeId: line.payeeId,
-      label,
+      destinataireId: element.destinataire.id,
+      label: element.destinataire.label,
       iban,
-      bic: beneficiaire?.bic ?? null,
-      montant,
+      bic: element.destinataire.bic,
+      origine: element.destinataire.origine,
+      montant: element.montant,
       lignes: [ligne],
     })
   }
