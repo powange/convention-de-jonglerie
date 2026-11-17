@@ -148,6 +148,71 @@ export function avanceNormalisee(saisie: {
 }
 
 /**
+ * Le « à régler » d'une dépense : à qui l'on doit verser, et si c'est fait.
+ *
+ * ## ⚠️ L'INVARIANT : exclusif de l'avance
+ *
+ * Une dépense est soit **avancée** par quelqu'un — l'association lui doit de l'argent —, soit **à
+ * régler** à un tiers — l'association doit de l'argent à ce tiers. Jamais les deux : la ligne
+ * compterait sinon dans les deux totaux, et le même montant serait réclamé deux fois.
+ *
+ * **L'avance l'emporte** quand un client envoie les deux. Elle constate un fait ACCOMPLI — quelqu'un
+ * a déjà sorti l'argent —, là où le règlement décrit une obligation à venir. Entre un fait et une
+ * intention, on garde le fait. C'est le même principe que « le compte l'emporte sur le nom » dans
+ * `avanceNormalisee` : la donnée la plus établie gagne.
+ *
+ * ## Normalisé, pas refusé
+ *
+ * Même raison qu'au-dessus : un formulaire qui bascule de dépense à recette, ou d'avance à
+ * règlement, laisse traîner les champs qu'il affichait. Rejeter la saisie pour cela serait
+ * incompréhensible. Ce qui n'a pas de sens est effacé, pas signalé.
+ *
+ * 📍 Cumulable en revanche avec `isForecast` : un devis signé non encore viré est à la fois engagé
+ * et à régler. Les deux notions ne se recouvrent pas — l'une dit si l'argent est sorti, l'autre à
+ * qui il doit aller.
+ */
+export function reglementNormalise(saisie: {
+  kind: 'EXPENSE' | 'INCOME'
+  payeeId?: number | null
+  disbursed?: boolean
+  /** Ce que l'avance a donné, DÉJÀ normalisé : c'est elle qui tranche en cas de conflit. */
+  avanceRetenue: { advancedById: number | null; advancedByName: string | null }
+}): { payeeId: number | null; disbursed: boolean } {
+  // Une recette n'est versée à personne : c'est l'édition qui l'encaisse.
+  const surUneDepense = saisie.kind === 'EXPENSE'
+  const avancePortee = !!saisie.avanceRetenue.advancedById || !!saisie.avanceRetenue.advancedByName
+
+  const payeeId = surUneDepense && !avancePortee ? (saisie.payeeId ?? null) : null
+
+  return {
+    payeeId,
+    // Sans bénéficiaire, il n'y a rien à régler : la case n'aurait aucun sens, et un `true` qui
+    // traîne ferait compter la ligne comme soldée dans un total auquel elle n'appartient pas.
+    disbursed: payeeId ? (saisie.disbursed ?? false) : false,
+  }
+}
+
+/**
+ * La date à écrire sur `disbursedAt`, d'après la BASCULE du booléen.
+ *
+ * ⚠️ Exactement la même règle que `dateDuRemboursement`, et pour la même raison : réenregistrer une
+ * ligne pour en corriger le libellé ne doit pas déplacer la date du versement. Les deux partagent
+ * `dateDeSolde` plutôt que d'en avoir chacune une copie — deux copies finiraient par diverger, et
+ * la divergence ne se verrait pas.
+ *
+ * 📍 `NULL` ne veut pas dire « non réglé » : c'est `disbursed` qui dit l'état.
+ *
+ * @param avant l'état en base, ou `undefined` à la création — il n'y a alors rien à préserver.
+ */
+export function dateDuReglement(
+  avant: boolean | undefined,
+  apres: boolean
+): { disbursedAt?: Date | null } {
+  const date = dateDeSolde(avant, apres)
+  return date === undefined ? {} : { disbursedAt: date }
+}
+
+/**
  * Le prêteur d'un apport au fonds de caisse : un compte OU un nom libre, jamais les deux.
  *
  * Le compte l'emporte — il désigne une personne sans ambiguïté, là où un nom se regroupe par

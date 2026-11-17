@@ -95,6 +95,15 @@ export default wrapApiHandler(
           reimbursedAt: true,
           advancedBy: { select: userWithProfileAndGravatarSelect },
           advancedByName: true,
+          payeeId: true,
+          disbursed: true,
+          /*
+           * ⚠️ Le LIBELLÉ seul, jamais l'IBAN. Cette réponse alimente aussi des écrans de lecture :
+           * y joindre les coordonnées bancaires les ferait voyager à chaque rafraîchissement, pour
+           * tous ceux qui consultent la page. Le carnet complet a son propre point d'API, gardé de
+           * la même façon mais appelé seulement quand on en a besoin.
+           */
+          payee: { select: { label: true } },
           code: { select: codeSelect },
           // Les tarifs dont la ligne tire son montant. Non vide ⇒ `amount` ci-dessus n'est pas lu.
           tiers: { select: { tierId: true } },

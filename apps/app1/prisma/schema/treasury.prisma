@@ -104,11 +104,8 @@ model TreasuryPayee {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  edition Edition @relation(fields: [editionId], references: [id], onDelete: Cascade)
-
-  // 📍 Le lien vers les entrées de trésorerie arrive au lot suivant, avec le champ « à régler à ».
-  // Le déclarer ici seul serait impossible : une relation Prisma est bidirectionnelle, et le champ
-  // d'en face n'aurait encore aucun usage.
+  edition Edition         @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  entries TreasuryEntry[]
 
   /// Deux bénéficiaires du même nom dans une édition sont presque toujours un doublon de saisie,
   /// et ils rendraient la carte des versements illisible — deux lignes identiques, deux totaux.
@@ -155,6 +152,37 @@ model TreasuryEntry {
   /// les TROIS points qui écrivent `reimbursed`. Un remboursement déjà daté ne voit pas sa date
   /// bouger quand on réenregistre la ligne.
   reimbursedAt   DateTime?
+
+  /// Le bénéficiaire à qui cette dépense doit être VERSÉE — prestataire, salle, fournisseur.
+  ///
+  /// ⚠️ EXCLUSIF DE L'AVANCE, et c'est l'invariant du dispositif. Une dépense est soit avancée par
+  /// quelqu'un — l'association lui doit de l'argent —, soit à régler à un tiers — l'association
+  /// doit de l'argent à ce tiers. Jamais les deux : la ligne compterait alors dans les deux
+  /// totaux, et le même montant serait réclamé deux fois.
+  ///
+  /// 📍 Normalisé et non refusé, comme l'avance : un formulaire qui bascule laisse traîner les
+  /// champs qu'il affichait, et rejeter la saisie pour cela serait incompréhensible. Voir
+  /// `reglementNormalise` dans `server/utils/treasury-guards.ts`.
+  ///
+  /// Cumulable en revanche avec `isForecast` : un devis signé non encore viré est à la fois
+  /// engagé et à régler.
+  payeeId Int?
+
+  /// Le versement a-t-il été effectué ? Sans objet sans `payeeId`.
+  ///
+  /// ⚠️ `disbursed` — « décaissé » — et NON `settled`, qui est déjà pris : `treasury-compute.ts`
+  /// emploie `settled` pour un MONTANT en centimes, celui qui est réellement réglé par opposition
+  /// à l'engagé. Un booléen du même nom l'écrasait silencieusement dans le type de la ligne, et
+  /// seul le typage l'a vu — les totaux auraient additionné un booléen à des centimes.
+  disbursed Boolean @default(false)
+
+  /// QUAND le versement a été fait.
+  ///
+  /// ⚠️ Même règle que `reimbursedAt` plus haut : `NULL` NE VEUT PAS DIRE « non réglé ». C'est
+  /// `settled` qui dit l'état, cette colonne ne dit que la date quand on la connaît. Déduire un
+  /// « réglé le … » de `updatedAt` serait un chiffre faux et plausible : cette colonne bouge au
+  /// moindre changement de libellé.
+  disbursedAt DateTime?
   /// Le jour où l'argent a bougé — celui du ticket de caisse, de la facture, du virement.
   ///
   /// À ne pas confondre avec `createdAt` juste en dessous, qui dit seulement quand la ligne a été
@@ -182,10 +210,16 @@ model TreasuryEntry {
   /// `SetNull` et non `Cascade` : un compte supprimé ne doit pas emporter la ligne comptable.
   /// L'avance devient anonyme, la dépense reste.
   advancedBy User?         @relation("TreasuryAdvances", fields: [advancedById], references: [id], onDelete: SetNull)
+  /// `SetNull` et non `Cascade`, pour la même raison que l'avance : supprimer un bénéficiaire du
+  /// carnet ne doit pas emporter les dépenses qu'on lui devait. La ligne perd son destinataire,
+  /// le montant reste.
+  payee      TreasuryPayee? @relation(fields: [payeeId], references: [id], onDelete: SetNull)
 
   @@index([editionId])
   @@index([codeId])
   @@index([advancedById])
+  /// Ce que la carte des versements lit : les dépenses à régler, non encore versées.
+  @@index([editionId, payeeId, disbursed])
 }
 
 /// Code d'imputation choisi pour une origine calculée.

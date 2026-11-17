@@ -9,6 +9,8 @@ import {
   assertTarifsRattachables,
   avanceNormalisee,
   dateDuRemboursement,
+  dateDuReglement,
+  reglementNormalise,
 } from '#server/utils/treasury-guards'
 import { deplacerJustificatif } from '#server/utils/treasury-receipt-files'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -50,6 +52,8 @@ const bodySchema = z
       .nullable()
       .optional(),
     advancedById: z.number().int().positive().nullable().optional(),
+    payeeId: z.number().int().positive().nullable().optional(),
+    disbursed: z.boolean().optional(),
     advancedByName: z.string().max(150).nullable().optional(),
     reimbursed: z.boolean().optional(),
     /**
@@ -116,6 +120,27 @@ export default wrapApiHandler(
     const imageUrl = await deplacerJustificatif(data.imageUrl, edition)
 
     const avance = avanceNormalisee(data)
+    /*
+     * ⚠️ APRÈS l'avance, et en lui passant son résultat : c'est elle qui tranche en cas de conflit.
+     * Une dépense est soit avancée, soit à régler à un tiers — jamais les deux, sans quoi le même
+     * montant serait réclamé deux fois.
+     */
+    const reglement = reglementNormalise({ ...data, avanceRetenue: avance })
+
+    // Un bénéficiaire d'une AUTRE édition rendrait la carte des versements incohérente, et
+    // laisserait deviner le carnet des voisins en essayant des identifiants.
+    if (reglement.payeeId) {
+      const payee = await prisma.treasuryPayee.findFirst({
+        where: { id: reglement.payeeId, editionId },
+        select: { id: true },
+      })
+      if (!payee) {
+        throw createError({
+          status: 400,
+          message: "Ce bénéficiaire n'appartient pas à cette édition",
+        })
+      }
+    }
 
     const entry = await prisma.treasuryEntry.create({
       data: {
@@ -137,6 +162,9 @@ export default wrapApiHandler(
         // Pas d'état d'avant à la création : une ligne saisie « déjà remboursée » est datée du
         // jour de la saisie. La règle est partagée avec les deux autres points d'écriture.
         ...dateDuRemboursement(undefined, avance.reimbursed),
+        ...reglement,
+        // Même règle qu'au-dessus : pas d'état d'avant à la création.
+        ...dateDuReglement(undefined, reglement.disbursed),
         ...(data.tierIds?.length
           ? { tiers: { create: data.tierIds.map((tierId) => ({ tierId })) } }
           : {}),

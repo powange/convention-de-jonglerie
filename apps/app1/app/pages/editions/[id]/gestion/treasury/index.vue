@@ -622,6 +622,7 @@
       :currency="currency"
       :edition-id="editionId"
       :noms-avance-connus="nomsAvanceConnus"
+      :payees="payees"
       @saved="onEntrySaved"
     />
 
