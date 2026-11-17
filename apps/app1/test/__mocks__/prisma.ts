@@ -27,6 +27,7 @@ export const prismaMock = {
   // Veille des conventions : les candidats repérés dans les agendas extérieurs.
   candidatEvenement: createModelMock(),
   editionAnalysisSource: createModelMock(),
+  treasuryPayee: createModelMock(),
 
   // Modèles principaux
   convention: createModelMock(),

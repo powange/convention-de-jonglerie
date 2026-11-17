@@ -343,6 +343,7 @@ model Edition {
   organizerPermissions             EditionOrganizerPermission[]
   editionPosts                     EditionPost[]
   analysisSources                  EditionAnalysisSource[]
+  treasuryPayees                   TreasuryPayee[]
   lostFoundItems                   LostFoundItem[]
   favoritedBy                      User[]                        @relation("FavoriteEditions")
   attendingUsers                   User[]                        @relation("AttendingEditions")
