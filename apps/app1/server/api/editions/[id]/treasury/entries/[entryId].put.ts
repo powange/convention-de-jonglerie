@@ -9,6 +9,8 @@ import {
   assertTarifsRattachables,
   avanceNormalisee,
   dateDuRemboursement,
+  dateDuReglement,
+  reglementNormalise,
 } from '#server/utils/treasury-guards'
 import { deplacerJustificatif, supprimerJustificatif } from '#server/utils/treasury-receipt-files'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
@@ -45,6 +47,8 @@ const bodySchema = z.object({
   advancedById: z.number().int().positive().nullable().optional(),
   advancedByName: z.string().max(150).nullable().optional(),
   reimbursed: z.boolean().optional(),
+  payeeId: z.number().int().positive().nullable().optional(),
+  disbursed: z.boolean().optional(),
 })
 
 /** PUT /api/editions/:id/treasury/entries/:entryId — modifie une ligne saisie à la main. */
@@ -82,7 +86,13 @@ export default wrapApiHandler(
         imageUrl: true,
         kind: true,
         advancedById: true,
+        advancedByName: true,
         reimbursed: true,
+        // ⚠️ L'état d'AVANT du règlement. Sans `disbursed` ici, `dateDuReglement` ne saurait pas
+        // distinguer « on vient de verser » de « c'était déjà versé », et la date d'un virement
+        // ancien se déplacerait à aujourd'hui au moindre changement de libellé.
+        payeeId: true,
+        disbursed: true,
         edition: { select: { id: true, conventionId: true } },
       },
     })
@@ -143,6 +153,33 @@ export default wrapApiHandler(
       reimbursed: data.reimbursed !== undefined ? data.reimbursed : existing.reimbursed,
     })
 
+    /*
+     * Recalculé lui aussi à partir de l'état EFFECTIF, et APRÈS l'avance qui tranche en cas de
+     * conflit : désigner un avanceur sur une ligne jusque-là « à régler » doit effacer le
+     * bénéficiaire, même si le client ne l'a pas renvoyé.
+     */
+    const reglement = reglementNormalise({
+      kind: data.kind ?? existing.kind,
+      payeeId: data.payeeId !== undefined ? data.payeeId : existing.payeeId,
+      disbursed: data.disbursed !== undefined ? data.disbursed : existing.disbursed,
+      avanceRetenue: avance,
+    })
+
+    // Un bénéficiaire d'une AUTRE édition rendrait la carte des versements incohérente, et
+    // laisserait deviner le carnet des voisins en essayant des identifiants.
+    if (reglement.payeeId) {
+      const payee = await prisma.treasuryPayee.findFirst({
+        where: { id: reglement.payeeId, editionId: existing.edition.id },
+        select: { id: true },
+      })
+      if (!payee) {
+        throw createError({
+          status: 400,
+          message: "Ce bénéficiaire n'appartient pas à cette édition",
+        })
+      }
+    }
+
     await prisma.treasuryEntry.update({
       where: { id: entryId },
       data: {
@@ -181,6 +218,9 @@ export default wrapApiHandler(
          * versement se déplacer à aujourd'hui.
          */
         ...dateDuRemboursement(existing.reimbursed, avance.reimbursed),
+        ...reglement,
+        // Même règle, et pour la même raison : la date d'un versement déjà fait ne bouge pas.
+        ...dateDuReglement(existing.disbursed, reglement.disbursed),
       },
     })
 

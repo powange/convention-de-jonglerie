@@ -55,6 +55,15 @@ export interface TreasuryLine extends TreasuryAmounts {
   advancedByName?: string | null
   reimbursed?: boolean
   /**
+   * Le bénéficiaire à qui cette dépense doit être versée, et si c'est fait.
+   *
+   * ⚠️ Exclusif de l'avance : une dépense est soit avancée par quelqu'un, soit à régler à un
+   * tiers. Les deux ne cohabitent jamais sur une même ligne — voir `reglementNormalise`.
+   */
+  payeeId?: number | null
+  payeeLabel?: string | null
+  disbursed?: boolean
+  /**
    * Quand l'avance a été remboursée, pour l'afficher au survol de la pastille.
    *
    * ⚠️ `null` ne veut PAS dire « pas remboursé » : les avances soldées avant l'arrivée de la
@@ -163,6 +172,17 @@ export interface ManualEntryRow {
   operationDate?: Date | string | null
   advancedBy?: PersonneAvance | null
   advancedByName?: string | null
+  /**
+   * Le bénéficiaire à régler, tel que la requête le ramène.
+   *
+   * ⚠️ `payee` ne porte QUE le libellé : cette lecture alimente aussi des écrans de consultation,
+   * et y joindre l'IBAN le ferait voyager à chaque rafraîchissement. Le carnet complet a son
+   * propre point d'API, gardé de la même façon mais appelé seulement quand on en a besoin.
+   */
+  payeeId?: number | null
+  payee?: { label: string } | null
+  /** Le versement a-t-il été fait ? `disbursed` et non `settled`, déjà pris par un MONTANT. */
+  disbursed?: boolean
 }
 
 /** Qui a avancé une dépense — juste de quoi l'afficher et la totaliser. */
@@ -464,6 +484,14 @@ export function computeTreasury(input: ComputeInput): TreasuryReport {
       advancedBy: entry.advancedBy ?? null,
       advancedByName: entry.advancedByName ?? null,
       reimbursed: entry.reimbursed ?? false,
+      /*
+       * ⚠️ Lus ET recopiés ici. Même piège que `reimbursedAt` et `operationDate` juste en dessous :
+       * une valeur lue en base puis oubliée à cette étape ne produit aucune erreur — l'écran
+       * affiche simplement du vide, quoi qu'on saisisse.
+       */
+      payeeId: entry.payeeId ?? null,
+      payeeLabel: entry.payee?.label ?? null,
+      disbursed: entry.disbursed ?? false,
       // Même piège que la ligne suivante : lue en base et perdue ici, la date ne serait jamais
       // affichée, et rien ne le signalerait.
       reimbursedAt: entry.reimbursedAt ?? null,

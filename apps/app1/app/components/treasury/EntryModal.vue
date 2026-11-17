@@ -152,6 +152,34 @@
             v-model="form.reimbursed"
             :label="$t('gestion.treasury.entry_reimbursed')"
           />
+
+          <!-- « À régler à » : le miroir de l'avance, tourné vers l'extérieur.
+               ⚠️ MASQUÉ dès qu'une avance est désignée, parce que les deux s'excluent : une
+               dépense est soit avancée par quelqu'un, soit à régler à un tiers. Les laisser
+               coexister à l'écran laisserait croire qu'on peut les cumuler, alors que le serveur
+               efface le bénéficiaire — l'organisateur verrait sa saisie disparaître sans
+               comprendre. -->
+          <template v-if="!personneAvance && !nomAvance">
+            <UFormField
+              :label="$t('gestion.treasury.entry_payee')"
+              :hint="$t('gestion.treasury.entry_payee_hint')"
+            >
+              <USelect
+                v-model="form.payeeId"
+                data-entry-payee="true"
+                :items="choixDeBeneficiaire"
+                value-key="value"
+                class="w-full"
+              />
+            </UFormField>
+
+            <!-- Sans bénéficiaire, il n'y a rien à régler : même raison que pour le remboursement. -->
+            <UCheckbox
+              v-if="form.payeeId !== null"
+              v-model="form.disbursed"
+              :label="$t('gestion.treasury.entry_settled')"
+            />
+          </template>
         </template>
 
         <!-- Le justificatif ferme le formulaire : c'est la dernière chose qu'on fait, souvent
@@ -268,6 +296,8 @@ const props = defineProps<{
     reimbursed?: boolean
     advancedBy?: CandidatAvance | null
     advancedByName?: string | null
+    payeeId?: number | null
+    disbursed?: boolean
   } | null
   codes: { id: number; code: string; label: string }[]
   /**
@@ -280,6 +310,8 @@ const props = defineProps<{
   editionId: number
   /** Les noms libres déjà employés sur cette édition, à reproposer plutôt qu'à faire retaper. */
   nomsAvanceConnus?: string[]
+  /** Le carnet des bénéficiaires de l'édition, pour le champ « à régler à ». */
+  payees?: { id: number; label: string; iban: string | null }[]
 }>()
 
 const emit = defineEmits<{
@@ -305,6 +337,9 @@ const form = reactive<{
   /** Date de l'opération au format `AAAA-MM-JJ`. Vide = non renseignée. */
   operationDate: string
   reimbursed: boolean
+  /** Le bénéficiaire à régler. `null` = cette dépense n'est pas à verser à un tiers. */
+  payeeId: number | null
+  disbursed: boolean
 }>({
   kind: 'EXPENSE',
   title: '',
@@ -315,6 +350,8 @@ const form = reactive<{
   isForecast: false,
   operationDate: '',
   reimbursed: false,
+  payeeId: null,
+  disbursed: false,
 })
 
 /**
@@ -322,6 +359,25 @@ const form = reactive<{
  * composant travaille sur un objet complet là où l'API n'attend qu'un identifiant.
  */
 const personneAvance = ref<UserSelectItem | null>(null)
+
+/**
+ * Les entrées du sélecteur de bénéficiaire, « aucun » compris.
+ *
+ * ⚠️ `null` pour « aucun », et surtout PAS la chaîne vide : Reka UI, sous `USelect`, la refuse
+ * comme valeur d'option — elle est réservée à l'effacement de la sélection. L'erreur est levée
+ * pendant le `setup` de l'item et emporte le rendu de l'écran entier ; ni le lint, ni le typage,
+ * ni les tests ne la voient. Le cas s'est déjà produit sur l'écran de veille.
+ *
+ * 📍 L'IBAN est rappelé entre parenthèses quand il existe : deux prestataires peuvent porter des
+ * noms proches, et c'est le compte qui décide du virement.
+ */
+const choixDeBeneficiaire = computed(() => [
+  { value: null, label: t('gestion.treasury.entry_payee_none') },
+  ...(props.payees ?? []).map((payee) => ({
+    value: payee.id,
+    label: payee.iban ? `${payee.label} (…${payee.iban.slice(-4)})` : payee.label,
+  })),
+])
 
 /**
  * Le nom libre, et le mode qui décide lequel des deux contrôles compte.
@@ -520,6 +576,8 @@ watch(
     form.isForecast = entry?.isForecast ?? false
     form.operationDate = dateDeLEntree(entry)
     form.reimbursed = entry?.reimbursed ?? false
+    form.payeeId = entry?.payeeId ?? null
+    form.disbursed = entry?.disbursed ?? false
     personneAvance.value = entry?.advancedBy
       ? {
           id: entry.advancedBy.id,
@@ -575,6 +633,13 @@ const body = () => ({
   advancedById: modeAvance.value === 'compte' ? (personneAvance.value?.id ?? null) : null,
   advancedByName: modeAvance.value === 'libre' ? (nomAvance.value ?? null) : null,
   reimbursed: form.reimbursed,
+  /*
+   * Envoyés même quand une avance est désignée : c'est le SERVEUR qui tranche l'exclusivité, en
+   * un seul endroit. Filtrer ici aussi donnerait deux règles à tenir, et c'est leur divergence
+   * qu'on ne verrait pas — l'écran masque déjà le champ, ce qui suffit à guider la saisie.
+   */
+  payeeId: form.payeeId,
+  disbursed: form.disbursed,
 })
 
 const { execute: createEntry, loading: creating } = useApiAction(
