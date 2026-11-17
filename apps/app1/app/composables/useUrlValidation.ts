@@ -17,7 +17,7 @@ export const useUrlValidation = () => {
    * @param maxUrls - Nombre maximum d'URLs autorisées (défaut: 5)
    * @returns Résultat de la validation
    */
-  const parseAndValidateUrls = (input: string, maxUrls: number = 5): UrlValidationResult => {
+  const parseAndValidateUrls = (input: string, maxUrls: number = 10): UrlValidationResult => {
     // Parser les URLs (une par ligne)
     const urls = input
       .split('\n')

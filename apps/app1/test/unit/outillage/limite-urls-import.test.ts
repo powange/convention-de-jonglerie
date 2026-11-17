@@ -53,6 +53,41 @@ describe('le plafond d’URL de l’import', () => {
     expect(Number(cotéEcran![1])).toBe(Number(cotéValidation![1]))
   })
 
+  it('⚠️ est le MÊME dans l’écran d’analyse et dans le serveur qui la refuse', () => {
+    /*
+     * Même piège que ci-dessus, sur l'autre écran qui alimente la même chaîne.
+     * `/editions/[id]/gestion/ai-update` garde sa propre constante `MAX_URLS_ANALYSE` : il ne peut
+     * pas lire le `.max()` d'un schéma zod côté serveur.
+     *
+     * Si elles divergeaient :
+     * - écran **trop haut** → le bouton reste actif, l'organisateur attend l'analyse, et le serveur
+     *   refuse la requête ENTIÈRE après coup, sans que rien n'ait prévenu ;
+     * - écran **trop bas** → le bouton se désactive alors que le serveur accepterait, et des
+     *   sources deviennent inutilisables.
+     *
+     * 📍 L'édition peut à elle seule fournir six liens (site, Facebook, Instagram, billetterie,
+     * programme, JugglingEdge) avant la moindre source ajoutée : la limite est vite atteinte.
+     */
+    const ecran = lire('app/pages/editions/[id]/gestion/ai-update.vue')
+    const serveurAgent = lire('server/api/admin/generate-import-json-agent.post.ts')
+    const serveurFlux = lire('server/api/admin/generate-import-json-stream.get.ts')
+
+    const cotéEcran = ecran.match(/const MAX_URLS_ANALYSE\s*=\s*(\d+)/)
+    const cotéAgent = serveurAgent.match(
+      /urls:\s*z\.array\(z\.string\(\)\.url\(\)\)\.min\(1\)\.max\((\d+)\)/
+    )
+    const cotéFlux = serveurFlux.match(/if \(urls\.length > (\d+)\)/)
+
+    // Sans ces trois gardes, un renommage ferait rendre `null` partout, et comparer `undefined` à
+    // `undefined` passerait au vert — le test deviendrait creux au moment d'alerter.
+    expect(cotéEcran, '`MAX_URLS_ANALYSE` introuvable dans ai-update.vue').not.toBe(null)
+    expect(cotéAgent, 'le `.max()` du schéma est introuvable côté agent').not.toBe(null)
+    expect(cotéFlux, 'le contrôle de longueur est introuvable côté flux').not.toBe(null)
+
+    expect(Number(cotéAgent![1])).toBe(Number(cotéEcran![1]))
+    expect(Number(cotéFlux![1])).toBe(Number(cotéEcran![1]))
+  })
+
   it('📍 l’écran passe les URL en paramètre RÉPÉTÉ, pas joint par un séparateur', () => {
     /*
      * `parseAndValidateUrls` découpe sur `\n` et sur rien d'autre. Un lien qui joindrait les URL
