@@ -74,6 +74,48 @@ model TreasuryEntryTier {
   @@index([entryId], map: "TreasuryEntryTier_entryId_fkey")
 }
 
+/// Un bénéficiaire à qui l'édition doit verser de l'argent : prestataire, salle, fournisseur.
+///
+/// ⚠️ RATTACHÉ À L'ÉDITION, et non à la convention — à la différence de `TreasuryCode` juste
+/// au-dessus, qui se réutilise d'une année sur l'autre. C'est la même décision que pour les
+/// coordonnées bancaires d'un artiste, et pour la même raison : un IBAN confié aux organisateurs
+/// d'une édition serait autrement lisible par ceux de toutes les autres, sans que son titulaire
+/// l'ait jamais accepté. Le prix est connu — un prestataire qui revient est ressaisi — et il est
+/// moins élevé que celui d'une donnée bancaire qui circule.
+///
+/// 📍 L'IBAN et le BIC sont stockés NORMALISÉS (majuscules, sans espaces) par
+/// `shared/utils/coordonnees-bancaires.ts`. Ce n'est pas cosmétique : c'est ce qui permet au
+/// regroupement des versements de reconnaître deux saisies du même compte. Sans normalisation,
+/// « FR76 1234 » et « fr7612 34 » produiraient deux virements au lieu d'un.
+model TreasuryPayee {
+  id        Int    @id @default(autoincrement())
+  editionId Int
+  /// À qui l'on verse, tel qu'on veut le lire sur l'ordre de virement.
+  label     String @db.VarChar(150)
+
+  /// Les coordonnées bancaires. Facultatives : on peut vouloir suivre ce qu'on doit à quelqu'un
+  /// avant d'avoir son RIB, et l'exiger ferait renoncer à enregistrer la dette.
+  iban String? @db.VarChar(34)
+  bic  String? @db.VarChar(11)
+
+  /// Note libre : numéro de facture, interlocuteur, conditions de paiement.
+  notes String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  edition Edition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+
+  // 📍 Le lien vers les entrées de trésorerie arrive au lot suivant, avec le champ « à régler à ».
+  // Le déclarer ici seul serait impossible : une relation Prisma est bidirectionnelle, et le champ
+  // d'en face n'aurait encore aucun usage.
+
+  /// Deux bénéficiaires du même nom dans une édition sont presque toujours un doublon de saisie,
+  /// et ils rendraient la carte des versements illisible — deux lignes identiques, deux totaux.
+  @@unique([editionId, label])
+  @@index([editionId])
+}
+
 model TreasuryEntry {
   id             Int               @id @default(autoincrement())
   editionId      Int

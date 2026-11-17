@@ -24,6 +24,13 @@
             :label="$t('gestion.treasury.manage_codes')"
             @click="codesModalOpen = true"
           />
+          <UButton
+            icon="i-heroicons-banknotes"
+            color="neutral"
+            variant="outline"
+            :label="$t('gestion.treasury.manage_payees')"
+            @click="payeesModalOpen = true"
+          />
         </div>
       </div>
 
@@ -623,6 +630,16 @@
       :codes="data?.codes ?? []"
       :edition-id="editionId"
       @changed="refresh()"
+    />
+
+    <!-- Le carnet des bénéficiaires : à qui l'on doit verser de l'argent. Géré d'ici, comme le
+         plan comptable, parce qu'un bénéficiaire se crée presque toujours au moment où l'on en a
+         besoin sur une entrée. -->
+    <TreasuryPayeesModal
+      v-model:open="payeesModalOpen"
+      :payees="payees"
+      :edition-id="editionId"
+      @changed="chargerLesBeneficiaires()"
     />
   </div>
 </template>
@@ -1278,6 +1295,31 @@ const estUnPdf = estUnJustificatifPdf
 
 const entryModalOpen = ref(false)
 const codesModalOpen = ref(false)
+const payeesModalOpen = ref(false)
+
+/**
+ * Le carnet des bénéficiaires, chargé à part de la trésorerie.
+ *
+ * ⚠️ Volontairement HORS de `/api/editions/:id/treasury`, qui alimente aussi des écrans de lecture.
+ * Ces lignes contiennent des IBAN : les joindre à la réponse principale les ferait voyager à
+ * chaque rafraîchissement de la page, pour tous ceux qui la consultent. Ici ils ne partent que
+ * lorsqu'on ouvre le carnet ou qu'on en a besoin.
+ */
+const payees = ref<
+  { id: number; label: string; iban: string | null; bic: string | null; notes: string | null }[]
+>([])
+
+const { execute: chargerLesBeneficiaires } = useApiAction(
+  () => `/api/editions/${editionId.value}/treasury/payees`,
+  {
+    method: 'GET',
+    silent: true, // Une édition sans bénéficiaire est le cas courant : rien à annoncer.
+    // Pas de `reponse.data` : `useApiAction` déballe déjà les réponses `createSuccessResponse`.
+    onSuccess: (reponse: any) => {
+      payees.value = reponse.payees
+    },
+  }
+)
 const editedLine = ref<TreasuryLine | null>(null)
 /** Le sens voulu à la création : celui du bouton cliqué. `null` en modification. */
 const sensImpose = ref<'EXPENSE' | 'INCOME' | null>(null)
@@ -1404,6 +1446,9 @@ onMounted(() => {
     // Un en-tête sans nom d'édition vaut mieux qu'une page qui refuse de s'afficher : l'export
     // retombe sur le titre générique.
   })
+  // Au montage, jamais pendant le `setup` : un appel lancé pendant le `setup` interrompt le rendu
+  // et laisse une page blanche, sans message.
+  chargerLesBeneficiaires()
 })
 
 /**
