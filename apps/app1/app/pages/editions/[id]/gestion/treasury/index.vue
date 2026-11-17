@@ -636,6 +636,14 @@
     <!-- Le carnet des bénéficiaires : à qui l'on doit verser de l'argent. Géré d'ici, comme le
          plan comptable, parce qu'un bénéficiaire se crée presque toujours au moment où l'on en a
          besoin sur une entrée. -->
+    <!-- Le détail des versements à faire : un virement par compte, ou ligne à ligne. -->
+    <TreasuryPayoutsModal
+      v-model:open="detailVersements"
+      :destinataires="versements?.destinataires ?? []"
+      :total="versements?.total ?? 0"
+      :money="money"
+    />
+
     <TreasuryPayeesModal
       v-model:open="payeesModalOpen"
       :payees="payees"
@@ -1166,6 +1174,33 @@ const totalCards = computed(() => {
       // liste vide promet quelque chose qu'elle n'a pas.
       onClick: totals?.toReimburse?.total ? () => (detailRemboursements.value = true) : undefined,
     },
+    /*
+     * La carte JUMELLE de la précédente, et il faut que la différence saute aux yeux.
+     *
+     * ⚠️ « À rembourser » = ce qu'on doit à des gens de l'ÉQUIPE qui ont avancé de leur poche.
+     * « À verser » = ce qu'on doit à des TIERS extérieurs qui attendent leur facture. Les deux se
+     * paient souvent par virement, et les confondre fait payer deux fois ou pas du tout. D'où
+     * l'icône distincte et la teinte différente : l'ambre pour ce qu'on doit à l'équipe, l'indigo
+     * pour ce qui sort vers l'extérieur.
+     *
+     * 📍 L'invariant posé avec le champ « à régler à » garantit qu'une ligne n'alimente jamais les
+     * deux cartes : une dépense est soit avancée, soit à régler.
+     */
+    {
+      key: 'to_pay_out',
+      label: t('gestion.treasury.to_pay_out'),
+      value: money(versements.value?.total ?? 0),
+      hint: versements.value?.total
+        ? t('gestion.treasury.to_pay_out_hint', { count: versements.value.destinataires.length })
+        : '',
+      icon: 'i-heroicons-banknotes',
+      iconBg: 'bg-indigo-100 dark:bg-indigo-900/40',
+      iconColor: 'text-indigo-600 dark:text-indigo-400',
+      valueClass: versements.value?.total ? 'text-indigo-600 dark:text-indigo-400' : '',
+      // Même précaution que la carte précédente : une carte à zéro qui s'ouvre sur une liste vide
+      // promet quelque chose qu'elle n'a pas.
+      onClick: versements.value?.total ? () => (detailVersements.value = true) : undefined,
+    },
     {
       key: 'balance',
       label: t('gestion.treasury.balance'),
@@ -1215,6 +1250,48 @@ const nomsAvanceConnus = computed(() => {
 
 /** Détail des avances par personne, ouvert depuis la carte « à rembourser ». */
 const detailRemboursements = ref(false)
+const detailVersements = ref(false)
+
+/**
+ * Les versements à faire, chargés à part de la trésorerie.
+ *
+ * ⚠️ Volontairement HORS de `/treasury` : ce point d'API est le seul à rendre des IBAN, et la
+ * lecture générale alimente aussi des écrans de consultation. Ici ils ne partent qu'au chargement
+ * de cette page de gestion, pour qui a le droit d'y être.
+ *
+ * 📍 Les montants sont recalculés par le SERVEUR sur toute l'édition, et non déduits des lignes
+ * affichées : un total de virement qui suivrait les filtres de l'écran annoncerait « reste à
+ * verser » sur une vue partielle.
+ */
+const versements = ref<{
+  total: number
+  destinataires: {
+    cle: string
+    payeeId: number
+    label: string
+    iban: string | null
+    bic: string | null
+    montant: number
+    lignes: {
+      cle: string
+      libelle: string
+      montant: number
+      code: { code: string; label: string } | null
+    }[]
+  }[]
+} | null>(null)
+
+const { execute: chargerLesVersements } = useApiAction(
+  () => `/api/editions/${editionId.value}/treasury/payouts`,
+  {
+    method: 'GET',
+    silent: true, // Une édition sans versement en attente est le cas courant : rien à annoncer.
+    // Pas de `reponse.data` : `useApiAction` déballe déjà les réponses `createSuccessResponse`.
+    onSuccess: (reponse: any) => {
+      versements.value = reponse
+    },
+  }
+)
 
 /** Un bénéficiaire du détail, tel que le rapport le rend. */
 type BeneficiaireAvance = NonNullable<
@@ -1450,6 +1527,7 @@ onMounted(() => {
   // Au montage, jamais pendant le `setup` : un appel lancé pendant le `setup` interrompt le rendu
   // et laisse une page blanche, sans message.
   chargerLesBeneficiaires()
+  chargerLesVersements()
 })
 
 /**

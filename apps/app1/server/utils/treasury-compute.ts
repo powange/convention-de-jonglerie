@@ -524,13 +524,7 @@ export function computeTreasury(input: ComputeInput): TreasuryReport {
               canceled: 0,
             }
           )
-        : {
-            // Une ligne saisie à la main est réglée par défaut. Marquée prévisionnelle, elle passe
-            // en engagé : le solde ne bouge pas — il additionne les deux — mais le réglé cesse de
-            // compter un montant qui n'a pas été payé.
-            settled: entry.isForecast ? 0 : entry.amount,
-            pending: entry.isForecast ? entry.amount : 0,
-          }),
+        : montantsDUneLigneSaisie(entry.amount, entry.isForecast)),
     })
   }
 
@@ -571,6 +565,28 @@ export function computeTreasury(input: ComputeInput): TreasuryReport {
  * Une avance PRÉVISIONNELLE est exclue : rien n'a encore été sorti de la poche de personne, il n'y
  * a donc rien à rembourser. Le montant retenu est celui réglé de la ligne, pas son montant brut.
  */
+/**
+ * Comment le montant d'une ligne SAISIE se répartit entre réglé et engagé.
+ *
+ * Une ligne saisie à la main est réglée par défaut. Marquée prévisionnelle, elle passe en engagé :
+ * le solde ne bouge pas — il additionne les deux — mais le réglé cesse de compter un montant qui
+ * n'a pas été payé.
+ *
+ * ⚠️ PARTAGÉE, et non recopiée. Le calcul des versements à faire (`treasury-payouts.ts`) a besoin
+ * de la même répartition pour des lignes qui ne passent pas par `calculerTresorerie`. Deux copies
+ * finiraient par diverger, et la divergence produirait un total juste dans sa forme et faux dans
+ * son chiffre — ce qui ne se remarque qu'en recomptant à la main.
+ */
+export function montantsDUneLigneSaisie(
+  amount: number,
+  isForecast: boolean | null | undefined
+): { settled: number; pending: number } {
+  return {
+    settled: isForecast ? 0 : amount,
+    pending: isForecast ? amount : 0,
+  }
+}
+
 export function avancesARembourser(lines: TreasuryLine[]): AvancesARembourser {
   /*
    * La clé porte l'origine de l'avance, et c'est ce qui empêche deux confusions symétriques :
