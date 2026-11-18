@@ -120,6 +120,45 @@ describe('versions annoncées dans CLAUDE.md', () => {
     ).toEqual([])
   })
 
+  it('⚠️ LES `overrides` ANNONCÉS SONT CEUX QUI EXISTENT', async () => {
+    /*
+     * LE DÉFAUT GARDÉ. Le document affirmait que les `overrides` « ne contiennent plus que `vue`
+     * et `@nuxt/devtools` ». Ils sont TROIS depuis #849 : `ipx@4.0.0` s'y est ajouté pour que
+     * `sharp` se dédoublonne en 0.35.5 — le retirer réintroduit la vulnérabilité **en silence**,
+     * l'application ne changeant pas de comportement. Un document qui laisse croire que cet
+     * override n'existe pas invite précisément à l'ôter.
+     *
+     * ⚠️ La vérification va du `package.json` vers le document, et non l'inverse : le document
+     * cite légitimement un override ABSENT (« il n'y a plus d'override `vite` »), et une
+     * vérification symétrique ferait rougir cette phrase-là, qui est vraie et utile.
+     */
+    const md = await readFile(CLAUDE_MD, 'utf8')
+    const pkg = JSON.parse(await readFile(PACKAGE, 'utf8'))
+    const overrides = Object.keys(pkg.overrides ?? {})
+
+    expect(
+      overrides.length,
+      'plus aucun override : ce cas et le document sont à revoir'
+    ).toBeGreaterThan(0)
+
+    const absents = overrides.filter((nom) => !md.includes(`\`${nom}\``))
+    expect(
+      absents,
+      `Ces \`overrides\` existent mais le CLAUDE.md ne les nomme pas. Chacun porte une raison, et ` +
+        `celui qu'on ne voit pas est celui qu'on retire :\n${absents.join(', ')}`
+    ).toEqual([])
+
+    // Le compte annoncé en toutes lettres, qui est ce qui s'était périmé.
+    const CHIFFRES: Record<string, number> = { un: 1, deux: 2, trois: 3, quatre: 4, cinq: 5 }
+    const annonce = md.match(/Il y a \*\*(\w+)\*\* `overrides`/)?.[1]
+    expect(annonce, "le CLAUDE.md n'annonce plus le nombre d'`overrides`").toBeDefined()
+    expect(
+      CHIFFRES[annonce!.toLowerCase()],
+      `Le CLAUDE.md annonce « ${annonce} » \`overrides\`, il y en a ${overrides.length} : ` +
+        `${overrides.join(', ')}`
+    ).toBe(overrides.length)
+  })
+
   it('⚠️ AUCUN SCRIPT NE POINTE UN CHEMIN ABSOLU D’UNE AUTRE MACHINE', async () => {
     /*
      * `jcodemunch:watch` pointait `/root/projets/convention-de-jonglerie` — un chemin qui n'existe
