@@ -103,7 +103,7 @@ export async function getInfomaniakEvents(
   const response = await $fetch<InfomaniakEvent[]>(`${INFOMANIAK_API_URL}/events`, {
     method: 'GET',
     headers: buildHeaders(apiKey, currency),
-    params: { withQuota: true },
+    query: { withQuota: true },
   })
   return response
 }
@@ -183,7 +183,7 @@ export async function getInfomaniakOrders(
   const response = await $fetch<unknown[]>(`${INFOMANIAK_API_URL}/orders`, {
     method: 'GET',
     headers: buildHeaders(apiKeyGuichet, currency, applicationPassword),
-    params: {
+    query: {
       limit: options.limit ?? 20,
       offset: options.offset ?? 0,
     },
@@ -203,7 +203,7 @@ export async function getInfomaniakTickets(
   const response = await $fetch<unknown[]>(`${INFOMANIAK_API_URL}/tickets`, {
     method: 'GET',
     headers: buildHeaders(apiKeyGuichet, currency, applicationPassword),
-    params: {
+    query: {
       limit: options.limit ?? 20,
       offset: options.offset ?? 0,
     },

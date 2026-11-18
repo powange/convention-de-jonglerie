@@ -259,7 +259,7 @@ const performSearch = async (email: string) => {
 
   try {
     const response = await $fetch<{ data: { users: User[] } }>('/api/users/search', {
-      params: { emailExact: trimmedEmail },
+      query: { emailExact: trimmedEmail },
     })
     searchResults.value = response.data.users || []
   } catch (err: any) {

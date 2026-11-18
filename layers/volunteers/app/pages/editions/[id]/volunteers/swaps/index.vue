@@ -231,7 +231,7 @@ watch(
     chargementCandidats.value = true
     try {
       const r = await $fetch<any>(`/api/editions/${editionId.value}/volunteers/swaps/candidates`, {
-        params: { assignmentId: id },
+        query: { assignmentId: id },
       })
       candidats.value = (r?.data ?? r)?.candidates ?? []
     } catch {

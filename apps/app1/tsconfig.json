@@ -1,5 +1,19 @@
 {
   // https://nuxt.com/docs/guide/concepts/typescript
+  //
+  // ⚠️ PAS D'`include` ICI. Depuis Nuxt 4.6, un `tsconfig.json` qui référence les projets
+  // générés par Nuxt ET déclare des fichiers à lui fait REFUSER la vérification :
+  // « type-checking will not run in build mode ». `nuxt typecheck` sort alors quatre paires
+  // TS6306/TS6310 sur les projets référencés et N'INSPECTE AUCUN CODE — or la porte de CI ne
+  // cherche que TS2304/TS2552 : elle passerait au vert sans rien avoir lu.
+  //
+  // 📊 Ce fichier portait `include: ["types/**/*.d.ts"]`, et les deux fichiers visés
+  // (`types/luxon.d.ts`, `types/nuxt-auth-utils.d.ts`) sont VIDES, 0 octet : l'`include`
+  // n'apportait rien au typage et ne faisait que le désactiver. Mesure après retrait : 1194
+  // erreurs préexistantes de nouveau visibles, dont zéro dans les codes que la porte surveille.
+  //
+  // `--build` n'est pas une issue : les tsconfig générés n'ont pas `composite` et portent
+  // `noEmit: true`, ce que ce mode refuse.
   "files": [],
   "references": [
     {
@@ -26,6 +40,5 @@
       "~/types/*": ["./app/types/*"],
       "~/utils/*": ["./app/utils/*"]
     }
-  },
-  "include": ["types/**/*.d.ts"]
+  }
 }

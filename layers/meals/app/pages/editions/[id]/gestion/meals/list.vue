@@ -655,7 +655,7 @@ const formattedParticipants = computed(() => participants.value.map(formaterPart
  */
 const toutesLesLignes = async () => {
   const reponse: any = await $fetch(`/api/editions/${editionId.value}/meals/participants`, {
-    params: {
+    query: {
       ...parametresDesFiltres(),
       page: '1',
       pageSize: String(Math.max(pagination.value.total, 1)),

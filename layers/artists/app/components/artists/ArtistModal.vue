@@ -1067,7 +1067,7 @@ const searchUsers = async (email: string) => {
   if (!estAdresseEmail(email)) return []
   try {
     const response = await $fetch<{ data: { users: any[] } }>('/api/users/search', {
-      params: { emailExact: email },
+      query: { emailExact: email },
     })
     return (response.data.users || []).map((user) => ({
       id: user.id,
