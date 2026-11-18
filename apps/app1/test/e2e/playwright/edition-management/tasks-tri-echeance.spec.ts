@@ -166,17 +166,36 @@ test.describe.serial('Tâches — tri par échéance', () => {
     await enKanban()
     const avantControle = await ordreEnBase()
     await glisser('Lointaine', 'Moyenne')
-    await page.waitForTimeout(2500)
-    const apresControle = await ordreEnBase()
-    expect(apresControle, 'le glisser-déposer doit agir en ordre manuel').not.toEqual(avantControle)
+    /*
+     * ⚠️ ON ATTEND LE RÉSULTAT, PAS UNE DURÉE. Ce cas attend que l'ordre CHANGE : le sondage est
+     * donc exact, et il remplace un `waitForTimeout(2500)` qui, sous charge en CI, pouvait finir
+     * avant l'écriture — l'ordre relu étant alors l'ancien, le cas sortait « instable ».
+     */
+    await expect
+      .poll(ordreEnBase, {
+        timeout: 20000,
+        message: 'le glisser-déposer doit agir en ordre manuel',
+      })
+      .not.toEqual(avantControle)
 
     // CAS ÉTUDIÉ : le même geste, tri par échéance actif.
     await enKanban('?sort=deadline_asc')
     const avantTri = await ordreEnBase()
     await glisser('Proche', 'Lointaine')
+    /*
+     * ⚠️⚠️ ICI, L'ATTENTE FIXE EST LE BON INSTRUMENT — ne pas la « corriger » en sondage.
+     *
+     * Ce cas assère que l'ordre NE change PAS. Un `expect.poll` serait satisfait par le PREMIER
+     * relevé, c'est-à-dire avant que l'écriture fautive ait eu le temps de se produire : il
+     * passerait au vert même avec le défaut présent. Pour prouver qu'il ne se passe rien, il faut
+     * laisser s'écouler une fenêtre pendant laquelle quelque chose AURAIT pu se passer.
+     *
+     * La durée n'est pas devinée : le cas de contrôle juste au-dessus établit, par sondage, qu'un
+     * vrai réordonnancement atteint la base bien en deçà de cette fenêtre.
+     */
     await page.waitForTimeout(2500)
     const apresTri = await ordreEnBase()
-    expect(apresTri).toEqual(avantTri)
+    expect(apresTri, 'le tri par échéance doit ignorer le geste').toEqual(avantTri)
 
     // Et l'organisateur sait pourquoi rien n'a bougé.
     await expect(page.getByText(/ordre manuel.*réordonner/i).first()).toBeVisible({

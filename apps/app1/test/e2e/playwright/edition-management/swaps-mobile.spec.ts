@@ -304,8 +304,14 @@ test.describe.serial('Échange de créneaux — rendu mobile', () => {
 
     // Capture de la modale de choix, pour l'inspection visuelle.
     await page.getByRole('button', { name: /le créneau que vous souhaitez/i }).click()
-    await page.waitForTimeout(1200)
-    await page.waitForTimeout(900)
+    /*
+     * ⚠️ ON ATTEND LA MODALE, PAS UNE DURÉE. Il y avait ici DEUX `waitForTimeout` consécutifs
+     * (1200 puis 900) — et deux attentes à la file sont l'aveu du procédé : la première ne
+     * suffisait pas, on en a ajouté une seconde au lieu de nommer la condition. Sous charge en CI,
+     * 2,1 s ne suffiraient pas davantage, et la capture montrerait une modale à moitié ouverte
+     * sans que rien ne le signale.
+     */
+    await expect(page.getByRole('dialog').last()).toBeVisible({ timeout: 15000 })
     await page.screenshot({
       path: '/tmp/claude-1000/-home-powange-projects-convention-de-jonglerie/ec64cc3e-3602-4801-a44c-3d566d88eedf/scratchpad/captures/modale.png',
       fullPage: true,

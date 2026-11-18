@@ -126,11 +126,31 @@ test.describe.serial('Date limite d’un appel à spectacles et fuseau de la con
       .getByRole('button', { name: /enregistrer/i })
       .first()
       .click()
-    await page.waitForTimeout(2000)
+    /*
+     * ⚠️ ON ATTEND LE RÉSULTAT, PAS UNE DURÉE.
+     *
+     * Ce cas portait un `waitForTimeout(2000)` avant de relire l'API — le frère exact du défaut
+     * corrigé dans `general-info-fuseau.spec.ts`, resté sur place. Sous charge en CI,
+     * l'enregistrement dépasse parfois ce délai : la lecture arrive avant l'écriture, le nom relu
+     * est l'ANCIEN, et le cas sort « instable » en repassant à la reprise suivante. L'étape
+     * « Refuser un test instable » le refuserait à juste titre.
+     *
+     * `expect.poll` réessaie jusqu'à ce que le nom ait atterri. L'échéance est ensuite vérifiée
+     * sur un état dont on SAIT que l'enregistrement est passé — ce qui est précisément l'invariant
+     * du cas.
+     */
+    const URL_APPEL = `http://localhost:3000/api/editions/${editionId}/shows-call/${showCallId}`
+    await expect
+      .poll(
+        async () => {
+          const r = await page.request.get(URL_APPEL)
+          return r.ok() ? (await r.json()).name : null
+        },
+        { timeout: 20000, message: 'le nom enregistré n’est jamais arrivé jusqu’à l’API' }
+      )
+      .toBe('E2E Fuseau appel renomme')
 
-    const reponse = await page.request.get(
-      `http://localhost:3000/api/editions/${editionId}/shows-call/${showCallId}`
-    )
+    const reponse = await page.request.get(URL_APPEL)
     const appel = await reponse.json()
 
     /*

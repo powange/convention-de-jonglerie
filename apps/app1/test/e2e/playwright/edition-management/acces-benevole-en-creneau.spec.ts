@@ -232,7 +232,12 @@ test.describe.serial('Bénévole en créneau de contrôle d’accès', () => {
     )
     await expect(page.getByText(/Accès refusé/i)).toHaveCount(0)
 
-    // Laisser la page finir de charger ses données avant de juger
+    /*
+     * ⚠️ ATTENTE FIXE NÉCESSAIRE — ne pas la convertir en sondage. `refuses` est alimenté par
+     * l'écoute du réseau, et l'assertion est une ABSENCE : aucun appel refusé. Sonder jusqu'à
+     * `[]` serait vrai avant même le premier appel. Il faut laisser la page finir de charger ses
+     * données, c'est-à-dire laisser passer les appels qui POURRAIENT être refusés.
+     */
     await page.waitForTimeout(3000)
     expect(refuses, `appels refusés : ${refuses.join(', ')}`).toEqual([])
 

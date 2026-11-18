@@ -122,7 +122,11 @@ test.describe.serial('Stock : ordre de base des objets d’un groupe', () => {
     for (let i = 1; i <= 10; i++) {
       await page.mouse.move(x, yDepart + ((yArrivee - yDepart) * i) / 10, { steps: 3 })
     }
-    // L'animation dure 150 ms : relâcher avant sa fin rendait l'ordre final indécis.
+    /*
+     * L'animation dure 150 ms : relâcher avant sa fin rendait l'ordre final indécis.
+     * ⚠️ Attente fixe assumée — il n'y a rien à sonder, on attend la fin d'une transition dont la
+     * durée est connue, pas l'arrivée d'un résultat.
+     */
     await page.waitForTimeout(300)
 
     /*
