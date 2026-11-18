@@ -132,6 +132,12 @@ test.describe.serial('Planning — l’infobulle d’un créneau', () => {
      */
     await creneau.dispatchEvent('mouseenter')
     await creneau.dispatchEvent('pointerenter', { pointerType: 'touch' })
+    /*
+     * ⚠️ ATTENTE FIXE NÉCESSAIRE — ne pas la convertir en sondage. L'assertion qui suit est une
+     * ABSENCE : il faut laisser à l'infobulle le temps de s'ouvrir si le défaut est présent. Un
+     * `expect.poll` serait satisfait par le premier relevé, avant toute ouverture, et passerait
+     * au vert avec le défaut en place.
+     */
     await page.waitForTimeout(300)
     await expect(page.locator(INFOBULLE), 'ouverte par l’événement de compatibilité').toBeHidden()
 

@@ -28,7 +28,15 @@ test.describe('Consultation hors ligne', () => {
     await page.goto(path, { waitUntil: 'load', timeout: 90000 })
     await page.waitForFunction(() => !!navigator.serviceWorker?.controller, { timeout: 60000 })
     await page.reload({ waitUntil: 'load', timeout: 90000 })
-    // Laisser les requêtes de la page atteindre le cache avant de couper.
+    /*
+     * ⚠️ ATTENTE FIXE ASSUMÉE — ne pas la « corriger » en sondage.
+     *
+     * Il s'agit de laisser les requêtes de la page atteindre le cache avant de couper le réseau.
+     * Il n'y a pas de condition observable depuis la page : le worker remplit son cache en
+     * arrière-plan, et sonder une entrée précise rendrait ce harnais solidaire du nom des caches
+     * et de la liste des URL pré-chargées — c'est-à-dire du détail même que ces cas ne doivent pas
+     * connaître. La durée est donc un budget, pas une devinette sur une horloge.
+     */
     await page.waitForTimeout(3000)
   }
 
@@ -74,13 +82,27 @@ test.describe('Consultation hors ligne', () => {
 
     await context.setOffline(true)
     await page.reload({ waitUntil: 'load', timeout: 90000 })
-    await page.waitForTimeout(4000)
+    /*
+     * ⚠️ ON ATTEND LE REMPLISSAGE, PAS UNE DURÉE. Ce cas portait un `waitForTimeout(4000)` : sous
+     * charge en CI, un service worker plus lent rendait la page encore vide au moment du relevé,
+     * et le cas accusait alors le cache d'un défaut qui n'était que de la lenteur.
+     *
+     * Le sondage porte exactement l'assertion « l'accueil n'est pas revenu vide » : elle n'est
+     * donc pas affaiblie, elle est seulement patiente. Les deux autres — pas d'erreur réseau, pas
+     * de clé brute — s'appliquent ensuite à un état dont on SAIT qu'il est rendu.
+     */
+    const lireLeCorps = async () => (await page.locator('body').innerText()).toLowerCase()
+    await expect
+      .poll(async () => (await lireLeCorps()).length, {
+        timeout: 30000,
+        message: 'l’accueil est revenu vide',
+      })
+      .toBeGreaterThan(200)
 
     // Le symptôme signalé : la page revenait, mais vide, sur une erreur réseau. Une page
     // conservée sans ce qu'elle affiche vaut moins qu'une absence de cache — elle a l'air cassée.
-    const texte = (await page.locator('body').innerText()).toLowerCase()
+    const texte = await lireLeCorps()
     expect(texte, 'l’accueil est revenu sur une erreur réseau').not.toContain('failed to fetch')
-    expect(texte.length, 'l’accueil est revenu vide').toBeGreaterThan(200)
 
     // Les traductions sont chargées par imports dynamiques. Demandées avant que le worker ne
     // contrôle la page, elles lui échappaient : l'interface affichait ses clés à la place des

@@ -88,9 +88,15 @@ test.describe('Défilement du panneau de gestion', () => {
     })
 
     await expect(page).toHaveURL(new RegExp(`/editions/${editionId}/gestion\\?essai=1$`))
+    /*
+     * ⚠️ ATTENTE FIXE NÉCESSAIRE — ne pas la convertir en sondage. On assère que le défilement
+     * RESTE à 400 : le défaut consisterait à le remettre à zéro peu après la navigation. Sonder
+     * jusqu'à lire 400 serait vrai dès le premier relevé, donc vert même si la page se replaçait
+     * en haut juste après.
+     */
     await page.waitForTimeout(1200)
 
-    expect(await defilement(page)).toBe(400)
+    expect(await defilement(page), 'le panneau ne doit pas revenir en haut').toBe(400)
 
     await context.close()
   })
