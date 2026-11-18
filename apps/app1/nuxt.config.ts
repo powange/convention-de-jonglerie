@@ -734,6 +734,34 @@ export default defineNuxtConfig({
   },
 
   experimental: {
+    /*
+     * Auto-imports serveur : couche de compatibilité POUR LES MODULES TIERS.
+     *
+     * ⚠️ Ce drapeau n'est pas un confort pour notre propre code — il est ce qui permet au projet
+     * de démarrer. Nuxt résout `nitroAutoImports` à `compatibilityVersion < 5`, et comme ce
+     * dépôt déclare `compatibilityVersion: 5` (voir `future`), il vaut `false` par défaut : le
+     * `virtual:#imports` du serveur n'exporte plus `createError`, `useRuntimeConfig`,
+     * `getRouteRules`, `useNitroOrigin` ni `useSiteConfig`.
+     *
+     * 📊 Or SEPT modules installés y importent encore ces symboles dans leur runtime serveur —
+     * `nuxt-auth-utils` (55 fichiers, tout le socle d'authentification), `@nuxt/image`,
+     * `nuxt-csurf`, `nuxt-file-storage`, `nuxt-link-checker`, `nuxt-qrcode` et `nuxt-security`.
+     * Le build Rollup échoue alors sur le premier d'entre eux (« "createError" is not exported by
+     * virtual:#imports »), et le serveur reste en 503 en reconstruisant en boucle. ⚠️ Il ne s'agit
+     * PAS d'une boucle de surveillance : chaque passe échoue, et seule la dernière ligne du
+     * journal dit pourquoi — le défilement de « Building server » donne le change.
+     *
+     * ⚠️ LES MONTER NE SUFFIT PAS : `nuxt-qrcode` est DÉJÀ à sa dernière version publiée et
+     * importe quand même depuis `#imports`. Le correctif ne nous appartient pas, il appartient à
+     * ces modules — d'où la couche de compatibilité, à retirer module par module à mesure qu'ils
+     * passeront à `nuxt/server`. (`@nuxt/image` 2.2.1 l'a fait, mais le monter pour ce seul motif
+     * n'avancerait à rien tant que les six autres sont là, et la décision du 15/10 est de garder
+     * ce module en place sans y toucher.)
+     *
+     * 📍 Le défaut est resté invisible jusqu'à Nuxt 4.6.4 : les versions antérieures
+     * n'appliquaient pas ce réglage, bien que `compatibilityVersion: 5` fût déjà déclaré.
+     */
+    nitroAutoImports: true,
     // Améliorer les performances avec la lazy hydration
     lazyHydration: true,
     /*

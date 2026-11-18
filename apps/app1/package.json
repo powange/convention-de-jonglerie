@@ -122,7 +122,7 @@
     "luxon": "^3.7.2",
     "md5": "^2.3.0",
     "nodemailer": "^10.1.4",
-    "nuxt": "^4.5.2",
+    "nuxt": "^4.6.4",
     "nuxt-auth-utils": "^0.5.29",
     "nuxt-qrcode": "^0.4.8",
     "nuxt-security": "^2.5.1",
