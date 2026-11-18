@@ -92,7 +92,7 @@
 
             <UFormField
               :label="$t('gestion.ticketing.infomaniak_app_password')"
-              :hint="$t('gestion.ticketing.infomaniak_app_password_hint')"
+              :help="$t('gestion.ticketing.infomaniak_app_password_hint')"
             >
               <UInput
                 v-model="localConfig.applicationPassword"
