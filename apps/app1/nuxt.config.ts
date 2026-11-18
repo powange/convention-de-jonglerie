@@ -938,4 +938,27 @@ export default defineNuxtConfig({
     enabled: process.env.NODE_ENV !== 'production',
     excludeLinks: ['mailto:*', 'tel:*'],
   },
+
+  /*
+   * Les deux modules que `@nuxtjs/seo` v6 installe d'office, désactivés DÉLIBÉRÉMENT.
+   *
+   * Ils ne sont pas désactivés parce qu'ils seraient mauvais, mais pour qu'une montée de version
+   * reste une montée de version : tous deux ajoutent du comportement visible que personne n'a
+   * demandé en même temps que le bump.
+   *
+   * `aiReady` publierait `llms.txt`, `llms-full.txt` et une version Markdown de chaque page —
+   * donc une nouvelle surface publique, exposant le contenu du site aux explorateurs d'IA. C'est
+   * une décision de produit, pas un effet de bord de dépendance.
+   *
+   * `skewProtection` garde disponibles les fichiers des builds précédents, pour qu'un onglet resté
+   * ouvert pendant un déploiement ne tombe pas sur une bribe manquante. ⚠️ Ce n'est PAS redondant
+   * avec notre répertoire de build par commit (`shared/utils/repertoire-de-build.ts`) : celui-ci
+   * empêche de servir un MAUVAIS contenu, celui-là empêche d'en servir AUCUN. Il adresse donc un
+   * défaut que nous avons réellement eu. Mais il stocke ses fichiers dans
+   * `node_modules/.cache/nuxt-seo/skew-protection`, et nos piles tirent une image préconstruite :
+   * il faudrait que ce cache traverse les constructions de la CI, ce qui est un changement
+   * d'infrastructure à instruire à part.
+   */
+  aiReady: false,
+  skewProtection: false,
 })
