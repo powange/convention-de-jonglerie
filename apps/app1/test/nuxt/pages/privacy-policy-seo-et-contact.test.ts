@@ -1,8 +1,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { mountSuspended } from '@nuxt/test-utils/runtime'
+import { afterEach, describe, expect, it } from 'vitest'
 
 /**
  * Le titre d'onglet était français pour les treize langues, et l'adresse de contact en dur
@@ -30,42 +30,84 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
  * l'entête du document, qu'un montage de composant ne rend pas, et asserter le texte traduit
  * serait de toute façon transitoire — l'environnement de test est en anglais.
  */
-const config = vi.hoisted(() => ({ adresse: 'contact@exemple.test' }))
-
 /*
- * ⚠️ LE BLOC `app` N'EST PAS DÉCORATIF. Remplacer `useRuntimeConfig` par le seul `public` fait
- * échouer la mise en place de Nuxt elle-même, AVANT tout test : son routeur lit `app.baseURL` par
- * ce même appel, et `useRouter()` rendait donc `undefined`. Les six cas sortaient « skipped » sur
- * un `TypeError` étranger à ce qu'ils mesurent.
+ * ⚠️ AUCUN BOUCHON DE `useRuntimeConfig` ICI, ET C'EST DÉLIBÉRÉ.
+ *
+ * Ce fichier en portait un : `mockNuxtImport('useRuntimeConfig', …)` rendant un objet écrit à la
+ * main. Or cette fonction substitue l'implémentation ENTIÈRE, donc tout ce que les plugins de Nuxt
+ * et des modules y lisent doit être satisfait par cet objet. Trois pannes l'ont montré :
+ *
+ * 1. sans le bloc `app`, le routeur de Nuxt lit `app.baseURL` par ce même appel : `useRouter()`
+ *    rend `undefined` et les six cas sortent « skipped » sur un `TypeError` ;
+ * 2. le 18/11/2026, la montée de `@nuxtjs/seo` en 6.0.1 a fait tomber les deux cas qui montent la
+ *    page, sur **`useI18n()` qui lève dans son `setup`** (vue-i18n code 27 : i18n non installé).
+ *    Le symptôme désigne la page, qui rend parfaitement — HTTP 200 vérifié en développement ET en
+ *    production. Mesuré : avec `nuxtseo: false`, les six cas repassaient ;
+ * 3. un relais « tolérant » rendant `{}` pour toute clé absente a bien fait passer les plugins,
+ *    mais `unhead` tombait alors sur `TypeError: object is not a function` — il lisait une clé
+ *    dont il attendait une fonction. **Un bouchon trop complaisant déplace la panne.**
+ *
+ * 📍 La leçon : deviner les clés qu'un bouchon doit fournir ne passe pas à l'échelle, et la liste
+ * change à chaque montée de dépendance. On modifie donc la configuration RÉELLE de l'application
+ * de test, et on la remet en place après — ce que le test mesure est inchangé, et plus rien ici ne
+ * dépend des modules installés.
  */
-mockNuxtImport('useRuntimeConfig', () => () => ({
-  app: { baseURL: '/', buildAssetsDir: '/_nuxt/', cdnURL: '' },
-  public: { contactEmail: config.adresse },
-}))
-
 import PageConfidentialite from '../../../app/pages/privacy-policy.vue'
 
-let monte: { unmount: () => void; html: () => string } | null = null
+/*
+ * ⚠️ TYPÉ PAR LE RETOUR DE `mountSuspended`, et non par une forme écrite à la main.
+ *
+ * La version précédente déclarait `{ unmount, html } | null` puis assignait `as never` : TypeScript
+ * réduit alors la variable à `never` par analyse de flux, et chaque `monte!.html()` devenait un
+ * TS2339 « la propriété n'existe pas ». Trois erreurs de typage pour un raccourci d'écriture.
+ * Motif repris de `entry-modal-ligne-previsionnelle.test.ts`.
+ */
+let monte: Awaited<ReturnType<typeof mountSuspended>> | null = null
+/** Relevée au moment où on la remplace, pour la remettre — et pour servir de témoin. */
+let adresseOrigine: string | undefined
+
+const publique = () => useRuntimeConfig().public as unknown as Record<string, unknown>
+
+/** Déclare l'adresse dans la configuration réelle, en gardant trace de celle qu'elle remplace. */
+const declarerAdresse = (adresse: string) => {
+  adresseOrigine = publique().contactEmail as string | undefined
+  expect(
+    adresseOrigine,
+    'le témoin est inutilisable : la configuration déclare déjà l’adresse d’essai'
+  ).not.toBe(adresse)
+  publique().contactEmail = adresse
+}
+
 afterEach(() => {
   monte?.unmount()
   monte = null
-  config.adresse = 'contact@exemple.test'
+  if (adresseOrigine !== undefined) {
+    publique().contactEmail = adresseOrigine
+    adresseOrigine = undefined
+  }
 })
 
 describe("confidentialité — l'adresse de contact vient de la configuration", () => {
+  const ADRESSE = 'rgpd@convention.test'
+
   it("affiche l'adresse déclarée, et non une adresse écrite dans le gabarit", async () => {
-    config.adresse = 'rgpd@convention.test'
-    monte = (await mountSuspended(PageConfidentialite)) as never
-    expect(monte!.html()).toContain('rgpd@convention.test')
-    // 📍 L'adresse d'origine ne doit plus apparaître : c'est ce qui distingue « lu de la
-    // configuration » de « écrit en dur à côté d'une valeur configurable ».
-    expect(monte!.html()).not.toContain('powange@gmail.com')
+    declarerAdresse(ADRESSE)
+    monte = await mountSuspended(PageConfidentialite)
+
+    expect(monte!.html()).toContain(ADRESSE)
+    /*
+     * 📍 L'adresse QUE LA CONFIGURATION DÉCLARAIT ne doit plus apparaître : c'est ce qui distingue
+     * « lu de la configuration » de « écrit en dur à côté d'une valeur configurable ». Visée par
+     * le témoin relevé plus haut, et non par une adresse recopiée ici — qui deviendrait fausse au
+     * premier changement de configuration, et qui n'a rien à faire dans un fichier de test.
+     */
+    expect(monte!.html()).not.toContain(adresseOrigine!)
   })
 
   it('en fait un lien cliquable', async () => {
-    config.adresse = 'rgpd@convention.test'
-    monte = (await mountSuspended(PageConfidentialite)) as never
-    expect(monte!.html()).toContain('mailto:rgpd@convention.test')
+    declarerAdresse(ADRESSE)
+    monte = await mountSuspended(PageConfidentialite)
+    expect(monte!.html()).toContain(`mailto:${ADRESSE}`)
   })
 })
 

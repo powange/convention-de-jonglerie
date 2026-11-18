@@ -818,6 +818,25 @@ useSeoMeta({
 
 // Schema.org Event pour l'édition
 useSchemaOrg([
+  /*
+   * ⚠️ CET APPEL PORTE UN TS2345 GELÉ, et quatre annotations qui n'en sont pas la cause.
+   *
+   * `nuxt-schema-org` 7 (montée de `@nuxtjs/seo` en 6.0.1, 18/11/2026) type `defineEvent` par une
+   * union dont une branche est un `WritableComputedRef`. TypeScript rapporte donc notre objet
+   * comme « manquant `value`, `effect`, [RefSymbol] » : il le juge contre la branche *computed
+   * ref*, faute de pouvoir satisfaire l'autre. Le message cite les onze propriétés et ne désigne
+   * pas la cause.
+   *
+   * Trois tentatives mesurées : élargir les littéraux en `string`, annoter les quatre membres
+   * ci-dessous, nommer l'objet et fournir son paramètre de type. **Aucune ne lève le TS2345.**
+   * L'erreur est donc gelée dans `typecheck-dette-2345.txt` — incompatibilité de générique chez le
+   * tiers —, et le RENDU est vérifié : le graphe Schema.org de cette page contient bien `Event`,
+   * `Place`, `PostalAddress`, `GeoCoordinates`, `Organization` et `Offer`.
+   *
+   * 📍 Les annotations de retour, elles, sont conservées pour leur propre compte : sans elles,
+   * `location`, `image`, `organizer` et `offers` étaient `any` par circularité (`TS7023`,
+   * « référencé dans l'une de ses propres expressions de retour »). Trois erreurs en moins.
+   */
   defineEvent({
     name: () => editionName.value,
     description: () =>
@@ -825,7 +844,7 @@ useSchemaOrg([
       (editionDescription.value.length > 200 ? '...' : ''),
     startDate: () => edition.value?.startDate || '',
     endDate: () => edition.value?.endDate || '',
-    location: () =>
+    location: (): Record<string, unknown> | undefined =>
       edition.value?.city
         ? {
             '@type': 'Place',
@@ -850,18 +869,19 @@ useSchemaOrg([
                 : undefined,
           }
         : undefined,
-    image: () => (editionImageUrl.value ? [editionImageUrl.value] : undefined),
+    image: (): string[] | undefined =>
+      editionImageUrl.value ? [editionImageUrl.value] : undefined,
     url: () => `${useRequestURLOrigin}/editions/${edition.value?.id || editionId}`,
     eventStatus: 'EventScheduled',
     eventAttendanceMode: 'OfflineEventAttendanceMode', // Les conventions de jonglerie sont des événements physiques
-    organizer: () => ({
+    organizer: (): Record<string, unknown> => ({
       '@type': 'Organization',
       name: conventionName.value,
       url: edition.value?.convention
         ? `${useRequestURLOrigin}/conventions/${edition.value.convention.id}`
         : undefined,
     }),
-    offers: () =>
+    offers: (): Record<string, unknown>[] | undefined =>
       tiers.value && tiers.value.length > 0
         ? tiers.value.map((tier: any) => ({
             '@type': 'Offer',
