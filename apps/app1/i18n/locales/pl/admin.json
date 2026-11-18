@@ -889,6 +889,71 @@
     "volunteer_reminders": "Przypomnienia wolontariuszy",
     "workshops_created": "Utworzone warsztaty",
     "backup_restore_dropped_tables": "Usunięto {count} tabel(e) nieobecnych w kopii zapasowej",
-    "backup_restore_step_migrations": "Stosowanie migracji"
+    "backup_restore_step_migrations": "Stosowanie migracji",
+    "veille": {
+      "already_imported": "Już zaimportowane",
+      "days": "{count} dzień/dni",
+      "description": "Wydarzenia znalezione w zewnętrznych kalendarzach, do rozstrzygnięcia przed importem. Odrzucenie jest ostateczne: późniejsze przejrzenie nie zaproponuje ich ponownie.",
+      "empty": "Brak kandydatów dla tych filtrów",
+      "error": {
+        "classify": "Nie udało się rozpocząć klasyfikacji",
+        "classify_partial": "{classes} sklasyfikowano, {echecs} nie udało się: {erreur}",
+        "load": "Nie udało się wczytać kandydatów",
+        "refresh": "Nie udało się ponownie odczytać kalendarzy",
+        "refresh_partial": "Nieczytelne źródła: {sources}. Brak nowości nie znaczy, że nie mają już wydarzeń.",
+        "verdict_partial": "{reussis} rozstrzygnięć zapisano, {echecs} nie udało się"
+      },
+      "filter": {
+        "ai_opinion": "Ocena SI",
+        "all_countries": "Wszystkie kraje",
+        "all_opinions": "Wszystkie oceny",
+        "all_sources": "Wszystkie źródła",
+        "country": "Kraj",
+        "hide_imported": "Ukryj już zaimportowane",
+        "source": "Źródło"
+      },
+      "ia": {
+        "classified": "{count} kandydatów sklasyfikowanych przez SI",
+        "classify": "Sklasyfikuj przez SI",
+        "classify_hint": "Przesyła {lot} kandydatów do modelu, jedno wywołanie na wydarzenie. Pozostaje {restants} do sklasyfikowania — uruchom tyle razy, ile potrzeba.",
+        "nothing_to_classify": "Wszyscy kandydaci do przejrzenia mają już ocenę modelu",
+        "opinion": {
+          "AUCUN": "Jeszcze niesklasyfikowane",
+          "CONVENTION": "SI: konwent",
+          "HORS_SUJET": "SI: nie na temat",
+          "INCERTAIN": "SI: niepewne"
+        },
+        "unreadable": "{classes} sklasyfikowano, {illisibles} nieczytelnych odpowiedzi — dla nich nic nie zapisano"
+      },
+      "import_one": "Zaimportuj ten konwent",
+      "open_source": "Zobacz w kalendarzu",
+      "refresh": "Odczytaj kalendarze ponownie",
+      "selection": {
+        "clear": "Odznacz wszystko",
+        "count": "{count} zaznaczonych",
+        "import": "Zaimportuj zaznaczone",
+        "import_limit": "Import przyjmuje najwyżej {max} adresów URL i powyżej tej liczby odrzuca całą paczkę. Zmniejsz zaznaczenie (obecnie {count})."
+      },
+      "stats": {
+        "refused": "Odrzucone",
+        "retained": "Zachowane",
+        "to_review": "Do przejrzenia"
+      },
+      "success": {
+        "refresh": "{count} nowych kandydatów",
+        "verdict": "{count} rozstrzygnięć zapisano"
+      },
+      "title": "Monitorowanie konwentów",
+      "verdict": {
+        "convention": "To jest konwent żonglerski",
+        "refuse": "To nie jest konwent",
+        "reset": "Wróć do przejrzenia"
+      },
+      "verdict_label": {
+        "A_EXAMINER": "Do przejrzenia",
+        "CONVENTION": "Zachowane",
+        "REFUSE": "Odrzucone"
+      }
+    }
   }
 }

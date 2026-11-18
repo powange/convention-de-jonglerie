@@ -284,6 +284,13 @@
       "deleted": "Notifikation slettet",
       "delete_failed": "Notifikationen kunne ikke slettes",
       "load_more_failed": "Der kunne ikke indlæses flere notifikationer"
+    },
+    "email": {
+      "automatic": "Denne e-mail er sendt automatisk af Juggling Convention.",
+      "greeting": "Hej {prenom},",
+      "manage_notifications": "Administrér mine notifikationer",
+      "signature": "— Juggling Convention-teamet",
+      "support_project": "Støt projektet"
     }
   },
   "push_notifications": {

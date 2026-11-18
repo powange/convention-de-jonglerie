@@ -204,7 +204,15 @@
     "leave_without_saving": "Esci senza salvare",
     "unsaved_changes": "Modifiche non salvate",
     "unsaved_changes_warning": "Hai modifiche che non sono state salvate. Se esci da questa pagina ora, andranno perse.",
-    "deleted_account": "Account eliminato"
+    "deleted_account": "Account eliminato",
+    "change_profile_picture": "Cambia la foto del profilo",
+    "contact": "Contatta",
+    "decrease_quantity": "Riduci la quantità",
+    "help": "Aiuto",
+    "increase_quantity": "Aumenta la quantità",
+    "pin": "Fissa",
+    "send": "Invia",
+    "show_qr_code": "Mostra il codice QR"
   },
   "dates": {
     "date_range": "Dal {startDate} al {endDate}",

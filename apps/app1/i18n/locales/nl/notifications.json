@@ -284,6 +284,13 @@
       "deleted": "Melding verwijderd",
       "delete_failed": "De melding kon niet worden verwijderd",
       "load_more_failed": "Er konden geen meldingen meer worden geladen"
+    },
+    "email": {
+      "automatic": "Deze e-mail is automatisch verzonden door Juggling Convention.",
+      "greeting": "Hallo {prenom},",
+      "manage_notifications": "Mijn meldingen beheren",
+      "signature": "— Het team van Juggling Convention",
+      "support_project": "Het project steunen"
     }
   },
   "push_notifications": {

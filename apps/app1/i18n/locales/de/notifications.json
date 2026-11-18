@@ -284,6 +284,13 @@
       "deleted": "Benachrichtigung gelöscht",
       "delete_failed": "Die Benachrichtigung konnte nicht gelöscht werden",
       "load_more_failed": "Es konnten keine weiteren Benachrichtigungen geladen werden"
+    },
+    "email": {
+      "automatic": "Diese E-Mail wurde automatisch von Juggling Convention gesendet.",
+      "greeting": "Hallo {prenom},",
+      "manage_notifications": "Meine Benachrichtigungen verwalten",
+      "signature": "— Das Team von Juggling Convention",
+      "support_project": "Das Projekt unterstützen"
     }
   },
   "push_notifications": {

@@ -284,6 +284,13 @@
       "deleted": "Powiadomienie usunięte",
       "delete_failed": "Nie udało się usunąć powiadomienia",
       "load_more_failed": "Nie udało się wczytać kolejnych powiadomień"
+    },
+    "email": {
+      "automatic": "Ten e-mail został wysłany automatycznie przez Juggling Convention.",
+      "greeting": "Dzień dobry {prenom},",
+      "manage_notifications": "Zarządzaj moimi powiadomieniami",
+      "signature": "— Zespół Juggling Convention",
+      "support_project": "Wsparcie projektu"
     }
   },
   "push_notifications": {

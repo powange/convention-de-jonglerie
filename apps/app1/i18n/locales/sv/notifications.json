@@ -284,6 +284,13 @@
       "deleted": "Avisering borttagen",
       "delete_failed": "Aviseringen kunde inte tas bort",
       "load_more_failed": "Det gick inte att läsa in fler aviseringar"
+    },
+    "email": {
+      "automatic": "Det här e-postmeddelandet skickades automatiskt av Juggling Convention.",
+      "greeting": "Hej {prenom},",
+      "manage_notifications": "Hantera mina aviseringar",
+      "signature": "— Teamet på Juggling Convention",
+      "support_project": "Stöd projektet"
     }
   },
   "push_notifications": {

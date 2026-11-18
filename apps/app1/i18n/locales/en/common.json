@@ -204,7 +204,15 @@
     "leave_without_saving": "Leave without saving",
     "unsaved_changes": "Unsaved changes",
     "unsaved_changes_warning": "You have changes that have not been saved. If you leave this page now, they will be lost.",
-    "deleted_account": "Deleted account"
+    "deleted_account": "Deleted account",
+    "change_profile_picture": "Change profile picture",
+    "contact": "Contact",
+    "decrease_quantity": "Decrease quantity",
+    "help": "Help",
+    "increase_quantity": "Increase quantity",
+    "pin": "Pin",
+    "send": "Send",
+    "show_qr_code": "Show QR code"
   },
   "dates": {
     "date_range": "From {startDate} to {endDate}",

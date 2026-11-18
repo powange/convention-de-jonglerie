@@ -284,6 +284,13 @@
       "deleted": "Notification deleted",
       "delete_failed": "Could not delete the notification",
       "load_more_failed": "Could not load more notifications"
+    },
+    "email": {
+      "automatic": "This email was sent automatically by Juggling Convention.",
+      "greeting": "Hello {prenom},",
+      "manage_notifications": "Manage my notifications",
+      "signature": "— The Juggling Convention team",
+      "support_project": "Support the project"
     }
   },
   "push_notifications": {

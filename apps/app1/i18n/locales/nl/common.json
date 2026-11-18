@@ -204,7 +204,15 @@
     "leave_without_saving": "Verlaten zonder opslaan",
     "unsaved_changes": "Niet-opgeslagen wijzigingen",
     "unsaved_changes_warning": "Je hebt wijzigingen die niet zijn opgeslagen. Als je deze pagina nu verlaat, gaan ze verloren.",
-    "deleted_account": "Verwijderd account"
+    "deleted_account": "Verwijderd account",
+    "change_profile_picture": "Profielfoto wijzigen",
+    "contact": "Contact opnemen",
+    "decrease_quantity": "Aantal verlagen",
+    "help": "Hulp",
+    "increase_quantity": "Aantal verhogen",
+    "pin": "Vastmaken",
+    "send": "Verzenden",
+    "show_qr_code": "QR-code weergeven"
   },
   "dates": {
     "date_range": "Van {startDate} tot {endDate}",

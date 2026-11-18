@@ -76,7 +76,10 @@
       "group_partial": "Неповне підтвердження",
       "group_title": "Люди з кількома перепустками",
       "group_validate": "Підтвердити решту перепустки | Підтвердити решту перепусток ({count})",
-      "group_validated": "Підтверджено {count} перепустку | Підтверджено перепусток: {count}"
+      "group_validated": "Підтверджено {count} перепустку | Підтверджено перепусток: {count}",
+      "manual_entry_label": "Ручне введення коду",
+      "manual_entry_placeholder": "Введіть код квитка",
+      "scanner_hint": "Розташуйте QR-код перед камерою. Розпізнавання відбувається автоматично."
     },
     "counters": {
       "connected": "Підключено",
@@ -115,12 +118,41 @@
       "syncing": "Синхронізація...",
       "title": "Лічильники",
       "token_regenerated": "Посилання успішно регенеровано",
-      "last_actor": "Змінив"
+      "last_actor": "Змінив",
+      "leave_with_pending": "Підрахунків, що чекають надсилання на сервер: {count}. Вони зберігаються на цьому пристрої й підуть, коли повернеться мережа, — але поки вони не надіслані, інші екрани їх не бачать.",
+      "leave_with_pending_title": "Частина підрахунків не надіслана"
     },
     "custom_fields": {
       "created": "Користувацьке поле успішно створено",
       "error_saving": "Не вдалося зберегти користувацьке поле",
-      "updated": "Користувацьке поле успішно оновлено"
+      "updated": "Користувацьке поле успішно оновлено",
+      "associations": {
+        "intro": "Налаштуйте тарифи, пов’язані з цим користувацьким полем.",
+        "tiers_label": "Пов’язані тарифи",
+        "title": "Зв’язки"
+      },
+      "list": {
+        "choices_prefix": "Варіанти:",
+        "delete_confirm_title": "Видалити користувацьке поле",
+        "delete_field": "Видалити поле",
+        "edit_field": "Змінити поле",
+        "handout_items_prefix": "Предмети до видачі:",
+        "manage_associations": "Керувати зв’язками",
+        "quotas_prefix": "Квоти:",
+        "required_badge": "Обов’язкове",
+        "tiers_prefix": "Тарифи:",
+        "title": "Користувацькі поля"
+      },
+      "modal": {
+        "choices_placeholder": "Напр.: S, M, L, XL",
+        "label_label": "Підпис поля",
+        "label_placeholder": "Напр.: розмір футболки",
+        "quotas_items_association": "Зв’язки квот і предметів",
+        "required_checkbox": "Це поле обов’язкове",
+        "required_label": "Обов’язкове поле",
+        "tiers_association": "Зв’язок із тарифами",
+        "type_label": "Тип поля"
+      }
     },
     "external": {
       "config_delete_error": "Не вдалося видалити конфігурацію",
@@ -145,7 +177,19 @@
       "tiers_load_error": "Не вдалося завантажити тарифи",
       "tiers_loaded": "Тарифи завантажено",
       "tiers_loaded_description": "Знайдено {tiers} тарифів, {options} опцій та {fields} користувацьких полів",
-      "view_loaded_data": "Переглянути завантажені дані"
+      "view_loaded_data": "Переглянути завантажені дані",
+      "client_id_hint": "Публічний ідентифікатор вашого API-клієнта",
+      "client_secret_hint": "Секретний ключ (шифрується після збереження)",
+      "form_detected": "Форму визначено",
+      "form_prefix": "Форма:",
+      "form_slug_hint": "Назва вашої форми в URL",
+      "form_type_hint": "Тип, видимий в URL HelloAsso",
+      "form_url_label": "URL вашого продажу квитків на HelloAsso",
+      "helloasso_connect_description": "Підключіть свій акаунт HelloAsso, щоб квитки та учасники синхронізувалися автоматично.",
+      "identify_form": "Визначити вашу форму",
+      "organization_prefix": "Організація:",
+      "organization_slug_hint": "Назва вашої організації в URL",
+      "type_prefix": "Тип:"
     },
     "handout_items": {
       "list": {
@@ -226,7 +270,12 @@
       "error_saving": "Не вдалося зберегти опцію",
       "list": {
         "loading": "Завантаження...",
-        "none_found": "Параметри не знайдено"
+        "none_found": "Параметри не знайдено",
+        "choices_prefix": "Варіанти:",
+        "delete_title": "Видалити опцію",
+        "meals_prefix": "Харчування:",
+        "quotas_prefix": "Квоти:",
+        "tiers_prefix": "Тарифи:"
       },
       "modal": {
         "choices_label": "Доступні варіанти",
@@ -239,7 +288,19 @@
         "position_label": "Позиція відображення",
         "position_placeholder": "0",
         "title": "Параметр HelloAsso",
-        "type_label": "Тип параметра"
+        "type_label": "Тип параметра",
+        "all_tiers": "Усі тарифи",
+        "choices_help": "Один варіант на рядок",
+        "helloasso_locked": "Ця опція синхронізується з HelloAsso і не може бути змінена.",
+        "meals_help": "Ця опція дасть доступ до вибраних прийомів їжі",
+        "meals_label": "Пов’язане харчування",
+        "meals_placeholder": "Виберіть прийоми їжі…",
+        "no_meal_selected": "Прийоми їжі не вибрані",
+        "position_help": "Порядок відображення (0 = першим)",
+        "price_help": "Додаткова ціна в євро (залиште порожнім, якщо опція безкоштовна)",
+        "price_label": "Ціна опції",
+        "tiers_label": "Пов’язані тарифи",
+        "tiers_placeholder": "Виберіть тарифи…"
       },
       "name_required": "Назва опції обов'язкова",
       "updated": "Опцію успішно оновлено"
@@ -311,7 +372,43 @@
       "discount_saved": "Знижку збережено",
       "order_discount_part": "з них {amount} повернено у вигляді знижки",
       "stats_discounted_help": "Повернено за квитками, які залишаються дійсними — уже відняте від підсумку",
-      "stats_discounted_title": "Знижки"
+      "stats_discounted_title": "Знижки",
+      "amount_prefix": "Сума:",
+      "amounts_by_method_title": "Розподіл сум за способом оплати",
+      "awaiting_short": "Очікує",
+      "check_number_label": "Номер чека (необов’язково)",
+      "check_payments": "Оплати чеком",
+      "email_prefix": "Ел. пошта:",
+      "external_not_configured": "Зовнішній продаж квитків не налаштовано",
+      "filter_all_types": "Усі типи",
+      "filter_field_placeholder": "Виберіть поле",
+      "filter_methods_placeholder": "Усі способи",
+      "filter_options_placeholder": "Виберіть опції",
+      "filter_tickets_placeholder": "Усі квитки",
+      "filter_tiers_placeholder": "Виберіть тарифи",
+      "filter_types_placeholder": "Усі типи",
+      "filter_value_placeholder": "Виберіть значення",
+      "grand_total": "Загальний підсумок",
+      "last_sync": "Остання синхронізація",
+      "old_paid_orders": "Давніші оплачені замовлення",
+      "paid_card": "Оплачено — карткою",
+      "paid_cash": "Оплачено — готівкою",
+      "paid_unknown_method": "Оплачено — спосіб не вказано",
+      "participant_prefix": "Учасник:",
+      "pay_card": "Оплата карткою",
+      "pay_cash": "Оплата готівкою",
+      "pay_check": "Оплата чеком",
+      "qr_title": "QR-код квитка",
+      "qr_value_prefix": "Значення QR-коду:",
+      "search_placeholder": "Шукати за іменем, ел. поштою, номером чека…",
+      "set_payment_method": "Вказати спосіб оплати",
+      "stat_donations": "Донати",
+      "stat_orders": "Замовлення",
+      "stat_tickets": "Квитки",
+      "stat_total_amount": "Загальна сума",
+      "ticket_prefix": "Квиток:",
+      "tickets_prefix": "Квитки:",
+      "unfinished_orders": "Незавершені замовлення"
     },
     "origin_site": "Створено на сайті",
     "participant": {
@@ -325,7 +422,32 @@
       "type": "Тип",
       "volunteer_validated": "Волонтер підтвердив свій вхід",
       "validated_by": "Підтвердив {name}",
-      "validated_on": "{date}"
+      "validated_on": "{date}",
+      "add": {
+        "amount_placeholder": "Сума в євро",
+        "anonymous": "Анонімно",
+        "free_price": "Вільна ціна",
+        "no_ticket_selected": "Квиток не вибрано",
+        "number_placeholder": "Кількість",
+        "option_placeholder": "Виберіть опцію",
+        "options_prefix": "Опції:",
+        "phone_placeholder": "Номер телефону",
+        "user_found_description": "Дані заповнено автоматично",
+        "user_found_title": "Користувача знайдено",
+        "with_info": "З даними"
+      },
+      "artist_guest": "Запрошений артист",
+      "canceled_order_description": "Це замовлення скасовано. Квитки більше не можна підтвердити.",
+      "confirm_payment_title": "Підтвердити оплату",
+      "invalidate_confirm": "Скасувати підтвердження",
+      "invalidate_description": "Ви впевнені, що хочете скасувати вхід цього учасника? Ця дія знімає підтвердження.",
+      "invalidate_title": "Скасувати вхід",
+      "meals_title": "Харчування",
+      "no_show_assigned": "Виступ не призначено",
+      "order_status": "Статус замовлення",
+      "pending_payment_description": "Це замовлення ще не позначено як оплачене. Виберіть спосіб оплати до підтвердження входу.",
+      "pending_payment_title": "Оплата очікується",
+      "ticket_status": "Статус квитка"
     },
     "payment": {
       "cash_received": "Отримана сума (€)",
@@ -337,12 +459,14 @@
         "cash": "Готівка",
         "check": "Чек",
         "pending": "Не оплачено",
-        "pendingSubtitle": "Очікування"
+        "pendingSubtitle": "Очікування",
+        "card_short": "Картка"
       },
       "open_sumup": "Відкрити SumUp",
       "selectMethod": "Виберіть спосіб оплати",
       "sumup_hint": "Підтвердіть оплату в SumUp, потім підтвердіть тут",
-      "sumup_not_configured": "Партнерський ключ і App ID SumUp мають бути налаштовані в параметрах продажу квитків, щоб увімкнути автоматичне заповнення суми."
+      "sumup_not_configured": "Партнерський ключ і App ID SumUp мають бути налаштовані в параметрах продажу квитків, щоб увімкнути автоматичне заповнення суми.",
+      "check_number_placeholder": "Напр.: 1234567"
     },
     "quotas": {
       "created": "Квоту успішно створено",
@@ -414,7 +538,8 @@
         "drag_to_reorder": "Перетягніть для зміни порядку",
         "inactive": "Неактивно",
         "loading": "Завантаження...",
-        "none_found": "Тарифи не знайдено"
+        "none_found": "Тарифи не знайдено",
+        "delete_title": "Видалити тариф"
       },
       "modal": {
         "description_label": "Опис",
@@ -437,10 +562,22 @@
         "price_placeholder": "0,00",
         "quotas_placeholder": "Вибрати квоти",
         "status_label": "Статус",
-        "title": "Тариф HelloAsso"
+        "title": "Тариф HelloAsso",
+        "count_as_participant_label": "Облік учасників",
+        "display_name_placeholder": "Власна назва для відображення",
+        "donation_max_help": "Залиште порожнім для донату без верхньої межі",
+        "helloasso_locked": "Цей тариф синхронізується з HelloAsso. Змінити можна лише предмети до видачі та дати дії.",
+        "no_limit_placeholder": "Без межі",
+        "position_help": "Порядок відображення (0 = першим)",
+        "presence_from_label": "Приїзд",
+        "presence_from_placeholder": "Початок випуску",
+        "presence_until_label": "Від’їзд",
+        "presence_until_placeholder": "Кінець випуску",
+        "price_help": "Може бути 0, щоб дозволити безкоштовну участь"
       },
       "name_required": "Назва тарифу обов'язкова",
-      "updated": "Тариф успішно оновлено"
+      "updated": "Тариф успішно оновлено",
+      "sync_label": "Синх.:"
     },
     "entry_log": {
       "all_movements": "Усі рухи",

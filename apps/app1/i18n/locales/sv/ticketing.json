@@ -76,7 +76,10 @@
       "group_partial": "Ofullständig bekräftelse",
       "group_title": "Personer med flera entréer",
       "group_validate": "Bekräfta den återstående entrén | Bekräfta de {count} återstående entréerna",
-      "group_validated": "{count} entré bekräftad | {count} entréer bekräftade"
+      "group_validated": "{count} entré bekräftad | {count} entréer bekräftade",
+      "manual_entry_label": "Ange koden manuellt",
+      "manual_entry_placeholder": "Ange biljettens kod",
+      "scanner_hint": "Håll QR-koden framför kameran. Avläsningen sker automatiskt."
     },
     "counters": {
       "connected": "Ansluten",
@@ -115,12 +118,41 @@
       "syncing": "Synkroniserar...",
       "title": "Räknare",
       "token_regenerated": "Länk framgångsrikt regenererad",
-      "last_actor": "Ändrad av"
+      "last_actor": "Ändrad av",
+      "leave_with_pending": "{count} räkning(ar) väntar på att skickas till servern. De sparas på den här enheten och skickas när nätverket är tillbaka — men så länge de inte är skickade ser andra skärmar dem inte.",
+      "leave_with_pending_title": "Vissa räkningar är inte skickade"
     },
     "custom_fields": {
       "created": "Anpassat fält skapat framgångsrikt",
       "error_saving": "Kan inte spara anpassat fält",
-      "updated": "Anpassat fält uppdaterat framgångsrikt"
+      "updated": "Anpassat fält uppdaterat framgångsrikt",
+      "associations": {
+        "intro": "Ställ in de priser som är kopplade till det här anpassade fältet.",
+        "tiers_label": "Kopplade priser",
+        "title": "Kopplingar"
+      },
+      "list": {
+        "choices_prefix": "Val:",
+        "delete_confirm_title": "Ta bort det anpassade fältet",
+        "delete_field": "Ta bort fältet",
+        "edit_field": "Ändra fältet",
+        "handout_items_prefix": "Varor att dela ut:",
+        "manage_associations": "Hantera kopplingarna",
+        "quotas_prefix": "Kvoter:",
+        "required_badge": "Obligatoriskt",
+        "tiers_prefix": "Priser:",
+        "title": "Anpassade fält"
+      },
+      "modal": {
+        "choices_placeholder": "T.ex.: S, M, L, XL",
+        "label_label": "Fältets etikett",
+        "label_placeholder": "T.ex.: T-shirtstorlek",
+        "quotas_items_association": "Kopplingar mellan kvoter och varor",
+        "required_checkbox": "Det här fältet är obligatoriskt",
+        "required_label": "Obligatoriskt fält",
+        "tiers_association": "Koppling till priserna",
+        "type_label": "Fälttyp"
+      }
     },
     "external": {
       "config_delete_error": "Kan inte ta bort konfiguration",
@@ -145,7 +177,19 @@
       "tiers_load_error": "Kan inte ladda priser",
       "tiers_loaded": "Priser laddade",
       "tiers_loaded_description": "{tiers} pris(er), {options} alternativ och {fields} anpassade fält hittade",
-      "view_loaded_data": "Visa inlästa data"
+      "view_loaded_data": "Visa inlästa data",
+      "client_id_hint": "Den offentliga identifieraren för din API-klient",
+      "client_secret_hint": "Hemlig nyckel (krypteras efter att den sparats)",
+      "form_detected": "Formulär hittat",
+      "form_prefix": "Formulär:",
+      "form_slug_hint": "Namnet på ditt formulär i URL:en",
+      "form_type_hint": "Den typ som syns i HelloAsso-URL:en",
+      "form_url_label": "URL till din HelloAsso-biljettförsäljning",
+      "helloasso_connect_description": "Anslut ditt HelloAsso-konto för att synkronisera biljetter och deltagare automatiskt.",
+      "identify_form": "Identifiera ditt formulär",
+      "organization_prefix": "Organisation:",
+      "organization_slug_hint": "Namnet på din förening i URL:en",
+      "type_prefix": "Typ:"
     },
     "handout_items": {
       "list": {
@@ -226,7 +270,12 @@
       "error_saving": "Kan inte spara alternativ",
       "list": {
         "loading": "Laddar...",
-        "none_found": "Inga alternativ hittades"
+        "none_found": "Inga alternativ hittades",
+        "choices_prefix": "Val:",
+        "delete_title": "Ta bort tillvalet",
+        "meals_prefix": "Måltider:",
+        "quotas_prefix": "Kvoter:",
+        "tiers_prefix": "Priser:"
       },
       "modal": {
         "choices_label": "Tillgängliga valmöjligheter",
@@ -239,7 +288,19 @@
         "position_label": "Displayens position",
         "position_placeholder": "0",
         "title": "HejAsso-alternativet",
-        "type_label": "Typ av option"
+        "type_label": "Typ av option",
+        "all_tiers": "Alla priser",
+        "choices_help": "Ett val per rad",
+        "helloasso_locked": "Det här tillvalet synkroniseras från HelloAsso och kan inte ändras.",
+        "meals_help": "Det här tillvalet ger tillgång till de valda måltiderna",
+        "meals_label": "Kopplade måltider",
+        "meals_placeholder": "Välj måltiderna …",
+        "no_meal_selected": "Ingen måltid vald",
+        "position_help": "Visningsordning (0 = först)",
+        "price_help": "Extra pris i euro (lämna tomt om tillvalet är gratis)",
+        "price_label": "Tillvalets pris",
+        "tiers_label": "Kopplade priser",
+        "tiers_placeholder": "Välj priserna …"
       },
       "name_required": "Alternativnamn krävs",
       "updated": "Alternativ uppdaterat framgångsrikt"
@@ -311,7 +372,43 @@
       "discount_saved": "Rabatten sparad",
       "order_discount_part": "varav {amount} återbetalda som rabatt",
       "stats_discounted_help": "Återbetalat på biljetter som förblir giltiga — redan avdraget från totalen",
-      "stats_discounted_title": "Rabatter"
+      "stats_discounted_title": "Rabatter",
+      "amount_prefix": "Belopp:",
+      "amounts_by_method_title": "Belopp fördelade per betalningsmetod",
+      "awaiting_short": "Väntar",
+      "check_number_label": "Checknummer (valfritt)",
+      "check_payments": "Betalningar med check",
+      "email_prefix": "E-post:",
+      "external_not_configured": "Extern biljettförsäljning är inte inställd",
+      "filter_all_types": "Alla typer",
+      "filter_field_placeholder": "Välj ett fält",
+      "filter_methods_placeholder": "Alla metoder",
+      "filter_options_placeholder": "Välj tillval",
+      "filter_tickets_placeholder": "Alla biljetter",
+      "filter_tiers_placeholder": "Välj priser",
+      "filter_types_placeholder": "Alla typer",
+      "filter_value_placeholder": "Välj ett värde",
+      "grand_total": "Totalsumma",
+      "last_sync": "Senaste synkronisering",
+      "old_paid_orders": "Äldre betalda ordrar",
+      "paid_card": "Betald — kort",
+      "paid_cash": "Betald — kontant",
+      "paid_unknown_method": "Betald — metod inte angiven",
+      "participant_prefix": "Deltagare:",
+      "pay_card": "Betalning med kort",
+      "pay_cash": "Betalning kontant",
+      "pay_check": "Betalning med check",
+      "qr_title": "Biljettens QR-kod",
+      "qr_value_prefix": "QR-kodens värde:",
+      "search_placeholder": "Sök på namn, e-post, checknummer …",
+      "set_payment_method": "Ange betalningsmetoden",
+      "stat_donations": "Donationer",
+      "stat_orders": "Ordrar",
+      "stat_tickets": "Biljetter",
+      "stat_total_amount": "Totalt belopp",
+      "ticket_prefix": "Biljett:",
+      "tickets_prefix": "Biljetter:",
+      "unfinished_orders": "Ej slutförda ordrar"
     },
     "origin_site": "Skapad på webbplatsen",
     "participant": {
@@ -325,7 +422,32 @@
       "type": "Typ",
       "volunteer_validated": "Volontären har validerat sin post",
       "validated_by": "Validerad av {name}",
-      "validated_on": "den {date}"
+      "validated_on": "den {date}",
+      "add": {
+        "amount_placeholder": "Belopp i euro",
+        "anonymous": "Anonym",
+        "free_price": "Fritt pris",
+        "no_ticket_selected": "Ingen biljett vald",
+        "number_placeholder": "Antal",
+        "option_placeholder": "Välj ett tillval",
+        "options_prefix": "Tillval:",
+        "phone_placeholder": "Telefonnummer",
+        "user_found_description": "Uppgifterna har fyllts i automatiskt",
+        "user_found_title": "Användare hittad",
+        "with_info": "Med uppgifter"
+      },
+      "artist_guest": "Gästartist",
+      "canceled_order_description": "Den här ordern har avbokats. Biljetterna kan inte längre valideras.",
+      "confirm_payment_title": "Bekräfta betalningen",
+      "invalidate_confirm": "Upphäv valideringen",
+      "invalidate_description": "Är du säker på att du vill upphäva den här deltagarens inträde? Åtgärden annullerar valideringen.",
+      "invalidate_title": "Upphäv inträdet",
+      "meals_title": "Måltider",
+      "no_show_assigned": "Ingen föreställning tilldelad",
+      "order_status": "Orderns status",
+      "pending_payment_description": "Den här ordern är ännu inte markerad som betald. Välj betalningsmetod innan du validerar inträdet.",
+      "pending_payment_title": "Betalning väntar",
+      "ticket_status": "Biljettens status"
     },
     "payment": {
       "cash_received": "Mottaget belopp (€)",
@@ -337,12 +459,14 @@
         "cash": "Kontant",
         "check": "Check",
         "pending": "Ej betald",
-        "pendingSubtitle": "Väntar"
+        "pendingSubtitle": "Väntar",
+        "card_short": "Kort"
       },
       "open_sumup": "Öppna SumUp",
       "selectMethod": "Välj betalningsmetod",
       "sumup_hint": "Bekräfta betalningen på SumUp och bekräfta sedan här",
-      "sumup_not_configured": "SumUp-affiliate-nyckeln och App ID måste vara konfigurerade i biljettinställningarna för att aktivera förifyllning av beloppet."
+      "sumup_not_configured": "SumUp-affiliate-nyckeln och App ID måste vara konfigurerade i biljettinställningarna för att aktivera förifyllning av beloppet.",
+      "check_number_placeholder": "T.ex.: 1234567"
     },
     "quotas": {
       "created": "Kvot skapad framgångsrikt",
@@ -414,7 +538,8 @@
         "drag_to_reorder": "Dra för att ändra ordning",
         "inactive": "Inaktiv",
         "loading": "Laddar...",
-        "none_found": "Inga tariffer hittades"
+        "none_found": "Inga tariffer hittades",
+        "delete_title": "Ta bort priset"
       },
       "modal": {
         "description_label": "Beskrivning",
@@ -437,10 +562,22 @@
         "price_placeholder": "0.00",
         "quotas_placeholder": "Välja kvoter",
         "status_label": "Status",
-        "title": "HelloAsso pris"
+        "title": "HelloAsso pris",
+        "count_as_participant_label": "Räkning av deltagarna",
+        "display_name_placeholder": "Anpassat namn för visning",
+        "donation_max_help": "Lämna tomt för en donation utan övre gräns",
+        "helloasso_locked": "Det här priset synkroniseras från HelloAsso. Bara varorna att dela ut och giltighetsdatumen kan ändras.",
+        "no_limit_placeholder": "Ingen gräns",
+        "position_help": "Visningsordning (0 = först)",
+        "presence_from_label": "Ankomst",
+        "presence_from_placeholder": "Upplagans början",
+        "presence_until_label": "Avresa",
+        "presence_until_placeholder": "Upplagans slut",
+        "price_help": "Kan vara 0 för att tillåta gratis deltagande"
       },
       "name_required": "Prisnamn krävs",
-      "updated": "Pris uppdaterat framgångsrikt"
+      "updated": "Pris uppdaterat framgångsrikt",
+      "sync_label": "Synk:"
     },
     "entry_log": {
       "all_movements": "Alla rörelser",

@@ -70,6 +70,7 @@
       "team_leader_from_volunteer": "Nowa wiadomość od wolontariusza {teamName} - {editionName}",
       "volunteer_to_organizers_from_organizer": "Nowa wiadomość od organizatora {editionName}",
       "volunteer_to_organizers_from_volunteer": "Nowa wiadomość od wolontariusza {editionName}"
-    }
+    },
+    "reconnecting": "Ponowne łączenie z rozmową…"
   }
 }

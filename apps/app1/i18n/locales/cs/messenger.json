@@ -70,6 +70,7 @@
       "team_leader_from_volunteer": "Nová zpráva od dobrovolníka {teamName} - {editionName}",
       "volunteer_to_organizers_from_organizer": "Nová zpráva od organizátora {editionName}",
       "volunteer_to_organizers_from_volunteer": "Nová zpráva od dobrovolníka {editionName}"
-    }
+    },
+    "reconnecting": "Opětovné připojení ke konverzaci…"
   }
 }

@@ -284,6 +284,13 @@
       "deleted": "Уведомление удалено",
       "delete_failed": "Не удалось удалить уведомление",
       "load_more_failed": "Не удалось загрузить больше уведомлений"
+    },
+    "email": {
+      "automatic": "Это письмо отправлено автоматически сервисом Juggling Convention.",
+      "greeting": "Здравствуйте, {prenom}!",
+      "manage_notifications": "Управлять моими уведомлениями",
+      "signature": "— Команда Juggling Convention",
+      "support_project": "Поддержать проект"
     }
   },
   "push_notifications": {

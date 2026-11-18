@@ -70,6 +70,7 @@
       "team_leader_from_volunteer": "Neue Nachricht von einem Helfer {teamName} - {editionName}",
       "volunteer_to_organizers_from_organizer": "Neue Nachricht vom Orga-Team {editionName}",
       "volunteer_to_organizers_from_volunteer": "Neue Nachricht von einem Helfer {editionName}"
-    }
+    },
+    "reconnecting": "Verbindung zum Gesprächsverlauf wird wiederhergestellt …"
   }
 }

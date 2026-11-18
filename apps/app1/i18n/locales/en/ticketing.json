@@ -76,7 +76,10 @@
       "group_partial": "Incomplete check-in",
       "group_title": "People with several entries",
       "group_validate": "Check in the remaining entry | Check in the {count} remaining entries",
-      "group_validated": "{count} entry checked in | {count} entries checked in"
+      "group_validated": "{count} entry checked in | {count} entries checked in",
+      "manual_entry_label": "Enter the code manually",
+      "manual_entry_placeholder": "Enter the ticket code",
+      "scanner_hint": "Hold the QR code in front of the camera. Detection is automatic."
     },
     "counters": {
       "connected": "Connected",
@@ -115,12 +118,41 @@
       "syncing": "Syncing...",
       "title": "Counters",
       "token_regenerated": "Link successfully regenerated",
-      "last_actor": "Changed by"
+      "last_actor": "Changed by",
+      "leave_with_pending": "{count} count(s) are waiting to be sent to the server. They are kept on this device and will be sent once the network is back — but until they are sent, other screens cannot see them.",
+      "leave_with_pending_title": "Some counts have not been sent"
     },
     "custom_fields": {
       "created": "Custom field created successfully",
       "error_saving": "Unable to save custom field",
-      "updated": "Custom field updated successfully"
+      "updated": "Custom field updated successfully",
+      "associations": {
+        "intro": "Set up the tiers linked to this custom field.",
+        "tiers_label": "Linked tiers",
+        "title": "Associations"
+      },
+      "list": {
+        "choices_prefix": "Choices:",
+        "delete_confirm_title": "Delete the custom field",
+        "delete_field": "Delete field",
+        "edit_field": "Edit field",
+        "handout_items_prefix": "Items to hand out:",
+        "manage_associations": "Manage associations",
+        "quotas_prefix": "Quotas:",
+        "required_badge": "Required",
+        "tiers_prefix": "Tiers:",
+        "title": "Custom fields"
+      },
+      "modal": {
+        "choices_placeholder": "E.g. S, M, L, XL",
+        "label_label": "Field label",
+        "label_placeholder": "E.g. T-shirt size",
+        "quotas_items_association": "Quota/item associations",
+        "required_checkbox": "This field is required",
+        "required_label": "Required field",
+        "tiers_association": "Link to tiers",
+        "type_label": "Field type"
+      }
     },
     "external": {
       "config_delete_error": "Unable to delete configuration",
@@ -145,7 +177,19 @@
       "tiers_load_error": "Unable to load tiers",
       "tiers_loaded": "Tiers loaded",
       "tiers_loaded_description": "{tiers} tier(s), {options} option(s) and {fields} custom field(s) found",
-      "view_loaded_data": "View loaded data"
+      "view_loaded_data": "View loaded data",
+      "client_id_hint": "Public identifier of your API client",
+      "client_secret_hint": "Secret key (encrypted once saved)",
+      "form_detected": "Form detected",
+      "form_prefix": "Form:",
+      "form_slug_hint": "Your form's name in the URL",
+      "form_type_hint": "The type visible in the HelloAsso URL",
+      "form_url_label": "URL of your HelloAsso ticketing",
+      "helloasso_connect_description": "Connect your HelloAsso account to synchronise tickets and participants automatically.",
+      "identify_form": "Identify your form",
+      "organization_prefix": "Organisation:",
+      "organization_slug_hint": "Your organisation's name in the URL",
+      "type_prefix": "Type:"
     },
     "handout_items": {
       "list": {
@@ -226,7 +270,12 @@
       "error_saving": "Unable to save option",
       "list": {
         "loading": "Loading...",
-        "none_found": "No options found"
+        "none_found": "No options found",
+        "choices_prefix": "Choices:",
+        "delete_title": "Delete the option",
+        "meals_prefix": "Meals:",
+        "quotas_prefix": "Quotas:",
+        "tiers_prefix": "Tiers:"
       },
       "modal": {
         "choices_label": "Available choices",
@@ -239,7 +288,19 @@
         "position_label": "Display position",
         "position_placeholder": "0",
         "title": "HelloAsso option",
-        "type_label": "Option type"
+        "type_label": "Option type",
+        "all_tiers": "All tiers",
+        "choices_help": "One choice per line",
+        "helloasso_locked": "This option is synchronised from HelloAsso and cannot be edited.",
+        "meals_help": "This option will grant access to the selected meals",
+        "meals_label": "Linked meals",
+        "meals_placeholder": "Select the meals...",
+        "no_meal_selected": "No meal selected",
+        "position_help": "Display order (0 = first)",
+        "price_help": "Additional price in euros (leave empty if the option is free)",
+        "price_label": "Option price",
+        "tiers_label": "Linked tiers",
+        "tiers_placeholder": "Select the tiers..."
       },
       "name_required": "Option name is required",
       "updated": "Option updated successfully"
@@ -311,7 +372,43 @@
       "discount_saved": "Discount saved",
       "order_discount_part": "{amount} paid back as a discount",
       "stats_discounted_help": "Paid back on tickets that stay valid — already deducted from the total",
-      "stats_discounted_title": "Discounts"
+      "stats_discounted_title": "Discounts",
+      "amount_prefix": "Amount:",
+      "amounts_by_method_title": "Breakdown of amounts by payment method",
+      "awaiting_short": "Pending",
+      "check_number_label": "Cheque number (optional)",
+      "check_payments": "Cheque payments",
+      "email_prefix": "Email:",
+      "external_not_configured": "External ticketing not configured",
+      "filter_all_types": "All types",
+      "filter_field_placeholder": "Select a field",
+      "filter_methods_placeholder": "All methods",
+      "filter_options_placeholder": "Select options",
+      "filter_tickets_placeholder": "All tickets",
+      "filter_tiers_placeholder": "Select tiers",
+      "filter_types_placeholder": "All types",
+      "filter_value_placeholder": "Select a value",
+      "grand_total": "Grand total",
+      "last_sync": "Last sync",
+      "old_paid_orders": "Older paid orders",
+      "paid_card": "Paid — card",
+      "paid_cash": "Paid — cash",
+      "paid_unknown_method": "Paid — method not specified",
+      "participant_prefix": "Participant:",
+      "pay_card": "Card payment",
+      "pay_cash": "Cash payment",
+      "pay_check": "Cheque payment",
+      "qr_title": "Ticket QR code",
+      "qr_value_prefix": "QR code value:",
+      "search_placeholder": "Search by name, email, cheque number...",
+      "set_payment_method": "Set the payment method",
+      "stat_donations": "Donations",
+      "stat_orders": "Orders",
+      "stat_tickets": "Tickets",
+      "stat_total_amount": "Total amount",
+      "ticket_prefix": "Ticket:",
+      "tickets_prefix": "Tickets:",
+      "unfinished_orders": "Unfinished orders"
     },
     "origin_site": "Created on the site",
     "participant": {
@@ -325,7 +422,32 @@
       "type": "Type",
       "volunteer_validated": "The volunteer has validated their entry",
       "validated_by": "Validated by {name}",
-      "validated_on": "on {date}"
+      "validated_on": "on {date}",
+      "add": {
+        "amount_placeholder": "Amount in euros",
+        "anonymous": "Anonymous",
+        "free_price": "Pay what you want",
+        "no_ticket_selected": "No ticket selected",
+        "number_placeholder": "Number",
+        "option_placeholder": "Select an option",
+        "options_prefix": "Options:",
+        "phone_placeholder": "Phone number",
+        "user_found_description": "The information has been pre-filled automatically",
+        "user_found_title": "User found",
+        "with_info": "With information"
+      },
+      "artist_guest": "Guest artist",
+      "canceled_order_description": "This order has been cancelled. Its tickets can no longer be validated.",
+      "confirm_payment_title": "Confirm payment",
+      "invalidate_confirm": "Invalidate",
+      "invalidate_description": "Are you sure you want to invalidate this participant's entry? This will cancel the validation.",
+      "invalidate_title": "Invalidate the entry",
+      "meals_title": "Meals",
+      "no_show_assigned": "No show assigned",
+      "order_status": "Order status",
+      "pending_payment_description": "This order has not been marked as paid yet. Select the payment method before validating the entry.",
+      "pending_payment_title": "Payment pending",
+      "ticket_status": "Ticket status"
     },
     "payment": {
       "cash_received": "Amount received (€)",
@@ -337,12 +459,14 @@
         "cash": "Cash",
         "check": "Check",
         "pending": "Not paid",
-        "pendingSubtitle": "Pending"
+        "pendingSubtitle": "Pending",
+        "card_short": "Card"
       },
       "open_sumup": "Open SumUp",
       "selectMethod": "Select payment method",
       "sumup_hint": "Confirm the payment on SumUp then confirm here",
-      "sumup_not_configured": "The SumUp affiliate key and App ID must be configured in the ticketing settings to enable amount pre-filling."
+      "sumup_not_configured": "The SumUp affiliate key and App ID must be configured in the ticketing settings to enable amount pre-filling.",
+      "check_number_placeholder": "E.g. 1234567"
     },
     "quotas": {
       "created": "Quota created successfully",
@@ -414,7 +538,8 @@
         "drag_to_reorder": "Drag to reorder",
         "inactive": "Inactive",
         "loading": "Loading...",
-        "none_found": "No tiers found"
+        "none_found": "No tiers found",
+        "delete_title": "Delete the tier"
       },
       "modal": {
         "description_label": "Description",
@@ -437,10 +562,22 @@
         "price_placeholder": "0.00",
         "quotas_placeholder": "Select quotas",
         "status_label": "Status",
-        "title": "HelloAsso tier"
+        "title": "HelloAsso tier",
+        "count_as_participant_label": "Counting of participants",
+        "display_name_placeholder": "Custom name for display",
+        "donation_max_help": "Leave empty for a donation with no upper limit",
+        "helloasso_locked": "This tier is synchronised from HelloAsso. Only the items to hand out and the validity dates can be edited.",
+        "no_limit_placeholder": "No limit",
+        "position_help": "Display order (0 = first)",
+        "presence_from_label": "Arrival",
+        "presence_from_placeholder": "Start of the edition",
+        "presence_until_label": "Departure",
+        "presence_until_placeholder": "End of the edition",
+        "price_help": "Can be 0 to allow free participation"
       },
       "name_required": "Tier name is required",
-      "updated": "Tier updated successfully"
+      "updated": "Tier updated successfully",
+      "sync_label": "Sync:"
     },
     "entry_log": {
       "all_movements": "All movements",

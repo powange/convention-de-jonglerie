@@ -284,6 +284,13 @@
       "deleted": "Oznámení smazáno",
       "delete_failed": "Oznámení se nepodařilo smazat",
       "load_more_failed": "Další oznámení se nepodařilo načíst"
+    },
+    "email": {
+      "automatic": "Tento e-mail byl automaticky odeslán službou Juggling Convention.",
+      "greeting": "Dobrý den {prenom},",
+      "manage_notifications": "Spravovat moje oznámení",
+      "signature": "— Tým Juggling Convention",
+      "support_project": "Podpořit projekt"
     }
   },
   "push_notifications": {
