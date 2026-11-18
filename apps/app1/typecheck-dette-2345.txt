@@ -16,4 +16,24 @@
 # le commentaire du job `typecheck` dans .github/workflows/tests.yml).
 #
 # Clé : <nombre>\t<chemin>\tTS<code>\t<message>. Pas de numéro de ligne, il bouge pour rien.
-# Total gelé : 2 erreur(s) sur 1 entrée(s).
+# Total gelé : 1 erreur(s) sur 1 entrée(s).
+#
+# ─── L'ENTRÉE CI-DESSOUS, et pourquoi elle n'est pas corrigée ───────────────────────────────
+#
+# Apparue le 18/11/2026 avec la montée de `@nuxtjs/seo` en 6.0.1. `nuxt-schema-org` 7 type
+# `defineEvent` par une union dont une branche est un `WritableComputedRef` : TypeScript rapporte
+# notre objet comme « manquant `value`, `effect`, [RefSymbol] », c'est-à-dire qu'il le juge contre
+# cette branche faute de pouvoir satisfaire l'autre. Le message cite les onze propriétés et ne
+# désigne pas la cause.
+#
+# TROIS TENTATIVES MESURÉES, aucune ne la lève :
+#   1. élargir `eventStatus` et `eventAttendanceMode` de leur littéral vers `string` ;
+#   2. annoter les quatre membres rendus `any` par circularité — gain réel et CONSERVÉ : trois
+#      TS7023 en moins, mais sans effet sur celle-ci ;
+#   3. nommer l'objet et fournir `defineEvent<typeof …>` explicitement.
+#
+# Le RENDU est vérifié : le graphe Schema.org d'une page d'édition contient `Event`, `Place`,
+# `PostalAddress`, `GeoCoordinates`, `Organization` et `Offer`. C'est donc une incompatibilité de
+# générique chez le tiers, à reprendre quand `nuxt-schema-org` corrigera son typage.
+# ────────────────────────────────────────────────────────────────────────────────────────────
+1	apps/app1/app/pages/editions/[id]/index.vue	TS2345	Argument of type '{ name: () => string; description: () => string; startDate: () => string; endDate: () => string; location: () => Record<string, unknown> | undefined; image: () => string[] | undefined; url: () => string; eventStatus: "EventScheduled"; eventAttendanceMode: "OfflineEventAttendanceMode"; organizer: () => Record<string,...' is not assignable to parameter of type 'VueSchemaOrgDefinerInput<Event, { name: () => string; description: () => string; startDate: () => string; endDate: () => string; location: () => Record<string, unknown> | undefined; image: () => string[] | undefined; ... 4 more ...; offers: () => Record<...>[] | undefined; }> | undefined'.
