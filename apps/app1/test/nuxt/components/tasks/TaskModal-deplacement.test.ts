@@ -1,7 +1,37 @@
-import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
+import { mockComponent, mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
+import { h } from 'vue'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import TaskModal from '../../../../../../layers/tasks/app/components/tasks/TaskModal.vue'
+
+/**
+ * L'ÉDITEUR MARKDOWN EST BOUCHONNÉ ICI, et ce n'est pas une commodité.
+ *
+ * `TaskModal.vue` rend `<LazyMarkdownEditor>`. Le préfixe `Lazy` en fait un composant
+ * asynchrone : sa chaîne d'imports — `MarkdownEditor` → `EditorToolbar` de Nuxt UI →
+ * `@tiptap/vue-3` → `@tiptap/core` → `@tiptap/pm` → `prosemirror-transform` — se résout APRÈS
+ * la fin des cas, parfois après que Vitest a démonté l'environnement. Il en sort alors six
+ * `EnvironmentTeardownError` et, surtout, un **code de sortie 1 malgré 4 669 tests verts** : le
+ * job `test (nuxt)` de la CI tombe au hasard, sur un lot qui n'y est pour rien.
+ *
+ * Ce fichier était le SEUL de la suite à monter un composant porteur d'éditeur — les sept autres
+ * porteurs n'ont aucun test. Le bouchon est donc exactement au périmètre du défaut.
+ *
+ * ⚠️ Et il est exact au regard de ce qui est éprouvé ici : ces cas examinent le CORPS de la
+ * requête envoyée au déplacement d'une tâche. L'éditeur n'y joue aucun rôle — la description de
+ * la tâche de référence est `null`.
+ *
+ * 📍 Ce que ce bouchon ne prouve pas : la course n'est pas reproductible à volonté (le fichier
+ * joué seul sort en 0, et `--teardownTimeout=1` aussi), donc il n'y a pas de contre-épreuve A/B.
+ * Le mécanisme est établi par la pile de l'erreur elle-même, et le seul déclencheur identifié est
+ * retiré. Le cas « le bouchon intercepte » ci-dessous garde ce raisonnement : si un jour
+ * `mockComponent` cessait d'attraper la variante `Lazy`, il tomberait au lieu de laisser la course
+ * revenir en silence.
+ */
+mockComponent('MarkdownEditor', () => ({
+  props: { modelValue: { type: String, default: '' } },
+  render: () => h('div', { 'data-bouchon-editeur-markdown': '' }),
+}))
 
 /**
  * Le BRANCHEMENT du déplacement d'une tâche étiquetée — constat B1.
@@ -172,6 +202,20 @@ describe('TasksTaskModal — déplacer une tâche étiquetée', () => {
     expect(corpsEnvoye, "le PUT n'est pas parti").toBeTruthy()
     expect(corpsEnvoye!).not.toHaveProperty('taskGroupId')
     expect(corpsEnvoye!.tagIds).toEqual([31, 32])
+  })
+
+  it("⚠️ LE BOUCHON DE L'ÉDITEUR INTERCEPTE BIEN, variante `Lazy` comprise", async () => {
+    /*
+     * La garde du correctif lui-même. `TaskModal.vue` rend `<LazyMarkdownEditor>` : si
+     * `mockComponent` n'attrapait que la forme non préfixée, la vraie chaîne tiptap repartirait
+     * et la course de fin de suite reviendrait — sans que rien ici ne change de couleur.
+     */
+    await monter()
+
+    expect(
+      document.querySelector('[data-bouchon-editeur-markdown]'),
+      "l'éditeur n'est pas bouchonné : la chaîne tiptap repart, et avec elle la course au démontage"
+    ).not.toBeNull()
   })
 
   it('annonce ce que le déplacement va retirer, et seulement alors', async () => {
