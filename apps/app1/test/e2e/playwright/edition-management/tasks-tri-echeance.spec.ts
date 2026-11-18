@@ -188,6 +188,14 @@ test.describe.serial('Tâches — tri par échéance', () => {
     // Signalé par un organisateur : en vue liste, la fin des titres longs disparaissait derrière
     // une ellipse — or c'est souvent là qu'est le détail qui distingue deux tâches proches.
     const { editionId } = loadState()
+    /*
+     * ⚠️ 200 CARACTÈRES AU PLUS, et la vraie limite est 191.
+     *
+     * J'avais allongé ce titre à ~300 caractères pour qu'il revienne à la ligne quelle que soit la
+     * largeur. Le point d'API a rendu un 500 : `tasks.post.ts` plafonne à 200, et la colonne est
+     * un `VARCHAR(191)`. Un titre entre 192 et 200 passe donc la validation et casse en base —
+     * défaut réel, traité ailleurs. Ce test reste sous la limite.
+     */
     const TITRE_LONG =
       'Réserver la grande salle polyvalente auprès de la mairie et confirmer les horaires ' +
       'de montage avec le gardien avant la fin du mois'
@@ -205,20 +213,33 @@ test.describe.serial('Tâches — tri par échéance', () => {
     const titre = page.getByText(TITRE_LONG, { exact: true }).first()
     await expect(titre).toBeVisible({ timeout: 20000 })
 
-    // Le symptôme se mesure sur la boîte, pas sur la classe : un titre coupé tient sur une seule
-    // ligne et son texte déborde de sa largeur. Ici il doit occuper plusieurs lignes.
+    /*
+     * ⚠️ ON MESURE QUE RIEN N'EST MASQUÉ, et non que le titre revient à la ligne.
+     *
+     * La version précédente exigeait `hauteur > 1,5 ligne`. C'était un INDICE du retour à la
+     * ligne, pas la propriété qui intéresse l'organisateur — et l'indice s'est périmé : la montée
+     * de Nuxt UI en 4.12.2 a élargi la colonne, le titre a tenu sur une ligne, et le test est tombé
+     * alors que le texte ENTIER était visible et non coupé. Un test qui mesure un indice tombe
+     * quand l'indice change ; celui qui mesure la propriété tient.
+     *
+     * Les trois mesures couvrent les deux façons de masquer du texte :
+     * - `truncate` (le défaut d'origine) → `whiteSpace: nowrap` ET débordement en largeur ;
+     * - `line-clamp` → pas de débordement en largeur, mais débordement en HAUTEUR.
+     */
     const mesures = await titre.evaluate((el) => {
       const style = getComputedStyle(el)
       return {
         blancs: style.whiteSpace,
-        hauteur: el.getBoundingClientRect().height,
-        hauteurDeLigne: parseFloat(style.lineHeight) || 20,
         debordeEnLargeur: el.scrollWidth > el.clientWidth + 1,
+        debordeEnHauteur: el.scrollHeight > el.clientHeight + 1,
       }
     })
-    expect(mesures.blancs).not.toBe('nowrap')
-    expect(mesures.debordeEnLargeur).toBe(false)
-    expect(mesures.hauteur).toBeGreaterThan(mesures.hauteurDeLigne * 1.5)
+    expect(mesures.blancs, 'le titre est en `nowrap` : il sera coupé').not.toBe('nowrap')
+    expect(mesures.debordeEnLargeur, 'le titre déborde en largeur : il est coupé').toBe(false)
+    expect(
+      mesures.debordeEnHauteur,
+      'le titre déborde en hauteur : il est écrêté par un `line-clamp`'
+    ).toBe(false)
   })
 
   test('nettoyer : rendre l’édition telle qu’on l’a trouvée', async ({ page }) => {

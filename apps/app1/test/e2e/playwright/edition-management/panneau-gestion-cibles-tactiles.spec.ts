@@ -39,7 +39,16 @@ test.describe('Panneau de gestion — cibles tactiles', () => {
   test('mobile : les entrées du tiroir sont assez hautes pour le doigt', async ({ browser }) => {
     const { page, ctx } = await contexte(browser, 390)
 
-    await page.getByRole('button', { name: 'Open sidebar' }).click({ timeout: 40000 })
+    /*
+     * ⚠️ LES DEUX LANGUES, et ce n'est pas une coquetterie. Nuxt UI 4.12 résout la locale de
+     * l'application là où 4.8 retombait sur l'anglais : ce bouton s'appelait « Open sidebar »,
+     * il s'appelle maintenant « Ouvrir la barre latérale ». Son `aria-label` est sa SEULE
+     * identité — le composant n'expose aucun attribut stable —, donc viser les deux noms est le
+     * seul moyen de ne pas rendre la spec solidaire d'une version ou d'une langue.
+     */
+    await page
+      .getByRole('button', { name: /open sidebar|ouvrir la barre latérale/i })
+      .click({ timeout: 40000 })
     const entrees = page.locator('[role=dialog] nav a')
     await expect(entrees.first()).toBeVisible()
 

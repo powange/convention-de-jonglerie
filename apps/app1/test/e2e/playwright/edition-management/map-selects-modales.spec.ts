@@ -75,9 +75,25 @@ test.describe('Carte du site — les menus des selects passent devant la modale'
   /**
    * Déplie le champ portant ce libellé et rend son menu.
    *
-   * On passe par l'étiquette et par `aria-controls` plutôt que par un rôle ou un index : les deux
-   * selects de cette modale ne se ressemblent pas — le premier est un `combobox`, le second un
-   * bouton `aria-haspopup="listbox"` dont le nom accessible est « Show popup ».
+   * On passe par l'étiquette plutôt que par un rôle ou un index : les deux selects de cette modale
+   * ne se ressemblent pas — le premier est un `combobox`, le second un bouton
+   * `aria-haspopup="listbox"`.
+   *
+   * ⚠️ `aria-controls` NE SUFFIT PLUS, ET IL SE LIT AVANT LE CLIC.
+   *
+   * Cet auxiliaire s'appuyait sur lui seul. Nuxt UI 4.12 / Reka UI 2.11 (2.9.8 → 2.11.0) ne le
+   * posent plus systématiquement : l'attribut revenait `null`, `page.locator('#null')` ne
+   * correspondait à rien, et `toBeVisible()` tombait sur « Expected: visible ». L'échec désigne
+   * alors l'empilement — tout l'objet de cette spec — alors que le menu n'avait jamais été
+   * localisé. D'où le repli sur le rôle `listbox`, que le menu porte dans les deux cas.
+   *
+   * 📍 ET IL SE LIT AVANT, surtout pas après : une fois le menu ouvert, le déclencheur n'est plus
+   * joignable à travers `getByRole('dialog')` — le dialogue sort de l'arbre d'accessibilité, et
+   * un `getAttribute` posé après le clic attend en vain `getByRole('dialog').locator('#v-0-21')`
+   * jusqu'au délai de deux minutes. Mesuré en voulant « bien faire ».
+   *
+   * Et l'on ASSÈRE QUE LA CIBLE EXISTE avant de la mesurer, sans quoi « pas trouvée » et
+   * « recouverte » se lisent de la même façon.
    */
   async function deplier(page: Page, dialogue: Locator, libelle: string) {
     const etiquette = dialogue.locator('label').filter({ hasText: libelle }).first()
@@ -88,7 +104,11 @@ test.describe('Carte du site — les menus des selects passent devant la modale'
     const menuId = await declencheur.getAttribute('aria-controls')
     await declencheur.click()
 
-    const menu = page.locator(`#${menuId}`)
+    const menu = menuId ? page.locator(`#${menuId}`) : page.getByRole('listbox').last()
+    await expect(
+      menu,
+      `menu de « ${libelle} » introuvable (aria-controls : ${menuId ?? 'absent'})`
+    ).toHaveCount(1)
     await expect(menu).toBeVisible()
     return menu
   }
