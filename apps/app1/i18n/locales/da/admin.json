@@ -889,6 +889,71 @@
     "volunteer_reminders": "Frivillig påmindelser",
     "workshops_created": "Oprettede workshops",
     "backup_restore_dropped_tables": "{count} tabel(ler), der mangler i sikkerhedskopien, er blevet slettet",
-    "backup_restore_step_migrations": "Anvender migreringer"
+    "backup_restore_step_migrations": "Anvender migreringer",
+    "veille": {
+      "already_imported": "Allerede importeret",
+      "days": "{count} dag(e)",
+      "description": "Begivenheder fundet i eksterne kalendere, som skal vurderes før import. Et afslag er endeligt: en senere gennemgang foreslår den ikke igen.",
+      "empty": "Ingen kandidater til disse filtre",
+      "error": {
+        "classify": "Klassificeringen kunne ikke startes",
+        "classify_partial": "{classes} klassificeret, {echecs} mislykkedes: {erreur}",
+        "load": "Kandidaterne kunne ikke indlæses",
+        "refresh": "Kalenderne kunne ikke læses igen",
+        "refresh_partial": "Ulæselig(e) kilde(r): {sources}. At der ikke er noget nyt betyder ikke, at de ikke har flere begivenheder.",
+        "verdict_partial": "{reussis} afgørelse(r) gemt, {echecs} mislykkedes"
+      },
+      "filter": {
+        "ai_opinion": "AI'ens vurdering",
+        "all_countries": "Alle lande",
+        "all_opinions": "Alle vurderinger",
+        "all_sources": "Alle kilder",
+        "country": "Land",
+        "hide_imported": "Skjul de allerede importerede",
+        "source": "Kilde"
+      },
+      "ia": {
+        "classified": "{count} kandidat(er) klassificeret af AI'en",
+        "classify": "Klassificér med AI",
+        "classify_hint": "Sender {lot} kandidat(er) til modellen, ét kald pr. begivenhed. {restants} mangler stadig — kør det så mange gange, som der er brug for.",
+        "nothing_to_classify": "Alle kandidater til gennemgang har allerede en vurdering fra modellen",
+        "opinion": {
+          "AUCUN": "Endnu ikke klassificeret",
+          "CONVENTION": "AI: konvention",
+          "HORS_SUJET": "AI: uden for emnet",
+          "INCERTAIN": "AI: usikker"
+        },
+        "unreadable": "{classes} klassificeret, {illisibles} ulæseligt/ulæselige svar — der blev ikke gemt noget for dem"
+      },
+      "import_one": "Importér denne konvention",
+      "open_source": "Se i kalenderen",
+      "refresh": "Læs kalenderne igen",
+      "selection": {
+        "clear": "Fravælg alt",
+        "count": "{count} valgt",
+        "import": "Importér det valgte",
+        "import_limit": "Importen tager højst {max} URL'er og afviser hele partiet derudover. Reducér udvalget ({count} lige nu)."
+      },
+      "stats": {
+        "refused": "Afvist",
+        "retained": "Beholdt",
+        "to_review": "Til gennemgang"
+      },
+      "success": {
+        "refresh": "{count} ny(e) kandidat(er)",
+        "verdict": "{count} afgørelse(r) gemt"
+      },
+      "title": "Overvågning af konventioner",
+      "verdict": {
+        "convention": "Det er en jongleringskonvention",
+        "refuse": "Det er ikke en",
+        "reset": "Tilbage til gennemgang"
+      },
+      "verdict_label": {
+        "A_EXAMINER": "Til gennemgang",
+        "CONVENTION": "Beholdt",
+        "REFUSE": "Afvist"
+      }
+    }
   }
 }

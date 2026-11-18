@@ -889,6 +889,71 @@
     "volunteer_reminders": "Volunteer reminders",
     "workshops_created": "Workshops created",
     "backup_restore_dropped_tables": "{count} table(s) missing from the backup were dropped",
-    "backup_restore_step_migrations": "Applying migrations"
+    "backup_restore_step_migrations": "Applying migrations",
+    "veille": {
+      "already_imported": "Already imported",
+      "days": "{count} day(s)",
+      "description": "Events spotted on external calendars, to be decided before import. A refusal is final: a later scan will not propose it again.",
+      "empty": "No candidates for these filters",
+      "error": {
+        "classify": "Could not start classification",
+        "classify_partial": "{classes} classified, {echecs} failed: {erreur}",
+        "load": "Could not load candidates",
+        "refresh": "Could not re-read the calendars",
+        "refresh_partial": "Unreadable source(s): {sources}. The absence of new entries does not mean they have no more events.",
+        "verdict_partial": "{reussis} verdict(s) saved, {echecs} failed"
+      },
+      "filter": {
+        "ai_opinion": "AI opinion",
+        "all_countries": "All countries",
+        "all_opinions": "All opinions",
+        "all_sources": "All sources",
+        "country": "Country",
+        "hide_imported": "Hide already imported",
+        "source": "Source"
+      },
+      "ia": {
+        "classified": "{count} candidate(s) classified by the AI",
+        "classify": "Classify with AI",
+        "classify_hint": "Submits {lot} candidate(s) to the model, one call per event. {restants} left to classify — run it as many times as needed.",
+        "nothing_to_classify": "Every candidate awaiting review already has a model opinion",
+        "opinion": {
+          "AUCUN": "Not classified yet",
+          "CONVENTION": "AI: convention",
+          "HORS_SUJET": "AI: off topic",
+          "INCERTAIN": "AI: uncertain"
+        },
+        "unreadable": "{classes} classified, {illisibles} unreadable response(s) — nothing was written for those"
+      },
+      "import_one": "Import this convention",
+      "open_source": "View on the calendar",
+      "refresh": "Re-read the calendars",
+      "selection": {
+        "clear": "Deselect all",
+        "count": "{count} selected",
+        "import": "Import selection",
+        "import_limit": "The import accepts at most {max} URLs, and rejects the whole batch beyond that. Reduce the selection ({count} currently)."
+      },
+      "stats": {
+        "refused": "Refused",
+        "retained": "Retained",
+        "to_review": "To review"
+      },
+      "success": {
+        "refresh": "{count} new candidate(s)",
+        "verdict": "{count} verdict(s) saved"
+      },
+      "title": "Convention watch",
+      "verdict": {
+        "convention": "This is a juggling convention",
+        "refuse": "This is not one",
+        "reset": "Back to review"
+      },
+      "verdict_label": {
+        "A_EXAMINER": "To review",
+        "CONVENTION": "Retained",
+        "REFUSE": "Refused"
+      }
+    }
   }
 }

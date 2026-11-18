@@ -70,6 +70,7 @@
       "team_leader_from_volunteer": "Nieuw bericht van een vrijwilliger {teamName} - {editionName}",
       "volunteer_to_organizers_from_organizer": "Nieuw bericht van de organisatie {editionName}",
       "volunteer_to_organizers_from_volunteer": "Nieuw bericht van een vrijwilliger {editionName}"
-    }
+    },
+    "reconnecting": "Opnieuw verbinden met het gesprek…"
   }
 }

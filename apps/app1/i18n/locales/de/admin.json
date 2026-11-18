@@ -889,6 +889,71 @@
     "volunteer_reminders": "Freiwilligen-Erinnerungen",
     "workshops_created": "Erstellte Workshops",
     "backup_restore_dropped_tables": "{count} in der Sicherung fehlende Tabelle(n) wurden gelöscht",
-    "backup_restore_step_migrations": "Migrationen werden angewendet"
+    "backup_restore_step_migrations": "Migrationen werden angewendet",
+    "veille": {
+      "already_imported": "Bereits importiert",
+      "days": "{count} Tag(e)",
+      "description": "Auf externen Kalendern entdeckte Veranstaltungen, über die vor dem Import entschieden werden muss. Eine Ablehnung ist endgültig: ein späterer Durchlauf schlägt sie nicht erneut vor.",
+      "empty": "Keine Kandidaten für diese Filter",
+      "error": {
+        "classify": "Klassifizierung konnte nicht gestartet werden",
+        "classify_partial": "{classes} klassifiziert, {echecs} fehlgeschlagen: {erreur}",
+        "load": "Kandidaten konnten nicht geladen werden",
+        "refresh": "Kalender konnten nicht erneut gelesen werden",
+        "refresh_partial": "Unlesbare Quelle(n): {sources}. Dass dort keine Neuheiten erscheinen, bedeutet nicht, dass es keine Veranstaltungen mehr gibt.",
+        "verdict_partial": "{reussis} Entscheidung(en) gespeichert, {echecs} fehlgeschlagen"
+      },
+      "filter": {
+        "ai_opinion": "Einschätzung der KI",
+        "all_countries": "Alle Länder",
+        "all_opinions": "Alle Einschätzungen",
+        "all_sources": "Alle Quellen",
+        "country": "Land",
+        "hide_imported": "Bereits importierte ausblenden",
+        "source": "Quelle"
+      },
+      "ia": {
+        "classified": "{count} Kandidat(en) von der KI klassifiziert",
+        "classify": "Von der KI klassifizieren",
+        "classify_hint": "Übergibt {lot} Kandidat(en) an das Modell, ein Aufruf pro Veranstaltung. {restants} noch zu klassifizieren — so oft wiederholen wie nötig.",
+        "nothing_to_classify": "Alle zu prüfenden Kandidaten haben schon eine Einschätzung des Modells",
+        "opinion": {
+          "AUCUN": "Noch nicht klassifiziert",
+          "CONVENTION": "KI: Convention",
+          "HORS_SUJET": "KI: nicht relevant",
+          "INCERTAIN": "KI: unsicher"
+        },
+        "unreadable": "{classes} klassifiziert, {illisibles} unlesbare Antwort(en) — dafür wurde nichts gespeichert"
+      },
+      "import_one": "Diese Convention importieren",
+      "open_source": "Im Kalender ansehen",
+      "refresh": "Kalender erneut lesen",
+      "selection": {
+        "clear": "Auswahl aufheben",
+        "count": "{count} ausgewählt",
+        "import": "Auswahl importieren",
+        "import_limit": "Der Import nimmt höchstens {max} URLs an und weist darüber hinaus den ganzen Stapel zurück. Verkleinern Sie die Auswahl (derzeit {count})."
+      },
+      "stats": {
+        "refused": "Abgelehnt",
+        "retained": "Angenommen",
+        "to_review": "Zu prüfen"
+      },
+      "success": {
+        "refresh": "{count} neue(r) Kandidat(en)",
+        "verdict": "{count} Entscheidung(en) gespeichert"
+      },
+      "title": "Convention-Beobachtung",
+      "verdict": {
+        "convention": "Das ist eine Jonglier-Convention",
+        "refuse": "Das ist keine",
+        "reset": "Zurück zur Prüfung"
+      },
+      "verdict_label": {
+        "A_EXAMINER": "Zu prüfen",
+        "CONVENTION": "Angenommen",
+        "REFUSE": "Abgelehnt"
+      }
+    }
   }
 }

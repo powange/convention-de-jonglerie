@@ -204,7 +204,15 @@
     "leave_without_saving": "Ohne Speichern verlassen",
     "unsaved_changes": "Nicht gespeicherte Änderungen",
     "unsaved_changes_warning": "Sie haben Änderungen, die nicht gespeichert wurden. Wenn Sie diese Seite jetzt verlassen, gehen sie verloren.",
-    "deleted_account": "Gelöschtes Konto"
+    "deleted_account": "Gelöschtes Konto",
+    "change_profile_picture": "Profilbild ändern",
+    "contact": "Kontaktieren",
+    "decrease_quantity": "Menge verringern",
+    "help": "Hilfe",
+    "increase_quantity": "Menge erhöhen",
+    "pin": "Anpinnen",
+    "send": "Senden",
+    "show_qr_code": "QR-Code anzeigen"
   },
   "dates": {
     "date_range": "Vom {startDate} bis {endDate}",

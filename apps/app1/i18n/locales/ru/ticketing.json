@@ -76,7 +76,10 @@
       "group_partial": "Неполное подтверждение",
       "group_title": "Люди с несколькими пропусками",
       "group_validate": "Подтвердить оставшийся пропуск | Подтвердить оставшиеся пропуска ({count})",
-      "group_validated": "Подтверждён {count} пропуск | Подтверждено пропусков: {count}"
+      "group_validated": "Подтверждён {count} пропуск | Подтверждено пропусков: {count}",
+      "manual_entry_label": "Ручной ввод кода",
+      "manual_entry_placeholder": "Введите код билета",
+      "scanner_hint": "Поместите QR-код перед камерой. Распознавание происходит автоматически."
     },
     "counters": {
       "connected": "Подключено",
@@ -115,12 +118,41 @@
       "syncing": "Синхронизация...",
       "title": "Счетчики",
       "token_regenerated": "Ссылка успешно перегенерирована",
-      "last_actor": "Изменил"
+      "last_actor": "Изменил",
+      "leave_with_pending": "Подсчётов, ожидающих отправки на сервер: {count}. Они хранятся на этом устройстве и уйдут, когда вернётся сеть, — но пока они не отправлены, другие экраны их не видят.",
+      "leave_with_pending_title": "Часть подсчётов не отправлена"
     },
     "custom_fields": {
       "created": "Пользовательское поле успешно создано",
       "error_saving": "Не удалось сохранить пользовательское поле",
-      "updated": "Пользовательское поле успешно обновлено"
+      "updated": "Пользовательское поле успешно обновлено",
+      "associations": {
+        "intro": "Настройте тарифы, связанные с этим пользовательским полем.",
+        "tiers_label": "Связанные тарифы",
+        "title": "Связи"
+      },
+      "list": {
+        "choices_prefix": "Варианты:",
+        "delete_confirm_title": "Удалить пользовательское поле",
+        "delete_field": "Удалить поле",
+        "edit_field": "Изменить поле",
+        "handout_items_prefix": "Предметы к выдаче:",
+        "manage_associations": "Управлять связями",
+        "quotas_prefix": "Квоты:",
+        "required_badge": "Обязательное",
+        "tiers_prefix": "Тарифы:",
+        "title": "Пользовательские поля"
+      },
+      "modal": {
+        "choices_placeholder": "Напр.: S, M, L, XL",
+        "label_label": "Подпись поля",
+        "label_placeholder": "Напр.: размер футболки",
+        "quotas_items_association": "Связи квот и предметов",
+        "required_checkbox": "Это поле обязательно",
+        "required_label": "Обязательное поле",
+        "tiers_association": "Связь с тарифами",
+        "type_label": "Тип поля"
+      }
     },
     "external": {
       "config_delete_error": "Не удалось удалить конфигурацию",
@@ -145,7 +177,19 @@
       "tiers_load_error": "Не удалось загрузить тарифы",
       "tiers_loaded": "Тарифы загружены",
       "tiers_loaded_description": "Найдено {tiers} тариф(ов), {options} опций и {fields} пользовательских полей",
-      "view_loaded_data": "Посмотреть загруженные данные"
+      "view_loaded_data": "Посмотреть загруженные данные",
+      "client_id_hint": "Публичный идентификатор вашего API-клиента",
+      "client_secret_hint": "Секретный ключ (шифруется после сохранения)",
+      "form_detected": "Форма определена",
+      "form_prefix": "Форма:",
+      "form_slug_hint": "Название вашей формы в URL",
+      "form_type_hint": "Тип, видимый в URL HelloAsso",
+      "form_url_label": "URL вашей продажи билетов на HelloAsso",
+      "helloasso_connect_description": "Подключите аккаунт HelloAsso, чтобы билеты и участники синхронизировались автоматически.",
+      "identify_form": "Определить вашу форму",
+      "organization_prefix": "Организация:",
+      "organization_slug_hint": "Название вашей организации в URL",
+      "type_prefix": "Тип:"
     },
     "handout_items": {
       "list": {
@@ -226,7 +270,12 @@
       "error_saving": "Не удалось сохранить опцию",
       "list": {
         "loading": "Загрузка...",
-        "none_found": "Параметры не найдены"
+        "none_found": "Параметры не найдены",
+        "choices_prefix": "Варианты:",
+        "delete_title": "Удалить опцию",
+        "meals_prefix": "Питание:",
+        "quotas_prefix": "Квоты:",
+        "tiers_prefix": "Тарифы:"
       },
       "modal": {
         "choices_label": "Доступные варианты",
@@ -239,7 +288,19 @@
         "position_label": "Позиция отображения",
         "position_placeholder": "0",
         "title": "Параметр HelloAsso",
-        "type_label": "Тип параметра"
+        "type_label": "Тип параметра",
+        "all_tiers": "Все тарифы",
+        "choices_help": "Один вариант в строке",
+        "helloasso_locked": "Эта опция синхронизируется из HelloAsso и не может быть изменена.",
+        "meals_help": "Эта опция даст доступ к выбранным приёмам пищи",
+        "meals_label": "Связанное питание",
+        "meals_placeholder": "Выберите приёмы пищи…",
+        "no_meal_selected": "Приёмы пищи не выбраны",
+        "position_help": "Порядок отображения (0 = первым)",
+        "price_help": "Дополнительная цена в евро (оставьте пустым, если опция бесплатна)",
+        "price_label": "Цена опции",
+        "tiers_label": "Связанные тарифы",
+        "tiers_placeholder": "Выберите тарифы…"
       },
       "name_required": "Название опции обязательно",
       "updated": "Опция успешно обновлена"
@@ -311,7 +372,43 @@
       "discount_saved": "Скидка сохранена",
       "order_discount_part": "из них {amount} возвращено в виде скидки",
       "stats_discounted_help": "Возвращено по билетам, которые остаются действительными — уже вычтено из итога",
-      "stats_discounted_title": "Скидки"
+      "stats_discounted_title": "Скидки",
+      "amount_prefix": "Сумма:",
+      "amounts_by_method_title": "Разбивка сумм по способу оплаты",
+      "awaiting_short": "Ожидает",
+      "check_number_label": "Номер чека (необязательно)",
+      "check_payments": "Оплаты чеком",
+      "email_prefix": "Эл. почта:",
+      "external_not_configured": "Внешняя продажа билетов не настроена",
+      "filter_all_types": "Все типы",
+      "filter_field_placeholder": "Выберите поле",
+      "filter_methods_placeholder": "Все способы",
+      "filter_options_placeholder": "Выберите опции",
+      "filter_tickets_placeholder": "Все билеты",
+      "filter_tiers_placeholder": "Выберите тарифы",
+      "filter_types_placeholder": "Все типы",
+      "filter_value_placeholder": "Выберите значение",
+      "grand_total": "Общий итог",
+      "last_sync": "Последняя синхронизация",
+      "old_paid_orders": "Прежние оплаченные заказы",
+      "paid_card": "Оплачено — картой",
+      "paid_cash": "Оплачено — наличными",
+      "paid_unknown_method": "Оплачено — способ не указан",
+      "participant_prefix": "Участник:",
+      "pay_card": "Оплата картой",
+      "pay_cash": "Оплата наличными",
+      "pay_check": "Оплата чеком",
+      "qr_title": "QR-код билета",
+      "qr_value_prefix": "Значение QR-кода:",
+      "search_placeholder": "Искать по имени, эл. почте, номеру чека…",
+      "set_payment_method": "Указать способ оплаты",
+      "stat_donations": "Донаты",
+      "stat_orders": "Заказы",
+      "stat_tickets": "Билеты",
+      "stat_total_amount": "Общая сумма",
+      "ticket_prefix": "Билет:",
+      "tickets_prefix": "Билеты:",
+      "unfinished_orders": "Незавершённые заказы"
     },
     "origin_site": "Создано на сайте",
     "participant": {
@@ -325,7 +422,32 @@
       "type": "Тип",
       "volunteer_validated": "Волонтёр подтвердил свой вход",
       "validated_by": "Подтвердил {name}",
-      "validated_on": "{date}"
+      "validated_on": "{date}",
+      "add": {
+        "amount_placeholder": "Сумма в евро",
+        "anonymous": "Анонимно",
+        "free_price": "Свободная цена",
+        "no_ticket_selected": "Билет не выбран",
+        "number_placeholder": "Количество",
+        "option_placeholder": "Выберите опцию",
+        "options_prefix": "Опции:",
+        "phone_placeholder": "Номер телефона",
+        "user_found_description": "Данные заполнены автоматически",
+        "user_found_title": "Пользователь найден",
+        "with_info": "С данными"
+      },
+      "artist_guest": "Приглашённый артист",
+      "canceled_order_description": "Этот заказ отменён. Билеты больше нельзя подтвердить.",
+      "confirm_payment_title": "Подтвердить оплату",
+      "invalidate_confirm": "Отменить подтверждение",
+      "invalidate_description": "Вы уверены, что хотите отменить вход этого участника? Это действие снимет подтверждение.",
+      "invalidate_title": "Отменить вход",
+      "meals_title": "Питание",
+      "no_show_assigned": "Выступление не назначено",
+      "order_status": "Статус заказа",
+      "pending_payment_description": "Этот заказ ещё не отмечен как оплаченный. Выберите способ оплаты до подтверждения входа.",
+      "pending_payment_title": "Оплата ожидается",
+      "ticket_status": "Статус билета"
     },
     "payment": {
       "cash_received": "Полученная сумма (€)",
@@ -337,12 +459,14 @@
         "cash": "Наличные",
         "check": "Чек",
         "pending": "Не оплачено",
-        "pendingSubtitle": "Ожидание"
+        "pendingSubtitle": "Ожидание",
+        "card_short": "Карта"
       },
       "open_sumup": "Открыть SumUp",
       "selectMethod": "Выберите способ оплаты",
       "sumup_hint": "Подтвердите оплату в SumUp, затем подтвердите здесь",
-      "sumup_not_configured": "Партнёрский ключ и App ID SumUp должны быть настроены в параметрах продажи билетов, чтобы включить автоматическое заполнение суммы."
+      "sumup_not_configured": "Партнёрский ключ и App ID SumUp должны быть настроены в параметрах продажи билетов, чтобы включить автоматическое заполнение суммы.",
+      "check_number_placeholder": "Напр.: 1234567"
     },
     "quotas": {
       "created": "Квота успешно создана",
@@ -414,7 +538,8 @@
         "drag_to_reorder": "Перетащите для изменения порядка",
         "inactive": "Неактивно",
         "loading": "Загрузка...",
-        "none_found": "Тарифы не найдены"
+        "none_found": "Тарифы не найдены",
+        "delete_title": "Удалить тариф"
       },
       "modal": {
         "description_label": "Описание",
@@ -437,10 +562,22 @@
         "price_placeholder": "0,00",
         "quotas_placeholder": "Выбрать квоты",
         "status_label": "Статус",
-        "title": "Тариф HelloAsso"
+        "title": "Тариф HelloAsso",
+        "count_as_participant_label": "Учёт участников",
+        "display_name_placeholder": "Своё название для отображения",
+        "donation_max_help": "Оставьте пустым для доната без верхнего предела",
+        "helloasso_locked": "Этот тариф синхронизируется из HelloAsso. Изменить можно только предметы к выдаче и даты действия.",
+        "no_limit_placeholder": "Без предела",
+        "position_help": "Порядок отображения (0 = первым)",
+        "presence_from_label": "Приезд",
+        "presence_from_placeholder": "Начало выпуска",
+        "presence_until_label": "Отъезд",
+        "presence_until_placeholder": "Конец выпуска",
+        "price_help": "Может быть 0, чтобы разрешить бесплатное участие"
       },
       "name_required": "Название тарифа обязательно",
-      "updated": "Тариф успешно обновлён"
+      "updated": "Тариф успешно обновлён",
+      "sync_label": "Синх.:"
     },
     "entry_log": {
       "all_movements": "Все движения",

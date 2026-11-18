@@ -284,6 +284,13 @@
       "deleted": "Notifica eliminata",
       "delete_failed": "Impossibile eliminare la notifica",
       "load_more_failed": "Impossibile caricare altre notifiche"
+    },
+    "email": {
+      "automatic": "Questa email è stata inviata automaticamente da Juggling Convention.",
+      "greeting": "Ciao {prenom},",
+      "manage_notifications": "Gestisci le mie notifiche",
+      "signature": "— Il team di Juggling Convention",
+      "support_project": "Sostieni il progetto"
     }
   },
   "push_notifications": {

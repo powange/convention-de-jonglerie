@@ -70,6 +70,7 @@
       "team_leader_from_volunteer": "New message from a {teamName} volunteer - {editionName}",
       "volunteer_to_organizers_from_organizer": "New message from an organiser {editionName}",
       "volunteer_to_organizers_from_volunteer": "New message from a volunteer {editionName}"
-    }
+    },
+    "reconnecting": "Reconnecting to the conversation…"
   }
 }

@@ -889,6 +889,71 @@
     "volunteer_reminders": "Promemoria volontari",
     "workshops_created": "Workshop creati",
     "backup_restore_dropped_tables": "{count} tabella/e assente/i dal backup sono state eliminate",
-    "backup_restore_step_migrations": "Applicazione delle migrazioni"
+    "backup_restore_step_migrations": "Applicazione delle migrazioni",
+    "veille": {
+      "already_imported": "Già importato",
+      "days": "{count} giorno/i",
+      "description": "Eventi individuati su calendari esterni, da decidere prima dell'importazione. Un rifiuto è definitivo: una scansione successiva non lo ripropone.",
+      "empty": "Nessun candidato per questi filtri",
+      "error": {
+        "classify": "Impossibile avviare la classificazione",
+        "classify_partial": "{classes} classificati, {echecs} non riusciti: {erreur}",
+        "load": "Impossibile caricare i candidati",
+        "refresh": "Impossibile rileggere i calendari",
+        "refresh_partial": "Fonte/i illeggibile/i: {sources}. L'assenza di novità non significa che non abbiano più eventi.",
+        "verdict_partial": "{reussis} verdetto/i salvato/i, {echecs} non riusciti"
+      },
+      "filter": {
+        "ai_opinion": "Parere dell'IA",
+        "all_countries": "Tutti i paesi",
+        "all_opinions": "Tutti i pareri",
+        "all_sources": "Tutte le fonti",
+        "country": "Paese",
+        "hide_imported": "Nascondi i già importati",
+        "source": "Fonte"
+      },
+      "ia": {
+        "classified": "{count} candidato/i classificato/i dall'IA",
+        "classify": "Classifica con l'IA",
+        "classify_hint": "Invia {lot} candidato/i al modello, una chiamata per evento. Ne restano {restants} da classificare: ripeti tutte le volte necessarie.",
+        "nothing_to_classify": "Tutti i candidati da esaminare hanno già un parere del modello",
+        "opinion": {
+          "AUCUN": "Non ancora classificato",
+          "CONVENTION": "IA: convention",
+          "HORS_SUJET": "IA: fuori tema",
+          "INCERTAIN": "IA: incerto"
+        },
+        "unreadable": "{classes} classificati, {illisibles} risposta/e illeggibile/i: per quelle non è stato salvato nulla"
+      },
+      "import_one": "Importa questa convention",
+      "open_source": "Vedi sul calendario",
+      "refresh": "Rileggi i calendari",
+      "selection": {
+        "clear": "Deseleziona tutto",
+        "count": "{count} selezionato/i",
+        "import": "Importa la selezione",
+        "import_limit": "L'importazione accetta al massimo {max} URL e rifiuta l'intero lotto oltre tale numero. Riduci la selezione ({count} attualmente)."
+      },
+      "stats": {
+        "refused": "Rifiutati",
+        "retained": "Accettati",
+        "to_review": "Da esaminare"
+      },
+      "success": {
+        "refresh": "{count} nuovo/i candidato/i",
+        "verdict": "{count} verdetto/i salvato/i"
+      },
+      "title": "Monitoraggio delle convention",
+      "verdict": {
+        "convention": "È una convention di giocoleria",
+        "refuse": "Non lo è",
+        "reset": "Rimetti da esaminare"
+      },
+      "verdict_label": {
+        "A_EXAMINER": "Da esaminare",
+        "CONVENTION": "Accettato",
+        "REFUSE": "Rifiutato"
+      }
+    }
   }
 }

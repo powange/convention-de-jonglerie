@@ -889,6 +889,71 @@
     "volunteer_reminders": "Lembretes de voluntários",
     "workshops_created": "Workshops criados",
     "backup_restore_dropped_tables": "{count} tabela(s) ausente(s) da cópia de segurança foram eliminadas",
-    "backup_restore_step_migrations": "A aplicar as migrações"
+    "backup_restore_step_migrations": "A aplicar as migrações",
+    "veille": {
+      "already_imported": "Já importado",
+      "days": "{count} dia(s)",
+      "description": "Eventos encontrados em agendas externas, a decidir antes de importar. Uma recusa é definitiva: uma análise posterior não o propõe de novo.",
+      "empty": "Nenhum candidato para estes filtros",
+      "error": {
+        "classify": "Não foi possível iniciar a classificação",
+        "classify_partial": "{classes} classificado(s), {echecs} com erro: {erreur}",
+        "load": "Não foi possível carregar os candidatos",
+        "refresh": "Não foi possível reler as agendas",
+        "refresh_partial": "Fonte(s) ilegível(eis): {sources}. A ausência de novidades não significa que já não tenham eventos.",
+        "verdict_partial": "{reussis} veredicto(s) guardado(s), {echecs} com erro"
+      },
+      "filter": {
+        "ai_opinion": "Opinião da IA",
+        "all_countries": "Todos os países",
+        "all_opinions": "Todas as opiniões",
+        "all_sources": "Todas as fontes",
+        "country": "País",
+        "hide_imported": "Ocultar os já importados",
+        "source": "Fonte"
+      },
+      "ia": {
+        "classified": "{count} candidato(s) classificado(s) pela IA",
+        "classify": "Classificar com a IA",
+        "classify_hint": "Envia {lot} candidato(s) ao modelo, uma chamada por evento. Faltam {restants} para classificar — repita tantas vezes quantas forem necessárias.",
+        "nothing_to_classify": "Todos os candidatos por examinar já têm uma opinião do modelo",
+        "opinion": {
+          "AUCUN": "Ainda não classificado",
+          "CONVENTION": "IA: convenção",
+          "HORS_SUJET": "IA: fora do tema",
+          "INCERTAIN": "IA: incerto"
+        },
+        "unreadable": "{classes} classificado(s), {illisibles} resposta(s) ilegível(eis) — nada foi guardado para essas"
+      },
+      "import_one": "Importar esta convenção",
+      "open_source": "Ver na agenda",
+      "refresh": "Reler as agendas",
+      "selection": {
+        "clear": "Desmarcar tudo",
+        "count": "{count} selecionado(s)",
+        "import": "Importar a seleção",
+        "import_limit": "A importação aceita no máximo {max} URL e rejeita o lote inteiro acima disso. Reduza a seleção ({count} atualmente)."
+      },
+      "stats": {
+        "refused": "Recusados",
+        "retained": "Aceites",
+        "to_review": "A examinar"
+      },
+      "success": {
+        "refresh": "{count} novo(s) candidato(s)",
+        "verdict": "{count} veredicto(s) guardado(s)"
+      },
+      "title": "Monitorização de convenções",
+      "verdict": {
+        "convention": "É uma convenção de malabarismo",
+        "refuse": "Não é uma",
+        "reset": "Voltar a examinar"
+      },
+      "verdict_label": {
+        "A_EXAMINER": "A examinar",
+        "CONVENTION": "Aceite",
+        "REFUSE": "Recusado"
+      }
+    }
   }
 }

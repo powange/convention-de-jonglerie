@@ -204,7 +204,15 @@
     "leave_without_saving": "Forlad uden at gemme",
     "unsaved_changes": "Ikke-gemte ændringer",
     "unsaved_changes_warning": "Du har ændringer, der ikke er gemt. Hvis du forlader denne side nu, går de tabt.",
-    "deleted_account": "Slettet konto"
+    "deleted_account": "Slettet konto",
+    "change_profile_picture": "Skift profilbillede",
+    "contact": "Kontakt",
+    "decrease_quantity": "Reducér antallet",
+    "help": "Hjælp",
+    "increase_quantity": "Forøg antallet",
+    "pin": "Fastgør",
+    "send": "Send",
+    "show_qr_code": "Vis QR-koden"
   },
   "dates": {
     "date_range": "Fra {startDate} til {endDate}",

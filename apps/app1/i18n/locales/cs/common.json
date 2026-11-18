@@ -204,7 +204,15 @@
     "leave_without_saving": "Odejít bez uložení",
     "unsaved_changes": "Neuložené změny",
     "unsaved_changes_warning": "Máte změny, které nebyly uloženy. Pokud nyní tuto stránku opustíte, budou ztraceny.",
-    "deleted_account": "Smazaný účet"
+    "deleted_account": "Smazaný účet",
+    "change_profile_picture": "Změnit profilovou fotku",
+    "contact": "Kontaktovat",
+    "decrease_quantity": "Snížit množství",
+    "help": "Nápověda",
+    "increase_quantity": "Zvýšit množství",
+    "pin": "Připnout",
+    "send": "Odeslat",
+    "show_qr_code": "Zobrazit QR kód"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

@@ -76,7 +76,10 @@
       "group_partial": "Onvolledige bevestiging",
       "group_title": "Personen met meerdere toegangen",
       "group_validate": "Resterende toegang bevestigen | De {count} resterende toegangen bevestigen",
-      "group_validated": "{count} toegang bevestigd | {count} toegangen bevestigd"
+      "group_validated": "{count} toegang bevestigd | {count} toegangen bevestigd",
+      "manual_entry_label": "Code handmatig invoeren",
+      "manual_entry_placeholder": "Voer de code van het ticket in",
+      "scanner_hint": "Houd de QR-code voor de camera. De detectie gebeurt automatisch."
     },
     "counters": {
       "connected": "Verbonden",
@@ -115,12 +118,41 @@
       "syncing": "Synchroniseren...",
       "title": "Tellers",
       "token_regenerated": "Link succesvol opnieuw gegenereerd",
-      "last_actor": "Gewijzigd door"
+      "last_actor": "Gewijzigd door",
+      "leave_with_pending": "{count} telling(en) wachten om naar de server te worden verzonden. Ze blijven op dit toestel bewaard en gaan weg zodra het netwerk terug is — maar zolang ze niet verzonden zijn, zien andere schermen ze niet.",
+      "leave_with_pending_title": "Sommige tellingen zijn niet verzonden"
     },
     "custom_fields": {
       "created": "Aangepast veld succesvol aangemaakt",
       "error_saving": "Kan aangepast veld niet opslaan",
-      "updated": "Aangepast veld succesvol bijgewerkt"
+      "updated": "Aangepast veld succesvol bijgewerkt",
+      "associations": {
+        "intro": "Stel de tarieven in die aan dit aangepaste veld gekoppeld zijn.",
+        "tiers_label": "Gekoppelde tarieven",
+        "title": "Koppelingen"
+      },
+      "list": {
+        "choices_prefix": "Keuzes:",
+        "delete_confirm_title": "Aangepast veld verwijderen",
+        "delete_field": "Veld verwijderen",
+        "edit_field": "Veld wijzigen",
+        "handout_items_prefix": "Uit te delen artikelen:",
+        "manage_associations": "Koppelingen beheren",
+        "quotas_prefix": "Quota:",
+        "required_badge": "Verplicht",
+        "tiers_prefix": "Tarieven:",
+        "title": "Aangepaste velden"
+      },
+      "modal": {
+        "choices_placeholder": "Bijv.: S, M, L, XL",
+        "label_label": "Label van het veld",
+        "label_placeholder": "Bijv.: T-shirtmaat",
+        "quotas_items_association": "Koppelingen quota/artikelen",
+        "required_checkbox": "Dit veld is verplicht",
+        "required_label": "Verplicht veld",
+        "tiers_association": "Koppeling aan de tarieven",
+        "type_label": "Type veld"
+      }
     },
     "external": {
       "config_delete_error": "Kan configuratie niet verwijderen",
@@ -145,7 +177,19 @@
       "tiers_load_error": "Kan tarieven niet laden",
       "tiers_loaded": "Tarieven geladen",
       "tiers_loaded_description": "{tiers} tarief(ven), {options} optie(s) en {fields} aangepast(e) veld(en) gevonden",
-      "view_loaded_data": "Geladen gegevens bekijken"
+      "view_loaded_data": "Geladen gegevens bekijken",
+      "client_id_hint": "Publieke identificatie van je API-client",
+      "client_secret_hint": "Geheime sleutel (versleuteld na het opslaan)",
+      "form_detected": "Formulier gevonden",
+      "form_prefix": "Formulier:",
+      "form_slug_hint": "De naam van je formulier in de URL",
+      "form_type_hint": "Het type dat in de HelloAsso-URL staat",
+      "form_url_label": "URL van je HelloAsso-ticketverkoop",
+      "helloasso_connect_description": "Verbind je HelloAsso-account om tickets en deelnemers automatisch te synchroniseren.",
+      "identify_form": "Je formulier bepalen",
+      "organization_prefix": "Organisatie:",
+      "organization_slug_hint": "De naam van je vereniging in de URL",
+      "type_prefix": "Type:"
     },
     "handout_items": {
       "list": {
@@ -226,7 +270,12 @@
       "error_saving": "Kan optie niet opslaan",
       "list": {
         "loading": "Laden...",
-        "none_found": "Geen opties gevonden"
+        "none_found": "Geen opties gevonden",
+        "choices_prefix": "Keuzes:",
+        "delete_title": "Optie verwijderen",
+        "meals_prefix": "Maaltijden:",
+        "quotas_prefix": "Quota:",
+        "tiers_prefix": "Tarieven:"
       },
       "modal": {
         "choices_label": "Beschikbare keuzes",
@@ -239,7 +288,19 @@
         "position_label": "Weergavepositie",
         "position_placeholder": "0",
         "title": "HelloAsso optie",
-        "type_label": "Type optie"
+        "type_label": "Type optie",
+        "all_tiers": "Alle tarieven",
+        "choices_help": "Eén keuze per regel",
+        "helloasso_locked": "Deze optie wordt gesynchroniseerd vanuit HelloAsso en kan niet worden gewijzigd.",
+        "meals_help": "Deze optie geeft toegang tot de geselecteerde maaltijden",
+        "meals_label": "Gekoppelde maaltijden",
+        "meals_placeholder": "Maaltijden selecteren...",
+        "no_meal_selected": "Geen maaltijd geselecteerd",
+        "position_help": "Weergaveorde (0 = eerst)",
+        "price_help": "Extra prijs in euro (laat leeg als de optie gratis is)",
+        "price_label": "Prijs van de optie",
+        "tiers_label": "Gekoppelde tarieven",
+        "tiers_placeholder": "Tarieven selecteren..."
       },
       "name_required": "Optienaam is verplicht",
       "updated": "Optie succesvol bijgewerkt"
@@ -311,7 +372,43 @@
       "discount_saved": "Korting opgeslagen",
       "order_discount_part": "waarvan {amount} als korting terugbetaald",
       "stats_discounted_help": "Terugbetaald op tickets die geldig blijven — al van het totaal afgetrokken",
-      "stats_discounted_title": "Kortingen"
+      "stats_discounted_title": "Kortingen",
+      "amount_prefix": "Bedrag:",
+      "amounts_by_method_title": "Verdeling van de bedragen per betaalmethode",
+      "awaiting_short": "In afwachting",
+      "check_number_label": "Chequenummer (optioneel)",
+      "check_payments": "Betalingen met cheque",
+      "email_prefix": "E-mail:",
+      "external_not_configured": "Externe ticketverkoop niet ingesteld",
+      "filter_all_types": "Alle types",
+      "filter_field_placeholder": "Een veld selecteren",
+      "filter_methods_placeholder": "Alle methodes",
+      "filter_options_placeholder": "Opties selecteren",
+      "filter_tickets_placeholder": "Alle tickets",
+      "filter_tiers_placeholder": "Tarieven selecteren",
+      "filter_types_placeholder": "Alle types",
+      "filter_value_placeholder": "Een waarde selecteren",
+      "grand_total": "Algemeen totaal",
+      "last_sync": "Laatste synchronisatie",
+      "old_paid_orders": "Oudere betaalde bestellingen",
+      "paid_card": "Betaald — kaart",
+      "paid_cash": "Betaald — cash",
+      "paid_unknown_method": "Betaald — methode niet opgegeven",
+      "participant_prefix": "Deelnemer:",
+      "pay_card": "Betaling met kaart",
+      "pay_cash": "Betaling in cash",
+      "pay_check": "Betaling met cheque",
+      "qr_title": "QR-code van het ticket",
+      "qr_value_prefix": "Waarde van de QR-code:",
+      "search_placeholder": "Zoeken op naam, e-mail, chequenummer...",
+      "set_payment_method": "De betaalmethode instellen",
+      "stat_donations": "Donaties",
+      "stat_orders": "Bestellingen",
+      "stat_tickets": "Tickets",
+      "stat_total_amount": "Totaalbedrag",
+      "ticket_prefix": "Ticket:",
+      "tickets_prefix": "Tickets:",
+      "unfinished_orders": "Niet afgeronde bestellingen"
     },
     "origin_site": "Op de site aangemaakt",
     "participant": {
@@ -325,7 +422,32 @@
       "type": "Type",
       "volunteer_validated": "De vrijwilliger heeft zijn toegang gevalideerd",
       "validated_by": "Gevalideerd door {name}",
-      "validated_on": "op {date}"
+      "validated_on": "op {date}",
+      "add": {
+        "amount_placeholder": "Bedrag in euro",
+        "anonymous": "Anoniem",
+        "free_price": "Vrije prijs",
+        "no_ticket_selected": "Geen ticket geselecteerd",
+        "number_placeholder": "Aantal",
+        "option_placeholder": "Een optie selecteren",
+        "options_prefix": "Opties:",
+        "phone_placeholder": "Telefoonnummer",
+        "user_found_description": "De gegevens zijn automatisch vooraf ingevuld",
+        "user_found_title": "Gebruiker gevonden",
+        "with_info": "Met gegevens"
+      },
+      "artist_guest": "Gastartiest",
+      "canceled_order_description": "Deze bestelling is geannuleerd. De tickets kunnen niet meer gevalideerd worden.",
+      "confirm_payment_title": "Betaling bevestigen",
+      "invalidate_confirm": "Validatie opheffen",
+      "invalidate_description": "Weet je zeker dat je de toegang van deze deelnemer wilt intrekken? Hiermee wordt de validatie geannuleerd.",
+      "invalidate_title": "Toegang intrekken",
+      "meals_title": "Maaltijden",
+      "no_show_assigned": "Geen voorstelling toegewezen",
+      "order_status": "Status van de bestelling",
+      "pending_payment_description": "Deze bestelling is nog niet als betaald gemarkeerd. Kies de betaalmethode voordat je de toegang valideert.",
+      "pending_payment_title": "Betaling in afwachting",
+      "ticket_status": "Status van het ticket"
     },
     "payment": {
       "cash_received": "Ontvangen bedrag (€)",
@@ -337,12 +459,14 @@
         "cash": "Contant",
         "check": "Cheque",
         "pending": "Niet betaald",
-        "pendingSubtitle": "In afwachting"
+        "pendingSubtitle": "In afwachting",
+        "card_short": "Kaart"
       },
       "open_sumup": "SumUp openen",
       "selectMethod": "Selecteer betaalmethode",
       "sumup_hint": "Bevestig de betaling op SumUp en bevestig dan hier",
-      "sumup_not_configured": "De SumUp-affiliatesleutel en App ID moeten in de ticketinginstellingen worden geconfigureerd om het vooraf invullen van het bedrag te activeren."
+      "sumup_not_configured": "De SumUp-affiliatesleutel en App ID moeten in de ticketinginstellingen worden geconfigureerd om het vooraf invullen van het bedrag te activeren.",
+      "check_number_placeholder": "Bijv.: 1234567"
     },
     "quotas": {
       "created": "Quotum succesvol aangemaakt",
@@ -414,7 +538,8 @@
         "drag_to_reorder": "Slepen om te herschikken",
         "inactive": "Inactief",
         "loading": "Laden...",
-        "none_found": "Geen tarieven gevonden"
+        "none_found": "Geen tarieven gevonden",
+        "delete_title": "Tarief verwijderen"
       },
       "modal": {
         "description_label": "Beschrijving",
@@ -437,10 +562,22 @@
         "price_placeholder": "0,00",
         "quotas_placeholder": "Selecteer quota",
         "status_label": "Status",
-        "title": "HelloAsso tarief"
+        "title": "HelloAsso tarief",
+        "count_as_participant_label": "Meetelling van de deelnemers",
+        "display_name_placeholder": "Aangepaste naam voor de weergave",
+        "donation_max_help": "Laat leeg voor een donatie zonder bovengrens",
+        "helloasso_locked": "Dit tarief wordt gesynchroniseerd vanuit HelloAsso. Alleen de uit te delen artikelen en de geldigheidsdata kunnen worden gewijzigd.",
+        "no_limit_placeholder": "Geen limiet",
+        "position_help": "Weergaveorde (0 = eerst)",
+        "presence_from_label": "Aankomst",
+        "presence_from_placeholder": "Begin van de editie",
+        "presence_until_label": "Vertrek",
+        "presence_until_placeholder": "Einde van de editie",
+        "price_help": "Mag 0 zijn om gratis deelname toe te laten"
       },
       "name_required": "Tariefnaam is verplicht",
-      "updated": "Tarief succesvol bijgewerkt"
+      "updated": "Tarief succesvol bijgewerkt",
+      "sync_label": "Sync:"
     },
     "entry_log": {
       "all_movements": "Alle bewegingen",

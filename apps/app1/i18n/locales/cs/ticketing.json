@@ -76,7 +76,10 @@
       "group_partial": "Neúplné potvrzení",
       "group_title": "Osoby s více vstupy",
       "group_validate": "Potvrdit zbývající vstup | Potvrdit {count} zbývající vstupy",
-      "group_validated": "Potvrzen {count} vstup | Potvrzeno {count} vstupů"
+      "group_validated": "Potvrzen {count} vstup | Potvrzeno {count} vstupů",
+      "manual_entry_label": "Ruční zadání kódu",
+      "manual_entry_placeholder": "Zadejte kód vstupenky",
+      "scanner_hint": "Umístěte QR kód před kameru. Rozpoznání je automatické."
     },
     "counters": {
       "connected": "Připojeno",
@@ -115,12 +118,41 @@
       "syncing": "Probíhá synchronizace...",
       "title": "Čítače",
       "token_regenerated": "Odkaz úspěšně regenerován",
-      "last_actor": "Upravil(a)"
+      "last_actor": "Upravil(a)",
+      "leave_with_pending": "{count} počítání čeká na odeslání na server. Zůstávají uložena v tomto zařízení a odejdou po obnovení sítě — dokud však odeslána nejsou, ostatní obrazovky je nevidí.",
+      "leave_with_pending_title": "Některá počítání nebyla odeslána"
     },
     "custom_fields": {
       "created": "Vlastní pole úspěšně vytvořeno",
       "error_saving": "Nelze uložit vlastní pole",
-      "updated": "Vlastní pole úspěšně aktualizováno"
+      "updated": "Vlastní pole úspěšně aktualizováno",
+      "associations": {
+        "intro": "Nastavte ceny spojené s tímto vlastním polem.",
+        "tiers_label": "Spojené ceny",
+        "title": "Vazby"
+      },
+      "list": {
+        "choices_prefix": "Možnosti:",
+        "delete_confirm_title": "Smazat vlastní pole",
+        "delete_field": "Smazat pole",
+        "edit_field": "Upravit pole",
+        "handout_items_prefix": "Předměty k předání:",
+        "manage_associations": "Spravovat vazby",
+        "quotas_prefix": "Kvóty:",
+        "required_badge": "Povinné",
+        "tiers_prefix": "Ceny:",
+        "title": "Vlastní pole"
+      },
+      "modal": {
+        "choices_placeholder": "Např.: S, M, L, XL",
+        "label_label": "Označení pole",
+        "label_placeholder": "Např.: Velikost trička",
+        "quotas_items_association": "Vazby kvót a předmětů",
+        "required_checkbox": "Toto pole je povinné",
+        "required_label": "Povinné pole",
+        "tiers_association": "Vazba na ceny",
+        "type_label": "Typ pole"
+      }
     },
     "external": {
       "config_delete_error": "Nelze odstranit konfiguraci",
@@ -145,7 +177,19 @@
       "tiers_load_error": "Nelze načíst tarify",
       "tiers_loaded": "Tarify načteny",
       "tiers_loaded_description": "Nalezeno {tiers} tarifů, {options} možností a {fields} vlastních polí",
-      "view_loaded_data": "Zobrazit načtená data"
+      "view_loaded_data": "Zobrazit načtená data",
+      "client_id_hint": "Veřejný identifikátor vašeho API klienta",
+      "client_secret_hint": "Tajný klíč (po uložení zašifrován)",
+      "form_detected": "Formulář rozpoznán",
+      "form_prefix": "Formulář:",
+      "form_slug_hint": "Název vašeho formuláře v URL",
+      "form_type_hint": "Typ viditelný v URL HelloAsso",
+      "form_url_label": "URL vašeho prodeje vstupenek na HelloAsso",
+      "helloasso_connect_description": "Připojte svůj účet HelloAsso, aby se vstupenky a účastníci synchronizovali automaticky.",
+      "identify_form": "Určit váš formulář",
+      "organization_prefix": "Organizace:",
+      "organization_slug_hint": "Název vašeho sdružení v URL",
+      "type_prefix": "Typ:"
     },
     "handout_items": {
       "list": {
@@ -226,7 +270,12 @@
       "error_saving": "Nelze uložit možnost",
       "list": {
         "loading": "Načítání...",
-        "none_found": "Nebyly nalezeny žádné možnosti"
+        "none_found": "Nebyly nalezeny žádné možnosti",
+        "choices_prefix": "Možnosti:",
+        "delete_title": "Smazat možnost",
+        "meals_prefix": "Jídla:",
+        "quotas_prefix": "Kvóty:",
+        "tiers_prefix": "Ceny:"
       },
       "modal": {
         "choices_label": "Dostupné možnosti",
@@ -239,7 +288,19 @@
         "position_label": "Pozice displeje",
         "position_placeholder": "0",
         "title": "Možnost HelloAsso",
-        "type_label": "Typ možnosti"
+        "type_label": "Typ možnosti",
+        "all_tiers": "Všechny ceny",
+        "choices_help": "Jedna možnost na řádek",
+        "helloasso_locked": "Tato možnost se synchronizuje z HelloAsso a nelze ji upravit.",
+        "meals_help": "Tato možnost umožní přístup k vybraným jídlům",
+        "meals_label": "Spojená jídla",
+        "meals_placeholder": "Vyberte jídla…",
+        "no_meal_selected": "Není vybráno žádné jídlo",
+        "position_help": "Pořadí zobrazení (0 = první)",
+        "price_help": "Příplatek v eurech (ponechte prázdné, pokud je možnost zdarma)",
+        "price_label": "Cena možnosti",
+        "tiers_label": "Spojené ceny",
+        "tiers_placeholder": "Vyberte ceny…"
       },
       "name_required": "Název možnosti je povinný",
       "updated": "Možnost úspěšně aktualizována"
@@ -311,7 +372,43 @@
       "discount_saved": "Sleva uložena",
       "order_discount_part": "z toho {amount} vráceno jako sleva",
       "stats_discounted_help": "Vráceno u vstupenek, které zůstávají platné — již odečteno z celkové částky",
-      "stats_discounted_title": "Slevy"
+      "stats_discounted_title": "Slevy",
+      "amount_prefix": "Částka:",
+      "amounts_by_method_title": "Rozpis částek podle způsobu platby",
+      "awaiting_short": "Čeká",
+      "check_number_label": "Číslo šeku (nepovinné)",
+      "check_payments": "Platby šekem",
+      "email_prefix": "E-mail:",
+      "external_not_configured": "Externí prodej vstupenek není nastaven",
+      "filter_all_types": "Všechny typy",
+      "filter_field_placeholder": "Vyberte pole",
+      "filter_methods_placeholder": "Všechny způsoby",
+      "filter_options_placeholder": "Vyberte možnosti",
+      "filter_tickets_placeholder": "Všechny vstupenky",
+      "filter_tiers_placeholder": "Vyberte ceny",
+      "filter_types_placeholder": "Všechny typy",
+      "filter_value_placeholder": "Vyberte hodnotu",
+      "grand_total": "Celkový součet",
+      "last_sync": "Poslední synchronizace",
+      "old_paid_orders": "Starší zaplacené objednávky",
+      "paid_card": "Zaplaceno — kartou",
+      "paid_cash": "Zaplaceno — hotově",
+      "paid_unknown_method": "Zaplaceno — způsob neuveden",
+      "participant_prefix": "Účastník:",
+      "pay_card": "Platba kartou",
+      "pay_cash": "Platba hotově",
+      "pay_check": "Platba šekem",
+      "qr_title": "QR kód vstupenky",
+      "qr_value_prefix": "Hodnota QR kódu:",
+      "search_placeholder": "Hledat podle jména, e-mailu, čísla šeku…",
+      "set_payment_method": "Určit způsob platby",
+      "stat_donations": "Dary",
+      "stat_orders": "Objednávky",
+      "stat_tickets": "Vstupenky",
+      "stat_total_amount": "Celková částka",
+      "ticket_prefix": "Vstupenka:",
+      "tickets_prefix": "Vstupenky:",
+      "unfinished_orders": "Nedokončené objednávky"
     },
     "origin_site": "Vytvořeno na webu",
     "participant": {
@@ -325,7 +422,32 @@
       "type": "Typ",
       "volunteer_validated": "Dobrovolník potvrdil svůj vstup",
       "validated_by": "Ověřeno uživatelem {name}",
-      "validated_on": "dne {date}"
+      "validated_on": "dne {date}",
+      "add": {
+        "amount_placeholder": "Částka v eurech",
+        "anonymous": "Anonymní",
+        "free_price": "Volná cena",
+        "no_ticket_selected": "Není vybrána žádná vstupenka",
+        "number_placeholder": "Počet",
+        "option_placeholder": "Vyberte možnost",
+        "options_prefix": "Možnosti:",
+        "phone_placeholder": "Telefonní číslo",
+        "user_found_description": "Údaje byly automaticky předvyplněny",
+        "user_found_title": "Uživatel nalezen",
+        "with_info": "S údaji"
+      },
+      "artist_guest": "Hostující umělec",
+      "canceled_order_description": "Tato objednávka byla zrušena. Vstupenky už nelze ověřit.",
+      "confirm_payment_title": "Potvrdit platbu",
+      "invalidate_confirm": "Zrušit ověření",
+      "invalidate_description": "Opravdu chcete zrušit vstup tohoto účastníka? Tím se ověření anuluje.",
+      "invalidate_title": "Zrušit vstup",
+      "meals_title": "Jídla",
+      "no_show_assigned": "Není přiřazeno žádné vystoupení",
+      "order_status": "Stav objednávky",
+      "pending_payment_description": "Tato objednávka ještě nebyla označena jako zaplacená. Před ověřením vstupu vyberte způsob platby.",
+      "pending_payment_title": "Platba čeká",
+      "ticket_status": "Stav vstupenky"
     },
     "payment": {
       "cash_received": "Přijatá částka (€)",
@@ -337,12 +459,14 @@
         "cash": "Hotovost",
         "check": "Šek",
         "pending": "Nezaplaceno",
-        "pendingSubtitle": "Čeká na vyřízení"
+        "pendingSubtitle": "Čeká na vyřízení",
+        "card_short": "Karta"
       },
       "open_sumup": "Otevřít SumUp",
       "selectMethod": "Vyberte způsob platby",
       "sumup_hint": "Potvrďte platbu na SumUp a poté potvrďte zde",
-      "sumup_not_configured": "Affiliate klíč a App ID SumUp musí být nakonfigurovány v nastavení vstupenek, aby bylo možné předvyplnit částku."
+      "sumup_not_configured": "Affiliate klíč a App ID SumUp musí být nakonfigurovány v nastavení vstupenek, aby bylo možné předvyplnit částku.",
+      "check_number_placeholder": "Např.: 1234567"
     },
     "quotas": {
       "created": "Kvóta úspěšně vytvořena",
@@ -414,7 +538,8 @@
         "drag_to_reorder": "Přetáhněte pro změnu pořadí",
         "inactive": "Neaktivní",
         "loading": "Načítání...",
-        "none_found": "Nebyly nalezeny žádné tarify"
+        "none_found": "Nebyly nalezeny žádné tarify",
+        "delete_title": "Smazat cenu"
       },
       "modal": {
         "description_label": "Popis",
@@ -437,10 +562,22 @@
         "price_placeholder": "0.00",
         "quotas_placeholder": "Výběr kvót",
         "status_label": "Stav",
-        "title": "Sazba HelloAsso"
+        "title": "Sazba HelloAsso",
+        "count_as_participant_label": "Započítávání účastníků",
+        "display_name_placeholder": "Vlastní název pro zobrazení",
+        "donation_max_help": "Ponechte prázdné pro dar bez horního limitu",
+        "helloasso_locked": "Tato cena se synchronizuje z HelloAsso. Upravit lze pouze předměty k předání a data platnosti.",
+        "no_limit_placeholder": "Bez limitu",
+        "position_help": "Pořadí zobrazení (0 = první)",
+        "presence_from_label": "Příjezd",
+        "presence_from_placeholder": "Začátek ročníku",
+        "presence_until_label": "Odjezd",
+        "presence_until_placeholder": "Konec ročníku",
+        "price_help": "Může být 0, aby byla umožněna účast zdarma"
       },
       "name_required": "Název tarifu je povinný",
-      "updated": "Tarif úspěšně aktualizován"
+      "updated": "Tarif úspěšně aktualizován",
+      "sync_label": "Synch.:"
     },
     "entry_log": {
       "all_movements": "Všechny pohyby",

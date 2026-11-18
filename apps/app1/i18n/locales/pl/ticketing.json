@@ -76,7 +76,10 @@
       "group_partial": "Niepełne potwierdzenie",
       "group_title": "Osoby z kilkoma wejściami",
       "group_validate": "Potwierdź pozostałe wejście | Potwierdź {count} pozostałe wejścia",
-      "group_validated": "Potwierdzono {count} wejście | Potwierdzono {count} wejścia"
+      "group_validated": "Potwierdzono {count} wejście | Potwierdzono {count} wejścia",
+      "manual_entry_label": "Ręczne wprowadzenie kodu",
+      "manual_entry_placeholder": "Wpisz kod biletu",
+      "scanner_hint": "Umieść kod QR przed kamerą. Wykrywanie jest automatyczne."
     },
     "counters": {
       "connected": "Połączono",
@@ -115,12 +118,41 @@
       "syncing": "Synchronizacja...",
       "title": "Liczniki",
       "token_regenerated": "Link pomyślnie zregenerowany",
-      "last_actor": "Zmienione przez"
+      "last_actor": "Zmienione przez",
+      "leave_with_pending": "{count} zliczeń czeka na wysłanie na serwer. Pozostają zapisane na tym urządzeniu i zostaną wysłane po powrocie sieci — ale dopóki nie zostaną wysłane, inne ekrany ich nie widzą.",
+      "leave_with_pending_title": "Niektóre zliczenia nie zostały wysłane"
     },
     "custom_fields": {
       "created": "Pole niestandardowe utworzone pomyślnie",
       "error_saving": "Nie można zapisać pola niestandardowego",
-      "updated": "Pole niestandardowe zaktualizowane pomyślnie"
+      "updated": "Pole niestandardowe zaktualizowane pomyślnie",
+      "associations": {
+        "intro": "Skonfiguruj taryfy powiązane z tym polem własnym.",
+        "tiers_label": "Powiązane taryfy",
+        "title": "Powiązania"
+      },
+      "list": {
+        "choices_prefix": "Wybory:",
+        "delete_confirm_title": "Usuń pole własne",
+        "delete_field": "Usuń pole",
+        "edit_field": "Zmień pole",
+        "handout_items_prefix": "Przedmioty do wydania:",
+        "manage_associations": "Zarządzaj powiązaniami",
+        "quotas_prefix": "Limity:",
+        "required_badge": "Obowiązkowe",
+        "tiers_prefix": "Taryfy:",
+        "title": "Pola własne"
+      },
+      "modal": {
+        "choices_placeholder": "Np.: S, M, L, XL",
+        "label_label": "Etykieta pola",
+        "label_placeholder": "Np.: Rozmiar koszulki",
+        "quotas_items_association": "Powiązania limitów i przedmiotów",
+        "required_checkbox": "To pole jest obowiązkowe",
+        "required_label": "Pole obowiązkowe",
+        "tiers_association": "Powiązanie z taryfami",
+        "type_label": "Typ pola"
+      }
     },
     "external": {
       "config_delete_error": "Nie można usunąć konfiguracji",
@@ -145,7 +177,19 @@
       "tiers_load_error": "Nie można załadować taryf",
       "tiers_loaded": "Taryfy załadowane",
       "tiers_loaded_description": "Znaleziono {tiers} taryf, {options} opcji i {fields} pól niestandardowych",
-      "view_loaded_data": "Zobacz wczytane dane"
+      "view_loaded_data": "Zobacz wczytane dane",
+      "client_id_hint": "Publiczny identyfikator twojego klienta API",
+      "client_secret_hint": "Tajny klucz (szyfrowany po zapisaniu)",
+      "form_detected": "Formularz rozpoznany",
+      "form_prefix": "Formularz:",
+      "form_slug_hint": "Nazwa twojego formularza w adresie URL",
+      "form_type_hint": "Typ widoczny w adresie URL HelloAsso",
+      "form_url_label": "Adres URL twojej sprzedaży biletów w HelloAsso",
+      "helloasso_connect_description": "Połącz swoje konto HelloAsso, aby automatycznie synchronizować bilety i uczestników.",
+      "identify_form": "Wskaż swój formularz",
+      "organization_prefix": "Organizacja:",
+      "organization_slug_hint": "Nazwa twojego stowarzyszenia w adresie URL",
+      "type_prefix": "Typ:"
     },
     "handout_items": {
       "list": {
@@ -226,7 +270,12 @@
       "error_saving": "Nie można zapisać opcji",
       "list": {
         "loading": "Ładowanie...",
-        "none_found": "Nie znaleziono opcji"
+        "none_found": "Nie znaleziono opcji",
+        "choices_prefix": "Wybory:",
+        "delete_title": "Usuń opcję",
+        "meals_prefix": "Posiłki:",
+        "quotas_prefix": "Limity:",
+        "tiers_prefix": "Taryfy:"
       },
       "modal": {
         "choices_label": "Dostępne wybory",
@@ -239,7 +288,19 @@
         "position_label": "Pozycja wyświetlania",
         "position_placeholder": "0",
         "title": "Opcja HelloAsso",
-        "type_label": "Typ opcji"
+        "type_label": "Typ opcji",
+        "all_tiers": "Wszystkie taryfy",
+        "choices_help": "Jeden wybór w wierszu",
+        "helloasso_locked": "Ta opcja jest synchronizowana z HelloAsso i nie można jej zmienić.",
+        "meals_help": "Ta opcja da dostęp do wybranych posiłków",
+        "meals_label": "Powiązane posiłki",
+        "meals_placeholder": "Wybierz posiłki…",
+        "no_meal_selected": "Nie wybrano żadnego posiłku",
+        "position_help": "Kolejność wyświetlania (0 = pierwszy)",
+        "price_help": "Dodatkowa cena w euro (pozostaw puste, jeśli opcja jest darmowa)",
+        "price_label": "Cena opcji",
+        "tiers_label": "Powiązane taryfy",
+        "tiers_placeholder": "Wybierz taryfy…"
       },
       "name_required": "Nazwa opcji jest wymagana",
       "updated": "Opcja zaktualizowana pomyślnie"
@@ -311,7 +372,43 @@
       "discount_saved": "Rabat zapisany",
       "order_discount_part": "w tym {amount} zwrócone jako rabat",
       "stats_discounted_help": "Zwrócone na biletach, które pozostają ważne — już odliczone od sumy",
-      "stats_discounted_title": "Rabaty"
+      "stats_discounted_title": "Rabaty",
+      "amount_prefix": "Kwota:",
+      "amounts_by_method_title": "Zestawienie kwot według metody płatności",
+      "awaiting_short": "Oczekuje",
+      "check_number_label": "Numer czeku (opcjonalnie)",
+      "check_payments": "Płatności czekiem",
+      "email_prefix": "E-mail:",
+      "external_not_configured": "Zewnętrzna sprzedaż biletów nie jest skonfigurowana",
+      "filter_all_types": "Wszystkie typy",
+      "filter_field_placeholder": "Wybierz pole",
+      "filter_methods_placeholder": "Wszystkie metody",
+      "filter_options_placeholder": "Wybierz opcje",
+      "filter_tickets_placeholder": "Wszystkie bilety",
+      "filter_tiers_placeholder": "Wybierz taryfy",
+      "filter_types_placeholder": "Wszystkie typy",
+      "filter_value_placeholder": "Wybierz wartość",
+      "grand_total": "Suma całkowita",
+      "last_sync": "Ostatnia synchronizacja",
+      "old_paid_orders": "Starsze opłacone zamówienia",
+      "paid_card": "Opłacone — karta",
+      "paid_cash": "Opłacone — gotówka",
+      "paid_unknown_method": "Opłacone — metoda nieokreślona",
+      "participant_prefix": "Uczestnik:",
+      "pay_card": "Płatność kartą",
+      "pay_cash": "Płatność gotówką",
+      "pay_check": "Płatność czekiem",
+      "qr_title": "Kod QR biletu",
+      "qr_value_prefix": "Wartość kodu QR:",
+      "search_placeholder": "Szukaj po nazwisku, e-mailu, numerze czeku…",
+      "set_payment_method": "Określ metodę płatności",
+      "stat_donations": "Darowizny",
+      "stat_orders": "Zamówienia",
+      "stat_tickets": "Bilety",
+      "stat_total_amount": "Kwota całkowita",
+      "ticket_prefix": "Bilet:",
+      "tickets_prefix": "Bilety:",
+      "unfinished_orders": "Niedokończone zamówienia"
     },
     "origin_site": "Utworzone na stronie",
     "participant": {
@@ -325,7 +422,32 @@
       "type": "Typ",
       "volunteer_validated": "Wolontariusz zwalidował swoje wejście",
       "validated_by": "Zatwierdzone przez {name}",
-      "validated_on": "dnia {date}"
+      "validated_on": "dnia {date}",
+      "add": {
+        "amount_placeholder": "Kwota w euro",
+        "anonymous": "Anonimowo",
+        "free_price": "Dowolna cena",
+        "no_ticket_selected": "Nie wybrano żadnego biletu",
+        "number_placeholder": "Liczba",
+        "option_placeholder": "Wybierz opcję",
+        "options_prefix": "Opcje:",
+        "phone_placeholder": "Numer telefonu",
+        "user_found_description": "Dane zostały wypełnione automatycznie",
+        "user_found_title": "Użytkownik znaleziony",
+        "with_info": "Z danymi"
+      },
+      "artist_guest": "Artysta gościnny",
+      "canceled_order_description": "To zamówienie zostało anulowane. Biletów nie można już zatwierdzić.",
+      "confirm_payment_title": "Potwierdź płatność",
+      "invalidate_confirm": "Unieważnij",
+      "invalidate_description": "Czy na pewno chcesz unieważnić wejście tego uczestnika? Ta czynność anuluje zatwierdzenie.",
+      "invalidate_title": "Unieważnij wejście",
+      "meals_title": "Posiłki",
+      "no_show_assigned": "Nie przypisano żadnego pokazu",
+      "order_status": "Status zamówienia",
+      "pending_payment_description": "To zamówienie nie zostało jeszcze oznaczone jako opłacone. Wybierz sposób płatności przed zatwierdzeniem wejścia.",
+      "pending_payment_title": "Płatność oczekuje",
+      "ticket_status": "Status biletu"
     },
     "payment": {
       "cash_received": "Otrzymana kwota (€)",
@@ -337,12 +459,14 @@
         "cash": "Gotówka",
         "check": "Czek",
         "pending": "Nieopłacone",
-        "pendingSubtitle": "Oczekujące"
+        "pendingSubtitle": "Oczekujące",
+        "card_short": "Karta"
       },
       "open_sumup": "Otwórz SumUp",
       "selectMethod": "Wybierz metodę płatności",
       "sumup_hint": "Potwierdź płatność w SumUp, a następnie potwierdź tutaj",
-      "sumup_not_configured": "Klucz afiliacyjny i App ID SumUp muszą zostać skonfigurowane w ustawieniach biletów, aby aktywować automatyczne wypełnianie kwoty."
+      "sumup_not_configured": "Klucz afiliacyjny i App ID SumUp muszą zostać skonfigurowane w ustawieniach biletów, aby aktywować automatyczne wypełnianie kwoty.",
+      "check_number_placeholder": "Np.: 1234567"
     },
     "quotas": {
       "created": "Limit utworzony pomyślnie",
@@ -414,7 +538,8 @@
         "drag_to_reorder": "Przeciągnij, aby zmienić kolejność",
         "inactive": "Nieaktywny",
         "loading": "Ładowanie...",
-        "none_found": "Nie znaleziono taryf"
+        "none_found": "Nie znaleziono taryf",
+        "delete_title": "Usuń taryfę"
       },
       "modal": {
         "description_label": "Opis",
@@ -437,10 +562,22 @@
         "price_placeholder": "0,00",
         "quotas_placeholder": "Wybierz kwoty",
         "status_label": "Status",
-        "title": "Taryfa HelloAsso"
+        "title": "Taryfa HelloAsso",
+        "count_as_participant_label": "Zliczanie uczestników",
+        "display_name_placeholder": "Własna nazwa do wyświetlania",
+        "donation_max_help": "Pozostaw puste dla darowizny bez górnego limitu",
+        "helloasso_locked": "Ta taryfa jest synchronizowana z HelloAsso. Zmienić można tylko przedmioty do wydania i daty ważności.",
+        "no_limit_placeholder": "Bez limitu",
+        "position_help": "Kolejność wyświetlania (0 = pierwszy)",
+        "presence_from_label": "Przyjazd",
+        "presence_from_placeholder": "Początek edycji",
+        "presence_until_label": "Wyjazd",
+        "presence_until_placeholder": "Koniec edycji",
+        "price_help": "Może wynosić 0, aby umożliwić darmowy udział"
       },
       "name_required": "Nazwa taryfy jest wymagana",
-      "updated": "Taryfa zaktualizowana pomyślnie"
+      "updated": "Taryfa zaktualizowana pomyślnie",
+      "sync_label": "Synch.:"
     },
     "entry_log": {
       "all_movements": "Wszystkie ruchy",

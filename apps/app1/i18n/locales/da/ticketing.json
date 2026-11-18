@@ -76,7 +76,10 @@
       "group_partial": "Ufuldstændig bekræftelse",
       "group_title": "Personer med flere adgange",
       "group_validate": "Bekræft den resterende adgang | Bekræft de {count} resterende adgange",
-      "group_validated": "{count} adgang bekræftet | {count} adgange bekræftet"
+      "group_validated": "{count} adgang bekræftet | {count} adgange bekræftet",
+      "manual_entry_label": "Indtast koden manuelt",
+      "manual_entry_placeholder": "Indtast billettens kode",
+      "scanner_hint": "Hold QR-koden foran kameraet. Genkendelsen sker automatisk."
     },
     "counters": {
       "connected": "Tilsluttet",
@@ -115,12 +118,41 @@
       "syncing": "Synkroniserer...",
       "title": "Tællere",
       "token_regenerated": "Link regenereret med succes",
-      "last_actor": "Ændret af"
+      "last_actor": "Ændret af",
+      "leave_with_pending": "{count} optælling(er) venter på at blive sendt til serveren. De bevares på denne enhed og sendes, når netværket er tilbage — men indtil de er sendt, kan andre skærme ikke se dem.",
+      "leave_with_pending_title": "Nogle optællinger er ikke sendt"
     },
     "custom_fields": {
       "created": "Brugerdefineret felt oprettet med succes",
       "error_saving": "Kan ikke gemme brugerdefineret felt",
-      "updated": "Brugerdefineret felt opdateret med succes"
+      "updated": "Brugerdefineret felt opdateret med succes",
+      "associations": {
+        "intro": "Indstil de priser, der er knyttet til dette brugerdefinerede felt.",
+        "tiers_label": "Tilknyttede priser",
+        "title": "Tilknytninger"
+      },
+      "list": {
+        "choices_prefix": "Valg:",
+        "delete_confirm_title": "Slet det brugerdefinerede felt",
+        "delete_field": "Slet feltet",
+        "edit_field": "Redigér feltet",
+        "handout_items_prefix": "Varer til udlevering:",
+        "manage_associations": "Administrér tilknytningerne",
+        "quotas_prefix": "Kvoter:",
+        "required_badge": "Påkrævet",
+        "tiers_prefix": "Priser:",
+        "title": "Brugerdefinerede felter"
+      },
+      "modal": {
+        "choices_placeholder": "F.eks.: S, M, L, XL",
+        "label_label": "Feltets mærkat",
+        "label_placeholder": "F.eks.: T-shirtstørrelse",
+        "quotas_items_association": "Tilknytninger af kvoter og varer",
+        "required_checkbox": "Dette felt er påkrævet",
+        "required_label": "Påkrævet felt",
+        "tiers_association": "Tilknytning til priserne",
+        "type_label": "Felttype"
+      }
     },
     "external": {
       "config_delete_error": "Kan ikke slette konfiguration",
@@ -145,7 +177,19 @@
       "tiers_load_error": "Kan ikke indlæse priser",
       "tiers_loaded": "Priser indlæst",
       "tiers_loaded_description": "{tiers} pris(er), {options} valgmulighed(er) og {fields} brugerdefineret(e) felt(er) fundet",
-      "view_loaded_data": "Se indlæste data"
+      "view_loaded_data": "Se indlæste data",
+      "client_id_hint": "Den offentlige identifikator for din API-klient",
+      "client_secret_hint": "Hemmelig nøgle (krypteres efter lagring)",
+      "form_detected": "Formular fundet",
+      "form_prefix": "Formular:",
+      "form_slug_hint": "Navnet på din formular i URL'en",
+      "form_type_hint": "Den type, der står i HelloAsso-URL'en",
+      "form_url_label": "URL til dit HelloAsso-billetsalg",
+      "helloasso_connect_description": "Forbind din HelloAsso-konto for automatisk at synkronisere billetter og deltagere.",
+      "identify_form": "Find din formular",
+      "organization_prefix": "Organisation:",
+      "organization_slug_hint": "Navnet på din forening i URL'en",
+      "type_prefix": "Type:"
     },
     "handout_items": {
       "list": {
@@ -226,7 +270,12 @@
       "error_saving": "Kan ikke gemme valgmulighed",
       "list": {
         "loading": "Indlæser...",
-        "none_found": "Ingen muligheder fundet"
+        "none_found": "Ingen muligheder fundet",
+        "choices_prefix": "Valg:",
+        "delete_title": "Slet tilvalget",
+        "meals_prefix": "Måltider:",
+        "quotas_prefix": "Kvoter:",
+        "tiers_prefix": "Priser:"
       },
       "modal": {
         "choices_label": "Tilgængelige valg",
@@ -239,7 +288,19 @@
         "position_label": "Visningsposition",
         "position_placeholder": "0",
         "title": "HelloAsso mulighed",
-        "type_label": "Type mulighed"
+        "type_label": "Type mulighed",
+        "all_tiers": "Alle priser",
+        "choices_help": "Ét valg pr. linje",
+        "helloasso_locked": "Dette tilvalg synkroniseres fra HelloAsso og kan ikke ændres.",
+        "meals_help": "Dette tilvalg giver adgang til de valgte måltider",
+        "meals_label": "Tilknyttede måltider",
+        "meals_placeholder": "Vælg måltiderne …",
+        "no_meal_selected": "Intet måltid valgt",
+        "position_help": "Visningsrækkefølge (0 = først)",
+        "price_help": "Ekstra pris i euro (lad feltet være tomt, hvis tilvalget er gratis)",
+        "price_label": "Tilvalgets pris",
+        "tiers_label": "Tilknyttede priser",
+        "tiers_placeholder": "Vælg priserne …"
       },
       "name_required": "Valgmulighedens navn er påkrævet",
       "updated": "Valgmulighed opdateret med succes"
@@ -311,7 +372,43 @@
       "discount_saved": "Rabat gemt",
       "order_discount_part": "heraf {amount} tilbagebetalt som rabat",
       "stats_discounted_help": "Tilbagebetalt på billetter, der stadig er gyldige — allerede trukket fra totalen",
-      "stats_discounted_title": "Rabatter"
+      "stats_discounted_title": "Rabatter",
+      "amount_prefix": "Beløb:",
+      "amounts_by_method_title": "Beløb fordelt på betalingsmetode",
+      "awaiting_short": "Afventer",
+      "check_number_label": "Checknummer (valgfrit)",
+      "check_payments": "Betalinger med check",
+      "email_prefix": "E-mail:",
+      "external_not_configured": "Eksternt billetsalg er ikke opsat",
+      "filter_all_types": "Alle typer",
+      "filter_field_placeholder": "Vælg et felt",
+      "filter_methods_placeholder": "Alle metoder",
+      "filter_options_placeholder": "Vælg tilvalg",
+      "filter_tickets_placeholder": "Alle billetter",
+      "filter_tiers_placeholder": "Vælg priser",
+      "filter_types_placeholder": "Alle typer",
+      "filter_value_placeholder": "Vælg en værdi",
+      "grand_total": "Samlet total",
+      "last_sync": "Seneste synkronisering",
+      "old_paid_orders": "Ældre betalte ordrer",
+      "paid_card": "Betalt — kort",
+      "paid_cash": "Betalt — kontant",
+      "paid_unknown_method": "Betalt — metode ikke angivet",
+      "participant_prefix": "Deltager:",
+      "pay_card": "Betaling med kort",
+      "pay_cash": "Betaling kontant",
+      "pay_check": "Betaling med check",
+      "qr_title": "Billettens QR-kode",
+      "qr_value_prefix": "QR-kodens værdi:",
+      "search_placeholder": "Søg efter navn, e-mail, checknummer …",
+      "set_payment_method": "Angiv betalingsmetoden",
+      "stat_donations": "Donationer",
+      "stat_orders": "Ordrer",
+      "stat_tickets": "Billetter",
+      "stat_total_amount": "Samlet beløb",
+      "ticket_prefix": "Billet:",
+      "tickets_prefix": "Billetter:",
+      "unfinished_orders": "Ikke afsluttede ordrer"
     },
     "origin_site": "Oprettet på sitet",
     "participant": {
@@ -325,7 +422,32 @@
       "type": "Type",
       "volunteer_validated": "Frivillig har valideret sin adgang",
       "validated_by": "Valideret af {name}",
-      "validated_on": "den {date}"
+      "validated_on": "den {date}",
+      "add": {
+        "amount_placeholder": "Beløb i euro",
+        "anonymous": "Anonym",
+        "free_price": "Frit beløb",
+        "no_ticket_selected": "Ingen billet valgt",
+        "number_placeholder": "Antal",
+        "option_placeholder": "Vælg et tilvalg",
+        "options_prefix": "Tilvalg:",
+        "phone_placeholder": "Telefonnummer",
+        "user_found_description": "Oplysningerne er udfyldt automatisk",
+        "user_found_title": "Bruger fundet",
+        "with_info": "Med oplysninger"
+      },
+      "artist_guest": "Gæsteartist",
+      "canceled_order_description": "Denne ordre er annulleret. Billetterne kan ikke længere valideres.",
+      "confirm_payment_title": "Bekræft betalingen",
+      "invalidate_confirm": "Annullér valideringen",
+      "invalidate_description": "Er du sikker på, at du vil annullere denne deltagers adgang? Handlingen ophæver valideringen.",
+      "invalidate_title": "Annullér adgangen",
+      "meals_title": "Måltider",
+      "no_show_assigned": "Ingen forestilling tildelt",
+      "order_status": "Ordrens status",
+      "pending_payment_description": "Denne ordre er endnu ikke markeret som betalt. Vælg betalingsmetoden, før du validerer adgangen.",
+      "pending_payment_title": "Betaling afventer",
+      "ticket_status": "Billettens status"
     },
     "payment": {
       "cash_received": "Modtaget beløb (€)",
@@ -337,12 +459,14 @@
         "cash": "Kontant",
         "check": "Check",
         "pending": "Ikke betalt",
-        "pendingSubtitle": "Afventer"
+        "pendingSubtitle": "Afventer",
+        "card_short": "Kort"
       },
       "open_sumup": "Åbn SumUp",
       "selectMethod": "Vælg betalingsmetode",
       "sumup_hint": "Bekræft betalingen på SumUp og bekræft derefter her",
-      "sumup_not_configured": "SumUp affiliate-nøglen og App ID skal konfigureres i billetindstillingerne for at aktivere forudfyldning af beløbet."
+      "sumup_not_configured": "SumUp affiliate-nøglen og App ID skal konfigureres i billetindstillingerne for at aktivere forudfyldning af beløbet.",
+      "check_number_placeholder": "F.eks.: 1234567"
     },
     "quotas": {
       "created": "Kvote oprettet med succes",
@@ -414,7 +538,8 @@
         "drag_to_reorder": "Træk for at omorganisere",
         "inactive": "Inaktiv",
         "loading": "Indlæser...",
-        "none_found": "Ingen priser fundet"
+        "none_found": "Ingen priser fundet",
+        "delete_title": "Slet prisen"
       },
       "modal": {
         "description_label": "Beskrivelse",
@@ -437,10 +562,22 @@
         "price_placeholder": "0,00",
         "quotas_placeholder": "Vælg kvoter",
         "status_label": "Status",
-        "title": "HelloAsso pris"
+        "title": "HelloAsso pris",
+        "count_as_participant_label": "Optælling af deltagerne",
+        "display_name_placeholder": "Tilpasset navn til visning",
+        "donation_max_help": "Lad feltet være tomt for en donation uden øvre grænse",
+        "helloasso_locked": "Denne pris synkroniseres fra HelloAsso. Kun varerne til udlevering og gyldighedsdatoerne kan ændres.",
+        "no_limit_placeholder": "Ingen grænse",
+        "position_help": "Visningsrækkefølge (0 = først)",
+        "presence_from_label": "Ankomst",
+        "presence_from_placeholder": "Udgavens begyndelse",
+        "presence_until_label": "Afrejse",
+        "presence_until_placeholder": "Udgavens afslutning",
+        "price_help": "Kan være 0 for at tillade gratis deltagelse"
       },
       "name_required": "Prisens navn er påkrævet",
-      "updated": "Pris opdateret med succes"
+      "updated": "Pris opdateret med succes",
+      "sync_label": "Sync:"
     },
     "entry_log": {
       "all_movements": "Alle bevægelser",

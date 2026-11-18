@@ -204,7 +204,15 @@
     "leave_without_saving": "Lämna utan att spara",
     "unsaved_changes": "Osparade ändringar",
     "unsaved_changes_warning": "Du har ändringar som inte har sparats. Om du lämnar den här sidan nu går de förlorade.",
-    "deleted_account": "Raderat konto"
+    "deleted_account": "Raderat konto",
+    "change_profile_picture": "Byt profilbild",
+    "contact": "Kontakta",
+    "decrease_quantity": "Minska antalet",
+    "help": "Hjälp",
+    "increase_quantity": "Öka antalet",
+    "pin": "Fäst",
+    "send": "Skicka",
+    "show_qr_code": "Visa QR-koden"
   },
   "dates": {
     "date_range": "Från {startDate} till {endDate}",

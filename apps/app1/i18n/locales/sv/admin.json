@@ -889,6 +889,71 @@
     "volunteer_reminders": "Påminnelser om volontärarbete",
     "workshops_created": "Skapade workshops",
     "backup_restore_dropped_tables": "{count} tabell(er) som saknas i säkerhetskopian har tagits bort",
-    "backup_restore_step_migrations": "Tillämpar migreringar"
+    "backup_restore_step_migrations": "Tillämpar migreringar",
+    "veille": {
+      "already_imported": "Redan importerad",
+      "days": "{count} dag(ar)",
+      "description": "Evenemang som hittats i externa kalendrar och ska bedömas före import. Ett avslag är slutgiltigt: en senare genomsökning föreslår det inte igen.",
+      "empty": "Inga kandidater för dessa filter",
+      "error": {
+        "classify": "Klassificeringen kunde inte startas",
+        "classify_partial": "{classes} klassificerade, {echecs} misslyckades: {erreur}",
+        "load": "Kandidaterna kunde inte läsas in",
+        "refresh": "Kalendrarna kunde inte läsas om",
+        "refresh_partial": "Oläsbar(a) källa/källor: {sources}. Att det inte finns något nytt betyder inte att de saknar fler evenemang.",
+        "verdict_partial": "{reussis} beslut sparade, {echecs} misslyckades"
+      },
+      "filter": {
+        "ai_opinion": "AI:ns bedömning",
+        "all_countries": "Alla länder",
+        "all_opinions": "Alla bedömningar",
+        "all_sources": "Alla källor",
+        "country": "Land",
+        "hide_imported": "Dölj de redan importerade",
+        "source": "Källa"
+      },
+      "ia": {
+        "classified": "{count} kandidat(er) klassificerade av AI:n",
+        "classify": "Klassificera med AI",
+        "classify_hint": "Skickar {lot} kandidat(er) till modellen, ett anrop per evenemang. {restants} återstår att klassificera — kör igen så många gånger som behövs.",
+        "nothing_to_classify": "Alla kandidater som ska granskas har redan en bedömning från modellen",
+        "opinion": {
+          "AUCUN": "Inte klassificerad än",
+          "CONVENTION": "AI: konvent",
+          "HORS_SUJET": "AI: utanför ämnet",
+          "INCERTAIN": "AI: osäker"
+        },
+        "unreadable": "{classes} klassificerade, {illisibles} oläsbart/oläsbara svar — inget sparades för dem"
+      },
+      "import_one": "Importera detta konvent",
+      "open_source": "Visa i kalendern",
+      "refresh": "Läs om kalendrarna",
+      "selection": {
+        "clear": "Avmarkera allt",
+        "count": "{count} markerade",
+        "import": "Importera markeringen",
+        "import_limit": "Importen tar emot högst {max} URL:er och avvisar hela partiet däröver. Minska urvalet ({count} just nu)."
+      },
+      "stats": {
+        "refused": "Avslagna",
+        "retained": "Behållna",
+        "to_review": "Att granska"
+      },
+      "success": {
+        "refresh": "{count} ny(a) kandidat(er)",
+        "verdict": "{count} beslut sparade"
+      },
+      "title": "Bevakning av konvent",
+      "verdict": {
+        "convention": "Det är ett jongleringskonvent",
+        "refuse": "Det är inte ett sådant",
+        "reset": "Tillbaka till granskning"
+      },
+      "verdict_label": {
+        "A_EXAMINER": "Att granska",
+        "CONVENTION": "Behållen",
+        "REFUSE": "Avslagen"
+      }
+    }
   }
 }

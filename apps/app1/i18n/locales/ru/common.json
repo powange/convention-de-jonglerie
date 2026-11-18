@@ -204,7 +204,15 @@
     "leave_without_saving": "Выйти без сохранения",
     "unsaved_changes": "Несохранённые изменения",
     "unsaved_changes_warning": "У вас есть изменения, которые не были сохранены. Если вы покинете страницу сейчас, они будут потеряны.",
-    "deleted_account": "Удалённый аккаунт"
+    "deleted_account": "Удалённый аккаунт",
+    "change_profile_picture": "Изменить фото профиля",
+    "contact": "Связаться",
+    "decrease_quantity": "Уменьшить количество",
+    "help": "Справка",
+    "increase_quantity": "Увеличить количество",
+    "pin": "Закрепить",
+    "send": "Отправить",
+    "show_qr_code": "Показать QR-код"
   },
   "dates": {
     "date_range": "С {startDate} до {endDate}",

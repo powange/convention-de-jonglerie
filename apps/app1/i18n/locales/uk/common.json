@@ -204,7 +204,15 @@
     "leave_without_saving": "Вийти без збереження",
     "unsaved_changes": "Незбережені зміни",
     "unsaved_changes_warning": "У вас є зміни, які не були збережені. Якщо ви залишите цю сторінку зараз, вони будуть втрачені.",
-    "deleted_account": "Видалений обліковий запис"
+    "deleted_account": "Видалений обліковий запис",
+    "change_profile_picture": "Змінити фото профілю",
+    "contact": "Зв’язатися",
+    "decrease_quantity": "Зменшити кількість",
+    "help": "Довідка",
+    "increase_quantity": "Збільшити кількість",
+    "pin": "Закріпити",
+    "send": "Надіслати",
+    "show_qr_code": "Показати QR-код"
   },
   "dates": {
     "date_range": "З {startDate} до {endDate}",

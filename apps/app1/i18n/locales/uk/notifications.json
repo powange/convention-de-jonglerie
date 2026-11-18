@@ -284,6 +284,13 @@
       "deleted": "Повідомлення видалено",
       "delete_failed": "Не вдалося видалити повідомлення",
       "load_more_failed": "Не вдалося завантажити більше повідомлень"
+    },
+    "email": {
+      "automatic": "Цей лист надіслано автоматично сервісом Juggling Convention.",
+      "greeting": "Вітаємо, {prenom}!",
+      "manage_notifications": "Керувати моїми повідомленнями",
+      "signature": "— Команда Juggling Convention",
+      "support_project": "Підтримати проєкт"
     }
   },
   "push_notifications": {

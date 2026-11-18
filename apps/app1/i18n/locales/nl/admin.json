@@ -889,6 +889,71 @@
     "volunteer_reminders": "Vrijwilligersherinneringen",
     "workshops_created": "Aangemaakte workshops",
     "backup_restore_dropped_tables": "{count} tabel(len) die in de back-up ontbreken, zijn verwijderd",
-    "backup_restore_step_migrations": "Migraties worden toegepast"
+    "backup_restore_step_migrations": "Migraties worden toegepast",
+    "veille": {
+      "already_imported": "Al geïmporteerd",
+      "days": "{count} dag(en)",
+      "description": "Evenementen gevonden op externe agenda's, te beoordelen vóór het importeren. Een afwijzing is definitief: een latere scan stelt het niet opnieuw voor.",
+      "empty": "Geen kandidaten voor deze filters",
+      "error": {
+        "classify": "Kan de classificatie niet starten",
+        "classify_partial": "{classes} geclassificeerd, {echecs} mislukt: {erreur}",
+        "load": "Kan de kandidaten niet laden",
+        "refresh": "Kan de agenda's niet opnieuw lezen",
+        "refresh_partial": "Onleesbare bron(nen): {sources}. Dat er geen nieuws is, betekent niet dat ze geen evenementen meer hebben.",
+        "verdict_partial": "{reussis} beslissing(en) opgeslagen, {echecs} mislukt"
+      },
+      "filter": {
+        "ai_opinion": "Oordeel van de AI",
+        "all_countries": "Alle landen",
+        "all_opinions": "Alle oordelen",
+        "all_sources": "Alle bronnen",
+        "country": "Land",
+        "hide_imported": "Al geïmporteerde verbergen",
+        "source": "Bron"
+      },
+      "ia": {
+        "classified": "{count} kandidaat/kandidaten geclassificeerd door de AI",
+        "classify": "Classificeren met AI",
+        "classify_hint": "Stuurt {lot} kandidaat/kandidaten naar het model, één aanroep per evenement. Nog {restants} te classificeren — herhaal zo vaak als nodig.",
+        "nothing_to_classify": "Alle te beoordelen kandidaten hebben al een oordeel van het model",
+        "opinion": {
+          "AUCUN": "Nog niet geclassificeerd",
+          "CONVENTION": "AI: conventie",
+          "HORS_SUJET": "AI: niet relevant",
+          "INCERTAIN": "AI: onzeker"
+        },
+        "unreadable": "{classes} geclassificeerd, {illisibles} onleesbaar antwoord(en) — daarvoor is niets opgeslagen"
+      },
+      "import_one": "Deze conventie importeren",
+      "open_source": "Bekijken op de agenda",
+      "refresh": "Agenda's opnieuw lezen",
+      "selection": {
+        "clear": "Selectie opheffen",
+        "count": "{count} geselecteerd",
+        "import": "Selectie importeren",
+        "import_limit": "De import accepteert maximaal {max} URL's en weigert het hele lot daarboven. Verklein de selectie (nu {count})."
+      },
+      "stats": {
+        "refused": "Afgewezen",
+        "retained": "Behouden",
+        "to_review": "Te beoordelen"
+      },
+      "success": {
+        "refresh": "{count} nieuwe kandidaat/kandidaten",
+        "verdict": "{count} beslissing(en) opgeslagen"
+      },
+      "title": "Conventies volgen",
+      "verdict": {
+        "convention": "Dit is een jongleerconventie",
+        "refuse": "Dit is er geen",
+        "reset": "Terug naar te beoordelen"
+      },
+      "verdict_label": {
+        "A_EXAMINER": "Te beoordelen",
+        "CONVENTION": "Behouden",
+        "REFUSE": "Afgewezen"
+      }
+    }
   }
 }

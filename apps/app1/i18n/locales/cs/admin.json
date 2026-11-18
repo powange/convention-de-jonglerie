@@ -889,6 +889,71 @@
     "volunteer_reminders": "Připomínky pro dobrovolníky",
     "workshops_created": "Vytvořené workshopy",
     "backup_restore_dropped_tables": "Bylo odstraněno {count} tabulek, které v záloze chybí",
-    "backup_restore_step_migrations": "Použití migrací"
+    "backup_restore_step_migrations": "Použití migrací",
+    "veille": {
+      "already_imported": "Již importováno",
+      "days": "{count} den/dny",
+      "description": "Události nalezené v externích kalendářích, o nichž je třeba rozhodnout před importem. Zamítnutí je definitivní: pozdější průchod ji znovu nenavrhne.",
+      "empty": "Pro tyto filtry nejsou žádní kandidáti",
+      "error": {
+        "classify": "Klasifikaci nelze spustit",
+        "classify_partial": "{classes} klasifikováno, {echecs} selhalo: {erreur}",
+        "load": "Kandidáty nelze načíst",
+        "refresh": "Kalendáře nelze znovu přečíst",
+        "refresh_partial": "Nečitelné zdroje: {sources}. To, že nejsou novinky, neznamená, že už nemají žádné události.",
+        "verdict_partial": "{reussis} rozhodnutí uloženo, {echecs} selhalo"
+      },
+      "filter": {
+        "ai_opinion": "Posouzení AI",
+        "all_countries": "Všechny země",
+        "all_opinions": "Všechna posouzení",
+        "all_sources": "Všechny zdroje",
+        "country": "Země",
+        "hide_imported": "Skrýt již importované",
+        "source": "Zdroj"
+      },
+      "ia": {
+        "classified": "{count} kandidátů klasifikováno AI",
+        "classify": "Klasifikovat pomocí AI",
+        "classify_hint": "Odešle {lot} kandidátů modelu, jedno volání na událost. Zbývá klasifikovat {restants} — spusťte to tolikrát, kolikrát bude potřeba.",
+        "nothing_to_classify": "Všichni kandidáti k posouzení už mají stanovisko modelu",
+        "opinion": {
+          "AUCUN": "Ještě neklasifikováno",
+          "CONVENTION": "AI: konvence",
+          "HORS_SUJET": "AI: mimo téma",
+          "INCERTAIN": "AI: nejisté"
+        },
+        "unreadable": "{classes} klasifikováno, {illisibles} nečitelných odpovědí — pro ty se nic neuložilo"
+      },
+      "import_one": "Importovat tuto konvenci",
+      "open_source": "Zobrazit v kalendáři",
+      "refresh": "Znovu přečíst kalendáře",
+      "selection": {
+        "clear": "Zrušit celý výběr",
+        "count": "{count} vybráno",
+        "import": "Importovat výběr",
+        "import_limit": "Import přijímá nejvýše {max} URL a nad tento počet odmítne celou dávku. Zmenšete výběr (nyní {count})."
+      },
+      "stats": {
+        "refused": "Zamítnuté",
+        "retained": "Přijaté",
+        "to_review": "K posouzení"
+      },
+      "success": {
+        "refresh": "{count} nových kandidátů",
+        "verdict": "{count} rozhodnutí uloženo"
+      },
+      "title": "Monitorování konvencí",
+      "verdict": {
+        "convention": "Je to žonglérská konvence",
+        "refuse": "Není to ona",
+        "reset": "Vrátit k posouzení"
+      },
+      "verdict_label": {
+        "A_EXAMINER": "K posouzení",
+        "CONVENTION": "Přijato",
+        "REFUSE": "Zamítnuto"
+      }
+    }
   }
 }
