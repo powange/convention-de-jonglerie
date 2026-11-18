@@ -32,7 +32,7 @@ model CarpoolOffer {
   userId          Int
   tripDate        DateTime
   locationCity    String
-  locationAddress String
+  locationAddress String @db.VarChar(200)
   latitude        Float?
   longitude       Float?
   availableSeats  Int
