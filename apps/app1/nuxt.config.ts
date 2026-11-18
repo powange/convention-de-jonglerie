@@ -966,13 +966,25 @@ export default defineNuxtConfig({
    * une décision de produit, pas un effet de bord de dépendance.
    *
    * `skewProtection` garde disponibles les fichiers des builds précédents, pour qu'un onglet resté
-   * ouvert pendant un déploiement ne tombe pas sur une bribe manquante. ⚠️ Ce n'est PAS redondant
-   * avec notre répertoire de build par commit (`shared/utils/repertoire-de-build.ts`) : celui-ci
-   * empêche de servir un MAUVAIS contenu, celui-là empêche d'en servir AUCUN. Il adresse donc un
-   * défaut que nous avons réellement eu. Mais il stocke ses fichiers dans
-   * `node_modules/.cache/nuxt-seo/skew-protection`, et nos piles tirent une image préconstruite :
-   * il faudrait que ce cache traverse les constructions de la CI, ce qui est un changement
-   * d'infrastructure à instruire à part.
+   * ouvert pendant un déploiement ne tombe pas sur une bribe manquante.
+   *
+   * ⚠️⚠️ ÉCARTÉ LE 18/11/2026, DÉCISION PRISE — ne pas le reproposer. Il figurait en file comme
+   * traitant le défaut #673 (le CDN servant une bribe d'un autre build). **La prémisse était
+   * fausse** : ce défaut est déjà traité, et par deux dispositifs de ce même fichier —
+   * `emitRouteChunkError: 'automatic-immediate'` plus bas, qui recharge la route dès qu'une bribe
+   * échoue, et le répertoire de build par commit (`shared/utils/repertoire-de-build.ts`), qui
+   * empêche de servir un MAUVAIS contenu.
+   *
+   * Le gain résiduel se réduit donc à ne pas perdre l'état de la page pendant ce rechargement
+   * (`restoreState` est délibérément désactivé). Son prix, mesuré : la Skew Protection collecte
+   * les anciennes bribes À LA CONSTRUCTION, dans `node_modules/.cache/nuxt-seo/skew-protection`.
+   * Or notre build tourne DANS `docker/build-push-action` : il faudrait restaurer un cache GitHub
+   * Actions dans le contexte, le faire entrer dans l'image, puis l'en RESSORTIR par une étape
+   * d'export buildx pour que le cache suivant le reprenne — plus une politique de rétention, et
+   * une image qui grossit à chaque version conservée.
+   *
+   * Ce qui rouvrirait le dossier : un rechargement intempestif devenu gênant EN PRATIQUE. Pas le
+   * numéro de défaut #673, qui est clos.
    */
   aiReady: false,
   skewProtection: false,
