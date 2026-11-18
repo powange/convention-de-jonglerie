@@ -161,8 +161,20 @@ test.describe("Recherche d'édition — téléphone", () => {
     await champDeploye(page).fill('Rennes')
     await expect(page).toHaveURL(/name=Rennes/)
 
-    // Une seule croix dans le champ, et elle fait les deux : effacer et refermer.
-    await page.getByRole('button', { name: /fermer/i }).click()
+    /*
+     * Une seule croix dans le champ, et elle fait les deux : effacer et refermer.
+     *
+     * ⚠️ PORTÉE À L'EN-TÊTE, sans quoi le sélecteur n'est unique que par accident. Nuxt UI 4.12
+     * résout la locale de l'application : le bouton de fermeture des toasts s'appelle désormais
+     * « Fermer » lui aussi, et une recherche à l'échelle de la page rendait DEUX éléments —
+     * `data-slot="base"` ici, `data-slot="close"` dans la région « Notifications ». La spec
+     * tombait en « strict mode violation », ce qui se lit comme un défaut de l'écran.
+     */
+    await page
+      .locator('header')
+      .first()
+      .getByRole('button', { name: /fermer/i })
+      .click()
 
     await expect(champDeploye(page)).toHaveCount(0)
     await expect(loupe(page)).toBeVisible()

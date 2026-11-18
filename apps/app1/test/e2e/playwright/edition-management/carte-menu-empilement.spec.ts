@@ -88,7 +88,19 @@ test.describe.serial('Carte du site — empilement des menus', () => {
 
     // `dispatchEvent` plutôt qu'un clic : en développement, la barre d'outils Vite recouvre la
     // page et intercepte le pointeur — même avec `force`.
-    await page.locator('button[aria-label="Open sidebar"]:visible').first().dispatchEvent('click')
+    /*
+     * ⚠️ LES DEUX LANGUES, et ce n'est pas une coquetterie. Nuxt UI 4.12 résout la locale de
+     * l'application là où 4.8 retombait sur l'anglais : ce bouton s'appelait « Open sidebar »,
+     * il s'appelle maintenant « Ouvrir la barre latérale ». Son `aria-label` est sa SEULE
+     * identité — le composant n'expose aucun attribut stable —, donc viser les deux noms est le
+     * seul moyen de ne pas rendre la spec solidaire d'une version ou d'une langue.
+     */
+    await page
+      .locator(
+        'button[aria-label="Open sidebar"]:visible, button[aria-label="Ouvrir la barre latérale"]:visible'
+      )
+      .first()
+      .dispatchEvent('click')
     await page.waitForTimeout(1500)
 
     verifier(await mesurerEmpilement(page))

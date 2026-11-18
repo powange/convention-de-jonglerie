@@ -188,9 +188,24 @@ test.describe.serial('Tâches — tri par échéance', () => {
     // Signalé par un organisateur : en vue liste, la fin des titres longs disparaissait derrière
     // une ellipse — or c'est souvent là qu'est le détail qui distingue deux tâches proches.
     const { editionId } = loadState()
+    /*
+     * ⚠️ UN TITRE QUI NE PEUT PAS TENIR SUR UNE LIGNE, À AUCUNE LARGEUR RÉALISTE.
+     *
+     * Le titre précédent faisait 150 caractères, et il suffisait — jusqu'à ce que la montée de
+     * Nuxt UI en 4.12.2 élargisse la colonne. Il tenait alors sur une seule ligne, et les trois
+     * mesures ci-dessous se lisaient comme un retour à la ligne disparu : `hauteur` valait une
+     * ligne. Or rien n'était coupé — `getByText(…, { exact: true })` trouvait le texte ENTIER et
+     * `debordeEnLargeur` restait faux. C'était la prémisse du test qui avait vieilli, pas l'écran.
+     *
+     * Allonger le titre rend la mesure indépendante de la largeur rendue, ce qu'un `setViewportSize`
+     * ne ferait pas sans fuir sur les tests suivants — ce fichier est `describe.serial` et partage
+     * sa page.
+     */
     const TITRE_LONG =
       'Réserver la grande salle polyvalente auprès de la mairie et confirmer les horaires ' +
-      'de montage avec le gardien avant la fin du mois'
+      'de montage avec le gardien avant la fin du mois, puis prévenir les bénévoles du ' +
+      'créneau concerné et vérifier que le plan de salle transmis correspond bien à celui ' +
+      'qui a été validé en réunion de préparation au début du printemps'
 
     const r = await apiPost(
       page,
@@ -218,7 +233,12 @@ test.describe.serial('Tâches — tri par échéance', () => {
     })
     expect(mesures.blancs).not.toBe('nowrap')
     expect(mesures.debordeEnLargeur).toBe(false)
-    expect(mesures.hauteur).toBeGreaterThan(mesures.hauteurDeLigne * 1.5)
+    expect(
+      mesures.hauteur,
+      `titre sur une seule ligne (${mesures.hauteur} px pour une ligne de ` +
+        `${mesures.hauteurDeLigne} px) : soit il est tronqué verticalement, soit le titre d'essai ` +
+        `n'est plus assez long pour la largeur rendue`
+    ).toBeGreaterThan(mesures.hauteurDeLigne * 1.5)
   })
 
   test('nettoyer : rendre l’édition telle qu’on l’a trouvée', async ({ page }) => {
