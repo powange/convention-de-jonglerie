@@ -162,7 +162,7 @@
           <template v-if="!personneAvance && !nomAvance">
             <UFormField
               :label="$t('gestion.treasury.entry_payee')"
-              :hint="$t('gestion.treasury.entry_payee_hint')"
+              :help="$t('gestion.treasury.entry_payee_hint')"
             >
               <USelect
                 v-model="form.payeeId"

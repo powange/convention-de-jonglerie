@@ -41,7 +41,7 @@
              n'a plus à deviner son nom ni son adresse de courriel, et ne produit que l'édition. -->
         <UFormField
           :label="$t('admin.import.target_convention')"
-          :hint="$t('admin.import.target_convention_hint')"
+          :help="$t('admin.import.target_convention_hint')"
         >
           <USelectMenu
             v-model="conventionCibleId"

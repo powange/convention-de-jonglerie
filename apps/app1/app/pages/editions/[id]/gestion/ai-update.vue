@@ -196,7 +196,7 @@
                seule celui-ci n'offrait pas le choix. -->
           <UFormField
             :label="$t('gestion.ai_update.generation_method')"
-            :hint="$t('gestion.ai_update.generation_method_hint')"
+            :help="$t('gestion.ai_update.generation_method_hint')"
           >
             <URadioGroup
               v-model="generationMethod"
