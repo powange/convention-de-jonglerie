@@ -104,12 +104,31 @@ test.describe.serial('Dates d’une édition et fuseau de la convention', () => 
       .getByRole('button', { name: /enregistrer/i })
       .first()
       .click()
-    await page.waitForTimeout(2500)
+    /*
+     * ⚠️ ON ATTEND LE RÉSULTAT, PAS UNE DURÉE.
+     *
+     * Ce cas portait un `waitForTimeout(2500)` avant de relire l'API. Sous charge en CI,
+     * l'enregistrement dépassait parfois ces 2,5 s : la lecture arrivait avant l'écriture, le nom
+     * relu était l'ANCIEN, et le cas sortait « instable » — repassant à la reprise suivante.
+     * Constaté sur #912, et l'étape « Refuser un test instable » le refusait à juste titre.
+     *
+     * `expect.poll` réessaie jusqu'à ce que le nom ait atterri : plus aucune durée devinée, et
+     * l'assertion reste la même. Les dates sont ensuite vérifiées sur un état dont on SAIT que
+     * l'enregistrement est passé — ce qui est précisément l'invariant du cas.
+     */
+    await expect
+      .poll(
+        async () => {
+          const r = await page.request.get(`${BASE}/api/editions/${editionId}`)
+          return r.ok() ? (await r.json()).name : null
+        },
+        { timeout: 20000, message: 'le nom enregistré n’est jamais arrivé jusqu’à l’API' }
+      )
+      .toBe('E2E Fuseau édition renommée')
 
     const reponse = await page.request.get(`${BASE}/api/editions/${editionId}`)
     const edition = await reponse.json()
 
-    expect(edition.name).toBe('E2E Fuseau édition renommée')
     expect(new Date(edition.startDate).toISOString()).toBe(DEBUT)
     expect(new Date(edition.endDate).toISOString()).toBe(FIN)
   })

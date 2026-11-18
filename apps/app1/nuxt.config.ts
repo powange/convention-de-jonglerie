@@ -917,15 +917,30 @@ export default defineNuxtConfig({
     ],
   },
 
+  /*
+   * ⚠️ OG IMAGE ÉTEINT, et ce n'est pas un renoncement : le module ne pouvait PAS fonctionner.
+   *
+   * Mesuré le 18/11/2026, avant de couper :
+   *
+   * - **aucun moteur de rendu installé.** `nuxt-og-image` 7 déclare `satori`, `@resvg/resvg-js`,
+   *   `@resvg/resvg-wasm`, `@takumi-rs/core`, `chrome-launcher` en pairs **optionnels** — tous
+   *   absents de l'arbre. Sans l'un d'eux, le module ne produit aucune image ;
+   * - **aucun appel dans le dépôt** : zéro `defineOgImage*`, aucun composant OG personnalisé ;
+   * - **ses routes rendent 404** en production (500 avant la montée en `@nuxtjs/seo` 6) ;
+   * - l'`og:image` d'une page d'édition vient de `useSeoMeta` et pointe vers notre propre fichier
+   *   déposé (`/uploads/editions/…`) — il ne doit donc rien à ce module, et n'est pas affecté.
+   *
+   * 📍 Il réclamait en plus un `NUXT_APP_SECRET` depuis la v7, qui signe les URL d'images : sans
+   * lui, ses requêtes rendent 500 en production. On ne paie donc plus ce réglage pour rien.
+   *
+   * ⚠️ CE QUI RESTE À FAIRE, SI ON VEUT DE VRAIES IMAGES DE PRÉVISUALISATION — et c'est un vrai
+   * manque : **l'accueil n'a aucune balise `og:image`**. Il faudrait installer un moteur de rendu
+   * (binaires natifs pour `resvg`, donc à instruire dans l'image Docker), définir
+   * `NUXT_APP_SECRET` sur les DEUX environnements, et vérifier le rendu. C'est une fonctionnalité,
+   * pas un réglage — demande à part.
+   */
   ogImage: {
-    // Active la génération d'images OG seulement si SSR est disponible
-    enabled: process.env.NODE_ENV !== 'test',
-    defaults: {
-      // Utilise le logo comme fallback
-      component: 'NuxtSeo',
-      width: 1200,
-      height: 630,
-    },
+    enabled: false,
   },
 
   schemaOrg: {

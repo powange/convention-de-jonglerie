@@ -54,32 +54,55 @@ test.describe('Voile de chargement', () => {
 
       const voile = () => document.querySelector('.loading-screen')
 
-      const guetterDisparition = () => {
-        if (!voile()) fenetre.__voile.disparu = performance.now()
-        else requestAnimationFrame(guetterDisparition)
-      }
-      const guetterFondu = () => {
+      /*
+       * ⚠️⚠️ UN `MutationObserver`, ET SURTOUT PLUS DE `requestAnimationFrame`.
+       *
+       * Les trois instants étaient relevés par sondage en `rAF`. Or `rAF` attend UNE FRAME : si le
+       * fil principal est occupé — hydratation, plugins de modules —, le relevé arrive tard, et
+       * c'est l'ÉCART mesuré qui se gonfle alors que l'application a tenu son minuteur. Le cas est
+       * sorti « instable » deux fois en CI (sur #906 puis #912), toujours en repassant à la reprise
+       * suivante : l'écart frôlait le seuil de 600 ms sans rien dire de l'application.
+       *
+       * Un `MutationObserver` est notifié en MICRO-TÂCHE, dès la mutation du DOM et sans attendre
+       * de frame. Les deux bornes qui comptent — le début du fondu et le retrait du voile — sont
+       * donc datées au plus près, et le seuil n'a pas eu besoin d'être desserré.
+       */
+      const noter = () => {
         const element = voile()
-        if (!element) {
-          // Le voile est parti sans jamais passer par le fondu : on note tout de même l'instant,
-          // le cas sera jugé plus bas.
-          fenetre.__voile.disparu = performance.now()
+        if (element) {
+          if (fenetre.__voile.apparu === undefined) fenetre.__voile.apparu = performance.now()
+          if (
+            fenetre.__voile.fondu === undefined &&
+            element.classList.contains('loading-screen--sortie')
+          ) {
+            fenetre.__voile.fondu = performance.now()
+          }
           return
         }
-        if (element.classList.contains('loading-screen--sortie')) {
-          fenetre.__voile.fondu = performance.now()
-          requestAnimationFrame(guetterDisparition)
-        } else requestAnimationFrame(guetterFondu)
+        // Plus de voile dans le document. On ne date la disparition qu'une fois qu'il est APPARU,
+        // sans quoi le premier appel — document encore vide — la daterait immédiatement.
+        if (fenetre.__voile.apparu !== undefined && fenetre.__voile.disparu === undefined) {
+          fenetre.__voile.disparu = performance.now()
+        }
       }
-      // D'abord qu'il paraisse : au premier appel le document est vide, et l'y chercher absent
-      // serait toujours vrai.
-      const guetterApparition = () => {
-        if (voile()) {
-          fenetre.__voile.apparu = performance.now()
-          requestAnimationFrame(guetterFondu)
-        } else requestAnimationFrame(guetterApparition)
-      }
-      requestAnimationFrame(guetterApparition)
+
+      /*
+       * ⚠️ ON OBSERVE `document`, PAS `document.documentElement`.
+       *
+       * `addInitScript` s'exécute avant tout script de la page : `documentElement` peut encore être
+       * `null`, et `observe(null, …)` LÈVE — le script d'initialisation échoue alors en silence,
+       * aucun instant n'est relevé, et le test expire sur `waitForFunction` sans rien dire de la
+       * cause. Mesuré en voulant corriger ce cas. Le nœud `Document`, lui, existe toujours, et
+       * `subtree: true` couvre tout l'arbre qui y sera construit.
+       */
+      new MutationObserver(noter).observe(document, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class'],
+      })
+      // Au cas où le voile serait déjà là avant l'installation de l'observateur.
+      noter()
     })
 
     await goto('/', { waitUntil: 'hydration' })
