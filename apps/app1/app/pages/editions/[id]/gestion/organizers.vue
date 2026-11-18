@@ -574,7 +574,7 @@ watch(debouncedSearchTerm, async (searchTerm) => {
   searchingUsers.value = true
   try {
     const response = await $fetch<{ data: { users: any[] } }>('/api/users/search', {
-      params: { emailExact: searchTerm },
+      query: { emailExact: searchTerm },
     })
     searchedUsers.value = response.data.users.map((user) => ({
       id: user.id,

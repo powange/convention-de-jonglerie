@@ -121,7 +121,7 @@ describe('useEditionStore', () => {
       await editionStore.fetchEditions()
 
       expect($fetch).toHaveBeenCalledWith('/api/editions', {
-        params: {
+        query: {
           page: '1',
           limit: '12',
         },
@@ -153,7 +153,7 @@ describe('useEditionStore', () => {
       await editionStore.fetchEditions(filters)
 
       expect($fetch).toHaveBeenCalledWith('/api/editions', {
-        params: {
+        query: {
           page: '2',
           limit: '24',
           name: 'test',

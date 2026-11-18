@@ -43,7 +43,7 @@ export function useRechercheResponsable(editionId: number): RechercheResponsable
     try {
       if (recherche.type === 'email') {
         const reponse = await $fetch<{ data: { users: any[] } }>('/api/users/search', {
-          params: { emailExact: recherche.valeur },
+          query: { emailExact: recherche.valeur },
         })
         return (reponse.data.users || []).map((u) => ({
           id: u.id,

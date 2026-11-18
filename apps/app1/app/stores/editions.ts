@@ -204,27 +204,28 @@ export const useEditionStore = defineStore('editions', {
         }
 
         /*
-         * ⚠️ DEUX ERREURS TS2345 GELÉES ICI, et une tentative de correction REVENUE EN ARRIÈRE.
+         * 📍 `query`, et non `params` — RÉSOLU par la montée en Nuxt 4.6, après avoir résisté à une
+         * tentative de correction qu'il avait fallu rendre.
          *
-         * Le diagnostic est établi : `$fetch` est générique sur trois paramètres, et n'en préciser
-         * qu'UN désactive l'inférence des deux autres, qui retombent sur leurs défauts —
-         * `R = NitroFetchRequest`, soit l'union de TOUTES les routes du dépôt.
-         * `AvailableRouterMethod<R>` distribue dessus, le compilateur décroche
-         * (« TS2589 — Type instantiation is excessively deep »), et le TS2345 sur les options n'est
-         * que l'ombre de ce décrochage.
+         * Cette ligne portait `params: queryParams` et deux TS2345 gelées. Le diagnostic d'alors
+         * mettait en cause le budget d'instanciation du compilateur : `$fetch` générique sur trois
+         * paramètres, `R` retombant sur l'union de TOUTES les routes du dépôt, un décrochage
+         * « TS2589 — Type instantiation is excessively deep », et le TS2345 pour ombre. Réduire la
+         * profondeur ici la faisait consommer ailleurs : les TS2589 du dépôt passaient de 3 à 5.
          *
-         * Donner la route en second paramètre de type FAIT disparaître le décrochage de cette
-         * ligne — mesuré. Mais il réapparaît ailleurs : les TS2589 du dépôt sont passés de 3 à 5,
-         * celui de ce fichier s'est déplacé de la ligne 206 à la 257, et deux TS2345 NOUVELLES sont
-         * apparues, dont une dans `pages/editions/[id]/edit.vue`, que ce lot ne touche pas. La
-         * limite est un BUDGET D'INSTANCIATION global : la réduire ici la fait consommer là.
+         * 4.6 reconstruit ce typage sur des types de routes générés, dont le coût de vérification
+         * ne dépend plus du nombre de routes. Mesure après la montée : **TS2589 à zéro dans tout le
+         * dépôt**, et `params` devenu un refus franc (TS2769) au lieu d'une ombre — la
+         * documentation de Nuxt l'annonce retiré de `$fetch` et `useFetch`, où il était un alias de
+         * `query`.
          *
-         * Treize appels de ce fichier emploient ce motif, et cinq fichiers du dépôt décrochent. Ce
-         * n'est donc pas une ligne à corriger au passage mais un lot à part, où l'on mesure l'effet
-         * sur le dépôt ENTIER avant de conclure. Ces deux erreurs restent dans la dette gelée.
+         * ⚠️ RIEN N'ÉTAIT CASSÉ À L'EXÉCUTION, et c'est vérifié plutôt que supposé : ofetch 1.5.1
+         * fusionne encore `params` dans `query` (`...input?.params`), et un appel réel avec l'un ou
+         * l'autre rend le même résultat, l'un et l'autre différant d'un appel sans option. Le
+         * renommage est donc une mise en conformité du typage, pas la correction d'un défaut.
          */
         const response = await $fetch<PaginatedResponse>('/api/editions', {
-          params: queryParams,
+          query: queryParams,
         })
         if (opts?.append) {
           this.editions = [...this.editions, ...response.data]
@@ -806,9 +807,9 @@ export const useEditionStore = defineStore('editions', {
           })
         }
 
-        // Même erreur gelée qu'au premier appel, et pour la même raison : voir son en-tête.
+        // `query` ici aussi, pour la raison exposée au premier appel : voir son en-tête.
         const response = await $fetch<PaginatedResponse>('/api/editions', {
-          params: queryParams,
+          query: queryParams,
         })
         this.allEditions = response.data
         this.processAllEditions()
