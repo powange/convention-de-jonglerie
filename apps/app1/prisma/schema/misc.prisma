@@ -65,7 +65,7 @@ model LostFoundComment {
 model Feedback {
   id         Int            @id @default(autoincrement())
   type       FeedbackType
-  subject    String
+  subject    String @db.VarChar(200)
   message    String         @db.Text
   email      String?
   name       String?

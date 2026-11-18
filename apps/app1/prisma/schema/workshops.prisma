@@ -6,7 +6,7 @@ model Workshop {
   id              Int       @id @default(autoincrement())
   editionId       Int
   creatorId       Int
-  title           String
+  title           String @db.VarChar(200)
   description     String?   @db.Text
   startDateTime   DateTime
   /// Facultative, comme pour un élément de programme : bien des ateliers n'annoncent pas de fin —

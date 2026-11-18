@@ -31,7 +31,7 @@ model TaskGroup {
 model Task {
   id           Int        @id @default(autoincrement())
   taskGroupId  Int
-  title        String
+  title        String @db.VarChar(200)
   description  String?    @db.Text
   status       TaskStatus @default(TODO)
   deadline     DateTime?
@@ -87,7 +87,7 @@ model TaskComment {
 model TaskChecklistItem {
   id           Int      @id @default(autoincrement())
   taskId       Int
-  title        String
+  title        String @db.VarChar(200)
   done         Boolean  @default(false)
   displayOrder Int      @default(0)
   createdAt    DateTime @default(now())
