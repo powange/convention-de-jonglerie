@@ -9,6 +9,35 @@ import { computed, ref, readonly, type Ref } from 'vue'
  */
 import { useNotificateur } from './useNotificateur'
 
+/*
+ * ⚠️ IMPORT DE TYPE SEULEMENT — il disparaît à la compilation, et ne compte donc pas comme un
+ * auto-import pour les tests `unit` évoqués juste au-dessus, qui tournent sans Nuxt.
+ *
+ * Ces deux types servent à FERMER les génériques de `$fetch`. Depuis Nuxt 4.6, `$fetch` est typé
+ * depuis les routes du serveur, et sa signature porte un paramètre de méthode dont le défaut est
+ * conditionnel : `M extends AnyServerRouteMethod = unknown extends T ? 'get' : AnyServerRouteMethod`.
+ *
+ * 📍 Ici `T` est `TResult`, un générique de CE composable : le compilateur ne peut pas décider si
+ * `unknown extends TResult`, la conditionnelle reste ouverte, et plus aucune surcharge ne
+ * correspond — `'POST'` n'est assignable ni à `'get'` ni à la branche non résolue. Une seule
+ * erreur à la racine (TS2769 sur l'appel) en produisait six en aval, toutes sur le type de retour.
+ *
+ * Les nommer explicitement résout la conditionnelle. `AnyServerRouteMethod` couvre bien les
+ * majuscules (`ServerRouteMethod | Uppercase<ServerRouteMethod>`).
+ *
+ * ⚠️ ET LE CAST DE L'URL EST LA CONTREPARTIE DE CE CHOIX. Fixer le paramètre de chemin retire la
+ * liberté d'inférence qui laissait passer un `string` : `AnyFetchPath` vaut
+ * `` `/${string}` | `${string}://${string}` ``, et la surcharge large exclut `string`
+ * explicitement (`Path | Exclude<FetchRequest, string>`). Aucun jeu de génériques ne permet donc
+ * de passer un chemin libre tout en fixant la méthode — d'où le `as AnyFetchPath`.
+ *
+ * 📍 Il ne masque rien : la documentation de Nuxt dit qu'un chemin construit à l'exécution ne peut
+ * être rattaché à aucune route et se résout en `unknown`. C'est exactement le cas de ce
+ * composable, dont l'endpoint est une donnée d'appel. Le typage de la RÉPONSE reste porté par
+ * `TResult`, que l'appelant nomme.
+ */
+import type { AnyFetchPath, AnyServerRouteMethod } from 'nuxt/app'
+
 /**
  * Structure d'erreur API normalisée
  */
@@ -319,12 +348,16 @@ export function useApiAction<TData = unknown, TResult = unknown>(
       const requestBody = typeof body === 'function' ? (body as () => TData)() : body
       const requestQuery = typeof query === 'function' ? query() : query
 
-      const result = await $fetch<TResult>(url, {
-        method,
-        body: requestBody as Record<string, unknown> | undefined,
-        query: requestQuery,
-        headers: typeof headers === 'function' ? headers() : headers,
-      })
+      // Génériques fermés + retour annoté : voir la note sur l'import de type, en tête de fichier.
+      const result = (await $fetch<TResult, AnyFetchPath, AnyServerRouteMethod>(
+        url as AnyFetchPath,
+        {
+          method,
+          body: requestBody as Record<string, unknown> | undefined,
+          query: requestQuery,
+          headers: typeof headers === 'function' ? headers() : headers,
+        }
+      )) as TResult
 
       const unwrapped = unwrapApiResponse(result)
       data.value = unwrapped
@@ -486,12 +519,16 @@ export function useApiActionById<TResult = unknown>(
       const requestBody = typeof body === 'function' ? body(id) : body
       const requestQuery = typeof query === 'function' ? query() : query
 
-      const result = await $fetch<TResult>(url, {
-        method,
-        body: requestBody as Record<string, unknown> | undefined,
-        query: requestQuery,
-        headers: typeof headers === 'function' ? headers() : headers,
-      })
+      // Génériques fermés + retour annoté : voir la note sur l'import de type, en tête de fichier.
+      const result = (await $fetch<TResult, AnyFetchPath, AnyServerRouteMethod>(
+        url as AnyFetchPath,
+        {
+          method,
+          body: requestBody as Record<string, unknown> | undefined,
+          query: requestQuery,
+          headers: typeof headers === 'function' ? headers() : headers,
+        }
+      )) as TResult
 
       // Unwrap createSuccessResponse avant tout traitement
       const unwrapped = unwrapApiResponse(result)
