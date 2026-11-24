@@ -24,6 +24,12 @@ model User {
   prenom                 String?
   password               String? // nullable : null pour les comptes OAuth (Google)
   authProvider           String    @default("email") // "email" | "google" | "facebook" | "MANUAL"
+  // Identifiants des fournisseurs OAuth : le layer d'auth retrouve le compte par eux au retour de
+  // Google / Facebook. Sans ces colonnes, le retour OAuth échouait (requête Prisma invalide).
+  googleId               String?   @unique
+  facebookId             String?   @unique
+  // Génération de session, écrite dans la session par le layer d'auth (même rôle que dans app1).
+  sessionVersion         Int       @default(0)
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
   lastLoginAt            DateTime?
