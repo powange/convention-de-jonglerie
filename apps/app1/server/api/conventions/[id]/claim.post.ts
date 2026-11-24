@@ -1,10 +1,10 @@
 import { randomInt } from 'node:crypto'
 
+import { nomDeSalutation } from '#auth/server/utils/nom-de-salutation'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { createFutureDate, TOKEN_DURATIONS } from '#server/utils/date-utils'
 import { sendEmail } from '#server/utils/emailService'
-import { nomDeSalutation } from '#server/utils/nom-de-salutation'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { emailRateLimiter } from '#server/utils/rate-limiter'
 import { validateConventionId } from '#server/utils/validation-helpers'

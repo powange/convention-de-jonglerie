@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
+import { nomDeSalutation } from '#auth/server/utils/nom-de-salutation'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { apresLaReponse, enTranches } from '#server/utils/apres-la-reponse'
 import { requireAuth } from '#server/utils/auth-utils'
 import { generateVolunteerScheduleEmailHtml, getSiteUrl } from '#server/utils/emailService'
-import { nomDeSalutation } from '#server/utils/nom-de-salutation'
 import { NotificationService } from '#server/utils/notification-service'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'

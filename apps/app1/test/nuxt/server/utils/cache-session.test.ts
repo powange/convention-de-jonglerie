@@ -5,7 +5,7 @@ import {
   tailleCacheDesSessions,
   versionDeSessionDuCompte,
   viderCacheDesSessions,
-} from '../../../../server/utils/cache-session'
+} from '#auth/server/utils/cache-session'
 
 const prismaMock = (globalThis as any).prisma
 

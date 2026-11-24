@@ -43,14 +43,26 @@ export default defineNuxtConfig({
       password: process.env.NUXT_SESSION_PASSWORD || '',
       maxAge: 60 * 60 * 24 * 30, // 30 jours
     },
+    public: {
+      // URL publique du site (liens des courriels). Surchargée à l'exécution par
+      // NUXT_PUBLIC_SITE_URL : https://dev.flowvent.org, https://test.flowvent.org, https://flowvent.org.
+      siteUrl: '',
+    },
   },
 
-  // Serveur de dev (Vite) : autoriser l'accès derrière le reverse proxy via le domaine
-  // auto-signé. N'affecte QUE `nuxt dev` (pas le build de prod). Si l'hôte transmis par
-  // le proxy diffère, remplacer par `allowedHosts: true`.
+  // Serveur de dev (Vite) : autoriser l'hôte de NUXT_PUBLIC_SITE_URL (ex. dev.flowvent.org),
+  // comme app1 — le domaine vit dans l'environnement, jamais dans le code. N'affecte QUE `nuxt dev`.
   vite: {
     server: {
-      allowedHosts: ['dev.event.powange.com'],
+      allowedHosts: (() => {
+        const siteUrl = process.env.NUXT_PUBLIC_SITE_URL
+        if (!siteUrl) return []
+        try {
+          return [new URL(siteUrl).hostname]
+        } catch {
+          return []
+        }
+      })(),
     },
   },
 })

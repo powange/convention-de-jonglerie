@@ -1,6 +1,15 @@
-# Flowvent (app2) — RELEASE (pré-prod). Image runtime, MySQL, derrière le reverse proxy.
-# Déployé comme stack Portainer (compose path = apps/app2/docker-compose.release.yml).
-# Variables lues depuis stack.env à la racine de la stack (../../stack.env).
+# Flowvent (app2) — RELEASE. Domaine : https://test.flowvent.org
+#
+# Stack Portainer : dépôt Git, compose path = apps/app2/docker-compose.release.yml.
+# Le reverse proxy (réseau externe `proxy-network`) doit viser `flowvent-app-release:3000`.
+#
+# Variables de la stack (onglet « Environment variables » de Portainer) :
+#   obligatoires : NUXT_PUBLIC_SITE_URL (https://test.flowvent.org), NUXT_SESSION_PASSWORD (>= 32 caractères), MYSQL_PASSWORD, MYSQL_ROOT_PASSWORD
+#   optionnelles : MYSQL_USER, MYSQL_DATABASE, NUXT_OAUTH_GOOGLE_CLIENT_ID/SECRET
+#
+# ⚠️ Une variable de stack Portainer sert à INTERPOLER ce fichier ; elle ne peuple pas
+# l'environnement du conteneur. Chaque variable lue par l'application est donc listée sous
+# `environment:` ci-dessous — l'oublier, c'est la voir absente au démarrage (vécu sur app1).
 name: flowvent-release
 services:
   flowvent-db-release:
@@ -8,34 +17,51 @@ services:
     container_name: flowvent-db-release
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Definir MYSQL_ROOT_PASSWORD dans la stack}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-flowvent_db}
       MYSQL_USER: ${MYSQL_USER:-flowvent_user}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-flowvent_password}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Definir MYSQL_PASSWORD dans la stack}
     volumes:
       - mysql_data:/var/lib/mysql
-    # Pas de port publié sur l'hôte : l'app accède à la base via le réseau interne.
-    # (débogage ponctuel : `docker exec -it flowvent-db-release mysql -uflowvent_user -p`)
+    # Aucun port publié : l'app joint la base par le réseau Docker. Un port publié sans adresse
+    # serait ouvert sur 0.0.0.0, et ufw ne le filtrerait pas (cf. apps/app1/docker-compose.prod.yml).
+    # Débogage ponctuel : `docker exec -it flowvent-db-release mysql -uflowvent_user -p`
     healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '--silent']
+      test: ['CMD', 'mysqladmin', 'ping', '-h', '127.0.0.1', '--silent']
       timeout: 2s
       interval: 3s
       retries: 15
       start_period: 5s
 
   flowvent-app-release:
-    image: flowvent-app:release
-    build:
-      context: .
-      target: runtime
-      args:
-        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:24-slim}
+    # Image construite et publiée par la CI (.github/workflows/publier-image-flowvent.yml), jamais
+    # par l'hôte — mêmes raisons qu'app1 : Portainer met à jour le dossier de la stack en extrayant
+    # une archive, qui n'efface pas les fichiers supprimés ; et le build ne doit pas peser sur la
+    # machine qui sert les utilisateurs.
+    #
+    # `pull_policy: always` est indispensable : sans lui, le redéploiement réutiliserait l'image
+    # locale déjà étiquetée `main` et ne livrerait rien. Pour revenir en arrière, remplacer
+    # `:main` par `:sha-<commit>`.
+    image: ghcr.io/powange/flowvent:main
+    pull_policy: always
     container_name: flowvent-app-release
     restart: unless-stopped
-    env_file:
-      - ../../stack.env
     environment:
-      DATABASE_URL: 'mysql://${MYSQL_USER:-flowvent_user}:${MYSQL_PASSWORD:-flowvent_password}@flowvent-db-release:3306/${MYSQL_DATABASE:-flowvent_db}'
+      # L'entrypoint construit DATABASE_URL à partir de ces valeurs (mot de passe encodé).
+      MYSQL_USER: ${MYSQL_USER:-flowvent_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-flowvent_db}
+      DATABASE_HOST: 'flowvent-db-release'
+      NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD:?Definir NUXT_SESSION_PASSWORD (>= 32 caracteres) dans la stack}
+      # Domaine de l'environnement (liens des courriels) — variable de stack, comme app1.
+      NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:?Definir NUXT_PUBLIC_SITE_URL (https://test.flowvent.org) dans la stack}
+      # OAuth Google (⚠️ vide : le bouton reste affiché mais échoue). URI de redirection à déclarer chez Google :
+      # https://test.flowvent.org/auth/google
+      NUXT_OAUTH_GOOGLE_CLIENT_ID: ${NUXT_OAUTH_GOOGLE_CLIENT_ID:-}
+      NUXT_OAUTH_GOOGLE_CLIENT_SECRET: ${NUXT_OAUTH_GOOGLE_CLIENT_SECRET:-}
+      # ⚠️ App2 n'a AUCUN transport de courriel : les messages (codes de vérification compris)
+      # sont écrits dans les journaux du conteneur. Passer à `true` ne ferait que les perdre.
+      SEND_EMAILS: 'false'
       NUXT_HOST: '0.0.0.0'
       NUXT_PORT: '3000'
       NODE_ENV: 'production'

@@ -4,11 +4,11 @@ import { z } from 'zod'
 import type { ApiSuccessResponse } from '#server/types/api'
 import type { LoginResponse } from '#server/types/api-responses'
 
+import { utilisateurDeSession } from '#auth/shared/utils/utilisateur-de-session'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { authRateLimiter } from '#server/utils/rate-limiter'
 import { ouvrirSession } from '#server/utils/session-helpers'
 import { sanitizeString } from '#server/utils/validation-helpers'
-import { utilisateurDeSession } from '~~/shared/utils/utilisateur-de-session'
 
 // Les fournisseurs OAuth pris en charge, tels qu'ils sont écrits en base par
 // routes/auth/google.get.ts et facebook.get.ts.

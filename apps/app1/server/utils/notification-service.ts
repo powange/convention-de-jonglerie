@@ -1,6 +1,5 @@
 import { sendEmail, generateNotificationEmailHtml, getSiteUrl } from './emailService'
 import { CHEMIN_DES_PREFERENCES, texteDeCourriel } from './habillage-courriel'
-import { nomDeSalutation } from './nom-de-salutation'
 import {
   isNotificationAllowed,
   isEmailNotificationAllowed,
@@ -13,6 +12,8 @@ import { translateServerSide } from './server-i18n'
 import { unifiedPushService, type PushNotificationData } from './unified-push-service'
 
 import type { NotificationType, Prisma } from '#server/types/prisma'
+
+import { nomDeSalutation } from '#auth/server/utils/nom-de-salutation'
 
 /**
  * Les paramètres de traduction d'une notification, ramenés à ce que la traduction sait lire.

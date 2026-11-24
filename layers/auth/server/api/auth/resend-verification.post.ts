@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { nomDeSalutation } from '#auth/server/utils/nom-de-salutation'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import {
   sendEmail,
@@ -7,7 +8,6 @@ import {
   generateVerificationEmailHtml,
   getSiteUrl,
 } from '#server/utils/emailService'
-import { nomDeSalutation } from '#server/utils/nom-de-salutation'
 import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
 import { emailRateLimiter } from '#server/utils/rate-limiter'
 import { sanitizeEmail } from '#server/utils/validation-helpers'

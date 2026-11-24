@@ -3,12 +3,12 @@ import path from 'node:path'
 
 import { describe, it, expect } from 'vitest'
 
-import { utilisateurDeSession } from '../../../shared/utils/utilisateur-de-session'
+import { utilisateurDeSession } from '#auth/shared/utils/utilisateur-de-session'
 
 /**
  * La copie du compte portée par la session, et le fait qu'elle soit la MÊME partout — constat B9.
  *
- * Le détail du défaut est dans l'en-tête de `shared/utils/utilisateur-de-session.ts` : huit
+ * Le détail du défaut est dans l'en-tête de `layers/auth/shared/utils/utilisateur-de-session.ts` : huit
  * ouvertures de session, cinq formes différentes, et `event.context.user` — que `requireAuth` rend
  * à tous les points d'API — qui changeait selon la façon dont la personne s'était connectée.
  */

@@ -96,7 +96,9 @@ const lire = (relatif: string) => fs.readFileSync(path.resolve(RACINE, relatif),
 describe('profil / sécurité — plus de copie locale des règles', () => {
   it('le schéma vient du module partagé', () => {
     const code = lire(PAGE)
-    expect(code).toContain("import { schemaMotDePasse } from '~~/shared/utils/regles-mot-de-passe'")
+    expect(code).toContain(
+      "import { schemaMotDePasse } from '#auth/shared/utils/regles-mot-de-passe'"
+    )
     expect(code).toContain('newPassword: schemaMotDePasse(t)')
   })
 
@@ -124,7 +126,7 @@ describe('profil / sécurité — plus de copie locale des règles', () => {
   it('le module partagé porte bien les trois règles, avec les clés du domaine des erreurs', () => {
     // Sans ce cas, le précédent serait satisfait par un module vide : les règles auraient
     // simplement disparu des deux côtés.
-    const module = lire('apps/app1/shared/utils/regles-mot-de-passe.ts')
+    const module = lire('layers/auth/shared/utils/regles-mot-de-passe.ts')
     const cles = module.match(/cleErreur: 'errors\.[a-z_]+'/g) ?? []
     expect(cles).toHaveLength(3)
   })

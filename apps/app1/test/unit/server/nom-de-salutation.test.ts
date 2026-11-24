@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { nomDeSalutation } from '../../../server/utils/nom-de-salutation'
+import { nomDeSalutation } from '#auth/server/utils/nom-de-salutation'
 
 /**
  * `User.prenom` est `String?` : 31 comptes sur 454 n'en ont pas, mesuré le 18/10/2026 en base.

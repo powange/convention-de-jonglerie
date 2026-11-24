@@ -3,7 +3,7 @@
 import { trouverRoutePublique } from '../constants/public-routes'
 import { getAuthSession, clearAuthSession } from '../utils/session-helpers'
 
-import { versionDeSessionDuCompte } from '#server/utils/cache-session'
+import { versionDeSessionDuCompte } from '#auth/server/utils/cache-session'
 
 export default defineEventHandler(async (event) => {
   const fullPath = event.path

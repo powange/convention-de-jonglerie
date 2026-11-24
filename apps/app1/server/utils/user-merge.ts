@@ -22,7 +22,7 @@ import {
 
 import type { PrismaTransaction } from '../types/prisma-helpers'
 
-import { oublierSessionDuCompte } from '#server/utils/cache-session'
+import { oublierSessionDuCompte } from '#auth/server/utils/cache-session'
 
 const log = createLogger('USER-MERGE')
 

@@ -1,10 +1,10 @@
 import { readBody } from 'h3'
 
+import { oublierSessionDuCompte } from '#auth/server/utils/cache-session'
+import { nomDeSalutation } from '#auth/server/utils/nom-de-salutation'
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { oublierSessionDuCompte } from '#server/utils/cache-session'
 import { sendEmail, generateAccountDeletionEmailHtml } from '#server/utils/emailService'
-import { nomDeSalutation } from '#server/utils/nom-de-salutation'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateResourceId } from '#server/utils/validation-helpers'
 

@@ -4,8 +4,8 @@ import { z } from 'zod'
 import { getSupportedLocalesCodes } from '~/utils/locales'
 import { isValidPronoun } from '~/utils/pronouns'
 
+import { schemaMotDePasse } from '#auth/shared/utils/regles-mot-de-passe'
 import { SUPPORTED_CURRENCIES } from '~~/shared/utils/money'
-import { schemaMotDePasse } from '~~/shared/utils/regles-mot-de-passe'
 import { CLES_SERVICES_EDITION, type CleServiceEdition } from '~~/shared/utils/services-d-edition'
 
 /**
@@ -32,7 +32,7 @@ export function normalizePhoneE164(value: string | null | undefined): string {
 
 // Schémas de base réutilisables
 export const emailSchema = z.string().email('Email invalide').min(1, 'Email requis')
-// Les règles vivent dans `shared/utils/regles-mot-de-passe` : l'interface affiche exactement
+// Les règles vivent dans `#auth/shared/utils/regles-mot-de-passe` (layer d'auth) : l'interface affiche exactement
 // celles que ce schéma applique.
 export const passwordSchema = schemaMotDePasse()
 export const pseudoSchema = z
