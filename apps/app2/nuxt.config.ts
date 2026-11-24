@@ -12,6 +12,20 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  // Icônes d'onglet et d'écran d'accueil (public/). `favicon.svg` suit le mode sombre ; les PNG et
+  // l'ICO, sur fond blanc, couvrent les navigateurs qui ne prennent pas le SVG. Générés à partir
+  // des tracés d'`app/components/AppLogo.vue`. `?v=` : Cloudflare garde les fichiers publics 4 h.
+  app: {
+    head: {
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg?v=1' },
+        { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/icon-192.png?v=1' },
+        { rel: 'alternate icon', href: '/favicon.ico?v=1' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png?v=1' },
+      ],
+    },
+  },
+
   // Enregistre les helpers de session nuxt-auth-utils pour l'alias `#imports`
   // utilisé par le code serveur du layer d'auth.
   imports: {
@@ -47,6 +61,8 @@ export default defineNuxtConfig({
       // URL publique du site (liens des courriels). Surchargée à l'exécution par
       // NUXT_PUBLIC_SITE_URL : https://dev.flowvent.org, https://test.flowvent.org, https://flowvent.org.
       siteUrl: '',
+      // Adresse affichée sur la politique de confidentialité (NUXT_PUBLIC_CONTACT_EMAIL), comme app1.
+      contactEmail: 'contact@flowvent.org',
     },
   },
 

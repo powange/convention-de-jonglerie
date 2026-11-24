@@ -103,6 +103,7 @@ services:
       - ./prisma.config.ts:/app/apps/app2/prisma.config.ts:cached
       - ./i18n:/app/apps/app2/i18n:cached
       - ./scripts:/app/apps/app2/scripts:cached
+      - ./public:/app/apps/app2/public:cached
       # Layer d'auth partagé (vit à la racine du repo ; le Dockerfile le copie, le dev le monte).
       # Monté pour que `extends: '../../layers/auth'` (→ /app/layers/auth dans le conteneur, layout du dépôt) résolve.
       - ../../layers/auth:/app/layers/auth:cached

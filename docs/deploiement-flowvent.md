@@ -37,20 +37,46 @@ _Stacks → Add stack → Repository_ :
 - **Compose path** : `apps/app2/docker-compose.release.yml` (ou `…prod.yml`)
 - **Environment variables** :
 
-| Variable                                  | Obligatoire | Note                                                                                                           |
-| ----------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------- |
-| `NUXT_PUBLIC_SITE_URL`                    | oui         | `https://test.flowvent.org` (release) / `https://flowvent.org` (prod) : liens des courriels                    |
-| `NUXT_SESSION_PASSWORD`                   | oui         | ≥ 32 caractères (`openssl rand -base64 32`), **différent** entre release et prod                               |
-| `MYSQL_PASSWORD`                          | oui         | sa ponctuation est sans importance : l'entrypoint l'encode                                                     |
-| `MYSQL_ROOT_PASSWORD`                     | oui         |                                                                                                                |
-| `MYSQL_USER`, `MYSQL_DATABASE`            | non         | défauts `flowvent_user` / `flowvent_db`                                                                        |
-| `NUXT_OAUTH_GOOGLE_CLIENT_ID` / `_SECRET` | non         | ⚠️ vides, le bouton Google reste affiché mais échoue. Redirection à déclarer : `https://<domaine>/auth/google` |
+| Variable                                    | Obligatoire | Note                                                                                        |
+| ------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------- |
+| `NUXT_PUBLIC_SITE_URL`                      | oui         | `https://test.flowvent.org` (release) / `https://flowvent.org` (prod) : liens des courriels |
+| `NUXT_SESSION_PASSWORD`                     | oui         | ≥ 32 caractères (`openssl rand -base64 32`), **différent** entre release et prod            |
+| `MYSQL_PASSWORD`                            | oui         | sa ponctuation est sans importance : l'entrypoint l'encode                                  |
+| `MYSQL_ROOT_PASSWORD`                       | oui         |                                                                                             |
+| `MYSQL_USER`, `MYSQL_DATABASE`              | non         | défauts `flowvent_user` / `flowvent_db`                                                     |
+| `NUXT_OAUTH_GOOGLE_CLIENT_ID` / `_SECRET`   | non         | Connexion Google. Vides : le bouton renvoie sur `/login`                                    |
+| `NUXT_OAUTH_FACEBOOK_CLIENT_ID` / `_SECRET` | non         | Connexion Facebook. Vides : le bouton renvoie sur `/login`                                  |
 
 Le compose refuse de démarrer si une variable obligatoire manque (`${VAR:?…}`), et l'entrypoint
 refuse un `NUXT_SESSION_PASSWORD` de moins de 32 caractères. Mieux vaut une erreur au déploiement
 qu'une application qui démarre et dont toutes les sessions échouent.
 
 - **Webhook** : l'activer, puis noter son URL. C'est elle qui redéploie.
+
+## Connexion Google et Facebook
+
+Les URL de retour sont **dérivées de `NUXT_PUBLIC_SITE_URL`** par le compose, et non de la requête :
+derrière le proxy, celle-ci pourrait se présenter en `http`, et le fournisseur refuserait l'URL.
+Elles sont à déclarer à l'identique chez chaque fournisseur, pour chaque environnement :
+
+| Environnement | Google et Facebook                                                                  |
+| ------------- | ----------------------------------------------------------------------------------- |
+| dev           | `https://dev.flowvent.org/auth/google` · `https://dev.flowvent.org/auth/facebook`   |
+| release       | `https://test.flowvent.org/auth/google` · `https://test.flowvent.org/auth/facebook` |
+| prod          | `https://flowvent.org/auth/google` · `https://flowvent.org/auth/facebook`           |
+
+- **Google** : console.cloud.google.com → _API et services → Identifiants → Créer un ID client
+  OAuth_ (type « Application Web »). Renseigner les trois URI dans « URI de redirection autorisés »,
+  et `https://flowvent.org` dans les origines. L'écran de consentement doit être **publié**
+  (« En production ») : en mode test, seuls les comptes listés peuvent se connecter.
+- **Facebook** : developers.facebook.com → _Créer une app_ (cas d'usage « Authentifier et demander
+  des données avec Facebook Login »). _Facebook Login → Paramètres_ : les trois URI dans « URI de
+  redirection OAuth valides ». _Paramètres de base_ : domaines `flowvent.org`, URL de la politique de
+  confidentialité, puis passer l'app en mode **Live** (en mode développement, seuls les rôles de
+  l'app peuvent se connecter). La permission `email` est requise.
+
+Un client par fournisseur suffit pour les trois environnements. Ses identifiants vont dans les
+variables de chaque stack, et dans `apps/app2/.env` pour le dev.
 
 ## Reverse proxy
 
