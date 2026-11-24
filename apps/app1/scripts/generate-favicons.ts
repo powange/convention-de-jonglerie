@@ -1,150 +1,33 @@
 #!/usr/bin/env tsx
 /* eslint-disable import/order */
 /**
- * Génère des variantes PNG du logo SVG pour les favicons et PWA.
+ * Génère les favicons et icônes PWA d'app1 (`npm run favicons`, depuis apps/app1).
+ *
+ * Le générateur est COMMUN aux apps du dépôt : `scripts/favicons/generer-favicons.mjs`. Ce fichier
+ * n'en porte que la configuration propre à Juggling Convention.
+ *
+ * ⚠️ L'icône `android-chrome-maskable-512x512.png` N'EST PAS régénérée ici : elle a été faite à la
+ * main pour la publication Play Store (#638, cf. docs/publication-play-store-twa.md). Le générateur
+ * sait la produire (`maskable: { echelle }`), mais remplacer une icône déjà publiée doit rester une
+ * décision explicite. Le manifeste web est généré dynamiquement : server/api/site.webmanifest.get.ts.
  */
-import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import path from 'node:path'
 import pngToIco from 'png-to-ico'
 import sharp from 'sharp'
 
-async function run() {
-  const srcSvg = path.resolve('public/logos/logo-jc.svg')
-  const outDir = path.resolve('public/favicons')
-  await mkdir(outDir, { recursive: true })
+import { genererFavicons } from '../../../scripts/favicons/generer-favicons.mjs'
 
-  let svgContent = await readFile(srcSvg, 'utf8')
-
-  // Remplacer les zones noires (fill rgb(5,12,10)) par blanc pour les favicons
-  svgContent = svgContent.replace(/fill="rgb\(5,12,10\)"/g, 'fill="#ffffff"')
-
-  // Couleur de fond oklch(20.8% 0.042 265.755) convertie en RGB
-  const backgroundColorRgb = { r: 15, g: 23, b: 43 } // Approximation RGB de la couleur oklch
-
-  const sizes = [16, 32, 48, 64, 96, 180, 192, 256, 384, 512]
-
-  await Promise.all(
-    sizes.map(async (size) => {
-      const file = path.join(outDir, `favicon-${size}x${size}.png`)
-
-      // Créer le logo sur fond coloré
-      const logoBuffer = await sharp(Buffer.from(svgContent)).resize(size, size).png().toBuffer()
-
-      await sharp({
-        create: {
-          width: size,
-          height: size,
-          channels: 4,
-          background: backgroundColorRgb,
-        },
-      })
-        .composite([
-          {
-            input: logoBuffer,
-            top: 0,
-            left: 0,
-          },
-        ])
-        .png({ compressionLevel: 9 })
-        .toFile(file)
-    })
-  )
-
-  // Générer favicon.png avec fond (48x48)
-  const logoBuffer48 = await sharp(Buffer.from(svgContent)).resize(48, 48).png().toBuffer()
-  const faviconWithBackground = await sharp({
-    create: {
-      width: 48,
-      height: 48,
-      channels: 4,
-      background: backgroundColorRgb,
-    },
-  })
-    .composite([
-      {
-        input: logoBuffer48,
-        top: 0,
-        left: 0,
-      },
-    ])
-    .png({ compressionLevel: 9 })
-    .toBuffer()
-
-  await writeFile(path.join(outDir, 'favicon.png'), faviconWithBackground)
-
-  // Générer les noms spéciaux attendus par les PWA et navigateurs
-  const specialFiles = [
-    { size: 192, name: 'android-chrome-192x192.png', needsBackground: true },
-    { size: 512, name: 'android-chrome-512x512.png', needsBackground: true },
-    { size: 180, name: 'apple-touch-icon.png', needsBackground: true },
-  ]
-
-  await Promise.all(
-    specialFiles.map(async ({ size, name, needsBackground }) => {
-      const file = path.join(outDir, name)
-      let sharpInstance = sharp(Buffer.from(svgContent)).resize(size, size)
-
-      if (needsBackground) {
-        // Créer une image avec fond coloré puis composer le logo par-dessus
-        const logoBuffer = await sharp(Buffer.from(svgContent)).resize(size, size).png().toBuffer()
-
-        sharpInstance = sharp({
-          create: {
-            width: size,
-            height: size,
-            channels: 4,
-            background: backgroundColorRgb,
-          },
-        })
-          .composite([
-            {
-              input: logoBuffer,
-              top: 0,
-              left: 0,
-            },
-          ])
-          .png({ compressionLevel: 9 })
-      } else {
-        sharpInstance = sharpInstance.png({ compressionLevel: 9 })
-      }
-
-      await sharpInstance.toFile(file)
-    })
-  )
-
-  // Générer notification-badge.png à partir du SVG monochrome
-  const badgeSvg = path.resolve('public/favicons/notification-badge.svg')
-  const badgeSvgContent = await readFile(badgeSvg, 'utf8')
-  await sharp(Buffer.from(badgeSvgContent))
-    .resize(96, 96)
-    .png({ compressionLevel: 9 })
-    .toFile(path.join(outDir, 'notification-badge.png'))
-
-  // Générer favicon.ico (vrai ICO multi-tailles : 16, 32, 48)
-  const icoSizes = [16, 32, 48]
-  const icoPngs = await Promise.all(
-    icoSizes.map(async (size) => {
-      const logoBuffer = await sharp(Buffer.from(svgContent)).resize(size, size).png().toBuffer()
-      return sharp({
-        create: { width: size, height: size, channels: 4, background: backgroundColorRgb },
-      })
-        .composite([{ input: logoBuffer, top: 0, left: 0 }])
-        .png()
-        .toBuffer()
-    })
-  )
-  const icoBuffer = await pngToIco(icoPngs)
-  await writeFile(path.resolve('public/favicon.ico'), icoBuffer)
-
-  // Note: Le manifest web est maintenant généré dynamiquement via /api/site.webmanifest
-  // selon l'environnement (DEV/TEST/PROD). Voir server/api/site.webmanifest.get.ts
-  console.log('Favicons générés dans public/favicons')
-  console.log('favicon.ico généré : public/favicon.ico')
-  console.log('Badge de notification généré : notification-badge.png')
-  console.log('Le manifest est généré dynamiquement via /api/site.webmanifest')
-}
-
-run().catch((e) => {
+genererFavicons({
+  sharp,
+  pngToIco,
+  source: path.resolve('public/logos/logo-jc.svg'),
+  dossierPublic: path.resolve('public'),
+  // Les zones noires du logo passent en blanc, sur le fond sombre de la marque.
+  remplacements: [['fill="rgb(5,12,10)"', 'fill="#ffffff"']],
+  // oklch(20.8% 0.042 265.755) converti en RGB
+  fond: { r: 15, g: 23, b: 43 },
+  badge: { source: path.resolve('public/favicons/notification-badge.svg'), taille: 96 },
+}).catch((e) => {
   console.error(e)
   process.exit(1)
 })

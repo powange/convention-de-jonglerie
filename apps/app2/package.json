@@ -12,6 +12,7 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
+    "favicons": "node scripts/generate-favicons.mjs",
     "docker:dev": "docker compose -f docker-compose.dev.yml up --build",
     "docker:dev:detached": "docker compose -f docker-compose.dev.yml up -d --build",
     "docker:dev:detached:nocache": "docker compose -f docker-compose.dev.yml build --no-cache && docker compose -f docker-compose.dev.yml up -d",
@@ -46,6 +47,8 @@
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/lucide": "^1.2.116",
-    "@iconify-json/simple-icons": "^1.2.89"
+    "@iconify-json/simple-icons": "^1.2.89",
+    "png-to-ico": "^3.0.1",
+    "sharp": "0.35.5"
   }
 }
