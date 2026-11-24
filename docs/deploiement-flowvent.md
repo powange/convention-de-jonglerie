@@ -89,6 +89,12 @@ Les deux stacks rejoignent le réseau externe `proxy-network`, comme app1. Hôte
 
 ## Redéployer
 
+**Avec Claude : `/deploy-flowvent release`, `/deploy-flowvent prod` ou `/deploy-flowvent all`.** Le
+skill attend l'image, déclenche le webhook, puis vérifie la bascule dans la page. Il lit
+`PORTAINER_RELEASE_WEBHOOK_URL` et `PORTAINER_PROD_WEBHOOK_URL` dans `apps/app2/.env`.
+
+À la main :
+
 1. Attendre que `publier-image-flowvent.yml` ait **terminé** pour le commit voulu. Un webhook
    déclenché trop tôt fait tirer l'image précédente, répond 204 et ne livre rien :
 
@@ -99,7 +105,8 @@ Les deux stacks rejoignent le réseau externe `proxy-network`, comme app1. Hôte
    ```
 
 2. Déclencher le webhook de la stack.
-3. Vérifier la bascule : `/_nuxt/builds/latest.json` porte un `id` qui doit être celui de l'image.
+3. Vérifier la bascule : le répertoire des fichiers de build porte le commit de l'image,
+   `/_nuxt-<12 premiers caractères du sha>/`, lisible dans le HTML de l'accueil.
 
 Revenir en arrière : remplacer `:main` par `:sha-<commit>` dans le compose de la stack.
 

@@ -69,6 +69,10 @@ jobs:
           file: apps/app2/Dockerfile
           target: runtime
           push: ${{ github.event_name != 'pull_request' }}
+          # Nomme le répertoire des fichiers de build : `/_nuxt-<empreinte>/` (cf. nuxt.config.ts).
+          # C'est ce que lit `/deploy-flowvent` pour prouver la bascule.
+          build-args: |
+            BUILD_SHA=${{ github.sha }}
           # Relie le paquet GHCR à ce dépôt (sans quoi il apparaît orphelin côté GitHub).
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
