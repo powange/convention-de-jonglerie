@@ -1,5 +1,17 @@
 // Configuration Nuxt de Flowvent (app2) : plateforme SaaS d'organisation d'événements.
 // App autonome, base MySQL via Prisma (adapter mariadb), auth via nuxt-auth-utils.
+
+/**
+ * Répertoire des fichiers de build nommé d'après le commit : `/_nuxt-<12 caractères du sha>/`.
+ * Même règle qu'app1 (apps/app1/shared/utils/repertoire-de-build.ts, où les raisons sont
+ * détaillées) : deux builds ne partagent aucune URL, donc un CDN ne peut pas servir le fichier de
+ * l'un à la place de l'autre ; et le commit servi se lit dans la page, ce qui permet au skill
+ * `/deploy-flowvent` de vérifier qu'une bascule a eu lieu. `NUXT_BUILD_SHA` vient de la CI
+ * (build-arg `BUILD_SHA`) ; absent en dev, on garde `/_nuxt/`.
+ */
+const empreinte = (process.env.NUXT_BUILD_SHA ?? '').replace(/[^A-Za-z0-9]/g, '').slice(0, 12)
+const buildAssetsDir = empreinte ? `/_nuxt-${empreinte}/` : '/_nuxt/'
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-03-02',
   devtools: { enabled: true },
@@ -17,6 +29,8 @@ export default defineNuxtConfig({
   // Le manifeste est dynamique (server/api/site.webmanifest.get.ts). `?v=` : Cloudflare garde les
   // fichiers publics 4 h, l'incrémenter après une régénération.
   app: {
+    buildAssetsDir,
+
     head: {
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg?v=2' },
