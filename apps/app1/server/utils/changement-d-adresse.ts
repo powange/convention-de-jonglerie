@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 
+import { nomDeSalutation } from '#auth/server/utils/nom-de-salutation'
 import { getEmailHash } from '#server/utils/email-hash'
 import {
   generateVerificationCode,
@@ -7,7 +8,6 @@ import {
   getSiteUrl,
   sendEmail,
 } from '#server/utils/emailService'
-import { nomDeSalutation } from '#server/utils/nom-de-salutation'
 
 /**
  * Le changement d'adresse de courriel, en deux temps — constat B2.

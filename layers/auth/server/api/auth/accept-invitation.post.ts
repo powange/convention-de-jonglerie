@@ -1,13 +1,13 @@
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
+import { utilisateurDeSession } from '#auth/shared/utils/utilisateur-de-session'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { NotificationHelpers } from '#server/utils/notification-service'
 import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
 import { authRateLimiter } from '#server/utils/rate-limiter'
 import { ouvrirSession } from '#server/utils/session-helpers'
 import { passwordSchema } from '#server/utils/validation-schemas'
-import { utilisateurDeSession } from '~~/shared/utils/utilisateur-de-session'
 
 const acceptInvitationSchema = z.object({
   token: z.string(),

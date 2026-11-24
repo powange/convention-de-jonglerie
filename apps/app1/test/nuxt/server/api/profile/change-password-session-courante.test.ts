@@ -9,7 +9,7 @@ vi.mock('#server/utils/auth-utils', () => ({
 vi.mock('#server/utils/session-helpers', () => ({
   suivreLaGenerationDeSession: mockSuivreGeneration,
 }))
-vi.mock('#server/utils/cache-session', () => ({
+vi.mock('#auth/server/utils/cache-session', () => ({
   oublierSessionDuCompte: mockOublier,
 }))
 /*

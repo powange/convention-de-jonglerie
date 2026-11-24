@@ -1,3 +1,4 @@
+import { utilisateurDeSession } from '#auth/shared/utils/utilisateur-de-session'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import {
   getImpersonationCookie,
@@ -5,7 +6,6 @@ import {
 } from '#server/utils/impersonation-helpers'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { ouvrirSession } from '#server/utils/session-helpers'
-import { utilisateurDeSession } from '~~/shared/utils/utilisateur-de-session'
 
 export default wrapApiHandler(
   async (event) => {

@@ -2,9 +2,9 @@ import bcrypt from 'bcryptjs'
 
 import { clearUserSession } from '#imports'
 
+import { oublierSessionDuCompte } from '#auth/server/utils/cache-session'
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { oublierSessionDuCompte } from '#server/utils/cache-session'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { suivreLaGenerationDeSession } from '#server/utils/session-helpers'
 import { changePasswordSchema, validateAndSanitize } from '#server/utils/validation-schemas'

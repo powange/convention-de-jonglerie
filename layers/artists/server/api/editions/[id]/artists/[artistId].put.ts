@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
+import { oublierSessionDuCompte } from '#auth/server/utils/cache-session'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { oublierSessionDuCompte } from '#server/utils/cache-session'
 import { coordonneesBancairesRecues } from '#server/utils/coordonnees-bancaires-recues'
 import { misesAJourDuProfil } from '#server/utils/infos-personnelles'
 import {

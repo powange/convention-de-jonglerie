@@ -1,3 +1,4 @@
+import { nomDeSalutation } from '#auth/server/utils/nom-de-salutation'
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { createFutureDate, TOKEN_DURATIONS } from '#server/utils/date-utils'
@@ -7,7 +8,6 @@ import {
   generateVerificationEmailHtml,
   getSiteUrl,
 } from '#server/utils/emailService'
-import { nomDeSalutation } from '#server/utils/nom-de-salutation'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userAdminSelect } from '#server/utils/prisma-select-helpers'
 import { validateUserId } from '#server/utils/validation-helpers'

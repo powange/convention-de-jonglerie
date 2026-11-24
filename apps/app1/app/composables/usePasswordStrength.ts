@@ -4,7 +4,7 @@ import {
   evaluerReglesMotDePasse,
   forceMotDePasse,
   motDePasseValide,
-} from '~~/shared/utils/regles-mot-de-passe'
+} from '#auth/shared/utils/regles-mot-de-passe'
 
 export const usePasswordStrength = (password: Ref<string>) => {
   const { t } = useI18n()

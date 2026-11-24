@@ -1,64 +1,79 @@
 # syntax=docker/dockerfile:1
-# Dockerfile de Flowvent (app2) — application autonome (aucun layer partagé).
-# 3 cibles : builder, runtime (prod), dev. Base de données MySQL (adapter mariadb).
+# Dockerfile de Flowvent (app2). 3 cibles : builder, runtime (release/prod), dev.
+#
+# ⚠️ CONTEXTE DE BUILD = RACINE DU DÉPÔT, et non `apps/app2`. App2 étend le layer partagé
+# `layers/auth` (`extends: '../../layers/auth'`), qui vit hors de son dossier : avec `apps/app2`
+# comme contexte, le build ne pouvait pas le voir. Le conteneur reproduit donc le layout du dépôt
+# — `/app/apps/app2` + `/app/layers/auth` — exactement comme app1.
+#
+# Ce qui entre dans le contexte est réglé par `Dockerfile.dockerignore`, à côté de ce fichier
+# (BuildKit le préfère au `.dockerignore` racine, qui exclut justement `apps/app2`).
 ARG BASE_NODE_IMAGE=node:24-slim
 
 # Stage de base commun
 FROM ${BASE_NODE_IMAGE} AS base
 RUN apt-get update && apt-get install -y curl openssl default-mysql-client && rm -rf /var/lib/apt/lists/*
-WORKDIR /app
+WORKDIR /app/apps/app2
 
 # -------------------------
 # Stage builder (production)
 # -------------------------
 FROM base AS builder
-# DATABASE_URL factice : le postinstall (prisma generate) lit prisma.config mais ne se connecte pas.
-ENV DATABASE_URL="mysql://user:pass@localhost:3306/db"
-COPY package*.json ./
-COPY prisma.config.ts ./
-COPY prisma ./prisma/
+COPY apps/app2/package*.json ./
 # --mount=type=cache : réutilise les tarballs npm déjà téléchargés entre les builds Docker
 RUN --mount=type=cache,target=/root/.npm \
     if [ -f package-lock.json ]; then npm ci; else npm install; fi
-COPY . .
+# Client Prisma généré explicitement, comme app1 : le postinstall ne le fait plus (il ne lance que
+# `nuxt prepare`), pour qu'un `npm install` sur l'hôte n'ait pas à réécrire `server/generated`,
+# que le conteneur de dev possède. DATABASE_URL factice : la génération ne se connecte pas.
+COPY apps/app2/prisma.config.ts ./
+COPY apps/app2/prisma ./prisma/
+RUN DATABASE_URL="mysql://user:pass@localhost:3306/db" npx prisma generate
+COPY apps/app2/ ./
+COPY layers/auth/ /app/layers/auth/
 # Le packaging Nitro est gourmand en mémoire ; le cache Nuxt/Vite accélère les rebuilds.
-RUN --mount=type=cache,target=/app/node_modules/.cache \
+RUN --mount=type=cache,target=/app/apps/app2/node_modules/.cache \
     NODE_OPTIONS='--max-old-space-size=4096' npx nuxt build
 # Conserver uniquement les dépendances de prod (prisma reste en `dependencies` pour `migrate deploy`).
 RUN npm prune --omit=dev
 
 # -------------------------
-# Stage runtime (production)
+# Stage runtime (release / production)
 # -------------------------
 FROM ${BASE_NODE_IMAGE} AS runtime
 RUN apt-get update && apt-get install -y openssl default-mysql-client && rm -rf /var/lib/apt/lists/*
-WORKDIR /app
-COPY --from=builder /app/.output ./.output
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/prisma.config.ts ./
-COPY --from=builder /app/server/generated ./server/generated
-COPY --from=builder /app/package*.json ./
-# Entrypoint : applique les migrations Prisma (migrate deploy) avant de démarrer Nuxt.
-COPY docker/entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+WORKDIR /app/apps/app2
+COPY --from=builder /app/apps/app2/.output ./.output
+COPY --from=builder /app/apps/app2/node_modules ./node_modules
+COPY --from=builder /app/apps/app2/prisma ./prisma
+COPY --from=builder /app/apps/app2/prisma.config.ts ./
+COPY --from=builder /app/apps/app2/server/generated ./server/generated
+COPY --from=builder /app/apps/app2/package*.json ./
+# Entrypoint : construit DATABASE_URL, applique les migrations (migrate deploy), démarre Nitro.
+COPY apps/app2/docker/entrypoint.sh /app/apps/app2/entrypoint.sh
+RUN chmod +x /app/apps/app2/entrypoint.sh
 ENV NODE_ENV=production NITRO_HOST=0.0.0.0 NITRO_PORT=3000
 EXPOSE 3000
-CMD ["/app/entrypoint.sh"]
+CMD ["/app/apps/app2/entrypoint.sh"]
 
 # -------------------------
-# Stage dev (HMR)
+# Stage dev (HMR) — le code est monté par docker-compose.dev.yml
 # -------------------------
 FROM base AS dev
-# DATABASE_URL factice pour le postinstall (prisma generate) ; surchargé par docker-compose au runtime.
-ENV DATABASE_URL="mysql://user:pass@localhost:3306/db"
-COPY package*.json ./
-COPY prisma.config.ts ./
-COPY prisma ./prisma/
+COPY apps/app2/package*.json ./
 # --mount=type=cache : réutilise les tarballs npm déjà téléchargés entre les builds Docker
 RUN --mount=type=cache,target=/root/.npm \
-    if [ -f package-lock.json ]; then npm ci; else npm install; fi
+    if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
+# Empreinte de ce qui vient d'être installé : `scripts/docker-start.sh` la compare au verrou pour
+# décider s'il faut réinstaller (même mécanique qu'app1).
+RUN if [ -f package-lock.json ]; then \
+      md5sum package-lock.json | cut -d' ' -f1 > node_modules/.empreinte-installation; \
+    else \
+      md5sum package.json | cut -d' ' -f1 > node_modules/.empreinte-installation; \
+    fi
+COPY apps/app2/prisma.config.ts ./
+COPY apps/app2/prisma ./prisma/
 ENV NODE_ENV=development NUXT_HOST=0.0.0.0 NUXT_PORT=3000
-EXPOSE 3000 24678
-# Le compose surcharge `command` pour lancer les migrations avant `npm run dev`.
+EXPOSE 3000
+# Le compose lance `scripts/docker-start.sh` (dépendances, prepare, Prisma, migrations, dev).
 CMD ["npm", "run", "dev"]

@@ -163,7 +163,7 @@
 import { reactive, ref, computed } from 'vue'
 import { z } from 'zod'
 
-import { schemaMotDePasse } from '~~/shared/utils/regles-mot-de-passe'
+import { schemaMotDePasse } from '#auth/shared/utils/regles-mot-de-passe'
 
 const route = useRoute()
 const toast = useToast()

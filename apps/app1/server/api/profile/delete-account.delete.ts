@@ -2,9 +2,9 @@ import { readBody } from 'h3'
 
 import { clearUserSession } from '#imports'
 
+import { oublierSessionDuCompte } from '#auth/server/utils/cache-session'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { oublierSessionDuCompte } from '#server/utils/cache-session'
 
 export default wrapApiHandler(
   async (event) => {

@@ -18,26 +18,26 @@ bénévoles…) via un **abonnement mensuel ou annuel**.
 
 Trois composes, tous avec un service MySQL dédié. Depuis `apps/app2/` :
 
-| Environnement | Compose | Cible | Conteneur app | MySQL (hôte) |
-| --- | --- | --- | --- | --- |
-| **dev** | `docker-compose.dev.yml` | `dev` (HMR) | `flowvent-app` | `3307` (publié) |
-| **release** | `docker-compose.release.yml` | `runtime` | `flowvent-app-release` | interne |
-| **prod** | `docker-compose.prod.yml` | `runtime` | `flowvent-app-prod` | interne |
+| Environnement           | Compose                      | Domaine                               | Conteneur app          | MySQL (hôte)    |
+| ----------------------- | ---------------------------- | ------------------------------------- | ---------------------- | --------------- |
+| **dev** (local)         | `docker-compose.dev.yml`     | `dev.flowvent.org` / `localhost:3001` | `flowvent-app`         | `3307` (publié) |
+| **release** (Portainer) | `docker-compose.release.yml` | `test.flowvent.org`                   | `flowvent-app-release` | interne         |
+| **prod** (Portainer)    | `docker-compose.prod.yml`    | `flowvent.org`                        | `flowvent-app-prod`    | interne         |
 
-- **dev** : hot-reload, code monté en volume, exposé sur `http://localhost:3001` **et** via le reverse
-  proxy `https://dev.event.powange.com` (réseau `proxy-network`, conteneur `flowvent-app`). Lit
-  `apps/app2/.env`.
-- **release / prod** : image `runtime`, derrière le reverse proxy, variables lues depuis
-  `../../stack.env` (comme app1). Les migrations sont appliquées au démarrage (`entrypoint.sh` →
-  `prisma migrate deploy`).
+- **Contexte de build = racine du dépôt** : app2 étend `layers/auth`, qui vit hors de son dossier.
+  Ce qui entre dans le contexte est réglé par `Dockerfile.dockerignore`.
+- **dev** : hot-reload, code et layer d'auth montés en volume. Lit `apps/app2/.env`.
+- **release / prod** : **image publiée par la CI** (`ghcr.io/powange/flowvent:main`, workflow
+  `publier-image-flowvent.yml`), jamais construite par l'hôte. Les migrations sont appliquées au
+  démarrage (`entrypoint.sh` → `prisma migrate deploy`). Mise en place : voir
+  [docs/deploiement-flowvent.md](../../docs/deploiement-flowvent.md).
 
 ### Lancer le dev
 
 ```bash
 docker compose -f docker-compose.dev.yml up --build -d
-# Première fois : créer la migration initiale (base MySQL)
-docker compose -f docker-compose.dev.yml exec flowvent-app npx prisma migrate dev --name init
-# → https://dev.event.powange.com  (ou http://localhost:3001)
+# Les migrations versionnées (prisma/migrations) sont appliquées au démarrage du conteneur.
+# → https://dev.flowvent.org  (ou http://localhost:3001)
 docker compose -f docker-compose.dev.yml down
 ```
 
@@ -51,7 +51,7 @@ Nécessite un MySQL accessible (ex. le service `flowvent-db` du compose dev, pub
 ```bash
 cp .env.example .env          # renseigner NUXT_SESSION_PASSWORD + pointer DATABASE_URL vers ton MySQL
 npm install
-npx prisma migrate dev --name init
+npx prisma migrate deploy
 npm run dev                   # http://localhost:3000
 ```
 
@@ -78,11 +78,12 @@ docker/
 
 ## Déploiement Portainer
 
-Créer une stack par environnement (compose path = `apps/app2/docker-compose.release.yml` ou
-`…prod.yml`), fournir `stack.env` (dont `NUXT_SESSION_PASSWORD`, `MYSQL_*`), et faire pointer le
-reverse proxy vers le conteneur (`flowvent-app-release` / `flowvent-app-prod`).
+Voir [docs/deploiement-flowvent.md](../../docs/deploiement-flowvent.md) : stacks release et prod,
+variables, reverse proxy, publication de l'image.
 
 ## Reste à faire
 
+- Brancher un **transport de courriel** : aujourd'hui les messages (codes de vérification
+  compris) ne sont qu'écrits dans les journaux du conteneur.
 - Brancher un **vrai prestataire de paiement** (ex. Stripe) à la place de `checkout.post.ts`.
 - Ajouter l'**i18n** (la 1ʳᵉ version est en français en dur) et les tests.

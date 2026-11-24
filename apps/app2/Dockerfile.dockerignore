@@ -1,0 +1,22 @@
+# Contexte de build de Flowvent (app2) = racine du dépôt. BuildKit lit CE fichier (nommé d'après
+# le Dockerfile) à la place du `.dockerignore` racine, qui exclut `apps/app2` pour le build d'app1.
+#
+# Liste blanche : tout est exclu, sauf l'app et le seul layer qu'elle étend. Le contexte reste ainsi
+# petit, et rien d'app1 (sauvegardes, uploads) ne peut s'y glisser.
+*
+!apps/app2
+!layers/auth
+
+# Artefacts et dépendances (régénérés dans l'image)
+**/node_modules
+**/.nuxt
+**/.output
+**/.data
+**/dist
+**/*.log
+apps/app2/server/generated
+
+# Secrets : jamais dans l'image
+**/.env
+**/.env.*
+!**/.env.example

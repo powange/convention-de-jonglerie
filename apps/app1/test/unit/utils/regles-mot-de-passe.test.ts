@@ -6,7 +6,7 @@ import {
   forceMotDePasse,
   motDePasseValide,
   schemaMotDePasse,
-} from '../../../shared/utils/regles-mot-de-passe'
+} from '#auth/shared/utils/regles-mot-de-passe'
 
 /** De quoi couvrir chaque combinaison d'exigence satisfaite ou non. */
 const ECHANTILLON = [

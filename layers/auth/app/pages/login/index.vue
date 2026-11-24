@@ -416,7 +416,7 @@ import { useDebounce } from '~/composables/useDebounce'
 import { useAuthStore } from '~/stores/auth'
 import type { HttpError } from '~/types'
 
-import { schemaMotDePasse } from '~~/shared/utils/regles-mot-de-passe'
+import { schemaMotDePasse } from '#auth/shared/utils/regles-mot-de-passe'
 
 const onGoogleLogin = async () => {
   // Détecter si on est en mode PWA et stocker l'info dans un cookie

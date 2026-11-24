@@ -2,10 +2,10 @@ import { randomBytes } from 'node:crypto'
 
 import { z } from 'zod'
 
+import { nomDeSalutation } from '#auth/server/utils/nom-de-salutation'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { createFutureDate, TOKEN_DURATIONS } from '#server/utils/date-utils'
 import { sendEmail, generatePasswordResetEmailHtml } from '#server/utils/emailService'
-import { nomDeSalutation } from '#server/utils/nom-de-salutation'
 import { passwordResetRateLimiter } from '#server/utils/rate-limiter'
 
 const requestPasswordResetSchema = z.object({

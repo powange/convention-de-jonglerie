@@ -3,10 +3,10 @@ import { randomBytes } from 'node:crypto'
 import { sendRedirect, getQuery, setCookie, getCookie, getRequestURL, createError } from 'h3'
 import { $fetch } from 'ofetch'
 
+import { utilisateurDeSession } from '#auth/shared/utils/utilisateur-de-session'
 import { getEmailHash } from '#server/utils/email-hash'
 import { sanitizeReturnTo } from '#server/utils/safe-redirect'
 import { ouvrirSession } from '#server/utils/session-helpers'
-import { utilisateurDeSession } from '~~/shared/utils/utilisateur-de-session'
 
 function slugifyPseudo(base: string) {
   const clean =

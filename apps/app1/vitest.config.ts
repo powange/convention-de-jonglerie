@@ -40,6 +40,8 @@ export default defineConfig({
           alias: {
             '~~': resolve(__dirname),
             '~': resolve(__dirname, 'app'),
+            // Déclaré par `layers/auth/nuxt.config.ts` ; ce projet ne lit pas la config Nuxt.
+            '#auth': resolve(__dirname, '../../layers/auth'),
           },
         },
         test: {

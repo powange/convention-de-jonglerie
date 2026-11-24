@@ -149,7 +149,7 @@ import { z } from 'zod'
 
 import { useAuthStore } from '~/stores/auth'
 
-import { schemaMotDePasse } from '~~/shared/utils/regles-mot-de-passe'
+import { schemaMotDePasse } from '#auth/shared/utils/regles-mot-de-passe'
 
 const route = useRoute()
 const { t } = useI18n()

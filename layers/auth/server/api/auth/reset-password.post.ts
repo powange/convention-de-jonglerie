@@ -3,8 +3,8 @@ import { z } from 'zod'
 
 import { clearUserSession } from '#imports'
 
+import { oublierSessionDuCompte } from '#auth/server/utils/cache-session'
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { oublierSessionDuCompte } from '#server/utils/cache-session'
 import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
 import { authRateLimiter } from '#server/utils/rate-limiter'
 import { passwordSchema } from '#server/utils/validation-schemas'

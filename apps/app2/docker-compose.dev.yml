@@ -3,7 +3,7 @@
 # Depuis apps/app2/ :
 #   docker compose -f docker-compose.dev.yml up --build -d
 #   docker compose -f docker-compose.dev.yml exec flowvent-app npx prisma migrate dev --name init   # 1re fois
-#   → https://dev.event.powange.com (reverse proxy) ou http://localhost:3001
+#   → https://dev.flowvent.org (reverse proxy) ou http://localhost:3001
 #
 # `name:` fige le nom de projet pour que les volumes (DB de dev) persistent entre les lancements.
 name: flowvent
@@ -63,12 +63,17 @@ services:
     image: flowvent-app:dev
     container_name: flowvent-app
     build:
-      context: .
+      context: ../..
+      dockerfile: apps/app2/Dockerfile
       target: dev
       args:
         BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:24-slim}
-    # Générer le client Prisma + appliquer les migrations, puis lancer Nuxt en dev.
-    command: sh -lc "npx prisma generate && npx prisma migrate deploy && npm run dev"
+    working_dir: /app/apps/app2
+    # Même démarrage qu'app1 : dépendances (selon l'empreinte du verrou), nuxt prepare, client
+    # Prisma, migrations, puis `npm run dev`.
+    command: sh -lc "/app/apps/app2/scripts/docker-start.sh"
+    tty: true
+    stdin_open: true
     env_file:
       - .env
     environment:
@@ -88,28 +93,32 @@ services:
       NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD:?Definir NUXT_SESSION_PASSWORD dans apps/app2/.env (>= 32 caracteres)}
     volumes:
       # Code monté pour le hot-reload
-      - ./app:/app/app:cached
-      - ./server:/app/server:cached
-      - ./prisma:/app/prisma:cached
-      - ./types:/app/types:cached
-      - ./nuxt.config.ts:/app/nuxt.config.ts:cached
-      - ./app.config.ts:/app/app.config.ts:cached
-      - ./tsconfig.json:/app/tsconfig.json:cached
-      - ./prisma.config.ts:/app/prisma.config.ts:cached
-      - ./i18n:/app/i18n:cached
-      # Layer d'auth partagé (vit à la racine du repo, HORS du contexte de build d'app2).
-      # Monté pour que `extends: '../../layers/auth'` (→ /layers/auth dans le conteneur) résolve.
-      - ../../layers/auth:/layers/auth:cached
+      - ./app:/app/apps/app2/app:cached
+      - ./server:/app/apps/app2/server:cached
+      - ./prisma:/app/apps/app2/prisma:cached
+      - ./types:/app/apps/app2/types:cached
+      - ./nuxt.config.ts:/app/apps/app2/nuxt.config.ts:cached
+      - ./app.config.ts:/app/apps/app2/app.config.ts:cached
+      - ./tsconfig.json:/app/apps/app2/tsconfig.json:cached
+      - ./prisma.config.ts:/app/apps/app2/prisma.config.ts:cached
+      - ./i18n:/app/apps/app2/i18n:cached
+      - ./scripts:/app/apps/app2/scripts:cached
+      # Layer d'auth partagé (vit à la racine du repo ; le Dockerfile le copie, le dev le monte).
+      # Monté pour que `extends: '../../layers/auth'` (→ /app/layers/auth dans le conteneur, layout du dépôt) résolve.
+      - ../../layers/auth:/app/layers/auth:cached
       # node_modules et dossiers de build dans des volumes (pas synchronisés avec l'hôte)
-      - node_modules:/app/node_modules
-      - ./.nuxt:/app/.nuxt
-      - ./.output:/app/.output
+      - node_modules:/app/apps/app2/node_modules
+      - ./.nuxt:/app/apps/app2/.nuxt
+      - ./.output:/app/apps/app2/.output
     ports:
       - '3001:3000' # Application Nuxt
-      - '24678:24678' # Vite HMR
+      # Pas de port HMR publié : 24678 est déjà pris par le dev d'app1, et Nuxt 4 fait passer le
+      # HMR par le port du serveur.
     depends_on:
       flowvent-db:
         condition: service_healthy
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
 
 volumes:
   mysql_data:
