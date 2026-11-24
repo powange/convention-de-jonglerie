@@ -12,16 +12,24 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
-  // Icônes d'onglet et d'écran d'accueil (public/). `favicon.svg` suit le mode sombre ; les PNG et
-  // l'ICO, sur fond blanc, couvrent les navigateurs qui ne prennent pas le SVG. Générés à partir
-  // des tracés d'`app/components/AppLogo.vue`. `?v=` : Cloudflare garde les fichiers publics 4 h.
+  // Icônes : même déclaration qu'app1. Les PNG et l'ICO sortent de `npm run favicons` (générateur
+  // commun, scripts/favicons/) ; `favicon.svg`, tiré d'AppLogo, suit le mode sombre du navigateur.
+  // Le manifeste est dynamique (server/api/site.webmanifest.get.ts). `?v=` : Cloudflare garde les
+  // fichiers publics 4 h, l'incrémenter après une régénération.
   app: {
     head: {
       link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg?v=1' },
-        { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/icon-192.png?v=1' },
-        { rel: 'alternate icon', href: '/favicon.ico?v=1' },
-        { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png?v=1' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg?v=2' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicons/favicon-32x32.png?v=2' },
+        {
+          rel: 'icon',
+          type: 'image/png',
+          sizes: '192x192',
+          href: '/favicons/favicon-192x192.png?v=2',
+        },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicons/favicon-180x180.png?v=2' },
+        { rel: 'manifest', href: '/api/site.webmanifest?v=2' },
+        { rel: 'alternate icon', href: '/favicon.ico?v=2' },
       ],
     },
   },
