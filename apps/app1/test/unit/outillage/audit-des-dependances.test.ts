@@ -76,7 +76,8 @@ describe('audit des dépendances', () => {
      * aux besoins de `ci-verte` : à lui de dire pourquoi, en retirant ce cas et en l'écrivant.
      */
     const workflow = await readFile(WORKFLOW, 'utf8')
-    const besoins = workflow.match(/^ {2}ci-verte:[\s\S]*?needs: \[([^\]]+)\]/m)?.[1] ?? ''
+    // `\s*` : la liste passe à la ligne quand elle dépasse la largeur que Prettier tolère.
+    const besoins = workflow.match(/^ {2}ci-verte:[\s\S]*?needs:\s*\[([^\]]+)\]/m)?.[1] ?? ''
 
     expect(besoins).not.toContain('audit')
     // Et le témoin : la ligne a bien été trouvée, sinon l'assertion ci-dessus est creuse.

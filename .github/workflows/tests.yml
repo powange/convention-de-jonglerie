@@ -9,14 +9,24 @@ on:
   # un déclenchement manuel, et la suite Playwright est justement celle qu'on veut parfois rejouer
   # seule, sans pousser de commit.
   workflow_dispatch:
+  # La suite COMPLÈTE sur `main`, une fois par nuit. Elle remplace le run complet qui suivait
+  # chaque merge (cf. le périmètre `amorcage` du job `changements`) : celui-ci rejouait un arbre que
+  # la PR venait de tester, et ses seuls échecs en 200 runs étaient des tests instables. Ce que ce
+  # run-ci attrape et qu'une PR ne voit pas : un test instable, un test qui dépend de la DATE (deux
+  # specs du planning tombaient chaque lundi), une vulnérabilité npm publiée depuis. Un échec ouvre
+  # une issue (job `signaler-run-planifie`) : un run planifié rouge ne bloque rien, il ne vaut que
+  # s'il se voit. 3 h 17 UTC pour éviter l'heure pile, où GitHub retarde les planifications.
+  schedule:
+    - cron: '17 3 * * *'
 
 # Chaque push sur une PR ouverte relançait les 9 checks en laissant les précédents aller au bout.
 # Les minutes sont gratuites sur un dépôt public, mais la limite de 20 jobs simultanés du compte
 # était occupée par des runs déjà périmés, et le dernier push — le seul qui compte — attendait
 # derrière eux.
 #
-# L'annulation est conditionnée à l'événement, et c'est délibéré : sur un push vers main, un run
-# interrompu laisserait un commit de la branche de référence sans vérification.
+# L'annulation est conditionnée à l'événement, et c'est délibéré : sur `main`, un run interrompu
+# laisserait soit un cache partagé non écrit (push, périmètre `amorcage`), soit une nuit sans suite
+# complète (schedule) — deux trous que rien ne signalerait.
 # ⚠️ LE JETON EST EN LECTURE SEULE POUR TOUS LES JOBS, et c'est écrit ici plutôt que supposé.
 #
 # Sept des neuf jobs n'avaient aucun `permissions:` et héritaient du défaut du DÉPÔT. Mesuré, ce
@@ -25,8 +35,8 @@ on:
 # lecture-écriture, un jour, donne ce pouvoir à huit jobs de PR d'un coup, sans qu'aucune revue le
 # voie. La déclarer ici rend la contrainte indépendante de ce réglage.
 #
-# `playwright` et `audit` gardent la leur : ils la restreignent ou l'étendent pour leur propre
-# besoin, et une déclaration de job l'emporte sur celle du workflow.
+# `playwright`, `audit` et `signaler-run-planifie` gardent la leur : ils la restreignent ou
+# l'étendent pour leur propre besoin, et une déclaration de job l'emporte sur celle du workflow.
 permissions:
   contents: read
 
@@ -71,13 +81,18 @@ defaults:
 
 jobs:
   # ---------------------------------------------------------------------------------------------
-  # Le périmètre du run : `complet`, ou `app2-seul` pour une PR qui ne touche que `apps/app2/`.
+  # Le périmètre du run, et la liste des jobs qu'il lance.
   #
-  # Une PR de Flowvent payait jusqu'ici les 18 jobs d'app1 (5 à 12 min) sans modifier une ligne
-  # d'app1. Dans le périmètre `app2-seul`, les jobs lourds qui ne lisent qu'app1 — typage, build,
-  # vitest Nuxt et base, Playwright — sont SAUTÉS ; `setup`, `lint` et `test-unit` tournent quand
-  # même, parce que quatre tests d'outillage d'app1 lisent des fichiers d'app2. La règle et la
-  # liste des sauts autorisés vivent dans `apps/app1/scripts/perimetre-ci.mjs`, où elles sont testées.
+  #   complet    PR qui touche autre chose qu'app2, run planifié, déclenchement manuel
+  #   app2-seul  PR limitée à `apps/app2/` : setup, lint et test-unit seulement — quatre tests
+  #              d'outillage d'app1 lisent des fichiers d'app2, le reste ne lit qu'app1
+  #   amorcage   push sur `main` : setup, base-de-test et navigateurs, qui écrivent les caches que
+  #              TOUTES les PR lisent. Le code, lui, vient d'être testé dans sa PR : la règle de
+  #              `main` exige `ci-verte` sur une branche à jour, et le squash ne change pas l'arbre.
+  #
+  # La décision vit dans `apps/app1/scripts/perimetre-ci.mjs`, où elle est testée ; chaque job
+  # conditionné cherche seulement son nom dans la sortie `jobs`, et `ci-verte` juge avec les mêmes
+  # listes.
   #
   # ⚠️ Pas de `paths-ignore` sur le workflow à la place : `ci-verte` est le check requis par la
   # règle de `main`, et un workflow qui ne démarre pas ne le rend jamais — la PR resterait bloquée
@@ -90,6 +105,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       perimetre: ${{ steps.calcul.outputs.perimetre }}
+      jobs: ${{ steps.calcul.outputs.jobs }}
 
     steps:
       # Sur une PR, le commit extrait est la fusion PR + pointe de `main` : son premier parent est
@@ -205,7 +221,8 @@ jobs:
     timeout-minutes: 5
     env:
       NODE_ENV: test
-    needs: setup
+    needs: [setup, changements]
+    if: contains(needs.changements.outputs.jobs, ' lint ')
 
     steps:
       - name: Checkout code
@@ -239,7 +256,7 @@ jobs:
     env:
       NODE_ENV: test
     needs: [setup, changements]
-    if: needs.changements.outputs.perimetre == 'complet'
+    if: contains(needs.changements.outputs.jobs, ' typecheck ')
 
     steps:
       - name: Checkout code
@@ -355,7 +372,7 @@ jobs:
     env:
       NODE_ENV: test
     needs: [setup, changements]
-    if: needs.changements.outputs.perimetre == 'complet'
+    if: contains(needs.changements.outputs.jobs, ' build ')
 
     steps:
       - name: Checkout code
@@ -421,8 +438,8 @@ jobs:
           # était donc vide à chaque échec de build — sans que rien ne le signale.
           include-hidden-files: true
 
-  # La suite unitaire, sortie de la matrice `test` ci-dessous parce qu'elle seule tourne dans TOUS
-  # les périmètres : quatre de ses tests d'outillage lisent des fichiers d'app2 comme du texte
+  # La suite unitaire, sortie de la matrice `test` ci-dessous parce qu'elle tourne AUSSI dans le
+  # périmètre `app2-seul` : quatre de ses tests d'outillage lisent des fichiers d'app2 comme du texte
   # (libellés des bénévoles, modules, tâches planifiées, titres de notification), si bien qu'une PR
   # limitée à `apps/app2/` peut la faire tomber. Une condition de job ne peut pas lire `matrix` ;
   # garder l'unitaire dans la matrice aurait donc obligé à faire tourner les trois suites ou aucune.
@@ -431,7 +448,8 @@ jobs:
     timeout-minutes: 15
     env:
       NODE_ENV: test
-    needs: [setup]
+    needs: [setup, changements]
+    if: contains(needs.changements.outputs.jobs, ' test-unit ')
 
     steps:
       - name: Checkout code
@@ -482,7 +500,7 @@ jobs:
     # Contrepartie assumée : sur une branche dont le lint ou le build échoue, les quatre jobs de
     # tests tournent quand même — on paie quelques minutes de runner pour en gagner en attente.
     needs: [setup, changements]
-    if: needs.changements.outputs.perimetre == 'complet'
+    if: contains(needs.changements.outputs.jobs, ' test ')
 
     strategy:
       fail-fast: false # Continue même si un test échoue
@@ -611,7 +629,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     needs: [setup, changements]
-    if: needs.changements.outputs.perimetre == 'complet'
+    if: contains(needs.changements.outputs.jobs, ' base-de-test ')
 
     services:
       mysql:
@@ -735,7 +753,7 @@ jobs:
     # ce job : le jour où il ne dépendrait plus de `base-de-test`, il se mettrait sinon à tourner
     # sur les PR d'app2 et à attendre un `build` qui ne viendra jamais.
     needs: [setup, changements, base-de-test]
-    if: needs.changements.outputs.perimetre == 'complet'
+    if: contains(needs.changements.outputs.jobs, ' playwright ')
 
     # Le step d'attente interroge l'API des jobs du run : sans `actions: read`, il échoue et
     # emporte les cinq lots. Déclarer le bloc restreint le jeton au strict nécessaire, d'où
@@ -1156,6 +1174,51 @@ jobs:
             apps/app1/playwright-report/
             apps/app1/test-results/
           retention-days: 7
+  # ---------------------------------------------------------------------------------------------
+  # Le cache des navigateurs Playwright, écrit sur `main` — périmètre `amorcage` seulement.
+  #
+  # Le job `playwright` le lit et l'écrit lui-même, mais sur une PR : or un cache écrit dans une PR
+  # n'est lisible que par CETTE PR. Tant que la suite complète tournait sur `main`, c'est elle qui
+  # le rendait commun ; ce run ne lançant plus `playwright`, ce job reprend ce seul rôle. Sans lui,
+  # chaque PR qui suit une montée du lockfile retéléchargerait Chromium, sans que rien ne le dise.
+  #
+  # ⚠️ La clé DOIT être celle du step « Cache Playwright browsers » du job `playwright` : une clé
+  # différente écrirait une entrée que personne ne lit. Un test le vérifie
+  # (test/unit/scripts/perimetre-ci.test.ts).
+  navigateurs:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    needs: [setup, changements]
+    if: contains(needs.changements.outputs.jobs, ' navigateurs ')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Même principe que `setup` : vérifier sans télécharger, et ne rien faire si l'entrée existe.
+      - name: Vérifier le cache des navigateurs
+        id: verif
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('apps/app1/package-lock.json') }}
+          lookup-only: true
+
+      - name: Préparer l'environnement
+        if: steps.verif.outputs.cache-hit != 'true'
+        uses: ./.github/actions/preparer-env
+
+      - name: Installer Chromium
+        if: steps.verif.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+
+      - name: Sauvegarder le cache des navigateurs
+        if: steps.verif.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('apps/app1/package-lock.json') }}
+
   # Les vulnérabilités connues des dépendances. ⚠️ CE JOB NE BLOQUE PAS `ci-verte`, et c'est
   # délibéré : un avis publié pendant la nuit rendrait rouge une PR qui ne touche pas aux
   # dépendances, et bloquerait le dépôt pour une raison étrangère à son contenu. Il est là pour
@@ -1172,7 +1235,8 @@ jobs:
   audit:
     runs-on: ubuntu-22.04
     timeout-minutes: 8
-    needs: setup
+    needs: [setup, changements]
+    if: contains(needs.changements.outputs.jobs, ' audit ')
 
     permissions:
       contents: read
@@ -1223,7 +1287,19 @@ jobs:
   ci-verte:
     runs-on: ubuntu-22.04
     if: always()
-    needs: [changements, setup, lint, typecheck, build, base-de-test, test-unit, test, playwright]
+    needs:
+      [
+        changements,
+        setup,
+        lint,
+        typecheck,
+        build,
+        base-de-test,
+        test-unit,
+        test,
+        playwright,
+        navigateurs,
+      ]
     timeout-minutes: 5
 
     steps:
@@ -1247,13 +1323,71 @@ jobs:
           PERIMETRE: ${{ needs.changements.outputs.perimetre }}
           RESULTATS: ${{ toJSON(needs) }}
 
-      # Un `skipped` ne passe plus systématiquement pour un échec : dans le périmètre `app2-seul`,
-      # les jobs lourds d'app1 sont sautés À DESSEIN. Il reste refusé partout ailleurs — un job
-      # requis sauté ne peut signifier qu'un échec en amont —, et un périmètre inconnu (job
-      # `changements` en échec) vaut `complet`, donc aucun saut accepté. Les règles et leurs cas sont
-      # dans `test/unit/scripts/perimetre-ci.test.ts`.
+      # Un `skipped` ne passe plus systématiquement pour un échec : chaque périmètre saute À DESSEIN
+      # les jobs qu'il ne lance pas. Il reste refusé pour un job que le périmètre lance — sauté, il
+      # ne peut l'être que par un échec en amont —, et un périmètre inconnu (job `changements` en
+      # échec) vaut `complet`, donc aucun saut accepté. Les règles et leurs cas sont dans
+      # `test/unit/scripts/perimetre-ci.test.ts`.
       - name: Refuser si un job requis n’est pas passé
         env:
           PERIMETRE: ${{ needs.changements.outputs.perimetre }}
           RESULTATS: ${{ toJSON(needs) }}
         run: node scripts/perimetre-ci.mjs --verdict
+
+  # ---------------------------------------------------------------------------------------------
+  # Le run planifié ne bloque rien : rouge, il ne vaut que s'il se voit. Une issue est donc ouverte
+  # au premier échec, commentée aux suivants (une seule issue, pas une par nuit), et refermée au
+  # premier run de nouveau vert — si bien qu'une issue ouverte veut toujours dire « encore rouge ».
+  #
+  # Seul job du workflow à écrire quoi que ce soit : `issues: write` lui est donc réservé, le reste
+  # garde le plancher en lecture seule. Il ne tourne que sur `schedule`.
+  signaler-run-planifie:
+    runs-on: ubuntu-22.04
+    if: always() && github.event_name == 'schedule'
+    needs: [ci-verte]
+    timeout-minutes: 5
+
+    permissions:
+      issues: write
+
+    # Aucun checkout : il n'a rien à lire. Le `defaults` du workflow (`apps/app1`) n'existerait
+    # donc pas, et bash refuserait de démarrer — même piège que celui qu'a connu `ci-verte`.
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - name: Ouvrir, commenter ou refermer l'issue du run planifié
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERDICT: ${{ needs.ci-verte.result }}
+          LIEN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          titre="CI planifiée rouge sur main"
+          numero=$(gh issue list --state open --search "\"$titre\" in:title" --json number,title \
+            --jq ".[] | select(.title == \"$titre\") | .number" | head -1)
+
+          if [ "$VERDICT" = "success" ]; then
+            if [ -n "$numero" ]; then
+              gh issue close "$numero" --comment "Le run planifié est de nouveau vert : $LIEN"
+              echo "Issue #$numero refermée."
+            else
+              echo "Run vert, aucune issue ouverte : rien à faire."
+            fi
+            exit 0
+          fi
+
+          corps="Le run planifié de « CI Tests » sur \`main\` a rendu \`$VERDICT\` : $LIEN
+
+          Ce run rejoue la suite complète chaque nuit sur un code déjà testé dans sa PR. Un échec y
+          signale donc d'abord un test instable, un test qui dépend de la date, ou une vulnérabilité
+          npm publiée depuis — rarement une régression. Le résumé de chaque lot Playwright nomme les
+          tests instables. Cette issue se referme d'elle-même au prochain run vert."
+
+          if [ -n "$numero" ]; then
+            gh issue comment "$numero" --body "Toujours rouge (\`$VERDICT\`) : $LIEN"
+            echo "Issue #$numero commentée."
+          else
+            gh issue create --title "$titre" --body "$corps"
+          fi
