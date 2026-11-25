@@ -72,6 +72,10 @@ model User {
   volunteerComments                  VolunteerComment[]
   notifications                      Notification[]
   organizers                         Organizer[]
+  // Stock (layer `stock`) : responsables de retrait et de retour d'un article, réservations.
+  stockPickupResponsibilities        StockItem[]                         @relation("StockPickupResponsible")
+  stockReturnResponsibilities        StockItem[]                         @relation("StockReturnResponsible")
+  stockReservations                  StockReservation[]
 }
 
 model PasswordResetToken {
@@ -133,6 +137,9 @@ model Event {
   editionOrganizers           EditionOrganizer[]
   zones                       EditionZone[]
   markers                     EditionMarker[]
+  stockGroups                 StockGroup[]
+  stockTags                   StockTag[]
+  stockShoppingLists          StockShoppingList[]
 
   @@index([ownerId])
 }
@@ -832,7 +839,9 @@ model EditionZone {
   externalMapObjectId   String?   @db.VarChar(64)
   externalMapImportedAt DateTime?
 
-  markers EditionMarker[]
+  markers           EditionMarker[]
+  stockItems        StockItem[]
+  stockReservations StockReservation[]
 
   @@unique([editionId, externalMapObjectId])
   @@index([editionId])
@@ -860,7 +869,232 @@ model EditionMarker {
   zone   EditionZone? @relation(fields: [zoneId], references: [id], onDelete: SetNull)
   zoneId Int?
 
+  stockItems        StockItem[]
+  stockReservations StockReservation[]
+
   @@unique([editionId, externalMapObjectId])
   @@index([editionId])
   @@index([zoneId])
+}
+
+// =============================================================================
+// Stock et prêts (layer `stock`, partagé avec app1) — mêmes modèles, rattachés à l'événement.
+// =============================================================================
+// Stock matériel : suivi du matériel d'une édition (groupes, objets,
+// réservations sur des périodes).
+
+enum StockReservationStatus {
+  RESERVED // Réservé (par défaut à la création)
+  PICKED_UP // Sorti / pris par le réserveur
+  RETURNED // Rendu au stock
+  CANCELLED // Annulée
+}
+
+model StockGroup {
+  id                  Int      @id @default(autoincrement())
+  editionId           Int
+  name                String
+  description         String?  @db.Text
+  // Ce groupe gère-t-il les réservations ?
+  //
+  // Fermé par défaut : tout le matériel ne se réserve pas. Un groupe « consommables » ou
+  // « décoration » n'a que faire d'un calendrier et de quantités disponibles par période, et leur
+  // présence encombre l'écran d'une mécanique dont personne ne se sert.
+  //
+  // ⚠️ La MIGRATION passe tous les groupes EXISTANTS à `true`. Le défaut sert les groupes à venir ;
+  // sans cet UPDATE, les éditions qui réservent aujourd'hui perdraient le système du jour au
+  // lendemain — y compris pendant une convention.
+  //
+  // Décocher est refusé tant qu'il reste des réservations : voir `reservations-du-groupe.ts`.
+  reservationsEnabled Boolean  @default(false)
+  displayOrder        Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  event Event       @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  items StockItem[]
+
+  @@index([editionId])
+  @@index([editionId, displayOrder])
+}
+
+model StockItem {
+  id                  Int       @id @default(autoincrement())
+  stockGroupId        Int
+  name                String
+  description         String?   @db.Text
+  quantity            Int       @default(1) // Nombre d'exemplaires identiques
+  notes               String?   @db.Text
+  displayOrder        Int       @default(0)
+  // Emprunt externe : matériel prêté par quelqu'un d'extérieur à la convention.
+  // Si `isExternalLoan` est false, les 3 champs suivants sont ignorés.
+  isExternalLoan      Boolean   @default(false)
+  ownerContact        String?   @db.Text // Texte libre (ex: "Jean Dupont — 06 12 34 56 78")
+  returnDueAt         DateTime? // Date prévue de retour au propriétaire
+  // Un emprunt a deux bouts : aller le chercher, puis le rapporter. Sans `pickedUpAt`, rien ne
+  // distinguait un emprunt convenu mais pas encore récupéré d'un emprunt déjà sur place.
+  pickedUpAt          DateTime? // Date effective de récupération. null = pas encore récupéré
+  returnedAt          DateTime? // Date effective du retour. null = pas encore rendu
+  // Où récupérer le matériel et où le rendre, et qui s'en charge. Les deux lieux sont distincts :
+  // on emprunte souvent chez quelqu'un et on rend ailleurs. Texte libre, car ces lieux sont
+  // généralement hors du site, où la carte de l'édition n'a rien à dire.
+  // Le responsable est un utilisateur quand il en est un ; le champ texte prend le relais pour
+  // quelqu'un qui n'a pas de compte.
+  pickupLocation      String?   @db.Text
+  pickupResponsibleId Int?
+  pickupContact       String?   @db.Text
+  returnLocation      String?   @db.Text
+  returnResponsibleId Int?
+  returnContact       String?   @db.Text
+  // Quantité constatée au rangement, en fin d'édition. L'écart avec `quantity` dit ce qui manque.
+  // `null` = pas encore compté, ce qui n'est pas la même chose que zéro.
+  finalQuantity       Int?
+  // Emplacement de rangement par défaut : où ranger le matériel quand il
+  // n'est pas réservé. Au moins l'un des trois doit être renseigné si l'on
+  // veut afficher un emplacement (validé côté API, tous peuvent rester null).
+  location            String? // Texte libre (ex: "Tente technique B")
+  zoneId              Int? // Lien optionnel vers une zone de la carte
+  markerId            Int? // Lien optionnel vers un marqueur de la carte
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  group         StockGroup              @relation(fields: [stockGroupId], references: [id], onDelete: Cascade)
+  zone          EditionZone?            @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  marker        EditionMarker?          @relation(fields: [markerId], references: [id], onDelete: SetNull)
+  reservations  StockReservation[]
+  tags          StockTagAssignment[]
+  shoppingLists StockShoppingListItem[]
+
+  pickupResponsible User? @relation("StockPickupResponsible", fields: [pickupResponsibleId], references: [id], onDelete: SetNull)
+  returnResponsible User? @relation("StockReturnResponsible", fields: [returnResponsibleId], references: [id], onDelete: SetNull)
+
+  @@index([stockGroupId])
+  @@index([stockGroupId, displayOrder])
+  @@index([zoneId])
+  @@index([markerId])
+  @@index([pickupResponsibleId])
+  @@index([returnResponsibleId])
+}
+
+model StockReservation {
+  id               Int                    @id @default(autoincrement())
+  stockItemId      Int
+  userId           Int // Utilisateur qui a posé la réservation
+  startsAt         DateTime
+  endsAt           DateTime
+  usage            String                 @db.Text // Pourquoi : "Spectacle de feu samedi 22h"
+  quantityReserved Int                    @default(1)
+  status           StockReservationStatus @default(RESERVED)
+  // Emplacement d'utilisation : où le matériel doit être amené pendant la
+  // réservation. Différent du rangement (StockItem.location). À la fin de la
+  // réservation, le matériel retourne à son emplacement de rangement.
+  // Au moins l'un des trois (location/zoneId/markerId) doit être renseigné
+  // (validé côté API).
+  location         String? // Texte libre (ex: "Scène principale, fond droit")
+  zoneId           Int? // Lien optionnel vers une zone de la carte
+  markerId         Int? // Lien optionnel vers un marqueur de la carte
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  stockItem StockItem      @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+  zone      EditionZone?   @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  marker    EditionMarker? @relation(fields: [markerId], references: [id], onDelete: SetNull)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([stockItemId])
+  @@index([userId])
+  @@index([zoneId])
+  @@index([markerId])
+  @@index([stockItemId, startsAt, endsAt])
+  @@index([status])
+}
+
+/**
+ * Étiquette transversale posée sur du matériel.
+ * Le groupe dit où l'objet est rangé — une seule place, une seule façon de classer. Le tag dit
+ * autre chose : une enceinte rangée en « Sonorisation » peut être à la fois fragile, lourde et
+ * prêtée, sans que rien de cela ne commande son rangement.
+ * Rattaché à l'ÉDITION et non au groupe, contrairement à `TaskTag` : c'est la seule façon de
+ * retrouver le même « fragile » d'un groupe à l'autre sans le recréer partout.
+ */
+model StockTag {
+  id           Int      @id @default(autoincrement())
+  editionId    Int
+  name         String
+  color        String
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  event       Event                @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  assignments StockTagAssignment[]
+
+  @@unique([editionId, name])
+  @@index([editionId])
+  @@index([editionId, displayOrder])
+}
+
+// Liaison many-to-many entre StockItem et StockTag. Un objet porte 0..N tags.
+model StockTagAssignment {
+  id          Int      @id @default(autoincrement())
+  stockItemId Int
+  tagId       Int
+  createdAt   DateTime @default(now())
+
+  item StockItem @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+  tag  StockTag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([stockItemId, tagId])
+  @@index([stockItemId])
+  @@index([tagId])
+}
+
+/**
+ * Une liste de courses : ce qu'il faut racheter après une édition.
+ * Le recomptage de fin d'édition dit ce qui manque, mais ne dit pas quoi en faire. Racheter se
+ * décide en plusieurs fois et pour plusieurs endroits — la quincaillerie, le magasin de jonglerie,
+ * la commande en ligne —, d'où PLUSIEURS listes nommées par édition plutôt qu'un seul inventaire
+ * des manques, qui ne se découpe pas.
+ * Rattachée à l'ÉDITION, comme `StockTag` : le matériel l'est, et une liste qui traverserait les
+ * éditions mélangerait des inventaires sans rapport.
+ */
+model StockShoppingList {
+  id        Int      @id @default(autoincrement())
+  editionId Int
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event                   @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  items StockShoppingListItem[]
+
+  @@index([editionId])
+}
+
+/**
+ * Un article d'une liste de courses, qui pointe vers du matériel du stock.
+ * ⚠️ Le lien est VIVANT, et c'est un choix : renommer l'objet met la liste à jour, et la quantité
+ * à racheter suit l'écart courant du recomptage plutôt que d'être figée à l'ajout. Deux
+ * conséquences assumées : supprimer l'objet du stock retire l'article des listes (cascade), et un
+ * recomptage postérieur modifie une liste déjà imprimée.
+ * Il n'y a donc pas de nom ni de quantité stockés ici : les dupliquer inviterait à les laisser
+ * diverger de la fiche, et c'est précisément ce que le lien vivant refuse.
+ * `purchased` est la seule chose que l'article porte en propre — ce qui distingue une liste de
+ * courses d'un simple export : on coche au fur et à mesure, et la liste montre ce qui reste.
+ */
+model StockShoppingListItem {
+  id          Int      @id @default(autoincrement())
+  listId      Int
+  stockItemId Int
+  purchased   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  list StockShoppingList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  item StockItem         @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+
+  // Un même objet ne s'ajoute pas deux fois à la même liste : deux lignes identiques se cocheraient
+  // séparément et feraient douter de ce qui reste à acheter.
+  @@unique([listId, stockItemId])
+  @@index([listId])
+  @@index([stockItemId])
 }

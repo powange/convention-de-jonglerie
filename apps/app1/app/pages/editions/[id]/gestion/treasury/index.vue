@@ -674,7 +674,7 @@ import { listeDepuisUrl, texteDepuisUrl } from '#core/shared/utils/filtres-url'
 import { estUnJustificatifPdf } from '#core/shared/utils/justificatif-pdf'
 import { cleDuNomAvance } from '~~/shared/utils/avance-nom-libre'
 import { DEFAULT_CURRENCY, formatCents } from '~~/shared/utils/money'
-import { contientTousLesMots } from '~~/shared/utils/recherche-texte'
+import { contientTousLesMots } from '#core/shared/utils/recherche-texte'
 
 definePageMeta({
   middleware: ['auth-protected'],

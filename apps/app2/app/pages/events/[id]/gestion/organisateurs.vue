@@ -42,36 +42,65 @@
         <ul class="divide-y divide-default">
           <li class="flex flex-wrap items-center gap-3 py-3">
             <UiUserAvatar :user="liste.proprietaire" size="md" />
-            <div class="min-w-0 flex-1">
-              <p class="truncate font-medium">{{ nom(liste.proprietaire) }}</p>
+            <!-- `min-w-48` : sur un téléphone, le badge passe dessous plutôt que d'écraser le nom. -->
+            <div class="min-w-48 flex-1">
+              <p class="font-medium break-words">{{ nom(liste.proprietaire) }}</p>
               <p v-if="liste.proprietaire.email" class="truncate text-sm text-muted">
                 {{ liste.proprietaire.email }}
               </p>
             </div>
-            <UBadge color="primary" variant="subtle" label="Propriétaire · tous les droits" />
+            <UBadge
+              color="primary"
+              variant="subtle"
+              label="Propriétaire · tous les droits"
+              class="ml-13 sm:ml-0"
+            />
           </li>
 
-          <li
-            v-for="o in liste.organisateurs"
-            :key="o.id"
-            class="flex flex-wrap items-center gap-3 py-3"
-          >
-            <UiUserAvatar :user="o.compte" size="md" />
-            <div class="min-w-0 flex-1">
-              <p class="flex items-center gap-2 font-medium">
-                <span class="truncate">{{ nom(o.compte) }}</span>
-                <UBadge
-                  v-if="o.compte.enAttente"
-                  color="warning"
-                  variant="subtle"
-                  size="sm"
-                  label="Invitation en attente"
-                  class="shrink-0"
-                />
-              </p>
-              <p v-if="o.compte.email" class="truncate text-sm text-muted">{{ o.compte.email }}</p>
+          <li v-for="o in liste.organisateurs" :key="o.id" class="flex flex-col gap-3 py-3">
+            <!-- Nom et actions sur une ligne, droits sur la suivante : le nom ne se tronque plus quand
+                 la liste des droits s'allonge avec les modules. -->
+            <div class="flex items-center gap-3">
+              <UiUserAvatar :user="o.compte" size="md" />
+              <div class="min-w-0 flex-1">
+                <p class="flex flex-wrap items-center gap-x-2 font-medium">
+                  <span class="break-words">{{ nom(o.compte) }}</span>
+                  <UBadge
+                    v-if="o.compte.enAttente"
+                    color="warning"
+                    variant="subtle"
+                    size="sm"
+                    label="Invitation en attente"
+                    class="shrink-0"
+                  />
+                </p>
+                <p v-if="o.compte.email" class="truncate text-sm text-muted">
+                  {{ o.compte.email }}
+                </p>
+              </div>
+              <div v-if="liste.peutGerer" class="flex gap-1">
+                <UTooltip v-if="o.compte.enAttente" text="Nouveau lien d'activation">
+                  <UButton
+                    icon="i-heroicons-link"
+                    color="neutral"
+                    variant="ghost"
+                    aria-label="Nouveau lien d'activation"
+                    :loading="lienEnCours === o.id"
+                    @click="nouveauLien(o.id, nom(o.compte))"
+                  />
+                </UTooltip>
+                <UTooltip text="Retirer de l'équipe">
+                  <UButton
+                    icon="i-heroicons-user-minus"
+                    color="error"
+                    variant="ghost"
+                    aria-label="Retirer de l'équipe"
+                    @click="retirer(o)"
+                  />
+                </UTooltip>
+              </div>
             </div>
-            <div class="flex flex-wrap items-center gap-4">
+            <div class="flex flex-wrap items-center gap-x-5 gap-y-2 sm:pl-13">
               <USwitch
                 v-for="d in DROITS"
                 :key="d.cle"
@@ -80,27 +109,6 @@
                 :disabled="!liste.peutGerer || droitEnCours === o.id"
                 @update:model-value="(v: boolean) => changerDroit(o.id, d.cle, v)"
               />
-            </div>
-            <div v-if="liste.peutGerer" class="flex gap-1">
-              <UTooltip v-if="o.compte.enAttente" text="Nouveau lien d'activation">
-                <UButton
-                  icon="i-heroicons-link"
-                  color="neutral"
-                  variant="ghost"
-                  aria-label="Nouveau lien d'activation"
-                  :loading="lienEnCours === o.id"
-                  @click="nouveauLien(o.id, nom(o.compte))"
-                />
-              </UTooltip>
-              <UTooltip text="Retirer de l'équipe">
-                <UButton
-                  icon="i-heroicons-user-minus"
-                  color="error"
-                  variant="ghost"
-                  aria-label="Retirer de l'équipe"
-                  @click="retirer(o)"
-                />
-              </UTooltip>
             </div>
           </li>
           <li v-if="!liste.organisateurs.length" class="py-4 text-sm text-muted">

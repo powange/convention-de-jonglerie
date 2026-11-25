@@ -98,6 +98,11 @@ const { data: acces } = useFetch<{ modules: Modules; droits: Droits }>(
 )
 const moduleBenevoles = computed(() => acces.value?.modules.benevoles !== false)
 const carteDuSite = computed(() => !!acces.value?.modules.carte && !!acces.value?.droits.modifier)
+// Stock : le droit dédié, ou responsable d'une équipe de bénévoles (même règle qu'app1,
+// `canAccessStock`) — un responsable va chercher le matériel de son équipe.
+const stockOuvert = computed(
+  () => !!acces.value?.modules.stock && (!!acces.value?.droits.stock || estResponsable.value)
+)
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 const peutGerer = computed(() => editionStore.canManageVolunteers(edition.value))
 const estResponsable = ref(false)
@@ -192,6 +197,35 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
           ]
         : []),
     ],
+    ...(stockOuvert.value
+      ? [
+          [
+            {
+              label: 'Stock matériel',
+              icon: 'i-heroicons-archive-box',
+              value: 'stock',
+              children: [
+                {
+                  label: 'Groupes',
+                  icon: 'i-heroicons-archive-box',
+                  to: `/events/${refPublique.value}/gestion/stock`,
+                  exact: true,
+                },
+                {
+                  label: 'Emprunts',
+                  icon: 'i-heroicons-hand-raised',
+                  to: `/events/${refPublique.value}/gestion/stock/loans`,
+                },
+                {
+                  label: 'Ce qui manque',
+                  icon: 'i-heroicons-shopping-cart',
+                  to: `/events/${refPublique.value}/gestion/stock/missing`,
+                },
+              ],
+            },
+          ],
+        ]
+      : []),
     // Sans aucun droit sur les bénévoles, la section n'apparaît pas (plutôt qu'un groupe vide).
     ...(enfants.length && moduleBenevoles.value
       ? [

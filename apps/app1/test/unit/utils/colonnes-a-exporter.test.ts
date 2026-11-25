@@ -5,7 +5,7 @@ import {
   colonneVisible,
   tableauAExporter,
   type ColonneExportable,
-} from '../../../app/utils/colonnes-a-exporter'
+} from '../../../../../layers/ui/app/utils/colonnes-a-exporter'
 
 /**
  * Un export n'emporte que les colonnes affichées.

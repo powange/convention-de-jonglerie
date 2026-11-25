@@ -148,7 +148,7 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
 import { filtrerParEcheance, type FiltreEcheance } from '~~/shared/utils/filtre-echeance-taches'
-import { contientLaSaisie } from '~~/shared/utils/recherche-texte'
+import { contientLaSaisie } from '#core/shared/utils/recherche-texte'
 
 definePageMeta({
   middleware: ['auth-protected'],

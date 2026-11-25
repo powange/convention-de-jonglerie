@@ -6,8 +6,8 @@ import {
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
-import { canAccessStock } from '#server/utils/stock-helpers'
 import { validateEditionId, validatePagination } from '#server/utils/validation-helpers'
+import { canAccessStock } from '#stock/server/utils/stock-helpers'
 
 /**
  * GET /api/editions/[id]/stock-items/[itemId]/reservations

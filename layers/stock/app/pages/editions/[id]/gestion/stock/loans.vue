@@ -367,7 +367,8 @@ const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 
 interface EmpruntTableau {
   id: number

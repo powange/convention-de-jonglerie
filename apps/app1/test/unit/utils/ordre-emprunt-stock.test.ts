@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { erreurOrdreEmprunt } from '../../../server/utils/emprunt-stock'
+import { erreurOrdreEmprunt } from '../../../../../layers/stock/server/utils/emprunt-stock'
 
 /**
  * Un emprunt se déroule dans l'ordre : on va chercher le matériel, puis on le rapporte.

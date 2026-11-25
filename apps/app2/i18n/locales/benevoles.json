@@ -103,7 +103,14 @@
     "all": "Tout",
     "contact": "Contacter",
     "show_qr_code": "Afficher le QR code",
-    "confirm_delete": "Confirmer la suppression"
+    "confirm_delete": "Confirmer la suppression",
+    "add": "Ajouter",
+    "quantity": "Quantité",
+    "select": "Sélectionner",
+    "select_all": "Tout sélectionner",
+    "validate": "Valider",
+    "view": "Voir",
+    "view_more": "Voir plus"
   },
   "components": {
     "date_time_picker": {

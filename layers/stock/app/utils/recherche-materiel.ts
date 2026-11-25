@@ -10,7 +10,7 @@
  * appelants qui la prenaient ici.
  */
 
-import { motsDeLaRequete, normaliserTexte } from '~~/shared/utils/recherche-texte'
+import { motsDeLaRequete, normaliserTexte } from '#core/shared/utils/recherche-texte'
 
 export { motsDeLaRequete, normaliserTexte }
 

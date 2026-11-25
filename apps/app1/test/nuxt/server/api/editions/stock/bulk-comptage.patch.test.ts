@@ -11,12 +11,12 @@ vi.mock('#server/utils/permissions/edition-permissions', () => ({
   canManageStock: mockCanManageStock,
 }))
 
-vi.mock('#server/utils/stock-helpers', () => ({
+vi.mock('#stock/server/utils/stock-helpers', () => ({
   validateReservationLocation: mockValidateReservationLocation,
   stockItemLocationInclude: {},
 }))
 
-vi.mock('#server/utils/stock-tags-helpers', () => ({
+vi.mock('#stock/server/utils/stock-tags-helpers', () => ({
   assertTagsBelongToEdition: mockAssertTags,
 }))
 

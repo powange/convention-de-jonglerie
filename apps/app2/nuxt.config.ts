@@ -25,12 +25,14 @@ export default defineNuxtConfig({
   // - `volunteers` : gestion des bénévoles — son serveur tourne sur le contrat d'hôte de Flowvent
   //   (server/volunteers/ports/registry.ts…). Cf. docs/flowvent-benevoles.md.
   // - `map` : la carte du site (zones, repères, import), lot 2 de docs/flowvent-modules.md.
+  // - `stock` : stock et prêts, lot 3.
   extends: [
     '../../layers/ui',
     '../../layers/core',
     '../../layers/auth',
     '../../layers/volunteers',
     '../../layers/map',
+    '../../layers/stock',
   ],
 
   hooks: {
@@ -118,7 +120,7 @@ export default defineNuxtConfig({
   // précédents :
   // 1. les libellés des layers bénévoles et carte, tels qu'app1 les sert (chemins relatifs à
   //    i18n/locales/) ;
-  // 2. `benevoles.json` : les clés que le layer emprunte aux fichiers communs d'app1 (common,
+  // 2. `benevoles.json` : les clés que les layers empruntent aux fichiers communs d'app1 (common,
   //    public, gestion…), copiées une fois, et les libellés reformulés pour Flowvent
   //    (« événement » et non « édition »). Un test garantit que chaque clé employée se résout ;
   // 3. `interface.json` : ceux des composants de layers/ui que Flowvent affiche (dépôt d'image) ;
@@ -135,6 +137,7 @@ export default defineNuxtConfig({
           '../../../../layers/volunteers/i18n/locales/fr/gestion-volunteers.json',
           '../../../../layers/map/i18n/locales/fr/map.json',
           '../../../../layers/map/i18n/locales/fr/gestion-map.json',
+          '../../../../layers/stock/i18n/locales/fr/gestion-stock.json',
           'benevoles.json',
           'interface.json',
           'fr.json',

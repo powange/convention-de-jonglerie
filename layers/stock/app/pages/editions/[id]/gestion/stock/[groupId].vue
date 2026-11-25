@@ -761,13 +761,8 @@
 </template>
 
 <script setup lang="ts">
+import { useNow } from '@vueuse/core'
 import { useSortable } from '@vueuse/integrations/useSortable'
-
-import {
-  colonnesExportablesVisibles,
-  tableauAExporter,
-  type ColonneExportable,
-} from '~/utils/colonnes-a-exporter'
 
 import { useAuthStore, useEditionStore } from '#imports'
 
@@ -813,6 +808,11 @@ import {
 } from '#core/app/utils/pdf-case-a-cocher'
 import { telechargerFichier } from '#core/app/utils/telechargement'
 import { versCsv } from '#core/shared/utils/csv'
+import {
+  colonnesExportablesVisibles,
+  tableauAExporter,
+  type ColonneExportable,
+} from '#ui-commun/app/utils/colonnes-a-exporter'
 
 definePageMeta({
   layout: 'edition-dashboard',
@@ -824,7 +824,8 @@ const router = useRouter()
 const { t, locale } = useI18n()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 
 /**
  * Ce qui manque au rangement, pour un objet donné.

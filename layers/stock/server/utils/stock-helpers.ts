@@ -1,6 +1,9 @@
-import { canManageStock, type EditionWithPermissions } from './permissions/edition-permissions'
+import type { UserForPermissions } from '#server/utils/permissions/types'
 
-import type { UserForPermissions } from './permissions/types'
+import {
+  canManageStock,
+  type EditionWithPermissions,
+} from '#server/utils/permissions/edition-permissions'
 
 /**
  * Vérifie qu'une zone/un marqueur référencés par une réservation ou un item

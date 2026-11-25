@@ -345,7 +345,7 @@ import type { TaskFiltersValue, TaskSort } from '../../../../../components/tasks
 import { valeurDepuisUrl } from '#core/shared/utils/filtres-url'
 import { filtrerParEcheance, type FiltreEcheance } from '~~/shared/utils/filtre-echeance-taches'
 import { nomAffichableDUnCompte } from '~~/shared/utils/nom-affichable'
-import { contientLaSaisie } from '~~/shared/utils/recherche-texte'
+import { contientLaSaisie } from '#core/shared/utils/recherche-texte'
 
 definePageMeta({
   layout: 'edition-dashboard',

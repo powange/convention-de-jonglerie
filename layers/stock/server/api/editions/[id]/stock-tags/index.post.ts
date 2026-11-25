@@ -6,9 +6,9 @@ import {
   canManageStock,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
-import { STOCK_TAG_COLOR_PATTERN } from '#server/utils/stock-tags-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
+import { STOCK_TAG_COLOR_PATTERN } from '#stock/server/utils/stock-tags-helpers'
 
 const bodySchema = z.object({
   name: z

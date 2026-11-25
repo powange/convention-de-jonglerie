@@ -4,7 +4,7 @@ import {
   isAnyTeamLeaderOnEdition,
   canAccessStock,
   getReservedQuantityOnPeriod,
-} from '../../../../server/utils/stock-helpers'
+} from '../../../../../../layers/stock/server/utils/stock-helpers'
 
 import type { EditionWithPermissions } from '../../../../server/utils/permissions/edition-permissions'
 import type { UserForPermissions } from '../../../../server/utils/permissions/types'

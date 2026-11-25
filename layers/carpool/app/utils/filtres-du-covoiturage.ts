@@ -2,7 +2,7 @@ import { placesRestantes } from './places-restantes'
 
 import type { OffreAPlaces } from './places-restantes'
 
-import { contientLaSaisie } from '~~/shared/utils/recherche-texte'
+import { contientLaSaisie } from '#core/shared/utils/recherche-texte'
 
 /**
  * Affiner la liste des annonces de covoiturage, côté navigateur.

@@ -58,7 +58,9 @@ export function getTranslationsToLoad(path: string): string[] {
     // .list_description, qui restent dans gestion.json — buckets de nav.)
     {
       pattern: /^\/editions\/\d+\/gestion/,
-      translations: ['gestion'],
+      // `gestion-stock` : les clés du stock, sorties dans layers/stock — le menu et l'accueil de la
+      // gestion en affichent sur toutes ces pages, comme quand elles vivaient dans gestion.json.
+      translations: ['gestion', 'gestion-stock'],
     },
     /*
      * Vue d'ensemble racine : workshops (cartes de modules). Le libellé de la carte « tâches » vit
@@ -202,7 +204,7 @@ export function getTranslationsToLoad(path: string): string[] {
      */
     {
       pattern: /^\/profile\/mes-conventions/,
-      translations: ['edition', 'gestion'],
+      translations: ['edition', 'gestion', 'gestion-stock'],
     },
   ]
 
@@ -322,6 +324,21 @@ export const translationLoaders: Record<string, Record<string, () => Promise<any
     uk: () => import('~~/i18n/locales/uk/gestion.json'),
     cs: () => import('~~/i18n/locales/cs/gestion.json'),
     sv: () => import('~~/i18n/locales/sv/gestion.json'),
+  },
+  'gestion-stock': {
+    en: () => import('../../../../layers/stock/i18n/locales/en/gestion-stock.json'),
+    da: () => import('../../../../layers/stock/i18n/locales/da/gestion-stock.json'),
+    de: () => import('../../../../layers/stock/i18n/locales/de/gestion-stock.json'),
+    es: () => import('../../../../layers/stock/i18n/locales/es/gestion-stock.json'),
+    fr: () => import('../../../../layers/stock/i18n/locales/fr/gestion-stock.json'),
+    it: () => import('../../../../layers/stock/i18n/locales/it/gestion-stock.json'),
+    nl: () => import('../../../../layers/stock/i18n/locales/nl/gestion-stock.json'),
+    pl: () => import('../../../../layers/stock/i18n/locales/pl/gestion-stock.json'),
+    pt: () => import('../../../../layers/stock/i18n/locales/pt/gestion-stock.json'),
+    ru: () => import('../../../../layers/stock/i18n/locales/ru/gestion-stock.json'),
+    uk: () => import('../../../../layers/stock/i18n/locales/uk/gestion-stock.json'),
+    cs: () => import('../../../../layers/stock/i18n/locales/cs/gestion-stock.json'),
+    sv: () => import('../../../../layers/stock/i18n/locales/sv/gestion-stock.json'),
   },
   tasks: {
     en: () => import('~~/i18n/locales/en/tasks.json'),
