@@ -103,6 +103,13 @@ model Event {
   /// Modules activés pour l'événement (page « Accueil de la gestion »), un par module comme les
   /// `*Enabled` d'une édition d'app1. Le module bénévoles est actif par défaut.
   volunteersEnabled Boolean       @default(true)
+  /// Les autres modules, inactifs par défaut comme dans app1 (cf. shared/modules-evenement.ts).
+  siteMapEnabled    Boolean       @default(false)
+  stockEnabled      Boolean       @default(false)
+  artistsEnabled    Boolean       @default(false)
+  mealsEnabled      Boolean       @default(false)
+  ticketingEnabled  Boolean       @default(false)
+  treasuryEnabled   Boolean       @default(false)
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   owner             User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
@@ -206,6 +213,11 @@ model EditionOrganizer {
   canEditEvent        Boolean                   @default(false)
   canManageOrganizers Boolean                   @default(false)
   canManageVolunteers Boolean                   @default(false)
+  canManageStock      Boolean                   @default(false)
+  canManageArtists    Boolean                   @default(false)
+  canManageMeals      Boolean                   @default(false)
+  canManageTicketing  Boolean                   @default(false)
+  canManageTreasury   Boolean                   @default(false)
   arrivalDateTime     String?
   departureDateTime   String?
   qrCodeToken         String?                   @unique

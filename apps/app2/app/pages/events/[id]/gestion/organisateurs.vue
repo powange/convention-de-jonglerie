@@ -176,15 +176,19 @@
 <script setup lang="ts">
 /**
  * Les organisateurs d'un événement Flowvent et leurs droits par domaine (décision de
- * l'utilisateur) : modifier l'événement, gérer les organisateurs, gérer les bénévoles. Le
- * propriétaire a tout, et seul lui supprime l'événement.
+ * l'utilisateur) : modifier l'événement, gérer les organisateurs, puis un droit par module porté
+ * (cf. shared/modules-evenement.ts). Le propriétaire a tout, et seul lui supprime l'événement.
  *
- * Ajout : un compte existant (e-mail ou pseudo), ou une invitation par adresse — Flowvent
- * n'envoyant pas de courriel, le lien d'activation est affiché ici, à transmettre soi-même.
+ * Ajout : un compte existant (e-mail ou pseudo), ou une invitation par adresse — l'invitation ne
+ * part pas encore par courriel : le lien d'activation est affiché ici, à transmettre soi-même.
  */
+import type { CleDroit } from '#shared/modules-evenement'
+
+import { droitsProposes } from '#shared/modules-evenement'
+
 definePageMeta({ middleware: ['subscription'] })
 
-type Cle = 'modifier' | 'organisateurs' | 'benevoles'
+type Cle = CleDroit
 interface Compte {
   id: number
   pseudo: string
@@ -202,19 +206,16 @@ interface Liste {
   organisateurs: { id: number; compte: Compte; droits: Record<Cle, boolean> }[]
 }
 
-const DROITS: { cle: Cle; libelle: string; description: string }[] = [
-  { cle: 'modifier', libelle: "Modifier l'événement", description: 'Nom, lieu, dates, fuseau.' },
-  {
-    cle: 'organisateurs',
-    libelle: 'Gérer les organisateurs',
-    description: 'Ajouter, retirer, régler les droits.',
-  },
-  {
-    cle: 'benevoles',
-    libelle: 'Gérer les bénévoles',
-    description: 'Candidatures, équipes, planning.',
-  },
-]
+// Les droits proposés : ceux de l'événement et ceux des modules portés (shared/modules-evenement).
+const DROITS = droitsProposes()
+
+/** Un nouvel organisateur : les bénévoles seulement, comme avant l'arrivée des autres modules. */
+function droitsParDefaut(): Record<Cle, boolean> {
+  return Object.fromEntries(DROITS.map((d) => [d.cle, d.cle === 'benevoles'])) as Record<
+    Cle,
+    boolean
+  >
+}
 
 const route = useRoute()
 const refEvenement = String(route.params.id)
@@ -239,7 +240,7 @@ const ajout = reactive({
   identifiant: '',
   prenom: '',
   nom: '',
-  droits: { modifier: false, organisateurs: false, benevoles: true } as Record<Cle, boolean>,
+  droits: droitsParDefaut(),
 })
 const inviter = ref(false)
 

@@ -1,12 +1,14 @@
 import { defineStore } from 'pinia'
 
+import type { Droits } from '#shared/modules-evenement'
+
 /**
  * Le store « éditions » attendu par l'interface du layer bénévoles (contrat d'hôte côté interface,
  * cf. docs/flowvent-benevoles.md). App1 a le sien, branché sur ses éditions et conventions ; celui
  * de Flowvent sert ses événements sous la même forme, via `GET /api/events/:id/edition`.
  *
- * Le layer n'en utilise que six membres : `fetchEditionById`, `getEditionById`, `loading`,
- * `canManageVolunteers`, `canEditEdition`, `isTeamLeader`.
+ * Membres lus par les layers : `fetchEditionById`, `getEditionById`, `loading`,
+ * `canManageVolunteers`, `canEditEdition`, `isTeamLeader`, et un `canManage*` par module.
  */
 export interface EditionFlowvent {
   id: number
@@ -31,6 +33,8 @@ export interface EditionFlowvent {
   volunteersSwapsEnabled: boolean
   volunteersHasFloatingTeam: boolean
   mealsEnabled: boolean
+  /** Droits par domaine de la personne connectée, calculés par le serveur ; `null` : visiteur. */
+  droits: Droits | null
   [cle: string]: unknown
 }
 
@@ -87,9 +91,26 @@ export const useEditionStore = defineStore('editions', {
       return !!edition?.peutGererBenevoles
     },
 
-    /** Mêmes personnes : Flowvent ne distingue pas encore « modifier » de « gérer ». */
+    /** Droit « modifier l'événement ». */
     canEditEdition(edition: EditionFlowvent | undefined | null, _userId?: number): boolean {
-      return !!edition?.peutGererBenevoles
+      return !!edition?.droits?.modifier
+    },
+
+    // Les droits des autres modules, sous les noms qu'appellent les layers partagés.
+    canManageStock(edition: EditionFlowvent | undefined | null, _userId?: number): boolean {
+      return !!edition?.droits?.stock
+    },
+    canManageArtists(edition: EditionFlowvent | undefined | null, _userId?: number): boolean {
+      return !!edition?.droits?.artistes
+    },
+    canManageMeals(edition: EditionFlowvent | undefined | null, _userId?: number): boolean {
+      return !!edition?.droits?.repas
+    },
+    canManageTicketing(edition: EditionFlowvent | undefined | null, _userId?: number): boolean {
+      return !!edition?.droits?.billetterie
+    },
+    canManageTreasury(edition: EditionFlowvent | undefined | null, _userId?: number): boolean {
+      return !!edition?.droits?.tresorerie
     },
 
     async isTeamLeader(editionId: number): Promise<boolean> {

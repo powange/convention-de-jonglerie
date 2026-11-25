@@ -1,6 +1,12 @@
 import { optionalAuth } from '#server/utils/auth-utils'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 
+import {
+  DROITS_PAR_DOMAINE,
+  droitsProposes,
+  MODULES_EVENEMENT,
+} from '../../../../shared/modules-evenement'
+import { droitsSurEvenement, selectionModules } from '../../../utils/droits-evenement'
 import { resoudreEvenement } from '../../../utils/evenement-public'
 
 /**
@@ -36,7 +42,7 @@ export default defineEventHandler(async (event) => {
       status: true,
       ownerId: true,
       publicId: true,
-      volunteersEnabled: true,
+      ...selectionModules,
       volunteerSettings: {
         select: {
           pagePublic: true,
@@ -56,6 +62,9 @@ export default defineEventHandler(async (event) => {
   if (!evenement) throw createError({ status: 404, message: 'Événement introuvable' })
 
   const gere = user ? await canManageEditionVolunteers(id, user.id, event) : false
+  // Les droits par domaine, lus par le store (`canManageStock`…) : l'interface n'a pas à connaître
+  // la règle. Un visiteur n'en a aucun.
+  const droits = user ? await droitsSurEvenement(id, user.id) : null
   const s = evenement.volunteerSettings
 
   return {
@@ -87,7 +96,14 @@ export default defineEventHandler(async (event) => {
     volunteersTeardownEndDate: s?.teardownEndDate ?? null,
     volunteersSwapsEnabled: s?.swapsEnabled ?? true,
     volunteersHasFloatingTeam: evenement._count.volunteerTeams > 0,
-    // Flowvent n'a pas de module repas.
-    mealsEnabled: false,
+    // Les interrupteurs des modules, sous leurs noms d'app1 (`stockEnabled`, `mealsEnabled`…) que
+    // lisent les layers partagés.
+    ...Object.fromEntries(MODULES_EVENEMENT.map((m) => [m.colonne, evenement[m.colonne]])),
+    // Seulement les droits proposés (événement + modules portés) : aucun sur un module à venir.
+    droits: droits
+      ? Object.fromEntries(
+          DROITS_PAR_DOMAINE.map((d) => [d.cle, droits[d.cle] && droitsProposes().includes(d)])
+        )
+      : null,
   }
 })

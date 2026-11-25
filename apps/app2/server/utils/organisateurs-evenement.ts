@@ -4,6 +4,12 @@
  */
 import type { H3Event } from 'h3'
 
+import { z } from 'zod'
+
+import type { CleDroit, ColonneDroit, Droits } from '../../shared/modules-evenement'
+
+import { DROITS_PAR_DOMAINE, droitsProposes } from '../../shared/modules-evenement'
+
 import { droitsSurEvenement } from './droits-evenement'
 import { idDepuisLaRoute } from './evenement-public'
 import { estEnAttente } from './invitation'
@@ -49,32 +55,32 @@ export function compteAffiche(c: Compte, avecEmail: boolean) {
   }
 }
 
-export const DROITS_SCHEMA_CLES = ['modifier', 'organisateurs', 'benevoles'] as const
+export const DROITS_SCHEMA_CLES = DROITS_PAR_DOMAINE.map((d) => d.cle)
+
+/**
+ * Les droits reçus par l'API : chaque domaine facultatif (un absent n'est pas touché). Seulement
+ * les droits PROPOSÉS — un droit sur un module pas encore porté est ignoré, pas enregistré.
+ */
+export const schemaDroits = z.object(
+  Object.fromEntries(droitsProposes().map((d) => [d.cle, z.boolean().optional()])) as Record<
+    CleDroit,
+    z.ZodOptional<z.ZodBoolean>
+  >
+)
 
 /** Les droits d'un organisateur, dans le vocabulaire de l'API (et de la page). */
-export function droitsAffiches(o: {
-  canEditEvent: boolean
-  canManageOrganizers: boolean
-  canManageVolunteers: boolean
-}) {
-  return {
-    modifier: o.canEditEvent,
-    organisateurs: o.canManageOrganizers,
-    benevoles: o.canManageVolunteers,
-  }
+export function droitsAffiches(o: Record<ColonneDroit, boolean>): Droits {
+  return Object.fromEntries(DROITS_PAR_DOMAINE.map((d) => [d.cle, o[d.colonne]])) as Droits
 }
 
-/** Et dans celui de la base. */
-export function droitsEnBase(d: {
-  modifier?: boolean
-  organisateurs?: boolean
-  benevoles?: boolean
-}) {
-  return {
-    ...(d.modifier !== undefined && { canEditEvent: d.modifier }),
-    ...(d.organisateurs !== undefined && { canManageOrganizers: d.organisateurs }),
-    ...(d.benevoles !== undefined && { canManageVolunteers: d.benevoles }),
-  }
+/** Et dans celui de la base — seulement les droits fournis. */
+export function droitsEnBase(d: Partial<Droits>): Partial<Record<ColonneDroit, boolean>> {
+  return Object.fromEntries(
+    DROITS_PAR_DOMAINE.filter((def) => d[def.cle] !== undefined).map((def) => [
+      def.colonne,
+      d[def.cle],
+    ])
+  )
 }
 
 /**

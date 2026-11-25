@@ -6,6 +6,7 @@ import { createPendingUserAndInvite } from '../../../../utils/invitation'
 import { NotificationService } from '../../../../utils/notification-service'
 import {
   droitsEnBase,
+  schemaDroits,
   exigerGestionDesOrganisateurs,
 } from '../../../../utils/organisateurs-evenement'
 
@@ -21,11 +22,7 @@ const schema = z.object({
   identifiant: z.string().trim().min(1, 'Indiquez une adresse e-mail ou un pseudo').max(191),
   prenom: z.string().trim().max(100).optional(),
   nom: z.string().trim().max(100).optional(),
-  droits: z.object({
-    modifier: z.boolean(),
-    organisateurs: z.boolean(),
-    benevoles: z.boolean(),
-  }),
+  droits: schemaDroits,
 })
 
 export default defineEventHandler(async (event) => {

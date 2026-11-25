@@ -1,4 +1,9 @@
-import { droitsSurEvenement, gestionOuverte } from '../../../utils/droits-evenement'
+import {
+  droitsSurEvenement,
+  gestionOuverte,
+  modulesAffiches,
+  selectionModules,
+} from '../../../utils/droits-evenement'
 import { idDepuisLaRoute } from '../../../utils/evenement-public'
 
 /**
@@ -23,7 +28,7 @@ export default defineEventHandler(async (event) => {
       startDate: true,
       endDate: true,
       timezone: true,
-      volunteersEnabled: true,
+      ...selectionModules,
       volunteerSettings: { select: { open: true, pagePublic: true } },
       _count: { select: { editionOrganizers: true } },
     },
@@ -65,7 +70,7 @@ export default defineEventHandler(async (event) => {
     },
     droits,
     abonnementActif: await gestionOuverte(eventId, userId),
-    modules: { benevoles: evenement.volunteersEnabled },
+    modules: modulesAffiches(evenement),
     organisateurs: evenement._count.editionOrganizers,
     benevoles,
   }

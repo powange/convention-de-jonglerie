@@ -3,36 +3,46 @@
  *
  * - le PROPRIÉTAIRE (créateur) peut tout, et lui seul (avec un administrateur) supprime ;
  * - un ORGANISATEUR déclaré (`EditionOrganizer`) voit la gestion, et a les droits par domaine
- *   qu'on lui a donnés : modifier l'événement, gérer les organisateurs, gérer les bénévoles ;
+ *   qu'on lui a donnés (la liste : `DROITS_PAR_DOMAINE`, shared/modules-evenement.ts) ;
  * - un ADMINISTRATEUR global peut tout.
  *
  * Abonnement (décision de l'utilisateur) : c'est celui du PROPRIÉTAIRE qui ouvre la gestion de
  * l'événement, à lui comme à ses organisateurs ; un organisateur n'a pas besoin du sien.
  */
+import type { ColonneDroit, ColonneModule, Droits, Modules } from '../../shared/modules-evenement'
+
+import { DROITS_PAR_DOMAINE, MODULES_EVENEMENT } from '../../shared/modules-evenement'
 import { getActiveSubscription } from './subscription'
 
-export interface DroitsEvenement {
+export type DroitsEvenement = Droits & {
   /** Voir l'événement et sa gestion. */
   voir: boolean
-  /** Modifier ses informations (nom, lieu, dates, fuseau…). */
-  modifier: boolean
-  /** Ajouter, retirer des organisateurs et régler leurs droits. */
-  organisateurs: boolean
-  /** Gérer les bénévoles (tout le module). */
-  benevoles: boolean
   /** Le supprimer, avec toutes ses données. */
   supprimer: boolean
   estProprietaire: boolean
 }
 
-const AUCUN: DroitsEvenement = {
+/** Les colonnes d'activation de tous les modules, pour un `select` Prisma. */
+export const selectionModules = Object.fromEntries(
+  MODULES_EVENEMENT.map((m) => [m.colonne, true])
+) as Record<ColonneModule, true>
+
+/** Les modules actifs, dans le vocabulaire de l'API (`{ benevoles: true, stock: false… }`). */
+export function modulesAffiches(e: Record<ColonneModule, boolean>): Modules {
+  return Object.fromEntries(MODULES_EVENEMENT.map((m) => [m.cle, e[m.colonne]])) as Modules
+}
+
+/** Les colonnes de tous les droits par domaine, pour un `select` Prisma. */
+export const selectionDroits = Object.fromEntries(
+  DROITS_PAR_DOMAINE.map((d) => [d.colonne, true])
+) as Record<ColonneDroit, true>
+
+const AUCUN = {
+  ...(Object.fromEntries(DROITS_PAR_DOMAINE.map((d) => [d.cle, false])) as Droits),
   voir: false,
-  modifier: false,
-  organisateurs: false,
-  benevoles: false,
   supprimer: false,
   estProprietaire: false,
-}
+} satisfies DroitsEvenement
 
 export async function droitsSurEvenement(
   eventId: number,
@@ -43,17 +53,18 @@ export async function droitsSurEvenement(
     prisma.user.findUnique({ where: { id: userId }, select: { isGlobalAdmin: true } }),
     prisma.editionOrganizer.findFirst({
       where: { editionId: eventId, organizer: { userId } },
-      select: { canEditEvent: true, canManageOrganizers: true, canManageVolunteers: true },
+      select: selectionDroits,
     }),
   ])
   if (!evenement) return AUCUN
   const estProprietaire = evenement.ownerId === userId
   const tout = estProprietaire || !!utilisateur?.isGlobalAdmin
+  const parDomaine = Object.fromEntries(
+    DROITS_PAR_DOMAINE.map((d) => [d.cle, tout || !!organisateur?.[d.colonne]])
+  ) as Droits
   return {
+    ...parDomaine,
     voir: tout || !!organisateur,
-    modifier: tout || !!organisateur?.canEditEvent,
-    organisateurs: tout || !!organisateur?.canManageOrganizers,
-    benevoles: tout || !!organisateur?.canManageVolunteers,
     supprimer: tout,
     estProprietaire,
   }
