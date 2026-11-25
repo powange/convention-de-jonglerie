@@ -4,7 +4,7 @@ import {
   AUCUNE_COLONNE_MASQUEE,
   colonnesMasqueesDepuisUrl,
   colonnesMasqueesVersUrl,
-} from '../../../app/utils/colonnes-url'
+} from '#ui-commun/app/utils/colonnes-url'
 
 const MASQUABLES = ['createdAt', 'user', 'referer', 'ip']
 

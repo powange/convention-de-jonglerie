@@ -3,8 +3,8 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { ICONE_DE_MODULE } from '~/utils/couleurs-de-module'
-import { moduleDeGestion } from '~/utils/modules-de-gestion'
+import { ICONE_DE_MODULE } from '#ui-commun/app/utils/couleurs-de-module'
+import { moduleDeGestion } from '#ui-commun/app/utils/modules-de-gestion'
 
 /**
  * Aucune page de gestion ne doit afficher son icône DEUX FOIS.

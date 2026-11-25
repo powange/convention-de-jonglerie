@@ -7,7 +7,7 @@ import {
   selectionDepuisUrl,
   selectionVersUrl,
   valeurDepuisUrl,
-} from '~~/shared/utils/filtres-url'
+} from '#core/shared/utils/filtres-url'
 
 /**
  * Les réglages des graphiques de statistiques, dans l'URL.

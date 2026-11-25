@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
  * Dans le projet `unit`, qui tourne SANS Nuxt, l'import échoue au chargement — « Tests: no tests »,
  * et aucune assertion ne s'exécute.
  */
-import { enTeteTriable } from '../../../app/utils/en-tete-triable'
+import { enTeteTriable } from '#ui-commun/app/utils/en-tete-triable'
 
 /**
  * L'en-tête triable, partagé — et les trois états qu'il doit distinguer.

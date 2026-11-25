@@ -173,11 +173,12 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { categorieDeGestion } from '~/utils/categories-de-gestion'
-import { ICONE_DE_MODULE_DANS_UN_LIEN } from '~/utils/couleurs-de-module'
 import { getEditionDisplayName } from '~/utils/editionName'
-import { moduleDeGestion } from '~/utils/modules-de-gestion'
 
 import type { NavigationMenuItem } from '@nuxt/ui'
+
+import { ICONE_DE_MODULE_DANS_UN_LIEN } from '#ui-commun/app/utils/couleurs-de-module'
+import { moduleDeGestion } from '#ui-commun/app/utils/modules-de-gestion'
 
 const route = useRoute()
 const authStore = useAuthStore()

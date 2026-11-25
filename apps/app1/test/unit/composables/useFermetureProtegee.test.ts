@@ -9,7 +9,7 @@ vi.stubGlobal('ref', ref)
 vi.stubGlobal('computed', computed)
 vi.stubGlobal('useConfirmation', useConfirmation)
 
-const { useFermetureProtegee } = await import('../../../app/composables/useFermetureProtegee')
+const { useFermetureProtegee } = await import('#ui-commun/app/composables/useFermetureProtegee')
 
 /**
  * Fermer une modale sans perdre une saisie non enregistrée.

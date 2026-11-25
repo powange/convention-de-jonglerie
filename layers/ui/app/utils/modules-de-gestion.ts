@@ -1,4 +1,4 @@
-import type { CouleurDeModule } from '~/utils/couleurs-de-module'
+import type { CouleurDeModule } from '#ui-commun/app/utils/couleurs-de-module'
 
 /**
  * Ce qui identifie visuellement chaque module de gestion : son icône et sa couleur.

@@ -4,8 +4,8 @@ import {
   COULEURS_DE_MODULE,
   FOND_DE_MODULE,
   ICONE_DE_MODULE,
-} from '../../../app/utils/couleurs-de-module'
-import { MODULES_DE_GESTION, moduleDeGestion } from '../../../app/utils/modules-de-gestion'
+} from '#ui-commun/app/utils/couleurs-de-module'
+import { MODULES_DE_GESTION, moduleDeGestion } from '#ui-commun/app/utils/modules-de-gestion'
 
 /**
  * Le registre est la seule source de l'icône et de la couleur d'un module.

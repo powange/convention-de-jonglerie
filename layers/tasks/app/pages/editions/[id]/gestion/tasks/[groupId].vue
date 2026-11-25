@@ -342,8 +342,8 @@
 // Composant frère du même layer → import relatif (le type n'est pas exposé par #components).
 import type { TaskFiltersValue, TaskSort } from '../../../../../components/tasks/TaskFilters.vue'
 
+import { valeurDepuisUrl } from '#core/shared/utils/filtres-url'
 import { filtrerParEcheance, type FiltreEcheance } from '~~/shared/utils/filtre-echeance-taches'
-import { valeurDepuisUrl } from '~~/shared/utils/filtres-url'
 import { nomAffichableDUnCompte } from '~~/shared/utils/nom-affichable'
 import { contientLaSaisie } from '~~/shared/utils/recherche-texte'
 
