@@ -5,7 +5,7 @@ import { ref, computed } from 'vue'
 vi.stubGlobal('ref', ref)
 vi.stubGlobal('computed', computed)
 
-import { useConfirmation } from '../../../app/composables/useConfirmation'
+import { useConfirmation } from '#ui-commun/app/composables/useConfirmation'
 
 /** Une promesse qu'on résout à la main, pour observer l'état PENDANT l'action. */
 function promesseSuspendue() {

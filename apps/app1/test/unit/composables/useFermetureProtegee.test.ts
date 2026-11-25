@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { ref, computed } from 'vue'
 
-import { useConfirmation } from '../../../app/composables/useConfirmation'
+import { useConfirmation } from '#ui-commun/app/composables/useConfirmation'
 
 // Auto-imports Nuxt employés par le composable. `useConfirmation` est le VRAI : c'est son
 // interaction avec la fermeture qu'on veut éprouver, pas un bouchon qui dirait toujours oui.

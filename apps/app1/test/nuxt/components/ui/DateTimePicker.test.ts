@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
-import DateTimePicker from '../../../../app/components/ui/DateTimePicker.vue'
+import DateTimePicker from '#ui-commun/app/components/ui/DateTimePicker.vue'
 
 // Mock useI18n pour éviter les problèmes d'initialisation
 mockNuxtImport('useI18n', () => () => ({

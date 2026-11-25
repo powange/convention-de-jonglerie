@@ -5,5 +5,15 @@
 // autres layers, tous rattachés à un domaine — et la règle qui décide de ce qu'on y met : si
 // l'explication d'un fichier a besoin du mot « édition », il n'a rien à y faire.
 //
-// Premier occupant : les pastilles de compteur du menu de navigation.
-export default defineNuxtConfig({})
+// Occupants : les pastilles de compteur du menu de navigation, puis les composants `Ui*` génériques
+// (avatar, nom d'utilisateur, confirmations, sélecteurs de date et de couleur, téléphone…) dont le
+// layer bénévoles se sert, avec leurs composables et utilitaires. Ils vivaient dans app1 ; Flowvent
+// (app2) doit les recevoir sans la recopier. Alias `#ui-commun` pour les imports explicites.
+import { fileURLToPath } from 'node:url'
+
+export default defineNuxtConfig({
+  alias: {
+    // Pas `#ui` : Nuxt UI s'en sert déjà (`#ui/types`, `#ui/components/…`).
+    '#ui-commun': fileURLToPath(new URL('./', import.meta.url)),
+  },
+})

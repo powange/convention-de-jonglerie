@@ -1,7 +1,7 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it } from 'vitest'
 
-import ConfirmModal from '../../../../app/components/ui/ConfirmModal.vue'
+import ConfirmModal from '#ui-commun/app/components/ui/ConfirmModal.vue'
 import QuotasList from '../../../../../../layers/ticketing/app/components/ticketing/QuotasList.vue'
 
 /**

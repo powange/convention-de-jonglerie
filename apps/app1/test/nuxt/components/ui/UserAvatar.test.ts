@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import UserAvatar from '../../../../app/components/ui/UserAvatar.vue'
+import UserAvatar from '#ui-commun/app/components/ui/UserAvatar.vue'
 
 describe('UserAvatar', () => {
   it('monte le composant avec succès', async () => {

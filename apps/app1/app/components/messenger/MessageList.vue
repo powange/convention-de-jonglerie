@@ -172,9 +172,9 @@
 <script setup lang="ts">
 import type { ConversationMessage, ConversationParticipant } from '~/composables/useMessenger'
 import { useAuthStore } from '~/stores/auth'
-import { useAvatar } from '~/utils/avatar'
 import { toIntlLocale } from '~/utils/locales'
 
+import { useAvatar } from '#ui-commun/app/utils/avatar'
 import { messageEncoreModifiable } from '~~/shared/utils/message-modifiable'
 
 /**

@@ -334,11 +334,12 @@
 </template>
 
 <script setup lang="ts">
-import ConfirmModal from '~/components/ui/ConfirmModal.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
 import { useTicketingCounter } from '#imports'
+
+import ConfirmModal from '#ui-commun/app/components/ui/ConfirmModal.vue'
 
 const route = useRoute()
 const router = useRouter()

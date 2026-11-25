@@ -19,7 +19,7 @@ const faux = vi.hoisted(() => ({
 }))
 vi.mock('~/stores/auth', () => ({ useAuthStore: () => faux }))
 
-import AccesRefuse from '../../../app/components/ui/AccesRefuse.vue'
+import AccesRefuse from '#ui-commun/app/components/ui/AccesRefuse.vue'
 
 /**
  * Le refus d'accès, et le raccourci de l'administrateur.

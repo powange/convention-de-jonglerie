@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Confirmation } from '~/composables/useConfirmation'
+import type { Confirmation } from '#ui-commun/app/composables/useConfirmation'
 
 /**
  * La modale que `useConfirmation` pilote — une ligne de gabarit par écran.
