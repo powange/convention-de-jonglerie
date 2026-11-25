@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { BOM_UTF8 } from '../../../shared/utils/csv'
+import { BOM_UTF8 } from '#core/shared/utils/csv'
 import {
   COLONNES_A_IMPRIMER,
   COLONNES_CANDIDATURES,

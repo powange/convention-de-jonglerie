@@ -1,4 +1,4 @@
-import { createLogger } from '#server/utils/logger'
+import { createLogger } from '#core/server/utils/logger'
 
 /**
  * Utilitaire pour gérer les interactions avec l'API HelloAsso

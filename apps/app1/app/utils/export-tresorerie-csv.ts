@@ -1,6 +1,6 @@
 import { regrouperParCode, type LigneTresorerie } from './export-tresorerie'
 
-import { versCsv } from '~~/shared/utils/csv'
+import { versCsv } from '#core/shared/utils/csv'
 import { fromCents } from '~~/shared/utils/money'
 
 /**

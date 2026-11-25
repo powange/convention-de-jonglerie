@@ -4,7 +4,7 @@
 
 import type { ComputedRef, Ref } from 'vue'
 
-import { formaterJournee } from '~~/shared/utils/fuseau-edition'
+import { formaterJournee } from '#core/shared/utils/fuseau-edition'
 
 // Types
 export type MealType = 'BREAKFAST' | 'LUNCH' | 'DINNER'

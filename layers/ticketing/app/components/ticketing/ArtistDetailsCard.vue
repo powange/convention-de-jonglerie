@@ -152,7 +152,7 @@
 <script setup lang="ts">
 import type TicketingUserInfoSection from './TicketingUserInfoSection.vue'
 
-import { formaterDateHeure, formaterJournee } from '~~/shared/utils/fuseau-edition'
+import { formaterDateHeure, formaterJournee } from '#core/shared/utils/fuseau-edition'
 
 // Utiliser le composable pour obtenir la configuration des artistes
 const { getParticipantTypeConfig } = useParticipantTypes()

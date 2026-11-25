@@ -388,8 +388,8 @@ import { useEditionStore } from '~/stores/editions'
 
 import { useVolunteerSettings } from '#imports'
 
-import { premierJourDeSemaine } from '~~/shared/utils/semaine'
-import { estUrlExterne } from '~~/shared/utils/url-externe'
+import { premierJourDeSemaine } from '#core/shared/utils/semaine'
+import { estUrlExterne } from '#core/shared/utils/url-externe'
 
 // La semaine commence le lundi en France, le dimanche ailleurs : la valeur suit la langue de qui
 // regarde plutôt que d'être figée. Sans elle, `UCalendar` démarre toujours le dimanche.

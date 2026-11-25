@@ -742,7 +742,7 @@
 </template>
 
 <script setup lang="ts">
-import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
+import { fuseauUtilisable } from '#core/shared/utils/fuseau-edition'
 
 interface Props {
   editionId: number

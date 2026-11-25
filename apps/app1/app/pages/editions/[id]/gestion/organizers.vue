@@ -440,14 +440,14 @@ import {
   ligneDUnOrganisateur,
   organisateursEnCsv,
 } from '~/utils/export-organisateurs'
-import { exporterTableauEnPdf } from '~/utils/export-pdf-tableau'
 import { summarizeRights } from '~/utils/organizerRights'
-import { telechargerFichier } from '~/utils/telechargement'
 
 import type { TableColumn } from '@nuxt/ui'
 
-import { estAdresseEmail } from '~~/shared/utils/adresse-email'
-import { nomDeFichierCsv } from '~~/shared/utils/csv'
+import { exporterTableauEnPdf } from '#core/app/utils/export-pdf-tableau'
+import { telechargerFichier } from '#core/app/utils/telechargement'
+import { estAdresseEmail } from '#core/shared/utils/adresse-email'
+import { nomDeFichierCsv } from '#core/shared/utils/csv'
 import { couleurDuRole } from '~~/shared/utils/roles-edition'
 
 // Sans ce garde, la page se rendait côté serveur pour un visiteur anonyme, puis affichait

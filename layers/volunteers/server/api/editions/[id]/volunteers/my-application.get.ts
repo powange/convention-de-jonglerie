@@ -1,12 +1,12 @@
 import { avecCoequipiers, coequipiersSelect } from '../../../../utils/coequipiers-creneau'
 import { visibiliteDuPlanning } from '../../../../utils/planning-publie'
 
+import { infosPersonnelles, infosPersonnellesSelect } from '#core/server/utils/infos-personnelles'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { infosPersonnelles, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { estHorsDesComptes, estReserve } from '~~/shared/utils/benevoles-volants'
+import { estHorsDesComptes, estReserve } from '#volunteers/shared/utils/benevoles-volants'
 
 /**
  * Récupère la candidature de bénévolat de l'utilisateur connecté pour une édition

@@ -115,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import { formatDate } from '~/utils/date'
+import { formatDate } from '#core/app/utils/date'
 
 interface Confirmation {
   id: string

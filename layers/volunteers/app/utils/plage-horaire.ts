@@ -1,4 +1,4 @@
-import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
+import { fuseauUtilisable } from '#core/shared/utils/fuseau-edition'
 
 /**
  * L'heure et la durée d'un créneau, dites d'une seule façon.

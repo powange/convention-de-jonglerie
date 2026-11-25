@@ -163,7 +163,7 @@ import { refDebounced } from '@vueuse/core'
 
 import type { TableColumn } from '@nuxt/ui'
 
-import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+import { formaterDateHeure } from '#core/shared/utils/fuseau-edition'
 
 /**
  * L'historique complet des mouvements d'entrée.

@@ -18,7 +18,7 @@ vi.mock('#server/utils/organizer-management', () => ({
   canManageEditionVolunteers: async () => true,
 }))
 
-vi.mock('#server/utils/infos-personnelles', () => ({
+vi.mock('#core/server/utils/infos-personnelles', () => ({
   infosPersonnellesSelect: {},
   infosPersonnelles: () => ({}),
 }))

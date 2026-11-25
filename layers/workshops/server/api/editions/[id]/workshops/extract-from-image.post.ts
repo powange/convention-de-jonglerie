@@ -1,5 +1,6 @@
 import { ancrerCreneauSurJournee, estJourneeValide } from '../../../../utils/ancrage-journee'
 
+import { journeesEntre } from '#core/shared/utils/fuseau-edition'
 import { getEffectiveAIConfigAsync, serveursLmStudio } from '#server/utils/ai-config'
 import { createAIProvider, type ExtractedWorkshop } from '#server/utils/ai-providers'
 import { wrapApiHandler } from '#server/utils/api-helpers'
@@ -7,7 +8,6 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { canManageWorkshopLocations } from '#server/utils/permissions/workshop-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { useWorkshopsPorts } from '#server/workshops/ports/registry'
-import { journeesEntre } from '~~/shared/utils/fuseau-edition'
 
 export default wrapApiHandler(
   async (event) => {

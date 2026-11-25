@@ -1,11 +1,7 @@
 import { describe, it, expect } from 'vitest'
 
 // Import statique pour optimiser les performances
-import {
-  convertirRaccourcisEmoji,
-  markdownEnTexte,
-  markdownToHtml,
-} from '../../../app/utils/markdown'
+import { convertirRaccourcisEmoji, markdownEnTexte, markdownToHtml } from '#core/app/utils/markdown'
 
 describe('markdownToHtml', () => {
   it('rend du HTML simple', async () => {

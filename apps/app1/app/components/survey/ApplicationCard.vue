@@ -104,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { markdownToHtml } from '~/utils/markdown'
+import { markdownToHtml } from '#core/app/utils/markdown'
 
 interface SurveyApplication {
   id: number

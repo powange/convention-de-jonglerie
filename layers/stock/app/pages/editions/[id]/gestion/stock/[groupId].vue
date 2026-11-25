@@ -768,8 +768,6 @@ import {
   tableauAExporter,
   type ColonneExportable,
 } from '~/utils/colonnes-a-exporter'
-import { dessinerCaseACocher, ENTETE_COCHE, styleColonneCoche } from '~/utils/pdf-case-a-cocher'
-import { telechargerFichier } from '~/utils/telechargement'
 
 import { useAuthStore, useEditionStore } from '#imports'
 
@@ -808,7 +806,13 @@ import { filtrerParLieuEmprunt, filtrerParNom } from '../../../../../utils/reche
 
 import type { TableColumn } from '@nuxt/ui'
 
-import { versCsv } from '~~/shared/utils/csv'
+import {
+  dessinerCaseACocher,
+  ENTETE_COCHE,
+  styleColonneCoche,
+} from '#core/app/utils/pdf-case-a-cocher'
+import { telechargerFichier } from '#core/app/utils/telechargement'
+import { versCsv } from '#core/shared/utils/csv'
 
 definePageMeta({
   layout: 'edition-dashboard',

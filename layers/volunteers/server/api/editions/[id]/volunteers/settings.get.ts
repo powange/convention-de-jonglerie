@@ -3,8 +3,8 @@ import { droitsSurLaConfiguration } from '../../../../utils/acces-configuration-
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { optionalAuth } from '#server/utils/auth-utils'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { visibiliteDuBenevolat } from '#server/utils/visibilite-benevoles'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+import { visibiliteDuBenevolat } from '#volunteers/server/utils/visibilite-benevoles'
 
 /**
  * GET .../volunteers/settings — la configuration bénévole d'une édition.

@@ -1,4 +1,4 @@
-import type { PeriodeEdition } from '~~/shared/utils/presence-edition'
+import type { PeriodeEdition } from '#core/shared/utils/presence-edition'
 
 import { editionSurPlace, RAYON_SUR_PLACE_KM } from '~~/shared/utils/geolocalisation'
 

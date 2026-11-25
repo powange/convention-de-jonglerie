@@ -6,7 +6,7 @@ import {
   nomDeFichierCsv,
   ressembleAUneFormule,
   versCsv,
-} from '../../../shared/utils/csv'
+} from '#core/shared/utils/csv'
 
 /**
  * Le CSV que les organisateurs ouvrent dans un tableur.

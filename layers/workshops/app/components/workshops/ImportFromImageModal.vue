@@ -265,7 +265,7 @@ import {
   journeesEntre,
   versChampLocal,
   versInstant,
-} from '~~/shared/utils/fuseau-edition'
+} from '#core/shared/utils/fuseau-edition'
 
 const { t, locale } = useI18n()
 const toast = useToast()

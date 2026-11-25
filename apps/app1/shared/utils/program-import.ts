@@ -9,7 +9,7 @@
  * Ce fichier ne touche ni au réseau ni à la base : il se teste sur des tableaux.
  */
 
-import { HEURE_BASCULE_JOURNEE, journeeDans, versInstant } from './fuseau-edition'
+import { HEURE_BASCULE_JOURNEE, journeeDans, versInstant } from '#core/shared/utils/fuseau-edition'
 
 /**
  * Un élément tel que le modèle vient de le lire, avant tout ancrage.

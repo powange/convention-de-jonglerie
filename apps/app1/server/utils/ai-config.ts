@@ -1,8 +1,9 @@
 import { budgetDeContenu } from './budget-de-contenu'
 import { contexteDuModele, type ModeleLocal } from './contexte-du-modele-local'
-import { loggers } from './logger'
 
 import type { ServeurModele } from './fetch-helpers'
+
+import { loggers } from '#core/server/utils/logger'
 
 const log = loggers.aiConfig
 

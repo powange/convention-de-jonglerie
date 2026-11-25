@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { cleDeBoiteDeReception } from '../../../shared/utils/adresse-email'
+import { cleDeBoiteDeReception } from '#core/shared/utils/adresse-email'
 import {
   cleDuTitre,
   meriteUnGesteGroupe,

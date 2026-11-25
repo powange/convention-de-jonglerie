@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { destinationSurPlace, periodeEdition } from '../../../shared/utils/presence-edition'
+import { destinationSurPlace, periodeEdition } from '#core/shared/utils/presence-edition'
 
 const d = (iso: string) => new Date(iso)
 

@@ -24,7 +24,7 @@ vi.mock('#server/utils/organizer-management', () => ({
   canManageEditionVolunteers: mockPeutGerer,
 }))
 
-vi.mock('#server/utils/infos-personnelles', () => ({
+vi.mock('#core/server/utils/infos-personnelles', () => ({
   infosPersonnelles: (app: any) => app,
   infosPersonnellesSelect: {},
 }))

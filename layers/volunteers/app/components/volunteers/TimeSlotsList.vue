@@ -84,8 +84,6 @@
 </template>
 
 <script setup lang="ts">
-import { formatDurationCompact } from '~/utils/date'
-
 import { genererIcs } from '../../utils/export-ics'
 import {
   lignesDePlanning,
@@ -94,7 +92,8 @@ import {
   type CreneauDePlanning,
 } from '../../utils/planning-pdf'
 
-import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
+import { formatDurationCompact } from '#core/app/utils/date'
+import { fuseauUtilisable } from '#core/shared/utils/fuseau-edition'
 
 interface TimeSlot {
   id: string

@@ -76,7 +76,7 @@ import {
   type SerieDeGraphique,
 } from '../../../utils/motifs-graphiques'
 
-import { formaterJournee } from '~~/shared/utils/fuseau-edition'
+import { formaterJournee } from '#core/shared/utils/fuseau-edition'
 
 /**
  * L'affluence : combien de PERSONNES sont sur place, tranche par tranche, et à quel titre.

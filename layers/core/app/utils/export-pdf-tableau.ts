@@ -3,7 +3,7 @@ import {
   entetesAvecCoche,
   lignesAvecCoche,
   styleColonneCoche,
-} from './pdf-case-a-cocher'
+} from '#core/app/utils/pdf-case-a-cocher'
 
 /**
  * Un tableau de gestion, mis en page pour l'impression.

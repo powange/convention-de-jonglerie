@@ -504,7 +504,7 @@
 import { useDebounce } from '~/composables/useDebounce'
 import type { Convention } from '~/types'
 
-import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
+import { fuseauUtilisable } from '#core/shared/utils/fuseau-edition'
 
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()

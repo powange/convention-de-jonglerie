@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { formatDate } from '~/utils/date'
+import { formatDate } from '#core/app/utils/date'
 
 /**
  * La lecture est confirmée dès l'ouverture de la page : c'est le clic sur le lien de la

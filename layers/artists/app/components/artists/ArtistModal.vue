@@ -680,17 +680,17 @@
 <script setup lang="ts">
 import { z } from 'zod'
 
-import type { AllergySeverityLevel } from '~/utils/allergy-severity'
-
 import { getAccommodationTypeSelectOptions, getAllergySeveritySelectOptions } from '#imports'
 
-import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+import type { AllergySeverityLevel } from '#core/app/utils/allergy-severity'
+
+import { estAdresseEmail } from '#core/shared/utils/adresse-email'
+import { versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
 import {
   bicEstPlausible,
   formaterIbanParGroupes,
   ibanEstPlausible,
 } from '~~/shared/utils/coordonnees-bancaires'
-import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
 import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
 
 const props = defineProps<{

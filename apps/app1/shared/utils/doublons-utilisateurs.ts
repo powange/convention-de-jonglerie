@@ -1,4 +1,4 @@
-import { cleDeBoiteDeReception } from './adresse-email'
+import { cleDeBoiteDeReception } from '#core/shared/utils/adresse-email'
 
 /**
  * Rapprocher les comptes qui semblent appartenir à une même personne.

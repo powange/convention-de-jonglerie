@@ -1,10 +1,10 @@
+import { generateSecureToken } from '#core/server/utils/token-generator'
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import {
   getEditionWithPermissions,
   canManageArtists,
 } from '#server/utils/permissions/edition-permissions'
-import { generateSecureToken } from '#server/utils/token-generator'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(

@@ -1,4 +1,4 @@
-import { fuseauUtilisable, journeeDans, versInstant } from '~~/shared/utils/fuseau-edition'
+import { fuseauUtilisable, journeeDans, versInstant } from '#core/shared/utils/fuseau-edition'
 
 export interface DateFormatOptions {
   locale?: string

@@ -161,11 +161,11 @@ import type { VolunteerTimeSlot } from '#imports'
 
 import { decalageTraduisible, horairesEffectifs } from '../../../../utils/retard-creneau'
 
+import { formaterDateHeure } from '#core/shared/utils/fuseau-edition'
 import {
   RETARD_MINUTES_MAX,
   RETARD_MINUTES_MIN,
 } from '#volunteers/shared/utils/bornes-retard-creneau'
-import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
 
 // Props
 interface Props {

@@ -175,7 +175,11 @@
 <script setup lang="ts">
 import type TicketingUserInfoSection from './TicketingUserInfoSection.vue'
 
-import { formaterDateHeure, formaterHeure, formaterJournee } from '~~/shared/utils/fuseau-edition'
+import {
+  formaterDateHeure,
+  formaterHeure,
+  formaterJournee,
+} from '#core/shared/utils/fuseau-edition'
 
 // Utiliser le composable pour obtenir la configuration des bénévoles
 const { getParticipantTypeConfig } = useParticipantTypes()

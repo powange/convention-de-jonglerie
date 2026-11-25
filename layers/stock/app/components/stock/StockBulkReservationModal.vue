@@ -152,7 +152,7 @@
 </template>
 
 <script setup lang="ts">
-import { journeeDans, versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
+import { journeeDans, versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
 import { getZoneTypeColor, getZoneTypeIcon } from '~~/shared/utils/zone-types'
 
 interface BulkItem {

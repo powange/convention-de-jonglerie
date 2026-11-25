@@ -12,7 +12,7 @@
  * d'un mois n'a que faire du jour de la semaine, et une tranche d'une semaine porte un MOT que
  * `toLocaleString` ne sait pas ajouter. Posée ici, la règle est éprouvée sans monter Chart.js.
  */
-import { formaterJournee } from '~~/shared/utils/fuseau-edition'
+import { formaterJournee } from '#core/shared/utils/fuseau-edition'
 
 /**
  * Les options de mise en forme d'une tranche, pour une granularité.

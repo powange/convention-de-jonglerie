@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { adresseEmailNormalisee, estAdresseEmail } from '../../../shared/utils/adresse-email'
+import { adresseEmailNormalisee, estAdresseEmail } from '#core/shared/utils/adresse-email'
 
 /**
  * L'interface vérifiait l'adresse avec une expression maison, le serveur avec `zod`. Les deux ne

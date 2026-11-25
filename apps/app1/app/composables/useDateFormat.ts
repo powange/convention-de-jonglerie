@@ -1,6 +1,6 @@
 import { toIntlLocale } from '~/utils/locales'
 
-import { fuseauUtilisable, journeeDans } from '~~/shared/utils/fuseau-edition'
+import { fuseauUtilisable, journeeDans } from '#core/shared/utils/fuseau-edition'
 
 /**
  * Composable pour formatter les dates avec horaires

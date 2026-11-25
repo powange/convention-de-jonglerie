@@ -502,14 +502,15 @@
 </template>
 
 <script setup lang="ts">
+import { LOCALES_CONFIG, languageCodeToFlag } from '~/utils/locales'
+
 import {
   getAllergySeverityBadgeClasses,
   getAllergySeverityInfo,
   getAllergySeveritySelectOptions,
   isValidAllergySeverityLevel,
-} from '~/utils/allergy-severity'
-import { formatDate } from '~/utils/date'
-import { LOCALES_CONFIG, languageCodeToFlag } from '~/utils/locales'
+} from '#core/app/utils/allergy-severity'
+import { formatDate } from '#core/app/utils/date'
 // Type pour l'utilisateur depuis l'API
 interface UserProfile {
   id: number

@@ -562,7 +562,8 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { EditionShowCallBasic, ShowApplication, ShowApplicationStatus } from '~/types'
-import { markdownToHtml } from '~/utils/markdown'
+
+import { markdownToHtml } from '#core/app/utils/markdown'
 
 definePageMeta({
   middleware: ['auth-protected'],

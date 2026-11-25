@@ -11,7 +11,7 @@ import {
   journeesEntre,
   versChampLocal,
   versInstant,
-} from '../../../shared/utils/fuseau-edition'
+} from '#core/shared/utils/fuseau-edition'
 
 /**
  * Les fuseaux sont nommés explicitement dans chaque cas : un test qui s'appuierait sur celui de la

@@ -1,7 +1,7 @@
+import { infosAlimentaires, infosPersonnellesSelect } from '#core/server/utils/infos-personnelles'
 import { useMealsPorts } from '#server/meals/ports/registry'
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { infosAlimentaires, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { canManageMealsById } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validatePagination } from '#server/utils/validation-helpers'
 

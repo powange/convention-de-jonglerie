@@ -1,6 +1,6 @@
 import { formatUserFullName } from './pronouns'
 
-import { versCsv } from '~~/shared/utils/csv'
+import { versCsv } from '#core/shared/utils/csv'
 
 /**
  * Les organisateurs d'une édition, en CSV.

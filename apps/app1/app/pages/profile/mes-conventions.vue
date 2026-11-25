@@ -252,7 +252,7 @@ import type {
 import type { OrganizerRightsFormData } from '~/types/organizer'
 import { getEditionDisplayNameWithConvention } from '~/utils/editionName'
 
-import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+import { estAdresseEmail } from '#core/shared/utils/adresse-email'
 
 // Charger les traductions du fichier edition.json pour les clés edition.*
 await useLazyI18n('edition')

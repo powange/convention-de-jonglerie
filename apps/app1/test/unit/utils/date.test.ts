@@ -8,7 +8,7 @@ import {
   formatDateTimeLocal,
   addHoursToDateTimeLocal,
   formatDurationCompact,
-} from '../../../app/utils/date'
+} from '#core/app/utils/date'
 
 describe('date utils', () => {
   describe('formatDate', () => {

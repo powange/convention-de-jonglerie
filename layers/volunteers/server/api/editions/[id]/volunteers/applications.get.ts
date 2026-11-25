@@ -3,9 +3,9 @@ import { classementDesCandidatures, sensDeTri } from '../../../../utils/tri-cand
 import type { Prisma } from '#server/types/prisma'
 import type { VolunteerApplicationWhereInput } from '#server/types/prisma-helpers'
 
+import { infosPersonnelles, infosPersonnellesSelect } from '#core/server/utils/infos-personnelles'
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { infosPersonnelles, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId, validatePagination } from '#server/utils/validation-helpers'

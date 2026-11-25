@@ -12,7 +12,7 @@ vi.mock('#server/utils/auth-utils', () => ({
   requireAuth: (event: any) => event.context.user,
 }))
 
-vi.mock('#server/utils/infos-personnelles', () => ({
+vi.mock('#core/server/utils/infos-personnelles', () => ({
   infosPersonnellesSelect: {},
   infosPersonnelles: () => ({}),
 }))

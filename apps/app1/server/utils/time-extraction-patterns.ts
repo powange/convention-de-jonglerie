@@ -5,7 +5,7 @@
  * de début et de fin d'un événement depuis sa description.
  */
 
-import { loggers } from './logger'
+import { loggers } from '#core/server/utils/logger'
 
 const log = loggers.agent
 

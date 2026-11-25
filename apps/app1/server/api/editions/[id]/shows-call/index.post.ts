@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { schemaUrlExterne } from '#core/shared/utils/url-externe'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import {
@@ -7,7 +8,6 @@ import {
   canManageArtists,
 } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { schemaUrlExterne } from '~~/shared/utils/url-externe'
 
 const createShowCallSchema = z.object({
   name: z.string().min(1, 'Le nom est requis').max(100, 'Le nom est trop long'),

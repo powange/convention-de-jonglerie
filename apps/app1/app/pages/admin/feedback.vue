@@ -454,7 +454,7 @@
 <script setup lang="ts">
 import { shallowRef } from 'vue'
 
-import { formatDate } from '~/utils/date'
+import { formatDate } from '#core/app/utils/date'
 
 definePageMeta({
   // `auth-protected` D'ABORD : c'est lui qui attend la réponse du serveur sur la session.

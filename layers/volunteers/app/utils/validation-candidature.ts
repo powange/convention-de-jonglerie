@@ -14,7 +14,7 @@
  * tests unitaires, hors Nuxt.
  */
 
-import { telephoneCandidatureAcceptable } from '~~/shared/utils/telephone-candidature'
+import { telephoneCandidatureAcceptable } from '#volunteers/shared/utils/telephone-candidature'
 
 /** Longueur maximale de la motivation, telle que le champ la borne déjà. */
 export const MOTIVATION_MAX = 2000

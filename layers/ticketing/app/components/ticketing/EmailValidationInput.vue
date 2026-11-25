@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+import { estAdresseEmail } from '#core/shared/utils/adresse-email'
 
 const props = defineProps<{
   modelValue: string | null

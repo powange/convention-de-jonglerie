@@ -1,4 +1,4 @@
-import { versCsv } from '~~/shared/utils/csv'
+import { versCsv } from '#core/shared/utils/csv'
 
 /**
  * Le fichier des candidatures de bénévoles.

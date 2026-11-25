@@ -141,7 +141,7 @@ import {
   differeDuFuseauLecteur,
   formaterHeure,
   formaterJournee,
-} from '~~/shared/utils/fuseau-edition'
+} from '#core/shared/utils/fuseau-edition'
 import {
   estTermine,
   grouperParJournee,

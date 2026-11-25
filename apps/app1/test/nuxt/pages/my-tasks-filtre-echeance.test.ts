@@ -1,7 +1,7 @@
 import { mockNuxtImport, mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
-import { journeeDans } from '../../../shared/utils/fuseau-edition'
+import { journeeDans } from '#core/shared/utils/fuseau-edition'
 
 /**
  * Le BRANCHEMENT du filtre d'échéance, et son fuseau — constat B4.

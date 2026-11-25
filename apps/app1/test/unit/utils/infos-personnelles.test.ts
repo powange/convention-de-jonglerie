@@ -4,7 +4,7 @@ import {
   complementsPourLeProfil,
   infosPersonnelles,
   misesAJourDuProfil,
-} from '../../../server/utils/infos-personnelles'
+} from '#core/server/utils/infos-personnelles'
 
 /**
  * Le profil est la seule source.

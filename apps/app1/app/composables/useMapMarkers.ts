@@ -3,7 +3,7 @@ import type { Edition } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { createCustomMarkerIcon, escapeHtml, getEditionStatus } from '~/utils/mapMarkers'
 
-import { fuseauUtilisable, journeeDans } from '~~/shared/utils/fuseau-edition'
+import { fuseauUtilisable, journeeDans } from '#core/shared/utils/fuseau-edition'
 
 /**
  * Contexte pré-calculé et échappé fourni au callback de construction de popup.

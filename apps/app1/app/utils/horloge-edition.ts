@@ -1,4 +1,4 @@
-import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
+import { versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
 
 /**
  * Le pont entre un couple « calendrier + heure » et l'instant qu'on enregistre.

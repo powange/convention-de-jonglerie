@@ -6,7 +6,7 @@ import {
   organisateursEnCsv,
   type ColonnesOrganisateurs,
 } from '../../../app/utils/export-organisateurs'
-import { BOM_UTF8 } from '../../../shared/utils/csv'
+import { BOM_UTF8 } from '#core/shared/utils/csv'
 
 /**
  * L'export CSV des organisateurs.

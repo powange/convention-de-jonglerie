@@ -420,7 +420,7 @@ import {
   journeeDeProgramme,
   versChampLocal,
   versInstant,
-} from '~~/shared/utils/fuseau-edition'
+} from '#core/shared/utils/fuseau-edition'
 
 const route = useRoute()
 const editionStore = useEditionStore()

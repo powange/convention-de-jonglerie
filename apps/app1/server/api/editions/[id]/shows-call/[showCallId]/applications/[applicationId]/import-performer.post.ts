@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { generateVolunteerQrCodeToken } from '#core/server/utils/token-generator'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEmailHash } from '#server/utils/email-hash'
@@ -7,7 +8,6 @@ import {
   getEditionWithPermissions,
   canManageArtists,
 } from '#server/utils/permissions/edition-permissions'
-import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({

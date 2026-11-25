@@ -1,9 +1,9 @@
 import { DateTime } from 'luxon'
 
+import { fuseauUtilisable } from '#core/shared/utils/fuseau-edition'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { billetsQuiComptent, estUnParticipant } from '#server/utils/ticketing/billets-qui-comptent'
-import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
 
 export default wrapApiHandler(
   async (event) => {

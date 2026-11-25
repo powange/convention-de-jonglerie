@@ -9,7 +9,7 @@ import type { CalendarOptions, EventInput } from '@fullcalendar/core'
 import type { ResourceInput } from '@fullcalendar/resource'
 import type { ComputedRef, Ref } from 'vue'
 
-import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
+import { fuseauUtilisable } from '#core/shared/utils/fuseau-edition'
 
 // Type simplifié pour FullCalendar (compatible avec VolunteerTeam)
 export interface VolunteerTeamCalendar {

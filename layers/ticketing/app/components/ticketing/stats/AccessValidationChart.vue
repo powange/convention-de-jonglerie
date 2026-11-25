@@ -65,7 +65,7 @@ import {
   type SerieDeGraphique,
 } from '../../../utils/motifs-graphiques'
 
-import { formaterJournee } from '~~/shared/utils/fuseau-edition'
+import { formaterJournee } from '#core/shared/utils/fuseau-edition'
 
 // Enregistrer les composants Chart.js nécessaires
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)

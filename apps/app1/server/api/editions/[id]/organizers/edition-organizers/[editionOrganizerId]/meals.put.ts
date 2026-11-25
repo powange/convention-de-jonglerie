@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
-import { requireAuth } from '#server/utils/auth-utils'
 import {
   infosAlimentaires,
   infosPersonnellesSelect,
   misesAJourDuProfil,
-} from '#server/utils/infos-personnelles'
+} from '#core/server/utils/infos-personnelles'
+import { requireAuth } from '#server/utils/auth-utils'
 import { canManageMealsById } from '#server/utils/permissions/edition-permissions'
 
 const updateOrganizerMealsSchema = z.object({

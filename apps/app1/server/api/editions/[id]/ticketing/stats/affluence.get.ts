@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 
+import { fuseauUtilisable } from '#core/shared/utils/fuseau-edition'
 import {
   fenetreDeLArtiste,
   fenetreDeLOrganisateur,
@@ -17,7 +18,6 @@ import {
   tranchesDepuisBornes,
   type PresenceDeclaree,
 } from '~~/shared/utils/affluence'
-import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
 
 /**
  * L'AFFLUENCE : combien de personnes sont sur place à un instant donné.

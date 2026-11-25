@@ -377,7 +377,7 @@ import { benevolesAffectables } from '../../../../utils/benevoles-affectables'
 import { organisateursAffectables } from '../../../../utils/organisateurs-affectables'
 import { dureeTraduisible } from '../../../../utils/plage-horaire'
 
-import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+import { formaterDateHeure } from '#core/shared/utils/fuseau-edition'
 
 // Props
 interface Props {

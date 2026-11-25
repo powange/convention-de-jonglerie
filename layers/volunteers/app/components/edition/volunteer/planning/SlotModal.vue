@@ -269,7 +269,7 @@ import { z } from 'zod'
 
 import type { VolunteerTimeSlot, VolunteerTeam } from '#imports'
 
-import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
+import { versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
 
 // Props
 interface Props {

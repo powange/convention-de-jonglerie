@@ -308,7 +308,7 @@ import {
   getAllergySeverityInfo,
   getAllergySeverityBadgeClasses,
   requiresEmergencyContact,
-} from '~/utils/allergy-severity'
+} from '#core/app/utils/allergy-severity'
 
 interface ApplicationWithSettings {
   [key: string]: any

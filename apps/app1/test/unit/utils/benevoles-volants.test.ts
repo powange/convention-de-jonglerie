@@ -10,7 +10,7 @@ import {
   estReserve,
   estVolant,
   peutEchangerSesCreneaux,
-} from '../../../shared/utils/benevoles-volants'
+} from '#volunteers/shared/utils/benevoles-volants'
 
 /**
  * Les bénévoles volants.

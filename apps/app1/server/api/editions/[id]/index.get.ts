@@ -3,7 +3,7 @@ import { optionalAuth } from '#server/utils/auth-utils'
 import { compterMesTachesDeLEdition } from '#server/utils/mes-taches-de-l-edition'
 import { checkAdminMode } from '#server/utils/organizer-management'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { visibiliteDuBenevolat } from '#server/utils/visibilite-benevoles'
+import { visibiliteDuBenevolat } from '#volunteers/server/utils/visibilite-benevoles'
 import { editionVisiblePubliquement } from '~~/shared/utils/visibilite-edition'
 
 export default wrapApiHandler(

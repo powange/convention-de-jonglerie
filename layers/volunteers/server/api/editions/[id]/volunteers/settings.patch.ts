@@ -1,12 +1,12 @@
 import { z } from 'zod'
 
+import { schemaUrlExterne } from '#core/shared/utils/url-externe'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { buildUpdateData } from '#server/utils/prisma-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
-import { schemaUrlExterne } from '~~/shared/utils/url-externe'
 
 const bodySchema = z
   .object({

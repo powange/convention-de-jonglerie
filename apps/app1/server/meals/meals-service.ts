@@ -16,7 +16,7 @@ import {
   infosAlimentaires,
   infosPersonnelles,
   infosPersonnellesSelect,
-} from '#server/utils/infos-personnelles'
+} from '#core/server/utils/infos-personnelles'
 import { normalizeHandoutItemSelections } from '#server/utils/ticketing/handout-item-selection'
 import {
   isVolunteerEligibleForMeal,

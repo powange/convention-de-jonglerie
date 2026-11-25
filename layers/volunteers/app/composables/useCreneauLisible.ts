@@ -1,8 +1,7 @@
-import { formatDurationCompact } from '~/utils/date'
-
 import { decalageTraduisible, horairesEffectifs } from '../utils/retard-creneau'
 
-import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
+import { formatDurationCompact } from '#core/app/utils/date'
+import { fuseauUtilisable } from '#core/shared/utils/fuseau-edition'
 
 /**
  * Une seule façon de dire un créneau, pour toute la page des échanges.
