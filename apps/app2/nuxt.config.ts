@@ -18,8 +18,26 @@ export default defineNuxtConfig({
 
   // Réutilise le layer d'authentification partagé (email/mot de passe + OAuth Google).
   // Le layer résout Prisma/utils/i18n via l'app hôte (apps/app2).
-  // `core` : utilitaires techniques partagés avec app1 (helpers d'API, validation, erreurs…).
-  extends: ['../../layers/core', '../../layers/auth'],
+  // Layers partagés avec app1, dans le même ordre :
+  // - `ui` : mécanismes d'interface sans métier (le layer bénévoles s'en sert : pastilles du menu) ;
+  // - `core` : utilitaires techniques (helpers d'API, validation, erreurs…) ;
+  // - `auth` : authentification ;
+  // - `volunteers` : gestion des bénévoles — son serveur tourne sur le contrat d'hôte de Flowvent
+  //   (server/volunteers/ports/registry.ts…). Cf. docs/flowvent-benevoles.md.
+  extends: ['../../layers/ui', '../../layers/core', '../../layers/auth', '../../layers/volunteers'],
+
+  hooks: {
+    /*
+     * ⚠️ PAGES DU LAYER BÉNÉVOLES ÉCARTÉES, provisoirement (lot 5 → lot 7). Elles vivent sous
+     * `/editions/[id]/…` et dépendent encore de l'interface d'app1 (`useEditionStore`, layout
+     * `edition-dashboard`) : montées telles quelles, elles casseraient la construction. Le lot 7
+     * les montera sous `/events/[id]/…` une fois découplées. Seul le SERVEUR du layer est actif.
+     */
+    'pages:extend'(pages) {
+      const duLayer = (p: { file?: string }) => !!p.file?.includes('/layers/volunteers/')
+      for (let i = pages.length - 1; i >= 0; i--) if (duLayer(pages[i]!)) pages.splice(i, 1)
+    },
+  },
 
   modules: ['@nuxt/ui', 'nuxt-auth-utils', '@pinia/nuxt', '@nuxtjs/i18n'],
 

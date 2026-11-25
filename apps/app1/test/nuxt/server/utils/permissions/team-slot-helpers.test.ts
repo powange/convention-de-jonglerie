@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   isActiveInTeamSlot,
   getActiveTeamSlot,
-} from '../../../../../server/utils/permissions/team-slot-helpers'
+} from '#volunteers/server/utils/permissions/team-slot-helpers'
 
 const prismaMock = (globalThis as any).prisma
 

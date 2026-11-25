@@ -1,6 +1,9 @@
 import { requireAuth, type AuthenticatedUser } from '../auth-utils'
 
-import { isActiveInTeamSlot, getActiveTeamSlot } from './team-slot-helpers'
+import {
+  isActiveInTeamSlot,
+  getActiveTeamSlot,
+} from '#volunteers/server/utils/permissions/team-slot-helpers'
 
 const MEAL_VALIDATION_FILTER = { isMealValidationTeam: true } as const
 
