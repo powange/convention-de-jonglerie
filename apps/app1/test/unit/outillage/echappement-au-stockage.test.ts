@@ -44,7 +44,7 @@ const RACINES_SERVEUR = ['apps/app1/server', 'layers']
  * fichier deviné serait une exemption muette le jour où elle déménage.
  */
 const DETTE: Record<string, string> = {
-  'apps/app1/server/utils/validation-helpers.ts': 'définit la fonction',
+  'layers/core/server/socle/validation-helpers.ts': 'définit la fonction',
   'apps/app1/server/api/editions/[id]/posts/index.post.ts':
     'publications d’édition, rendues par interpolation — même défaut, migration à part',
   'apps/app1/server/utils/commentsHandler.ts':
