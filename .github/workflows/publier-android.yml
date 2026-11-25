@@ -20,11 +20,11 @@ on:
   workflow_dispatch:
     inputs:
       version_affichee:
-        description: "Version affichée aux utilisateurs (ex. 1.0.0)"
+        description: 'Version affichée aux utilisateurs (ex. 1.0.0)'
         required: true
         default: '1.0.0'
       signer:
-        description: "Signer le paquet (non = paquet non signé, pour une simple vérification)"
+        description: 'Signer le paquet (non = paquet non signé, pour une simple vérification)'
         type: boolean
         required: false
         default: true
@@ -44,13 +44,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Java 17 : c'est ce qu'attendent les outils de construction Android employés par Bubblewrap.
       # Le runner en embarque plusieurs ; on fixe celle-ci plutôt que de dépendre de la valeur par
       # défaut de l'image, qui change d'une version à l'autre sans prévenir.
       - name: Préparer Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
@@ -58,9 +58,9 @@ jobs:
       - name: Préparer le SDK Android
         # ⚠️ ÉPINGLÉE PAR EMPREINTE, et c'est la SEULE action tierce de ce dépôt. Un tag de
         # majeure peut être déplacé par son éditeur : c'est le vecteur exploité contre
-        # `tj-actions` en 2025. Les 37 autres usages sont des actions officielles GitHub, 8 une
-        # action locale, 3 de Docker Inc. — les épingler toutes rendrait chaque mise à jour
-        # manuelle pour un risque que GitHub lui-même ne recommande pas de couvrir ainsi.
+        # `tj-actions` en 2025. Tous les autres usages sont des actions officielles GitHub, de
+        # Docker Inc. ou l'action locale `preparer-env` — les épingler toutes rendrait chaque mise
+        # à jour manuelle pour un risque que GitHub lui-même ne recommande pas de couvrir ainsi.
         #
         # Pour la faire évoluer : relever la nouvelle empreinte avec
         #   gh api repos/android-actions/setup-android/git/ref/tags/<tag> --jq .object.sha
@@ -69,7 +69,7 @@ jobs:
         uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3.2.2
 
       - name: Préparer Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
 
@@ -154,7 +154,7 @@ jobs:
         run: rm -f android/cle-envoi.keystore
 
       - name: Déposer le paquet en artefact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: paquet-android-${{ inputs.version_affichee }}-${{ github.run_number }}
           path: |
