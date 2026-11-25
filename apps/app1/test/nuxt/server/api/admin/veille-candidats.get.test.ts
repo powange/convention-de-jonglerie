@@ -16,6 +16,7 @@ vi.mock('#server/utils/admin-auth', () => ({
 }))
 
 import handler from '../../../../../server/api/admin/veille/candidats.get'
+import { estPasse } from '../../../../../server/utils/veille-candidats'
 import { global } from '../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma
@@ -137,6 +138,43 @@ describe('GET /api/admin/veille/candidats', () => {
 
     expect(avec.data.candidats).toHaveLength(1)
     expect(sans.data.candidats).toHaveLength(0)
+  })
+
+  it('masque les passées quand on le demande, et garde celles sans date', async () => {
+    /*
+     * Trois candidats : un terminé, un à venir, un sans date. Celui sans date reste : le masquer
+     * ferait disparaître un événement peut-être à venir sans que rien ne le dise.
+     */
+    prismaMock.candidatEvenement.findMany.mockResolvedValue([
+      candidat({
+        id: 1,
+        url: 'https://exemple.org/passee',
+        debut: new Date('2020-05-01'),
+        jours: 3,
+      }),
+      candidat({
+        id: 2,
+        url: 'https://exemple.org/avenir',
+        debut: new Date('2099-05-01'),
+        jours: 3,
+      }),
+      candidat({ id: 3, url: 'https://exemple.org/sans-date', debut: null, jours: null }),
+    ])
+
+    const avec = await appeler()
+    const sans = await appeler({ masquerPassees: 'true' })
+
+    expect(avec.data.candidats).toHaveLength(3)
+    expect(sans.data.candidats.map((c: any) => c.id)).toEqual([2, 3])
+  })
+
+  it('📍 une convention en cours n’est pas passée avant la fin de son dernier jour', () => {
+    const debut = new Date('2026-11-20T00:00:00Z')
+    // 3 jours : 20, 21, 22 — encore en cours le 22 au soir, passée le 23 à minuit.
+    expect(estPasse({ debut, jours: 3 }, new Date('2026-11-22T23:00:00Z'))).toBe(false)
+    expect(estPasse({ debut, jours: 3 }, new Date('2026-11-23T00:00:00Z'))).toBe(true)
+    // Sans durée, la journée entière compte.
+    expect(estPasse({ debut, jours: null }, new Date('2026-11-20T18:00:00Z'))).toBe(false)
   })
 
   it('ne filtre que sur un verdict CONNU', async () => {
