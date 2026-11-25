@@ -47,7 +47,7 @@
 // Adresse lue de la configuration (NUXT_PUBLIC_CONTACT_EMAIL), comme dans app1.
 const adresseDeContact = useRuntimeConfig().public.contactEmail as string
 const contact = adresseDeContact
-const derniereMiseAJour = '24 novembre 2026'
+const derniereMiseAJour = '25 novembre 2026'
 
 interface Section {
   id: string
@@ -85,6 +85,16 @@ const sections: Section[] = [
           'les informations que vous saisissez pour organiser un événement : nom, description, lieu et date.',
       },
       {
+        libelle: 'Votre candidature de bénévole',
+        texte:
+          "si vous candidatez comme bénévole à un événement : votre téléphone, vos disponibilités (montage, événement, démontage, heures d'arrivée et de départ), vos préférences d'horaires et d'équipes, votre motivation, vos compétences et votre expérience, et, selon ce que l'organisateur demande, votre régime alimentaire, vos allergies et leur gravité, un contact en cas d'urgence, vos pronoms, la présence d'animaux, d'enfants mineurs ou d'un véhicule, la personne avec qui vous venez et celles avec qui vous préférez ne pas être placé. Le régime alimentaire et les allergies peuvent révéler des informations de santé : ils ne servent qu'à organiser l'événement, et ne sont vus que par ses organisateurs.",
+      },
+      {
+        libelle: 'Votre engagement de bénévole',
+        texte:
+          "une fois votre candidature acceptée : vos équipes, vos créneaux, vos demandes d'échange de créneau, le code QR qui valide votre arrivée sur place, et les notes que les organisateurs ajoutent à votre candidature.",
+      },
+      {
         libelle: 'Votre abonnement',
         texte:
           "la formule choisie, son statut et sa date d'échéance. Le paiement est actuellement simulé : aucune donnée bancaire n'est demandée ni conservée.",
@@ -103,6 +113,10 @@ const sections: Section[] = [
       {
         texte:
           'Créer et gérer votre compte, vous permettre de vous connecter et de gérer vos événements et votre abonnement — base légale : exécution du service que vous demandez.',
+      },
+      {
+        texte:
+          'Traiter votre candidature de bénévole et organiser votre participation (équipes, créneaux, repas éventuels, sécurité sur place) — base légale : exécution du service que vous demandez ; pour le régime alimentaire et les allergies, votre consentement, exprimé en les renseignant, et que vous pouvez retirer en les effaçant.',
       },
       {
         texte:
@@ -143,12 +157,22 @@ const sections: Section[] = [
     liste: [
       {
         libelle: "L'éditeur de Flowvent",
-        texte: 'seul, pour faire fonctionner le service et répondre à vos demandes.',
+        texte: 'pour faire fonctionner le service et répondre à vos demandes.',
+      },
+      {
+        libelle: "Les organisateurs d'un événement",
+        texte:
+          "votre candidature de bénévole, et ce qui s'y rattache, n'est vue que par les organisateurs de l'événement concerné et, pour les membres de leur équipe, par ses responsables d'équipe. Les autres bénévoles du même événement ne voient que votre pseudo et votre photo de profil, quand ils vous proposent un échange de créneau.",
       },
       {
         libelle: 'Cloudflare',
         texte:
           'intermédiaire réseau entre votre navigateur et notre serveur, pour la sécurité et la disponibilité du site. Il voit passer les requêtes, et donc votre adresse IP. Cloudflare peut traiter ces données hors de l’Union européenne, dans le cadre des garanties prévues par le RGPD (Data Privacy Framework et clauses contractuelles types).',
+      },
+      {
+        libelle: 'Gravatar',
+        texte:
+          "si vous n'avez pas déposé de photo de profil, votre navigateur demande à Gravatar (Automattic) l'image éventuellement associée à votre adresse e-mail. Il ne lui transmet pas l'adresse elle-même, mais son empreinte (un hachage).",
       },
       {
         libelle: 'Google ou Meta (Facebook)',

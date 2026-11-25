@@ -104,6 +104,18 @@ watch(
   }
 )
 
-const repliableIci = computed(() => props.repliableSurMobile && !estBureau.value)
+/*
+ * ⚠️ PAS AVANT LE MONTAGE. La media query vaut `false` au rendu serveur, `true` au client sur un
+ * écran large : l'en-tête était un bouton côté serveur et un `h3` au premier rendu client, et Vue
+ * signalait un écart d'hydratation à chaque chargement de la page bénévole. Attendre le montage
+ * rend le premier rendu client identique à celui du serveur ; sur mobile, la carte devient
+ * repliable juste après.
+ */
+const monte = ref(false)
+onMounted(() => {
+  monte.value = true
+})
+
+const repliableIci = computed(() => props.repliableSurMobile && monte.value && !estBureau.value)
 const ouverte = computed(() => !repliableIci.value || deplie.value)
 </script>

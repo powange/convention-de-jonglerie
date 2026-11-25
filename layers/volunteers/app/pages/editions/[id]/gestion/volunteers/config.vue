@@ -30,8 +30,13 @@
               </h2>
             </div>
 
-            <!-- Mode de gestion des bénévoles -->
-            <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+            <!-- Mode de gestion des bénévoles — absent quand l'app n'offre que l'interne
+                 (`benevoles.modeExterne`, cf. app.config.ts du layer) : un choix à une seule
+                 option n'en est pas un. -->
+            <div
+              v-if="modeExterneDisponible"
+              class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+            >
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="font-medium text-gray-900 dark:text-white">
@@ -408,10 +413,18 @@ const { t } = useI18n()
 
 const editionId = Number(route.params.id)
 
-// Charger les données de l'édition
-const { data: edition, pending: loading } = await useFetch(`/api/editions/${editionId}`, {
-  key: `edition-${editionId}`,
-})
+/*
+ * L'édition passe par le store, comme sur les autres pages du layer, et non par un appel direct
+ * à `/api/editions/:id` : c'est l'app hôte qui sait la servir (app1 depuis ses éditions, Flowvent
+ * depuis ses événements). L'adresse d'app1 écrite ici laissait la page sur « édition introuvable »
+ * dans Flowvent.
+ *
+ * `force` : la page voulait une édition fraîche, et le store peut tenir une version allégée venue
+ * d'une liste.
+ */
+await editionStore.fetchEditionById(editionId, { force: true }).catch(() => null)
+const edition = computed(() => editionStore.getEditionById(editionId))
+const loading = computed(() => editionStore.loading && !edition.value)
 
 // Utiliser le composable pour les paramètres des bénévoles
 const {
@@ -454,6 +467,8 @@ const volunteersInitialized = ref(false)
  */
 const setupStartDateLocal = shallowRef<DateValue | undefined>(undefined)
 const teardownEndDateLocal = shallowRef<DateValue | undefined>(undefined)
+
+const modeExterneDisponible = useAppConfig().benevoles?.modeExterne !== false
 
 const volunteerModeItems = computed(() => [
   { value: 'INTERNAL', label: t('gestion.volunteers.mode_internal') },

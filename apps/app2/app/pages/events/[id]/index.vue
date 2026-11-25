@@ -30,7 +30,7 @@
       <div v-if="subActive" class="grid gap-4 sm:grid-cols-2">
         <UCard
           class="cursor-pointer transition hover:ring-2 hover:ring-primary"
-          @click="navigateTo(`/events/${event.id}/volunteers`)"
+          @click="navigateTo(`/events/${event.id}/gestion/volunteers/config`)"
         >
           <div class="flex items-center gap-3">
             <div
@@ -40,7 +40,25 @@
             </div>
             <div>
               <p class="font-semibold">Gestion des bénévoles</p>
-              <p class="text-sm text-muted">Équipes, créneaux, affectations.</p>
+              <p class="text-sm text-muted">Candidatures, équipes, planning, notifications.</p>
+            </div>
+          </div>
+        </UCard>
+        <!-- La page que l'on partage aux bénévoles : ils y candidatent, puis y retrouvent leurs
+             créneaux. -->
+        <UCard
+          class="cursor-pointer transition hover:ring-2 hover:ring-primary"
+          @click="navigateTo(`/events/${event.id}/volunteers`)"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="flex size-11 items-center justify-center rounded-lg bg-secondary/10 text-secondary"
+            >
+              <UIcon name="i-heroicons-eye" class="text-2xl" />
+            </div>
+            <div>
+              <p class="font-semibold">Page des bénévoles</p>
+              <p class="text-sm text-muted">Ce que voient les candidats, et le lien à partager.</p>
             </div>
           </div>
         </UCard>
@@ -49,7 +67,9 @@
       <!-- Paywall -->
       <UCard v-else>
         <div class="flex flex-col items-center py-6 text-center">
-          <div class="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <div
+            class="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary"
+          >
             <UIcon name="i-heroicons-lock-closed" class="text-2xl" />
           </div>
           <p class="mt-3 font-semibold">Fonctionnalités réservées aux abonnés</p>
@@ -57,7 +77,12 @@
             Abonnez-vous pour débloquer la gestion des bénévoles et les autres outils d'organisation
             de vos événements.
           </p>
-          <UButton class="mt-4" to="/pricing" label="Voir les tarifs" icon="i-heroicons-credit-card" />
+          <UButton
+            class="mt-4"
+            to="/pricing"
+            label="Voir les tarifs"
+            icon="i-heroicons-credit-card"
+          />
         </div>
       </UCard>
     </div>

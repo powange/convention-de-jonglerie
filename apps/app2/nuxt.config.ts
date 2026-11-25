@@ -28,18 +28,32 @@ export default defineNuxtConfig({
 
   hooks: {
     /*
-     * ⚠️ PAGES DU LAYER BÉNÉVOLES ÉCARTÉES, provisoirement (lot 5 → lot 7). Elles vivent sous
-     * `/editions/[id]/…` et dépendent encore de l'interface d'app1 (`useEditionStore`, layout
-     * `edition-dashboard`) : montées telles quelles, elles casseraient la construction. Le lot 7
-     * les montera sous `/events/[id]/…` une fois découplées. Seul le SERVEUR du layer est actif.
+     * Pages du layer bénévoles montées sous les adresses de Flowvent : `/editions/:id/…` (celles
+     * d'app1, inchangées là-bas) devient `/events/:id/…`. Les pages de GESTION reçoivent en plus le
+     * middleware `subscription` : dans Flowvent, l'abonnement débloque l'organisation. Les pages du
+     * BÉNÉVOLE (candidater, ses créneaux, échanges) restent ouvertes — un bénévole n'est pas abonné.
      */
     'pages:extend'(pages) {
-      const duLayer = (p: { file?: string }) => !!p.file?.includes('/layers/volunteers/')
-      for (let i = pages.length - 1; i >= 0; i--) if (duLayer(pages[i]!)) pages.splice(i, 1)
+      const renommer = (liste: typeof pages) => {
+        for (const page of liste) {
+          if (page.file?.includes('/layers/volunteers/')) {
+            page.path = page.path.replace(/^\/editions\//, '/events/')
+            if (page.name) page.name = page.name.replace(/^editions-/, 'events-')
+            if (page.path.includes('/gestion/')) {
+              const actuels = page.meta?.middleware
+              const liste2 = Array.isArray(actuels) ? actuels : actuels ? [actuels] : []
+              page.meta = { ...page.meta, middleware: [...liste2, 'subscription'] }
+            }
+          }
+          if (page.children?.length) renommer(page.children)
+        }
+      }
+      renommer(pages)
     },
   },
 
-  modules: ['@nuxt/ui', 'nuxt-auth-utils', '@pinia/nuxt', '@nuxtjs/i18n'],
+  // `nuxt-qrcode` : le layer bénévoles affiche le QR code d'un bénévole (composant `Qrcode`).
+  modules: ['@nuxt/ui', 'nuxt-auth-utils', '@pinia/nuxt', '@nuxtjs/i18n', 'nuxt-qrcode'],
 
   css: ['~/assets/css/main.css'],
 
@@ -90,6 +104,16 @@ export default defineNuxtConfig({
   // pas d'étape « catégories » → on renvoie directement vers le tableau de bord.
   routeRules: {
     '/welcome/categories': { redirect: '/dashboard' },
+    // Le layer bénévoles écrit des liens en dur vers les adresses d'app1 (notifications, rappels,
+    // boutons) : ils mènent ici aux pages équivalentes de Flowvent.
+    '/editions/**': { redirect: '/events/**' },
+    // Les pages de gestion du layer bénévoles ne déclarent pas de layout : c'est l'app qui habille
+    // toute sa zone de gestion, comme app1. Rendu client seul, comme app1 aussi (pages derrière
+    // une session, rien à indexer).
+    '/events/*/gestion/**': { appLayout: 'edition-dashboard', ssr: false },
+    // Pages bénévole du layer : centrées, comme sous le layout par défaut d'app1.
+    '/events/*/volunteers': { appLayout: 'evenement' },
+    '/events/*/volunteers/**': { appLayout: 'evenement' },
   },
 
   runtimeConfig: {

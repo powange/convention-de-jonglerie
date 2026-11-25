@@ -25,8 +25,9 @@ L'argument détermine la cible :
 
 ## ⚠️ Ce qui diffère d'app1 : l'image ne suit pas chaque commit
 
-`publier-image-flowvent.yml` ne se déclenche que si un commit touche `apps/app2/**`, `layers/auth/**`
-ou le workflow lui-même. Un lot qui ne concerne qu'app1 ne publie **aucune** image Flowvent.
+`publier-image-flowvent.yml` ne se déclenche que si un commit touche `apps/app2/**`, l'un des layers
+que Flowvent étend (`layers/auth/**`, `core`, `ui`, `volunteers`) ou le workflow lui-même. Un lot qui
+ne concerne qu'app1 ne publie **aucune** image Flowvent.
 
 Deux conséquences :
 
