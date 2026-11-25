@@ -202,8 +202,8 @@ export default wrapApiHandler(
         await NotificationService.create({
           userId: volunteer.user.id,
           type: 'INFO',
-          title: notificationTitle,
-          message: notificationMessage,
+          titleText: notificationTitle,
+          messageText: notificationMessage,
           actionUrl: '/profile/mes-candidatures-benevole',
           actionText: 'Voir mes créneaux',
           entityType: 'Edition',

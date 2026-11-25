@@ -70,7 +70,8 @@ describe('rappel de créneau — l’heure annoncée', () => {
   })
 
   /** Le message du premier rappel envoyé. */
-  const messageDuRappel = () => mockNotifier.mock.calls[0]?.[0]?.message as string
+  // `messageText` : la clé que le service lit (`message` était ignoré, cf. notification-create-titre).
+  const messageDuRappel = () => mockNotifier.mock.calls[0]?.[0]?.messageText as string
 
   it('demande le fuseau de l’événement avec le créneau', async () => {
     /*

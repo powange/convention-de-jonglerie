@@ -179,7 +179,8 @@ describe('publier le planning des bénévoles', () => {
       await handler(evenement as any)
       await attendreLaDiffusion()
 
-      const message = mockNotifier.mock.calls[0][0].message as string
+      // `messageText` : la clé que le service lit (`message` était ignoré, cf. notification-create-titre).
+      const message = mockNotifier.mock.calls[0][0].messageText as string
       expect(message).toContain('20:00')
       expect(message).not.toContain('08:00')
     })
