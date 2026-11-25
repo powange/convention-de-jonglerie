@@ -1,4 +1,9 @@
-import { droitsSurEvenement, gestionOuverte } from '../../../utils/droits-evenement'
+import {
+  droitsSurEvenement,
+  gestionOuverte,
+  modulesAffiches,
+  selectionModules,
+} from '../../../utils/droits-evenement'
 import { idDepuisLaRoute } from '../../../utils/evenement-public'
 
 /**
@@ -14,11 +19,11 @@ export default defineEventHandler(async (event) => {
   if (!droits.voir) throw createError({ status: 404, message: 'Événement introuvable' })
   const evenement = await prisma.event.findUniqueOrThrow({
     where: { id: eventId },
-    select: { volunteersEnabled: true },
+    select: selectionModules,
   })
   return {
     droits,
     abonnementActif: await gestionOuverte(eventId, userId),
-    modules: { benevoles: evenement.volunteersEnabled },
+    modules: modulesAffiches(evenement),
   }
 })

@@ -1,4 +1,4 @@
-import { droitsSurEvenement } from '../../../../utils/droits-evenement'
+import { droitsSurEvenement, selectionDroits } from '../../../../utils/droits-evenement'
 import { idDepuisLaRoute } from '../../../../utils/evenement-public'
 import {
   compteAffiche,
@@ -24,9 +24,7 @@ export default defineEventHandler(async (event) => {
         orderBy: { createdAt: 'asc' },
         select: {
           id: true,
-          canEditEvent: true,
-          canManageOrganizers: true,
-          canManageVolunteers: true,
+          ...selectionDroits,
           organizer: { select: { user: { select: selectionCompte } } },
         },
       },

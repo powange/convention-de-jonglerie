@@ -1,20 +1,14 @@
-import { z } from 'zod'
-
 import {
   droitsAffiches,
   droitsEnBase,
   exigerGestionDesOrganisateurs,
   organisateurDeLaRoute,
+  schemaDroits,
 } from '../../../../utils/organisateurs-evenement'
+import { selectionDroits } from '../../../../utils/droits-evenement'
 
 /** Règle les droits d'un organisateur (un ou plusieurs domaines à la fois). */
-const schema = z
-  .object({
-    modifier: z.boolean().optional(),
-    organisateurs: z.boolean().optional(),
-    benevoles: z.boolean().optional(),
-  })
-  .refine((d) => Object.keys(d).length > 0, 'Aucun droit à modifier')
+const schema = schemaDroits.refine((d) => Object.keys(d).length > 0, 'Aucun droit à modifier')
 
 export default defineEventHandler(async (event) => {
   const { eventId } = await exigerGestionDesOrganisateurs(event)
@@ -29,7 +23,7 @@ export default defineEventHandler(async (event) => {
   const maj = await prisma.editionOrganizer.update({
     where: { id: ligne.id },
     data: droitsEnBase(resultat.data),
-    select: { canEditEvent: true, canManageOrganizers: true, canManageVolunteers: true },
+    select: selectionDroits,
   })
   return createSuccessResponse({ droits: droitsAffiches(maj) }, 'Droits mis à jour')
 })

@@ -98,23 +98,27 @@
             ses données reviennent telles quelles à la réactivation.
           </p>
         </template>
-        <div class="flex flex-wrap items-start justify-between gap-4">
-          <div class="flex items-start gap-3">
-            <UIcon name="i-heroicons-hand-raised" class="mt-0.5 size-5 text-primary" />
-            <div>
-              <p class="font-medium">Bénévoles</p>
-              <p class="text-sm text-muted">
-                Candidatures, équipes, planning, échanges, notifications, et la page publique où
-                l'on candidate.
-              </p>
+        <div class="divide-y divide-default">
+          <div
+            v-for="m in MODULES"
+            :key="m.cle"
+            class="flex flex-wrap items-start justify-between gap-4 py-3 first:pt-0 last:pb-0"
+          >
+            <div class="flex items-start gap-3">
+              <UIcon :name="m.icone" class="mt-0.5 size-5 text-primary" />
+              <div>
+                <p class="font-medium">{{ m.libelle }}</p>
+                <p class="text-sm text-muted">{{ m.description }}</p>
+              </div>
             </div>
+            <USwitch
+              :model-value="accueil.modules[m.cle]"
+              :disabled="!accueil.droits.modifier || enregistrementModules"
+              :label="accueil.modules[m.cle] ? 'Activé' : 'Désactivé'"
+              :aria-label="`Module ${m.libelle}`"
+              @update:model-value="(v: boolean) => basculerModule(m.cle, v)"
+            />
           </div>
-          <USwitch
-            :model-value="accueil.modules.benevoles"
-            :disabled="!accueil.droits.modifier || enregistrementModules"
-            :label="accueil.modules.benevoles ? 'Activé' : 'Désactivé'"
-            @update:model-value="basculerBenevoles"
-          />
         </div>
         <p v-if="!accueil.droits.modifier" class="mt-3 text-xs text-muted">
           Seuls le propriétaire et les organisateurs autorisés à modifier l'événement changent les
@@ -130,7 +134,14 @@
  * Accueil de la gestion d'un événement : une carte par module que la personne peut ouvrir (avec ses
  * chiffres), et l'activation des modules — le point d'entrée où chaque module à venir s'ajoutera.
  */
+import type { CleModule, Droits, Modules } from '#shared/modules-evenement'
+
+import { modulesDisponibles } from '#shared/modules-evenement'
+
 definePageMeta({ middleware: ['subscription'] })
+
+/** Les modules portés dans Flowvent : chaque lot de portage ajoute le sien. */
+const MODULES = modulesDisponibles()
 
 interface Accueil {
   evenement: {
@@ -141,8 +152,8 @@ interface Accueil {
     endDate: string | null
     timezone: string | null
   }
-  droits: { modifier: boolean; organisateurs: boolean; benevoles: boolean }
-  modules: { benevoles: boolean }
+  droits: Droits
+  modules: Modules
   organisateurs: number
   benevoles: null | {
     enAttente: number
@@ -228,12 +239,12 @@ async function copierLien() {
   toast.add({ title: 'Lien copié', icon: 'i-heroicons-check', color: 'success' })
 }
 
-const voulu = ref(true)
+const voulu = ref<Partial<Modules>>({})
 const { execute: enregistrerModules, loading: enregistrementModules } = useApiAction(
   `/api/events/${refEvenement}/modules`,
   {
     method: 'PUT',
-    body: () => ({ benevoles: voulu.value }),
+    body: () => voulu.value,
     successMessage: { title: 'Modules mis à jour' },
     errorMessages: { default: "Le module n'a pas pu être modifié" },
     onSuccess: async () => {
@@ -243,8 +254,8 @@ const { execute: enregistrerModules, loading: enregistrementModules } = useApiAc
     },
   }
 )
-function basculerBenevoles(valeur: boolean) {
-  voulu.value = valeur
+function basculerModule(cle: CleModule, valeur: boolean) {
+  voulu.value = { [cle]: valeur }
   enregistrerModules()
 }
 </script>

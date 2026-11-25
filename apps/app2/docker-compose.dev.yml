@@ -97,6 +97,7 @@ services:
       - ./server:/app/apps/app2/server:cached
       - ./prisma:/app/apps/app2/prisma:cached
       - ./types:/app/apps/app2/types:cached
+      - ./shared:/app/apps/app2/shared:cached
       - ./nuxt.config.ts:/app/apps/app2/nuxt.config.ts:cached
       - ./app.config.ts:/app/apps/app2/app.config.ts:cached
       - ./tsconfig.json:/app/apps/app2/tsconfig.json:cached

@@ -28,15 +28,16 @@ export default defineNuxtConfig({
 
   hooks: {
     /*
-     * Pages du layer bénévoles montées sous les adresses de Flowvent : `/editions/:id/…` (celles
-     * d'app1, inchangées là-bas) devient `/events/:id/…`. Les pages de GESTION reçoivent en plus le
+     * Pages des layers d'événement (bénévoles, et chaque module porté ensuite) montées sous les
+     * adresses de Flowvent : `/editions/:id/…` (celles d'app1, inchangées là-bas) devient
+     * `/events/:id/…`. La règle vaut pour TOUT layer : un module porté n'a rien à ajouter ici. Les pages de GESTION reçoivent en plus le
      * middleware `subscription` : dans Flowvent, l'abonnement débloque l'organisation. Les pages du
      * BÉNÉVOLE (candidater, ses créneaux, échanges) restent ouvertes — un bénévole n'est pas abonné.
      */
     'pages:extend'(pages) {
       const renommer = (liste: typeof pages) => {
         for (const page of liste) {
-          if (page.file?.includes('/layers/volunteers/')) {
+          if (/\/layers\/[^/]+\/app\/pages\//.test(page.file ?? '')) {
             page.path = page.path.replace(/^\/editions\//, '/events/')
             if (page.name) page.name = page.name.replace(/^editions-/, 'events-')
             if (page.path.includes('/gestion/')) {
