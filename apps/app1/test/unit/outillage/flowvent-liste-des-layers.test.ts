@@ -1,0 +1,85 @@
+import { readFileSync } from 'node:fs'
+import { join, resolve } from 'node:path'
+
+import { describe, expect, it } from 'vitest'
+
+/**
+ * Les layers que Flowvent (app2) étend sont recopiés à la main en SIX endroits :
+ *
+ *   apps/app2/nuxt.config.ts                     `extends` — la source
+ *   apps/app2/Dockerfile                         `COPY layers/<x>/` — ce qui entre dans l'image
+ *   apps/app2/Dockerfile.dockerignore            `!layers/<x>` — ce que le contexte laisse passer
+ *   apps/app2/docker-compose.dev.yml             les montages du conteneur de dev
+ *   .github/workflows/publier-image-flowvent.yml les filtres `push` ET `pull_request`
+ *
+ * Chaque oubli a son symptôme, et aucun n'est bruyant au bon moment :
+ *  - absent du Dockerfile ou du dockerignore → l'image ne se construit plus, découvert à la
+ *    publication sur `main` ;
+ *  - absent des montages → le serveur de dev ne démarre plus, découvert par le premier qui le lance ;
+ *  - absent des filtres du workflow → une PR qui casse Flowvent par ce layer ne le reconstruit PAS,
+ *    et passe au vert. C'est le pire des trois : la garde existe et regarde ailleurs.
+ *
+ * `layers/map` a été ajouté après coup, fichier par fichier : c'est exactement cette dérive.
+ *
+ * ⚠️ Les fichiers sont LUS COMME DU TEXTE, comme dans les autres tests `flowvent-*` : la CI ne
+ * prépare qu'app1, un import d'un fichier d'app2 y échouerait.
+ */
+const DEPOT = resolve(process.cwd(), '..', '..')
+const lire = (chemin: string) => readFileSync(join(DEPOT, chemin), 'utf8')
+const ensemble = (src: string, motif: RegExp) =>
+  [...new Set([...src.matchAll(motif)].map((m) => m[1]!))].sort()
+
+/** Le bloc d'un déclencheur du workflow : de `  <nom>:` à la clé suivante de même niveau. */
+const declencheur = (src: string, nom: string) => {
+  const debut = src.search(new RegExp(`^ {2}${nom}:$`, 'm'))
+  if (debut < 0) return ''
+  const suite = src.slice(debut + 1).search(/^ {2}\S/m)
+  return src.slice(debut, suite < 0 ? undefined : debut + 1 + suite)
+}
+
+describe('Flowvent — la liste des layers est la même partout', () => {
+  const extendsBloc = lire('apps/app2/nuxt.config.ts').match(/extends:\s*\[([^\]]*)\]/)?.[1] ?? ''
+  const source = ensemble(extendsBloc, /'\.\.\/\.\.\/layers\/([a-z0-9-]+)'/g)
+
+  const workflow = lire('.github/workflows/publier-image-flowvent.yml')
+  const copies: Record<string, string[]> = {
+    'apps/app2/Dockerfile': ensemble(
+      lire('apps/app2/Dockerfile'),
+      /^COPY layers\/([a-z0-9-]+)\//gm
+    ),
+    'apps/app2/Dockerfile.dockerignore': ensemble(
+      lire('apps/app2/Dockerfile.dockerignore'),
+      /^!layers\/([a-z0-9-]+)\s*$/gm
+    ),
+    'apps/app2/docker-compose.dev.yml': ensemble(
+      lire('apps/app2/docker-compose.dev.yml'),
+      /^\s*- \.\.\/\.\.\/layers\/([a-z0-9-]+):\/app\/layers\//gm
+    ),
+    'publier-image-flowvent.yml (push)': ensemble(
+      declencheur(workflow, 'push'),
+      /- 'layers\/([a-z0-9-]+)\/\*\*'/g
+    ),
+    'publier-image-flowvent.yml (pull_request)': ensemble(
+      declencheur(workflow, 'pull_request'),
+      /- 'layers\/([a-z0-9-]+)\/\*\*'/g
+    ),
+  }
+
+  it('la source est lue — le test ne conclut pas sur une liste vide', () => {
+    // auth et core sont étendus depuis l'origine de Flowvent ; s'ils manquent, c'est la lecture
+    // qui est cassée, pas la configuration.
+    expect(source).toEqual(expect.arrayContaining(['auth', 'core']))
+  })
+
+  for (const [fichier, liste] of Object.entries(copies)) {
+    it(`⚠️ ${fichier} reprend exactement les layers de \`extends\``, () => {
+      const manquants = source.filter((l) => !liste.includes(l))
+      const enTrop = liste.filter((l) => !source.includes(l))
+      expect(
+        { manquants, enTrop },
+        `${fichier} : layers absents ${JSON.stringify(manquants)}, en trop ${JSON.stringify(enTrop)} ` +
+          `par rapport à \`extends\` dans apps/app2/nuxt.config.ts`
+      ).toEqual({ manquants: [], enTrop: [] })
+    })
+  }
+})
