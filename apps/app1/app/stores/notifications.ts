@@ -277,12 +277,7 @@ export const useNotificationsStore = defineStore('notifications', {
      * Supprime une notification
      */
     async deleteNotification(notificationId: string) {
-      try {
-        await $fetch(`/api/notifications/${notificationId}/delete`, {
-          method: 'DELETE',
-        })
-
-        // Supprimer localement
+      const retirerLocalement = () => {
         const index = this.notifications.findIndex((n) => n.id === notificationId)
         if (index > -1) {
           const notification = this.notifications[index]
@@ -291,7 +286,25 @@ export const useNotificationsStore = defineStore('notifications', {
           }
           this.notifications.splice(index, 1)
         }
+      }
+
+      try {
+        await $fetch(`/api/notifications/${notificationId}/delete`, {
+          method: 'DELETE',
+        })
+        retirerLocalement()
       } catch (error) {
+        /*
+         * 404 : le serveur n'a pas (ou plus) cette notification pour cet utilisateur — supprimée
+         * depuis un autre onglet, un autre appareil, ou par un double clic. Le but est atteint :
+         * on la retire de l'écran. Avant, elle y restait avec un toast d'échec, et l'utilisateur
+         * recommençait — relevé en production : quatre DELETE de suite sur le même identifiant.
+         */
+        const e = error as { statusCode?: number; status?: number } | undefined
+        if ((e?.statusCode ?? e?.status) === 404) {
+          retirerLocalement()
+          return
+        }
         console.error('Erreur lors de la suppression de la notification:', error)
         throw error
       }
