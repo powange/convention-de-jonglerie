@@ -81,6 +81,26 @@ les ateliers et le covoiturage d'app1 l'importent désormais par `#map/…`.
 - Restent dans app1 : la page PUBLIQUE de la carte (`/editions/:id/map`, liée au programme) et
   l'export KML.
 
+## Stock et prêts (lot 3)
+
+Le layer `stock` existait déjà ; ce qui le rattachait encore à app1 est parti dans les layers :
+
+- utilitaires du stock (`stock-helpers`, quantités, étiquettes, prêts, modification par lot) →
+  `layers/stock/server/utils` (alias `#stock`) ;
+- traductions `gestion.stock` sorties de `gestion.json` → `layers/stock/i18n/locales/*/gestion-stock.json`,
+  chargées par app1 partout où `gestion` l'est (menu et accueil de la gestion en affichent) ;
+- composants et utilitaires d'interface qu'il empruntait à app1 → `layers/ui` (`UserSelector`,
+  `UiDateField`, `useSaisieTemporisee`, `useSaisieNonEnregistree`, `colonnes-a-exporter`) et
+  `layers/core/shared/utils` (`recherche-texte`, `recherche-responsable`).
+
+Contrat d'hôte propre à Flowvent : `personnes-edition` (qui peut être responsable d'un article :
+propriétaire, organisateurs, bénévoles acceptés), `personSearchRateLimiter`,
+`userWithNameAndAvatarSelect`, `permissions/types`. L'accès au stock suit app1 : le droit dédié,
+ou responsable d'une équipe de bénévoles.
+
+⚠️ Un layer ne doit pas compter sur les auto-imports de VueUse : app1 a `@vueuse/nuxt`, pas
+Flowvent (`useNow` y valait `undefined`, page en 500). Importer depuis `@vueuse/core`.
+
 ## Notions « convention » à ramener à l'événement
 
 Flowvent n'a pas de convention : l'événement en tient lieu (`getEditionWithPermissions` rend

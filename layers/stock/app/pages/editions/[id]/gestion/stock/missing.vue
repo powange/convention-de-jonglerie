@@ -866,7 +866,8 @@ const { t } = useI18n()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
 
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 
 const edition = computed(() => editionStore.getEditionById(editionId))
 

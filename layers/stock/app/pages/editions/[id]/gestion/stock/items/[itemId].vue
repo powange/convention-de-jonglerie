@@ -423,7 +423,8 @@ const router = useRouter()
 const { t, locale } = useI18n()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 const itemId = computed(() => parseInt(route.params.itemId as string))
 
 /** Sans l'adresse e-mail : l'API ne la rend plus, et l'écran n'en affichait que le pseudo. */

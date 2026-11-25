@@ -1,12 +1,11 @@
 import { refDebounced } from '@vueuse/core'
 
-import type { UserSelectItem } from '~/components/UserSelector.vue'
-
 import { libelleResponsable } from '../utils/nom-responsable'
 
+import type { UserSelectItem } from '#ui-commun/app/components/UserSelector.vue'
 import type { Ref } from 'vue'
 
-import { rechercheResponsable } from '~~/shared/utils/recherche-responsable'
+import { rechercheResponsable } from '#core/shared/utils/recherche-responsable'
 
 /**
  * Le champ « qui s'en occupe », partout où il apparaît.

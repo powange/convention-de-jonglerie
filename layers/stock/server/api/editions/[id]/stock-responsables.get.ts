@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { LONGUEUR_MINIMALE_PSEUDO, motsDeRecherche } from '#core/shared/utils/recherche-responsable'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { personSearchRateLimiter } from '#server/utils/api-rate-limiter'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -14,7 +15,6 @@ import {
 } from '#server/utils/personnes-edition'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
-import { LONGUEUR_MINIMALE_PSEUDO, motsDeRecherche } from '~~/shared/utils/recherche-responsable'
 
 /*
  * `q` est le nom du paramètre, et `pseudo` reste accepté.

@@ -8,14 +8,14 @@ import {
   canManageStock,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
-import { MESSAGE_QUANTITE_MAX, QUANTITE_MAX_STOCK } from '#server/utils/quantite-stock'
+import { validateEditionId } from '#server/utils/validation-helpers'
+import { handleValidationError } from '#server/utils/validation-schemas'
+import { MESSAGE_QUANTITE_MAX, QUANTITE_MAX_STOCK } from '#stock/server/utils/quantite-stock'
 import {
   canAccessStock,
   getReservedQuantityOnPeriod,
   validateReservationLocation,
-} from '#server/utils/stock-helpers'
-import { validateEditionId } from '#server/utils/validation-helpers'
-import { handleValidationError } from '#server/utils/validation-schemas'
+} from '#stock/server/utils/stock-helpers'
 
 const RESERVATION_STATUSES = ['RESERVED', 'PICKED_UP', 'RETURNED', 'CANCELLED'] as const
 

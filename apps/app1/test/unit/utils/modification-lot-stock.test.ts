@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   changementsEnLot,
   destinatairesDesChampsDEmprunt,
-} from '../../../server/utils/modification-lot-stock'
+} from '../../../../../layers/stock/server/utils/modification-lot-stock'
 
 /**
  * Modifier vingt objets d'un coup ne se relit pas objet par objet : ce qui part est ce qui reste.

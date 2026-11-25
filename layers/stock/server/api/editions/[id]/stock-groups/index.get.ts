@@ -2,8 +2,8 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
 import { userWithNameAndAvatarSelect } from '#server/utils/prisma-select-helpers'
-import { canAccessStock, stockItemLocationInclude } from '#server/utils/stock-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { canAccessStock, stockItemLocationInclude } from '#stock/server/utils/stock-helpers'
 
 /**
  * GET /api/editions/[id]/stock-groups

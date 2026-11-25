@@ -1,4 +1,4 @@
-import { normaliserTexte } from './recherche-texte'
+import { normaliserTexte } from '#core/shared/utils/recherche-texte'
 
 import { cleDeBoiteDeReception } from '#core/shared/utils/adresse-email'
 

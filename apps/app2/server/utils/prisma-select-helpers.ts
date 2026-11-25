@@ -47,6 +47,17 @@ export const volunteerAssignmentDetailedInclude = {
   },
 } satisfies Prisma.VolunteerAssignmentInclude
 
+/** Nom et avatar d'un compte (responsables du stock…). Même définition qu'app1. */
+export const userWithNameAndAvatarSelect = {
+  id: true,
+  pseudo: true,
+  nom: true,
+  prenom: true,
+  profilePicture: true,
+  emailHash: true,
+  updatedAt: true,
+} satisfies Prisma.UserSelect
+
 /**
  * Sélections de la carte du site, attendues par le layer `map` (contrat d'hôte). Mêmes définitions
  * qu'app1.

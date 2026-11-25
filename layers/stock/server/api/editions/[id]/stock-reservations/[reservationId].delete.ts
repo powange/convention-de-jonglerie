@@ -6,8 +6,8 @@ import {
   canManageStock,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
-import { canAccessStock } from '#server/utils/stock-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { canAccessStock } from '#stock/server/utils/stock-helpers'
 
 /**
  * DELETE /api/editions/[id]/stock-reservations/[reservationId]

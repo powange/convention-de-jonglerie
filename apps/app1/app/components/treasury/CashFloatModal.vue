@@ -88,7 +88,7 @@
 <script setup lang="ts">
 import { z } from 'zod'
 
-import type { UserSelectItem } from '~/components/UserSelector.vue'
+import type { UserSelectItem } from '#ui-commun/app/components/UserSelector.vue'
 
 /**
  * Saisir ou corriger un apport au fonds de caisse.

@@ -2,21 +2,21 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { erreurOrdreEmprunt } from '#server/utils/emprunt-stock'
-import {
-  changementsEnLot,
-  destinatairesDesChampsDEmprunt,
-} from '#server/utils/modification-lot-stock'
 import {
   canManageStock,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
 import { assertResponsablesDeLEdition } from '#server/utils/personnes-edition'
-import { MESSAGE_QUANTITE_MAX, QUANTITE_MAX_STOCK } from '#server/utils/quantite-stock'
-import { validateReservationLocation } from '#server/utils/stock-helpers'
-import { assertTagsBelongToEdition } from '#server/utils/stock-tags-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
+import { erreurOrdreEmprunt } from '#stock/server/utils/emprunt-stock'
+import {
+  changementsEnLot,
+  destinatairesDesChampsDEmprunt,
+} from '#stock/server/utils/modification-lot-stock'
+import { MESSAGE_QUANTITE_MAX, QUANTITE_MAX_STOCK } from '#stock/server/utils/quantite-stock'
+import { validateReservationLocation } from '#stock/server/utils/stock-helpers'
+import { assertTagsBelongToEdition } from '#stock/server/utils/stock-tags-helpers'
 
 /**
  * Chaque champ est **facultatif** : absent, il n'est pas touché. C'est ce qui distingue « laisser

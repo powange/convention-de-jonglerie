@@ -114,6 +114,7 @@ services:
       - ../../layers/auth:/app/layers/auth:cached
       - ../../layers/volunteers:/app/layers/volunteers:cached
       - ../../layers/map:/app/layers/map:cached
+      - ../../layers/stock:/app/layers/stock:cached
       # node_modules et dossiers de build dans des volumes (pas synchronisés avec l'hôte)
       - node_modules:/app/apps/app2/node_modules
       - ./.nuxt:/app/apps/app2/.nuxt

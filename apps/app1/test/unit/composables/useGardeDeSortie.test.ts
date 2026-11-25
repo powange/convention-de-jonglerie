@@ -36,7 +36,8 @@ vi.stubGlobal('watch', () => {})
 vi.stubGlobal('onMounted', () => {})
 vi.stubGlobal('onBeforeUnmount', () => {})
 
-const { useGardeDeSortie } = await import('../../../app/composables/useSaisieNonEnregistree')
+const { useGardeDeSortie } =
+  await import('../../../../../layers/ui/app/composables/useSaisieNonEnregistree')
 
 /** La garde que le composable vient de poser, telle que le routeur l'appellerait. */
 const derniereGarde = () => gardesPosees[gardesPosees.length - 1]!

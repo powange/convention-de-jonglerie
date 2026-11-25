@@ -9,7 +9,7 @@ vi.mock('#server/utils/permissions/edition-permissions', () => ({
   canManageStock: mockCanManageStock,
 }))
 
-vi.mock('#server/utils/stock-helpers', () => ({
+vi.mock('#stock/server/utils/stock-helpers', () => ({
   validateReservationLocation: mockValidateReservationLocation,
   stockItemLocationInclude: {},
 }))

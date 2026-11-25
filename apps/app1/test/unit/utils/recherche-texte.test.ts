@@ -5,7 +5,7 @@ import {
   contientTousLesMots,
   motsDeLaRequete,
   normaliserTexte,
-} from '../../../shared/utils/recherche-texte'
+} from '../../../../../layers/core/shared/utils/recherche-texte'
 
 /**
  * La comparaison de textes partagée par les écrans de recherche.

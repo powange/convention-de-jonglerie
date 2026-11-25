@@ -5,14 +5,14 @@ import { reservationsOuvertesSur } from '../../../../../app/utils/reservations-d
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
-import { MESSAGE_QUANTITE_MAX, QUANTITE_MAX_STOCK } from '#server/utils/quantite-stock'
+import { validateEditionId } from '#server/utils/validation-helpers'
+import { handleValidationError } from '#server/utils/validation-schemas'
+import { MESSAGE_QUANTITE_MAX, QUANTITE_MAX_STOCK } from '#stock/server/utils/quantite-stock'
 import {
   canAccessStock,
   getReservedQuantityOnPeriod,
   validateReservationLocation,
-} from '#server/utils/stock-helpers'
-import { validateEditionId } from '#server/utils/validation-helpers'
-import { handleValidationError } from '#server/utils/validation-schemas'
+} from '#stock/server/utils/stock-helpers'
 
 const bodySchema = z
   .object({

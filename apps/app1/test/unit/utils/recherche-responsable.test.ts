@@ -4,7 +4,7 @@ import {
   motsDeRecherche,
   MOTS_MAXIMUM,
   rechercheResponsable,
-} from '../../../shared/utils/recherche-responsable'
+} from '../../../../../layers/core/shared/utils/recherche-responsable'
 
 /**
  * Deux recherches cohabitent dans le même champ, et elles n'ont pas la même portée : une adresse

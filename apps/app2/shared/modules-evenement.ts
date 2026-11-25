@@ -97,7 +97,7 @@ export const MODULES_EVENEMENT: readonly DefinitionModule[] = [
     description: 'Inventaire du matériel, emplacements et prêts.',
     icone: 'i-heroicons-archive-box',
     droit: 'stock',
-    disponible: false,
+    disponible: true,
   },
   {
     cle: 'artistes',

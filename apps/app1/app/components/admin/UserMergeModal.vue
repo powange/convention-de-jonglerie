@@ -180,7 +180,7 @@
 <script setup lang="ts">
 import { useDebounce } from '@vueuse/core'
 
-import type { UserSelectItem } from '~/components/UserSelector.vue'
+import type { UserSelectItem } from '#ui-commun/app/components/UserSelector.vue'
 
 interface ModalUser {
   id: number

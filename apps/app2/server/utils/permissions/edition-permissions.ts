@@ -26,6 +26,8 @@ export interface EditionWithPermissions {
   ownerId: number
   /** Vocabulaire d'app1 : le propriétaire tient lieu de créateur et d'auteur de la convention. */
   creatorId: number
+  /** L'événement lui-même, faute de convention (lu par le stock, cf. personnes-edition). */
+  conventionId: number
   convention: { id: number; name: string; authorId: number; organizers: never[] }
   /** Les droits de `pourUtilisateur`, calculés au chargement. */
   droits: DroitsEvenement
@@ -44,6 +46,7 @@ export async function getEditionWithPermissions(
     ...evenement,
     creatorId: evenement.ownerId,
     // Pas de convention dans Flowvent : l'événement en tient lieu (même id, même nom).
+    conventionId: evenement.id,
     convention: {
       id: evenement.id,
       name: evenement.name,

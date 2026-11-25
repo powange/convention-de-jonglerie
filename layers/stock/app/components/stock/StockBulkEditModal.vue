@@ -239,7 +239,7 @@
 </template>
 
 <script setup lang="ts">
-import type { UserSelectItem } from '~/components/UserSelector.vue'
+import type { UserSelectItem } from '#ui-commun/app/components/UserSelector.vue'
 
 import { getZoneTypeColor, getZoneTypeIcon } from '#map/shared/utils/zone-types'
 
