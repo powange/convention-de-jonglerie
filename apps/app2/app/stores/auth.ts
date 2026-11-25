@@ -29,6 +29,8 @@ export const useAuthStore = defineStore('auth', () => {
   )
 
   const isAuthenticated = computed(() => !!user.value || loggedIn.value)
+  // Lu par le layer bénévoles (mode administrateur d'app1) : Flowvent n'en a pas.
+  const isAdminModeActive = computed(() => false)
 
   /**
    * Connexion par email/mot de passe.
@@ -82,6 +84,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     user,
     isAuthenticated,
+    isAdminModeActive,
     login,
     logout,
     updateUser,

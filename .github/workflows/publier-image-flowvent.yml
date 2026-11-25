@@ -7,9 +7,10 @@ name: Publier l'image Flowvent
 #
 # DEUX RÔLES, selon l'événement :
 #
-#   - sur une PR qui touche app2 OU le layer d'auth : construire SANS publier. C'est la garde qui
-#     manquait : le layer `layers/auth` a évolué pour app1 pendant des mois en important des modules
-#     qu'app2 n'avait pas, et app2 a cessé de se construire sans que rien ne le dise ;
+#   - sur une PR qui touche app2 OU un layer qu'elle étend (auth, core, ui, volunteers) : construire
+#     SANS publier. C'est la garde qui manquait : le layer `layers/auth` a évolué pour app1 pendant
+#     des mois en important des modules qu'app2 n'avait pas, et app2 a cessé de se construire sans
+#     que rien ne le dise ;
 #   - sur `main` (ou à la main) : construire et publier `:main` + `:sha-<commit>`.
 #
 # Les chemins filtrent : un lot qui ne touche qu'app1 ne reconstruit pas Flowvent.

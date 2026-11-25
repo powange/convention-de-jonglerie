@@ -89,36 +89,47 @@ de Flowvent.
 - **Liens en dur vers `/editions/<id>/…`** dans le layer (boutons, `actionUrl` des notifications) :
   Flowvent les redirige vers `/events/**` deux fois — `routeRules` pour un chargement complet, un
   middleware global pour une navigation dans l'application, qui ne passe pas par le serveur.
-- **Contrat d'hôte côté interface** : `useDateFormat` (core) importe `toIntlLocale` de
-  `~/utils/locales`, propre à chaque app ; les pages du layer attendent un composant
-  `EditionHeader` et un store `useEditionStore` fournis par l'app.
+- **Contrat d'hôte côté interface** — ce que chaque app fournit aux pages du layer :
+  - `~/utils/locales` avec `toIntlLocale` (importé par `useDateFormat`, dans `core`) ;
+  - le store `useEditionStore` (`fetchEditionById`, `getEditionById`, `loading`,
+    `canManageVolunteers`, `canEditEdition`, `isTeamLeader`). Une page ne doit JAMAIS appeler
+    `/api/editions/:id` elle-même : la configuration le faisait, et restait « introuvable » dans
+    Flowvent ;
+  - les composants `EditionHeader` (pages du bénévole) et `EditionBandeauSurPlace` (Flowvent : vide) ;
+  - le layout `edition-dashboard`, attribué à `…/gestion/**` par `routeRules`, pas par les pages.
+- **Réglages d'interface** : `layers/volunteers/app/app.config.ts` (`benevoles.modeExterne`, que
+  Flowvent éteint : la configuration n'offre plus le choix du mode).
+- **Rendu serveur** : le store de Flowvent passe par `useRequestFetch`, sinon l'appel part sans
+  cookie et l'organisateur reçoit un 404 sur la page non publique de ses propres bénévoles.
 - **Tâches planifiées** (rappels de créneau, nettoyage des échanges) : non programmées dans Flowvent.
 
-- **Politique de confidentialité de Flowvent** : `User` porte désormais régime, allergies, contact
-  d'urgence et pronoms. Dès que le formulaire de candidature les demande (lot 7), la page
-  `/privacy-policy` doit les annoncer — elle affirme aujourd'hui ne recueillir que l'identité.
+- **Politique de confidentialité de Flowvent** : mise à jour au lot 7b — candidature, engagement,
+  qui y a accès (organisateurs, responsables d'équipe, pseudo et photo pour les échanges), Gravatar.
+  À reprendre si le formulaire demande un champ nouveau.
+- **Lien du layer vers `/profile/mes-candidatures-benevole`** (page de confirmation d'une
+  notification) : la page n'existe que dans app1. Lien mort dans Flowvent, à trancher.
 - **Statut des événements** : Flowvent n'a pas de notion de publication ; ses événements sont créés
   `PUBLISHED`. À revoir s'il en gagne une.
 
 ## Les lots
 
-| Lot   | Contenu                                                                                                                                                                                                                                      | Touche app1 ?                            |
-| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| 1 ✅  | Famille 1 déplacée dans le layer, alias `#volunteers` (#927)                                                                                                                                                                                 | oui, imports seulement                   |
-| 2 ✅  | Famille 2 dans le nouveau layer `layers/core`, alias `#core` (#928)                                                                                                                                                                          | oui, imports seulement                   |
-| 3 ✅  | Derniers utilitaires bénévoles et interface des ports dans le layer ; contrat d'hôte écrit                                                                                                                                                   | oui, imports seulement                   |
-| 4a ✅ | Helpers serveur génériques dans `layers/core/server/socle`, réexportés par app1 (#930)                                                                                                                                                       | oui, réexports                           |
-| 4b ✅ | App2 étend `layers/core` ; ses copies réduites deviennent des réexports                                                                                                                                                                      | non                                      |
-| 3b ✅ | Lectures d'`Edition` revenues dans le layer depuis l'étape 0bis : fuseau et nom via `eventScope`, droits via `organizers`                                                                                                                    | oui                                      |
-| 3c ✅ | Fuseau promu sur `Event` (migrations app1 non destructives) ; repas optionnels (`MealsPort.disponible`)                                                                                                                                      | oui                                      |
-| 4c ✅ | Schéma de Flowvent : 14 modèles bénévoles, `Notification`, `Organizer` + `EditionOrganizer`, `Event` (fin, statut, fuseau), champs personnels de `User` — migration non destructive                                                          | non                                      |
-| 5a ✅ | `auth-utils` dans `layers/core`, réexporté par app1 (#935)                                                                                                                                                                                   | oui, réexport                            |
-| 5b ✅ | Flowvent implémente le contrat d'hôte, câble les 8 ports, étend `ui` + `volunteers` (pages écartées), dépendances npm du layer                                                                                                               | non (déplacement de `team-slot-helpers`) |
-| 6a ✅ | Composants `Ui*` du layer bénévoles dans `layers/ui` (#938)                                                                                                                                                                                  | oui, déplacement                         |
-| 6c ✅ | `useNotificateur`, `useParticipantTypes` → `ui` ; `useDateFormat`, table des emoji → `core` (#939)                                                                                                                                           | oui, déplacement                         |
-| 7a    | En-tête de gestion et registre des modules, `MarkdownEditor`, `useImageUrl`, tri et colonnes dans l'URL, `useFermetureProtegee`, `useModeClairTemporaire` → `ui` ; `filtres-url` → `core` ; `useContactResponsablesBenevoles` → `volunteers` | oui, déplacement                         |
-| 7b    | Écran de gestion de Flowvent : pages sous `/events/[id]`, barre latérale, `EditionHeader` propre, options retirées                                                                                                                           | non                                      |
-| 8     | Libellés : le layer est en 13 langues, Flowvent en français                                                                                                                                                                                  | non                                      |
+| Lot   | Contenu                                                                                                                                                                                                                                             | Touche app1 ?                                                         |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| 1 ✅  | Famille 1 déplacée dans le layer, alias `#volunteers` (#927)                                                                                                                                                                                        | oui, imports seulement                                                |
+| 2 ✅  | Famille 2 dans le nouveau layer `layers/core`, alias `#core` (#928)                                                                                                                                                                                 | oui, imports seulement                                                |
+| 3 ✅  | Derniers utilitaires bénévoles et interface des ports dans le layer ; contrat d'hôte écrit                                                                                                                                                          | oui, imports seulement                                                |
+| 4a ✅ | Helpers serveur génériques dans `layers/core/server/socle`, réexportés par app1 (#930)                                                                                                                                                              | oui, réexports                                                        |
+| 4b ✅ | App2 étend `layers/core` ; ses copies réduites deviennent des réexports                                                                                                                                                                             | non                                                                   |
+| 3b ✅ | Lectures d'`Edition` revenues dans le layer depuis l'étape 0bis : fuseau et nom via `eventScope`, droits via `organizers`                                                                                                                           | oui                                                                   |
+| 3c ✅ | Fuseau promu sur `Event` (migrations app1 non destructives) ; repas optionnels (`MealsPort.disponible`)                                                                                                                                             | oui                                                                   |
+| 4c ✅ | Schéma de Flowvent : 14 modèles bénévoles, `Notification`, `Organizer` + `EditionOrganizer`, `Event` (fin, statut, fuseau), champs personnels de `User` — migration non destructive                                                                 | non                                                                   |
+| 5a ✅ | `auth-utils` dans `layers/core`, réexporté par app1 (#935)                                                                                                                                                                                          | oui, réexport                                                         |
+| 5b ✅ | Flowvent implémente le contrat d'hôte, câble les 8 ports, étend `ui` + `volunteers` (pages écartées), dépendances npm du layer                                                                                                                      | non (déplacement de `team-slot-helpers`)                              |
+| 6a ✅ | Composants `Ui*` du layer bénévoles dans `layers/ui` (#938)                                                                                                                                                                                         | oui, déplacement                                                      |
+| 6c ✅ | `useNotificateur`, `useParticipantTypes` → `ui` ; `useDateFormat`, table des emoji → `core` (#939)                                                                                                                                                  | oui, déplacement                                                      |
+| 7a ✅ | En-tête de gestion et registre des modules, `MarkdownEditor`, `useImageUrl`, tri et colonnes dans l'URL, `useFermetureProtegee`, `useModeClairTemporaire` → `ui` ; `filtres-url` → `core` ; `useContactResponsablesBenevoles` → `volunteers` (#940) | oui, déplacement                                                      |
+| 7b    | Écran de gestion de Flowvent : pages sous `/events/[id]`, barre latérale, `EditionHeader` propre, mode externe retiré, `nuxt-qrcode`, politique de confidentialité                                                                                  | oui : `config.vue` passe par le store, `CarteRepliable` (hydratation) |
+| 8     | Libellés : le layer est en 13 langues, Flowvent en français                                                                                                                                                                                         | non                                                                   |
 
 Chaque lot touchant app1 est un **déplacement sans changement de comportement**, prouvé par ses
 suites de tests (unitaires et Nuxt) et par le serveur de dev.
