@@ -1,7 +1,7 @@
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import ImageUpload from '../../../../app/components/ui/ImageUpload.vue'
+import ImageUpload from '#ui-commun/app/components/ui/ImageUpload.vue'
 import { global } from '../../globales-nitro'
 
 /**

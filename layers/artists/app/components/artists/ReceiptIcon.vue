@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { estUnJustificatifPdf } from '~~/shared/utils/justificatif-pdf'
+import { estUnJustificatifPdf } from '#core/shared/utils/justificatif-pdf'
 
 const props = defineProps<{
   /** L'URL du justificatif, ou `null` : l'icône n'apparaît pas sans fichier. */
