@@ -563,7 +563,7 @@ import { estUnLienHttp } from '~/utils/lien-externe'
 
 import type { StepperItem } from '@nuxt/ui'
 
-import { premierJourDeSemaine } from '~~/shared/utils/semaine'
+import { premierJourDeSemaine } from '#core/shared/utils/semaine'
 import { servicesDepuisEdition } from '~~/shared/utils/services-d-edition'
 
 // La semaine commence le lundi en France, le dimanche ailleurs : la valeur suit la langue de qui

@@ -4,7 +4,7 @@ import {
   finDuBenevolat,
   visibiliteDuBenevolat,
   type SituationDuBenevolat,
-} from '../../../server/utils/visibilite-benevoles'
+} from '#volunteers/server/utils/visibilite-benevoles'
 
 /**
  * La fermeture automatique du bénévolat.

@@ -588,8 +588,8 @@
 </template>
 
 <script setup lang="ts">
+import { formaterDateHeure, formaterHeure } from '#core/shared/utils/fuseau-edition'
 import { comparerLignes, meriteUnDiff, type ComparaisonLignes } from '~~/shared/utils/diff-lignes'
-import { formaterDateHeure, formaterHeure } from '~~/shared/utils/fuseau-edition'
 import { editionDayKeys } from '~~/shared/utils/program-days'
 import {
   ancrerDansFuseau,

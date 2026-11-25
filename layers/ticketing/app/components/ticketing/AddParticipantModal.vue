@@ -828,7 +828,7 @@ import { ref, computed, watch } from 'vue'
 
 import { isFreePrice, isFixedPrice } from '../../utils/ticketing/tiers'
 
-import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+import { estAdresseEmail } from '#core/shared/utils/adresse-email'
 
 const { money, symbol } = useEditionCurrency()
 

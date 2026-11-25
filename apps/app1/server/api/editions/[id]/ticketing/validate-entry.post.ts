@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { schemaAdresseEmail } from '#core/shared/utils/adresse-email'
 import { isHttpError } from '#server/types/api'
 import { requireAuth } from '#server/utils/auth-utils'
 import { updateUserInfo } from '#server/utils/editions/ticketing/user-info-update'
@@ -9,7 +10,6 @@ import { billetAnnule } from '#server/utils/ticketing/billets-qui-comptent'
 import { journaliserMouvementDEntree } from '#server/utils/ticketing/journal-des-entrees'
 import { departagerLesEntrees } from '#server/utils/ticketing/mouvement-de-validation'
 import { utilisateursResponsablesDeLEquipe } from '#volunteers/server/utils/editions/volunteers/responsables-equipe'
-import { schemaAdresseEmail } from '~~/shared/utils/adresse-email'
 
 const bodySchema = z.object({
   participantIds: z.array(z.number()).min(1),

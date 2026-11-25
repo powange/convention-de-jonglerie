@@ -596,7 +596,7 @@ import { repasConnu, repasDepuisUrl, requeteRepas } from '../../../../../utils/r
 
 // La journée et l'heure SUR PLACE, pour le repas présenté d'emblée. Les utils partagés ne sont pas
 // auto-importés dans un layer, contrairement à ceux de `layers/meals/app/utils`.
-import { heureDans, journeeDans } from '~~/shared/utils/fuseau-edition'
+import { heureDans, journeeDans } from '#core/shared/utils/fuseau-edition'
 
 // Layer meals : imports cœur via #imports (résolution cross-layer) plutôt que ~/ (qui pointe le layer).
 

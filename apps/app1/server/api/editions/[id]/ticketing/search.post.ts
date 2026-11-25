@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { cleDeBoiteDeReception } from '#core/shared/utils/adresse-email'
 import { isHttpError } from '#server/types/api'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
@@ -15,7 +16,6 @@ import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-a
 import { resoudreLesValidateurs } from '#server/utils/ticketing/nom-du-validateur'
 import { detteDeCommande, montantARembourser } from '#server/utils/ticketing/remboursement-du'
 import { sanitizeEmail } from '#server/utils/validation-helpers'
-import { cleDeBoiteDeReception } from '~~/shared/utils/adresse-email'
 import {
   normaliserPhases,
   phasesDuBenevole,

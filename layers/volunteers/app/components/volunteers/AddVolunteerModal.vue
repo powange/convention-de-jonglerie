@@ -182,7 +182,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 
-import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+import { estAdresseEmail } from '#core/shared/utils/adresse-email'
 
 interface User {
   id: number

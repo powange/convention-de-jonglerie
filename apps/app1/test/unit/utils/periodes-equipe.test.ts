@@ -5,7 +5,7 @@ import {
   equipeRecoupeLesDisponibilites,
   equipesProposables,
   periodesDeLEquipe,
-} from '../../../shared/utils/periodes-equipe'
+} from '#volunteers/shared/utils/periodes-equipe'
 
 /**
  * Les périodes d'une équipe, et ce qu'on propose au candidat.

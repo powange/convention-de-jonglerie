@@ -10,9 +10,9 @@ import type {
   VolunteerPorts,
 } from './types'
 
+import { infosAlimentaires, infosPersonnellesSelect } from '#core/server/utils/infos-personnelles'
 import * as mealsService from '#server/meals/meals-service'
 import { sendEmail } from '#server/utils/emailService'
-import { infosAlimentaires, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import {
   ensureVolunteerConversations,
   removeVolunteerFromOrganizersConversation,

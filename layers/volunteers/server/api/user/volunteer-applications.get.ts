@@ -1,8 +1,8 @@
 import { avecCoequipiers, coequipiersSelect } from '../../utils/coequipiers-creneau'
 
+import { infosPersonnelles, infosPersonnellesSelect } from '#core/server/utils/infos-personnelles'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { infosPersonnelles, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 export default wrapApiHandler(

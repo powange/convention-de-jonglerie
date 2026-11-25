@@ -388,7 +388,7 @@
 </template>
 
 <script setup lang="ts">
-import { fuseauUtilisable, journeeDans } from '~~/shared/utils/fuseau-edition'
+import { fuseauUtilisable, journeeDans } from '#core/shared/utils/fuseau-edition'
 import {
   CONVENTION_RIGHTS,
   EDITION_RIGHTS,

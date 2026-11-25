@@ -202,7 +202,7 @@
  * Une personne telle qu'une ASSIGNATION la porte — sans adresse e-mail, que le point d'API des
  * groupes ne transmet plus.
  */
-import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
+import { versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
 import { nomCompletDUnCompte } from '~~/shared/utils/nom-affichable'
 
 interface AssignedUser {

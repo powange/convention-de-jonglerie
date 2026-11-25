@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { EditionMarker } from '~/composables/useEditionMarkers'
 import type { EditionZone } from '~/composables/useEditionZones'
-import { DEFAULT_HEX_PALETTE } from '~/utils/default-palette'
 import { fromZoneSelection, NO_ZONE, toZoneSelection } from '~/utils/map-zone-attachment'
 
+import { DEFAULT_HEX_PALETTE } from '#core/app/utils/default-palette'
 import { EDITION_ZONE_TYPES, getZoneTypeIcon } from '~~/shared/utils/zone-types'
 
 interface Props {

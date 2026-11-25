@@ -787,11 +787,11 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition, EditionShowCallPublic, ShowApplication, ShowPreset } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
-import { markdownToHtml } from '~/utils/markdown'
 
 import type { FormSubmitEvent } from '@nuxt/ui'
 
-import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+import { markdownToHtml } from '#core/app/utils/markdown'
+import { estAdresseEmail } from '#core/shared/utils/adresse-email'
 
 const route = useRoute()
 // `buildLoginUrl` nettoie l'URL, refuse de boucler sur une page d'authentification et

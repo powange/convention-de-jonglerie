@@ -1,7 +1,7 @@
 import type { EtatDuCreneau } from './changement-de-creneau'
 
+import { formaterDateHeure } from '#core/shared/utils/fuseau-edition'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
-import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
 
 /**
  * Prévenir les personnes affectées quand leur créneau bouge — constat B4.

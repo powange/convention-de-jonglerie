@@ -244,7 +244,7 @@
 <script setup lang="ts">
 import { performanceVierge, type PerformanceInput } from '~/utils/show-performances'
 
-import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
+import { versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
 
 const props = defineProps<{
   show?: any

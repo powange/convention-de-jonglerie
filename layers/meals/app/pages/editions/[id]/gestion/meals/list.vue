@@ -380,14 +380,6 @@
 </template>
 
 <script setup lang="ts">
-import { exporterTableauEnPdf } from '~/utils/export-pdf-tableau'
-import {
-  dessinerCaseACocher,
-  LARGEUR_COLONNE_COCHE,
-  styleColonneCoche,
-} from '~/utils/pdf-case-a-cocher'
-import { telechargerFichier } from '~/utils/telechargement'
-
 // Import explicite : plusieurs layers exportent un `filtresDepuisUrl`, et l'auto-import ne
 // saurait pas lequel prendre.
 import {
@@ -407,7 +399,14 @@ import {
   resumerRepas,
 } from '../../../../../utils/restauration-pdf'
 
-import { nomDeFichierCsv, versCsv } from '~~/shared/utils/csv'
+import { exporterTableauEnPdf } from '#core/app/utils/export-pdf-tableau'
+import {
+  dessinerCaseACocher,
+  LARGEUR_COLONNE_COCHE,
+  styleColonneCoche,
+} from '#core/app/utils/pdf-case-a-cocher'
+import { telechargerFichier } from '#core/app/utils/telechargement'
+import { nomDeFichierCsv, versCsv } from '#core/shared/utils/csv'
 
 const route = useRoute()
 const editionStore = useEditionStore()

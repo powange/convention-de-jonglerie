@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
+import { generateVolunteerQrCodeToken } from '#core/server/utils/token-generator'
 import { isHttpError } from '#server/types/api'
 import { requireAuth } from '#server/utils/auth-utils'
 import { syncOrganizersGroupParticipants } from '#server/utils/messenger-helpers'
 import { canManageEditionOrganizers } from '#server/utils/permissions/edition-permissions'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
-import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
 
 const bodySchema = z.object({
   organizerId: z.number().int().positive(),

@@ -7,9 +7,9 @@ import { placesOccupees } from '../../../../utils/places-creneau'
 import type { Prisma } from '#server/types/prisma'
 import type { PrismaTransaction } from '#server/types/prisma-helpers'
 
+import { createLogger } from '#core/server/utils/logger'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { createLogger } from '#server/utils/logger'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { createRateLimiter } from '#server/utils/rate-limiter'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -26,7 +26,7 @@ import {
 import {
   estEquipeHorsCharge,
   estHorsAssignationAutomatique,
-} from '~~/shared/utils/benevoles-volants'
+} from '#volunteers/shared/utils/benevoles-volants'
 
 // Types pour les données récupérées de la base de données
 type VolunteerWithTeamAssignments = Prisma.EditionVolunteerApplicationGetPayload<{

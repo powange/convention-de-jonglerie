@@ -353,11 +353,10 @@
 <script setup lang="ts">
 import { z } from 'zod'
 
-import { DEFAULT_HEX_PALETTE } from '~/utils/default-palette'
-
 import type { VolunteerTeam } from '#imports'
 
-import { equipeCouvreAuMoinsUnePeriode } from '~~/shared/utils/periodes-equipe'
+import { DEFAULT_HEX_PALETTE } from '#core/app/utils/default-palette'
+import { equipeCouvreAuMoinsUnePeriode } from '#volunteers/shared/utils/periodes-equipe'
 
 // Props
 interface Props {

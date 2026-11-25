@@ -1,4 +1,4 @@
-import type { AllergySeverityLevel } from './allergy-severity'
+import type { AllergySeverityLevel } from '#core/app/utils/allergy-severity'
 
 /**
  * Interface pour les données d'une candidature de bénévole

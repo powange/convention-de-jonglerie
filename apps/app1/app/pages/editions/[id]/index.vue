@@ -603,8 +603,8 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
-import { markdownToHtml } from '~/utils/markdown'
 
+import { markdownToHtml } from '#core/app/utils/markdown'
 import { editionVisiblePubliquement } from '~~/shared/utils/visibilite-edition'
 
 const { formatDateTimeRange } = useDateFormat()

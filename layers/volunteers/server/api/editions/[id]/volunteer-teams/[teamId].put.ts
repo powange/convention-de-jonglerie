@@ -4,7 +4,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { validateEditionId, validateStringResourceId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
-import { equipeCouvreAuMoinsUnePeriode } from '~~/shared/utils/periodes-equipe'
+import { equipeCouvreAuMoinsUnePeriode } from '#volunteers/shared/utils/periodes-equipe'
 
 const updateTeamSchema = z.object({
   name: z.string().min(1, "Le nom de l'équipe est requis").max(100).optional(),

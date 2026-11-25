@@ -9,6 +9,11 @@
  * la géolocalisation : une seconde définition des périodes finirait par en contredire la première.
  */
 import {
+  periodeEdition,
+  type BornesEditionPresence,
+  type PeriodeEdition,
+} from '#core/shared/utils/presence-edition'
+import {
   equipesDe,
   personnesDuCreneau,
   type AcceptedVolunteer,
@@ -17,12 +22,7 @@ import {
 import {
   estEquipeHorsCharge,
   estHorsAssignationAutomatique,
-} from '~~/shared/utils/benevoles-volants'
-import {
-  periodeEdition,
-  type BornesEditionPresence,
-  type PeriodeEdition,
-} from '~~/shared/utils/presence-edition'
+} from '#volunteers/shared/utils/benevoles-volants'
 
 /** Les trois périodes, dans l'ordre où elles se vivent. */
 export const PERIODES: PeriodeEdition[] = ['montage', 'evenement', 'demontage']

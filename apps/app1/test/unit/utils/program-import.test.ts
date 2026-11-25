@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formaterHeure } from '../../../shared/utils/fuseau-edition'
+import { formaterHeure } from '#core/shared/utils/fuseau-edition'
 import {
   ancrerDansFuseau,
   construireElementsDeJournee,

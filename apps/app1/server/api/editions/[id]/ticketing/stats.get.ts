@@ -1,11 +1,11 @@
 import { DateTime } from 'luxon'
 
+import { fuseauUtilisable } from '#core/shared/utils/fuseau-edition'
 import { isHttpError } from '#server/types/api'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
 import { benevolePresentSurPlace } from '#server/utils/ticketing/benevoles-presents'
 import { billetsQuiComptent, estUnParticipant } from '#server/utils/ticketing/billets-qui-comptent'
-import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
 import { compterLesParticipants } from '~~/shared/utils/participants-par-personne'
 
 export default wrapApiHandler(

@@ -243,7 +243,7 @@ import type { VolunteerTimeSlot, VolunteerTeam } from '~/types/volunteer'
 import { dureeTraduisible } from '../../../../utils/plage-horaire'
 import { decalageTraduisible, horairesEffectifs } from '../../../../utils/retard-creneau'
 
-import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+import { formaterDateHeure } from '#core/shared/utils/fuseau-edition'
 
 interface Assignment {
   id: string

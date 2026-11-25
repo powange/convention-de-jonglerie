@@ -1,4 +1,4 @@
-import { journeeDans } from './fuseau-edition'
+import { journeeDans } from '#core/shared/utils/fuseau-edition'
 
 /**
  * Les filtres d'échéance des tâches, découpés à l'heure de l'ÉDITION — constat B4.

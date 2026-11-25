@@ -2,10 +2,10 @@ import { createHash } from 'crypto'
 
 import { z } from 'zod'
 
+import { schemaAdresseEmail } from '#core/shared/utils/adresse-email'
 import { requireAuth } from '#server/utils/auth-utils'
 import { applyCustomName } from '#server/utils/editions/ticketing/tiers'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
-import { schemaAdresseEmail } from '~~/shared/utils/adresse-email'
 
 const itemSchema = z.object({
   tierId: z.number(),

@@ -364,7 +364,7 @@ import {
   formaterJournee,
   versChampLocal,
   versInstant,
-} from '~~/shared/utils/fuseau-edition'
+} from '#core/shared/utils/fuseau-edition'
 import {
   detecterChevauchements,
   grouperParJournee,

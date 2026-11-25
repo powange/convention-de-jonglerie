@@ -221,9 +221,8 @@
 </template>
 
 <script setup lang="ts">
-import { markdownEnTexte } from '~/utils/markdown'
-
-import { formaterDateHeure, fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
+import { markdownEnTexte } from '#core/app/utils/markdown'
+import { formaterDateHeure, fuseauUtilisable } from '#core/shared/utils/fuseau-edition'
 
 const { t, locale } = useI18n()
 const { getImageUrl } = useImageUrl()

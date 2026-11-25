@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import { manquementsDeLaCandidature } from '../../../../../layers/volunteers/app/utils/validation-candidature'
 import { volunteerApplicationBodySchema } from '#volunteers/server/utils/editions/volunteers/applications'
-import { telephoneCandidatureAcceptable } from '../../../shared/utils/telephone-candidature'
+import { telephoneCandidatureAcceptable } from '#volunteers/shared/utils/telephone-candidature'
 
 /**
  * Le formulaire et le point d'API doivent rendre le MÊME verdict sur un téléphone.

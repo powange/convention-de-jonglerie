@@ -11,8 +11,8 @@ import {
   getAllergySeverityDescriptionKey,
   isValidAllergySeverityLevel,
   getAllergySeverityBadgeClasses,
-} from '../../../app/utils/allergy-severity'
-import type { AllergySeverityLevel } from '../../../app/utils/allergy-severity'
+} from '#core/app/utils/allergy-severity'
+import type { AllergySeverityLevel } from '#core/app/utils/allergy-severity'
 
 const LEVELS: AllergySeverityLevel[] = ['LIGHT', 'MODERATE', 'SEVERE', 'CRITICAL']
 

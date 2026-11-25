@@ -1,4 +1,4 @@
-import { peutEchangerSesCreneaux } from '~~/shared/utils/benevoles-volants'
+import { peutEchangerSesCreneaux } from '#volunteers/shared/utils/benevoles-volants'
 
 /**
  * Refuse la requête si l'édition a fermé les échanges de créneaux.

@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
+import { schemaUrlExterne } from '#core/shared/utils/url-externe'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { listerSources, MAX_SOURCES_PAR_EDITION } from '#server/utils/edition-analysis-sources'
 import { getEditionForEdit } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { schemaUrlExterne } from '#shared/utils/url-externe'
 
 /*
  * ⚠️ `schemaUrlExterne`, et non le validateur d'URL nu de zod : le schéma maison élague les

@@ -139,7 +139,7 @@ import { reactive, ref, onMounted } from 'vue'
 
 import type { Convention } from '~/types'
 
-import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+import { estAdresseEmail } from '#core/shared/utils/adresse-email'
 
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()

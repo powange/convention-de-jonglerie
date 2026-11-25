@@ -11,7 +11,7 @@ import type {
   MealTicketValidationRow,
 } from './types'
 
-import { infosAlimentaires, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
+import { infosAlimentaires, infosPersonnellesSelect } from '#core/server/utils/infos-personnelles'
 import { donneDroitAuRepas } from '~~/shared/utils/droit-au-repas'
 
 const artistUserSelect = {

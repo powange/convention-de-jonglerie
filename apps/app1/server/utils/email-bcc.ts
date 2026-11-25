@@ -1,4 +1,4 @@
-import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+import { estAdresseEmail } from '#core/shared/utils/adresse-email'
 
 /**
  * Adresses en copie cachée de tous les envois réels (SMTP_BCC), pour archivage.

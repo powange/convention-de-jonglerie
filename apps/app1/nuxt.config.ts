@@ -147,6 +147,8 @@ export default defineNuxtConfig({
   // Layers modulaires (étape 2) — bénévole, repas, tâches, FAQ, objets trouvés, ateliers, covoiturage
   // Monorepo : les layers sont partagés à la racine (../../layers), pas dans l'app.
   extends: [
+    // Utilitaires techniques sans métier (journalisation, CSV, Markdown, dates…), partagés avec app2.
+    '../../layers/core',
     // Mécanismes d'interface sans métier — pastilles de compteur du menu, pour l'instant.
     // Placé en tête : ce dont les autres peuvent dépendre, jamais l'inverse.
     '../../layers/ui',

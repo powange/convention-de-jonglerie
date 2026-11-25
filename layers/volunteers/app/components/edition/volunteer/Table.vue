@@ -619,20 +619,6 @@
 import { h, resolveComponent, watch, onMounted, nextTick } from 'vue'
 
 import {
-  getAllergySeverityInfo,
-  getAllergySeverityBadgeClasses,
-  requiresEmergencyContact,
-} from '~/utils/allergy-severity'
-import { formatDateRange } from '~/utils/date'
-import { exporterTableauEnPdf } from '~/utils/export-pdf-tableau'
-import { telechargerFichier } from '~/utils/telechargement'
-import {
-  updateVolunteerApplication,
-  updateVolunteerApplicationStatus,
-  assignVolunteerTeams,
-} from '~/utils/volunteer-application-api'
-
-import {
   candidaturesEnCsv,
   colonnesCandidaturesVisibles,
   type CandidatureExportable,
@@ -650,7 +636,20 @@ import {
 
 import type { ContextMenuItem, TableColumn, TableRow } from '@nuxt/ui'
 
-import { nomDeFichierCsv } from '~~/shared/utils/csv'
+import {
+  getAllergySeverityInfo,
+  getAllergySeverityBadgeClasses,
+  requiresEmergencyContact,
+} from '#core/app/utils/allergy-severity'
+import { formatDateRange } from '#core/app/utils/date'
+import { exporterTableauEnPdf } from '#core/app/utils/export-pdf-tableau'
+import { telechargerFichier } from '#core/app/utils/telechargement'
+import { nomDeFichierCsv } from '#core/shared/utils/csv'
+import {
+  updateVolunteerApplication,
+  updateVolunteerApplicationStatus,
+  assignVolunteerTeams,
+} from '#volunteers/app/utils/volunteer-application-api'
 
 interface Props {
   volunteersInfo: any

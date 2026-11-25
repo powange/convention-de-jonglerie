@@ -323,7 +323,7 @@ import { entierPositifDuChamp } from '~/utils/champ-numerique'
 
 import { isFreePrice } from '../../utils/ticketing/tiers'
 
-import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
+import { versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
 import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
 
 interface TicketingTier {

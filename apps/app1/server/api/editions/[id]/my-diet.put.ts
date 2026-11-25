@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
+import { misesAJourDuProfil } from '#core/server/utils/infos-personnelles'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { misesAJourDuProfil } from '#server/utils/infos-personnelles'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 const updateDietSchema = z.object({

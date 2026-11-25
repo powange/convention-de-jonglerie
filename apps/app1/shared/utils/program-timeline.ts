@@ -11,7 +11,7 @@
  * minces et que ces règles soient vérifiables sans base de données.
  */
 
-import { finDeJourneeDeProgramme, journeeDeProgramme } from './fuseau-edition'
+import { finDeJourneeDeProgramme, journeeDeProgramme } from '#core/shared/utils/fuseau-edition'
 
 /** D'où vient une entrée du programme. Sert à l'affichage (icône, couleur) et aux liens. */
 export type SourceProgramme = 'workshop' | 'spectacle' | 'element'

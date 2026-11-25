@@ -1,4 +1,4 @@
-import { journeeDans, versChampLocal } from './fuseau-edition'
+import { journeeDans, versChampLocal } from '#core/shared/utils/fuseau-edition'
 
 /**
  * Traduire la présence d'un artiste dans le vocabulaire des repas.

@@ -375,7 +375,7 @@
 </template>
 
 <script setup lang="ts">
-import { formatDate } from '~/utils/date'
+import { formatDate } from '#core/app/utils/date'
 
 definePageMeta({
   middleware: ['auth-protected', 'super-admin'],

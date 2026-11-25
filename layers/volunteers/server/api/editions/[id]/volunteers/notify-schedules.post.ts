@@ -1,17 +1,16 @@
 import { z } from 'zod'
 
 import { nomDeSalutation } from '#auth/server/utils/nom-de-salutation'
+import { apresLaReponse, enTranches } from '#core/server/utils/apres-la-reponse'
+import { formaterHeure, formaterJournee, heureDans } from '#core/shared/utils/fuseau-edition'
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { apresLaReponse, enTranches } from '#server/utils/apres-la-reponse'
 import { requireAuth } from '#server/utils/auth-utils'
 import { generateVolunteerScheduleEmailHtml, getSiteUrl } from '#server/utils/emailService'
 import { NotificationService } from '#server/utils/notification-service'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
-import { estHorsAssignationAutomatique } from '~~/shared/utils/benevoles-volants'
-// Depuis un layer, l'alias est `~~` : `~` ne résout pas vers la couche application.
-import { formaterHeure, formaterJournee, heureDans } from '~~/shared/utils/fuseau-edition'
+import { estHorsAssignationAutomatique } from '#volunteers/shared/utils/benevoles-volants'
 
 /** Envois simultanés par tranche : le nombre de requêtes en vol reste borné. */
 const TAILLE_DE_TRANCHE = 10

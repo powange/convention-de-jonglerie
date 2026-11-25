@@ -9,7 +9,7 @@ import {
   LARGEUR_COLONNE_COCHE,
   lignesAvecCoche,
   styleColonneCoche,
-} from '../../../app/utils/pdf-case-a-cocher'
+} from '#core/app/utils/pdf-case-a-cocher'
 
 /**
  * La colonne de cases à cocher des tableaux imprimés.

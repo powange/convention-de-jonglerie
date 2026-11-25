@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { LUNDI, premierJourDeSemaine } from '../../../shared/utils/semaine'
+import { LUNDI, premierJourDeSemaine } from '#core/shared/utils/semaine'
 
 /**
  * Les calendriers démarraient tous le dimanche — le défaut de la bibliothèque — alors qu'en

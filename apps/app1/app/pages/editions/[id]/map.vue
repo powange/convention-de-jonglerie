@@ -219,8 +219,8 @@ import {
 
 import type { ExternalMapProvider } from '~~/shared/utils/external-map'
 
+import { formaterHeure, formaterJournee } from '#core/shared/utils/fuseau-edition'
 import { externalMapEmbedUrl as buildExternalMapEmbedUrl } from '~~/shared/utils/external-map'
-import { formaterHeure, formaterJournee } from '~~/shared/utils/fuseau-edition'
 // ⚠️ Import EXPLICITE : les utils de `shared/` ne sont pas auto-importés — `program.vue` importe
 // `estTermine` de la même façon. Sans cette ligne, le filtre lèverait au premier popup.
 import { estTermine } from '~~/shared/utils/program-timeline'

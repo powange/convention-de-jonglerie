@@ -491,9 +491,8 @@
 </template>
 
 <script setup lang="ts">
-import { withdrawVolunteerApplication } from '~/utils/volunteer-application-api'
-
-import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
+import { fuseauUtilisable } from '#core/shared/utils/fuseau-edition'
+import { withdrawVolunteerApplication } from '#volunteers/app/utils/volunteer-application-api'
 
 // Données « édition » à plat renvoyées par /api/user/volunteer-applications.
 // Métadonnées génériques (id/name/dates) issues d'`Event`, données d'affichage propres au domaine

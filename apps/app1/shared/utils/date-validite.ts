@@ -20,7 +20,7 @@
  * Ce module ne dépend ni du réseau ni de la base : il se teste sur des chaînes.
  */
 
-import { versInstant } from './fuseau-edition'
+import { versInstant } from '#core/shared/utils/fuseau-edition'
 
 /**
  * Une heure murale nue, telle que la rend un sélecteur de date : sans fuseau, ni `Z`, ni décalage.

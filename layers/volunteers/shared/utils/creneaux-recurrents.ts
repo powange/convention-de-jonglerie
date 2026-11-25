@@ -1,4 +1,4 @@
-import { journeesEntre, versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
+import { journeesEntre, versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
 
 /**
  * Étendue d'une répétition de créneau bénévole.

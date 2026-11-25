@@ -389,8 +389,8 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { EditionShowCall, ShowCallVisibility } from '~/types'
 
-import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
-import { estUrlExterne } from '~~/shared/utils/url-externe'
+import { versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
+import { estUrlExterne } from '#core/shared/utils/url-externe'
 
 definePageMeta({
   middleware: ['auth-protected'],

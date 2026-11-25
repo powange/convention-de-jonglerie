@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { wallClockToUtcIso } from '../../../app/utils/date'
+import { wallClockToUtcIso } from '#core/app/utils/date'
 
 /**
  * Le cas d'origine : sur `/editions/:id/gestion/ai-update`, une date déjà correcte était

@@ -841,10 +841,6 @@
 </template>
 
 <script setup lang="ts">
-// Ces deux-ci vivent dans la couche application, que l'alias `~` atteint bien.
-import { dessinerCaseACocher, ENTETE_COCHE, styleColonneCoche } from '~/utils/pdf-case-a-cocher'
-import { telechargerFichier } from '~/utils/telechargement'
-
 import { useSaisieTemporisee, getAccommodationTypeLabel, markdownToHtml } from '#imports'
 
 // Chemin relatif, comme `filtres-artistes-url` juste en dessous : l'alias `~` ne résout pas
@@ -860,8 +856,14 @@ import { filtresDepuisUrl, requeteArtistes } from '../../../../../utils/filtres-
 
 import type { TableColumn } from '@nuxt/ui'
 
-import { nomDeFichierCsv, versCsv } from '~~/shared/utils/csv'
-import { formaterDateHeure, formaterJournee } from '~~/shared/utils/fuseau-edition'
+import {
+  dessinerCaseACocher,
+  ENTETE_COCHE,
+  styleColonneCoche,
+} from '#core/app/utils/pdf-case-a-cocher'
+import { telechargerFichier } from '#core/app/utils/telechargement'
+import { nomDeFichierCsv, versCsv } from '#core/shared/utils/csv'
+import { formaterDateHeure, formaterJournee } from '#core/shared/utils/fuseau-edition'
 import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
 import { resteAPayer, resteAVerserEnTout } from '~~/shared/utils/reste-a-verser-a-un-artiste'
 

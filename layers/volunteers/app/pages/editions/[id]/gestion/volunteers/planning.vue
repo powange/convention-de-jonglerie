@@ -182,6 +182,7 @@ import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '#imports'
 
 import { listeTronquee, pagesRestantes } from '../../../../../utils/pagination-complete'
 
+import { fuseauUtilisable, versChampLocal } from '#core/shared/utils/fuseau-edition'
 import { effectifParPeriode, PERIODES } from '#volunteers/app/utils/effectif-par-periode'
 import { detecterSpectaclesManques } from '#volunteers/app/utils/spectacles-manques'
 import {
@@ -190,7 +191,6 @@ import {
   calculateVolunteersStatsIndividual,
   calculateVolunteersStatsByTeam,
 } from '#volunteers/app/utils/volunteer-stats'
-import { fuseauUtilisable, versChampLocal } from '~~/shared/utils/fuseau-edition'
 
 const { t } = useI18n()
 const route = useRoute()

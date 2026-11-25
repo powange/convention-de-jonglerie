@@ -100,7 +100,7 @@
 <script setup lang="ts">
 import type TicketingUserInfoSection from './TicketingUserInfoSection.vue'
 
-import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+import { formaterDateHeure } from '#core/shared/utils/fuseau-edition'
 
 interface Organizer {
   id: number

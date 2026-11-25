@@ -665,7 +665,7 @@
 <script setup lang="ts">
 import { CalendarDate } from '@internationalized/date'
 
-import { premierJourDeSemaine } from '~~/shared/utils/semaine'
+import { premierJourDeSemaine } from '#core/shared/utils/semaine'
 
 // La semaine commence le lundi en France, le dimanche ailleurs : la valeur suit la langue de qui
 // regarde plutôt que d'être figée. Sans elle, `UCalendar` démarre toujours le dimanche.

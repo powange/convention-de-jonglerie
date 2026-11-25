@@ -329,6 +329,7 @@
 </template>
 
 <script setup lang="ts">
+import type { PeriodeEdition } from '#core/shared/utils/presence-edition'
 // `VolunteerStats` était redéclaré ici, à l'identique de celui d'où viennent les données. La
 // copie a cessé de suivre l'original dès qu'un champ y est apparu, et le composant lisait un
 // type qui ne décrivait plus ce qu'il recevait.
@@ -339,7 +340,6 @@ import type {
   VolunteerStatsIndividual,
   TeamStats,
 } from '#volunteers/app/utils/volunteer-stats'
-import type { PeriodeEdition } from '~~/shared/utils/presence-edition'
 
 interface Props {
   canManageVolunteers: boolean

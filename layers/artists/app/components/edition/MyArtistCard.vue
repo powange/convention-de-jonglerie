@@ -199,7 +199,7 @@
 </template>
 
 <script setup lang="ts">
-import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+import { formaterDateHeure } from '#core/shared/utils/fuseau-edition'
 
 interface ArtistShow {
   id: number

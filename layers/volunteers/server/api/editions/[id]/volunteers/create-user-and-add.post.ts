@@ -1,13 +1,13 @@
 import { z } from 'zod'
 
+import { generateVolunteerQrCodeToken } from '#core/server/utils/token-generator'
+import { schemaAdresseEmail } from '#core/shared/utils/adresse-email'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { createPendingUserAndInvite } from '#server/utils/invitation'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
-import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
 import { sanitizeEmail, validateEditionId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
-import { schemaAdresseEmail } from '~~/shared/utils/adresse-email'
 
 const bodySchema = z.object({
   email: schemaAdresseEmail,

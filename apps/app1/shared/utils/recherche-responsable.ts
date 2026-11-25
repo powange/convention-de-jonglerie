@@ -1,4 +1,4 @@
-import { estAdresseEmail } from './adresse-email'
+import { estAdresseEmail } from '#core/shared/utils/adresse-email'
 
 /**
  * Comment lire ce qui est tapé dans le champ « qui s'en occupe ».

@@ -11,7 +11,6 @@
  */
 
 import { getEmailHash } from './email-hash'
-import { createLogger } from './logger'
 import {
   orderedUserReferences,
   splitConflicts,
@@ -23,6 +22,7 @@ import {
 import type { PrismaTransaction } from '../types/prisma-helpers'
 
 import { oublierSessionDuCompte } from '#auth/server/utils/cache-session'
+import { createLogger } from '#core/server/utils/logger'
 
 const log = createLogger('USER-MERGE')
 

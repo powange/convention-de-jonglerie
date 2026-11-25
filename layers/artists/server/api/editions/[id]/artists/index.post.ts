@@ -1,17 +1,17 @@
 import { z } from 'zod'
 
+import { misesAJourDuProfil } from '#core/server/utils/infos-personnelles'
+import { generateVolunteerQrCodeToken } from '#core/server/utils/token-generator'
+import { schemaAdresseEmail } from '#core/shared/utils/adresse-email'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { coordonneesBancairesRecues } from '#server/utils/coordonnees-bancaires-recues'
-import { misesAJourDuProfil } from '#server/utils/infos-personnelles'
 import { createPendingUserAndInvite } from '#server/utils/invitation'
 import {
   getEditionWithPermissions,
   canManageArtists,
 } from '#server/utils/permissions/edition-permissions'
-import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { schemaAdresseEmail } from '~~/shared/utils/adresse-email'
 import { toCents } from '~~/shared/utils/money'
 
 // Un montant réel supérieur à son plafond rendrait l'artiste inéditable : le PUT

@@ -1,6 +1,6 @@
+import { infosPersonnellesSelect } from '#core/server/utils/infos-personnelles'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'

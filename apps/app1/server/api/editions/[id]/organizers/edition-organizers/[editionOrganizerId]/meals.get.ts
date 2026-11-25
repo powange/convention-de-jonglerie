@@ -1,5 +1,5 @@
+import { infosAlimentaires, infosPersonnellesSelect } from '#core/server/utils/infos-personnelles'
 import { requireAuth } from '#server/utils/auth-utils'
-import { infosAlimentaires, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { canManageMealsById } from '#server/utils/permissions/edition-permissions'
 
 /**

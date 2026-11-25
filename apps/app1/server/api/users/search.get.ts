@@ -2,8 +2,8 @@ import { z } from 'zod'
 
 import { requireUserSession } from '#imports'
 
+import { schemaAdresseEmail } from '#core/shared/utils/adresse-email'
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { schemaAdresseEmail } from '~~/shared/utils/adresse-email'
 
 // GET /api/users/search?emailExact=email (recherche exacte par email)
 // Auth requis. Retourne l'utilisateur correspondant (id, pseudo, profilePicture?, emailHash)

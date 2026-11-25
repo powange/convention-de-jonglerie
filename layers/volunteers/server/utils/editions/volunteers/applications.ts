@@ -1,14 +1,14 @@
 import { z } from 'zod'
 
-import { requiresEmergencyContact } from '#server/utils/allergy-severity'
-import { misesAJourDuProfil } from '#server/utils/infos-personnelles'
-import { equipeRecoupeLesDisponibilites } from '~~/shared/utils/periodes-equipe'
+import { requiresEmergencyContact } from '#core/server/utils/allergy-severity'
+import { misesAJourDuProfil } from '#core/server/utils/infos-personnelles'
+import { equipeRecoupeLesDisponibilites } from '#volunteers/shared/utils/periodes-equipe'
 import {
   FORME_TELEPHONE,
   TELEPHONE_MAX,
   TELEPHONE_MIN,
   telephoneCandidatureValide,
-} from '~~/shared/utils/telephone-candidature'
+} from '#volunteers/shared/utils/telephone-candidature'
 
 // Créneaux horaires valides pour les préférences
 export const VALID_TIME_SLOTS = [

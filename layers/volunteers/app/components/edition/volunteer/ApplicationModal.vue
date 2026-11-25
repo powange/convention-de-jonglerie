@@ -620,12 +620,6 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
-import {
-  requiresEmergencyContact,
-  getAllergySeverityOptions,
-  getAllergySeverityDescriptionKey,
-  type AllergySeverityLevel,
-} from '~/utils/allergy-severity'
 
 import {
   contactDUrgenceExige,
@@ -635,7 +629,13 @@ import {
   type ChampCandidature,
 } from '../../../utils/validation-candidature'
 
-import { equipesProposables } from '~~/shared/utils/periodes-equipe'
+import {
+  requiresEmergencyContact,
+  getAllergySeverityOptions,
+  getAllergySeverityDescriptionKey,
+  type AllergySeverityLevel,
+} from '#core/app/utils/allergy-severity'
+import { equipesProposables } from '#volunteers/shared/utils/periodes-equipe'
 
 interface VolunteerInfo {
   open: boolean

@@ -1,4 +1,4 @@
-import { peutEchangerSesCreneaux } from '~~/shared/utils/benevoles-volants'
+import { peutEchangerSesCreneaux } from '#volunteers/shared/utils/benevoles-volants'
 
 /**
  * Règles de l'échange de créneaux entre bénévoles.

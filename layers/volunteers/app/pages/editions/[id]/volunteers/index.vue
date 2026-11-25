@@ -467,21 +467,21 @@
 // App components & stores
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-import { requiresEmergencyContact } from '~/utils/allergy-severity'
 import { getEditionDisplayName } from '~/utils/editionName'
-import { markdownToHtml } from '~/utils/markdown'
-import {
-  updateVolunteerApplication as updateVolunteerApplicationAPI,
-  submitVolunteerApplication,
-  withdrawVolunteerApplication,
-} from '~/utils/volunteer-application-api'
 
 import { useVolunteerTeams, useVolunteerSettings } from '#imports'
 
+import { requiresEmergencyContact } from '#core/app/utils/allergy-severity'
+import { markdownToHtml } from '#core/app/utils/markdown'
 import {
   extraireErreursChamps,
   messageErreurValidation,
 } from '#volunteers/app/utils/erreurs-validation'
+import {
+  updateVolunteerApplication as updateVolunteerApplicationAPI,
+  submitVolunteerApplication,
+  withdrawVolunteerApplication,
+} from '#volunteers/app/utils/volunteer-application-api'
 
 const { t } = useI18n()
 const { formatDateTimeRange: formaterPlage, formatDate: formaterDate } = useDateFormat()

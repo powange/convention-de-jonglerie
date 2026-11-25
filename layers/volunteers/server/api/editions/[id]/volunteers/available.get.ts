@@ -3,7 +3,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { volunteerUserDetailedSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
-import { estHorsDesComptes } from '~~/shared/utils/benevoles-volants'
+import { estHorsDesComptes } from '#volunteers/shared/utils/benevoles-volants'
 
 export default wrapApiHandler(
   async (event) => {

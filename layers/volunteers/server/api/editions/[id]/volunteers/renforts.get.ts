@@ -4,7 +4,7 @@ import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { userWithProfileAndGravatarSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { equipesDontIlEstResponsable } from '#volunteers/server/utils/editions/volunteers/responsables-equipe'
-import { estHorsDesComptes } from '~~/shared/utils/benevoles-volants'
+import { estHorsDesComptes } from '#volunteers/shared/utils/benevoles-volants'
 
 /**
  * GET /api/editions/[id]/volunteers/renforts

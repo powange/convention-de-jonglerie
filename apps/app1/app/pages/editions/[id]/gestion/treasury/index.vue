@@ -669,8 +669,8 @@ import { colonnesTresorerieVisibles, tresorerieVersCsv } from '~/utils/export-tr
 
 import type { TableColumn } from '@nuxt/ui'
 
+import { BOM_UTF8 } from '#core/shared/utils/csv'
 import { cleDuNomAvance } from '~~/shared/utils/avance-nom-libre'
-import { BOM_UTF8 } from '~~/shared/utils/csv'
 import { listeDepuisUrl, texteDepuisUrl } from '~~/shared/utils/filtres-url'
 import { estUnJustificatifPdf } from '~~/shared/utils/justificatif-pdf'
 import { DEFAULT_CURRENCY, formatCents } from '~~/shared/utils/money'

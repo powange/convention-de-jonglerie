@@ -1,5 +1,5 @@
+import { destinationSurPlace, periodeEdition } from '#core/shared/utils/presence-edition'
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { destinationSurPlace, periodeEdition } from '~~/shared/utils/presence-edition'
 
 /**
  * GET /api/editions/en-cours-localisees

@@ -843,7 +843,7 @@ import { regrouperLesSectionsParCommande } from '../../../../../utils/sections-d
 
 import type { TitreAffiche } from '../../../../../components/ticketing/ParticipantDetailsModal.vue'
 
-import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+import { formaterDateHeure } from '#core/shared/utils/fuseau-edition'
 
 const route = useRoute()
 const editionStore = useEditionStore()

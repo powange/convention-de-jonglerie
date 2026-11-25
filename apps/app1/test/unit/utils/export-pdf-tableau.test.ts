@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { nomAvecExtensionPdf, orientationPour } from '../../../app/utils/export-pdf-tableau'
+import { nomAvecExtensionPdf, orientationPour } from '#core/app/utils/export-pdf-tableau'
 
 /**
  * La mise en page partagée des tableaux imprimés.

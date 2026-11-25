@@ -108,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import type { PeriodeEdition } from '~~/shared/utils/presence-edition'
+import type { PeriodeEdition } from '#core/shared/utils/presence-edition'
 
 import { calculerBesoinEnBenevoles } from '#volunteers/app/utils/besoin-benevoles'
 import { PERIODES, type EffectifParPeriode } from '#volunteers/app/utils/effectif-par-periode'

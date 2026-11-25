@@ -1,5 +1,5 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { visibiliteDuBenevolat } from '#server/utils/visibilite-benevoles'
+import { visibiliteDuBenevolat } from '#volunteers/server/utils/visibilite-benevoles'
 
 export default wrapApiHandler(
   async () => {

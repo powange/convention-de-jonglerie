@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
+import { apresLaReponse } from '#core/server/utils/apres-la-reponse'
+import { schemaUrlExterne } from '#core/shared/utils/url-externe'
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { apresLaReponse } from '#server/utils/apres-la-reponse'
 import { requireAuth } from '#server/utils/auth-utils'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import {
@@ -9,7 +10,6 @@ import {
   canManageArtists,
 } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { schemaUrlExterne } from '~~/shared/utils/url-externe'
 
 /** Comptes artiste notifiés par tranche : le nombre de requêtes simultanées reste borné. */
 const TAILLE_DE_TRANCHE = 20

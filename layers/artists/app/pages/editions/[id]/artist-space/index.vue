@@ -934,13 +934,13 @@ import {
   markdownToHtml,
 } from '#imports'
 
+import { formaterDateHeure, versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
 import {
   bicEstPlausible,
   formaterIbanParGroupes,
   ibanEstPlausible,
   normaliserCoordonneeBancaire,
 } from '~~/shared/utils/coordonnees-bancaires'
-import { formaterDateHeure, versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
 
 interface ArtistShowAct {
   id: number

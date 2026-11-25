@@ -6,9 +6,10 @@
  */
 
 import { AI_TIMEOUTS } from './ai-config'
-import { loggers } from './logger'
 
 import type { WebContentExtraction } from './web-content-extractor'
+
+import { loggers } from '#core/server/utils/logger'
 
 const log = loggers.cache
 

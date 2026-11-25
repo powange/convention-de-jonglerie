@@ -9,14 +9,14 @@
 
 import { jourDeLEdition } from '~/utils/jour-edition'
 
-import type { EquipePourVolants } from '~~/shared/utils/benevoles-volants'
+import type { EquipePourVolants } from '#volunteers/shared/utils/benevoles-volants'
 
 import {
   benevolesDesComptes,
   estEquipeHorsCharge,
   estHorsDesComptes,
   estReserve,
-} from '~~/shared/utils/benevoles-volants'
+} from '#volunteers/shared/utils/benevoles-volants'
 
 export interface VolunteerStats {
   totalVolunteers: number

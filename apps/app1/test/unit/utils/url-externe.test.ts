@@ -3,7 +3,7 @@ import { join, sep } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { estUrlExterne, urlExterneNormalisee } from '../../../shared/utils/url-externe'
+import { estUrlExterne, urlExterneNormalisee } from '#core/shared/utils/url-externe'
 
 /**
  * Le lien externe, et ce que les deux moitiés en disent.
