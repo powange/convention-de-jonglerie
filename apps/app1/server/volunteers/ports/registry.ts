@@ -4,7 +4,7 @@
 //   plugin serveur — pour injecter ses propres implémentations.
 import { createDefaultVolunteerPorts } from './default-binding'
 
-import type { VolunteerPorts } from './types'
+import type { VolunteerPorts } from '#volunteers/server/ports/types'
 
 let override: VolunteerPorts | null = null
 let cached: VolunteerPorts | null = null

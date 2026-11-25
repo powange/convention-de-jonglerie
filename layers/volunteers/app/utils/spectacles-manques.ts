@@ -10,9 +10,9 @@
  * l'assignation automatique : l'algorithme ne doit pas juger acceptable ce que cette page
  * dénonce.
  */
-import type { SpectacleProgramme } from '~~/shared/utils/spectacles-visibles'
+import type { SpectacleProgramme } from '#volunteers/shared/utils/spectacles-visibles'
 
-import { empeche, representationsDe } from '~~/shared/utils/spectacles-visibles'
+import { empeche, representationsDe } from '#volunteers/shared/utils/spectacles-visibles'
 
 export type { SpectacleProgramme }
 

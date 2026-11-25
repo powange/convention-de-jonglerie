@@ -1,7 +1,7 @@
 import type { HandoutItemSelection } from '#server/utils/ticketing/handout-item-selection'
 
 // DTO du module repas. Partagés par le service (server/meals) et le contrat du port
-// (server/volunteers/ports/types.ts → MealsPort). `phases` est typé `unknown` car porté en `Json`
+// (layers/volunteers/server/ports/types.ts → MealsPort). `phases` est typé `unknown` car porté en `Json`
 // côté Prisma (le front le consomme comme un tableau de chaînes).
 
 /** Liaison repas ↔ article à remettre (junction VolunteerMealHandoutItem). */

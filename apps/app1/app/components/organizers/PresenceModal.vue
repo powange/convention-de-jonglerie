@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { creneauxDePresence } from '~~/shared/utils/presence-benevole'
+import { creneauxDePresence } from '#volunteers/shared/utils/presence-benevole'
 
 /**
  * Quand un organisateur arrive sur place, et quand il repart.

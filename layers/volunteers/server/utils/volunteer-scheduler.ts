@@ -1,11 +1,17 @@
 import { DateTime as dt } from 'luxon'
 
+import type { FenetrePresence } from '#volunteers/shared/utils/presence-benevole'
+import type {
+  Representation,
+  SpectacleProgramme,
+} from '#volunteers/shared/utils/spectacles-visibles'
 import type { DateTime } from 'luxon'
-import type { FenetrePresence } from '~~/shared/utils/presence-benevole'
-import type { Representation, SpectacleProgramme } from '~~/shared/utils/spectacles-visibles'
 
-import { estPresentPendant, fenetreDe } from '~~/shared/utils/presence-benevole'
-import { representationsDe, spectacleInaccessible } from '~~/shared/utils/spectacles-visibles'
+import { estPresentPendant, fenetreDe } from '#volunteers/shared/utils/presence-benevole'
+import {
+  representationsDe,
+  spectacleInaccessible,
+} from '#volunteers/shared/utils/spectacles-visibles'
 
 /** Les disponibilités d'un bénévole, telles que le moteur les lit. */
 export interface DisponibiliteBenevole {

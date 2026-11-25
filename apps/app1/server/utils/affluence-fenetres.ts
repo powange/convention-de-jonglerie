@@ -1,6 +1,6 @@
-import type { FenetrePresence } from '~~/shared/utils/presence-benevole'
+import type { FenetrePresence } from '#volunteers/shared/utils/presence-benevole'
 
-import { fenetreDe } from '~~/shared/utils/presence-benevole'
+import { fenetreDe } from '#volunteers/shared/utils/presence-benevole'
 
 /**
  * La fenêtre de présence de chaque population, et ce qu'on fait quand elle n'est pas déclarée.
