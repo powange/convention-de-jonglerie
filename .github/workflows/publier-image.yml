@@ -34,6 +34,16 @@ name: Publier l'image
 on:
   push:
     branches: [main]
+    # Un commit qui ne touche que Flowvent (app2) ne change rien à cette image : la republier coûtait
+    # 5½ min de runner, et surtout renommait `/_nuxt-<sha>/` — invalidant tout le cache CDN au
+    # déploiement suivant pour un contenu identique. `:main` reste donc sur le dernier commit qui
+    # touche autre chose qu'app2.
+    #
+    # ⚠️ Ce filtre a une contrepartie : le commit servi n'est plus forcément `origin/main`. Le skill
+    # `/deploy` compare au dernier commit hors app2 (`git log -1 origin/main -- . ':!apps/app2'`) ;
+    # un test garde les deux d'accord (flowvent-hors-image-app1.test.ts).
+    paths-ignore:
+      - 'apps/app2/**'
   # Republier sans pousser de commit : ce qu'on veut pouvoir faire quand une publication a échoué
   # sur une panne de registre, ou pour reconstruire une image perdue.
   workflow_dispatch:
