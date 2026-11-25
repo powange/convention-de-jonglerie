@@ -5,10 +5,11 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { createFutureDate, TOKEN_DURATIONS } from '#server/utils/date-utils'
 import { getEmailHash } from '#server/utils/email-hash'
 import {
-  sendEmail,
   generateVerificationCode,
   generateVerificationEmailHtml,
   getSiteUrl,
+  NOM_DU_SITE,
+  sendEmail,
 } from '#server/utils/emailService'
 import { registerRateLimiter } from '#server/utils/rate-limiter'
 import { sanitizeEmail, sanitizeString } from '#server/utils/validation-helpers'
@@ -129,7 +130,7 @@ export default wrapApiHandler(
     const emailHtml = await generateVerificationEmailHtml(verificationCode, displayName, cleanEmail)
     const emailSent = await sendEmail({
       to: cleanEmail,
-      subject: '🤹 Vérifiez votre compte - Conventions de Jonglerie',
+      subject: `🤹 Vérifiez votre compte - ${NOM_DU_SITE}`,
       html: emailHtml,
       text: `Bonjour ${displayName}, votre code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier : ${siteUrl}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
     })

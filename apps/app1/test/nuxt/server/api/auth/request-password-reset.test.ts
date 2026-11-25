@@ -4,6 +4,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 vi.mock('../../../../../server/utils/emailService', () => ({
   sendEmail: vi.fn(),
   generatePasswordResetEmailHtml: vi.fn(),
+  NOM_DU_SITE: 'Conventions de Jonglerie',
+  SIGNATURE_COURRIEL: "L'équipe des Conventions de Jonglerie",
 }))
 
 import { sendEmail, generatePasswordResetEmailHtml } from '../../../../../server/utils/emailService'

@@ -53,6 +53,26 @@ qu'une application qui démarre et dont toutes les sessions échouent.
 
 - **Webhook** : l'activer, puis noter son URL. C'est elle qui redéploie.
 
+### Les courriels
+
+Le transport est celui d'app1, mis en commun (`layers/core/server/socle/envoi-courriel.ts`) ; seul
+le nom d'expéditeur diffère (« Flowvent »). Variables de la stack :
+
+| Variable      | Défaut  | Note                                                                           |
+| ------------- | ------- | ------------------------------------------------------------------------------ |
+| `SEND_EMAILS` | `false` | `true` pour envoyer. Sinon les messages sont écrits dans les journaux          |
+| `SMTP_HOST`   | vide    | serveur SMTP ; vide : Gmail avec `SMTP_USER` / `SMTP_PASS`                     |
+| `SMTP_PORT`   | `587`   | `465` = TLS direct                                                             |
+| `SMTP_USER`   | vide    |                                                                                |
+| `SMTP_PASS`   | vide    |                                                                                |
+| `SMTP_FROM`   | vide    | adresse d'expédition (défaut : `SMTP_USER`), affichée sous le nom « Flowvent » |
+| `SMTP_BCC`    | vide    | copie cachée d'archivage, adresses séparées par des virgules                   |
+
+**Tant que `SEND_EMAILS` n'est pas `true`, personne ne peut valider son inscription par email** :
+les codes ne sont lisibles que dans les journaux du conteneur (`📧 EMAIL SIMULÉ`). La connexion
+Google ou Facebook, elle, s'en passe. Aucun message ne part vers un domaine de test (`.test`,
+`.invalid`, `example.com`…), même en envoi réel.
+
 ### Les photos de profil : un volume
 
 Les photos déposées sont des fichiers, sur le volume nommé `uploads_data` monté en `/uploads`
@@ -142,11 +162,6 @@ Revenir en arrière : remplacer `:main` par `:sha-<commit>` dans le compose de l
 
 ## Ce que l'environnement ne fait pas encore
 
-- **Aucun courriel n'est envoyé.** App2 n'a pas de transport : les messages, codes de vérification
-  d'inscription compris, sont seulement écrits dans les journaux du conteneur (`📧 EMAIL SIMULÉ`).
-  En release, on s'en accommode en lisant les journaux. **En prod, personne ne pourra valider son
-  inscription par email** tant qu'un transport n'est pas branché. La connexion Google, une fois ses identifiants renseignés,
-  fonctionne sans courriel.
 - **Release est indexable.** App2 n'a pas `@nuxtjs/seo` : rien n'empêche un moteur de référencer
   `test.flowvent.org`.
 - **Paiement simulé** : l'abonnement s'active sans prestataire.

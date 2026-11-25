@@ -5,7 +5,12 @@ import { z } from 'zod'
 import { nomDeSalutation } from '#auth/server/utils/nom-de-salutation'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { createFutureDate, TOKEN_DURATIONS } from '#server/utils/date-utils'
-import { sendEmail, generatePasswordResetEmailHtml } from '#server/utils/emailService'
+import {
+  generatePasswordResetEmailHtml,
+  NOM_DU_SITE,
+  sendEmail,
+  SIGNATURE_COURRIEL,
+} from '#server/utils/emailService'
 import { passwordResetRateLimiter } from '#server/utils/rate-limiter'
 
 const requestPasswordResetSchema = z.object({
@@ -54,9 +59,9 @@ export default wrapApiHandler(
     const emailHtml = await generatePasswordResetEmailHtml(resetLink, salutation)
     await sendEmail({
       to: user.email,
-      subject: 'Réinitialisation de votre mot de passe - Conventions de Jonglerie',
+      subject: `Réinitialisation de votre mot de passe - ${NOM_DU_SITE}`,
       html: emailHtml,
-      text: `Bonjour ${salutation},\n\nVous avez demandé la réinitialisation de votre mot de passe.\n\nCliquez sur ce lien pour réinitialiser votre mot de passe : ${resetLink}\n\nCe lien est valide pendant 1 heure.\n\nSi vous n'avez pas demandé cette réinitialisation, ignorez cet email.\n\nL'équipe des Conventions de Jonglerie`,
+      text: `Bonjour ${salutation},\n\nVous avez demandé la réinitialisation de votre mot de passe.\n\nCliquez sur ce lien pour réinitialiser votre mot de passe : ${resetLink}\n\nCe lien est valide pendant 1 heure.\n\nSi vous n'avez pas demandé cette réinitialisation, ignorez cet email.\n\n${SIGNATURE_COURRIEL}`,
     })
 
     return createSuccessResponse(null, genericMessage)

@@ -6,7 +6,9 @@
 # Variables de la stack (onglet « Environment variables » de Portainer) :
 #   obligatoires : NUXT_PUBLIC_SITE_URL (https://test.flowvent.org), NUXT_SESSION_PASSWORD (>= 32 caractères), MYSQL_PASSWORD, MYSQL_ROOT_PASSWORD
 #   optionnelles : MYSQL_USER, MYSQL_DATABASE, NUXT_OAUTH_GOOGLE_CLIENT_ID/SECRET,
-#                  NUXT_OAUTH_FACEBOOK_CLIENT_ID/SECRET
+#                  NUXT_OAUTH_FACEBOOK_CLIENT_ID/SECRET,
+#                  SEND_EMAILS (true pour envoyer), SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS,
+#                  SMTP_FROM (expéditeur), SMTP_BCC (copie d'archivage)
 #
 # ⚠️ Une variable de stack Portainer sert à INTERPOLER ce fichier ; elle ne peuple pas
 # l'environnement du conteneur. Chaque variable lue par l'application est donc listée sous
@@ -67,9 +69,16 @@ services:
       NUXT_OAUTH_FACEBOOK_CLIENT_ID: ${NUXT_OAUTH_FACEBOOK_CLIENT_ID:-}
       NUXT_OAUTH_FACEBOOK_CLIENT_SECRET: ${NUXT_OAUTH_FACEBOOK_CLIENT_SECRET:-}
       NUXT_OAUTH_FACEBOOK_REDIRECT_URL: ${NUXT_PUBLIC_SITE_URL}/auth/facebook
-      # ⚠️ App2 n'a AUCUN transport de courriel : les messages (codes de vérification compris)
-      # sont écrits dans les journaux du conteneur. Passer à `true` ne ferait que les perdre.
-      SEND_EMAILS: 'false'
+      # Courriels : simulés (écrits dans les journaux) tant que SEND_EMAILS n'est pas `true`.
+      # Pour les envoyer, renseigner dans la stack SEND_EMAILS=true et le serveur SMTP. Rien ne
+      # part vers un domaine de test (`.test`, `example.com`…). Cf. docs/deploiement-flowvent.md.
+      SEND_EMAILS: ${SEND_EMAILS:-false}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_BCC: ${SMTP_BCC:-}
       NUXT_HOST: '0.0.0.0'
       NUXT_PORT: '3000'
       NODE_ENV: 'production'

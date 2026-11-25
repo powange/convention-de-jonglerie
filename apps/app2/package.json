@@ -53,6 +53,7 @@
     "jspdf-autotable": "^5.0.7",
     "libphonenumber-js": "^1.13.1",
     "luxon": "^3.7.2",
+    "nodemailer": "^10.6.1",
     "nuxt": "^4.7.0",
     "nuxt-auth-utils": "^0.5.29",
     "nuxt-file-storage": "^0.3.3",
