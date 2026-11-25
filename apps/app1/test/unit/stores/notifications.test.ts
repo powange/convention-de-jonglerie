@@ -387,6 +387,36 @@ describe('notifications store', () => {
       expect(store.notifications[0].id).toBe('1')
       expect(store.unreadCount).toBe(1) // Le compteur ne change pas
     })
+
+    it('⚠️ un 404 RETIRE la notification au lieu de la laisser à l’écran, sans lever', async () => {
+      // Relevé en production : quatre DELETE de suite sur la même notification, déjà supprimée
+      // ailleurs. Elle restait affichée avec un toast d'échec, et l'utilisateur recommençait.
+      // État posé explicitement : des cas précédents modifient `mockNotifications` (lecture).
+      store.notifications = mockNotifications.map((n) => ({ ...n, isRead: n.id === '2' }))
+      store.unreadCount = 1
+
+      vi.mocked($fetch).mockRejectedValue(
+        Object.assign(new Error('Not Found'), { statusCode: 404 })
+      )
+
+      await expect(store.deleteNotification('1')).resolves.toBeUndefined()
+
+      expect(store.notifications.map((n) => n.id)).toEqual(['2'])
+      expect(store.unreadCount).toBe(0)
+    })
+
+    it('une autre erreur GARDE la notification et remonte l’échec', async () => {
+      store.notifications = mockNotifications.map((n) => ({ ...n, isRead: n.id === '2' }))
+      store.unreadCount = 1
+      vi.spyOn(console, 'error').mockImplementation(() => {})
+
+      vi.mocked($fetch).mockRejectedValue(Object.assign(new Error('Boom'), { statusCode: 500 }))
+
+      await expect(store.deleteNotification('1')).rejects.toThrow('Boom')
+
+      expect(store.notifications.map((n) => n.id)).toEqual(['1', '2'])
+      expect(store.unreadCount).toBe(1)
+    })
   })
 
   describe('addRealTimeNotification', () => {
