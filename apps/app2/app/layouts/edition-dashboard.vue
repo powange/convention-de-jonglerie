@@ -72,12 +72,14 @@
  * Habillage de la gestion d'un événement Flowvent — le pendant du layout `edition-dashboard`
  * d'app1, attribué par `routeRules` à toute la zone `/events/:id/gestion/**`.
  *
- * Flowvent n'a qu'un module d'organisation, les bénévoles : la barre latérale n'en porte que les
- * entrées, dans l'ordre et sous les conditions d'app1 (échanges fermés → pas d'entrée ; renforts
+ * Les entrées de chaque module porté (cf. docs/flowvent-modules.md) : la carte du site, et les
+ * bénévoles dans l'ordre et sous les conditions d'app1 (échanges fermés → pas d'entrée ; renforts
  * seulement avec une équipe volante ; responsable d'équipe → notifications et renforts seuls).
  * Libellés en clair : Flowvent est en français seul, comme ses autres écrans.
  */
 import type { NavigationMenuItem } from '@nuxt/ui'
+
+import type { Droits, Modules } from '#shared/modules-evenement'
 
 import { useEditionStore } from '~/stores/editions'
 
@@ -90,11 +92,12 @@ const refPublique = computed(() => String(route.params.id))
 
 // Modules actifs (et droits) de l'événement : clé partagée, que l'accueil rafraîchit après un
 // changement de module.
-const { data: acces } = useFetch<{ modules: { benevoles: boolean } }>(
+const { data: acces } = useFetch<{ modules: Modules; droits: Droits }>(
   () => `/api/events/${refPublique.value}/acces-gestion`,
   { key: `acces-gestion-${refPublique.value}`, server: false }
 )
 const moduleBenevoles = computed(() => acces.value?.modules.benevoles !== false)
+const carteDuSite = computed(() => !!acces.value?.modules.carte && !!acces.value?.droits.modifier)
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 const peutGerer = computed(() => editionStore.canManageVolunteers(edition.value))
 const estResponsable = ref(false)
@@ -178,6 +181,16 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
         icon: 'i-heroicons-user-plus',
         to: `/events/${refPublique.value}/gestion/organisateurs`,
       },
+      // Carte du site : module activé ET droit « modifier l'événement » (même règle qu'app1).
+      ...(carteDuSite.value
+        ? [
+            {
+              label: 'Carte du site',
+              icon: 'i-heroicons-map',
+              to: `/events/${refPublique.value}/gestion/map`,
+            },
+          ]
+        : []),
     ],
     // Sans aucun droit sur les bénévoles, la section n'apparaît pas (plutôt qu'un groupe vide).
     ...(enfants.length && moduleBenevoles.value

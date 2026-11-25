@@ -46,3 +46,34 @@ export const volunteerAssignmentDetailedInclude = {
     select: userBasicSelect,
   },
 } satisfies Prisma.VolunteerAssignmentInclude
+
+/**
+ * Sélections de la carte du site, attendues par le layer `map` (contrat d'hôte). Mêmes définitions
+ * qu'app1.
+ */
+export const editionZoneSelect = {
+  id: true,
+  name: true,
+  description: true,
+  color: true,
+  coordinates: true,
+  zoneTypes: true,
+  order: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.EditionZoneSelect
+
+export const editionMarkerSelect = {
+  id: true,
+  name: true,
+  description: true,
+  latitude: true,
+  longitude: true,
+  markerTypes: true,
+  color: true,
+  order: true,
+  // Zone à laquelle ce marqueur est rattaché — son entrée. `null` quand il est autonome.
+  zoneId: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.EditionMarkerSelect

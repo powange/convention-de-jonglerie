@@ -85,6 +85,27 @@ export const canManageArtists = droitSurEdition('artistes')
 export const canManageMeals = droitSurEdition('repas')
 export const canManageTicketing = droitSurEdition('billetterie')
 
+/**
+ * L'événement, à condition que la personne puisse le modifier : 404 s'il n'existe pas ou qu'elle
+ * ne le voit pas, 403 sinon. Même contrat qu'app1 (la carte du site l'emploie).
+ */
+export async function getEditionForEdit(
+  eventId: number,
+  user: UtilisateurPourDroits
+): Promise<EditionWithPermissions> {
+  const edition = await getEditionWithPermissions(eventId, { userId: user.id })
+  if (!edition || !edition.droits.voir) {
+    throw createError({ status: 404, message: 'Événement introuvable' })
+  }
+  if (!edition.droits.modifier) {
+    throw createError({
+      status: 403,
+      message: "Vous n'avez pas les droits pour modifier cet événement",
+    })
+  }
+  return edition
+}
+
 // Formes par identifiant.
 export const canEditEditionById = droitParId('modifier')
 export const canManageArtistsById = droitParId('artistes')

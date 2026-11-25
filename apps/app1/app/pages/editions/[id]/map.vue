@@ -204,23 +204,23 @@
 </template>
 
 <script setup lang="ts">
-import ZonesLegend from '~/components/edition/zones/ZonesLegend.vue'
-import type { EditionMarker } from '~/composables/useEditionMarkers'
-import type { EditionZone } from '~/composables/useEditionZones'
 import { useEditionStore } from '~/stores/editions'
 import { getEditionDisplayName } from '~/utils/editionName'
+
+import type { EditionMarker } from '#map/app/composables/useEditionMarkers'
+import type { EditionZone } from '#map/app/composables/useEditionZones'
+import type { ExternalMapProvider } from '#map/shared/utils/external-map'
+
+import { formaterHeure, formaterJournee } from '#core/shared/utils/fuseau-edition'
+import ZonesLegend from '#map/app/components/edition/zones/ZonesLegend.vue'
 import {
   buildItemsPopupHtml,
   buildMarkerAttachmentHtml,
   buildZoneAttachmentHtml,
   groupMarkersByZone,
   zoneNavigationTarget,
-} from '~/utils/map-zone-attachment'
-
-import type { ExternalMapProvider } from '~~/shared/utils/external-map'
-
-import { formaterHeure, formaterJournee } from '#core/shared/utils/fuseau-edition'
-import { externalMapEmbedUrl as buildExternalMapEmbedUrl } from '~~/shared/utils/external-map'
+} from '#map/app/utils/map-zone-attachment'
+import { externalMapEmbedUrl as buildExternalMapEmbedUrl } from '#map/shared/utils/external-map'
 // ⚠️ Import EXPLICITE : les utils de `shared/` ne sont pas auto-importés — `program.vue` importe
 // `estTermine` de la même façon. Sans cette ligne, le filtre lèverait au premier popup.
 import { estTermine } from '~~/shared/utils/program-timeline'

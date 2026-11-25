@@ -2,7 +2,7 @@ import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { defineComponent, h, ref } from 'vue'
 
-import { useEditionMarkers } from '../../../app/composables/useEditionMarkers'
+import { useEditionMarkers } from '../../../../../layers/map/app/composables/useEditionMarkers'
 
 /**
  * Ce test tient à une subtilité qui a coûté un bug visible : `useApiAction` déballe les réponses

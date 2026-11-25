@@ -4,8 +4,8 @@ import {
   looksLikeFetchIncident,
   reconcileExternalMap,
   type ImportedRecord,
-} from '../../../server/utils/external-map-reconcile'
-import type { ExternalMapObject } from '../../../server/utils/google-my-maps-import'
+} from '../../../../../layers/map/server/utils/external-map-reconcile'
+import type { ExternalMapObject } from '../../../../../layers/map/server/utils/google-my-maps-import'
 
 const IMPORTED_AT = new Date('2026-07-01T10:00:00Z')
 

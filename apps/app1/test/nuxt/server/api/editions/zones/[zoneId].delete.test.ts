@@ -12,7 +12,7 @@ vi.mock('#server/utils/auth-utils', () => ({
   requireAuth: vi.fn((event) => event.context.user),
 }))
 
-import zonesDeleteHandler from '../../../../../../server/api/editions/[id]/zones/[zoneId].delete'
+import zonesDeleteHandler from '../../../../../../../../layers/map/server/api/editions/[id]/zones/[zoneId].delete'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

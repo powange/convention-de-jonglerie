@@ -65,6 +65,22 @@ Pour porter un module, dans cet ordre :
 Garde : `apps/app1/test/unit/outillage/flowvent-modules-evenement.test.ts` vérifie que chaque
 colonne du catalogue existe dans le schéma de Flowvent.
 
+## La carte du site (lot 2)
+
+Sortie d'app1 dans `layers/map` (alias `#map`), qu'étendent app1 et Flowvent : zones, repères,
+import Google My Maps, page de gestion et d'import, traductions `map` / `gestion-map`. Le stock,
+les ateliers et le covoiturage d'app1 l'importent désormais par `#map/…`.
+
+- **Port** `#server/map/ports/registry` (type : `layers/map/server/ports/types.ts`) : lire les
+  drapeaux de la carte, enregistrer sa visibilité et la carte externe. App1 écrit sur l'édition,
+  Flowvent sur l'événement — seuls endroits où les deux diffèrent.
+- `useEditionId()` est passé de `layers/volunteers` à `layers/core` : tout layer d'événement en a
+  besoin (un `parseInt(route.params.id)` rend `NaN` dans Flowvent). Garde :
+  `layer-benevoles-id-par-useeditionid.test.ts`, étendue à la carte.
+- `fetch-helpers` est passé dans `layers/core/server/socle/` (réexporté par chaque app).
+- Restent dans app1 : la page PUBLIQUE de la carte (`/editions/:id/map`, liée au programme) et
+  l'export KML.
+
 ## Notions « convention » à ramener à l'événement
 
 Flowvent n'a pas de convention : l'événement en tient lieu (`getEditionWithPermissions` rend

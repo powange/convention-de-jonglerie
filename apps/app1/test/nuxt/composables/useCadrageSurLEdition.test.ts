@@ -2,7 +2,7 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, it, expect, vi } from 'vitest'
 import { defineComponent, h, ref, nextTick } from 'vue'
 
-import { useCadrageSurLEdition } from '../../../app/composables/useCadrageSurLEdition'
+import { useCadrageSurLEdition } from '../../../../../layers/map/app/composables/useCadrageSurLEdition'
 
 /**
  * Recentrer sur le lieu de l'édition — sans jamais passer devant le contenu.

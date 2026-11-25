@@ -88,7 +88,7 @@ export const MODULES_EVENEMENT: readonly DefinitionModule[] = [
     description: 'Zones et repères du lieu, et leur import.',
     icone: 'i-heroicons-map',
     droit: 'modifier',
-    disponible: false,
+    disponible: true,
   },
   {
     cle: 'stock',
@@ -142,7 +142,7 @@ export const DROITS_PAR_DOMAINE: readonly DefinitionDroit[] = [
     cle: 'modifier',
     colonne: 'canEditEvent',
     libelle: "Modifier l'événement",
-    description: 'Nom, lieu, dates, fuseau, modules.',
+    description: 'Nom, lieu, dates, fuseau, modules, et la carte du site.',
   },
   {
     cle: 'organisateurs',

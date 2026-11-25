@@ -34,7 +34,10 @@ vi.stubGlobal('useApiAction', useApiAction)
 vi.stubGlobal('useApiActionById', useApiActionById)
 
 // Importer après les mocks
-import { useEditionZones, type EditionZone } from '../../../app/composables/useEditionZones'
+import {
+  useEditionZones,
+  type EditionZone,
+} from '../../../../../layers/map/app/composables/useEditionZones'
 
 describe('useEditionZones', () => {
   const mockZones: EditionZone[] = [

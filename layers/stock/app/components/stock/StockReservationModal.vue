@@ -127,7 +127,7 @@
 
 <script setup lang="ts">
 import { journeeDans, versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
-import { getZoneTypeColor, getZoneTypeIcon } from '~~/shared/utils/zone-types'
+import { getZoneTypeColor, getZoneTypeIcon } from '#map/shared/utils/zone-types'
 
 type StockReservationStatus = 'RESERVED' | 'PICKED_UP' | 'RETURNED' | 'CANCELLED'
 

@@ -11,11 +11,11 @@ vi.mock('#server/utils/auth-utils', () => ({
   requireAuth: vi.fn((event) => event.context.user),
 }))
 
-vi.mock('#server/utils/external-map-fetch', () => ({
+vi.mock('#map/server/utils/external-map-fetch', () => ({
   fetchExternalMapObjects: mockFetchExternalMapObjects,
 }))
 
-import handler from '../../../../../../server/api/editions/[id]/external-map/objects.get'
+import handler from '../../../../../../../../layers/map/server/api/editions/[id]/external-map/objects.get'
 import { global } from '../../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma

@@ -1,9 +1,9 @@
 import type { MapMarker } from '~/composables/useLeafletMap'
 import type { Edition } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
-import { createCustomMarkerIcon, escapeHtml, getEditionStatus } from '~/utils/mapMarkers'
 
 import { fuseauUtilisable, journeeDans } from '#core/shared/utils/fuseau-edition'
+import { createCustomMarkerIcon, escapeHtml, getEditionStatus } from '#map/app/utils/mapMarkers'
 
 /**
  * Contexte pré-calculé et échappé fourni au callback de construction de popup.

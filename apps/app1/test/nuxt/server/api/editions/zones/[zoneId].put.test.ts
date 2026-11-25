@@ -12,7 +12,7 @@ vi.mock('#server/utils/auth-utils', () => ({
   requireAuth: vi.fn((event) => event.context.user),
 }))
 
-import zonesPutHandler from '../../../../../../server/api/editions/[id]/zones/[zoneId].put'
+import zonesPutHandler from '../../../../../../../../layers/map/server/api/editions/[id]/zones/[zoneId].put'
 import { global } from '../../../../globales-nitro'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts

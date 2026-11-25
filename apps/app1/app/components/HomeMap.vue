@@ -101,7 +101,8 @@ import type { PopupBuilderContext } from '~/composables/useMapMarkers'
 import { useAuthStore } from '~/stores/auth'
 import { useFavoritesEditionsStore } from '~/stores/favoritesEditions'
 import type { Edition } from '~/types'
-import { escapeHtml } from '~/utils/mapMarkers'
+
+import { escapeHtml } from '#map/app/utils/mapMarkers'
 
 interface Props {
   editions: Edition[]

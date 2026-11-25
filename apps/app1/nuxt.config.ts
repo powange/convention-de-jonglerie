@@ -153,6 +153,9 @@ export default defineNuxtConfig({
     // Placé en tête : ce dont les autres peuvent dépendre, jamais l'inverse.
     '../../layers/ui',
     '../../layers/volunteers',
+    // Carte du site (zones, repères, import) — partagée avec Flowvent ; le stock et les spectacles
+    // y rattachent leurs emplacements.
+    '../../layers/map',
     '../../layers/meals',
     '../../layers/tasks',
     '../../layers/faq',

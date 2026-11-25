@@ -45,7 +45,8 @@ const lire = (relatif: string) =>
 const FLUX = 'app1/server/api/admin/generate-import-json-stream.get.ts'
 const DIRECT = 'app1/server/api/admin/generate-import-json.post.ts'
 const AGENT = 'app1/server/api/admin/generate-import-json-agent.post.ts'
-const FETCH = 'app1/server/utils/fetch-helpers.ts'
+// Implémentation commune (app1 n'en garde qu'une réexportation).
+const FETCH = '../layers/core/server/socle/fetch-helpers.ts'
 
 describe('import IA — l’annulation traverse toute la chaîne', () => {
   it('⚠️ LE FLUX SSE ABANDONNE À LA DÉCONNEXION', () => {

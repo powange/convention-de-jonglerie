@@ -89,7 +89,8 @@
 <script setup lang="ts">
 import type { PopupBuilderContext } from '~/composables/useMapMarkers'
 import type { Edition } from '~/types'
-import { escapeHtml } from '~/utils/mapMarkers'
+
+import { escapeHtml } from '#map/app/utils/mapMarkers'
 
 interface Props {
   editions: Edition[]

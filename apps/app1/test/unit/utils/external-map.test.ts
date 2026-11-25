@@ -4,7 +4,7 @@ import {
   parseExternalMapUrl,
   externalMapEmbedUrl,
   externalMapViewerUrl,
-} from '../../../shared/utils/external-map'
+} from '../../../../../layers/map/shared/utils/external-map'
 
 describe('parseExternalMapUrl', () => {
   it("accepte l'URL du visualiseur Google, celle que l'organisateur a sous la main", () => {

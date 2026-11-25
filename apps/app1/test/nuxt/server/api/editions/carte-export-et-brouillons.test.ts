@@ -3,7 +3,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 const assurerCarteLisible = vi.hoisted(() => vi.fn(async () => undefined))
 const canManageProgram = vi.hoisted(() => vi.fn(async () => false))
 
-vi.mock('../../../../../server/utils/carte-lisible', () => ({ assurerCarteLisible }))
+vi.mock('../../../../../../../layers/map/server/utils/carte-lisible', () => ({
+  assurerCarteLisible,
+}))
 vi.mock('../../../../../server/utils/permissions/program-permissions', () => ({
   canManageProgram,
 }))

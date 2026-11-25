@@ -41,6 +41,8 @@ const aliasHorsNuxt = {
   '#core': resolve(__dirname, '../../layers/core'),
   // Déclaré par `layers/volunteers/nuxt.config.ts`.
   '#volunteers': resolve(__dirname, '../../layers/volunteers'),
+  // Déclaré par `layers/map/nuxt.config.ts`.
+  '#map': resolve(__dirname, '../../layers/map'),
 }
 
 export default defineConfig({

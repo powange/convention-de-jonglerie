@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import zonesGetHandler from '../../../../../../server/api/editions/[id]/zones/index.get'
+import zonesGetHandler from '../../../../../../../../layers/map/server/api/editions/[id]/zones/index.get'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

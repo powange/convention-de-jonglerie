@@ -279,7 +279,7 @@
 <script setup lang="ts">
 import type { UserSelectItem } from '~/components/UserSelector.vue'
 
-import { getZoneTypeColor, getZoneTypeIcon } from '~~/shared/utils/zone-types'
+import { getZoneTypeColor, getZoneTypeIcon } from '#map/shared/utils/zone-types'
 
 /** Un responsable tel que la fiche le rend : à retraduire pour le sélecteur. */
 interface ResponsableFiche {

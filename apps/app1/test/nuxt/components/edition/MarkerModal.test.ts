@@ -1,7 +1,7 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it } from 'vitest'
 
-import MarkerModal from '../../../../app/components/edition/zones/MarkerModal.vue'
+import MarkerModal from '../../../../../../layers/map/app/components/edition/zones/MarkerModal.vue'
 
 /**
  * Le rattachement d'un point de repère à une zone se posait mais ne se retirait plus.
@@ -97,7 +97,7 @@ describe('MarkerModal — rattachement à une zone', () => {
 
   // Le cas signalé : sans valeur choisissable pour « aucune zone », le rattachement restait.
   it('retire le rattachement quand « aucune zone » est retenu', async () => {
-    const { NO_ZONE } = await import('../../../../app/utils/map-zone-attachment')
+    const { NO_ZONE } = await import('../../../../../../layers/map/app/utils/map-zone-attachment')
     expect((await saveWith(81, NO_ZONE)).zoneId).toBeNull()
   })
 
