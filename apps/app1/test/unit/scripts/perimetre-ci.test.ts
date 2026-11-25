@@ -12,6 +12,7 @@ import {
   listePourConditions,
   rendreVerdict,
   touchePourFlowvent,
+  touchePourImageApp1,
   // @ts-expect-error — module .mjs sans déclarations, importé pour son comportement
 } from '../../../scripts/perimetre-ci.mjs'
 
@@ -36,6 +37,8 @@ type Besoins = Record<string, { result: string }>
 const SCENARIOS: Record<string, string[]> = {
   'complet sans Flowvent': calculerJobs('pull_request', ['apps/app1/a.ts'], LAYERS_APP2).jobs,
   'complet avec Flowvent': calculerJobs('pull_request', ['layers/auth/a.ts'], LAYERS_APP2).jobs,
+  'complet avec image app1': calculerJobs('pull_request', ['apps/app1/Dockerfile'], LAYERS_APP2)
+    .jobs,
   'app2-seul': calculerJobs('pull_request', ['apps/app2/a.ts'], LAYERS_APP2).jobs,
   amorcage: calculerJobs('push', [], LAYERS_APP2).jobs,
   planifié: calculerJobs('schedule', [], LAYERS_APP2).jobs,
@@ -95,7 +98,7 @@ describe('périmètre de la CI', () => {
     for (const evt of ['schedule', 'workflow_dispatch']) {
       const { perimetre, jobs } = calculerJobs(evt, [], LAYERS_APP2)
       expect(perimetre, evt).toBe('complet')
-      expect(jobs, evt).toEqual([...JOBS_PAR_PERIMETRE.complet, 'image-flowvent'])
+      expect(jobs, evt).toEqual([...JOBS_PAR_PERIMETRE.complet, 'image-flowvent', 'image-app1'])
     }
   })
 
@@ -156,6 +159,30 @@ describe('image de Flowvent', () => {
       'test-unit',
       'image-flowvent',
     ])
+  })
+})
+
+describe('image d’app1', () => {
+  it('construite quand la PR touche ce qui décide du contenu de l’image', () => {
+    for (const f of [
+      'apps/app1/Dockerfile',
+      '.dockerignore',
+      'apps/app1/docker/entrypoint.sh',
+      'apps/app1/package.json',
+      'apps/app1/package-lock.json',
+      'apps/app1/scripts/lier-layers-node-modules.mjs',
+    ]) {
+      expect(touchePourImageApp1([f]), f).toBe(true)
+    }
+  })
+
+  it('⚠️ pas pour le code d’app1 — le job `build` le couvre déjà', () => {
+    expect(touchePourImageApp1(['apps/app1/app/pages/index.vue'])).toBe(false)
+    expect(touchePourImageApp1(['apps/app1/Dockerfile.test'])).toBe(false)
+    expect(touchePourImageApp1(['apps/app2/Dockerfile'])).toBe(false)
+    expect(calculerJobs('pull_request', ['apps/app1/a.ts'], LAYERS_APP2).jobs).not.toContain(
+      'image-app1'
+    )
   })
 })
 

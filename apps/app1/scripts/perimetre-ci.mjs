@@ -28,6 +28,7 @@
  * « en attente ». Le workflow démarre donc toujours ; ce sont ses jobs qui se sautent.
  *
  * En plus du périmètre, certains jobs dépendent des FICHIERS touchés (`JOBS_SELON_FICHIERS`) :
+ * `image-app1` construit celle d'app1 quand la PR touche ses fichiers Docker ou ses dépendances ;
  * `image-flowvent` ne construit l'image de Flowvent que si la PR touche app2 ou un layer qu'elle
  * étend. Cette garde vivait dans `publier-image-flowvent.yml`, hors de `ci-verte` : une PR qui
  * cassait Flowvent pouvait être mergée. La liste de ces layers est lue dans `extends` de
@@ -63,7 +64,7 @@ export const JOBS_PAR_PERIMETRE = {
 }
 
 /** Les jobs ajoutés selon les fichiers touchés (hors push sur main, où rien n'est vérifié). */
-export const JOBS_SELON_FICHIERS = ['image-flowvent']
+export const JOBS_SELON_FICHIERS = ['image-flowvent', 'image-app1']
 
 /** Tous les jobs qui portent une condition dans le YAML. */
 export const JOBS_CONDITIONNES = [
@@ -138,6 +139,27 @@ export function touchePourFlowvent(fichiers, layersApp2) {
 }
 
 /**
+ * Les fichiers qui décident de ce qui entre dans l'image d'app1 et que le job `build` ne voit pas :
+ * il fait un `nuxt build` HORS de Docker, si bien qu'un Dockerfile cassé, un `.dockerignore` qui
+ * écarte un fichier nécessaire ou une dépendance qui ne s'installe que dans l'image n'étaient
+ * découverts qu'une fois sur `main`, quand la publication échouait — `:main` restant alors sur
+ * l'image précédente sans que rien ne le dise.
+ */
+const FICHIERS_IMAGE_APP1 = [
+  'apps/app1/Dockerfile',
+  '.dockerignore',
+  'apps/app1/package.json',
+  'apps/app1/package-lock.json',
+  'apps/app1/scripts/lier-layers-node-modules.mjs',
+  '.github/workflows/tests.yml',
+]
+
+/** @param {string[]} fichiers */
+export function touchePourImageApp1(fichiers) {
+  return fichiers.some((f) => FICHIERS_IMAGE_APP1.includes(f) || f.startsWith('apps/app1/docker/'))
+}
+
+/**
  * Le périmètre et la liste complète des jobs conditionnés à lancer.
  *
  * @param {string} evenement
@@ -154,6 +176,7 @@ export function calculerJobs(evenement, fichiers, layersApp2) {
   // Hors PR (planifié, manuel) ou sans liste lisible : tout ce qui dépend des fichiers tourne.
   const toutLancer = evenement !== 'pull_request' || utiles.length === 0
   if (toutLancer || touchePourFlowvent(utiles, layersApp2)) jobs.push('image-flowvent')
+  if (toutLancer || touchePourImageApp1(utiles)) jobs.push('image-app1')
   return { perimetre, raison, jobs }
 }
 
