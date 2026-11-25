@@ -6,6 +6,7 @@ vi.mock('../../../../../server/utils/emailService', () => ({
   generateVerificationCode: vi.fn(),
   generateVerificationEmailHtml: vi.fn(),
   getSiteUrl: vi.fn(() => 'http://localhost:3000'),
+  NOM_DU_SITE: 'Conventions de Jonglerie',
 }))
 
 vi.mock('../../../../../server/utils/rate-limiter', () => ({

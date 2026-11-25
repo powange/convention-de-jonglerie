@@ -1,56 +1,38 @@
-// Service d'envoi d'emails — version SIMULATION uniquement pour app2.
+// Service d'envoi de courriels de Flowvent.
 //
-// app2 n'a ni `nodemailer`, ni `@vue-email/render`, ni templates d'email.
-// - `sendEmail` ne throw JAMAIS : en mode simulation (SEND_EMAILS !== 'true') il
-//   logge le destinataire + le sujet + un extrait du contenu (le code de
-//   vérification reste ainsi visible dans les logs serveur) et retourne `true`.
-//   Si SEND_EMAILS === 'true', il retourne `false` sans rien envoyer (aucun
-//   transport configuré).
-// - Les fonctions `generate*EmailHtml` retournent une simple chaîne HTML.
+// - `sendEmail` passe par le TRANSPORT commun avec app1 (`layers/core/server/socle/envoi-courriel.ts`) :
+//   simulation (journal) tant que SEND_EMAILS n'est pas `true`, sinon SMTP (SMTP_HOST/PORT/USER/PASS,
+//   SMTP_FROM, SMTP_BCC). Rien ne part vers un domaine de test (`.test`, `example.com`…).
+// - Les gabarits (`generate*EmailHtml`) restent ceux, sobres, de Flowvent.
 import { randomInt } from 'node:crypto'
 
-export interface EmailOptions {
-  to: string
-  subject: string
-  html: string
-  text?: string
-}
+import {
+  envoyerCourriel,
+  type EmailOptions,
+} from '../../../../layers/core/server/socle/envoi-courriel'
+
+export type { EmailOptions } from '../../../../layers/core/server/socle/envoi-courriel'
 
 /**
  * URL publique du site : runtimeConfig.public.siteUrl, sinon NUXT_PUBLIC_SITE_URL,
  * sinon localhost.
  */
+/**
+ * Nom de l'application dans les sujets des courriels du layer d'auth, et sa signature : chaque
+ * application fournit les siens (le layer les lit par `#server/utils/emailService`).
+ */
+export const NOM_DU_SITE = 'Flowvent'
+export const SIGNATURE_COURRIEL = "L'équipe Flowvent"
+
 export function getSiteUrl(): string {
   const config = useRuntimeConfig()
   const publicConfig = config.public as Record<string, any>
   return publicConfig?.siteUrl || process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 }
 
-/**
- * Envoi d'email en mode simulation. Ne throw jamais.
- * @returns `true` en simulation (email « envoyé »), `false` si SEND_EMAILS=true
- *          (aucun transport réel disponible dans app2).
- */
+/** Envoi d'un courriel, au nom de « Flowvent ». Ne lève jamais : `false` si l'envoi a échoué. */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
-  const isSimulation = process.env.SEND_EMAILS !== 'true'
-
-  if (!isSimulation) {
-    console.warn(
-      `[emailService] SEND_EMAILS=true mais aucun transport n'est configuré dans app2 — ` +
-        `email NON envoyé à ${options.to} (sujet: "${options.subject}")`
-    )
-    return false
-  }
-
-  // Mode simulation : logger le contenu pour retrouver le code / lien dans les logs.
-  const excerpt = (options.text || options.html || '').replace(/\s+/g, ' ').trim().slice(0, 500)
-  console.log('📧 EMAIL SIMULÉ (SEND_EMAILS!=true):', {
-    to: options.to,
-    subject: options.subject,
-    contenu: excerpt,
-  })
-
-  return true
+  return envoyerCourriel(options, { nomExpediteur: 'Flowvent' })
 }
 
 /**

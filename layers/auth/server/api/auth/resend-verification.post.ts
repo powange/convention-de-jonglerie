@@ -3,10 +3,11 @@ import { z } from 'zod'
 import { nomDeSalutation } from '#auth/server/utils/nom-de-salutation'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import {
-  sendEmail,
   generateVerificationCode,
   generateVerificationEmailHtml,
   getSiteUrl,
+  NOM_DU_SITE,
+  sendEmail,
 } from '#server/utils/emailService'
 import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
 import { emailRateLimiter } from '#server/utils/rate-limiter'
@@ -66,7 +67,7 @@ export default wrapApiHandler(
     const emailHtml = await generateVerificationEmailHtml(verificationCode, prenom, cleanEmail)
     const emailSent = await sendEmail({
       to: cleanEmail,
-      subject: '🤹 Nouveau code de vérification - Conventions de Jonglerie',
+      subject: `🤹 Nouveau code de vérification - ${NOM_DU_SITE}`,
       html: emailHtml,
       text: `Bonjour ${prenom}, votre nouveau code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier : ${siteUrl}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
     })
