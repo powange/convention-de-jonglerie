@@ -84,6 +84,31 @@ interface HelloAssoFormIdentifier {
 }
 
 /**
+ * Les types de formulaire que l'API v5 accepte dans `/forms/{formType}/…` — et AUCUN autre
+ * (énumération `FormType` de https://dev.helloasso.com/reference) :
+ * `CrowdFunding`, `Membership`, `Event`, `Donation`, `PaymentForm`, `Checkout`, `Shop`.
+ *
+ * ⚠️ L'interface proposait aussi « Billetterie » (`Ticketing`) et « Formulaire » (`Form`), et le
+ * décodage d'URL produisait les mêmes : HelloAsso répond alors par une erreur, que le test de
+ * connexion rendait en « vérifiez les identifiants ». Des configurations ont été enregistrées
+ * ainsi : on les traduit ici, à l'appel, pour qu'elles fonctionnent sans ressaisie. Une
+ * « billetterie » HelloAsso est un formulaire `Event` ; un « formulaire » est un `PaymentForm`.
+ */
+const TYPES_HERITES: Record<string, string> = { Ticketing: 'Event', Form: 'PaymentForm' }
+
+export function normaliserTypeFormulaire(formType: string): string {
+  const type = formType.trim()
+  return TYPES_HERITES[type] ?? type
+}
+
+/** Le chemin d'un formulaire dans l'API, type normalisé et slugs débarrassés de leurs espaces. */
+export function cheminDuFormulaire(formulaire: HelloAssoFormIdentifier): string {
+  const organisation = encodeURIComponent(formulaire.organizationSlug.trim())
+  const slug = encodeURIComponent(formulaire.formSlug.trim())
+  return `/v5/organizations/${organisation}/forms/${normaliserTypeFormulaire(formulaire.formType)}/${slug}`
+}
+
+/**
  * Récupère un token d'accès OAuth2 depuis l'API HelloAsso
  */
 export async function getHelloAssoAccessToken(credentials: HelloAssoCredentials): Promise<string> {
@@ -144,7 +169,7 @@ export async function getHelloAssoForm(
     journal.debug('récupération du formulaire', formIdentifier)
 
     // Utiliser directement l'API REST au lieu du SDK
-    const url = `${HELLOASSO_API_URL}/v5/organizations/${formIdentifier.organizationSlug}/forms/${formIdentifier.formType}/${formIdentifier.formSlug}/public`
+    const url = `${HELLOASSO_API_URL}${cheminDuFormulaire(formIdentifier)}/public`
     journal.debug('URL du formulaire', url)
 
     const response = await fetch(url, {
@@ -421,7 +446,7 @@ async function fetchOrdersPageFromHelloAsso(
       withCount: 'true',
     })
 
-    const url = `${HELLOASSO_API_URL}/v5/organizations/${formIdentifier.organizationSlug}/forms/${formIdentifier.formType}/${formIdentifier.formSlug}/orders?${params}`
+    const url = `${HELLOASSO_API_URL}${cheminDuFormulaire(formIdentifier)}/orders?${params}`
 
     const response = await fetch(url, {
       headers: {
