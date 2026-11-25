@@ -1,4 +1,7 @@
-import { colonnesMasqueesDepuisUrl, colonnesMasqueesVersUrl } from './colonnes-url'
+import {
+  colonnesMasqueesDepuisUrl,
+  colonnesMasqueesVersUrl,
+} from '#ui-commun/app/utils/colonnes-url'
 
 /**
  * Lecture et écriture, dans l'URL, de l'état du journal d'erreurs.

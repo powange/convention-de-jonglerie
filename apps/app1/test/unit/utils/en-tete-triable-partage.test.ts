@@ -48,7 +48,7 @@ describe('en-tête triable — une seule définition', () => {
       return /function\s+(enTeteTriable|getSortableHeader)\s*\(/.test(src)
     }).map((f) => path.relative(RACINE, f))
 
-    expect(copies, 'employer `enTeteTriable` de `~/utils/en-tete-triable`').toEqual([])
+    expect(copies, 'employer `enTeteTriable` de `#ui-commun/app/utils/en-tete-triable`').toEqual([])
   })
 
   it('les cinq écrans qui triaient trient toujours', () => {

@@ -223,7 +223,7 @@ import {
 
 import { nomFichierFaq, preparerFaqPourPdf } from '../../../../../utils/faq-pdf'
 
-import { requeteAvec, texteDepuisUrl } from '~~/shared/utils/filtres-url'
+import { requeteAvec, texteDepuisUrl } from '#core/shared/utils/filtres-url'
 import { htmlVersTexte } from '~~/shared/utils/html-to-text'
 
 // Layer faq : imports du cœur applicatif via #imports (auto-imports fusionnés entre layers).

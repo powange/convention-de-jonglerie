@@ -3,7 +3,7 @@ import {
   requeteAvec,
   texteDepuisUrl,
   valeurDepuisUrl,
-} from '~~/shared/utils/filtres-url'
+} from '#core/shared/utils/filtres-url'
 
 /**
  * Les filtres de la liste des repas, dans l'URL.

@@ -1,4 +1,4 @@
-import type { UploadEndpoint } from '~/types/upload'
+import type { UploadEndpoint } from '#ui-commun/app/types/upload'
 
 /**
  * Composable pour gérer les URLs d'images

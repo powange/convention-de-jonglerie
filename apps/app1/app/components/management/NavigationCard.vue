@@ -28,7 +28,11 @@
 </template>
 
 <script setup lang="ts">
-import { FOND_DE_MODULE, ICONE_DE_MODULE, type CouleurDeModule } from '~/utils/couleurs-de-module'
+import {
+  FOND_DE_MODULE,
+  ICONE_DE_MODULE,
+  type CouleurDeModule,
+} from '#ui-commun/app/utils/couleurs-de-module'
 
 const NuxtLink = resolveComponent('NuxtLink')
 

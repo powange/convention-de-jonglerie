@@ -2,7 +2,7 @@ import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { effectScope, ref } from 'vue'
 
-import { useModeClairTemporaire } from '../../../app/composables/useModeClairTemporaire'
+import { useModeClairTemporaire } from '#ui-commun/app/composables/useModeClairTemporaire'
 
 /**
  * `useColorMode` réel manipule le DOM et n'a pas sa place ici : ce qu'on vérifie, c'est la

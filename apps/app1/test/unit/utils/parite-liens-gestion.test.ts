@@ -4,7 +4,7 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { CATEGORIES_DE_GESTION } from '../../../app/utils/categories-de-gestion'
-import { MODULES_DE_GESTION } from '../../../app/utils/modules-de-gestion'
+import { MODULES_DE_GESTION } from '#ui-commun/app/utils/modules-de-gestion'
 
 /**
  * Trois surfaces mènent aux mêmes modules de gestion, et aucune ne doit en oublier.

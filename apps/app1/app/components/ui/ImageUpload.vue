@@ -156,7 +156,7 @@
 <script setup lang="ts">
 import { useMediaQuery } from '@vueuse/core'
 
-import type { UploadEndpoint, UploadOptions } from '~/types/upload'
+import type { UploadEndpoint, UploadOptions } from '#ui-commun/app/types/upload'
 
 import { estUnJustificatifPdf } from '~~/shared/utils/justificatif-pdf'
 

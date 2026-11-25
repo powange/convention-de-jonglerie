@@ -1,4 +1,4 @@
-import { entierDepuisUrl, requeteAvec, texteDepuisUrl } from '~~/shared/utils/filtres-url'
+import { entierDepuisUrl, requeteAvec, texteDepuisUrl } from '#core/shared/utils/filtres-url'
 
 /**
  * Les filtres des candidatures à un appel à spectacles, dans l'URL.

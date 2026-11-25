@@ -356,7 +356,7 @@ import {
 
 import type { TableColumn } from '@nuxt/ui'
 
-import { type ColonneTriee, triDepuisUrl, triVersUrl } from '~~/shared/utils/filtres-url'
+import { type ColonneTriee, triDepuisUrl, triVersUrl } from '#core/shared/utils/filtres-url'
 
 definePageMeta({
   layout: 'edition-dashboard',

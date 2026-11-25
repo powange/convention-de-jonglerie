@@ -2,7 +2,7 @@ import {
   colonnesMasqueesDepuisUrl,
   colonnesMasqueesVersUrl,
   PARAMETRE_DE_COLONNES,
-} from '~/utils/colonnes-url'
+} from '#ui-commun/app/utils/colonnes-url'
 
 /**
  * Retenir dans l'URL les colonnes qu'on a masquées.

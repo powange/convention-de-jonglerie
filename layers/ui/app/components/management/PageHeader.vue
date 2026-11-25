@@ -12,8 +12,8 @@
 </template>
 
 <script setup lang="ts">
-import { ICONE_DE_MODULE } from '~/utils/couleurs-de-module'
-import { moduleDeGestion } from '~/utils/modules-de-gestion'
+import { ICONE_DE_MODULE } from '#ui-commun/app/utils/couleurs-de-module'
+import { moduleDeGestion } from '#ui-commun/app/utils/modules-de-gestion'
 
 /**
  * Le titre d'un écran de gestion : l'icône du module, le titre, la description.

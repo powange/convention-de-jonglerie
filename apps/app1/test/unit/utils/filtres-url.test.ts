@@ -12,7 +12,7 @@ import {
   triDepuisUrl,
   triVersUrl,
   valeurDepuisUrl,
-} from '../../../shared/utils/filtres-url'
+} from '#core/shared/utils/filtres-url'
 
 /**
  * Les briques communes à tous les filtres d'URL.
