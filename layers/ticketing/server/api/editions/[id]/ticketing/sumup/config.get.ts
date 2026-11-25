@@ -52,7 +52,7 @@ export default wrapApiHandler(
       // Le guichet construit le lien profond `sumupmerchant://` : sans cette clé, le bénévole
       // qui tient la porte ne peut pas encaisser par carte. Le créneau doit être EN COURS.
       const { isActiveAccessControlVolunteer } =
-        await import('#server/utils/permissions/access-control-permissions')
+        await import('#volunteers/server/utils/permissions/access-control-permissions')
       if (!(await isActiveAccessControlVolunteer(user.id, editionId))) {
         throw createError({
           status: 403,
