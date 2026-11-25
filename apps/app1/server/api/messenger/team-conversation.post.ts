@@ -2,8 +2,8 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'
 import { assurerConversationsEquipeDesMembres } from '#server/utils/messenger-helpers'
+import { equipesDontIlEstResponsable } from '#volunteers/server/utils/editions/volunteers/responsables-equipe'
 
 /*
  * Le corps n'était pas validé : un `editionId` reçu en chaîne (« 3 ») passait le contrôle de

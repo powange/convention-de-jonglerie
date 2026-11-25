@@ -13,7 +13,7 @@ vi.mock('../../../../../server/utils/messenger-helpers', () => ({
   ensureOrganizersGroupConversation: assurerGroupeOrganisateurs,
 }))
 
-vi.mock('../../../../../server/utils/editions/volunteers/responsables-equipe', () => ({
+vi.mock('#volunteers/server/utils/editions/volunteers/responsables-equipe', () => ({
   equipesDontIlEstResponsable,
 }))
 

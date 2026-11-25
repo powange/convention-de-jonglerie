@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { genererCreneauxRecurrents } from '../../../shared/utils/creneaux-recurrents'
+import { genererCreneauxRecurrents } from '#volunteers/shared/utils/creneaux-recurrents'
 
 const PARIS = 'Europe/Paris'
 

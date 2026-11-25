@@ -108,10 +108,10 @@
 </template>
 
 <script setup lang="ts">
-import { calculerBesoinEnBenevoles } from '~/utils/besoin-benevoles'
-import { PERIODES, type EffectifParPeriode } from '~/utils/effectif-par-periode'
-
 import type { PeriodeEdition } from '~~/shared/utils/presence-edition'
+
+import { calculerBesoinEnBenevoles } from '#volunteers/app/utils/besoin-benevoles'
+import { PERIODES, type EffectifParPeriode } from '#volunteers/app/utils/effectif-par-periode'
 
 const props = defineProps<{
   modelValue: boolean

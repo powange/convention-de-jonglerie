@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-vi.mock('../../../../../server/utils/permissions/volunteer-permissions', () => ({
+vi.mock('#volunteers/server/utils/permissions/volunteer-permissions', () => ({
   requireVolunteerPlanningAccess: vi.fn(),
   isAcceptedVolunteer: vi.fn(async () => true),
 }))

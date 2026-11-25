@@ -3,7 +3,7 @@ import {
   champsRestituables,
   cleBrouillon,
   type BrouillonEnregistre,
-} from '~~/shared/utils/brouillon-candidature'
+} from '#volunteers/shared/utils/brouillon-candidature'
 
 /**
  * Conserve la saisie en cours d'une candidature, pour la rendre telle quelle au retour.

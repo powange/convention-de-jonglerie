@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 const responsablesDeLEquipe = vi.hoisted(() => vi.fn(async () => [] as number[]))
 
-vi.mock('../../../../server/utils/editions/volunteers/responsables-equipe', () => ({
+vi.mock('#volunteers/server/utils/editions/volunteers/responsables-equipe', () => ({
   utilisateursResponsablesDeLEquipe: responsablesDeLEquipe,
 }))
 

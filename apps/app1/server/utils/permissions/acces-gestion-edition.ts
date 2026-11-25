@@ -1,12 +1,12 @@
 import type { UserForPermissions } from '#server/utils/permissions/types'
 
-import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'
-import { isActiveAccessControlVolunteer } from '#server/utils/permissions/access-control-permissions'
 import {
   canEditEdition,
   type EditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
 import { canAccessMealValidation } from '#server/utils/permissions/meal-validation-permissions'
+import { equipesDontIlEstResponsable } from '#volunteers/server/utils/editions/volunteers/responsables-equipe'
+import { isActiveAccessControlVolunteer } from '#volunteers/server/utils/permissions/access-control-permissions'
 
 /**
  * Cette personne a-t-elle accès à l'espace de gestion d'une édition, à un titre quelconque ?

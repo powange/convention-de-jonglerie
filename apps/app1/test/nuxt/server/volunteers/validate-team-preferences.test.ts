@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import { validateTeamPreferences } from '../../../../server/utils/editions/volunteers/applications'
+import { validateTeamPreferences } from '#volunteers/server/utils/editions/volunteers/applications'
 
 const prismaMock = (globalThis as any).prisma
 

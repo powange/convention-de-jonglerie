@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   calculerBesoinEnBenevoles,
   heuresDesOrganisateurs,
-} from '../../../app/utils/besoin-benevoles'
+} from '#volunteers/app/utils/besoin-benevoles'
 
 /**
  * Le calcul de dimensionnement, tel qu'il a été arrêté : seules les heures des organisateurs se

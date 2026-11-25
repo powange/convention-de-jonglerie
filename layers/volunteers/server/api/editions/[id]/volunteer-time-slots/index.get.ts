@@ -4,11 +4,11 @@ import { PLANNING_NON_PUBLIE } from '../../../../utils/publication-plannings'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
+import { validateEditionId } from '#server/utils/validation-helpers'
 import {
   isAcceptedVolunteer,
   requireVolunteerPlanningAccess,
-} from '#server/utils/permissions/volunteer-permissions'
-import { validateEditionId } from '#server/utils/validation-helpers'
+} from '#volunteers/server/utils/permissions/volunteer-permissions'
 
 export default wrapApiHandler(
   async (event) => {

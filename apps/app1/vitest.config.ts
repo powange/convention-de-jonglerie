@@ -40,8 +40,12 @@ export default defineConfig({
           alias: {
             '~~': resolve(__dirname),
             '~': resolve(__dirname, 'app'),
+            // Les modules déplacés de app1 vers un layer y importent l'app hôte par `#server`.
+            '#server': resolve(__dirname, 'server'),
             // Déclaré par `layers/auth/nuxt.config.ts` ; ce projet ne lit pas la config Nuxt.
             '#auth': resolve(__dirname, '../../layers/auth'),
+            // Déclaré par `layers/volunteers/nuxt.config.ts`.
+            '#volunteers': resolve(__dirname, '../../layers/volunteers'),
           },
         },
         test: {

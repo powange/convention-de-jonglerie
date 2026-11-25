@@ -4,10 +4,13 @@ import type { Prisma } from '#server/types/prisma'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { creneauxConcernes, empreinteDesAffectations } from '#server/utils/empreinte-affectations'
 import { createLogger } from '#server/utils/logger'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+import {
+  creneauxConcernes,
+  empreinteDesAffectations,
+} from '#volunteers/server/utils/empreinte-affectations'
 
 const log = createLogger('ASSIGNATION-AUTO')
 

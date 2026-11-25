@@ -12,7 +12,10 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { validateEditionId, validateStringId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
-import { RETARD_MINUTES_MAX, RETARD_MINUTES_MIN } from '~~/shared/utils/bornes-retard-creneau'
+import {
+  RETARD_MINUTES_MAX,
+  RETARD_MINUTES_MIN,
+} from '#volunteers/shared/utils/bornes-retard-creneau'
 
 const updateTimeSlotSchema = z
   .object({

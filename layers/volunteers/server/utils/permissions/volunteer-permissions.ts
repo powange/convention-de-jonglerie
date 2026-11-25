@@ -1,4 +1,4 @@
-import { requireAuth, type AuthenticatedUser } from '../auth-utils'
+import { requireAuth, type AuthenticatedUser } from '#server/utils/auth-utils'
 
 /**
  * Vérifie que l'utilisateur a les permissions pour gérer les bénévoles d'une édition

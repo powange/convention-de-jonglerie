@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import {
   equipesDontIlEstResponsable,
   utilisateursResponsablesDeLEquipe,
-} from '../../../../server/utils/editions/volunteers/responsables-equipe'
+} from '#volunteers/server/utils/editions/volunteers/responsables-equipe'
 
 /**
  * Le statut de responsable d'équipe n'est pas qu'une étiquette : plusieurs endpoints

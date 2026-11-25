@@ -9,17 +9,20 @@ import type { PrismaTransaction } from '#server/types/prisma-helpers'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { creneauxConcernes, empreinteDesAffectations } from '#server/utils/empreinte-affectations'
 import { createLogger } from '#server/utils/logger'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { createRateLimiter } from '#server/utils/rate-limiter'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+import {
+  creneauxConcernes,
+  empreinteDesAffectations,
+} from '#volunteers/server/utils/empreinte-affectations'
 import {
   VolunteerScheduler,
   type Assignment,
   type SchedulingResult,
-} from '#server/utils/volunteer-scheduler'
-import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+} from '#volunteers/server/utils/volunteer-scheduler'
 import {
   estEquipeHorsCharge,
   estHorsAssignationAutomatique,

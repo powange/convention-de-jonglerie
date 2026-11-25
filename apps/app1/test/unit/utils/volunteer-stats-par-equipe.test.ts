@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { calculateVolunteersStatsByTeam } from '../../../app/utils/volunteer-stats'
+import { calculateVolunteersStatsByTeam } from '#volunteers/app/utils/volunteer-stats'
 
 const benevole = (id: number) => ({ user: { id, pseudo: `b${id}` } })
 const organisateur = (id: number) => ({ user: { id, pseudo: `o${id}` } })

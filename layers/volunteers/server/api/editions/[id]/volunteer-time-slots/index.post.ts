@@ -9,7 +9,7 @@ import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import {
   genererCreneauxRecurrents,
   type EtendueRecurrence,
-} from '~~/shared/utils/creneaux-recurrents'
+} from '#volunteers/shared/utils/creneaux-recurrents'
 
 const createTimeSlotSchema = z
   .object({

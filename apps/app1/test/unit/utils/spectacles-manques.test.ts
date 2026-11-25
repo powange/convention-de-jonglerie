@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { detecterSpectaclesManques } from '../../../app/utils/spectacles-manques'
+import { detecterSpectaclesManques } from '#volunteers/app/utils/spectacles-manques'
 
 const creneau = (options: {
   id?: string

@@ -4,8 +4,11 @@ import {
   calculateVolunteersStats,
   calculateVolunteersStatsByDay,
   calculateVolunteersStatsIndividual,
-} from '../../../app/utils/volunteer-stats'
-import type { TimeSlotWithAssignments, AcceptedVolunteer } from '../../../app/utils/volunteer-stats'
+} from '#volunteers/app/utils/volunteer-stats'
+import type {
+  TimeSlotWithAssignments,
+  AcceptedVolunteer,
+} from '#volunteers/app/utils/volunteer-stats'
 
 // --- Helpers de construction de données réalistes ---
 

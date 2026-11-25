@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
-vi.mock('../../../../../server/utils/permissions/volunteer-permissions', () => ({
+vi.mock('#volunteers/server/utils/permissions/volunteer-permissions', () => ({
   requireVolunteerPlanningAccess: vi.fn(),
   isAcceptedVolunteer: vi.fn(),
 }))
@@ -13,7 +13,7 @@ vi.mock('../../../../../server/utils/organizer-management', () => ({
   canManageEditionVolunteers: vi.fn(async () => false),
 }))
 
-vi.mock('../../../../../server/utils/editions/volunteers/responsables-equipe', () => ({
+vi.mock('#volunteers/server/utils/editions/volunteers/responsables-equipe', () => ({
   equipesDontIlEstResponsable: vi.fn(async () => []),
   // L'appartenance décide de ce qu'on voit NOMMÉMENT ; la responsabilité, de QUAND.
   equipesDontIlEstMembre: vi.fn(async () => []),
@@ -22,7 +22,7 @@ vi.mock('../../../../../server/utils/editions/volunteers/responsables-equipe', (
 import {
   requireVolunteerPlanningAccess,
   isAcceptedVolunteer,
-} from '#server/utils/permissions/volunteer-permissions'
+} from '#volunteers/server/utils/permissions/volunteer-permissions'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import handler from '../../../../../../../layers/volunteers/server/api/editions/[id]/volunteer-time-slots/index.get'
 

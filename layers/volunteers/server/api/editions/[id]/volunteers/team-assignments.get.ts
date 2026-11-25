@@ -1,9 +1,9 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { equipesDontIlEstResponsable } from '#volunteers/server/utils/editions/volunteers/responsables-equipe'
 
 /**
  * Route dédiée pour récupérer tous les bénévoles acceptés avec leurs assignations d'équipes

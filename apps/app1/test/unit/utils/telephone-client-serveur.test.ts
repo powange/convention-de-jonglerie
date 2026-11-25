@@ -2,7 +2,7 @@ import { getCountryCallingCode, parsePhoneNumberFromString } from 'libphonenumbe
 import { describe, expect, it } from 'vitest'
 
 import { manquementsDeLaCandidature } from '../../../../../layers/volunteers/app/utils/validation-candidature'
-import { volunteerApplicationBodySchema } from '../../../server/utils/editions/volunteers/applications'
+import { volunteerApplicationBodySchema } from '#volunteers/server/utils/editions/volunteers/applications'
 import { telephoneCandidatureAcceptable } from '../../../shared/utils/telephone-candidature'
 
 /**

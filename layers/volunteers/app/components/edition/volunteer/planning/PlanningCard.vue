@@ -92,7 +92,6 @@
 import { computed, ref } from 'vue'
 
 import type { Edition } from '~/types'
-import type { VolunteerStats, DayStats, VolunteerStatsIndividual } from '~/utils/volunteer-stats'
 
 import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '#imports'
 
@@ -105,6 +104,12 @@ import {
   requeteFiltres,
   vueDepuisUrl,
 } from '../../../../utils/filtres-planning'
+
+import type {
+  VolunteerStats,
+  DayStats,
+  VolunteerStatsIndividual,
+} from '#volunteers/app/utils/volunteer-stats'
 
 interface Props {
   edition: Edition | undefined

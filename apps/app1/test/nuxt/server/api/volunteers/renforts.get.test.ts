@@ -4,13 +4,13 @@ vi.mock('../../../../../server/utils/organizer-management', () => ({
   canManageEditionVolunteers: vi.fn(async () => true),
 }))
 
-vi.mock('../../../../../server/utils/editions/volunteers/responsables-equipe', () => ({
+vi.mock('#volunteers/server/utils/editions/volunteers/responsables-equipe', () => ({
   equipesDontIlEstResponsable: vi.fn(async () => []),
   // L'appartenance décide de ce qu'on voit NOMMÉMENT ; la responsabilité, de QUAND.
   equipesDontIlEstMembre: vi.fn(async () => []),
 }))
 
-import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'
+import { equipesDontIlEstResponsable } from '#volunteers/server/utils/editions/volunteers/responsables-equipe'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import renforts from '../../../../../../../layers/volunteers/server/api/editions/[id]/volunteers/renforts.get'
 

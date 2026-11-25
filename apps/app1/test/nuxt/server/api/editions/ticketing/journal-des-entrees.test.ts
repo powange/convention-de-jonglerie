@@ -27,7 +27,7 @@ vi.mock('#server/utils/notification-service', () => ({
   NotificationHelpers: { volunteerEntryValidated: vi.fn() },
   safeNotify: vi.fn(),
 }))
-vi.mock('#server/utils/editions/volunteers/responsables-equipe', () => ({
+vi.mock('#volunteers/server/utils/editions/volunteers/responsables-equipe', () => ({
   utilisateursResponsablesDeLEquipe: vi.fn().mockResolvedValue([]),
 }))
 vi.mock('#server/utils/editions/ticketing/user-info-update', () => ({

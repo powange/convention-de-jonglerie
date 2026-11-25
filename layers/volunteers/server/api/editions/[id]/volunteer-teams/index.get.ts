@@ -2,9 +2,9 @@ import { filtreDesEquipesVisibles, VUE_DE_CANDIDATURE } from '../../../../utils/
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { optionalAuth } from '#server/utils/auth-utils'
-import { isAcceptedVolunteer } from '#server/utils/permissions/volunteer-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+import { isAcceptedVolunteer } from '#volunteers/server/utils/permissions/volunteer-permissions'
 
 export default wrapApiHandler(
   async (event) => {

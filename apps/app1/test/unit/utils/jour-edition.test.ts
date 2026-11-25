@@ -4,7 +4,7 @@ import { jourDeLEdition } from '../../../app/utils/jour-edition'
 import {
   calculateVolunteersStatsByDay,
   calculateVolunteersStatsByTeam,
-} from '../../../app/utils/volunteer-stats'
+} from '#volunteers/app/utils/volunteer-stats'
 
 /**
  * À quelle journée appartient un créneau.

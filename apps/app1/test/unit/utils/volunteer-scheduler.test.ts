@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
 
-import { VolunteerScheduler } from '../../../server/utils/volunteer-scheduler'
+import { VolunteerScheduler } from '#volunteers/server/utils/volunteer-scheduler'
 
-import type { BornesEvenement } from '../../../server/utils/volunteer-scheduler'
+import type { BornesEvenement } from '#volunteers/server/utils/volunteer-scheduler'
 
 // L'édition se tient le 1er août, de 14 h à 23 h (heures UTC pour rester lisible).
 const DEBUT = '2026-08-01T14:00:00.000Z'

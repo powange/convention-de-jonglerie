@@ -1,8 +1,8 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { isActiveAccessControlVolunteer } from '#server/utils/permissions/access-control-permissions'
 import { canAccessMealValidation } from '#server/utils/permissions/meal-validation-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { isActiveAccessControlVolunteer } from '#volunteers/server/utils/permissions/access-control-permissions'
 
 /**
  * Endpoint unifié pour vérifier les accès « bénévole » à la gestion d'une édition.

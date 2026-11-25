@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import {
   isActiveAccessControlVolunteer,
   getActiveAccessControlSlot,
-} from '../../server/utils/permissions/access-control-permissions'
+} from '#volunteers/server/utils/permissions/access-control-permissions'
 import { getEmailHash } from '../../server/utils/email-hash'
 import { prismaTest } from '../setup-db'
 

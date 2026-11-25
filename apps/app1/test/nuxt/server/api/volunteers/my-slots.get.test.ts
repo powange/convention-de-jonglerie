@@ -7,7 +7,7 @@ vi.mock('#server/utils/api-helpers', () => ({
 
 // Le point d'API demande désormais de quelles équipes la personne fait partie : l'appartenance
 // décide de ce qu'elle voit nommément, la responsabilité de QUAND elle le voit.
-vi.mock('#server/utils/editions/volunteers/responsables-equipe', () => ({
+vi.mock('#volunteers/server/utils/editions/volunteers/responsables-equipe', () => ({
   equipesDontIlEstResponsable: vi.fn(async () => []),
   equipesDontIlEstMembre: vi.fn(async () => []),
 }))

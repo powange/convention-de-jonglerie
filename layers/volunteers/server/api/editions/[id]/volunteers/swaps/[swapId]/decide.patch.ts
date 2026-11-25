@@ -9,8 +9,8 @@ import {
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
-import { requireVolunteerManagementAccess } from '#server/utils/permissions/volunteer-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { requireVolunteerManagementAccess } from '#volunteers/server/utils/permissions/volunteer-permissions'
 
 const bodySchema = z.object({ approve: z.boolean() })
 

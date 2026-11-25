@@ -5,7 +5,10 @@
  * posée la contribution attendue de chacun : dire « il reste 120 heures à pourvoir » ne se traduit
  * en effectif que si l'on sait ce qu'un bénévole doit faire.
  */
-import { personnesDuCreneau, type TimeSlotWithAssignments } from './volunteer-stats'
+import {
+  personnesDuCreneau,
+  type TimeSlotWithAssignments,
+} from '#volunteers/app/utils/volunteer-stats'
 
 /** Le dimensionnement de l'édition, pour une contribution attendue donnée. */
 export interface BesoinEnBenevoles {

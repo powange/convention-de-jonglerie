@@ -1,20 +1,20 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { infosPersonnellesSelect } from '#server/utils/infos-personnelles'
+import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
+import { userBasicSelect } from '#server/utils/prisma-select-helpers'
+import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import {
   volunteerApplicationPatchSchema,
   validateAllergiesUpdate,
   buildVolunteerApplicationUpdateData,
   getUserUpdateData,
-} from '#server/utils/editions/volunteers/applications'
-import { infosPersonnellesSelect } from '#server/utils/infos-personnelles'
-import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
-import { userBasicSelect } from '#server/utils/prisma-select-helpers'
-import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
+} from '#volunteers/server/utils/editions/volunteers/applications'
 import {
   compareApplicationChanges,
   hasApplicationDataChanges,
-} from '#server/utils/volunteer-application-diff'
-import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+} from '#volunteers/server/utils/volunteer-application-diff'
 
 export default wrapApiHandler(
   async (event) => {

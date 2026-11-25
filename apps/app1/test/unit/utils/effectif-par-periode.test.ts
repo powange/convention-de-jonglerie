@@ -4,7 +4,7 @@ import {
   chargeParPeriode,
   disponibleSurLaPeriode,
   effectifParPeriode,
-} from '../../../app/utils/effectif-par-periode'
+} from '#volunteers/app/utils/effectif-par-periode'
 
 /**
  * Dimensionner l'effectif période par période.
