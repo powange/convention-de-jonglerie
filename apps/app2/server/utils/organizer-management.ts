@@ -1,25 +1,19 @@
 import type { H3Event } from 'h3'
 
+import { droitsSurEvenement } from './droits-evenement'
+
 /**
- * Qui gère les bénévoles d'un événement Flowvent : son PROPRIÉTAIRE, ses organisateurs déclarés
- * (`EditionOrganizer`) et un administrateur global. Contrat d'hôte du layer bénévoles — app1 y
- * applique ses propres règles (conventions, droits par édition).
+ * Qui gère les bénévoles d'un événement Flowvent : son PROPRIÉTAIRE, un administrateur global, et
+ * les organisateurs à qui ce droit a été donné (`EditionOrganizer.canManageVolunteers`). Contrat
+ * d'hôte du layer bénévoles — app1 y applique ses propres règles (conventions, droits par édition).
+ * La règle vit dans `droits-evenement.ts`, écrite une fois.
  */
 export async function canManageEditionVolunteers(
   eventId: number,
   userId: number,
   _event?: H3Event
 ): Promise<boolean> {
-  const [evenement, utilisateur, organisateur] = await Promise.all([
-    prisma.event.findUnique({ where: { id: eventId }, select: { ownerId: true } }),
-    prisma.user.findUnique({ where: { id: userId }, select: { isGlobalAdmin: true } }),
-    prisma.editionOrganizer.findFirst({
-      where: { editionId: eventId, organizer: { userId } },
-      select: { id: true },
-    }),
-  ])
-  if (!evenement) return false
-  return evenement.ownerId === userId || !!utilisateur?.isGlobalAdmin || !!organisateur
+  return (await droitsSurEvenement(eventId, userId)).benevoles
 }
 
 /** Les comptes à prévenir quand une décision de gestion est attendue (échanges de créneaux…). */
@@ -27,7 +21,9 @@ export async function listerGestionnairesBenevoles(eventId: number): Promise<num
   const [evenement, organisateurs] = await Promise.all([
     prisma.event.findUnique({ where: { id: eventId }, select: { ownerId: true } }),
     prisma.editionOrganizer.findMany({
-      where: { editionId: eventId },
+      // Seulement ceux qui ont le droit de décider : prévenir les autres leur demanderait une action
+      // qu'ils ne peuvent pas faire.
+      where: { editionId: eventId, canManageVolunteers: true },
       select: { organizer: { select: { userId: true } } },
     }),
   ])

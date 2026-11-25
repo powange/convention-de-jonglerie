@@ -3,7 +3,7 @@
     <div class="mb-6 flex items-center justify-between gap-4">
       <div>
         <h1 class="text-2xl font-bold">Mes événements</h1>
-        <p class="text-sm text-muted">Gérez vos événements et leurs bénévoles.</p>
+        <p class="text-sm text-muted">Vos événements, et ceux dont vous êtes co-organisateur.</p>
       </div>
       <UButton to="/events/new" icon="i-heroicons-plus" label="Créer un événement" />
     </div>
@@ -43,7 +43,16 @@
         class="cursor-pointer transition hover:ring-2 hover:ring-primary"
         @click="navigateTo(`/events/${ev.publicId}`)"
       >
-        <h3 class="truncate font-semibold">{{ ev.name }}</h3>
+        <div class="flex items-start justify-between gap-2">
+          <h3 class="truncate font-semibold">{{ ev.name }}</h3>
+          <UBadge
+            v-if="!ev.estProprietaire"
+            color="secondary"
+            variant="subtle"
+            size="sm"
+            label="Co-organisateur"
+          />
+        </div>
         <p v-if="ev.location" class="mt-2 flex items-center gap-1 text-sm text-muted">
           <UIcon name="i-heroicons-map-pin" /> {{ ev.location }}
         </p>
