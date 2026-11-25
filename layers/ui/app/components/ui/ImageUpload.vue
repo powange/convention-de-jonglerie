@@ -158,7 +158,7 @@ import { useMediaQuery } from '@vueuse/core'
 
 import type { UploadEndpoint, UploadOptions } from '#ui-commun/app/types/upload'
 
-import { estUnJustificatifPdf } from '~~/shared/utils/justificatif-pdf'
+import { estUnJustificatifPdf } from '#core/shared/utils/justificatif-pdf'
 
 interface Props {
   /** Valeur actuelle (URL de l'image) */

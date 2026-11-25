@@ -124,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { estUnJustificatifPdf } from '~~/shared/utils/justificatif-pdf'
+import { estUnJustificatifPdf } from '#core/shared/utils/justificatif-pdf'
 
 /**
  * Les types acceptés.

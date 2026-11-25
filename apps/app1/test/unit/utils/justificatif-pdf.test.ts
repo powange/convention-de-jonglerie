@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { estUnJustificatifPdf } from '../../../shared/utils/justificatif-pdf'
+import { estUnJustificatifPdf } from '#core/shared/utils/justificatif-pdf'
 
 describe('estUnJustificatifPdf', () => {
   it('reconnaît un PDF, quelle que soit la casse de son extension', () => {
