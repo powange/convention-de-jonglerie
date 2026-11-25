@@ -12,6 +12,7 @@ import {
   listePourConditions,
   rendreVerdict,
   touchePourFlowvent,
+  touchePourAudit,
   touchePourImageApp1,
   // @ts-expect-error — module .mjs sans déclarations, importé pour son comportement
 } from '../../../scripts/perimetre-ci.mjs'
@@ -98,7 +99,12 @@ describe('périmètre de la CI', () => {
     for (const evt of ['schedule', 'workflow_dispatch']) {
       const { perimetre, jobs } = calculerJobs(evt, [], LAYERS_APP2)
       expect(perimetre, evt).toBe('complet')
-      expect(jobs, evt).toEqual([...JOBS_PAR_PERIMETRE.complet, 'image-flowvent', 'image-app1'])
+      expect(jobs, evt).toEqual([
+        ...JOBS_PAR_PERIMETRE.complet,
+        'image-flowvent',
+        'image-app1',
+        'audit',
+      ])
     }
   })
 
@@ -183,6 +189,21 @@ describe('image d’app1', () => {
     expect(calculerJobs('pull_request', ['apps/app1/a.ts'], LAYERS_APP2).jobs).not.toContain(
       'image-app1'
     )
+  })
+})
+
+describe('audit des dépendances', () => {
+  it('sur une PR, seulement si le manifeste ou le verrou d’app1 change', () => {
+    expect(touchePourAudit(['apps/app1/package-lock.json'])).toBe(true)
+    expect(touchePourAudit(['apps/app1/package.json'])).toBe(true)
+    expect(touchePourAudit(['apps/app1/app/a.vue', 'apps/app2/package-lock.json'])).toBe(false)
+    expect(calculerJobs('pull_request', ['apps/app1/a.ts'], LAYERS_APP2).jobs).not.toContain(
+      'audit'
+    )
+  })
+
+  it('⚠️ toujours sur le run planifié — c’est là qu’un avis publié depuis se voit', () => {
+    expect(calculerJobs('schedule', [], LAYERS_APP2).jobs).toContain('audit')
   })
 })
 

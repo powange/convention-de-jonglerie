@@ -1308,6 +1308,11 @@ jobs:
   # ⚠️ Le seuil n'est PAS un compte. Caler une garde sur « pas plus de 96 hautes » la ferait tomber
   # le jour où le chiffre baisse, et il faudrait la corriger pour avoir bien travaillé. Le compte
   # est écrit dans le résumé du run, où il se lit ; seul le niveau critique arrête.
+  #
+  # QUAND : sur le run planifié et le déclenchement manuel, et sur une PR qui touche
+  # apps/app1/package.json ou son verrou. Une vulnérabilité naît dans la base de npm, pas dans nos
+  # commits : une PR qui ne change pas les dépendances n'apprenait rien, et c'est le run de la nuit
+  # qui voit un avis publié depuis (cf. `touchePourAudit` dans scripts/perimetre-ci.mjs).
   audit:
     runs-on: ubuntu-22.04
     timeout-minutes: 8
