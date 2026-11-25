@@ -26,14 +26,24 @@
  * ⚠️ Pas de `paths-ignore` au niveau du workflow : `ci-verte` est le check REQUIS par la règle de
  * `main`, et un workflow qui ne démarre pas ne le rend jamais — la PR resterait bloquée sur un check
  * « en attente ». Le workflow démarre donc toujours ; ce sont ses jobs qui se sautent.
+ *
+ * En plus du périmètre, certains jobs dépendent des FICHIERS touchés (`JOBS_SELON_FICHIERS`) :
+ * `image-flowvent` ne construit l'image de Flowvent que si la PR touche app2 ou un layer qu'elle
+ * étend. Cette garde vivait dans `publier-image-flowvent.yml`, hors de `ci-verte` : une PR qui
+ * cassait Flowvent pouvait être mergée. La liste de ces layers est lue dans `extends` de
+ * `apps/app2/nuxt.config.ts` à chaque run, et non recopiée ici : une copie de plus aurait dérivé
+ * comme les autres (cf. test/unit/outillage/flowvent-liste-des-layers.test.ts).
  */
+
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 /** Préfixe des fichiers qu'aucun job lourd d'app1 ne lit. */
 const PREFIXE_APP2 = 'apps/app2/'
 
 /**
- * Les jobs CONDITIONNÉS à lancer, par périmètre. `changements` et `setup` tournent toujours et ne
- * figurent pas ici ; `ci-verte` et `signaler-run-planifie` non plus, ils jugent les autres.
+ * Les jobs CONDITIONNÉS lancés d'office, par périmètre. `changements` et `setup` tournent toujours
+ * et ne figurent pas ici ; `ci-verte` et `signaler-run-planifie` non plus, ils jugent les autres.
  */
 export const JOBS_PAR_PERIMETRE = {
   complet: [
@@ -52,8 +62,25 @@ export const JOBS_PAR_PERIMETRE = {
   amorcage: ['base-de-test', 'navigateurs'],
 }
 
-/** Tous les jobs qui portent une condition de périmètre. */
-export const JOBS_CONDITIONNES = [...new Set(Object.values(JOBS_PAR_PERIMETRE).flat())].sort()
+/** Les jobs ajoutés selon les fichiers touchés (hors push sur main, où rien n'est vérifié). */
+export const JOBS_SELON_FICHIERS = ['image-flowvent']
+
+/** Tous les jobs qui portent une condition dans le YAML. */
+export const JOBS_CONDITIONNES = [
+  ...new Set([...Object.values(JOBS_PAR_PERIMETRE).flat(), ...JOBS_SELON_FICHIERS]),
+].sort()
+
+/**
+ * Les layers qu'app2 étend, lus dans le TEXTE de sa configuration (la CI ne prépare pas app2 : un
+ * import n'y marcherait pas).
+ *
+ * @param {string} sourceConfig - contenu de `apps/app2/nuxt.config.ts`
+ * @returns {string[]}
+ */
+export function layersEtendusParApp2(sourceConfig) {
+  const bloc = sourceConfig.match(/extends:\s*\[([^\]]*)\]/)?.[1] ?? ''
+  return [...bloc.matchAll(/'\.\.\/\.\.\/layers\/([a-z0-9-]+)'/g)].map((m) => m[1])
+}
 
 /**
  * @param {string} evenement - `github.event_name`
@@ -92,34 +119,73 @@ export function calculerPerimetre(evenement, fichiers) {
 }
 
 /**
+ * La PR peut-elle casser l'image de Flowvent ? Oui si elle touche app2, un layer qu'app2 étend, ou
+ * la définition du job lui-même. Si la liste des layers n'a pas pu être lue, TOUT changement de
+ * `layers/` compte : dans le doute, on construit.
+ *
+ * @param {string[]} fichiers
+ * @param {string[]} layersApp2
+ */
+export function touchePourFlowvent(fichiers, layersApp2) {
+  return fichiers.some(
+    (f) =>
+      f.startsWith(PREFIXE_APP2) ||
+      f === '.github/workflows/tests.yml' ||
+      (layersApp2.length === 0
+        ? f.startsWith('layers/')
+        : layersApp2.some((l) => f.startsWith(`layers/${l}/`)))
+  )
+}
+
+/**
+ * Le périmètre et la liste complète des jobs conditionnés à lancer.
+ *
+ * @param {string} evenement
+ * @param {string[]} fichiers
+ * @param {string[]} layersApp2
+ * @returns {{ perimetre: keyof typeof JOBS_PAR_PERIMETRE, raison: string, jobs: string[] }}
+ */
+export function calculerJobs(evenement, fichiers, layersApp2) {
+  const { perimetre, raison } = calculerPerimetre(evenement, fichiers)
+  const jobs = [...JOBS_PAR_PERIMETRE[perimetre]]
+  if (perimetre === 'amorcage') return { perimetre, raison, jobs }
+
+  const utiles = fichiers.map((f) => f.trim()).filter(Boolean)
+  // Hors PR (planifié, manuel) ou sans liste lisible : tout ce qui dépend des fichiers tourne.
+  const toutLancer = evenement !== 'pull_request' || utiles.length === 0
+  if (toutLancer || touchePourFlowvent(utiles, layersApp2)) jobs.push('image-flowvent')
+  return { perimetre, raison, jobs }
+}
+
+/**
  * La liste publiée pour les conditions du YAML, entourée d'espaces : chaque job y cherche
  * ` <son nom> `, si bien que `test` ne se reconnaît pas dans `test-unit`. Une chaîne et non du
  * JSON : si `changements` échoue, la sortie est vide, et `contains('', …)` vaut faux au lieu de
  * lever une erreur d'évaluation comme le ferait `fromJSON('')`.
  *
- * @param {keyof typeof JOBS_PAR_PERIMETRE} perimetre
+ * @param {string[]} jobs
  */
-export function listePourConditions(perimetre) {
-  return ` ${JOBS_PAR_PERIMETRE[perimetre].join(' ')} `
+export function listePourConditions(jobs) {
+  return ` ${jobs.join(' ')} `
 }
 
 /**
- * Le verdict de `ci-verte`.
+ * Le verdict de `ci-verte`, à partir de la liste que `changements` a publiée.
  *
- *  1. un job en échec ou annulé refuse, quel que soit le périmètre ;
- *  2. un périmètre inconnu (job `changements` en échec, sortie vide) vaut `complet` — la lecture
- *     prudente : tout saut devient alors un refus ;
- *  3. un job sauté n'est accepté que s'il porte une condition de périmètre ET que le périmètre ne
- *     le lance pas. Un job inconnu de ce fichier est donc REQUIS : un job ajouté plus tard n'est
- *     jamais exempté par oubli.
+ *  1. un job en échec ou annulé refuse, toujours ;
+ *  2. une liste absente ou vide (job `changements` en échec) vaut « tout était requis » — la
+ *     lecture prudente : tout saut devient alors un refus ;
+ *  3. un job sauté n'est accepté que s'il porte une condition ET qu'il n'était pas dans la liste.
+ *     Un job inconnu de ce fichier est donc REQUIS : un job ajouté plus tard n'est jamais exempté
+ *     par oubli.
  *
  * @param {Record<string, { result: string }>} besoins - `toJSON(needs)`
- * @param {string | undefined} perimetre - sortie du job `changements`
+ * @param {string | undefined} jobsPublies - sortie `jobs` du job `changements`
  * @returns {{ vert: boolean, problemes: string[] }}
  */
-export function rendreVerdict(besoins, perimetre) {
-  const effectif = perimetre && perimetre in JOBS_PAR_PERIMETRE ? perimetre : 'complet'
-  const lances = JOBS_PAR_PERIMETRE[effectif]
+export function rendreVerdict(besoins, jobsPublies) {
+  const publies = (jobsPublies ?? '').split(/\s+/).filter(Boolean)
+  const lances = publies.length > 0 ? publies : JOBS_CONDITIONNES
   const problemes = []
 
   const noms = Object.keys(besoins)
@@ -131,7 +197,7 @@ export function rendreVerdict(besoins, perimetre) {
     if (resultat === 'skipped' && JOBS_CONDITIONNES.includes(nom) && !lances.includes(nom)) continue
     problemes.push(
       resultat === 'skipped'
-        ? `${nom} : sauté alors que le périmètre « ${effectif} » l'exige`
+        ? `${nom} : sauté alors qu'il devait tourner`
         : `${nom} : ${resultat ?? 'résultat absent'}`
     )
   }
@@ -145,17 +211,27 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
   if (mode === '--perimetre') {
     const fichiers = readFileSync(0, 'utf8').split('\n')
-    const { perimetre, raison } = calculerPerimetre(evenement ?? '', fichiers)
-    const jobs = listePourConditions(perimetre)
+    let layersApp2 = []
+    try {
+      const config = join(dirname(fileURLToPath(import.meta.url)), '../../app2/nuxt.config.ts')
+      layersApp2 = layersEtendusParApp2(readFileSync(config, 'utf8'))
+    } catch {
+      console.log(
+        '::warning::apps/app2/nuxt.config.ts illisible : tout changement de layers/ compte'
+      )
+    }
+    const { perimetre, raison, jobs } = calculerJobs(evenement ?? '', fichiers, layersApp2)
+    const liste = listePourConditions(jobs)
     console.log(`Périmètre : ${perimetre} (${raison})`)
-    console.log(`Jobs lancés en plus de setup :${jobs}`)
+    console.log(`Layers étendus par app2 : ${layersApp2.join(', ') || '(inconnus)'}`)
+    console.log(`Jobs lancés en plus de setup :${liste}`)
     if (process.env.GITHUB_OUTPUT) {
-      appendFileSync(process.env.GITHUB_OUTPUT, `perimetre=${perimetre}\njobs=${jobs}\n`)
+      appendFileSync(process.env.GITHUB_OUTPUT, `perimetre=${perimetre}\njobs=${liste}\n`)
     }
     if (process.env.GITHUB_STEP_SUMMARY) {
       appendFileSync(
         process.env.GITHUB_STEP_SUMMARY,
-        `### Périmètre : \`${perimetre}\`\n\n${raison}\n\nJobs lancés en plus de \`setup\` :${jobs}\n`
+        `### Périmètre : \`${perimetre}\`\n\n${raison}\n\nJobs lancés en plus de \`setup\` :${liste}\n`
       )
     }
     process.exit(0)
@@ -169,14 +245,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       console.error('::error::RESULTATS absent ou illisible : impossible de rendre un verdict')
       process.exit(1)
     }
-    const { vert, problemes } = rendreVerdict(besoins, process.env.PERIMETRE)
+    const { vert, problemes } = rendreVerdict(besoins, process.env.JOBS)
     if (!vert) {
       for (const p of problemes) console.error(`::error::${p}`)
       process.exit(1)
     }
-    console.log(
-      `✅ Tous les jobs requis par le périmètre « ${process.env.PERIMETRE || 'complet'} » sont passés.`
-    )
+    console.log(`✅ Tous les jobs requis sont passés (lancés :${process.env.JOBS || ' tous'}).`)
     process.exit(0)
   }
 
