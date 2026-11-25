@@ -16,37 +16,62 @@ datasource db {
 }
 
 model User {
-  id                     Int       @id @default(autoincrement())
-  email                  String    @unique
+  id                     Int               @id @default(autoincrement())
+  email                  String            @unique
   emailHash              String
-  pseudo                 String    @unique
+  pseudo                 String            @unique
   nom                    String?
   prenom                 String?
   password               String? // nullable : null pour les comptes OAuth (Google)
-  authProvider           String    @default("email") // "email" | "google" | "facebook" | "MANUAL"
+  authProvider           String            @default("email") // "email" | "google" | "facebook" | "MANUAL"
   // Identifiants des fournisseurs OAuth : le layer d'auth retrouve le compte par eux au retour de
   // Google / Facebook. Sans ces colonnes, le retour OAuth échouait (requête Prisma invalide).
-  googleId               String?   @unique
-  facebookId             String?   @unique
+  googleId               String?           @unique
+  facebookId             String?           @unique
   // Génération de session, écrite dans la session par le layer d'auth (même rôle que dans app1).
-  sessionVersion         Int       @default(0)
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
+  sessionVersion         Int               @default(0)
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
   lastLoginAt            DateTime?
   profilePicture         String? // avatar (photo de profil Google)
   emailVerificationCode  String?
-  isEmailVerified        Boolean   @default(false)
+  isEmailVerified        Boolean           @default(false)
   verificationCodeExpiry DateTime?
-  isGlobalAdmin          Boolean   @default(false)
+  isGlobalAdmin          Boolean           @default(false)
   phone                  String?
-  preferredLanguage      String    @default("fr")
-  isVolunteer            Boolean   @default(false)
-  isArtist               Boolean   @default(false)
-  isOrganizer            Boolean   @default(false)
+  // Informations personnelles demandées par le formulaire de candidature bénévole (selon la
+  // configuration de l'événement). Mêmes champs qu'app1 : le layer bénévoles les lit tels quels.
+  pronouns               String?
+  dietaryPreference      DietaryPreference @default(NONE)
+  allergies              String?           @db.Text
+  allergySeverity        AllergySeverity?
+  emergencyContactName   String?
+  emergencyContactPhone  String?
+  preferredLanguage      String            @default("fr")
+  isVolunteer            Boolean           @default(false)
+  isArtist               Boolean           @default(false)
+  isOrganizer            Boolean           @default(false)
 
   events              Event[]
   subscription        Subscription?
   passwordResetTokens PasswordResetToken[]
+
+  // Gestion des bénévoles (relations inverses, mêmes noms qu'app1)
+  volunteerApplications              EditionVolunteerApplication[]
+  manuallyAddedVolunteers            EditionVolunteerApplication[]       @relation("ManuallyAddedVolunteers")
+  volunteerNotificationGroups        VolunteerNotificationGroup[]
+  volunteerNotificationConfirmations VolunteerNotificationConfirmation[]
+  volunteerAssignments               VolunteerAssignment[]               @relation("VolunteerAssignment_user")
+  volunteerSwapsRequested            VolunteerSwapRequest[]              @relation("VolunteerSwap_requester")
+  volunteerSwapsReceived             VolunteerSwapRequest[]              @relation("VolunteerSwap_target")
+  volunteerSwapsDecided              VolunteerSwapRequest[]              @relation("VolunteerSwap_decidedBy")
+  assignedVolunteerSlots             VolunteerAssignment[]               @relation("VolunteerAssignment_assignedBy")
+  volunteerAutoAssignRuns            VolunteerAutoAssignRun[]            @relation("VolunteerAutoAssignRun_executedBy")
+  volunteerAutoAssignRunsUndone      VolunteerAutoAssignRun[]            @relation("VolunteerAutoAssignRun_undoneBy")
+  volunteerAutoAssignPlans           VolunteerAutoAssignPlan[]           @relation("VolunteerAutoAssignPlan_createdBy")
+  volunteerComments                  VolunteerComment[]
+  notifications                      Notification[]
+  organizers                         Organizer[]
 }
 
 model PasswordResetToken {
@@ -62,15 +87,31 @@ model PasswordResetToken {
 }
 
 model Event {
-  id          Int       @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   name        String
-  description String?   @db.Text
+  description String?       @db.Text
   location    String?
   startDate   DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  // Métadonnées génériques lues par le layer bénévoles (comme l'`Event` d'app1).
+  endDate     DateTime?
+  status      EditionStatus @default(PUBLISHED)
+  timezone    String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  owner       User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId     Int
+
+  // Gestion des bénévoles (relations inverses, mêmes noms qu'app1)
+  volunteerApplications       EditionVolunteerApplication[]
+  volunteerTeams              VolunteerTeam[]
+  volunteerTimeSlots          VolunteerTimeSlot[]
+  volunteerNotificationGroups VolunteerNotificationGroup[]
+  volunteerComments           VolunteerComment[]
+  volunteerSwapRequests       VolunteerSwapRequest[]
+  volunteerSettings           EventVolunteerSettings?
+  volunteerAutoAssignRuns     VolunteerAutoAssignRun[]
+  volunteerAutoAssignPlans    VolunteerAutoAssignPlan[]
+  editionOrganizers           EditionOrganizer[]
 
   @@index([ownerId])
 }
@@ -84,4 +125,656 @@ model Subscription {
   currentPeriodEnd DateTime
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════════
+// Gestion des bénévoles — modèles du layer `layers/volunteers`, repris d'app1
+// (apps/app1/prisma/schema/volunteer.prisma). Relations vers des modules que Flowvent n'a pas
+// (repas, objets remis, quotas billetterie, conversations) retirées. Cf. docs/flowvent-benevoles.md.
+// ═══════════════════════════════════════════════════════════════════════════════════════════════
+
+enum EditionStatus {
+  PLANNED
+  PUBLISHED
+  OFFLINE
+  CANCELLED
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+/// Notifications internes. Même forme qu'app1 : le layer bénévoles en crée et en lit.
+model Notification {
+  id                String           @id @default(cuid())
+  userId            Int
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              NotificationType
+  titleKey          String?
+  messageKey        String?
+  translationParams Json?
+  actionTextKey     String?
+  titleText         String?          @db.Text
+  messageText       String?          @db.Text
+  actionText        String?
+  category          String?
+  entityType        String?
+  entityId          String?
+  isRead            Boolean          @default(false)
+  readAt            DateTime?
+  actionUrl         String?          @db.Text
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@index([category])
+  @@index([entityType, entityId])
+}
+
+/// Un organisateur de Flowvent (base des co-organisateurs). Le layer bénévoles ne lit que
+/// `editionOrganizer.organizer.userId` / `.user` : le nom du modèle lui est indifférent.
+model Organizer {
+  id        Int                @id @default(autoincrement())
+  userId    Int
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime           @default(now())
+  editions  EditionOrganizer[]
+
+  @@index([userId])
+}
+
+/// Organisateur affecté à un événement. Nom et champs d'app1 : le layer interroge
+/// `prisma.editionOrganizer` et ses relations par ces noms. `editionId` désigne l'`Event`.
+model EditionOrganizer {
+  id                Int                       @id @default(autoincrement())
+  editionId         Int
+  organizerId       Int
+  arrivalDateTime   String?
+  departureDateTime String?
+  qrCodeToken       String?                   @unique
+  entryValidated    Boolean                   @default(false)
+  entryValidatedAt  DateTime?
+  entryValidatedBy  Int?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+  event             Event                     @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  organizer         Organizer                 @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  teamAssignments   OrganizerTeamAssignment[]
+  slotAssignments   OrganizerSlotAssignment[]
+
+  @@unique([editionId, organizerId])
+  @@index([editionId])
+  @@index([organizerId])
+}
+
+enum VolunteerMode {
+  INTERNAL
+  EXTERNAL
+}
+
+enum DietaryPreference {
+  NONE
+  VEGETARIAN
+  VEGAN
+}
+
+enum AllergySeverity {
+  LIGHT
+  MODERATE
+  SEVERE
+  CRITICAL
+}
+
+enum VolunteerStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum VolunteerApplicationSource {
+  APPLICATION // Candidature spontanée via formulaire
+  MANUAL // Ajout manuel par un organisateur
+}
+
+// Configuration bénévole d'un événement (1:1 avec Event), portée par le layer volunteers.
+// Étape 0bis : extraite d'Edition pour que le module bénévole ne dépende plus du domaine jonglerie.
+model EventVolunteerSettings {
+  eventId Int   @id
+  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  enabled           Boolean       @default(false)
+  open              Boolean       @default(false)
+  pagePublic        Boolean       @default(false)
+  mode              VolunteerMode @default(INTERNAL)
+  // Les échanges de créneaux entre bénévoles, ouverts par défaut : les éditions existantes
+  // gardent le comportement qu'elles avaient avant l'arrivée de ce réglage.
+  swapsEnabled      Boolean       @default(true)
+  // Rattacher des organisateurs aux équipes et créneaux. Fermé par défaut : c'est une
+  // possibilité qu'on ouvre, pas un comportement que les éditions existantes attendaient.
+  organizersInTeams Boolean       @default(false)
+  // Le planning est-il montré aux bénévoles acceptés ?
+  //
+  // Fermé par défaut, et c'est l'inverse du raisonnement de `swapsEnabled` : un responsable
+  // construit ses plannings par itérations, et voir apparaître puis disparaître ses créneaux au
+  // fil de la journée donne à un bénévole des informations fausses qu'il notera dans son agenda.
+  // Une édition neuve doit donc commencer masquée, et le responsable publier quand il juge prêt.
+  //
+  // ⚠️ La MIGRATION passe toutes les lignes EXISTANTES à `true`. Le défaut sert les éditions à
+  // venir ; sans cet UPDATE, les éditions en cours perdraient du jour au lendemain un affichage
+  // que leurs bénévoles ont déjà — y compris pendant une convention.
+  planningPublished Boolean       @default(false)
+  description       String?       @db.Text
+  externalUrl       String?
+  setupStartDate    DateTime?
+  teardownEndDate   DateTime?
+  updatedAt         DateTime?
+
+  // Questions du formulaire de candidature
+  askDiet             Boolean @default(false)
+  askAllergies        Boolean @default(false)
+  askTimePreferences  Boolean @default(false)
+  askTeamPreferences  Boolean @default(false)
+  askPets             Boolean @default(false)
+  askMinors           Boolean @default(false)
+  askVehicle          Boolean @default(false)
+  askCompanion        Boolean @default(false)
+  askAvoidList        Boolean @default(false)
+  askSkills           Boolean @default(false)
+  askExperience       Boolean @default(false)
+  askEmergencyContact Boolean @default(false)
+  askSetup            Boolean @default(false)
+  askTeardown         Boolean @default(false)
+
+  /// Les réglages de l'assignation automatique, partagés par les organisateurs de l'édition.
+  ///
+  /// Ils vivaient dans le `localStorage` du navigateur : changer de poste les faisait repartir
+  /// aux valeurs par défaut sans prévenir — y compris le mode de conservation, qui décide de ce
+  /// qui sera détruit. Et deux organisateurs pouvaient lancer le calcul avec des contraintes
+  /// différentes sans le savoir, le résultat dépendant alors de qui avait cliqué.
+  ///
+  /// `null` signifie « jamais réglé » : l'écran part de ses valeurs par défaut, comme avant.
+  autoAssignConstraints Json?
+}
+
+model EditionVolunteerApplication {
+  id                   Int                         @id @default(autoincrement())
+  eventId              Int
+  userId               Int
+  status               VolunteerStatus             @default(PENDING)
+  motivation           String?                     @db.Text
+  createdAt            DateTime                    @default(now())
+  updatedAt            DateTime                    @updatedAt
+  decidedAt            DateTime?
+  userSnapshotPhone    String?
+  timePreferences      Json?
+  teamPreferences      Json?
+  acceptanceNote       String?                     @db.Text
+  hasPets              Boolean?
+  petsDetails          String?                     @db.Text
+  hasMinors            Boolean?
+  minorsDetails        String?                     @db.Text
+  hasVehicle           Boolean?
+  vehicleDetails       String?                     @db.Text
+  companionName        String?                     @db.Text
+  avoidList            String?                     @db.Text
+  skills               String?                     @db.Text
+  hasExperience        Boolean?
+  experienceDetails    String?                     @db.Text
+  setupAvailability    Boolean?
+  teardownAvailability Boolean?
+  eventAvailability    Boolean?
+  arrivalDateTime      String?
+  departureDateTime    String?
+  qrCodeToken          String?                     @unique
+  entryValidated       Boolean                     @default(false)
+  entryValidatedAt     DateTime?
+  entryValidatedBy     Int?
+  source               VolunteerApplicationSource  @default(APPLICATION)
+  addedById            Int?
+  addedAt              DateTime?
+  event                Event                       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user                 User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addedBy              User?                       @relation("ManuallyAddedVolunteers", fields: [addedById], references: [id], onDelete: SetNull)
+  teamAssignments      ApplicationTeamAssignment[]
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([status])
+  @@index([userId], map: "EditionVolunteerApplication_userId_fkey")
+  @@index([entryValidated])
+  @@index([source])
+  @@index([addedById])
+  @@index([qrCodeToken])
+}
+
+model VolunteerNotificationGroup {
+  id             String   @id @default(cuid())
+  eventId        Int
+  /// Facultatif depuis que la suppression de compte le met à nul : l'envoi reste, son auteur non.
+  /// Le message a été reçu, et l'effacer avec son expéditeur réécrirait l'histoire de l'édition.
+  senderId       Int?
+  title          String
+  message        String   @db.Text
+  targetType     String // 'all' ou 'teams'
+  selectedTeams  Json? // Array des équipes sélectionnées si targetType = 'teams'
+  recipientCount Int
+  sentAt         DateTime @default(now())
+
+  event         Event                               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  sender        User?                               @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  confirmations VolunteerNotificationConfirmation[]
+
+  @@index([eventId])
+  @@index([senderId])
+}
+
+model VolunteerNotificationConfirmation {
+  id                           String    @id @default(cuid())
+  volunteerNotificationGroupId String
+  userId                       Int
+  confirmedAt                  DateTime?
+
+  notificationGroup VolunteerNotificationGroup @relation(fields: [volunteerNotificationGroupId], references: [id], onDelete: Cascade)
+  /// Cascade : un accusé de lecture est une ligne PAR DESTINATAIRE. Le destinataire parti, elle ne
+  /// dit plus rien — et sans action de suppression, la relation étant obligatoire, Prisma applique
+  /// `Restrict` et la suppression du compte échouait en P2003.
+  user              User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([volunteerNotificationGroupId, userId])
+  @@index([userId])
+}
+
+model VolunteerTeam {
+  id                    String   @id @default(cuid())
+  eventId               Int
+  name                  String
+  description           String?  @db.Text
+  color                 String   @default("#6b7280") @db.VarChar(7)
+  maxVolunteers         Int?
+  isRequired            Boolean  @default(false)
+  isAccessControlTeam   Boolean  @default(false)
+  isMealValidationTeam  Boolean  @default(false)
+  /// Équipe de bénévoles VOLANTS : des gens à disposition, sans créneau fixe, qu'on appelle en
+  /// renfort quand une équipe prend du retard ou qu'une tâche se révèle plus lourde que prévu.
+  ///
+  /// La notion vit sur l'ÉQUIPE et non sur le bénévole, et c'est ce qui la rend peu coûteuse :
+  /// être volant, c'est simplement appartenir à une telle équipe. Le rattachement existe déjà
+  /// (`ApplicationTeamAssignment`), les objets à remettre sont déjà portés par l'équipe, et la
+  /// conversation d'équipe permet déjà de joindre tout le monde pendant l'événement.
+  ///
+  /// ⚠️ Elle n'exempte de rien à elle seule. Un bénévole n'est « hors des comptes » que si TOUTES
+  /// ses équipes sont volantes : quelqu'un qui est à la fois en cuisine et volant reste un
+  /// bénévole ordinaire, et l'assignation automatique lui donne ses heures de cuisine. Voir
+  /// `benevoles-volants.ts`, où la règle est écrite une fois.
+  isFloatingTeam        Boolean  @default(false)
+  /// Équipe AUTONOME : elle se gère à part, et réserve ses membres.
+  ///
+  /// Ses créneaux ne comptent pas dans les heures à pourvoir et ne sont pas remplis par
+  /// l'assignation automatique — elle s'organise elle-même. Et les bénévoles qui n'appartiennent
+  /// qu'à des équipes autonomes ne reçoivent aucun créneau d'ailleurs : ils lui sont réservés.
+  ///
+  /// ⚠️ À ne pas confondre avec `isFloatingTeam`, dont l'effet sur l'ÉQUIPE est le même mais dont
+  /// l'effet sur les PERSONNES est inverse : la volante libère ses membres de leur volume
+  /// d'heures et les propose en renfort, l'autonome les garde tenus à leurs heures et les tient
+  /// hors de la page des renforts. Voir `benevoles-volants.ts`, où les deux règles cohabitent.
+  isAutonomousTeam      Boolean  @default(false)
+  /// Les PÉRIODES sur lesquelles l'équipe intervient — montage, événement, démontage.
+  ///
+  /// Une équipe d'accueil peut n'exister que pendant l'événement, une équipe de chantier
+  /// seulement au montage et au démontage. Le formulaire de candidature ne propose alors, dans les
+  /// équipes préférées, que celles dont une période recoupe les disponibilités annoncées par le
+  /// bénévole : demander à quelqu'un qui ne vient qu'au montage s'il préfère l'équipe de plonge du
+  /// dimanche soir n'avait pas de sens, et son choix n'aurait servi à personne.
+  ///
+  /// `true` par défaut sur les trois : l'`ALTER` remplit ainsi les équipes existantes, qui gardent
+  /// donc exactement le comportement qu'elles avaient. Aucune édition en cours ne change.
+  ///
+  /// ⚠️ Au moins une période doit rester cochée — une équipe qui ne couvre rien ne serait proposée
+  /// à personne. Les deux points d'API le refusent.
+  coversSetup           Boolean  @default(true)
+  coversEvent           Boolean  @default(true)
+  coversTeardown        Boolean  @default(true)
+  isVisibleToVolunteers Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  event                Event                       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  timeSlots            VolunteerTimeSlot[]
+  assignedApplications ApplicationTeamAssignment[]
+  assignedOrganizers   OrganizerTeamAssignment[]
+
+  @@index([eventId])
+}
+
+model VolunteerTimeSlot {
+  id            String   @id @default(cuid())
+  eventId       Int
+  teamId        String?
+  title         String?
+  description   String?  @db.Text
+  startDateTime DateTime
+  endDateTime   DateTime
+  maxVolunteers Int      @default(1)
+  delayMinutes  Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  event                Event                     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  team                 VolunteerTeam?            @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  assignments          VolunteerAssignment[]
+  organizerAssignments OrganizerSlotAssignment[]
+
+  @@index([eventId])
+  @@index([teamId])
+}
+
+/// D'où vient une affectation : posée à la main, ou produite par l'assignation automatique.
+/// `assignedById` ne peut pas en tenir lieu — l'organisateur qui lance le calcul y figure
+/// comme s'il avait tout posé lui-même.
+///
+/// Sert aux deux choses que l'assignation automatique écrit, et qu'elle doit donc pouvoir
+/// reprendre sans écraser de décision humaine : l'affectation à un créneau
+/// (`VolunteerAssignment`) et le rattachement à une équipe (`ApplicationTeamAssignment`).
+enum VolunteerAssignmentSource {
+  MANUAL
+  AUTO
+}
+
+model VolunteerAssignment {
+  id           String                    @id @default(cuid())
+  timeSlotId   String
+  userId       Int
+  assignedAt   DateTime                  @default(now())
+  assignedById Int
+  // Par défaut manuelle : c'est le choix prudent pour les lignes déjà en base, dont l'origine
+  // est perdue, et une relance ne doit pas les balayer par surprise.
+  source       VolunteerAssignmentSource @default(MANUAL)
+
+  /// Quand le rappel « votre créneau commence dans 30 minutes » a été envoyé pour cette
+  /// affectation. `null` = jamais.
+  ///
+  /// ⚠️ SANS CETTE MARQUE, LE RAPPEL PARTAIT 4 À 5 FOIS. La tâche tourne CHAQUE MINUTE et retient
+  /// les créneaux qui démarrent dans 28 à 32 minutes : un même créneau tombe donc dans la fenêtre
+  /// à quatre ou cinq passages consécutifs, et rien ne gardait trace de l'envoi précédent.
+  ///
+  /// Portée par l'AFFECTATION et non par le créneau : quelqu'un affecté entre deux passages doit
+  /// recevoir son rappel, ce qu'une marque posée sur le créneau lui aurait retiré.
+  reminderSentAt DateTime?
+
+  timeSlot       VolunteerTimeSlot      @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
+  user           User                   @relation("VolunteerAssignment_user", fields: [userId], references: [id], onDelete: Cascade)
+  assignedBy     User                   @relation("VolunteerAssignment_assignedBy", fields: [assignedById], references: [id], onDelete: Cascade)
+  swapsOffered   VolunteerSwapRequest[] @relation("VolunteerSwap_requesterAssignment")
+  swapsRequested VolunteerSwapRequest[] @relation("VolunteerSwap_targetAssignment")
+
+  @@unique([timeSlotId, userId])
+  @@index([timeSlotId])
+  @@index([userId])
+  @@index([assignedById])
+  // La relance efface les affectations automatiques d'une édition : cet index évite un
+  // balayage complet de la table pour les retrouver.
+  @@index([source])
+}
+
+/// Le journal d'une application de l'assignation automatique, et de quoi la défaire.
+///
+/// Le calcul écrit des centaines de lignes d'un coup et n'en gardait aucune trace : ni les
+/// réglages employés, ni ce qu'il avait effacé, ni qui l'avait lancé — deux `console.log` en tout.
+/// Un organisateur qui se trompait de mode n'avait aucun moyen de revenir en arrière.
+///
+/// L'état antérieur est conservé en JSON plutôt qu'en tables filles, et c'est délibéré : il est
+/// écrit d'un bloc, relu d'un bloc au moment d'annuler, et n'est jamais interrogé autrement. Deux
+/// tables de plus n'apporteraient que des jointures.
+///
+/// ⚠️ Seul le dernier journal d'une édition peut être annulé, et une seule fois. Défaire un calcul
+/// par-dessus un autre reviendrait à restaurer un état que le suivant a déjà modifié.
+model VolunteerAutoAssignRun {
+  id           String   @id @default(cuid())
+  eventId      Int
+  executedById Int
+  executedAt   DateTime @default(now())
+  /// `replace-all`, `keep-all` ou `keep-manual`.
+  mode         String
+  /// Les contraintes telles que l'organisateur les avait réglées, pour savoir ce qui a produit ce
+  /// planning — la question que l'on se pose toujours en second.
+  constraints  Json
+
+  /// Ce que le calcul a effacé, tel que c'était : de quoi le recréer à l'identique.
+  deletedAssignments Json
+  /// Ce qu'il a créé : de quoi le retirer.
+  createdAssignments Json
+  /// Les rattachements d'équipe, sur le même principe.
+  deletedTeamLinks   Json
+  createdTeamLinks   Json
+
+  createdCount Int
+  deletedCount Int
+
+  /**
+   * L'état du planning tel que ce calcul l'a laissé.
+   * L'annulation ne refusait que si un AUTRE calcul avait été appliqué depuis. Elle ne voyait pas
+   * les affectations posées à la main entre-temps : les retirer aurait fait disparaître ce
+   * travail, et recréer les anciennes pouvait entrer en conflit avec lui.
+   * Même mécanique que l'empreinte qui protège l'application : on compare avant d'écrire.
+   */
+  empreinteApres String?
+
+  /// Renseignés quand le calcul a été annulé. Un journal annulé ne l'est pas deux fois.
+  undoneAt   DateTime?
+  undoneById Int?
+
+  event      Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  executedBy User  @relation("VolunteerAutoAssignRun_executedBy", fields: [executedById], references: [id], onDelete: Cascade)
+  undoneBy   User? @relation("VolunteerAutoAssignRun_undoneBy", fields: [undoneById], references: [id], onDelete: SetNull)
+
+  @@index([eventId, executedAt])
+  @@index([executedById])
+  @@index([undoneById])
+}
+
+/// Un plan calculé, en attente d'être appliqué.
+///
+/// L'aperçu et l'application étaient deux calculs distincts : le bouton « Appliquer » relisait la
+/// base et relançait l'algorithme. Entre les deux clics, un créneau ajouté, une candidature
+/// acceptée ou une affectation posée par un collègue suffisaient à ce que le plan écrit ne soit
+/// pas celui que l'organisateur avait validé.
+///
+/// L'aperçu conserve donc son résultat ici, avec une EMPREINTE des données qui l'ont produit.
+/// L'application le relit, vérifie que l'empreinte tient toujours, et écrit exactement ce qui a
+/// été montré — ou refuse, en demandant un nouvel aperçu.
+///
+/// Les plans sont éphémères : `expiresAt` dit jusqu'à quand celui-ci vaut encore la peine d'être
+/// proposé. Un plan vieux d'une heure décrit une édition qui a probablement changé.
+model VolunteerAutoAssignPlan {
+  id          String   @id @default(cuid())
+  eventId     Int
+  createdById Int
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+
+  /// Ce qui a produit ce plan, et qu'on revérifiera avant de l'appliquer.
+  fingerprint String
+  mode        String
+  constraints Json
+
+  /// Le plan lui-même, et le périmètre qui borne ce qu'il a le droit d'effacer.
+  assignments Json
+  perimetre   Json
+  /// Le résultat complet montré à l'organisateur — statistiques, non-assignés, diagnostic.
+  ///
+  /// Conservé pour que l'application n'ait pas à relancer l'algorithme : elle le relançait
+  /// uniquement pour produire une réponse dont elle jetait ensuite le contenu, et ce calcul
+  /// coûte plusieurs secondes sur une grosse édition.
+  resultat    Json?
+
+  /// Renseigné quand le plan a été appliqué : un plan ne s'applique pas deux fois.
+  appliedAt DateTime?
+
+  event     Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdBy User  @relation("VolunteerAutoAssignPlan_createdBy", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([eventId, createdAt])
+  @@index([createdById])
+  @@index([expiresAt])
+}
+
+model ApplicationTeamAssignment {
+  applicationId Int
+  teamId        String
+  isLeader      Boolean                   @default(false)
+  assignedAt    DateTime                  @default(now())
+  /// D'où vient ce rattachement : d'un organisateur, ou d'un calcul d'assignation automatique.
+  ///
+  /// Sans cette colonne, « tout effacer et recalculer » emportait les équipes attribuées à la
+  /// main — une décision que rien ne reconstruit, et dont le calcul se sert pourtant pour scorer
+  /// (`assignedTeams`, bonus d'équipe, mode strict). Le pendant exact de `VolunteerAssignment.source`.
+  ///
+  /// Par défaut manuelle, pour la même raison qu'elle : l'origine des lignes déjà en base est
+  /// perdue, et une relance ne doit pas les balayer par surprise.
+  source        VolunteerAssignmentSource @default(MANUAL)
+
+  application EditionVolunteerApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  team        VolunteerTeam               @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@id([applicationId, teamId])
+  @@index([teamId])
+  @@index([isLeader])
+  /// La relance efface les rattachements automatiques : cet index évite un balayage complet.
+  @@index([source])
+}
+
+/// Rattachement d'un organisateur d'édition à une équipe de bénévoles.
+///
+/// Table distincte de `ApplicationTeamAssignment`, et non un champ ajouté à celle-ci : un
+/// organisateur n'a pas de candidature, et la table des candidatures ne saurait donc pas le
+/// porter. Séparer les deux évite d'inventer des candidatures fantômes pour des gens qui n'en
+/// ont jamais déposé.
+model OrganizerTeamAssignment {
+  editionOrganizerId Int
+  teamId             String
+  /// Un organisateur peut piloter une équipe, au même titre qu'un bénévole responsable — et
+  /// avec les mêmes droits, qui ne dépendent donc plus d'une candidature acceptée.
+  isLeader           Boolean  @default(false)
+  assignedAt         DateTime @default(now())
+
+  editionOrganizer EditionOrganizer @relation(fields: [editionOrganizerId], references: [id], onDelete: Cascade)
+  team             VolunteerTeam    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@id([editionOrganizerId, teamId])
+  @@index([teamId])
+  @@index([isLeader])
+}
+
+/// Affectation d'un organisateur d'édition à un créneau de bénévolat.
+///
+/// Table distincte de `VolunteerAssignment`, mais pas parce qu'un organisateur pèserait moins :
+/// il occupe une place comme un bénévole, et `maxVolunteers` les compte ensemble. Ce qui le
+/// distingue est ailleurs — il n'a ni candidature, ni échange de créneau, ni part dans
+/// l'assignation automatique.
+///
+/// Sans `assignedById`, contrairement à `VolunteerAssignment` : cette traçabilité y sert aux
+/// échanges et à distinguer les affectations automatiques, deux mécaniques dont les
+/// organisateurs sont hors de portée.
+model OrganizerSlotAssignment {
+  editionOrganizerId Int
+  timeSlotId         String
+  assignedAt         DateTime  @default(now())
+  /// Quand le rappel « dans 30 minutes » a été envoyé à cet organisateur — constat B5.
+  ///
+  /// ⚠️ PORTÉE PAR L'AFFECTATION, PAS PAR LE CRÉNEAU, exactement comme celle des bénévoles
+  /// (`VolunteerAssignment.reminderSentAt`, #642). Quelqu'un posé à la dernière minute en
+  /// remplacement arrive avec sa propre ligne vierge et reçoit son rappel ; une marque sur le
+  /// créneau l'en priverait en silence. Décision à ne pas rouvrir.
+  ///
+  /// Sans cette colonne, l'organisateur recevrait le rappel QUATRE À CINQ FOIS : la tâche tourne
+  /// chaque minute sur une fenêtre de 28 à 32 minutes, donc un même créneau y tombe à plusieurs
+  /// passages consécutifs. C'est le défaut que #642 avait refermé pour les seuls bénévoles.
+  reminderSentAt     DateTime?
+
+  editionOrganizer EditionOrganizer  @relation(fields: [editionOrganizerId], references: [id], onDelete: Cascade)
+  timeSlot         VolunteerTimeSlot @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
+
+  @@id([editionOrganizerId, timeSlotId])
+  @@index([timeSlotId])
+}
+
+model VolunteerComment {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  eventId   Int
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@index([userId])
+  @@index([eventId])
+}
+
+/// Où en est une demande d'échange.
+///
+/// Deux accords sont nécessaires avant d'y toucher : celui du bénévole visé, puis celui d'un
+/// organisateur. Un planning se déséquilibre vite, et l'échange qui arrange deux personnes peut
+/// dégarnir un poste que ni l'une ni l'autre ne voit.
+enum VolunteerSwapStatus {
+  /// En attente de la réponse du bénévole visé.
+  PENDING_PEER
+  /// Les deux bénévoles sont d'accord ; un organisateur doit trancher.
+  PENDING_MANAGER
+  ACCEPTED
+  /// Refusée par le bénévole visé ou par l'organisateur.
+  REFUSED
+  /// Retirée par le demandeur.
+  CANCELLED
+  /// L'un des deux créneaux est passé : l'échange n'a plus d'objet.
+  EXPIRED
+}
+
+/// Demande d'échange d'un créneau contre un autre, entre deux bénévoles.
+///
+/// Un pour un : le demandeur offre l'une de ses affectations et en convoite une autre. Prendre un
+/// créneau libre ou abandonner le sien sans contrepartie ne passe pas par ici.
+///
+/// Les deux affectations sont référencées par leur identifiant, en `Cascade` : si l'une disparaît
+/// — désaffectation manuelle, relance de l'assignation automatique — la demande s'efface avec
+/// elle. C'est le comportement voulu : elle porterait sur un créneau que plus personne ne tient.
+model VolunteerSwapRequest {
+  id                    String              @id @default(cuid())
+  eventId               Int
+  requesterId           Int
+  targetId              Int
+  /// Affectation offerte par le demandeur.
+  requesterAssignmentId String
+  /// Affectation convoitée, tenue par la cible.
+  targetAssignmentId    String
+  status                VolunteerSwapStatus @default(PENDING_PEER)
+  /// Quand la cible a répondu, quel que soit son sens.
+  peerRespondedAt       DateTime?
+  /// L'organisateur qui a tranché, et quand.
+  decidedById           Int?
+  decidedAt             DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  event               Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  requester           User                @relation("VolunteerSwap_requester", fields: [requesterId], references: [id], onDelete: Cascade)
+  target              User                @relation("VolunteerSwap_target", fields: [targetId], references: [id], onDelete: Cascade)
+  decidedBy           User?               @relation("VolunteerSwap_decidedBy", fields: [decidedById], references: [id], onDelete: SetNull)
+  requesterAssignment VolunteerAssignment @relation("VolunteerSwap_requesterAssignment", fields: [requesterAssignmentId], references: [id], onDelete: Cascade)
+  targetAssignment    VolunteerAssignment @relation("VolunteerSwap_targetAssignment", fields: [targetAssignmentId], references: [id], onDelete: Cascade)
+
+  @@index([eventId, status])
+  @@index([requesterId])
+  @@index([targetId])
+  @@index([requesterAssignmentId])
+  @@index([targetAssignmentId])
+  @@index([decidedById])
 }
