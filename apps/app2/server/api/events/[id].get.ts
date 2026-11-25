@@ -1,19 +1,16 @@
-import { requireUserSession } from '#imports'
+import { droitsSurEvenement, idEvenement } from '../../utils/droits-evenement'
 
-import prisma from '../../utils/prisma'
-
+/**
+ * Un événement, pour qui peut le voir (propriétaire, organisateur, administrateur), avec ce que
+ * la personne peut en faire. Un événement qu'elle ne peut pas voir répond 404, comme un absent.
+ */
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
+  const id = idEvenement(event)
 
-  const id = Number(getRouterParam(event, 'id'))
-  if (!Number.isInteger(id) || id <= 0) {
-    throw createError({ statusCode: 400, statusMessage: 'Identifiant invalide' })
-  }
+  const droits = await droitsSurEvenement(id, (user as { id: number }).id)
+  const found = droits.voir ? await prisma.event.findUnique({ where: { id } }) : null
+  if (!found) throw createError({ status: 404, message: 'Événement introuvable' })
 
-  const found = await prisma.event.findUnique({ where: { id } })
-  if (!found || found.ownerId !== user.id) {
-    throw createError({ statusCode: 404, statusMessage: 'Événement introuvable' })
-  }
-
-  return { event: found }
+  return { event: found, droits }
 })

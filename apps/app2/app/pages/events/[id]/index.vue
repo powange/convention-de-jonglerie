@@ -16,7 +16,8 @@
           <UIcon name="i-heroicons-map-pin" /> {{ event.location }}
         </span>
         <span v-if="event.startDate" class="flex items-center gap-1">
-          <UIcon name="i-heroicons-calendar" /> {{ formatDate(event.startDate) }}
+          <UIcon name="i-heroicons-calendar" />
+          {{ periodeEvenement({ ...event, timezone: event.timezone ?? undefined }) }}
         </span>
       </div>
 
@@ -104,8 +105,4 @@ const { data: subData } = await useFetch('/api/subscription/status')
 const subActive = computed(() => !!subData.value?.active)
 
 useSeoMeta({ title: () => (event.value ? `${event.value.name} — Flowvent` : 'Événement') })
-
-function formatDate(d: string | Date) {
-  return new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-}
 </script>
