@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { formatUserFullName } from '~/utils/pronouns'
+import { formatUserFullName } from '#ui-commun/app/utils/pronouns'
 
 interface User {
   prenom?: string | null

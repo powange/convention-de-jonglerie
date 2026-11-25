@@ -315,9 +315,9 @@ import { z } from 'zod'
 import { useAuthStore } from '~/stores/auth'
 import type { User } from '~/types'
 import { LOCALES_CONFIG } from '~/utils/locales'
-import { USER_PRONOUNS, PRONOUN_NONE } from '~/utils/pronouns'
 
 import { getAllergySeveritySelectOptions } from '#core/app/utils/allergy-severity'
+import { USER_PRONOUNS, PRONOUN_NONE } from '#ui-commun/app/utils/pronouns'
 
 definePageMeta({
   layout: 'profile',

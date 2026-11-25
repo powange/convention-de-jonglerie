@@ -2,9 +2,9 @@ import { isValidPhoneNumber, parsePhoneNumberFromString } from 'libphonenumber-j
 import { z } from 'zod'
 
 import { getSupportedLocalesCodes } from '~/utils/locales'
-import { isValidPronoun } from '~/utils/pronouns'
 
 import { schemaMotDePasse } from '#auth/shared/utils/regles-mot-de-passe'
+import { isValidPronoun } from '#ui-commun/app/utils/pronouns'
 import { SUPPORTED_CURRENCIES } from '~~/shared/utils/money'
 import { CLES_SERVICES_EDITION, type CleServiceEdition } from '~~/shared/utils/services-d-edition'
 

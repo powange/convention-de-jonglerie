@@ -19,7 +19,7 @@ import { telephoneCandidatureAcceptable } from '#volunteers/shared/utils/telepho
  */
 
 /**
- * Reproduit `emitValue()` de `app/components/ui/PhoneInput.vue` : ce que le champ met réellement
+ * Reproduit `emitValue()` de `layers/ui/app/components/ui/PhoneInput.vue` : ce que le champ met réellement
  * dans le corps de la requête.
  *
  * Recopié plutôt qu'importé — la fonction vit dans le `<script setup>` d'un composant, d'où elle

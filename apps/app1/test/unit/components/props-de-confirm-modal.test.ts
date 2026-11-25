@@ -23,7 +23,18 @@ import { describe, expect, it } from 'vitest'
  */
 
 const RACINE = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
-const COMPOSANT = join(RACINE, 'app', 'components', 'ui', 'ConfirmModal.vue')
+// Composant partagé depuis qu'il a rejoint `layers/ui` (avec Flowvent).
+const COMPOSANT = join(
+  RACINE,
+  '..',
+  '..',
+  'layers',
+  'ui',
+  'app',
+  'components',
+  'ui',
+  'ConfirmModal.vue'
+)
 
 /** Les dossiers où vivent les templates qui peuvent appeler le composant. */
 const DOSSIERS = [join(RACINE, 'app'), join(RACINE, '..', '..', 'layers')]

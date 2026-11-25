@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useAvatar } from '~/utils/avatar'
+import { useAvatar } from '#ui-commun/app/utils/avatar'
 
 interface User {
   id?: number

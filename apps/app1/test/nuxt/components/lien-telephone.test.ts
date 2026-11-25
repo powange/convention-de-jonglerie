@@ -1,7 +1,7 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it } from 'vitest'
 
-import LienTelephone from '../../../app/components/ui/LienTelephone.vue'
+import LienTelephone from '#ui-commun/app/components/ui/LienTelephone.vue'
 
 /**
  * Le numéro qui appelle, mutualisé.

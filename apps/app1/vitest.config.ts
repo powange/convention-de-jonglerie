@@ -35,6 +35,8 @@ const aliasHorsNuxt = {
   '#server': resolve(__dirname, 'server'),
   // Déclaré par `layers/auth/nuxt.config.ts` ; ce projet ne lit pas la config Nuxt.
   '#auth': resolve(__dirname, '../../layers/auth'),
+  // Déclaré par `layers/ui/nuxt.config.ts`.
+  '#ui-commun': resolve(__dirname, '../../layers/ui'),
   // Déclaré par `layers/core/nuxt.config.ts`.
   '#core': resolve(__dirname, '../../layers/core'),
   // Déclaré par `layers/volunteers/nuxt.config.ts`.

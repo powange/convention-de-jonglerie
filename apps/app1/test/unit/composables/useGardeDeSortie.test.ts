@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { ref, computed } from 'vue'
 
-import { useConfirmation } from '../../../app/composables/useConfirmation'
+import { useConfirmation } from '#ui-commun/app/composables/useConfirmation'
 
 /**
  * La garde qui demande confirmation avant de quitter une page non enregistrée.

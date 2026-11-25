@@ -2,8 +2,8 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it } from 'vitest'
 import { h } from 'vue'
 
-import EtatVide from '../../../app/components/ui/EtatVide.vue'
-import SqueletteDeListe from '../../../app/components/ui/SqueletteDeListe.vue'
+import EtatVide from '#ui-commun/app/components/ui/EtatVide.vue'
+import SqueletteDeListe from '#ui-commun/app/components/ui/SqueletteDeListe.vue'
 
 /**
  * Les deux composants qui disent « il n'y a rien » et « ça arrive ».

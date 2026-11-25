@@ -61,11 +61,10 @@
 import { CalendarDate, Time, getLocalTimeZone } from '@internationalized/date'
 import { watch, shallowRef } from 'vue'
 
-import { useDateTimePicker } from '~/composables/useDateTimePicker'
-
 import type { TimeValue } from 'reka-ui'
 
 import { premierJourDeSemaine } from '#core/shared/utils/semaine'
+import { useDateTimePicker } from '#ui-commun/app/composables/useDateTimePicker'
 
 // La semaine commence le lundi en France, le dimanche ailleurs : la valeur suit la langue de qui
 // regarde plutôt que d'être figée. Sans elle, `UCalendar` démarre toujours le dimanche.

@@ -19,7 +19,7 @@ import { volunteerApplicationBodySchema } from '#volunteers/server/utils/edition
  */
 
 /**
- * Reproduit `emitValue()` de `app/components/ui/PhoneInput.vue` : ce que le champ à indicatif
+ * Reproduit `emitValue()` de `layers/ui/app/components/ui/PhoneInput.vue` : ce que le champ à indicatif
  * met réellement dans le corps de la requête.
  *
  * Recopié plutôt qu'importé — la fonction vit dans le `<script setup>` d'un composant, d'où

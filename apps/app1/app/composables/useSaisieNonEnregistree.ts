@@ -1,4 +1,4 @@
-import type { Confirmation } from '~/composables/useConfirmation'
+import type { Confirmation } from '#ui-commun/app/composables/useConfirmation'
 
 /**
  * Prévenir avant de quitter une page dont la saisie n'est pas enregistrée.

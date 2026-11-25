@@ -5,7 +5,7 @@ import {
   formatPronoun,
   formatUserFullName,
   PRONOUN_NONE,
-} from '../../../app/utils/pronouns'
+} from '#ui-commun/app/utils/pronouns'
 
 // Fausse fonction de traduction : reproduit le mapping fr des pronoms.
 const t = (key: string) => {

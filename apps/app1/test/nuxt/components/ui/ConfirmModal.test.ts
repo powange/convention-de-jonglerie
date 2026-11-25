@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
-import ConfirmModal from '../../../../app/components/ui/ConfirmModal.vue'
+import ConfirmModal from '#ui-commun/app/components/ui/ConfirmModal.vue'
 
 // Mock useI18n pour éviter les problèmes d'initialisation
 mockNuxtImport('useI18n', () => () => ({
