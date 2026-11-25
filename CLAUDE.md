@@ -83,7 +83,7 @@ bcryptjs **3**
 Nuxt Image **2** · Prettier **3**
 
 ⚠️ **Vue n'est pas une dépendance déclarée** : il arrive par Nuxt, et sa version est fixée par
-`overrides` (3.5.38). Il y a **trois** `overrides`, et chacun porte une raison — **aucun n'est à
+`overrides` (3.5.38). Il y a **deux** `overrides`, et chacun porte une raison — **aucun n'est à
 retirer sans la lire** :
 
 - `vue` — pour n'avoir qu'un seul Vue dans l'arbre. ⚠️ C'est cet épinglage qui **maintient** une
@@ -93,10 +93,9 @@ retirer sans la lire** :
 - `ipx` — la majeure précédente gardait sa propre copie vulnérable de `sharp` ; celle-ci en élargit
   la plage, si bien que `sharp` se dédoublonne. **Le retirer réintroduit la vulnérabilité en
   silence**, sans que l'application change de comportement (#849).
-- `@nuxt/devtools` — outillage de développement.
-
-**Il n'y a plus d'override `vite`**, contrairement à ce qu'une consigne plus ancienne demandait de
-préserver. Un test garde cette liste : elle s'était déjà périmée sans que rien ne le dise.
+  **Il n'y a plus d'override `vite`**, contrairement à ce qu'une consigne plus ancienne demandait de
+  préserver. **Ni d'override `@nuxt/devtools`** : la v4 bêta qu'il imposait laissait l'interface
+  « non autorisée » derrière l'URL de dev ; on suit désormais la v3 que Nuxt fournit, comme app2. Un test garde cette liste : elle s'était déjà périmée sans que rien ne le dise.
 
 **Architecture (monorepo) :**
 
