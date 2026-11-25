@@ -47,11 +47,3 @@ export async function droitsSurEvenement(
     estProprietaire,
   }
 }
-
-/** L'identifiant de l'événement dans l'URL, validé. */
-export function idEvenement(event: Parameters<typeof getRouterParam>[0]): number {
-  const id = Number(getRouterParam(event, 'id'))
-  if (!Number.isInteger(id) || id <= 0)
-    throw createError({ status: 400, message: 'Identifiant invalide' })
-  return id
-}

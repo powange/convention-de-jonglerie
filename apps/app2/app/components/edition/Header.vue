@@ -1,7 +1,7 @@
 <template>
   <div v-if="edition" class="mb-6">
     <UButton
-      :to="`/events/${edition.id}`"
+      :to="`/events/${edition.publicId}`"
       variant="link"
       color="neutral"
       icon="i-heroicons-arrow-left"

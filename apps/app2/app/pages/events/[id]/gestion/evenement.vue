@@ -179,14 +179,16 @@ interface Droits {
 }
 
 const route = useRoute()
-const id = Number(route.params.id)
+// L'identifiant de l'adresse (public) pour l'API de l'événement, l'id numérique pour le store.
+const ref = String(route.params.id)
+const id = useEditionId()
 const editionStore = useEditionStore()
 
 const {
   data,
   error: erreur,
   refresh,
-} = await useFetch<{ event: Evenement; droits: Droits }>(`/api/events/${id}`)
+} = await useFetch<{ event: Evenement; droits: Droits }>(`/api/events/${ref}`)
 const evenement = computed(() => data.value?.event)
 const droits = computed(() => data.value?.droits)
 
@@ -216,7 +218,7 @@ const erreurFin = computed(() =>
   etat.debut && etat.fin && etat.fin < etat.debut ? 'La fin doit suivre le début' : undefined
 )
 
-const { execute: enregistrer, loading: enregistrement } = useApiAction(`/api/events/${id}`, {
+const { execute: enregistrer, loading: enregistrement } = useApiAction(`/api/events/${ref}`, {
   method: 'PUT',
   body: () => ({
     name: etat.name,
@@ -241,7 +243,7 @@ watch(fenetreSuppression, (ouverte) => {
   if (ouverte) confirmation.value = ''
 })
 
-const { execute: supprimer, loading: suppression } = useApiAction(`/api/events/${id}`, {
+const { execute: supprimer, loading: suppression } = useApiAction(`/api/events/${ref}`, {
   method: 'DELETE',
   body: () => ({ confirmation: confirmation.value }),
   successMessage: { title: 'Événement supprimé' },

@@ -82,8 +82,7 @@ definePageMeta({
 
 const { t } = useI18n()
 
-const route = useRoute()
-const editionId = computed(() => Number(route.params.id))
+const editionId = useEditionIdRef()
 
 /**
  * Les échanges peuvent être fermés par l'organisateur : la page n'existe alors plus, y compris

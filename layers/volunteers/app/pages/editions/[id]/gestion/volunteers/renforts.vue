@@ -153,10 +153,9 @@ definePageMeta({
   middleware: ['auth-protected'],
 })
 
-const route = useRoute()
 const { t, locale } = useI18n()
 
-const editionId = parseInt(route.params.id as string)
+const editionId = useEditionId()
 
 /** Le fuseau de l'édition, qui commande toutes les heures de cette page. */
 const editionStore = useEditionStore()

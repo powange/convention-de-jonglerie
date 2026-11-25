@@ -2,7 +2,8 @@ import { z } from 'zod'
 
 import { fuseauUtilisable, versInstant } from '#core/shared/utils/fuseau-edition'
 
-import { droitsSurEvenement, idEvenement } from '../../utils/droits-evenement'
+import { droitsSurEvenement } from '../../utils/droits-evenement'
+import { idDepuisLaRoute } from '../../utils/evenement-public'
 
 /**
  * Modifie un événement : nom, description, lieu, dates de début et de fin, fuseau.
@@ -32,7 +33,7 @@ const schema = z
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
-  const id = idEvenement(event)
+  const id = await idDepuisLaRoute(event)
 
   const droits = await droitsSurEvenement(id, (user as { id: number }).id)
   if (!droits.voir) throw createError({ status: 404, message: 'Événement introuvable' })

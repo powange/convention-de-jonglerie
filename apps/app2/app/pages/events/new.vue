@@ -84,7 +84,7 @@ async function onSubmit() {
       },
     })
     toast.add({ title: 'Événement créé', icon: 'i-heroicons-check-circle', color: 'success' })
-    await navigateTo(`/events/${res.event.id}`)
+    await navigateTo(`/events/${res.event.publicId}`)
   } catch (err: any) {
     toast.add({
       title: err?.data?.statusMessage || "Impossible de créer l'événement",

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
-import { droitsSurEvenement, idEvenement } from '../../utils/droits-evenement'
+import { droitsSurEvenement } from '../../utils/droits-evenement'
+import { idDepuisLaRoute } from '../../utils/evenement-public'
 
 /**
  * Supprime un événement, et avec lui TOUTES ses données (candidatures, équipes, créneaux, planning,
@@ -14,7 +15,7 @@ const schema = z.object({ confirmation: z.string() })
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
-  const id = idEvenement(event)
+  const id = await idDepuisLaRoute(event)
 
   const droits = await droitsSurEvenement(id, (user as { id: number }).id)
   if (!droits.voir) throw createError({ status: 404, message: 'Événement introuvable' })

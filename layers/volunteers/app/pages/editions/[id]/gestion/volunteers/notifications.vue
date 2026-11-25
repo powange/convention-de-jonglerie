@@ -171,12 +171,11 @@ import { useEditionStore } from '~/stores/editions'
 
 import { useVolunteerSettings } from '#imports'
 
-const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { t } = useI18n()
 
-const editionId = parseInt(route.params.id as string)
+const editionId = useEditionId()
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 // Utiliser le composable pour les paramètres des bénévoles

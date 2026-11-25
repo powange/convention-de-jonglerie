@@ -1,6 +1,8 @@
 import { optionalAuth } from '#server/utils/auth-utils'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 
+import { resoudreEvenement } from '../../../utils/evenement-public'
+
 /**
  * L'événement sous la forme « édition » qu'attend l'interface du layer bénévoles (cf.
  * app/stores/editions.ts). Distinct de `GET /api/events/:id`, réservé au propriétaire : la page du
@@ -11,10 +13,15 @@ import { canManageEditionVolunteers } from '#server/utils/organizer-management'
  * Rien d'autre que des métadonnées d'affichage : pas d'adresse e-mail, pas de données de compte.
  */
 export default defineEventHandler(async (event) => {
-  const id = Number(getRouterParam(event, 'id'))
-  if (!Number.isInteger(id) || id <= 0) {
-    throw createError({ status: 400, message: 'Identifiant invalide' })
-  }
+  // Numéro ou identifiant public, selon la règle de `resoudreEvenement` (par numéro : seulement
+  // pour qui est impliqué, ce qui ferme l'énumération des pages publiques).
+  const user = optionalAuth(event)
+  const resolu = await resoudreEvenement(
+    String(getRouterParam(event, 'id') ?? ''),
+    user?.id ?? null
+  )
+  if (!resolu) throw createError({ status: 404, message: 'Événement introuvable' })
+  const id = resolu.id
 
   const evenement = await prisma.event.findUnique({
     where: { id },
@@ -28,6 +35,7 @@ export default defineEventHandler(async (event) => {
       timezone: true,
       status: true,
       ownerId: true,
+      publicId: true,
       volunteerSettings: {
         select: {
           pagePublic: true,
@@ -46,21 +54,12 @@ export default defineEventHandler(async (event) => {
   })
   if (!evenement) throw createError({ status: 404, message: 'Événement introuvable' })
 
-  const user = optionalAuth(event)
   const gere = user ? await canManageEditionVolunteers(id, user.id, event) : false
-  const aCandidate = user
-    ? !!(await prisma.editionVolunteerApplication.findFirst({
-        where: { eventId: id, userId: user.id },
-        select: { id: true },
-      }))
-    : false
   const s = evenement.volunteerSettings
-  if (!gere && !aCandidate && !s?.pagePublic && !s?.open) {
-    throw createError({ status: 404, message: 'Événement introuvable' })
-  }
 
   return {
     id: evenement.id,
+    publicId: evenement.publicId,
     name: evenement.name,
     description: evenement.description,
     location: evenement.location,
@@ -76,6 +75,10 @@ export default defineEventHandler(async (event) => {
     // Calculé côté serveur : l'interface n'a pas à connaître la règle des droits.
     peutGererBenevoles: gere,
     volunteersMode: s?.mode ?? 'INTERNAL',
+    // Lus par la page bénévoles du layer pour décider si elle s'ouvre à un visiteur : sans eux, la
+    // page n'était JAMAIS publique dans Flowvent, même réglée comme telle.
+    volunteersPagePublic: s?.pagePublic ?? false,
+    volunteersOpen: s?.open ?? false,
     volunteersOrganizersInTeams: s?.organizersInTeams ?? false,
     volunteersSetupStartDate: s?.setupStartDate ?? null,
     volunteersTeardownEndDate: s?.teardownEndDate ?? null,

@@ -31,7 +31,7 @@
       <div v-if="subActive" class="grid gap-4 sm:grid-cols-2">
         <UCard
           class="cursor-pointer transition hover:ring-2 hover:ring-primary"
-          @click="navigateTo(`/events/${event.id}/gestion/volunteers/config`)"
+          @click="navigateTo(`/events/${event.publicId}/gestion/volunteers/config`)"
         >
           <div class="flex items-center gap-3">
             <div
@@ -49,7 +49,7 @@
              créneaux. -->
         <UCard
           class="cursor-pointer transition hover:ring-2 hover:ring-primary"
-          @click="navigateTo(`/events/${event.id}/volunteers`)"
+          @click="navigateTo(`/events/${event.publicId}/volunteers`)"
         >
           <div class="flex items-center gap-3">
             <div

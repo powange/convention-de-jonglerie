@@ -117,7 +117,7 @@ interface NotificationData {
 const { t } = useI18n()
 const route = useRoute()
 
-const editionId = route.params.id as string
+const editionId = String(useEditionId())
 const groupId = route.params.groupId as string
 
 // État réactif

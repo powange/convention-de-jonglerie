@@ -97,6 +97,15 @@ de Flowvent.
     Flowvent ;
   - les composants `EditionHeader` (pages du bénévole) et `EditionBandeauSurPlace` (Flowvent : vide) ;
   - le layout `edition-dashboard`, attribué à `…/gestion/**` par `routeRules`, pas par les pages.
+- **Identifiant de l'événement dans les adresses** : app1 y met le numéro (`/editions/12/…`) ;
+  Flowvent un identifiant public aléatoire (`Event.publicId`, `/events/58e143cb3f/…`), pour que ni
+  le nombre d'événements ni les pages publiques des autres ne se devinent en comptant. Les pages du
+  layer lisent l'id numérique par `useEditionId()` / `useEditionIdRef()`, JAMAIS par
+  `Number(route.params.id)` (`NaN` dans Flowvent). Flowvent le résout dans son middleware global
+  (`adresses-du-layer-benevoles.global.ts`), qui réécrit aussi toute adresse numérique — liens du
+  layer, `actionUrl` des notifications — en adresse publique. Règle d'accès
+  (`server/utils/evenement-public.ts`) : par identifiant public, un événement public se trouve ; par
+  numéro, seulement pour qui le gère ou y a candidaté.
 - **Réglages d'interface** : `layers/volunteers/app/app.config.ts`, tous vrais par défaut (app1),
   tous éteints par Flowvent — `benevoles.modeExterne` (choix du mode), `billetterie` (colonne et
   filtre du billet des candidatures), `organisateurs` (organisateurs rattachés aux équipes).

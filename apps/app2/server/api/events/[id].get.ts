@@ -1,4 +1,5 @@
-import { droitsSurEvenement, idEvenement } from '../../utils/droits-evenement'
+import { droitsSurEvenement } from '../../utils/droits-evenement'
+import { idDepuisLaRoute } from '../../utils/evenement-public'
 
 /**
  * Un événement, pour qui peut le voir (propriétaire, organisateur, administrateur), avec ce que
@@ -6,7 +7,7 @@ import { droitsSurEvenement, idEvenement } from '../../utils/droits-evenement'
  */
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
-  const id = idEvenement(event)
+  const id = await idDepuisLaRoute(event)
 
   const droits = await droitsSurEvenement(id, (user as { id: number }).id)
   const found = droits.voir ? await prisma.event.findUnique({ where: { id } }) : null
