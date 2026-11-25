@@ -36,10 +36,7 @@ let tableRaccourcis: Record<string, string> | null = null
 
 async function chargerTableRaccourcis(): Promise<Record<string, string>> {
   if (!tableRaccourcis) {
-    tableRaccourcis = (await import('~/utils/emoji-shortcodes.json')).default as Record<
-      string,
-      string
-    >
+    tableRaccourcis = (await import('./emoji-shortcodes.json')).default as Record<string, string>
   }
   return tableRaccourcis
 }

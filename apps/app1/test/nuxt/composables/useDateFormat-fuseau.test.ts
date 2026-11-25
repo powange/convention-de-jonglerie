@@ -1,7 +1,7 @@
 import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { describe, it, expect } from 'vitest'
 
-import { useDateFormat } from '../../../app/composables/useDateFormat'
+import { useDateFormat } from '#core/app/composables/useDateFormat'
 
 /**
  * Le fuseau dans lequel `useDateFormat` lit un instant.

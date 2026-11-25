@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   useParticipantTypes,
   type ParticipantType,
-} from '../../../app/composables/useParticipantTypes'
+} from '#ui-commun/app/composables/useParticipantTypes'
 
 /**
  * Le code couleur des quatre natures de participant.

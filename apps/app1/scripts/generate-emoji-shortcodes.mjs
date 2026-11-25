@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Régénère `app/utils/emoji-shortcodes.json` depuis la table de l'éditeur.
+ * Régénère `layers/core/app/utils/emoji-shortcodes.json` (à côté de `markdown.ts` qui le charge) depuis la table de l'éditeur.
  *
  * L'éditeur (Tiptap, extension Emoji) enregistre les emojis sous forme de raccourci —
  * `:performing_arts:` — dans le markdown. Le rendu doit donc disposer de la même table pour
@@ -48,6 +48,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const destination = join(
     dirname(fileURLToPath(import.meta.url)),
     '..',
+    '..',
+    '..',
+    'layers',
+    'core',
     'app',
     'utils',
     'emoji-shortcodes.json'

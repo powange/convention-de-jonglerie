@@ -2,7 +2,7 @@ import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { defineComponent, h } from 'vue'
 
-import { useNotificateur, messageDErreurServeur } from '../../../app/composables/useNotificateur'
+import { useNotificateur, messageDErreurServeur } from '#ui-commun/app/composables/useNotificateur'
 
 /**
  * La forme commune des toasts : couleur et icône par type, écrites une seule fois.
