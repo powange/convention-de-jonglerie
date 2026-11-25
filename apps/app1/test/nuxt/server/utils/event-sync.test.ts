@@ -14,13 +14,14 @@ describe('event-sync', () => {
   })
 
   describe('syncEventMetadataFromEdition', () => {
-    it('recopie nom/dates/statut sur l’Event (nom = « Convention - Edition »)', async () => {
+    it('recopie nom/dates/statut/fuseau sur l’Event (nom = « Convention - Edition »)', async () => {
       prismaMock.edition.findUnique.mockResolvedValue({
         eventId: 10,
         name: 'Été 2026',
         startDate: new Date('2026-07-01'),
         endDate: new Date('2026-07-03'),
         status: 'PUBLISHED',
+        timezone: 'America/Montreal',
         convention: { name: 'Festival Jonglerie' },
       })
 
@@ -33,6 +34,8 @@ describe('event-sync', () => {
           startDate: new Date('2026-07-01'),
           endDate: new Date('2026-07-03'),
           status: 'PUBLISHED',
+          // Le fuseau est lu par le layer bénévoles sur `Event` (créneaux, rappels, plannings).
+          timezone: 'America/Montreal',
         },
       })
     })

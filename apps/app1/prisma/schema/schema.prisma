@@ -205,6 +205,9 @@ model Event {
   startDate DateTime?
   endDate   DateTime?
   status    EditionStatus @default(OFFLINE)
+  // Fuseau IANA, promu depuis l'édition comme le nom et les dates : les modules (bénévoles…) le
+  // lisent ici sans traverser vers `Edition`. Recopié par `syncEventMetadataFromEdition`.
+  timezone  String?
 
   // Extension domaine (1:1) — côté jonglerie
   edition Edition?

@@ -324,14 +324,11 @@ export default wrapApiHandler(
                   endDate: true,
                   /**
                    * Le fuseau accompagne ces dates, sans quoi elles s'affichent à l'heure du
-                   * navigateur de l'organisateur et non à celle du lieu.
-                   *
-                   * ⚠️ Il vit sur l'ÉDITION, pas sur l'événement — une seule traversée, pour un
-                   * seul scalaire, et c'est la seule façon de l'obtenir. Le demander directement
-                   * sur `Event` fait rejeter la requête ENTIÈRE par Prisma : un 500, pas un champ
-                   * manquant, et ce dépôt l'a déjà payé une fois sur la page des candidatures.
+                   * navigateur de l'organisateur et non à celle du lieu. Il est porté par `Event`
+                   * (promu depuis l'édition, comme le nom et les dates) : traverser vers `Edition`
+                   * faisait rejeter toute la requête par Prisma dans une app qui n'en a pas.
                    */
-                  edition: { select: { timezone: true } },
+                  timezone: true,
                 },
               },
             },
@@ -341,7 +338,13 @@ export default wrapApiHandler(
       addedBy: {
         select: userWithNameSelect,
       },
-      mealSelections: {
+    }
+
+    // Repas : seulement si l'app hôte en gère (cf. `MealsPort.disponible`). L'interface tolère
+    // leur absence (`mealSelections || []`). `?? true` : un câblage antérieur à l'indicateur garde
+    // le comportement d'avant.
+    if (useVolunteerPorts().meals?.disponible ?? true) {
+      selectFields.mealSelections = {
         select: {
           id: true,
           accepted: true,
@@ -354,7 +357,7 @@ export default wrapApiHandler(
             },
           },
         },
-      },
+      }
     }
 
     if (includeTeams) {

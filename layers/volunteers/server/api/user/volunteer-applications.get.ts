@@ -69,7 +69,7 @@ export default wrapApiHandler(
             // ⚠️ Le fuseau vit sur l'ÉDITION, pas sur l'événement. Demandé ici directement, il a
             // fait rejeter la requête ENTIÈRE par Prisma — un 500, pas un champ manquant — et la
             // page des candidatures est restée cassée jusqu'au relevé des logs.
-            edition: { select: { timezone: true } },
+            timezone: true,
             volunteerSettings: true,
             volunteerTeams: {
               select: {
@@ -186,7 +186,7 @@ export default wrapApiHandler(
           name: app.event.name,
           startDate: app.event.startDate,
           endDate: app.event.endDate,
-          timezone: app.event.edition?.timezone ?? null,
+          timezone: app.event.timezone ?? null,
           volunteersAskDiet: s?.askDiet ?? false,
           volunteersAskAllergies: s?.askAllergies ?? false,
           volunteersAskEmergencyContact: s?.askEmergencyContact ?? false,

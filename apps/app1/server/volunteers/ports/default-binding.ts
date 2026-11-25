@@ -321,6 +321,7 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
       },
     },
     meals: {
+      disponible: true,
       // Jonglerie : délégation au module repas cœur (server/meals/meals-service.ts).
       getEditionMealSchedule: (editionId) => mealsService.getEditionMealSchedule(editionId),
       updateEditionMealsConfig: (editionId, meals) =>

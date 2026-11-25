@@ -398,7 +398,7 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
     it('se replie sur la date de fin de l’édition faute de démontage déclaré', async () => {
       prismaMock.event.findUnique.mockResolvedValue({
         ...editionPassee({ teardownEndDate: null }),
-        edition: { endDate: IL_Y_A_DEUX_SEMAINES },
+        endDate: IL_Y_A_DEUX_SEMAINES,
       })
 
       const result = await appelGestionnaire()

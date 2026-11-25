@@ -31,7 +31,7 @@ export default wrapApiHandler(
      */
     const eventRecord = await prisma.event.findUnique({
       where: { id: editionId },
-      select: { volunteerSettings: true, edition: { select: { endDate: true } } },
+      select: { volunteerSettings: true, endDate: true },
     })
     if (!eventRecord) throw createError({ status: 404, message: 'Édition introuvable' })
 
@@ -49,7 +49,7 @@ export default wrapApiHandler(
       open: s?.open ?? false,
       pagePublic: s?.pagePublic ?? false,
       finDemontage: s?.teardownEndDate,
-      finEdition: eventRecord.edition?.endDate,
+      finEdition: eventRecord.endDate,
       maintenant: new Date(),
     })
 

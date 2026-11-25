@@ -20,9 +20,12 @@ describe('vérificateur des sélections Prisma', () => {
     const modeles = lireSchema()
 
     expect(modeles.size).toBeGreaterThan(50)
-    expect(modeles.get('Edition')?.has('timezone')).toBe(true)
-    // Le piège exact du deuxième incident : les deux modèles sont voisins, un seul porte le champ.
-    expect(modeles.get('Event')?.has('timezone')).toBe(false)
+    expect(modeles.get('Edition')?.has('city')).toBe(true)
+    // Le piège du deuxième incident : les deux modèles sont voisins, un seul porte le champ.
+    // L'incident portait sur `timezone`, promu depuis sur `Event` ; `city`, lui, reste propre à
+    // l'édition.
+    expect(modeles.get('Event')?.has('city')).toBe(false)
+    expect(modeles.get('Event')?.has('timezone')).toBe(true)
   })
 
   it('connaît les clés composées, qui ne sont pas des champs', () => {

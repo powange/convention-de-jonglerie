@@ -89,6 +89,7 @@ de Flowvent.
 | 4a ✅ | Helpers serveur génériques dans `layers/core/server/socle`, réexportés par app1 (#930)                                    | oui, réexports         |
 | 4b ✅ | App2 étend `layers/core` ; ses copies réduites deviennent des réexports                                                   | non                    |
 | 3b ✅ | Lectures d'`Edition` revenues dans le layer depuis l'étape 0bis : fuseau et nom via `eventScope`, droits via `organizers` | oui                    |
+| 3c ✅ | Fuseau promu sur `Event` (migrations app1 non destructives) ; repas optionnels (`MealsPort.disponible`)                   | oui                    |
 | 4c    | Schéma d'app2 : `Event` aligné, les 14 modèles bénévoles, `EditionOrganizer` et `Notification` minimaux                   | non                    |
 | 5     | Ports serveur d'app2 (gestionnaire = propriétaire de l'event, notifications sans courriel)                                | non                    |
 | 6     | Découplage de l'interface du layer (« contexte d'événement » fourni par l'app)                                            | oui                    |

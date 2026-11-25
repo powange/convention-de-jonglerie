@@ -233,6 +233,12 @@ export interface ArtistsPort {
  * Domaine sans repas : implémentations vides (listes/objets vides, no-op).
  */
 export interface MealsPort {
+  /**
+   * L'app hôte gère-t-elle les repas ? Sans module repas (Flowvent), les requêtes du layer ne
+   * doivent pas inclure les sélections de repas : la relation n'existe pas dans son schéma, et
+   * Prisma rejetterait la requête ENTIÈRE (la liste des candidatures en 500).
+   */
+  readonly disponible: boolean
   /** Réconcilie et renvoie le planning des repas d'une édition (avec liaisons d'articles). */
   getEditionMealSchedule(editionId: number): Promise<EditionMealRecord[]>
   /**

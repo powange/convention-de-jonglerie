@@ -65,17 +65,17 @@ describe('GET /api/user/volunteer-applications — la sélection colle au schém
     for (const champ of demandes) expect(declares).toContain(champ)
   })
 
-  it('va chercher le fuseau sur l’ÉDITION, pas sur l’événement', async () => {
-    // C'est exactement la confusion qui a cassé la page : les deux modèles sont voisins et liés
-    // un à un, mais un seul porte le fuseau.
+  it('va chercher le fuseau sur l’ÉVÉNEMENT, sans traverser vers l’édition', async () => {
+    // Le fuseau a été promu sur `Event` (comme le nom et les dates) : le demander à `Edition`
+    // ferait rejeter toute la requête par Prisma dans une app qui n'a pas ce modèle (Flowvent).
+    // Le test garde la forme réelle de la requête, le mock de Prisma rendant ce qu'on lui dit.
     await handler({ context: { user: { id: 42 } } } as any)
 
     const evenement =
       prismaMock.editionVolunteerApplication.findMany.mock.calls[0][0].select.event.select
 
-    expect(evenement).not.toHaveProperty('timezone')
-    expect(evenement.edition?.select?.timezone).toBe(true)
-    expect(champsDe('Event')).not.toContain('timezone')
-    expect(champsDe('Edition')).toContain('timezone')
+    expect(evenement.timezone).toBe(true)
+    expect(evenement).not.toHaveProperty('edition')
+    expect(champsDe('Event')).toContain('timezone')
   })
 })
