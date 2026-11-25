@@ -72,7 +72,7 @@ const sections: Section[] = [
       {
         libelle: 'Votre compte',
         texte:
-          "adresse e-mail, pseudo, prénom et nom, et votre mot de passe sous forme chiffrée (haché) : il n'est jamais conservé en clair.",
+          "adresse e-mail, pseudo, prénom et nom, votre photo de profil si vous en déposez une, et votre mot de passe sous forme chiffrée (haché) : il n'est jamais conservé en clair. La photo est visible des autres utilisateurs là où votre compte apparaît (candidatures, équipes, planning) ; la remplacer ou la retirer efface l'ancienne de nos serveurs.",
       },
       {
         libelle: 'Connexion avec Google ou Facebook',

@@ -53,6 +53,18 @@ qu'une application qui démarre et dont toutes les sessions échouent.
 
 - **Webhook** : l'activer, puis noter son URL. C'est elle qui redéploie.
 
+### Les photos de profil : un volume
+
+Les photos déposées sont des fichiers, sur le volume nommé `uploads_data` monté en `/uploads`
+(déclaré dans le compose, avec `NUXT_FILE_STORAGE_MOUNT=/uploads`). Docker le crée au premier
+déploiement et le garde d'un redéploiement à l'autre — sans lui, chaque redéploiement effacerait
+toutes les photos. **Il n'est pas dans les sauvegardes de la base** : le sauvegarder à part
+(`docker run --rm -v <stack>_uploads_data:/u -v "$PWD":/b alpine tar czf /b/uploads.tgz -C /u .`).
+
+Circuit (le même qu'app1) : dépôt dans `temp/profiles/<id>/`, déplacé dans `profiles/<id>/` à
+l'enregistrement du profil, l'ancienne photo effacée ; un dépôt abandonné est supprimé après une
+heure par la tâche `cleanup-temp-uploads`. Seules les photos sont servies par `/uploads/**`.
+
 ## Connexion Google et Facebook
 
 Les URL de retour sont **dérivées de `NUXT_PUBLIC_SITE_URL`** par le compose, et non de la requête :

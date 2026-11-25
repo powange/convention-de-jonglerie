@@ -51,6 +51,8 @@ RUN npm prune --omit=dev
 FROM ${BASE_NODE_IMAGE} AS runtime
 RUN apt-get update && apt-get install -y openssl default-mysql-client && rm -rf /var/lib/apt/lists/*
 WORKDIR /app/apps/app2
+# Fichiers déposés (photos de profil) : monté sur un volume par les piles (docker-compose.*.yml).
+RUN mkdir -p /uploads
 COPY --from=builder /app/apps/app2/.output ./.output
 COPY --from=builder /app/apps/app2/node_modules ./node_modules
 COPY --from=builder /app/apps/app2/prisma ./prisma
@@ -68,6 +70,7 @@ CMD ["/app/apps/app2/entrypoint.sh"]
 # Stage dev (HMR) — le code est monté par docker-compose.dev.yml
 # -------------------------
 FROM base AS dev
+RUN mkdir -p /uploads
 COPY apps/app2/package*.json ./
 # --mount=type=cache : réutilise les tarballs npm déjà téléchargés entre les builds Docker
 RUN --mount=type=cache,target=/root/.npm \

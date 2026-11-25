@@ -129,3 +129,19 @@ export const passwordResetRateLimiter = createRateLimiter({
   max: DEV ? 100 : 3,
   message: 'Trop de demandes de réinitialisation, veuillez réessayer plus tard',
 })
+
+/**
+ * Dépôt d'images (photo de profil) : 60 envois / heure / compte, comme app1.
+ *
+ * ⚠️ LA CLÉ EST LE COMPTE : à appeler APRÈS `requireAuth`, sinon tous les envois tomberaient dans
+ * le même seau et le premier abus bloquerait tout le monde.
+ */
+export const uploadRateLimiter = createRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  max: DEV ? 1000 : 60,
+  message: "Trop d'envois d'images, veuillez réessayer plus tard",
+  keyGenerator: (event) => {
+    const user = event.context.user as { id?: number } | undefined
+    return user?.id ? `upload:${user.id}` : 'upload:anonymous'
+  },
+})

@@ -31,7 +31,7 @@
           <UDropdownMenu :items="userMenuItems">
             <UButton
               :label="user?.pseudo || user?.email"
-              icon="i-heroicons-user-circle"
+              :avatar="avatar"
               trailing-icon="i-heroicons-chevron-down"
               color="neutral"
               variant="soft"
@@ -53,6 +53,21 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 const { loggedIn, user, clear } = useUserSession()
 const toast = useToast()
+
+/*
+ * L'avatar du menu : la photo de profil (déposée, ou reprise de Google / Facebook), sinon les
+ * initiales du pseudo. La session ne porte pas la photo (cf. layers/auth/shared/utils/
+ * utilisateur-de-session.ts) : on la lit dans le profil, partagé avec l'espace « Mon profil »
+ * (même clé), si bien qu'une photo changée là-bas se voit ici sans rechargement.
+ */
+const { data: profil } = useProfil({ immediate: loggedIn.value, watch: [loggedIn] })
+const { getUserAvatar } = useAvatar()
+const avatar = computed(() => ({
+  src: profil.value?.profilePicture
+    ? getUserAvatar({ id: profil.value.id, profilePicture: profil.value.profilePicture }, 64)
+    : undefined,
+  alt: user.value?.pseudo || user.value?.email || '',
+}))
 
 async function logout() {
   try {

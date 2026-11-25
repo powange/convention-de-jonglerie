@@ -20,6 +20,8 @@ import { TACHES_PLANIFIEES } from '../../../server/utils/scheduled-tasks'
 const RACINES = [
   join(__dirname, '../../../server/tasks'),
   join(__dirname, '../../../../../layers/volunteers/server/tasks'),
+  // `cleanup-temp-uploads`, commune à app1 et Flowvent.
+  join(__dirname, '../../../../../layers/core/server/tasks'),
 ]
 
 /** Les tâches réellement définies, application et layers confondus. */
