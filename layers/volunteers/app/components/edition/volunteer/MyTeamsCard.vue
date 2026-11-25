@@ -24,7 +24,9 @@
             <h4 class="font-semibold text-sm">{{ team.name }}</h4>
           </div>
           <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <!-- Sans messagerie dans l'app (`benevoles.messagerie`), pas de conversation d'équipe. -->
             <UButton
+              v-if="messagerieDisponible"
               icon="i-heroicons-chat-bubble-left-right"
               color="primary"
               variant="soft"
@@ -146,6 +148,9 @@ interface EquipeDirigee {
   description?: string | null
   color?: string | null
 }
+
+/** Pas de messagerie dans l'app (cf. app.config du layer) : pas de bouton « Envoyer un message ». */
+const messagerieDisponible = useAppConfig().benevoles?.messagerie !== false
 
 const props = withDefaults(
   defineProps<{
