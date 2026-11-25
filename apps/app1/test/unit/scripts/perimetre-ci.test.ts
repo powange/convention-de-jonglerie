@@ -206,6 +206,7 @@ describe('le workflow et le script sont d’accord', () => {
       .match(/needs:\s*\[([^\]]+)\]/)![1]!
       .split(',')
       .map((s) => s.trim())
+      .filter(Boolean) // la virgule finale d’une liste multiligne
     const attendus = [...blocs.keys()].filter(
       (n) => !['ci-verte', 'audit', 'signaler-run-planifie'].includes(n)
     )
