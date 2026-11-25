@@ -70,6 +70,50 @@ defaults:
     working-directory: apps/app1
 
 jobs:
+  # ---------------------------------------------------------------------------------------------
+  # Le périmètre du run : `complet`, ou `app2-seul` pour une PR qui ne touche que `apps/app2/`.
+  #
+  # Une PR de Flowvent payait jusqu'ici les 18 jobs d'app1 (5 à 12 min) sans modifier une ligne
+  # d'app1. Dans le périmètre `app2-seul`, les jobs lourds qui ne lisent qu'app1 — typage, build,
+  # vitest Nuxt et base, Playwright — sont SAUTÉS ; `setup`, `lint` et `test-unit` tournent quand
+  # même, parce que quatre tests d'outillage d'app1 lisent des fichiers d'app2. La règle et la
+  # liste des sauts autorisés vivent dans `apps/app1/scripts/perimetre-ci.mjs`, où elles sont testées.
+  #
+  # ⚠️ Pas de `paths-ignore` sur le workflow à la place : `ci-verte` est le check requis par la
+  # règle de `main`, et un workflow qui ne démarre pas ne le rend jamais — la PR resterait bloquée
+  # sur un check « en attente ».
+  #
+  # Ce job court en même temps que `setup` (il ne lui doit rien) : il n'allonge pas le chemin
+  # critique.
+  changements:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    outputs:
+      perimetre: ${{ steps.calcul.outputs.perimetre }}
+
+    steps:
+      # Sur une PR, le commit extrait est la fusion PR + pointe de `main` : son premier parent est
+      # la base, et `git diff HEAD^1 HEAD` donne exactement ce que la PR change par rapport à elle.
+      # Une profondeur de 2 suffit à avoir ces deux commits.
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      # `|| true` est sans risque ici, contrairement au typage : une liste vide est lue par le
+      # script comme « illisible », donc `complet` — l'échec ne peut que faire tourner PLUS.
+      - name: Calculer le périmètre
+        id: calcul
+        env:
+          EVENEMENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENEMENT" = "pull_request" ]; then
+            fichiers=$(git diff --name-only HEAD^1 HEAD || true)
+          else
+            fichiers=""
+          fi
+          printf '%s\n' "$fichiers" | node scripts/perimetre-ci.mjs --perimetre "$EVENEMENT"
+
   # Ce job n'existe que pour garantir aux cinq autres que les deux entrées de cache existent avant
   # qu'ils ne les lisent. Il ne prépare rien pour lui-même.
   setup:
@@ -194,7 +238,8 @@ jobs:
     timeout-minutes: 20
     env:
       NODE_ENV: test
-    needs: setup
+    needs: [setup, changements]
+    if: needs.changements.outputs.perimetre == 'complet'
 
     steps:
       - name: Checkout code
@@ -309,7 +354,8 @@ jobs:
     # production — voir son commentaire.
     env:
       NODE_ENV: test
-    needs: setup
+    needs: [setup, changements]
+    if: needs.changements.outputs.perimetre == 'complet'
 
     steps:
       - name: Checkout code
@@ -375,7 +421,53 @@ jobs:
           # était donc vide à chaque échec de build — sans que rien ne le signale.
           include-hidden-files: true
 
-  # Tests en parallèle avec matrice
+  # La suite unitaire, sortie de la matrice `test` ci-dessous parce qu'elle seule tourne dans TOUS
+  # les périmètres : quatre de ses tests d'outillage lisent des fichiers d'app2 comme du texte
+  # (libellés des bénévoles, modules, tâches planifiées, titres de notification), si bien qu'une PR
+  # limitée à `apps/app2/` peut la faire tomber. Une condition de job ne peut pas lire `matrix` ;
+  # garder l'unitaire dans la matrice aurait donc obligé à faire tourner les trois suites ou aucune.
+  test-unit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    env:
+      NODE_ENV: test
+    needs: [setup]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Préparer l'environnement
+        uses: ./.github/actions/preparer-env
+        with:
+          # Mêmes raisons que pour la matrice `test` : `#build` → `.nuxt`, et les paquets des layers.
+          preparer-nuxt: 'true'
+          lier-layers: 'true'
+
+      - name: Run tests - unit
+        run: npm run test:unit:run
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-unit-${{ github.run_id }}
+          path: |
+            apps/app1/test-results/
+            apps/app1/coverage/
+            apps/app1/.nuxt/
+          retention-days: 7
+          include-hidden-files: true
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports-unit-${{ github.run_id }}
+          path: apps/app1/coverage/
+          retention-days: 30
+
+  # Tests en parallèle avec matrice — Nuxt et base, sautés dans le périmètre `app2-seul`.
   test:
     runs-on: ubuntu-22.04
     timeout-minutes: 15
@@ -389,13 +481,14 @@ jobs:
     # lint/typecheck/build, au lieu de leur ajouter leur durée en tête de chemin critique.
     # Contrepartie assumée : sur une branche dont le lint ou le build échoue, les quatre jobs de
     # tests tournent quand même — on paie quelques minutes de runner pour en gagner en attente.
-    needs: [setup]
+    needs: [setup, changements]
+    if: needs.changements.outputs.perimetre == 'complet'
 
     strategy:
       fail-fast: false # Continue même si un test échoue
       matrix:
+        # `unit` est sorti dans son propre job, `test-unit` : voir au-dessus.
         test-group:
-          - { name: 'unit', cmd: 'npm run test:unit:run', db: false }
           - { name: 'nuxt', cmd: 'npm run test:nuxt:run', db: false }
           - { name: 'database', cmd: 'npm run test:db:run', db: true }
 
@@ -480,7 +573,7 @@ jobs:
           include-hidden-files: true
 
       - name: Upload coverage reports
-        if: always() && (matrix.test-group.name == 'unit' || matrix.test-group.name == 'database')
+        if: always() && matrix.test-group.name == 'database'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-reports-${{ matrix.test-group.name }}-${{ github.run_id }}
@@ -517,7 +610,8 @@ jobs:
   base-de-test:
     runs-on: ubuntu-22.04
     timeout-minutes: 15
-    needs: setup
+    needs: [setup, changements]
+    if: needs.changements.outputs.perimetre == 'complet'
 
     services:
       mysql:
@@ -636,7 +730,12 @@ jobs:
     # inexistant et donneraient une erreur incompréhensible.
     #
     # `base-de-test` reste dans `needs:` : son artifact est lu dès le début de la préparation.
-    needs: [setup, base-de-test]
+    #
+    # La condition de périmètre est redite ici alors qu'un `base-de-test` sauté suffirait à sauter
+    # ce job : le jour où il ne dépendrait plus de `base-de-test`, il se mettrait sinon à tourner
+    # sur les PR d'app2 et à attendre un `build` qui ne viendra jamais.
+    needs: [setup, changements, base-de-test]
+    if: needs.changements.outputs.perimetre == 'complet'
 
     # Le step d'attente interroge l'API des jobs du run : sans `actions: read`, il échoue et
     # emporte les cinq lots. Déclarer le bloc restreint le jeton au strict nécessaire, d'où
@@ -1124,29 +1223,37 @@ jobs:
   ci-verte:
     runs-on: ubuntu-22.04
     if: always()
-    needs: [setup, lint, typecheck, build, base-de-test, test, playwright]
-
-    # Le `defaults` du workflow place tous les `run:` dans `apps/app1`. Ce job ne fait AUCUN
-    # checkout — il n'a rien à lire —, donc ce répertoire n'existe pas et bash refuse de démarrer :
-    # « An error occurred trying to start process '/usr/bin/bash' […] No such file or directory ».
-    # Le job échouait alors que les douze autres étaient verts. Déclaré requis dans cet état, il
-    # aurait bloqué toutes les PR sans qu'aucune ne soit en cause.
-    defaults:
-      run:
-        working-directory: .
+    needs: [changements, setup, lint, typecheck, build, base-de-test, test-unit, test, playwright]
+    timeout-minutes: 5
 
     steps:
+      # Le verdict est rendu par `scripts/perimetre-ci.mjs`, d'où ce checkout limité à ce dossier :
+      # quelques secondes, et le `defaults` du workflow (`apps/app1`) existe alors pour bash. Sans
+      # aucun checkout, bash refusait de démarrer dans un répertoire absent, et ce job échouait alors
+      # que les douze autres étaient verts.
+      - name: Checkout du script de verdict
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: apps/app1/scripts
+          sparse-checkout-cone-mode: true
+
       # Affiché systématiquement, y compris au vert : le jour où ce job rendra un verdict qui
       # surprend, c'est la première chose qu'on voudra lire.
       - name: Résultats des jobs surveillés
-        run: echo '${{ toJSON(needs) }}'
+        run: |
+          echo "périmètre : ${PERIMETRE:-inconnu}"
+          echo "$RESULTATS"
+        env:
+          PERIMETRE: ${{ needs.changements.outputs.perimetre }}
+          RESULTATS: ${{ toJSON(needs) }}
 
-      # `skipped` bloque au même titre que `failure`, et ce n'est pas de la paranoïa : aucun des
-      # sept jobs n'a de condition, donc aucun ne peut être sauté légitimement. Un `skipped` ne peut
-      # signifier qu'une chose — un échec en amont l'a empêché de tourner.
-      - name: Refuser si un job n’est pas passé
-        if: >-
-          contains(needs.*.result, 'failure') ||
-          contains(needs.*.result, 'cancelled') ||
-          contains(needs.*.result, 'skipped')
-        run: exit 1
+      # Un `skipped` ne passe plus systématiquement pour un échec : dans le périmètre `app2-seul`,
+      # les jobs lourds d'app1 sont sautés À DESSEIN. Il reste refusé partout ailleurs — un job
+      # requis sauté ne peut signifier qu'un échec en amont —, et un périmètre inconnu (job
+      # `changements` en échec) vaut `complet`, donc aucun saut accepté. Les règles et leurs cas sont
+      # dans `test/unit/scripts/perimetre-ci.test.ts`.
+      - name: Refuser si un job requis n’est pas passé
+        env:
+          PERIMETRE: ${{ needs.changements.outputs.perimetre }}
+          RESULTATS: ${{ toJSON(needs) }}
+        run: node scripts/perimetre-ci.mjs --verdict

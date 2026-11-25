@@ -1,5 +1,5 @@
 ---
-description: "Pipeline complet : i18n, traductions, code review avec corrections, quality-check (lint, tests, commit), puis PR, attente de la CI en arrière-plan et merge si elle est verte"
+description: 'Pipeline complet : i18n, traductions, code review avec corrections, quality-check (lint, tests, commit), puis PR, attente de la CI en arrière-plan et merge si elle est verte'
 thinking: false
 ---
 
@@ -65,15 +65,17 @@ de plus et terminer.
      # 1 = au moins un job est rouge — mais 1 sert aussi aux vraies erreurs (auth, réseau).
      # D'où la double condition : un code concluant ET une sortie qui ressemble au tableau
      # des contrôles. Tout le reste est une panne d'API, et on réessaie.
+     # `ci-verte` ne conclut qu'une fois TOUS ses jobs finis : sa ligne en pass/fail est le
+     # signal de fin. `pending` couvre en plus les workflows qu'il ne surveille pas (image Flowvent).
      if { [ $CODE -eq 0 ] || [ $CODE -eq 1 ]; } \
-        && echo "$OUT" | grep -qE "\b(pass|fail)\b" \
-        && ! echo "$OUT" | grep -qE "pending|skipping"; then
+        && echo "$OUT" | grep -qE "^ci-verte[[:space:]]+(pass|fail)\b" \
+        && ! echo "$OUT" | grep -qwE "pending"; then
        break
      fi
      sleep 30
    done
    echo "$OUT"
-   if echo "$OUT" | grep -q "fail"; then echo "VERDICT: ROUGE"; else echo "VERDICT: VERT"; fi
+   if echo "$OUT" | grep -qw "fail"; then echo "VERDICT: ROUGE"; else echo "VERDICT: VERT"; fi
    ```
 
    Lancer cette commande **en tâche de fond** (`run_in_background`), puis rendre la main à
@@ -84,8 +86,8 @@ de plus et terminer.
    et rend le code **0** dès que l'API GitHub renvoie une erreur — un 503 en pleine surveillance
    devient alors indiscernable d'une CI verte. Constaté trois fois en une seule session, sur des
    PR dont des jobs étaient encore en cours. La boucle ci-dessus ne sort que sur un état
-   _observé_ : la sortie porte le tableau des contrôles, et plus aucun job n'est `pending` ni
-   `skipping`. Une erreur d'API remet simplement en attente au lieu de conclure.
+   _observé_ : la ligne du check requis `ci-verte` porte un verdict, et plus aucun job n'est
+   `pending`. Une erreur d'API remet simplement en attente au lieu de conclure.
 
    **Et pourquoi le code de sortie est capturé, jamais testé** : la forme précédente
    (`until OUT=$(gh pr checks <n> 2>&1) && …`) ne se terminait **jamais quand un job échouait**.
@@ -94,8 +96,12 @@ de plus et terminer.
    depuis vingt minutes quand l'utilisateur a demandé où elle en était. Une condition d'attente
    ne doit donc jamais dépendre du succès de la commande d'observation.
 
-   `skipping` compte comme une attente : un job sauté l'est parce qu'un autre a échoué, et la
-   sortie porte alors un `fail` que la ligne de verdict relèvera.
+   ⚠️ **`skipping` n'est PLUS une attente.** Il l'a été, sur l'idée qu'un job sauté l'est parce
+   qu'un autre a échoué — mais un job sauté le reste pour toujours, si bien que la boucle ne se
+   terminait jamais dès qu'un échec de `setup` sautait ses dépendants. Et depuis le périmètre de
+   CI (`apps/app1/scripts/perimetre-ci.mjs`), une PR limitée à `apps/app2/` saute À DESSEIN les
+   jobs lourds d'app1 : attendre la fin des `skipping` bloquerait chacune de ces PR. C'est
+   `ci-verte` qui sait si un saut était permis ; son `pass` ou son `fail` suffit.
 
 3. **Interpréter le verdict** au réveil, d'après la ligne `VERDICT:` :
    - **VERT** → merger avec `gh pr merge <numéro> --squash --delete-branch`.
