@@ -92,8 +92,8 @@ describe('intégrité des scripts chargés depuis un CDN', () => {
      * fichier neuf charge depuis un CDN, il doit poser les deux attributs — et cette liste grandit.
      */
     expect(chargeurs.map(({ chemin }) => chemin).sort()).toEqual([
-      'apps/app1/app/composables/useLeafletEditable.ts',
       'apps/app1/app/composables/useLeafletMap.ts',
+      'layers/map/app/composables/useLeafletEditable.ts',
     ])
   })
 

@@ -43,6 +43,9 @@ export default defineEventHandler(async (event) => {
       ownerId: true,
       publicId: true,
       ...selectionModules,
+      mapPublic: true,
+      externalMapProvider: true,
+      externalMapRef: true,
       volunteerSettings: {
         select: {
           pagePublic: true,
@@ -100,6 +103,11 @@ export default defineEventHandler(async (event) => {
     // lisent les layers partagés.
     ...Object.fromEntries(MODULES_EVENEMENT.map((m) => [m.colonne, evenement[m.colonne]])),
     // Seulement les droits proposés (événement + modules portés) : aucun sur un module à venir.
+    // Carte du site (layer `map`) : sa visibilité et la carte externe d'où l'on importe. Pas de
+    // coordonnées : la carte s'ouvre sur son centre par défaut, puis se cadre sur les zones.
+    mapPublic: evenement.mapPublic,
+    externalMapProvider: evenement.externalMapProvider,
+    externalMapRef: evenement.externalMapRef,
     droits: droits
       ? Object.fromEntries(
           DROITS_PAR_DOMAINE.map((d) => [d.cle, droits[d.cle] && droitsProposes().includes(d)])

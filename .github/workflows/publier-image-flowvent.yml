@@ -23,6 +23,7 @@ on:
       - 'layers/ui/**'
       - 'layers/core/**'
       - 'layers/volunteers/**'
+      - 'layers/map/**'
       - 'layers/auth/**'
       - '.github/workflows/publier-image-flowvent.yml'
   pull_request:
@@ -31,6 +32,7 @@ on:
       - 'layers/ui/**'
       - 'layers/core/**'
       - 'layers/volunteers/**'
+      - 'layers/map/**'
       - 'layers/auth/**'
       - '.github/workflows/publier-image-flowvent.yml'
   workflow_dispatch:

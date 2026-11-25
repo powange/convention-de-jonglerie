@@ -49,6 +49,7 @@
     "@vvo/tzdb": "^6.204.0",
     "bcryptjs": "^3.0.3",
     "cron": "^4.4.2",
+    "fast-xml-parser": "^5.12.1",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "libphonenumber-js": "^1.13.1",

@@ -5,8 +5,8 @@ vi.mock('../../../../../server/utils/permissions/edition-permissions', () => ({
   canAccessEditionData: droitAccorde,
 }))
 
-import zones from '../../../../../server/api/editions/[id]/zones/index.get'
-import markers from '../../../../../server/api/editions/[id]/markers/index.get'
+import zones from '../../../../../../../layers/map/server/api/editions/[id]/zones/index.get'
+import markers from '../../../../../../../layers/map/server/api/editions/[id]/markers/index.get'
 import { global } from '../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma

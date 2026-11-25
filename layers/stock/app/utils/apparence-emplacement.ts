@@ -1,4 +1,4 @@
-import { getZoneTypeColor, getZoneTypeIcon } from '~~/shared/utils/zone-types'
+import { getZoneTypeColor, getZoneTypeIcon } from '#map/shared/utils/zone-types'
 
 /**
  * Comment montrer l'emplacement de rangement d'un matériel.

@@ -87,33 +87,38 @@ model PasswordResetToken {
 }
 
 model Event {
-  id                Int           @id @default(autoincrement())
+  id                  Int           @id @default(autoincrement())
   /// Identifiant PUBLIC, celui des adresses (`/events/<publicId>/…`) : aléatoire, donc ni le
   /// nombre d'événements ni les pages publiques des autres ne se devinent en comptant. L'`id`
   /// numérique reste interne (relations, API du layer bénévoles).
-  publicId          String        @unique @default(nanoid(10)) @db.VarChar(16)
-  name              String
-  description       String?       @db.Text
-  location          String?
-  startDate         DateTime?
+  publicId            String        @unique @default(nanoid(10)) @db.VarChar(16)
+  name                String
+  description         String?       @db.Text
+  location            String?
+  startDate           DateTime?
   // Métadonnées génériques lues par le layer bénévoles (comme l'`Event` d'app1).
-  endDate           DateTime?
-  status            EditionStatus @default(PUBLISHED)
-  timezone          String?
+  endDate             DateTime?
+  status              EditionStatus @default(PUBLISHED)
+  timezone            String?
   /// Modules activés pour l'événement (page « Accueil de la gestion »), un par module comme les
   /// `*Enabled` d'une édition d'app1. Le module bénévoles est actif par défaut.
-  volunteersEnabled Boolean       @default(true)
+  volunteersEnabled   Boolean       @default(true)
   /// Les autres modules, inactifs par défaut comme dans app1 (cf. shared/modules-evenement.ts).
-  siteMapEnabled    Boolean       @default(false)
-  stockEnabled      Boolean       @default(false)
-  artistsEnabled    Boolean       @default(false)
-  mealsEnabled      Boolean       @default(false)
-  ticketingEnabled  Boolean       @default(false)
-  treasuryEnabled   Boolean       @default(false)
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  owner             User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId           Int
+  siteMapEnabled      Boolean       @default(false)
+  stockEnabled        Boolean       @default(false)
+  artistsEnabled      Boolean       @default(false)
+  mealsEnabled        Boolean       @default(false)
+  ticketingEnabled    Boolean       @default(false)
+  treasuryEnabled     Boolean       @default(false)
+  /// Carte du site (layer `map`) : publique ou réservée à la gestion, et la carte externe
+  /// (Google My Maps…) d'où l'on importe zones et repères. Mêmes colonnes que l'`Edition` d'app1.
+  mapPublic           Boolean       @default(false)
+  externalMapProvider String?
+  externalMapRef      String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  owner               User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId             Int
 
   // Gestion des bénévoles (relations inverses, mêmes noms qu'app1)
   volunteerApplications       EditionVolunteerApplication[]
@@ -126,6 +131,8 @@ model Event {
   volunteerAutoAssignRuns     VolunteerAutoAssignRun[]
   volunteerAutoAssignPlans    VolunteerAutoAssignPlan[]
   editionOrganizers           EditionOrganizer[]
+  zones                       EditionZone[]
+  markers                     EditionMarker[]
 
   @@index([ownerId])
 }
@@ -801,4 +808,59 @@ model VolunteerSwapRequest {
   @@index([requesterAssignmentId])
   @@index([targetAssignmentId])
   @@index([decidedById])
+}
+
+// =============================================================================
+// Carte du site (layer `map`, partagé avec app1) — mêmes modèles, rattachés à l'événement.
+// Les relations vers les modules pas encore portés (stock, spectacles…) arriveront avec eux.
+// =============================================================================
+
+model EditionZone {
+  id          Int      @id @default(autoincrement())
+  event       Event    @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  editionId   Int
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  color       String   @db.VarChar(7) // Format #RRGGBB
+  coordinates Json // GeoJSON polygon coordinates
+  zoneTypes   Json     @default("[\"OTHER\"]") // JSON array of EditionZoneType values
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Provenance : objet de la carte externe dont cette zone est issue (cf. app1).
+  externalMapObjectId   String?   @db.VarChar(64)
+  externalMapImportedAt DateTime?
+
+  markers EditionMarker[]
+
+  @@unique([editionId, externalMapObjectId])
+  @@index([editionId])
+}
+
+model EditionMarker {
+  id          Int      @id @default(autoincrement())
+  event       Event    @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  editionId   Int
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  latitude    Float
+  longitude   Float
+  markerTypes Json     @default("[\"OTHER\"]") // JSON array of EditionZoneType values
+  color       String?  @db.VarChar(7) // null = couleur du type
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  externalMapObjectId   String?   @db.VarChar(64)
+  externalMapImportedAt DateTime?
+
+  // Rattachement facultatif à une zone (son entrée). `SetNull` : supprimer une salle ne doit pas
+  // effacer ses entrées au passage (cf. app1).
+  zone   EditionZone? @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  zoneId Int?
+
+  @@unique([editionId, externalMapObjectId])
+  @@index([editionId])
+  @@index([zoneId])
 }

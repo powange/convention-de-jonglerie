@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { GroupableLegendItem } from '../../../app/utils/map-zone-attachment'
+import type { GroupableLegendItem } from '../../../../../layers/map/app/utils/map-zone-attachment'
 import {
   buildItemsPopupHtml,
   buildMarkerAttachmentHtml,
@@ -12,7 +12,7 @@ import {
   toZoneSelection,
   groupMarkersByZone,
   zoneNavigationTarget,
-} from '../../../app/utils/map-zone-attachment'
+} from '../../../../../layers/map/app/utils/map-zone-attachment'
 
 const marker = (over: Partial<Parameters<typeof groupMarkersByZone>[0][number]> = {}) => ({
   id: 1,

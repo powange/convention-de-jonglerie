@@ -68,7 +68,7 @@
 
 <script setup lang="ts">
 import { useLeafletMap } from '~/composables/useLeafletMap'
-import { escapeHtml } from '~/utils/mapMarkers'
+import { escapeHtml } from '#map/app/utils/mapMarkers'
 
 import {
   cadreDesPoints,

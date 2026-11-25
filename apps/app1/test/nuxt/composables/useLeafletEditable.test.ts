@@ -2,7 +2,7 @@ import { flushPromises } from '@vue/test-utils'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { ref } from 'vue'
 
-import { useLeafletEditable } from '../../../app/composables/useLeafletEditable'
+import { useLeafletEditable } from '../../../../../layers/map/app/composables/useLeafletEditable'
 
 /**
  * Ce test ne couvre qu'un point de `useLeafletEditable`, mais celui-là a coûté une demi-journée :

@@ -102,7 +102,8 @@
     "accepted": "Accepté",
     "all": "Tout",
     "contact": "Contacter",
-    "show_qr_code": "Afficher le QR code"
+    "show_qr_code": "Afficher le QR code",
+    "confirm_delete": "Confirmer la suppression"
   },
   "components": {
     "date_time_picker": {
@@ -204,7 +205,8 @@
       "volunteer_form": "Formulaire d'appel à bénévole",
       "volunteer_page": "Page bénévolat",
       "week_view": "Semaine"
-    }
+    },
+    "site_map": "Carte du site"
   },
   "errors": {
     "error_occurred": "Une erreur est survenue",

@@ -220,6 +220,17 @@ const cartes = computed(() => {
       couleur: 'bg-secondary/10 text-secondary',
       to: `${base}/organisateurs`,
     },
+    ...(a.modules.carte && a.droits.modifier
+      ? [
+          {
+            titre: 'Carte du site',
+            description: 'Zones et repères du lieu.',
+            icone: 'i-heroicons-map',
+            couleur: 'bg-primary/10 text-primary',
+            to: `${base}/map`,
+          },
+        ]
+      : []),
     ...(a.modules.benevoles
       ? [
           {

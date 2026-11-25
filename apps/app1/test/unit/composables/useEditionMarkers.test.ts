@@ -34,7 +34,10 @@ vi.stubGlobal('useApiAction', useApiAction)
 vi.stubGlobal('useApiActionById', useApiActionById)
 
 // Importer après les mocks
-import { useEditionMarkers, type EditionMarker } from '../../../app/composables/useEditionMarkers'
+import {
+  useEditionMarkers,
+  type EditionMarker,
+} from '../../../../../layers/map/app/composables/useEditionMarkers'
 
 describe('useEditionMarkers', () => {
   const mockMarkers: EditionMarker[] = [

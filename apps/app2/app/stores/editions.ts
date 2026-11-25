@@ -86,6 +86,13 @@ export const useEditionStore = defineStore('editions', {
       return promesse
     },
 
+    /** Remplace l'édition en cache après une modification locale (la carte s'en sert). */
+    setEdition(edition: EditionFlowvent) {
+      const i = this.editions.findIndex((e) => e.id === edition.id)
+      if (i !== -1) this.editions[i] = edition
+      else this.editions.push(edition)
+    },
+
     /** Droit calculé par le serveur (propriétaire, organisateur déclaré, administrateur). */
     canManageVolunteers(edition: EditionFlowvent | undefined | null, _userId?: number): boolean {
       return !!edition?.peutGererBenevoles

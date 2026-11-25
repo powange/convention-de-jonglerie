@@ -5,7 +5,7 @@ import {
   escapeHtml,
   getEditionStatus,
   type MarkerOptions,
-} from '../../../app/utils/mapMarkers'
+} from '../../../../../layers/map/app/utils/mapMarkers'
 
 // Mock Leaflet
 const mockLeafletIcon = vi.fn()

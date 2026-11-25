@@ -24,7 +24,14 @@ export default defineNuxtConfig({
   // - `auth` : authentification ;
   // - `volunteers` : gestion des bénévoles — son serveur tourne sur le contrat d'hôte de Flowvent
   //   (server/volunteers/ports/registry.ts…). Cf. docs/flowvent-benevoles.md.
-  extends: ['../../layers/ui', '../../layers/core', '../../layers/auth', '../../layers/volunteers'],
+  // - `map` : la carte du site (zones, repères, import), lot 2 de docs/flowvent-modules.md.
+  extends: [
+    '../../layers/ui',
+    '../../layers/core',
+    '../../layers/auth',
+    '../../layers/volunteers',
+    '../../layers/map',
+  ],
 
   hooks: {
     /*
@@ -109,7 +116,8 @@ export default defineNuxtConfig({
 
   // app2 est en français uniquement. Fichiers chargés dans l'ordre, chacun l'emportant sur les
   // précédents :
-  // 1. les libellés du layer bénévoles, tels qu'app1 les sert (chemins relatifs à i18n/locales/) ;
+  // 1. les libellés des layers bénévoles et carte, tels qu'app1 les sert (chemins relatifs à
+  //    i18n/locales/) ;
   // 2. `benevoles.json` : les clés que le layer emprunte aux fichiers communs d'app1 (common,
   //    public, gestion…), copiées une fois, et les libellés reformulés pour Flowvent
   //    (« événement » et non « édition »). Un test garantit que chaque clé employée se résout ;
@@ -125,6 +133,8 @@ export default defineNuxtConfig({
         files: [
           '../../../../layers/volunteers/i18n/locales/fr/volunteers.json',
           '../../../../layers/volunteers/i18n/locales/fr/gestion-volunteers.json',
+          '../../../../layers/map/i18n/locales/fr/map.json',
+          '../../../../layers/map/i18n/locales/fr/gestion-map.json',
           'benevoles.json',
           'interface.json',
           'fr.json',

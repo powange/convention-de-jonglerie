@@ -9,6 +9,7 @@
 !layers/core
 !layers/auth
 !layers/volunteers
+!layers/map
 
 # Artefacts et dépendances (régénérés dans l'image)
 **/node_modules
