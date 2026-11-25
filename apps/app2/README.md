@@ -87,3 +87,5 @@ variables, reverse proxy, publication de l'image.
   compris) ne sont qu'écrits dans les journaux du conteneur.
 - Brancher un **vrai prestataire de paiement** (ex. Stripe) à la place de `checkout.post.ts`.
 - Ajouter l'**i18n** (la 1ʳᵉ version est en français en dur) et les tests.
+
+<!-- sonde du périmètre de CI app2-seul, PR jetable, à fermer sans merger -->
