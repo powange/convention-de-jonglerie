@@ -6,7 +6,7 @@ type PrismaLike = Pick<typeof prisma, 'edition' | 'event'>
 /**
  * Étape 0bis — synchronise les métadonnées génériques de l'`Event` depuis son `Edition` (jonglerie).
  *
- * `Event` porte désormais `name`/`startDate`/`endDate`/`status` pour que les modules (bénévoles…)
+ * `Event` porte désormais `name`/`startDate`/`endDate`/`status`/`timezone` pour que les modules (bénévoles…)
  * n'aient plus à lire `Edition`/`Convention`. L'app jonglerie reste la source de vérité et maintient
  * ces champs en miroir : à appeler après toute création/màj d'édition (ou de nom de convention).
  *
@@ -25,6 +25,7 @@ export async function syncEventMetadataFromEdition(
       startDate: true,
       endDate: true,
       status: true,
+      timezone: true,
       convention: { select: { name: true } },
     },
   })
@@ -39,6 +40,7 @@ export async function syncEventMetadataFromEdition(
       startDate: edition.startDate,
       endDate: edition.endDate,
       status: edition.status,
+      timezone: edition.timezone,
     },
   })
 }

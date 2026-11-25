@@ -319,7 +319,7 @@
                           >
                             {{
                               formatDateRange(comment.event.startDate, comment.event.endDate, {
-                                fuseau: comment.event.edition?.timezone,
+                                fuseau: comment.event.timezone,
                               })
                             }}
                           </span>

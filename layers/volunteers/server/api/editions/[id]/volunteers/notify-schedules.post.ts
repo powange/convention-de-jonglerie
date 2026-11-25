@@ -63,7 +63,7 @@ export default wrapApiHandler(
       where: { id: editionId },
       // Le fuseau de l'édition voyage avec le nom : toutes les heures de ce courriel sont des
       // heures VÉCUES SUR PLACE, et sans lui elles seraient celles du serveur.
-      select: { name: true, edition: { select: { timezone: true } } },
+      select: { name: true, timezone: true },
     })
 
     if (!eventRecord) {
@@ -89,7 +89,7 @@ export default wrapApiHandler(
      * `null` quand l'édition n'a pas de fuseau : les utilitaires retombent alors sur le
      * comportement d'avant, ce qui ne dégrade rien et évite d'inventer un fuseau par défaut.
      */
-    const fuseau = eventRecord.edition?.timezone ?? null
+    const fuseau = eventRecord.timezone ?? null
 
     const { inclureSansCreneau } = corpsSchema.parse(await readBody(event).catch(() => null))
 

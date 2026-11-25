@@ -261,7 +261,7 @@ export default wrapApiHandler(
         // Le fuseau vit sur l'édition, pas sur l'événement. Toutes les heures du moteur s'y
         // lisent : sans lui, « 23 h 30 » se comprend dans le fuseau du conteneur, c'est-à-dire
         // UTC, et un créneau de soirée est compté sur le jour précédent.
-        edition: { select: { timezone: true } },
+        timezone: true,
       },
     })
 
@@ -578,7 +578,7 @@ export default wrapApiHandler(
           },
           spectacles,
           affectationsExistantes: affectationsConservees,
-          fuseau: eventRecord.edition?.timezone ?? null,
+          fuseau: eventRecord.timezone ?? null,
         })
 
     /**

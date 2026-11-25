@@ -45,7 +45,7 @@ const creneauDans30Minutes = () => ({
   delayMinutes: 0,
   eventId: 22,
   team: { name: 'Bar', color: '#fff' },
-  event: { name: 'EJC', edition: { timezone: 'Europe/Paris' } },
+  event: { name: 'EJC', timezone: 'Europe/Paris' },
   /*
    * ⚠️ `organizerAssignments` est OBLIGATOIRE dans ces jeux d'essai depuis le constat B5 : la
    * tâche rappelle désormais aussi les organisateurs affectés. L'omettre ne rend pas la liste

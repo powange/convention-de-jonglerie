@@ -89,7 +89,7 @@ export default defineTask({
           team: { select: { name: true, color: true } },
           event: {
             // Le fuseau voyage avec le nom : l'heure annoncée doit être celle vécue SUR PLACE.
-            select: { name: true, edition: { select: { timezone: true } } },
+            select: { name: true, timezone: true },
           },
         },
       })
@@ -127,10 +127,7 @@ export default defineTask({
            * deux heures différentes au même créneau selon qu'on lit le courriel de publication ou
            * le rappel.
            */
-          const startTime = formaterHeure(
-            adjustedStartDateTime,
-            slot.event.edition?.timezone ?? null
-          )
+          const startTime = formaterHeure(adjustedStartDateTime, slot.event.timezone ?? null)
 
           /*
            * UN RAPPEL PAR PERSONNE, et non par affectation — constat B5.

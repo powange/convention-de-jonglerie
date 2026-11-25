@@ -92,7 +92,7 @@ describe('publier le planning des bénévoles', () => {
     mockEnvoyerCourriel.mockResolvedValue(true)
     global.readBody = vi.fn().mockResolvedValue({})
     prismaMock.eventVolunteerSettings.upsert.mockResolvedValue({})
-    prismaMock.event.findUnique.mockResolvedValue({ name: 'EJC', edition: { timezone: null } })
+    prismaMock.event.findUnique.mockResolvedValue({ name: 'EJC', timezone: null })
     prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([benevole(1)])
     prismaMock.volunteerAssignment.findMany.mockResolvedValue([creneau(1)])
   })
@@ -115,7 +115,7 @@ describe('publier le planning des bénévoles', () => {
    */
   describe('les heures sont celles de l’édition', () => {
     const avecFuseau = (timezone: string | null) =>
-      prismaMock.event.findUnique.mockResolvedValue({ name: 'EJC', edition: { timezone } })
+      prismaMock.event.findUnique.mockResolvedValue({ name: 'EJC', timezone })
 
     /** Les créneaux passés au générateur de courriel, pour le premier destinataire. */
     const creneauxDuCourriel = () => mockGenererCourriel.mock.calls[0]?.[3] as any[]

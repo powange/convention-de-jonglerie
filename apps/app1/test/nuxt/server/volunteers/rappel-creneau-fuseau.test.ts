@@ -51,7 +51,7 @@ const creneauDans30Minutes = (timezone: string | null) => {
     delayMinutes: 0,
     eventId: 22,
     team: { name: 'Bar', color: '#fff' },
-    event: { name: 'EJC', edition: { timezone } },
+    event: { name: 'EJC', timezone },
     // Voir la note de `rappel-creneau-une-seule-fois` : Prisma renvoie toujours ce tableau.
     organizerAssignments: [],
     assignments: [
@@ -72,7 +72,7 @@ describe('rappel de créneau — l’heure annoncée', () => {
   /** Le message du premier rappel envoyé. */
   const messageDuRappel = () => mockNotifier.mock.calls[0]?.[0]?.message as string
 
-  it('demande le fuseau de l’édition avec le créneau', async () => {
+  it('demande le fuseau de l’événement avec le créneau', async () => {
     /*
      * 🔬 L'assertion sur la FORME de la requête, et elle n'est pas redondante avec les suivantes :
      * le mock de Prisma rend ce qu'on lui dit, donc les tests d'heure resteraient verts même si le
@@ -84,7 +84,9 @@ describe('rappel de créneau — l’heure annoncée', () => {
     await tache.run({ payload: {} } as any)
 
     const include = prismaMock.volunteerTimeSlot.findMany.mock.calls[0][0].include
-    expect(include.event.select.edition).toEqual({ select: { timezone: true } })
+    // Porté par `Event` depuis sa promotion — plus de traversée vers `Edition`.
+    expect(include.event.select.timezone).toBe(true)
+    expect(include.event.select).not.toHaveProperty('edition')
   })
 
   it('annonce l’heure d’AUCKLAND pour une édition néo-zélandaise', async () => {

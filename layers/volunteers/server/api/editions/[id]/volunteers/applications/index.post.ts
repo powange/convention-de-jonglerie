@@ -28,7 +28,7 @@ export default wrapApiHandler(
         open: true,
         // Pour la fermeture automatique : la fin du démontage, et à défaut celle de l'édition.
         teardownEndDate: true,
-        event: { select: { edition: { select: { endDate: true } } } },
+        event: { select: { endDate: true } },
         askDiet: true,
         askAllergies: true,
         askTimePreferences: true,
@@ -54,7 +54,7 @@ export default wrapApiHandler(
       open: settings.open,
       pagePublic: false,
       finDemontage: settings.teardownEndDate,
-      finEdition: settings.event?.edition?.endDate,
+      finEdition: settings.event?.endDate,
       maintenant: new Date(),
     })
     if (!benevolat.open) throw createError({ status: 400, message: 'Recrutement fermé' })

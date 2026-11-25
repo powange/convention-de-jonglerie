@@ -24,7 +24,7 @@ const MOI = { id: 42, email: 'benevole@exemple.fr', pseudo: 'camille' }
 const reglages = (champs: Record<string, unknown> = {}) => ({
   open: true,
   teardownEndDate: new Date(Date.now() + 14 * JOUR),
-  event: { edition: { endDate: new Date(Date.now() + 10 * JOUR) } },
+  event: { endDate: new Date(Date.now() + 10 * JOUR) },
   askDiet: false,
   askAllergies: false,
   askTimePreferences: false,
@@ -58,7 +58,7 @@ describe('POST .../volunteers/applications — une édition terminée ne recrute
     prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(
       reglages({
         teardownEndDate: new Date(Date.now() - 2 * JOUR),
-        event: { edition: { endDate: new Date(Date.now() - 5 * JOUR) } },
+        event: { endDate: new Date(Date.now() - 5 * JOUR) },
       })
     )
 
@@ -70,7 +70,7 @@ describe('POST .../volunteers/applications — une édition terminée ne recrute
     prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(
       reglages({
         teardownEndDate: null,
-        event: { edition: { endDate: new Date(Date.now() - 10 * JOUR) } },
+        event: { endDate: new Date(Date.now() - 10 * JOUR) },
       })
     )
 
@@ -84,7 +84,7 @@ describe('POST .../volunteers/applications — une édition terminée ne recrute
     prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(
       reglages({
         teardownEndDate: new Date(Date.now() + JOUR),
-        event: { edition: { endDate: new Date(Date.now() - 2 * JOUR) } },
+        event: { endDate: new Date(Date.now() - 2 * JOUR) },
       })
     )
 
@@ -99,7 +99,7 @@ describe('POST .../volunteers/applications — une édition terminée ne recrute
     prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(
       reglages({
         teardownEndDate: new Date(Date.now() - 2 * JOUR),
-        event: { edition: { endDate: new Date(Date.now() + 10 * JOUR) } },
+        event: { endDate: new Date(Date.now() + 10 * JOUR) },
       })
     )
 

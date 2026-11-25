@@ -58,7 +58,7 @@ const creneau = (options: { benevoles?: number[]; organisateurs?: number[][] } =
   startDateTime: MAINTENANT(),
   delayMinutes: 0,
   team: { name: 'Bar', color: '#fff' },
-  event: { name: 'EJC', edition: { timezone: 'Europe/Paris' } },
+  event: { name: 'EJC', timezone: 'Europe/Paris' },
   assignments: (options.benevoles ?? []).map((id) => ({
     id: `aff-${id}`,
     reminderSentAt: null,
