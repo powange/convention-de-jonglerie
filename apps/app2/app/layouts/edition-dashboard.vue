@@ -153,6 +153,13 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
   return [
     [
       {
+        label: "Informations de l'événement",
+        icon: 'i-lucide-settings',
+        to: `/events/${editionId.value}/gestion/evenement`,
+      },
+    ],
+    [
+      {
         label: 'Bénévoles',
         icon: 'i-heroicons-hand-raised',
         value: 'benevoles',

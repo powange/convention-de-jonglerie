@@ -555,7 +555,6 @@ import { reactive, ref, watch, computed, onMounted, nextTick } from 'vue'
 
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
 import { useDatetime } from '~/composables/useDatetime'
-import { useTimezones } from '~/composables/useTimezones'
 import type { Edition, Convention } from '~/types'
 import { countrySelectOptions } from '~/utils/countries'
 import { ancrerHorloge, horlogeMurale, relireHorloge } from '~/utils/horloge-edition'
@@ -564,6 +563,7 @@ import { estUnLienHttp } from '~/utils/lien-externe'
 import type { StepperItem } from '@nuxt/ui'
 
 import { premierJourDeSemaine } from '#core/shared/utils/semaine'
+import { useTimezones } from '#ui-commun/app/composables/useTimezones'
 import { servicesDepuisEdition } from '~~/shared/utils/services-d-edition'
 
 // La semaine commence le lundi en France, le dimanche ailleurs : la valeur suit la langue de qui

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { useTimezones } from '../../../app/composables/useTimezones'
+import { useTimezones } from '#ui-commun/app/composables/useTimezones'
 
 describe('useTimezones - getSelectMenuItems', () => {
   const { getSelectMenuItems } = useTimezones()

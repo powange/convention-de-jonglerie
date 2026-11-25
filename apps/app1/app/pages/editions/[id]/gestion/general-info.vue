@@ -328,13 +328,13 @@
 import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date'
 
 import { useDatetime } from '~/composables/useDatetime'
-import { useTimezones } from '~/composables/useTimezones'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { countrySelectOptions } from '~/utils/countries'
 import { ancrerHorloge, horlogeMurale, relireHorloge } from '~/utils/horloge-edition'
 
 import { premierJourDeSemaine } from '#core/shared/utils/semaine'
+import { useTimezones } from '#ui-commun/app/composables/useTimezones'
 import { DEFAULT_CURRENCY, SUPPORTED_CURRENCIES } from '~~/shared/utils/money'
 
 // La semaine commence le lundi en France, le dimanche ailleurs : la valeur suit la langue de qui

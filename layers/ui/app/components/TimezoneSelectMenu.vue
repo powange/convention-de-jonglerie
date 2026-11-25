@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { useTimezones } from '~/composables/useTimezones'
+import { useTimezones } from '#ui-commun/app/composables/useTimezones'
 
 defineProps<{
   /** Texte affiché quand aucun fuseau n'est sélectionné (défaut : clé i18n select_timezone) */
