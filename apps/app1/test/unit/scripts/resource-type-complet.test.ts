@@ -33,7 +33,8 @@ import { describe, it, expect } from 'vitest'
  */
 const RACINE = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 const MONOREPO = join(RACINE, '..', '..')
-const HELPERS = join(RACINE, 'server/utils/validation-helpers.ts')
+// Implémentation commune depuis le lot « core » : app1 n'en garde qu'un réexport.
+const HELPERS = join(MONOREPO, 'layers/core/server/socle/validation-helpers.ts')
 
 const source = readFileSync(HELPERS, 'utf8')
 
