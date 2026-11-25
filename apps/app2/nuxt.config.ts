@@ -92,12 +92,28 @@ export default defineNuxtConfig({
     ],
   },
 
-  // app2 est en français uniquement ; le layer d'auth utilise des clés de traduction
-  // fournies dans i18n/locales/fr.json.
+  // app2 est en français uniquement. Fichiers chargés dans l'ordre, chacun l'emportant sur les
+  // précédents :
+  // 1. les libellés du layer bénévoles, tels qu'app1 les sert (chemins relatifs à i18n/locales/) ;
+  // 2. `benevoles.json` : les clés que le layer emprunte aux fichiers communs d'app1 (common,
+  //    public, gestion…), copiées une fois, et les libellés reformulés pour Flowvent
+  //    (« événement » et non « édition »). Un test garantit que chaque clé employée se résout ;
+  // 3. `fr.json` : les libellés propres à Flowvent, dont ceux du layer d'auth.
   i18n: {
     defaultLocale: 'fr',
     strategy: 'no_prefix',
-    locales: [{ code: 'fr', language: 'fr-FR', file: 'fr.json' }],
+    locales: [
+      {
+        code: 'fr',
+        language: 'fr-FR',
+        files: [
+          '../../../../layers/volunteers/i18n/locales/fr/volunteers.json',
+          '../../../../layers/volunteers/i18n/locales/fr/gestion-volunteers.json',
+          'benevoles.json',
+          'fr.json',
+        ],
+      },
+    ],
   },
 
   // Après vérification d'email, le layer redirige vers /welcome/categories ; app2 n'a

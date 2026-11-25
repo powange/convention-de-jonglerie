@@ -1,0 +1,399 @@
+{
+  "artists": {
+    "meals": {
+      "confirm_close_unsaved": "Vous avez des modifications non sauvegardées. Voulez-vous vraiment fermer ?"
+    }
+  },
+  "calendar": {
+    "today": "Aujourd'hui"
+  },
+  "common": {
+    "actions": "Actions",
+    "active": "Actif",
+    "are_you_sure": "Êtes-vous sûr de vouloir continuer ?",
+    "artist": "Artiste",
+    "back": "Retour",
+    "cancel": "Annuler",
+    "characters": "caractères",
+    "clear": "Effacer",
+    "click_to_view_full": "Cliquer pour voir le texte complet",
+    "close": "Fermer",
+    "color": "Couleur",
+    "columns": "Colonnes",
+    "confirm": "Confirmer",
+    "confirmation": "Confirmation",
+    "create": "Créer",
+    "date": "Date",
+    "day": "Jour",
+    "delete": "Supprimer",
+    "deleted": "Supprimé",
+    "deleted_account": "Compte supprimé",
+    "description": "Description",
+    "edit": "Modifier",
+    "edition": {
+      "volunteers": {
+        "send_message_to_team": "Envoyer un message à l'équipe"
+      }
+    },
+    "editor": {
+      "block_tooltip": "Bloc de code",
+      "bold_tooltip": "Texte en gras (Ctrl+B)",
+      "bullet_list_tooltip": "Liste à puces",
+      "code_tooltip": "Code en ligne (Ctrl+`)",
+      "emoji_tooltip": "Insérer un emoji (:)",
+      "heading1_tooltip": "Titre de niveau 1",
+      "heading2_tooltip": "Titre de niveau 2",
+      "heading3_tooltip": "Titre de niveau 3",
+      "heading_tooltip": "Titre",
+      "italic_tooltip": "Texte en italique (Ctrl+I)",
+      "link_tooltip": "Insérer un lien (Ctrl+K)",
+      "numbered_list_tooltip": "Liste numérotée",
+      "quote_tooltip": "Citation",
+      "strike_tooltip": "Texte barré",
+      "underline_tooltip": "Souligner"
+    },
+    "email": "E-mail",
+    "end": "Fin",
+    "end_date": "Date de fin",
+    "error": "Erreur",
+    "export": "Exporter",
+    "export_csv": "Exporter en CSV",
+    "export_pdf": "Exporter en PDF",
+    "export_success": "Export réussi",
+    "filters": "Filtres",
+    "hidden": "Masquée",
+    "inactive": "Inactif",
+    "leave_without_saving": "Quitter sans enregistrer",
+    "loading": "Chargement...",
+    "manage": "Gérer",
+    "message": "Message",
+    "name": "Nom",
+    "no": "Non",
+    "no_permission": "Pas d'autorisation",
+    "organizer": "Organisateur",
+    "phone": "Téléphone",
+    "refresh": "Rafraîchir",
+    "remove": "Retirer",
+    "required": "obligatoire",
+    "reset": "Réinitialiser",
+    "save": "Enregistrer",
+    "saved": "Sauvegardé",
+    "saving": "Enregistrement...",
+    "search": "Rechercher",
+    "searching": "Recherche en cours",
+    "show_less": "Afficher moins",
+    "show_more": "Afficher plus",
+    "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)",
+    "start": "Début",
+    "start_date": "Date de début",
+    "status": "État",
+    "success": "Succès",
+    "ticket": "Billet",
+    "title": "Titre",
+    "total": "Total",
+    "type_name_to_confirm": "Tapez le nom pour confirmer",
+    "type_to_confirm": "Tapez « {name} » pour confirmer",
+    "unknown": "Inconnu",
+    "visible": "Visible",
+    "volunteer": "Bénévole",
+    "warning": "Attention",
+    "week": "Semaine",
+    "yes": "Oui"
+  },
+  "components": {
+    "date_time_picker": {
+      "clear": "Effacer",
+      "placeholder": "Sélectionner une date"
+    }
+  },
+  "dates": {
+    "date_range": "Du {startDate} au {endDate}",
+    "date_range_compact": "{startDate} → {endDate}",
+    "date_range_with_time": "Du {startDate} au {endDate}",
+    "same_day_with_time": "Le {date} de {startTime} à {endTime}"
+  },
+  "diet": {
+    "none": "Aucun",
+    "vegan": "Végan",
+    "vegetarian": "Végétarien"
+  },
+  "edition": {
+    "internal_mode_options": "Options du formulaire d'appel à bénévole",
+    "loading_details": "Chargement des détails de l'événement...",
+    "lost_found": "Objets trouvés",
+    "not_found": "Événement introuvable.",
+    "ticketing": {
+      "qr_details": "Détails",
+      "qr_how_to_use": "Comment l'utiliser ?",
+      "qr_instructions": "Présentez ce QR code à l'entrée de l'événement pour accéder en tant que bénévole.",
+      "qr_modal_title": "Mon QR code bénévole",
+      "volunteer_management": "Gestion des bénévoles"
+    },
+    "volunteers": {
+      "add_error": "Erreur lors de l'ajout du bénévole",
+      "add_volunteer": "Ajouter un bénévole",
+      "add_volunteer_title": "Ajouter un bénévole manuellement",
+      "allergy_severity_critical_description": "Réaction critique, urgence médicale immédiate",
+      "allergy_severity_critical_short": "Critique",
+      "allergy_severity_light_description": "Gêne légère, réaction généralement bénigne",
+      "allergy_severity_light_short": "Légère",
+      "allergy_severity_moderate_description": "Réaction modérée, surveillance recommandée",
+      "allergy_severity_moderate_short": "Modérée",
+      "allergy_severity_severe_description": "Réaction sévère, attention médicale possible",
+      "allergy_severity_severe_short": "Sévère",
+      "back_to_search": "Retour à la recherche",
+      "create_account_info": "Cette personne n'a pas encore de compte. Un compte sera créé avec les informations ci-dessous et un email d'invitation lui sera envoyé.",
+      "create_and_add": "Créer le compte et ajouter comme bénévole",
+      "create_error": "Erreur lors de la création de l'utilisateur",
+      "day_view": "Jour",
+      "email_already_exists_suggest_search": "Cet email est déjà utilisé. Veuillez rechercher l'utilisateur existant dans la liste.",
+      "email_placeholder": "exemple{'@'}mail.com",
+      "first_name": "Prénom",
+      "first_name_placeholder": "Votre prénom",
+      "form_description": "Choisissez les informations demandées aux bénévoles lors de leur candidature",
+      "last_name": "Nom",
+      "last_name_placeholder": "Votre nom",
+      "meals": {
+        "after_show": "Après spectacle",
+        "check_all": "Tout cocher",
+        "confirm_close_unsaved": "Vous avez des modifications non sauvegardées. Voulez-vous vraiment fermer ?",
+        "description": "Sélectionnez les repas que vous souhaitez prendre pendant votre bénévolat",
+        "error_loading": "Erreur lors du chargement des repas",
+        "error_saving": "Erreur lors de la sauvegarde des repas",
+        "no_meals": "Aucun repas disponible",
+        "not_eligible": "Vous n'êtes pas éligible aux repas pour ce créneau",
+        "not_eligible_reason": "Hors période de présence",
+        "saved_success": "Vos choix de repas ont été sauvegardés",
+        "title": "Choix de vos repas",
+        "uncheck_all": "Tout décocher",
+        "unsaved_changes": "Modifications non sauvegardées"
+      },
+      "no_account_link": "La personne n'a pas de compte ?",
+      "no_user_found": "Aucun utilisateur trouvé",
+      "page_description": "Vue d'ensemble du bénévolat pour cet événement",
+      "planning": "Planning",
+      "search_by_email": "Rechercher par email",
+      "search_by_email_description": "Recherchez un utilisateur par son adresse email",
+      "search_error": "Erreur lors de la recherche",
+      "selected_user": "Utilisateur sélectionné",
+      "teams": "Les équipes",
+      "time_granularity": {
+        "afternoon": "Après-midi",
+        "evening": "Soir",
+        "morning": "Matin",
+        "noon": "Midi"
+      },
+      "time_slots_options": {
+        "early_afternoon": "Début d'après-midi (14h-17h)",
+        "early_morning": "Matin tôt (6h-9h)",
+        "evening": "Soirée (20h-23h)",
+        "late_afternoon": "Fin d'après-midi (17h-20h)",
+        "late_evening": "Soirée tard (23h-2h)",
+        "lunch": "Midi (12h-14h)",
+        "morning": "Matinée (9h-12h)",
+        "night": "Nuit (2h-6h)"
+      },
+      "title": "Bénévolat",
+      "unassigned_slots": "Non assigné",
+      "untitled_slot": "Créneau sans titre",
+      "users_found": "Utilisateurs trouvés",
+      "volunteer_form": "Formulaire d'appel à bénévole",
+      "volunteer_page": "Page bénévolat",
+      "week_view": "Semaine"
+    }
+  },
+  "errors": {
+    "error_occurred": "Une erreur est survenue",
+    "invalid_color": "Couleur invalide",
+    "loading_error": "Erreur de chargement",
+    "required_field": "Ce champ est requis"
+  },
+  "forms": {
+    "labels": {
+      "select_date": "Sélectionner une date"
+    }
+  },
+  "gestion": {
+    "artists": {
+      "title": "Artistes"
+    },
+    "meals": {
+      "title": "Repas"
+    },
+    "organizers": {
+      "teams": {
+        "description": "Rattachez cet organisateur à des équipes de bénévolat. Il y apparaîtra, sans compter dans les effectifs ni dans l'assignation automatique.",
+        "load_error": "Impossible de charger les équipes",
+        "no_teams": "Aucune équipe de bénévoles sur cet événement",
+        "title_for": "Équipes — {name}"
+      }
+    },
+    "stock": {
+      "confirm_delete_item": "Supprimer l'objet « {name} » ?"
+    },
+    "ticketing": {
+      "title": "Billetterie"
+    },
+    "volunteers": {
+      "config_title": "Configuration bénévolat",
+      "organizers_in_teams": "Organisateurs dans le bénévolat",
+      "organizers_in_teams_closed": "Les organisateurs ne participent pas au bénévolat",
+      "organizers_in_teams_description": "Autoriser le rattachement d'organisateurs de l'événement aux équipes de bénévoles et leur affectation à des créneaux. Ils y occupent une place et comptent dans les statistiques, et peuvent être responsables d'une équipe. Ils restent hors de l'assignation automatique et des échanges de créneaux.",
+      "organizers_in_teams_open": "Les organisateurs peuvent rejoindre les équipes et les créneaux",
+      "planning_description": "Planifier les créneaux et missions",
+      "swaps_closed": "Les échanges sont fermés",
+      "swaps_enabled": "Échanges de créneaux",
+      "swaps_enabled_description": "Autoriser les bénévoles à échanger un créneau entre eux, avec validation d'un responsable",
+      "swaps_open": "Les bénévoles peuvent proposer un échange",
+      "teams_description": "Organiser les équipes de bénévoles",
+      "comment_hint": "Ce commentaire sera visible uniquement par les organisateurs de l'événement",
+      "comment_warning": "Ce commentaire est lié au bénévole pour cet événement uniquement.",
+      "management_mode_description": "Choisissez comment gérer les bénévoles pour cet événement",
+      "volunteering_ended_description": "Le démontage de cet événement est terminé : les candidatures sont fermées et la page publique n’est plus visible des visiteurs. Vous et les bénévoles qui ont candidaté gardez accès à tout ce qui a été saisi.",
+      "volunteering_ended_title": "Le bénévolat de cet événement est clos"
+    },
+    "workshops": {
+      "title": "Workshops"
+    }
+  },
+  "organizers": {
+    "title": "Organisateurs"
+  },
+  "pages": {
+    "access_denied": {
+      "description": "Vous n'avez pas les droits pour accéder à cette page.",
+      "enable_admin_mode": "Activer le mode administrateur",
+      "title": "Accès refusé",
+      "volunteers_description": "Vous n'avez pas les permissions nécessaires pour voir les candidatures de bénévoles."
+    },
+    "volunteers": {
+      "allergies": "Allergies",
+      "application_details": "Détails de la candidature",
+      "assigned_time_slots": "Créneaux assignés",
+      "availability": "Disponibilités",
+      "avoid_list": "Liste à éviter",
+      "companion": "Accompagnant",
+      "companion_name": "Nom de l'accompagnant",
+      "contact_organizer": "Contacter responsables bénévoles",
+      "contact_organizer_error": "Erreur lors de la création de la conversation avec les organisateurs",
+      "dates": "Dates",
+      "diet": "Régime",
+      "dietary": {
+        "none": "Aucun",
+        "other": "Autre",
+        "vegan": "Végétalien",
+        "vegetarian": "Végétarien"
+      },
+      "dietary_preferences": "Préférences alimentaires",
+      "emergency_contact": "Contact d'urgence",
+      "emergency_contact_name": "Nom du contact d'urgence",
+      "emergency_contact_phone": "Téléphone du contact d'urgence",
+      "event": "Événement",
+      "experience": "Expérience",
+      "experience_details": "Détails de l'expérience",
+      "export_ical": "Export iCal",
+      "export_ics_default_title": "Créneau bénévole",
+      "export_ics_team_prefix": "Équipe",
+      "export_pdf": "Export PDF",
+      "export_pdf_column_slot": "Créneau",
+      "export_pdf_column_team": "Équipe",
+      "export_pdf_column_when": "Quand",
+      "export_pdf_delay": "Retard : {minutes} min",
+      "export_pdf_empty": "Aucun créneau à imprimer",
+      "export_pdf_summary": "{creneaux} créneaux — {heures} — {equipes} équipe(s)",
+      "export_pdf_title": "Planning bénévole",
+      "has_experience": "A de l'expérience",
+      "has_minors": "Accompagné de mineurs",
+      "has_pets": "Possède des animaux",
+      "has_vehicle": "Possède un véhicule",
+      "minors": "Personnes mineures",
+      "minors_details": "Détails sur les mineurs",
+      "motivation": "Motivation",
+      "my_slots_title": "Mes Créneaux",
+      "no_upcoming_slots": "Aucun créneau à venir.",
+      "pets": "Animaux de compagnie",
+      "pets_details": "Détails sur les animaux",
+      "setup": "Montage",
+      "show_past_slots": "Afficher le créneau passé | Afficher les {count} créneaux passés",
+      "skills": "Compétences",
+      "team_distribution": {
+        "all_teams": "Toutes équipes",
+        "description": "Répartition des bénévoles acceptés dans les équipes. Cliquez sur un bénévole pour choisir son équipe.",
+        "empty_team": "Équipe vide",
+        "leader_added": "Responsable ajouté",
+        "leader_badge": "Responsable",
+        "leader_removed": "Responsable retiré",
+        "manage_teams": "Gérer les équipes",
+        "max_label": "Max:",
+        "modal": {
+          "assign_title": "Assigner {name}",
+          "assign_title_generic": "Sélectionner une équipe"
+        },
+        "no_preferred_teams": "Ce bénévole n'a exprimé aucun souhait d'équipe.",
+        "no_teams": "Aucune équipe de bénévoles sur cet événement",
+        "organizers_label": "Organisateurs rattachés",
+        "other_teams": "Autres équipes",
+        "preferences_label": "Préf:",
+        "preferred_teams": "Équipes souhaitées",
+        "remove_as_leader": "Retirer le rôle de responsable",
+        "select_teams_instruction": "Cochez les équipes de ce bénévole",
+        "set_as_leader": "Définir comme responsable",
+        "stats": {
+          "assigned_volunteers": "Bénévoles assignés",
+          "attached_organizers": "Organisateurs rattachés",
+          "total_assignments": "Assignations totales",
+          "total_teams": "Total équipes",
+          "unassigned": "Sans assignation"
+        },
+        "title": "Répartition par équipes",
+        "unassigned_description": "Ces bénévoles acceptés n'ont pas encore été assignés à une équipe. Cliquez sur l'un d'eux pour choisir la sienne.",
+        "unassigned_volunteers": "Bénévoles non assignés",
+        "volunteers_count": "{count} bénévole(s)"
+      },
+      "team_preferences": "Préférences d'équipes",
+      "teardown": "Démontage",
+      "time_preferences": "Préférences horaires",
+      "vehicle": "Véhicule",
+      "vehicle_details": "Détails du véhicule"
+    }
+  },
+  "validation": {
+    "allergy_severity_required": "Le niveau de sévérité est requis lorsque des allergies sont renseignées",
+    "arrival_date_required": "La date d'arrivée est requise",
+    "at_least_one_availability_required": "Au moins une disponibilité doit être sélectionnée",
+    "departure_date_required": "La date de départ est requise",
+    "emergency_contact_name_required": "Le nom du contact d'urgence est requis",
+    "emergency_contact_phone_invalid": "Le numéro du contact d'urgence n'est pas valide",
+    "emergency_contact_phone_required": "Le téléphone du contact d'urgence est requis",
+    "external_url_invalid": "Ce lien n'est pas valide — seuls les liens commençant par http:// ou https:// sont acceptés",
+    "first_name_required": "Le prénom est requis",
+    "last_name_required": "Le nom est requis",
+    "message_required": "Le message est requis",
+    "message_too_long": "Le message ne peut pas dépasser {max} caractères",
+    "motivation_too_long": "La motivation ne peut pas dépasser {max} caractères",
+    "phone_invalid": "Ce numéro de téléphone n'est pas valide",
+    "phone_required": "Le numéro de téléphone est requis"
+  },
+  "volunteers": {
+    "apply_description": "Soumettez votre candidature pour aider pendant l'événement.",
+    "auto_assignment": {
+      "existing_mode_help_replace_all": "Toutes les affectations de l'événement sont effacées avant le calcul, y compris celles posées à la main.",
+      "history_description": "Les calculs d'assignation automatique déjà lancés sur cet événement.",
+      "history_empty": "Aucun calcul n'a encore été lancé sur cet événement.",
+      "confirm_apply_replace_all": "Toutes les affectations de l'événement seront effacées avant d'écrire ce plan, y compris celles que vous avez posées à la main."
+    },
+    "closed_visible_as_editor": "Les candidatures bénévoles sont actuellement fermées. Vous y avez accès en tant qu'organisateur de cet événement.",
+    "confirm_delete_description": "Cette action est irréversible. Le bénévole sera définitivement retiré de cet événement et toutes ses assignations seront supprimées.",
+    "notification_title_info": "Le titre sera automatiquement \"Bénévoles - {'nom de l`événement'}\"",
+    "notifications_info_admin": "Envoyez des notifications et gérez les communications avec les bénévoles acceptés pour cet événement.",
+    "organizers_in_teams": {
+      "empty": "Aucun organisateur sur cet événement."
+    },
+    "page_private_visible_as_editor": "Cette page n'est pas publique. Vous y avez accès en tant qu'organisateur de cet événement.",
+    "planning_publish_on_hint": "Les bénévoles acceptés voient leurs créneaux et le planning de l’événement.",
+    "renforts_none": "Aucun bénévole volant sur cet événement",
+    "staffing_period_undefined": "Cette période n’est pas définie sur l’événement",
+    "swap_no_assignment": "Vous n'avez aucun créneau sur cet événement.",
+    "volunteer_description_help": "Décrivez les missions, les horaires et les informations importantes pour les bénévoles de cet événement."
+  }
+}
