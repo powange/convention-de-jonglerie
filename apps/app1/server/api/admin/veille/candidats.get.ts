@@ -42,6 +42,7 @@ export default wrapApiHandler(
       source: requete.source ? String(requete.source) : undefined,
       pays: requete.pays ? String(requete.pays) : undefined,
       masquerImportes: requete.masquerImportes === 'true',
+      masquerPassees: requete.masquerPassees === 'true',
     })
 
     /*

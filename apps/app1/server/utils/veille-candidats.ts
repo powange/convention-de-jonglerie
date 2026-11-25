@@ -171,6 +171,28 @@ export interface FiltresCandidats {
   avisIa?: AvisIa | 'AUCUN'
   /** Masquer ceux dont une édition existe déjà. Appliqué APRÈS la base, le calcul n'y vivant pas. */
   masquerImportes?: boolean
+  /** Masquer ceux dont la date de fin est dépassée. Appliqué APRÈS la base, comme le précédent. */
+  masquerPassees?: boolean
+}
+
+const UN_JOUR_MS = 24 * 60 * 60 * 1000
+
+/**
+ * Un candidat est « passé » quand sa fin — début + durée annoncée — est derrière nous.
+ *
+ * ⚠️ Un candidat SANS date de début n'est jamais passé : on ne sait pas, et le masquer ferait
+ * disparaître un événement peut-être à venir sans que rien ne le dise.
+ *
+ * 📍 La durée vaut au moins un jour : sans elle, une convention du jour serait masquée dès minuit
+ * passé, alors qu'elle se tient encore.
+ */
+export function estPasse(
+  candidat: { debut: Date | null; jours: number | null },
+  maintenant: Date = new Date()
+): boolean {
+  if (!candidat.debut) return false
+  const fin = candidat.debut.getTime() + Math.max(candidat.jours ?? 1, 1) * UN_JOUR_MS
+  return fin <= maintenant.getTime()
 }
 
 /**
@@ -206,5 +228,10 @@ export async function listerCandidats(
     })(),
   })) as CandidatPourEcran[]
 
-  return filtres.masquerImportes ? enrichis.filter((c) => !c.dejaImporte) : enrichis
+  const maintenant = new Date()
+  return enrichis.filter(
+    (c) =>
+      !(filtres.masquerImportes && c.dejaImporte) &&
+      !(filtres.masquerPassees && estPasse(c, maintenant))
+  )
 }

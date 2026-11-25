@@ -142,6 +142,14 @@
           class="sm:pb-2"
           @update:model-value="recharger"
         />
+
+        <USwitch
+          v-model="filtres.masquerPassees"
+          data-filtre="masquerPassees"
+          :label="t('admin.veille.filter.hide_past')"
+          class="sm:pb-2"
+          @update:model-value="recharger"
+        />
       </div>
     </UCard>
 
@@ -463,6 +471,9 @@ const filtres = reactive({
   // n'a pas encore vus, qui sont justement ceux qu'il reste à traiter.
   avisIa: TOUS_AVIS as AvisIa | typeof TOUS_AVIS | typeof SANS_AVIS,
   masquerImportes: false,
+  // Masquées par défaut : une convention terminée n'appelle plus aucune décision. L'interrupteur
+  // permet de les revoir, par exemple pour revenir sur un verdict.
+  masquerPassees: true,
 })
 
 const onglets = computed(() => [
@@ -593,6 +604,7 @@ const { execute: charger, loading: chargement } = useApiAction('/api/admin/veill
     // « filtrer sur l'absence d'avis » sont deux demandes différentes.
     ...(filtres.avisIa !== TOUS_AVIS ? { avisIa: filtres.avisIa } : {}),
     ...(filtres.masquerImportes ? { masquerImportes: 'true' } : {}),
+    ...(filtres.masquerPassees ? { masquerPassees: 'true' } : {}),
   }),
   errorMessages: { default: t('admin.veille.error.load') },
   /*

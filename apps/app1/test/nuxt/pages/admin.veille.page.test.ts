@@ -177,6 +177,8 @@ describe('Page /admin/veille', () => {
     const chargement = appels.liste.find((appel) => appel.url.includes('/candidats'))
     expect(chargement).toBeDefined()
     expect(chargement!.options.query.verdict).toBe('A_EXAMINER')
+    // Les conventions passées sont masquées dès l'arrivée : elles n'appellent plus de décision.
+    expect(chargement!.options.query.masquerPassees).toBe('true')
   })
 
   it('⚠️ affiche les compteurs RENDUS PAR L’API, et non la longueur de la liste', async () => {
