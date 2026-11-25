@@ -130,15 +130,15 @@
                     class="w-16 h-16 object-cover rounded-lg"
                   />
                   <img
-                    v-else-if="application.edition.convention.logo"
+                    v-else-if="application.edition.convention?.logo"
                     :src="
                       getImageUrl(
-                        application.edition.convention.logo,
+                        application.edition.convention?.logo,
                         'convention',
-                        application.edition.convention.id
+                        application.edition.convention?.id
                       ) || ''
                     "
-                    :alt="application.edition.convention.name"
+                    :alt="application.edition.convention?.name"
                     class="w-16 h-16 object-cover rounded-lg"
                   />
                   <div
@@ -155,7 +155,7 @@
                   </h3>
                   <p class="text-gray-600 dark:text-gray-400 flex items-center gap-2 mt-1">
                     <UIcon name="i-heroicons-map-pin" class="w-4 h-4" />
-                    {{ application.edition.city }}, {{ application.edition.country }}
+                    {{ lieuDe(application.edition) }}
                   </p>
                   <p class="text-gray-600 dark:text-gray-400 flex items-center gap-2 mt-1">
                     <UIcon name="i-heroicons-calendar-days" class="w-4 h-4" />
@@ -277,7 +277,7 @@
                 </UButton>
 
                 <UButton
-                  v-if="application.status === 'ACCEPTED'"
+                  v-if="application.status === 'ACCEPTED' && messagerieDisponible"
                   size="sm"
                   color="success"
                   variant="outline"
@@ -343,15 +343,15 @@
                 class="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-lg"
               />
               <img
-                v-else-if="application.edition.convention.logo"
+                v-else-if="application.edition.convention?.logo"
                 :src="
                   getImageUrl(
-                    application.edition.convention.logo,
+                    application.edition.convention?.logo,
                     'convention',
-                    application.edition.convention.id
+                    application.edition.convention?.id
                   ) || ''
                 "
-                :alt="application.edition.convention.name"
+                :alt="application.edition.convention?.name"
                 class="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-lg"
               />
               <div
@@ -368,7 +368,7 @@
                 {{ getEditionDisplayName(application.edition) }}
               </h3>
               <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
-                {{ application.edition.city }}, {{ application.edition.country }}
+                {{ lieuDe(application.edition) }}
               </p>
               <p class="text-xs text-gray-500 truncate sm:hidden">
                 {{
@@ -420,7 +420,7 @@
                 square
               />
               <UButton
-                v-if="application.status === 'ACCEPTED'"
+                v-if="application.status === 'ACCEPTED' && messagerieDisponible"
                 :aria-label="$t('common.contact')"
                 size="xs"
                 color="success"
@@ -848,6 +848,22 @@ const showApplicationDetails = (application: any) => {
 // Contacter les responsables bénévoles. La page bénévolat de l'édition propose le même bouton :
 // la logique vit donc dans un composable partagé plutôt qu'en double.
 const { contacter: contacterResponsables } = useContactResponsablesBenevoles()
+
+/** Pas de messagerie dans l'app (`benevoles.messagerie`, cf. app.config du layer) : pas de contact. */
+const messagerieDisponible = useAppConfig().benevoles?.messagerie !== false
+
+/**
+ * Le lieu d'un événement : « ville, pays » quand l'app les fournit (app1), sinon le lieu libre
+ * (`location`, Flowvent). Le port `eventScope.getEventDisplayData` de chaque app décide des champs.
+ */
+function lieuDe(edition: {
+  city?: string | null
+  country?: string | null
+  location?: string | null
+}) {
+  const villePays = [edition.city, edition.country].filter(Boolean).join(', ')
+  return villePays || edition.location || ''
+}
 
 const contactOrganizer = (application: any) => {
   contacterResponsables(application.edition.id)

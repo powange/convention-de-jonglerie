@@ -79,4 +79,16 @@ describe('GET /api/user/volunteer-applications', () => {
     const [resultat] = await appeler([candidature()])
     expect(resultat).not.toHaveProperty('user')
   })
+
+  it('un événement sans date de fin finit le jour où il commence', async () => {
+    // Flowvent crée des événements sans fin. `endDate: null` devenait `new Date(null)` — 1970 —
+    // dans la page : la candidature tombait dans l'historique dès son dépôt.
+    const debut = new Date('2027-06-10T08:00:00Z')
+    const [resultat] = await appeler([
+      candidature({
+        event: { name: 'Festival', startDate: debut, endDate: null, volunteerSettings: null },
+      }),
+    ])
+    expect(resultat.edition.endDate).toEqual(debut)
+  })
 })

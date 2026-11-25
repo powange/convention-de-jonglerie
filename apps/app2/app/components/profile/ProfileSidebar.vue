@@ -43,6 +43,14 @@ const items: NavigationMenuItem[] = [
     to: '/profile/informations',
     onSelect: () => emit('navigate'),
   },
+  // Toujours affichée, contrairement à app1 qui la réserve aux comptes marqués bénévoles : dans
+  // Flowvent, n'importe quel compte peut candidater, et la page dit elle-même quand la liste est vide.
+  {
+    label: 'Mes candidatures de bénévole',
+    icon: 'i-heroicons-hand-raised',
+    to: '/profile/mes-candidatures-benevole',
+    onSelect: () => emit('navigate'),
+  },
   {
     label: 'Sécurité',
     icon: 'i-heroicons-shield-check',

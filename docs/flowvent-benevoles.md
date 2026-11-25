@@ -112,8 +112,10 @@ de Flowvent.
 - **Politique de confidentialité de Flowvent** : mise à jour au lot 7b — candidature, engagement,
   qui y a accès (organisateurs, responsables d'équipe, pseudo et photo pour les échanges), Gravatar.
   À reprendre si le formulaire demande un champ nouveau.
-- **Lien du layer vers `/profile/mes-candidatures-benevole`** (page de confirmation d'une
-  notification) : la page n'existe que dans app1. Lien mort dans Flowvent, à trancher.
+- **« Mes candidatures de bénévole »** (`/profile/mes-candidatures-benevole`) vit dans le layer
+  depuis le lot 9 : les deux apps la servent. Lieu : « ville, pays » si le port `eventScope` les
+  fournit (app1), sinon `location` (Flowvent). Réglage `benevoles.messagerie` : sans messagerie,
+  pas de bouton « Contacter » (ni ici, ni sur la page bénévole).
 - **Statut des événements** : Flowvent n'a pas de notion de publication ; ses événements sont créés
   `PUBLISHED`. À revoir s'il en gagne une.
 
@@ -135,7 +137,9 @@ de Flowvent.
 | 6c ✅ | `useNotificateur`, `useParticipantTypes` → `ui` ; `useDateFormat`, table des emoji → `core` (#939)                                                                                                                                                  | oui, déplacement                                                      |
 | 7a ✅ | En-tête de gestion et registre des modules, `MarkdownEditor`, `useImageUrl`, tri et colonnes dans l'URL, `useFermetureProtegee`, `useModeClairTemporaire` → `ui` ; `filtres-url` → `core` ; `useContactResponsablesBenevoles` → `volunteers` (#940) | oui, déplacement                                                      |
 | 7b ✅ | Écran de gestion de Flowvent : pages sous `/events/[id]`, barre latérale, `EditionHeader` propre, mode externe retiré, `nuxt-qrcode`, politique de confidentialité                                                                                  | oui : `config.vue` passe par le store, `CarteRepliable` (hydratation) |
-| 8     | Libellés de Flowvent (fichiers du layer + `benevoles.json`), billetterie et organisateurs masqués                                                                                                                                                   | non                                                                   |
+| 8 ✅  | Libellés de Flowvent (fichiers du layer + `benevoles.json`), billetterie et organisateurs masqués (#942)                                                                                                                                            | non                                                                   |
+| 9     | « Mes candidatures de bénévole » dans le layer (servie par les deux apps), réglage `messagerie`, fin d'événement absente = jour du début                                                                                                            | oui : page déplacée, API (repli de la date de fin)                    |
+| 10    | Tâches planifiées du layer (rappels de créneau, échanges expirés) programmées dans Flowvent                                                                                                                                                         | non                                                                   |
 
 Chaque lot touchant app1 est un **déplacement sans changement de comportement**, prouvé par ses
 suites de tests (unitaires et Nuxt) et par le serveur de dev.

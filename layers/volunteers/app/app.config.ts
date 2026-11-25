@@ -22,14 +22,29 @@ export default defineAppConfig({
      * Flowvent n'offre aucun moyen d'en déclarer : l'option ne pourrait qu'afficher une liste vide.
      */
     organisateurs: true,
+    /**
+     * Une messagerie : le bénévole accepté peut écrire aux responsables depuis sa candidature.
+     * Flowvent n'en a pas, le bouton « Contacter » y mènerait à une page absente.
+     */
+    messagerie: true,
   },
 })
 
 declare module 'nuxt/schema' {
   interface AppConfigInput {
-    benevoles?: { modeExterne?: boolean; billetterie?: boolean; organisateurs?: boolean }
+    benevoles?: {
+      modeExterne?: boolean
+      billetterie?: boolean
+      organisateurs?: boolean
+      messagerie?: boolean
+    }
   }
   interface AppConfig {
-    benevoles: { modeExterne: boolean; billetterie: boolean; organisateurs: boolean }
+    benevoles: {
+      modeExterne: boolean
+      billetterie: boolean
+      organisateurs: boolean
+      messagerie: boolean
+    }
   }
 }
