@@ -4,7 +4,7 @@ import {
   useParticipantTypes,
   type ParticipantType,
   type ManagementSectionType,
-} from '../../../app/composables/useParticipantTypes'
+} from '#ui-commun/app/composables/useParticipantTypes'
 
 describe('useParticipantTypes', () => {
   const {

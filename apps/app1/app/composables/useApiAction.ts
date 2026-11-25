@@ -1,17 +1,8 @@
 import { computed, ref, readonly, type Ref } from 'vue'
 
 /*
- * ⚠️ IMPORT EXPLICITE, et non auto-import. Les tests du projet `unit` tournent SANS Nuxt : ils
- * simulent les auto-imports par `vi.stubGlobal`. Un `useNotificateur()` compté sur l'auto-import
- * y est donc introuvable, et c'est 58 tests qui tombent d'un coup — sur `useApiAction`, mais
- * aussi sur `useEditionMarkers` et `useEditionZones`, qui en dépendent. L'import rend la
- * dépendance visible et résoluble partout.
- */
-import { useNotificateur } from './useNotificateur'
-
-/*
  * ⚠️ IMPORT DE TYPE SEULEMENT — il disparaît à la compilation, et ne compte donc pas comme un
- * auto-import pour les tests `unit` évoqués juste au-dessus, qui tournent sans Nuxt.
+ * auto-import pour les tests `unit` évoqués juste en dessous, qui tournent sans Nuxt.
  *
  * Ces deux types servent à FERMER les génériques de `$fetch`. Depuis Nuxt 4.6, `$fetch` est typé
  * depuis les routes du serveur, et sa signature porte un paramètre de méthode dont le défaut est
@@ -37,6 +28,15 @@ import { useNotificateur } from './useNotificateur'
  * `TResult`, que l'appelant nomme.
  */
 import type { AnyFetchPath, AnyServerRouteMethod } from 'nuxt/app'
+
+/*
+ * ⚠️ IMPORT EXPLICITE, et non auto-import. Les tests du projet `unit` tournent SANS Nuxt : ils
+ * simulent les auto-imports par `vi.stubGlobal`. Un `useNotificateur()` compté sur l'auto-import
+ * y est donc introuvable, et c'est 58 tests qui tombent d'un coup — sur `useApiAction`, mais
+ * aussi sur `useEditionMarkers` et `useEditionZones`, qui en dépendent. L'import rend la
+ * dépendance visible et résoluble partout.
+ */
+import { useNotificateur } from '#ui-commun/app/composables/useNotificateur'
 
 /**
  * Structure d'erreur API normalisée

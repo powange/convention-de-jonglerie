@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest'
 
 import { construireTable } from '../../../scripts/generate-emoji-shortcodes.mjs'
 
-import table from '../../../app/utils/emoji-shortcodes.json'
+import table from '../../../../../layers/core/app/utils/emoji-shortcodes.json'
 
 /**
  * L'éditeur propose les emojis de `gitHubEmojis` et les enregistre en raccourci ; le rendu les
