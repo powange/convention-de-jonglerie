@@ -34,11 +34,11 @@
     "@prisma/adapter-mariadb": "^7.10.1",
     "@prisma/client": "^7.8.0",
     "bcryptjs": "^3.0.3",
-    "nuxt": "^4.6.4",
+    "nuxt": "^4.7.0",
     "nuxt-auth-utils": "^0.5.29",
     "pinia": "^3.0.4",
     "prisma": "^7.10.1",
-    "vue": "^3.5.17",
+    "vue": "^3.5.46",
     "zod": "^4.6.7"
   },
   "engines": {
@@ -48,6 +48,7 @@
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/lucide": "^1.2.116",
     "@iconify-json/simple-icons": "^1.2.89",
+    "@nuxt/devtools": "^3.4.4",
     "png-to-ico": "^3.0.1",
     "sharp": "0.35.5"
   }
