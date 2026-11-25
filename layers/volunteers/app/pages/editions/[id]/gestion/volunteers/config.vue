@@ -330,9 +330,10 @@
             </div>
 
             <!-- Organisateurs dans les équipes. Même réserve que les échanges : hors du mode
-                 interne, il n'y a ni équipe ni créneau ici à quoi les rattacher. -->
+                 interne, il n'y a ni équipe ni créneau ici à quoi les rattacher. Absent aussi
+                 quand l'app ne gère pas d'organisateurs (`benevoles.organisateurs`). -->
             <div
-              v-if="volunteersModeLocal === 'INTERNAL'"
+              v-if="volunteersModeLocal === 'INTERNAL' && organisateursDisponibles"
               class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
             >
               <div class="flex items-center justify-between">
@@ -469,6 +470,7 @@ const setupStartDateLocal = shallowRef<DateValue | undefined>(undefined)
 const teardownEndDateLocal = shallowRef<DateValue | undefined>(undefined)
 
 const modeExterneDisponible = useAppConfig().benevoles?.modeExterne !== false
+const organisateursDisponibles = useAppConfig().benevoles?.organisateurs !== false
 
 const volunteerModeItems = computed(() => [
   { value: 'INTERNAL', label: t('gestion.volunteers.mode_internal') },

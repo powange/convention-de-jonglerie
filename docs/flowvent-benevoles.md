@@ -97,8 +97,14 @@ de Flowvent.
     Flowvent ;
   - les composants `EditionHeader` (pages du bénévole) et `EditionBandeauSurPlace` (Flowvent : vide) ;
   - le layout `edition-dashboard`, attribué à `…/gestion/**` par `routeRules`, pas par les pages.
-- **Réglages d'interface** : `layers/volunteers/app/app.config.ts` (`benevoles.modeExterne`, que
-  Flowvent éteint : la configuration n'offre plus le choix du mode).
+- **Réglages d'interface** : `layers/volunteers/app/app.config.ts`, tous vrais par défaut (app1),
+  tous éteints par Flowvent — `benevoles.modeExterne` (choix du mode), `billetterie` (colonne et
+  filtre du billet des candidatures), `organisateurs` (organisateurs rattachés aux équipes).
+- **Libellés de Flowvent** : sa locale agrège les fichiers du layer, `benevoles.json` puis
+  `fr.json` (`apps/app2/nuxt.config.ts`). `benevoles.json` copie les clés que le layer emprunte
+  aux fichiers communs d'app1, et reformule pour Flowvent (« événement ») celles qui parlent
+  d'édition ou de convention. Une clé nouvelle du layer prise dans un fichier commun d'app1 doit
+  y être ajoutée : `test/unit/outillage/flowvent-libelles-benevoles.test.ts` la nomme sinon.
 - **Rendu serveur** : le store de Flowvent passe par `useRequestFetch`, sinon l'appel part sans
   cookie et l'organisateur reçoit un 404 sur la page non publique de ses propres bénévoles.
 - **Tâches planifiées** (rappels de créneau, nettoyage des échanges) : non programmées dans Flowvent.
@@ -128,8 +134,8 @@ de Flowvent.
 | 6a ✅ | Composants `Ui*` du layer bénévoles dans `layers/ui` (#938)                                                                                                                                                                                         | oui, déplacement                                                      |
 | 6c ✅ | `useNotificateur`, `useParticipantTypes` → `ui` ; `useDateFormat`, table des emoji → `core` (#939)                                                                                                                                                  | oui, déplacement                                                      |
 | 7a ✅ | En-tête de gestion et registre des modules, `MarkdownEditor`, `useImageUrl`, tri et colonnes dans l'URL, `useFermetureProtegee`, `useModeClairTemporaire` → `ui` ; `filtres-url` → `core` ; `useContactResponsablesBenevoles` → `volunteers` (#940) | oui, déplacement                                                      |
-| 7b    | Écran de gestion de Flowvent : pages sous `/events/[id]`, barre latérale, `EditionHeader` propre, mode externe retiré, `nuxt-qrcode`, politique de confidentialité                                                                                  | oui : `config.vue` passe par le store, `CarteRepliable` (hydratation) |
-| 8     | Libellés : le layer est en 13 langues, Flowvent en français                                                                                                                                                                                         | non                                                                   |
+| 7b ✅ | Écran de gestion de Flowvent : pages sous `/events/[id]`, barre latérale, `EditionHeader` propre, mode externe retiré, `nuxt-qrcode`, politique de confidentialité                                                                                  | oui : `config.vue` passe par le store, `CarteRepliable` (hydratation) |
+| 8     | Libellés de Flowvent (fichiers du layer + `benevoles.json`), billetterie et organisateurs masqués                                                                                                                                                   | non                                                                   |
 
 Chaque lot touchant app1 est un **déplacement sans changement de comportement**, prouvé par ses
 suites de tests (unitaires et Nuxt) et par le serveur de dev.

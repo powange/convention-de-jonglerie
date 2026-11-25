@@ -96,6 +96,7 @@
                 />
 
                 <USelect
+                  v-if="billetterieDisponible"
                   v-model="applicationsFilterBillet"
                   :items="volunteerBilletItems"
                   :placeholder="t('volunteers.ticket_all')"
@@ -195,6 +196,7 @@
           />
 
           <USelect
+            v-if="billetterieDisponible"
             v-model="applicationsFilterBillet"
             :items="volunteerBilletItems"
             :placeholder="t('volunteers.ticket_all')"
@@ -1408,7 +1410,14 @@ const celluleTexteDetaille = (texte: string, apercu: unknown[]) =>
     }
   )
 
-const columns = computed((): TableColumn<any>[] => [
+/*
+ * Sans billetterie (`benevoles.billetterie` dans l'app.config du layer — Flowvent l'éteint), la
+ * colonne et le filtre du billet n'ont rien à montrer : chaque ligne y dirait « pas de billet ».
+ * La colonne est retirée de la liste, ce qui la retire aussi du choix des colonnes et des exports.
+ */
+const billetterieDisponible = useAppConfig().benevoles?.billetterie !== false
+
+const toutesLesColonnes = computed((): TableColumn<any>[] => [
   // ID en tout premier
   {
     accessorKey: 'id',
@@ -2319,6 +2328,14 @@ watch(
 )
 
 /** Les colonnes que le lecteur a le droit de masquer — l'URL ne peut pas en cacher d'autres. */
+const columns = computed(() =>
+  billetterieDisponible
+    ? toutesLesColonnes.value
+    : toutesLesColonnes.value.filter(
+        (c) => (c as { accessorKey?: string }).accessorKey !== 'billet'
+      )
+)
+
 const colonnesMasquables = computed(() => colonnesMasquablesDe(columns.value))
 
 /*
