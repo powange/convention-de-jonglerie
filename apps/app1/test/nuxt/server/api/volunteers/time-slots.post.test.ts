@@ -1,9 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
+// Le fuseau passe par le port `eventScope` (et non plus par `prisma.edition`).
+const mockGetTimezone = vi.fn()
 const mockRequireAccess = vi.hoisted(() => vi.fn())
 
 vi.mock('#server/volunteers/ports/registry', () => ({
-  useVolunteerPorts: () => ({ organizers: { requireManagementAccess: mockRequireAccess } }),
+  useVolunteerPorts: () => ({
+    organizers: { requireManagementAccess: mockRequireAccess },
+    eventScope: { getTimezone: mockGetTimezone },
+  }),
 }))
 
 // L'authentification est vérifiée ailleurs : ici on éprouve la répétition des créneaux.
@@ -68,7 +73,7 @@ describe('POST /api/editions/[id]/volunteer-time-slots — récurrence', () => {
     vi.clearAllMocks()
     mockRequireAccess.mockResolvedValue({ id: 1 })
     prismaMock.event.findUnique.mockResolvedValue(evenement)
-    prismaMock.edition.findUnique.mockResolvedValue({ timezone: 'Europe/Paris' })
+    mockGetTimezone.mockResolvedValue('Europe/Paris')
     prismaMock.volunteerTimeSlot.create.mockImplementation(async () => creneauCree(1))
     prismaMock.$transaction.mockImplementation(async (ops: any) => Promise.all(ops))
     global.readValidatedBody = vi.fn()

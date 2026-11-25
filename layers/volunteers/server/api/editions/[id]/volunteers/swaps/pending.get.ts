@@ -5,7 +5,7 @@ import { selectionCreneauLisible } from '../../../../../utils/selection-creneau-
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { userWithProfileAndGravatarSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { requireVolunteerManagementAccess } from '#volunteers/server/utils/permissions/volunteer-permissions'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 /**
  * GET .../volunteers/swaps/pending — les échanges qui attendent une décision.
@@ -18,7 +18,7 @@ export default wrapApiHandler(
   async (event) => {
     const editionId = validateEditionId(event)
     await exigerEchangesOuverts(editionId)
-    await requireVolunteerManagementAccess(event, editionId)
+    await useVolunteerPorts().organizers.requireManagementAccess(event, editionId)
 
     const affectation = {
       select: {

@@ -110,6 +110,16 @@ export interface EventScopePort {
    *   le module les fournit (métadonnées génériques d'`Event` + config bénévole) et elles priment.
    */
   getEventDisplayData(eventIds: number[]): Promise<Record<number, Record<string, unknown>>>
+  /**
+   * Fuseau IANA de l'événement (« Europe/Paris »), qui ancre les heures murales des créneaux et des
+   * notifications. `null` : inconnu — l'appelant retombe sur son défaut. Jonglerie : `Edition.timezone`.
+   */
+  getTimezone(eventId: number): Promise<string | null>
+  /**
+   * Nom à afficher pour l'événement (notifications d'échanges notamment). `null` : événement
+   * introuvable. Jonglerie : nom de l'édition, sinon celui de sa convention.
+   */
+  getDisplayName(eventId: number): Promise<string | null>
 }
 
 /**

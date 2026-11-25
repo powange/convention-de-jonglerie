@@ -70,20 +70,30 @@ chaque app implémente exactement la même.
 | `~/stores/auth`                                                                                | `useAuthStore`                                                                                                                                     |
 | `~/stores/editions`, `~/utils/editionName`, `~/types`, `~/types/volunteer`                     | **interface** : à découpler au lot 6                                                                                                               |
 
+### Organisateurs et notifications : par le schéma, pas par un port
+
+Le layer interroge `prisma.editionOrganizer` et `prisma.notification`, et inclut
+`organizerAssignments` / `assignedOrganizers` dans ses requêtes de planning (28 fichiers). Prisma
+s'adresse aux tables par **nom de modèle** et suit les relations par **nom de champ** : il suffit que
+Flowvent déclare un `EditionOrganizer` (`editionId`, `organizer` → son propre modèle d'organisateur
+avec `userId`/`user`) et un `Notification` de même forme. Ce sera aussi la base des co-organisateurs
+de Flowvent.
+
 ## Les lots
 
-| Lot   | Contenu                                                                                    | Touche app1 ?          |
-| ----- | ------------------------------------------------------------------------------------------ | ---------------------- |
-| 1 ✅  | Famille 1 déplacée dans le layer, alias `#volunteers` (#927)                               | oui, imports seulement |
-| 2 ✅  | Famille 2 dans le nouveau layer `layers/core`, alias `#core` (#928)                        | oui, imports seulement |
-| 3 ✅  | Derniers utilitaires bénévoles et interface des ports dans le layer ; contrat d'hôte écrit | oui, imports seulement |
-| 4a ✅ | Helpers serveur génériques dans `layers/core/server/socle`, réexportés par app1 (#930)     | oui, réexports         |
-| 4b ✅ | App2 étend `layers/core` ; ses copies réduites deviennent des réexports                    | non                    |
-| 4c    | Schéma d'app2 : `Event` aligné et les 14 modèles bénévoles                                 | non                    |
-| 5     | Ports serveur d'app2 (gestionnaire = propriétaire de l'event, notifications sans courriel) | non                    |
-| 6     | Découplage de l'interface du layer (« contexte d'événement » fourni par l'app)             | oui                    |
-| 7     | Écran de gestion de Flowvent : barre latérale, pages sous `/events/[id]`, options retirées | non                    |
-| 8     | Libellés : le layer est en 13 langues, Flowvent en français                                | non                    |
+| Lot   | Contenu                                                                                                                   | Touche app1 ?          |
+| ----- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| 1 ✅  | Famille 1 déplacée dans le layer, alias `#volunteers` (#927)                                                              | oui, imports seulement |
+| 2 ✅  | Famille 2 dans le nouveau layer `layers/core`, alias `#core` (#928)                                                       | oui, imports seulement |
+| 3 ✅  | Derniers utilitaires bénévoles et interface des ports dans le layer ; contrat d'hôte écrit                                | oui, imports seulement |
+| 4a ✅ | Helpers serveur génériques dans `layers/core/server/socle`, réexportés par app1 (#930)                                    | oui, réexports         |
+| 4b ✅ | App2 étend `layers/core` ; ses copies réduites deviennent des réexports                                                   | non                    |
+| 3b ✅ | Lectures d'`Edition` revenues dans le layer depuis l'étape 0bis : fuseau et nom via `eventScope`, droits via `organizers` | oui                    |
+| 4c    | Schéma d'app2 : `Event` aligné, les 14 modèles bénévoles, `EditionOrganizer` et `Notification` minimaux                   | non                    |
+| 5     | Ports serveur d'app2 (gestionnaire = propriétaire de l'event, notifications sans courriel)                                | non                    |
+| 6     | Découplage de l'interface du layer (« contexte d'événement » fourni par l'app)                                            | oui                    |
+| 7     | Écran de gestion de Flowvent : barre latérale, pages sous `/events/[id]`, options retirées                                | non                    |
+| 8     | Libellés : le layer est en 13 langues, Flowvent en français                                                               | non                    |
 
 Chaque lot touchant app1 est un **déplacement sans changement de comportement**, prouvé par ses
 suites de tests (unitaires et Nuxt) et par le serveur de dev.

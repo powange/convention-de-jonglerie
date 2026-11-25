@@ -15,6 +15,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 const bodySchema = z.object({
   /** Affectation offerte par le demandeur. */
@@ -129,15 +130,12 @@ export default wrapApiHandler(
     })
 
     // `safeNotify` : une notification qui échoue ne doit pas annuler une demande déjà créée.
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      select: { name: true, convention: { select: { name: true } } },
-    })
+    const nomEvenement = await useVolunteerPorts().eventScope.getDisplayName(editionId)
     await safeNotify(
       () =>
         NotificationHelpers.volunteerSwap(convoitee.userId, 'REQUESTED', {
           editionId,
-          editionName: edition?.name || edition?.convention.name || `Édition #${editionId}`,
+          editionName: nomEvenement || `Édition #${editionId}`,
           swapId: demande.id,
           otherName: user.pseudo,
         }),
