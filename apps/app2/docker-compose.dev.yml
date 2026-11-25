@@ -106,6 +106,7 @@ services:
       - ./public:/app/apps/app2/public:cached
       # Layer d'auth partagé (vit à la racine du repo ; le Dockerfile le copie, le dev le monte).
       # Monté pour que `extends: '../../layers/auth'` (→ /app/layers/auth dans le conteneur, layout du dépôt) résolve.
+      - ../../layers/core:/app/layers/core:cached
       - ../../layers/auth:/app/layers/auth:cached
       # node_modules et dossiers de build dans des volumes (pas synchronisés avec l'hôte)
       - node_modules:/app/apps/app2/node_modules

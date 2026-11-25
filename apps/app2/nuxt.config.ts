@@ -18,7 +18,8 @@ export default defineNuxtConfig({
 
   // Réutilise le layer d'authentification partagé (email/mot de passe + OAuth Google).
   // Le layer résout Prisma/utils/i18n via l'app hôte (apps/app2).
-  extends: ['../../layers/auth'],
+  // `core` : utilitaires techniques partagés avec app1 (helpers d'API, validation, erreurs…).
+  extends: ['../../layers/core', '../../layers/auth'],
 
   modules: ['@nuxt/ui', 'nuxt-auth-utils', '@pinia/nuxt', '@nuxtjs/i18n'],
 
