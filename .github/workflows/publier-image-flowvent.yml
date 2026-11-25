@@ -5,15 +5,13 @@ name: Publier l'image Flowvent
 # `publier-image.yml` pour app1 : la CI construit, l'hôte ne fait que tirer, et ce workflow ne
 # déploie rien — le webhook Portainer reste une décision explicite.
 #
-# DEUX RÔLES, selon l'événement :
-#
-#   - sur une PR qui touche app2 OU un layer qu'elle étend (auth, core, ui, volunteers) : construire
-#     SANS publier. C'est la garde qui manquait : le layer `layers/auth` a évolué pour app1 pendant
-#     des mois en important des modules qu'app2 n'avait pas, et app2 a cessé de se construire sans
-#     que rien ne le dise ;
-#   - sur `main` (ou à la main) : construire et publier `:main` + `:sha-<commit>`.
-#
+# UN SEUL RÔLE : sur `main` (ou à la main), construire et publier `:main` + `:sha-<commit>`.
 # Les chemins filtrent : un lot qui ne touche qu'app1 ne reconstruit pas Flowvent.
+#
+# ⚠️ La garde des PR n'est PLUS ici. Ce workflow construisait aussi l'image sans la publier sur
+# chaque PR touchant app2 ou ses layers, mais hors du check requis `ci-verte` : une PR qui cassait
+# Flowvent pouvait être mergée. Elle est devenue le job `image-flowvent` de `tests.yml`, qui compte
+# dans le verdict et lit la liste des layers dans `extends` d'app2 au lieu de la recopier.
 
 on:
   push:
@@ -26,22 +24,12 @@ on:
       - 'layers/map/**'
       - 'layers/auth/**'
       - '.github/workflows/publier-image-flowvent.yml'
-  pull_request:
-    paths:
-      - 'apps/app2/**'
-      - 'layers/ui/**'
-      - 'layers/core/**'
-      - 'layers/volunteers/**'
-      - 'layers/map/**'
-      - 'layers/auth/**'
-      - '.github/workflows/publier-image-flowvent.yml'
   workflow_dispatch:
 
-# Pas d'annulation sur `main` : un run interrompu laisserait `:main` sur une image plus ancienne.
-# Sur une PR, un nouveau push rend l'ancien build inutile.
+# Pas d'annulation : un run interrompu laisserait `:main` sur une image plus ancienne.
 concurrency:
-  group: publier-image-flowvent-${{ github.event_name == 'pull_request' && github.ref || 'main' }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: publier-image-flowvent
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -59,7 +47,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Se connecter à GHCR
-        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -71,13 +58,13 @@ jobs:
 
       # Contexte = racine du dépôt (app2 étend `layers/auth`) ; ce qui y entre est réglé par
       # `apps/app2/Dockerfile.dockerignore`.
-      - name: Construire (et publier hors PR)
+      - name: Construire et publier
         uses: docker/build-push-action@v6
         with:
           context: .
           file: apps/app2/Dockerfile
           target: runtime
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           # Nomme le répertoire des fichiers de build : `/_nuxt-<empreinte>/` (cf. nuxt.config.ts).
           # C'est ce que lit `/deploy-flowvent` pour prouver la bascule.
           build-args: |
@@ -92,7 +79,6 @@ jobs:
           cache-to: type=gha,mode=max,scope=flowvent
 
       - name: Rappeler ce qui vient d'être publié
-        if: github.event_name != 'pull_request'
         run: |
           echo "Image publiée :"
           echo "  ghcr.io/${{ github.repository_owner }}/flowvent:main"

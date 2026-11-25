@@ -1219,6 +1219,45 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('apps/app1/package-lock.json') }}
 
+  # ---------------------------------------------------------------------------------------------
+  # L’image de Flowvent (app2), construite SANS être publiée, quand la PR peut la casser : elle touche
+  # app2 ou un layer qu’app2 étend (lu dans `extends` de apps/app2/nuxt.config.ts par
+  # `changements`). Aussi sur le run planifié et le déclenchement manuel.
+  #
+  # Cette garde vivait dans `publier-image-flowvent.yml`, hors de `ci-verte` : une PR qui cassait
+  # Flowvent pouvait être mergée — le layer `auth` a déjà évolué pour app1 pendant des mois en
+  # important des modules qu’app2 n’avait pas, sans que rien ne bloque. Elle compte désormais dans le
+  # verdict. `publier-image-flowvent.yml` ne garde que la publication sur `main`.
+  #
+  # App2 n’a ni lint, ni typage, ni tests propres en CI : ce build est sa seule vérification.
+  #
+  # Le cache Docker porte le même `scope` que la publication : une PR lit les couches que `main` a
+  # écrites, et ce qu’elle écrit reste cantonné à sa PR.
+  image-flowvent:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    needs: [changements]
+    if: contains(needs.changements.outputs.jobs, ' image-flowvent ')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Préparer Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Construire l’image Flowvent (sans la publier)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/app2/Dockerfile
+          target: runtime
+          push: false
+          build-args: |
+            BUILD_SHA=${{ github.sha }}
+          cache-from: type=gha,scope=flowvent
+          cache-to: type=gha,mode=max,scope=flowvent
+
   # Les vulnérabilités connues des dépendances. ⚠️ CE JOB NE BLOQUE PAS `ci-verte`, et c'est
   # délibéré : un avis publié pendant la nuit rendrait rouge une PR qui ne touche pas aux
   # dépendances, et bloquerait le dépôt pour une raison étrangère à son contenu. Il est là pour
@@ -1299,6 +1338,7 @@ jobs:
         test,
         playwright,
         navigateurs,
+        image-flowvent,
       ]
     timeout-minutes: 5
 
@@ -1317,10 +1357,11 @@ jobs:
       # surprend, c'est la première chose qu'on voudra lire.
       - name: Résultats des jobs surveillés
         run: |
-          echo "périmètre : ${PERIMETRE:-inconnu}"
+          echo "périmètre : ${PERIMETRE:-inconnu} — jobs lancés :${JOBS:- (liste absente)}"
           echo "$RESULTATS"
         env:
           PERIMETRE: ${{ needs.changements.outputs.perimetre }}
+          JOBS: ${{ needs.changements.outputs.jobs }}
           RESULTATS: ${{ toJSON(needs) }}
 
       # Un `skipped` ne passe plus systématiquement pour un échec : chaque périmètre saute À DESSEIN
@@ -1330,7 +1371,7 @@ jobs:
       # `test/unit/scripts/perimetre-ci.test.ts`.
       - name: Refuser si un job requis n’est pas passé
         env:
-          PERIMETRE: ${{ needs.changements.outputs.perimetre }}
+          JOBS: ${{ needs.changements.outputs.jobs }}
           RESULTATS: ${{ toJSON(needs) }}
         run: node scripts/perimetre-ci.mjs --verdict
 
