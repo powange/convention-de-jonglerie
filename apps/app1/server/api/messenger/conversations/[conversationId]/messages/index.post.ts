@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getUserAvatarUrl } from '#server/utils/avatar-url'
-import { utilisateursResponsablesDeLEquipe } from '#server/utils/editions/volunteers/responsables-equipe'
 import { masquerMessageSupprime } from '#server/utils/messenger-message-affiche'
 import {
   messengerStreamService,
@@ -13,6 +12,7 @@ import { notificationAutoriseeDapres } from '#server/utils/notification-preferen
 import { messengerMessageInclude } from '#server/utils/prisma-select-helpers'
 import { translateServerSide } from '#server/utils/server-i18n'
 import { unifiedPushService } from '#server/utils/unified-push-service'
+import { utilisateursResponsablesDeLEquipe } from '#volunteers/server/utils/editions/volunteers/responsables-equipe'
 
 const bodySchema = z.object({
   content: z.string().min(1).max(10000),

@@ -7,7 +7,7 @@
  * venu renforcer une équipe doit au contraire y apparaître sous CETTE équipe.
  */
 
-import { jourDeLEdition } from './jour-edition'
+import { jourDeLEdition } from '~/utils/jour-edition'
 
 import type { EquipePourVolants } from '~~/shared/utils/benevoles-volants'
 

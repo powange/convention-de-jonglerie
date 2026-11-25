@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import handler from '../../../../../../server/api/messenger/conversations/index.get'
-import { utilisateursResponsablesDeLEquipe } from '../../../../../../server/utils/editions/volunteers/responsables-equipe'
+import { utilisateursResponsablesDeLEquipe } from '#volunteers/server/utils/editions/volunteers/responsables-equipe'
 
 const prismaMock = (globalThis as any).prisma
 

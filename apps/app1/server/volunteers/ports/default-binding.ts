@@ -24,11 +24,11 @@ import {
   type CreateNotificationData,
 } from '#server/utils/notification-service'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
+import { isArtistEligibleForMeal } from '#server/utils/volunteer-meals'
 import {
   requireVolunteerManagementAccess,
   requireVolunteerReadAccess,
-} from '#server/utils/permissions/volunteer-permissions'
-import { isArtistEligibleForMeal } from '#server/utils/volunteer-meals'
+} from '#volunteers/server/utils/permissions/volunteer-permissions'
 
 function toCreateData(input: NotifyInput): CreateNotificationData {
   return { ...input, type: input.type as NotificationType }

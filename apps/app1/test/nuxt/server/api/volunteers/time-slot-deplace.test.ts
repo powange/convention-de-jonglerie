@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import {
   RETARD_MINUTES_MAX,
   RETARD_MINUTES_MIN,
-} from '../../../../../shared/utils/bornes-retard-creneau'
+} from '#volunteers/shared/utils/bornes-retard-creneau'
 
 const mockRequireManagement = vi.fn()
 /*

@@ -2,12 +2,12 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'
 import { Prisma } from '#server/utils/prisma'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+import { equipesDontIlEstResponsable } from '#volunteers/server/utils/editions/volunteers/responsables-equipe'
 
 const notificationSchema = z.object({
   targetType: z.enum(['all', 'teams']),

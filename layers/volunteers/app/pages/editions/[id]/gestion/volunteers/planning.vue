@@ -173,14 +173,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-import { effectifParPeriode, PERIODES } from '~/utils/effectif-par-periode'
-import { detecterSpectaclesManques } from '~/utils/spectacles-manques'
-import {
-  calculateVolunteersStats,
-  calculateVolunteersStatsByDay,
-  calculateVolunteersStatsIndividual,
-  calculateVolunteersStatsByTeam,
-} from '~/utils/volunteer-stats'
 
 import {
   EditionVolunteerPlanningSlotModal as SlotModal,
@@ -190,6 +182,14 @@ import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '#imports'
 
 import { listeTronquee, pagesRestantes } from '../../../../../utils/pagination-complete'
 
+import { effectifParPeriode, PERIODES } from '#volunteers/app/utils/effectif-par-periode'
+import { detecterSpectaclesManques } from '#volunteers/app/utils/spectacles-manques'
+import {
+  calculateVolunteersStats,
+  calculateVolunteersStatsByDay,
+  calculateVolunteersStatsIndividual,
+  calculateVolunteersStatsByTeam,
+} from '#volunteers/app/utils/volunteer-stats'
 import { fuseauUtilisable, versChampLocal } from '~~/shared/utils/fuseau-edition'
 
 const { t } = useI18n()

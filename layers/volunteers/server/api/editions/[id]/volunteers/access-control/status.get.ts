@@ -1,10 +1,10 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { validateEditionId } from '#server/utils/validation-helpers'
 import {
   getActiveAccessControlSlot,
   isActiveAccessControlVolunteer,
-} from '#server/utils/permissions/access-control-permissions'
-import { validateEditionId } from '#server/utils/validation-helpers'
+} from '#volunteers/server/utils/permissions/access-control-permissions'
 
 export default wrapApiHandler(
   async (event) => {

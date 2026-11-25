@@ -8,7 +8,7 @@ import {
 import {
   equipesDontIlEstMembre,
   equipesDontIlEstResponsable,
-} from '#server/utils/editions/volunteers/responsables-equipe'
+} from '#volunteers/server/utils/editions/volunteers/responsables-equipe'
 
 /**
  * La garde du réglage « planning publié », côté serveur.

@@ -1,7 +1,7 @@
 import type { PrismaTransaction } from '#server/types/prisma-helpers'
 
-import { utilisateursResponsablesDeLEquipe } from '#server/utils/editions/volunteers/responsables-equipe'
 import { organisateursHabilitesSurLesArtistes } from '#server/utils/organisateurs-des-artistes'
+import { utilisateursResponsablesDeLEquipe } from '#volunteers/server/utils/editions/volunteers/responsables-equipe'
 
 /** Un fil privé avec les responsables, réduit à ce qui sert à le reconnaître. */
 type FilDeResponsables = {

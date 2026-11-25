@@ -332,14 +332,13 @@
 // `VolunteerStats` était redéclaré ici, à l'identique de celui d'où viennent les données. La
 // copie a cessé de suivre l'original dès qu'un champ y est apparu, et le composant lisait un
 // type qui ne décrivait plus ce qu'il recevait.
-import type { EffectifParPeriode } from '~/utils/effectif-par-periode'
+import type { EffectifParPeriode } from '#volunteers/app/utils/effectif-par-periode'
 import type {
   DayStats,
   VolunteerStats,
   VolunteerStatsIndividual,
   TeamStats,
-} from '~/utils/volunteer-stats'
-
+} from '#volunteers/app/utils/volunteer-stats'
 import type { PeriodeEdition } from '~~/shared/utils/presence-edition'
 
 interface Props {

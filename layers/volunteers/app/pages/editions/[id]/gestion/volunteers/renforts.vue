@@ -146,7 +146,7 @@ import {
   resumeDesRenforts,
   volantsParDisponibilite,
   type EtatDuVolant,
-} from '~~/shared/utils/disponibilite-volants'
+} from '#volunteers/shared/utils/disponibilite-volants'
 
 definePageMeta({
   layout: 'edition-dashboard',

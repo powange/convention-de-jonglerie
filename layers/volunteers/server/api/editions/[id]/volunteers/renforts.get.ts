@@ -1,9 +1,9 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { userWithProfileAndGravatarSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { equipesDontIlEstResponsable } from '#volunteers/server/utils/editions/volunteers/responsables-equipe'
 import { estHorsDesComptes } from '~~/shared/utils/benevoles-volants'
 
 /**

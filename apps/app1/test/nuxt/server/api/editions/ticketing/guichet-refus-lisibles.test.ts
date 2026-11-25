@@ -23,7 +23,7 @@ vi.mock('#server/utils/notification-service', () => ({
   NotificationHelpers: { volunteerEntryValidated: vi.fn() },
   safeNotify: vi.fn(),
 }))
-vi.mock('#server/utils/editions/volunteers/responsables-equipe', () => ({
+vi.mock('#volunteers/server/utils/editions/volunteers/responsables-equipe', () => ({
   utilisateursResponsablesDeLEquipe: vi.fn().mockResolvedValue([]),
 }))
 const mockUpdateUserInfo = vi.hoisted(() => vi.fn())

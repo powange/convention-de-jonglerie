@@ -23,6 +23,22 @@ import { defineConfig } from 'vitest/config'
  * - npx vitest --project e2e           → Lance uniquement les tests e2e
  * - npx vitest --project integration   → Lance uniquement les tests d'intégration
  */
+/**
+ * Alias de Nuxt pour les projets qui tournent HORS de Nuxt (`unit`, `integration`) et ne lisent
+ * donc pas sa configuration. Partagés : le projet `integration` n'en avait aucun, et a cessé de
+ * résoudre ses imports quand des modules d'app1 ont rejoint un layer (`#volunteers`, `#server`).
+ */
+const aliasHorsNuxt = {
+  '~~': resolve(__dirname),
+  '~': resolve(__dirname, 'app'),
+  // Les modules déplacés de app1 vers un layer y importent l'app hôte par `#server`.
+  '#server': resolve(__dirname, 'server'),
+  // Déclaré par `layers/auth/nuxt.config.ts` ; ce projet ne lit pas la config Nuxt.
+  '#auth': resolve(__dirname, '../../layers/auth'),
+  // Déclaré par `layers/volunteers/nuxt.config.ts`.
+  '#volunteers': resolve(__dirname, '../../layers/volunteers'),
+}
+
 export default defineConfig({
   plugins: [vue()],
   test: {
@@ -37,12 +53,7 @@ export default defineConfig({
            * de rendre ses tests inexécutables, ce qui poussait à dupliquer le code partagé plutôt
            * qu'à s'y référer.
            */
-          alias: {
-            '~~': resolve(__dirname),
-            '~': resolve(__dirname, 'app'),
-            // Déclaré par `layers/auth/nuxt.config.ts` ; ce projet ne lit pas la config Nuxt.
-            '#auth': resolve(__dirname, '../../layers/auth'),
-          },
+          alias: aliasHorsNuxt,
         },
         test: {
           name: 'unit',
@@ -157,6 +168,7 @@ export default defineConfig({
        */
       // Projet 3 : Tests d'intégration (avec base de données)
       {
+        resolve: { alias: aliasHorsNuxt },
         test: {
           name: 'integration',
           include: ['test/integration/**/*.db.test.ts'],

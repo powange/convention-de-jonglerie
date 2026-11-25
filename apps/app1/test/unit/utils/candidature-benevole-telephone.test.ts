@@ -1,7 +1,7 @@
 import { getCountryCallingCode, parsePhoneNumberFromString } from 'libphonenumber-js'
 import { describe, expect, it } from 'vitest'
 
-import { volunteerApplicationBodySchema } from '../../../server/utils/editions/volunteers/applications'
+import { volunteerApplicationBodySchema } from '#volunteers/server/utils/editions/volunteers/applications'
 
 /**
  * Le téléphone d'une candidature bénévole traverse deux moitiés qui doivent s'accorder :

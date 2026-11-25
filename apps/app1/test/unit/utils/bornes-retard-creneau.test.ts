@@ -5,7 +5,7 @@ import {
   RETARD_MINUTES_MAX,
   RETARD_MINUTES_MIN,
   retardAccepte,
-} from '../../../shared/utils/bornes-retard-creneau'
+} from '#volunteers/shared/utils/bornes-retard-creneau'
 
 /**
  * Les bornes du retard d'un créneau, et la marge qu'elles imposent à la tâche de rappel.

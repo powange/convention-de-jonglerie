@@ -362,7 +362,8 @@ export async function canAccessEditionDataOrAccessControl(
   if (hasManagementAccess) return true
 
   // Si pas d'accès en gestion, vérifier si l'utilisateur est en créneau actif de contrôle d'accès
-  const { isActiveAccessControlVolunteer } = await import('./access-control-permissions')
+  const { isActiveAccessControlVolunteer } =
+    await import('#volunteers/server/utils/permissions/access-control-permissions')
   const hasAccessControlAccess = await isActiveAccessControlVolunteer(userId, editionId)
 
   return hasAccessControlAccess

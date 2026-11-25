@@ -1,6 +1,10 @@
 import { requiresEmergencyContact } from '#server/utils/allergy-severity'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { infosPersonnellesSelect } from '#server/utils/infos-personnelles'
+import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
+import { sanitizeString, validateEditionId } from '#server/utils/validation-helpers'
+import { visibiliteDuBenevolat } from '#server/utils/visibilite-benevoles'
 import {
   volunteerApplicationBodySchema,
   processPhoneLogic,
@@ -8,11 +12,7 @@ import {
   validateRequiredFields,
   validateAvailability,
   validateTeamPreferences,
-} from '#server/utils/editions/volunteers/applications'
-import { infosPersonnellesSelect } from '#server/utils/infos-personnelles'
-import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
-import { sanitizeString, validateEditionId } from '#server/utils/validation-helpers'
-import { visibiliteDuBenevolat } from '#server/utils/visibilite-benevoles'
+} from '#volunteers/server/utils/editions/volunteers/applications'
 
 export default wrapApiHandler(
   async (event) => {

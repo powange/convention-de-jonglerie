@@ -13,8 +13,7 @@ import {
   personnesDuCreneau,
   type AcceptedVolunteer,
   type TimeSlotWithAssignments,
-} from './volunteer-stats'
-
+} from '#volunteers/app/utils/volunteer-stats'
 import {
   estEquipeHorsCharge,
   estHorsAssignationAutomatique,

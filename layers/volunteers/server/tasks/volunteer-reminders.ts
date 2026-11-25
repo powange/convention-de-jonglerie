@@ -1,5 +1,5 @@
 import { NotificationService } from '#server/utils/notification-service'
-import { MARGE_RETARD_MS } from '~~/shared/utils/bornes-retard-creneau'
+import { MARGE_RETARD_MS } from '#volunteers/shared/utils/bornes-retard-creneau'
 // Depuis un layer, l'alias est `~~` : `~` ne résout pas vers la couche application.
 import { formaterHeure } from '~~/shared/utils/fuseau-edition'
 

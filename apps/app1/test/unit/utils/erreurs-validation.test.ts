@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   extraireErreursChamps,
   messageErreurValidation,
-} from '../../../app/utils/erreurs-validation'
+} from '#volunteers/app/utils/erreurs-validation'
 
 /**
  * Le détail par champ arrive à DEUX niveaux dans l'erreur, pas un.

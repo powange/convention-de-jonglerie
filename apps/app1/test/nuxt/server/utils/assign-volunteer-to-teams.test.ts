@@ -12,7 +12,7 @@ vi.mock('#server/volunteers/ports/registry', () => ({
   }),
 }))
 
-import { assignVolunteerToTeams } from '../../../../server/utils/editions/volunteers/teams'
+import { assignVolunteerToTeams } from '#volunteers/server/utils/editions/volunteers/teams'
 
 const prismaMock = (globalThis as any).prisma
 

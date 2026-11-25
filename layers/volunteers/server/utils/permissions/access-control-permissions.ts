@@ -1,6 +1,5 @@
-import { requireAuth, type AuthenticatedUser } from '../auth-utils'
-
-import { isActiveInTeamSlot, getActiveTeamSlot } from './team-slot-helpers'
+import { requireAuth, type AuthenticatedUser } from '#server/utils/auth-utils'
+import { isActiveInTeamSlot, getActiveTeamSlot } from '#server/utils/permissions/team-slot-helpers'
 
 const ACCESS_CONTROL_FILTER = { isAccessControlTeam: true } as const
 

@@ -5,7 +5,7 @@ import {
   champsRestituables,
   cleBrouillon,
   PEREMPTION_BROUILLON_JOURS,
-} from '../../../shared/utils/brouillon-candidature'
+} from '#volunteers/shared/utils/brouillon-candidature'
 
 const MAINTENANT = new Date('2026-08-23T12:00:00.000Z')
 const ilYaJours = (jours: number) =>

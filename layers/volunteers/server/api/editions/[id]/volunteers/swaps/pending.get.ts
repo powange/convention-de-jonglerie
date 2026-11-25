@@ -3,9 +3,9 @@ import { exigerEchangesOuverts } from '../../../../../utils/echanges-ouverts'
 import { selectionCreneauLisible } from '../../../../../utils/selection-creneau-lisible'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { requireVolunteerManagementAccess } from '#server/utils/permissions/volunteer-permissions'
 import { userWithProfileAndGravatarSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { requireVolunteerManagementAccess } from '#volunteers/server/utils/permissions/volunteer-permissions'
 
 /**
  * GET .../volunteers/swaps/pending — les échanges qui attendent une décision.

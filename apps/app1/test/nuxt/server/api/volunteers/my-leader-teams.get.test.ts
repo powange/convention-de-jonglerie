@@ -16,7 +16,7 @@ vi.mock('#server/utils/validation-helpers', () => ({
 }))
 
 const mockEquipesResponsable = vi.hoisted(() => vi.fn())
-vi.mock('#server/utils/editions/volunteers/responsables-equipe', () => ({
+vi.mock('#volunteers/server/utils/editions/volunteers/responsables-equipe', () => ({
   equipesDontIlEstResponsable: mockEquipesResponsable,
 }))
 

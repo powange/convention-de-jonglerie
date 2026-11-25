@@ -28,7 +28,7 @@ vi.mock('~/stores/editions', () => ({
   }),
 }))
 
-vi.mock('~/composables/useAccessControlPermissions', () => ({
+vi.mock('#volunteers/app/composables/useAccessControlPermissions', () => ({
   useAccessControlPermissions: () => ({ canAccessAccessControl: { value: false } }),
 }))
 

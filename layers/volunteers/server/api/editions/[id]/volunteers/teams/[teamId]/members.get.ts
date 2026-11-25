@@ -2,9 +2,9 @@ import { createHash } from 'node:crypto'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { sanitizeEmail, validateEditionId } from '#server/utils/validation-helpers'
+import { equipesDontIlEstResponsable } from '#volunteers/server/utils/editions/volunteers/responsables-equipe'
 
 /**
  * Récupère les membres d'une équipe de bénévoles avec leurs coordonnées

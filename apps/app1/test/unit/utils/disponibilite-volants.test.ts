@@ -6,7 +6,7 @@ import {
   prochainCreneau,
   resumeDesRenforts,
   volantsParDisponibilite,
-} from '../../../shared/utils/disponibilite-volants'
+} from '#volunteers/shared/utils/disponibilite-volants'
 
 /**
  * Qui peut prêter main-forte, maintenant.

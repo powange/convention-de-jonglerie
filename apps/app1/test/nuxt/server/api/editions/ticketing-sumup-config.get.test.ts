@@ -22,7 +22,7 @@ vi.mock('#server/utils/permissions/edition-permissions', () => ({
   canManageTicketing: canManageTicketingMock,
   getEditionWithPermissions: getEditionWithPermissionsMock,
 }))
-vi.mock('#server/utils/permissions/access-control-permissions', () => ({
+vi.mock('#volunteers/server/utils/permissions/access-control-permissions', () => ({
   isActiveAccessControlVolunteer: estBenevoleEnCreneauMock,
 }))
 vi.mock('#server/utils/encryption', () => ({ decrypt: (v: string) => `clair:${v}` }))
