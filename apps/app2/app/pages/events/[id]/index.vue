@@ -27,39 +27,22 @@
 
       <USeparator class="my-8" label="Fonctionnalités d'organisation" />
 
-      <!-- Accès débloqué -->
-      <div v-if="subActive" class="grid gap-4 sm:grid-cols-2">
+      <!-- Accès débloqué : par l'abonnement du PROPRIÉTAIRE (un organisateur n'a pas besoin du
+           sien), et chaque carte selon les droits de la personne. -->
+      <div v-if="acces?.abonnementActif" class="grid gap-4 sm:grid-cols-2">
         <UCard
+          v-for="carte in cartes"
+          :key="carte.to"
           class="cursor-pointer transition hover:ring-2 hover:ring-primary"
-          @click="navigateTo(`/events/${event.publicId}/gestion/volunteers/config`)"
+          @click="navigateTo(carte.to)"
         >
           <div class="flex items-center gap-3">
-            <div
-              class="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary"
-            >
-              <UIcon name="i-heroicons-user-group" class="text-2xl" />
+            <div class="flex size-11 items-center justify-center rounded-lg" :class="carte.couleur">
+              <UIcon :name="carte.icone" class="text-2xl" />
             </div>
             <div>
-              <p class="font-semibold">Gestion des bénévoles</p>
-              <p class="text-sm text-muted">Candidatures, équipes, planning, notifications.</p>
-            </div>
-          </div>
-        </UCard>
-        <!-- La page que l'on partage aux bénévoles : ils y candidatent, puis y retrouvent leurs
-             créneaux. -->
-        <UCard
-          class="cursor-pointer transition hover:ring-2 hover:ring-primary"
-          @click="navigateTo(`/events/${event.publicId}/volunteers`)"
-        >
-          <div class="flex items-center gap-3">
-            <div
-              class="flex size-11 items-center justify-center rounded-lg bg-secondary/10 text-secondary"
-            >
-              <UIcon name="i-heroicons-eye" class="text-2xl" />
-            </div>
-            <div>
-              <p class="font-semibold">Page des bénévoles</p>
-              <p class="text-sm text-muted">Ce que voient les candidats, et le lien à partager.</p>
+              <p class="font-semibold">{{ carte.titre }}</p>
+              <p class="text-sm text-muted">{{ carte.description }}</p>
             </div>
           </div>
         </UCard>
@@ -73,17 +56,26 @@
           >
             <UIcon name="i-heroicons-lock-closed" class="text-2xl" />
           </div>
-          <p class="mt-3 font-semibold">Fonctionnalités réservées aux abonnés</p>
-          <p class="mt-1 max-w-md text-sm text-muted">
-            Abonnez-vous pour débloquer la gestion des bénévoles et les autres outils d'organisation
-            de vos événements.
-          </p>
-          <UButton
-            class="mt-4"
-            to="/pricing"
-            label="Voir les tarifs"
-            icon="i-heroicons-credit-card"
-          />
+          <template v-if="acces?.droits.estProprietaire">
+            <p class="mt-3 font-semibold">Fonctionnalités réservées aux abonnés</p>
+            <p class="mt-1 max-w-md text-sm text-muted">
+              Abonnez-vous pour débloquer la gestion des bénévoles et les autres outils
+              d'organisation de vos événements — pour vous et vos co-organisateurs.
+            </p>
+            <UButton
+              class="mt-4"
+              to="/pricing"
+              label="Voir les tarifs"
+              icon="i-heroicons-credit-card"
+            />
+          </template>
+          <template v-else>
+            <p class="mt-3 font-semibold">Gestion momentanément indisponible</p>
+            <p class="mt-1 max-w-md text-sm text-muted">
+              L'abonnement du propriétaire de cet événement n'est plus actif : la gestion reprendra
+              dès qu'il sera renouvelé.
+            </p>
+          </template>
         </div>
       </UCard>
     </div>
@@ -101,8 +93,63 @@ if (error.value) {
 }
 const event = computed(() => data.value?.event)
 
-const { data: subData } = await useFetch('/api/subscription/status')
-const subActive = computed(() => !!subData.value?.active)
+// Droits de la personne, et l'abonnement du propriétaire qui ouvre (ou non) la gestion.
+const { data: acces } = await useFetch<{
+  droits: {
+    voir: boolean
+    modifier: boolean
+    organisateurs: boolean
+    benevoles: boolean
+    estProprietaire: boolean
+  }
+  abonnementActif: boolean
+}>(`/api/events/${route.params.id}/acces-gestion`)
+
+const cartes = computed(() => {
+  const e = event.value
+  const d = acces.value?.droits
+  if (!e || !d) return []
+  const base = `/events/${e.publicId}`
+  return [
+    d.benevoles && {
+      titre: 'Gestion des bénévoles',
+      description: 'Candidatures, équipes, planning, notifications.',
+      icone: 'i-heroicons-user-group',
+      couleur: 'bg-primary/10 text-primary',
+      to: `${base}/gestion/volunteers/config`,
+    },
+    {
+      titre: 'Organisateurs',
+      description: d.organisateurs
+        ? 'Ajouter des co-organisateurs et régler leurs droits.'
+        : "L'équipe d'organisation de l'événement.",
+      icone: 'i-heroicons-user-plus',
+      couleur: 'bg-secondary/10 text-secondary',
+      to: `${base}/gestion/organisateurs`,
+    },
+    {
+      titre: "Informations de l'événement",
+      description: d.modifier ? 'Nom, lieu, dates, fuseau.' : 'Nom, lieu, dates (lecture seule).',
+      icone: 'i-lucide-settings',
+      couleur: 'bg-primary/10 text-primary',
+      to: `${base}/gestion/evenement`,
+    },
+    // La page que l'on partage aux bénévoles : ils y candidatent, puis y retrouvent leurs créneaux.
+    {
+      titre: 'Page des bénévoles',
+      description: 'Ce que voient les candidats, et le lien à partager.',
+      icone: 'i-heroicons-eye',
+      couleur: 'bg-secondary/10 text-secondary',
+      to: `${base}/volunteers`,
+    },
+  ].filter(Boolean) as {
+    titre: string
+    description: string
+    icone: string
+    couleur: string
+    to: string
+  }[]
+})
 
 useSeoMeta({ title: () => (event.value ? `${event.value.name} — Flowvent` : 'Événement') })
 </script>

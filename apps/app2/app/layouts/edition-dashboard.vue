@@ -159,17 +159,27 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
         icon: 'i-lucide-settings',
         to: `/events/${refPublique.value}/gestion/evenement`,
       },
-    ],
-    [
       {
-        label: 'Bénévoles',
-        icon: 'i-heroicons-hand-raised',
-        value: 'benevoles',
-        defaultOpen: true,
-        children: enfants,
-        ...pastilleMenu('benevoles-candidatures', 'benevoles-echanges'),
+        label: 'Organisateurs',
+        icon: 'i-heroicons-user-plus',
+        to: `/events/${refPublique.value}/gestion/organisateurs`,
       },
     ],
+    // Sans aucun droit sur les bénévoles, la section n'apparaît pas (plutôt qu'un groupe vide).
+    ...(enfants.length
+      ? [
+          [
+            {
+              label: 'Bénévoles',
+              icon: 'i-heroicons-hand-raised',
+              value: 'benevoles',
+              defaultOpen: true,
+              children: enfants,
+              ...pastilleMenu('benevoles-candidatures', 'benevoles-echanges'),
+            },
+          ],
+        ]
+      : []),
     [
       {
         label: 'Page publique des bénévoles',

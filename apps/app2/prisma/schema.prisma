@@ -195,21 +195,26 @@ model Organizer {
 /// Organisateur affecté à un événement. Nom et champs d'app1 : le layer interroge
 /// `prisma.editionOrganizer` et ses relations par ces noms. `editionId` désigne l'`Event`.
 model EditionOrganizer {
-  id                Int                       @id @default(autoincrement())
-  editionId         Int
-  organizerId       Int
-  arrivalDateTime   String?
-  departureDateTime String?
-  qrCodeToken       String?                   @unique
-  entryValidated    Boolean                   @default(false)
-  entryValidatedAt  DateTime?
-  entryValidatedBy  Int?
-  createdAt         DateTime                  @default(now())
-  updatedAt         DateTime                  @updatedAt
-  event             Event                     @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  organizer         Organizer                 @relation(fields: [organizerId], references: [id], onDelete: Cascade)
-  teamAssignments   OrganizerTeamAssignment[]
-  slotAssignments   OrganizerSlotAssignment[]
+  id                  Int                       @id @default(autoincrement())
+  editionId           Int
+  organizerId         Int
+  /// Droits par domaine (décision de l'utilisateur : un droit par domaine, chaque module ajoute le
+  /// sien). Le propriétaire de l'événement a tout, sans ligne ici.
+  canEditEvent        Boolean                   @default(false)
+  canManageOrganizers Boolean                   @default(false)
+  canManageVolunteers Boolean                   @default(false)
+  arrivalDateTime     String?
+  departureDateTime   String?
+  qrCodeToken         String?                   @unique
+  entryValidated      Boolean                   @default(false)
+  entryValidatedAt    DateTime?
+  entryValidatedBy    Int?
+  createdAt           DateTime                  @default(now())
+  updatedAt           DateTime                  @updatedAt
+  event               Event                     @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  organizer           Organizer                 @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  teamAssignments     OrganizerTeamAssignment[]
+  slotAssignments     OrganizerSlotAssignment[]
 
   @@unique([editionId, organizerId])
   @@index([editionId])

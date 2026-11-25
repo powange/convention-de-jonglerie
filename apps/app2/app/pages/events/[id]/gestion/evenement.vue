@@ -180,7 +180,7 @@ interface Droits {
 
 const route = useRoute()
 // L'identifiant de l'adresse (public) pour l'API de l'événement, l'id numérique pour le store.
-const ref = String(route.params.id)
+const refEvenement = String(route.params.id)
 const id = useEditionId()
 const editionStore = useEditionStore()
 
@@ -188,7 +188,7 @@ const {
   data,
   error: erreur,
   refresh,
-} = await useFetch<{ event: Evenement; droits: Droits }>(`/api/events/${ref}`)
+} = await useFetch<{ event: Evenement; droits: Droits }>(`/api/events/${refEvenement}`)
 const evenement = computed(() => data.value?.event)
 const droits = computed(() => data.value?.droits)
 
@@ -218,24 +218,27 @@ const erreurFin = computed(() =>
   etat.debut && etat.fin && etat.fin < etat.debut ? 'La fin doit suivre le début' : undefined
 )
 
-const { execute: enregistrer, loading: enregistrement } = useApiAction(`/api/events/${ref}`, {
-  method: 'PUT',
-  body: () => ({
-    name: etat.name,
-    description: etat.description || null,
-    location: etat.location || null,
-    timezone: etat.timezone,
-    debut: etat.debut || null,
-    fin: etat.fin || null,
-  }),
-  successMessage: { title: 'Événement mis à jour' },
-  errorMessages: { default: "L'événement n'a pas pu être enregistré" },
-  onSuccess: async () => {
-    await refresh()
-    // L'en-tête et les pages bénévoles lisent l'événement dans le store : on le rafraîchit.
-    await editionStore.fetchEditionById(id, { force: true }).catch(() => null)
-  },
-})
+const { execute: enregistrer, loading: enregistrement } = useApiAction(
+  `/api/events/${refEvenement}`,
+  {
+    method: 'PUT',
+    body: () => ({
+      name: etat.name,
+      description: etat.description || null,
+      location: etat.location || null,
+      timezone: etat.timezone,
+      debut: etat.debut || null,
+      fin: etat.fin || null,
+    }),
+    successMessage: { title: 'Événement mis à jour' },
+    errorMessages: { default: "L'événement n'a pas pu être enregistré" },
+    onSuccess: async () => {
+      await refresh()
+      // L'en-tête et les pages bénévoles lisent l'événement dans le store : on le rafraîchit.
+      await editionStore.fetchEditionById(id, { force: true }).catch(() => null)
+    },
+  }
+)
 
 const fenetreSuppression = ref(false)
 const confirmation = ref('')
@@ -243,7 +246,7 @@ watch(fenetreSuppression, (ouverte) => {
   if (ouverte) confirmation.value = ''
 })
 
-const { execute: supprimer, loading: suppression } = useApiAction(`/api/events/${ref}`, {
+const { execute: supprimer, loading: suppression } = useApiAction(`/api/events/${refEvenement}`, {
   method: 'DELETE',
   body: () => ({ confirmation: confirmation.value }),
   successMessage: { title: 'Événement supprimé' },

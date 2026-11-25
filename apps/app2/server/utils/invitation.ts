@@ -70,13 +70,8 @@ export async function createPendingUserAndInvite(params: CreatePendingUserAndInv
     },
   })
 
-  const token = randomBytes(32).toString('hex')
-  await prisma.passwordResetToken.create({
-    data: { token, userId: user.id, expiresAt: createFutureDate(DUREE_INVITATION_MS) },
-  })
-
+  const lien = await nouveauLienInvitation(user.id)
   const role = ROLE_LABELS[params.role as keyof typeof ROLE_LABELS] ?? params.role
-  const lien = `${getSiteUrl()}/auth/invitation?token=${token}`
   await sendEmail({
     to: email,
     subject: `Invitation ${role} — ${params.eventName}`,
@@ -84,5 +79,25 @@ export async function createPendingUserAndInvite(params: CreatePendingUserAndInv
     text: `Bonjour ${prenom}, un organisateur de ${params.eventName} vous a ajouté comme ${role} sur Flowvent. Activez votre compte : ${lien} (lien valable 7 jours).`,
   })
 
-  return { user }
+  // Le lien est rendu à l'appelant : Flowvent n'envoie pas de courriel, c'est l'organisateur
+  // qui le transmet (les appelants du layer bénévoles l'ignorent).
+  return { user, lien }
+}
+
+/**
+ * Un lien d'activation neuf (sept jours) pour un compte en attente — celui de l'invitation, ou
+ * son remplaçant quand le premier a été perdu ou a expiré. Les liens précédents restent valables
+ * jusqu'à leur échéance.
+ */
+export async function nouveauLienInvitation(userId: number): Promise<string> {
+  const token = randomBytes(32).toString('hex')
+  await prisma.passwordResetToken.create({
+    data: { token, userId, expiresAt: createFutureDate(DUREE_INVITATION_MS) },
+  })
+  return `${getSiteUrl()}/auth/invitation?token=${token}`
+}
+
+/** Un compte créé par invitation et jamais activé (ni mot de passe, ni adresse vérifiée). */
+export function estEnAttente(compte: { password: string | null; isEmailVerified: boolean }) {
+  return !compte.password && !compte.isEmailVerified
 }
