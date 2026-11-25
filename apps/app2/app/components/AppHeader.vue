@@ -85,6 +85,10 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
     { label: 'Mon profil', icon: 'i-heroicons-user', to: '/profile' },
     { label: 'Tableau de bord', icon: 'i-heroicons-squares-2x2', to: '/dashboard' },
     { label: 'Tarifs', icon: 'i-heroicons-credit-card', to: '/pricing' },
+    // Réservé aux administrateurs ; les pages et l'API le revérifient (server/utils/administration.ts).
+    ...((user.value as { isGlobalAdmin?: boolean } | null)?.isGlobalAdmin
+      ? [{ label: 'Administration', icon: 'i-heroicons-shield-check', to: '/admin' }]
+      : []),
   ],
   [{ label: 'Se déconnecter', icon: 'i-heroicons-arrow-right-on-rectangle', onSelect: logout }],
 ])
