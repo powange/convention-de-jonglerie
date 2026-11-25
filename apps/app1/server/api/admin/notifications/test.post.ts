@@ -89,8 +89,8 @@ export default wrapApiHandler(
         notification = await NotificationService.create({
           userId: targetUserId,
           type: 'INFO',
-          title: 'Notification de test 🧪',
-          message:
+          titleText: 'Notification de test 🧪',
+          messageText:
             parsed.message || "Ceci est une notification de test générée depuis l'administration.",
           category: 'system',
           entityType: 'Test',

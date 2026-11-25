@@ -213,8 +213,8 @@ export default defineTask({
               await NotificationService.create({
                 userId,
                 type: 'INFO',
-                title: 'Rappel : Créneau bénévole dans 30 minutes',
-                message: `Votre créneau "${slotTitle}" pour l'équipe "${teamName}" de "${editionName}" commence à ${startTime}. Merci de vous présenter à l'heure !`,
+                titleText: 'Rappel : Créneau bénévole dans 30 minutes',
+                messageText: `Votre créneau "${slotTitle}" pour l'équipe "${teamName}" de "${editionName}" commence à ${startTime}. Merci de vous présenter à l'heure !`,
                 category: 'volunteer',
                 entityType: 'VolunteerTimeSlot',
                 entityId: slot.id,
