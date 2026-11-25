@@ -5,8 +5,10 @@
 # petit, et rien d'app1 (sauvegardes, uploads) ne peut s'y glisser.
 *
 !apps/app2
+!layers/ui
 !layers/core
 !layers/auth
+!layers/volunteers
 
 # Artefacts et dépendances (régénérés dans l'image)
 **/node_modules

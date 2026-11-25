@@ -30,8 +30,10 @@ COPY apps/app2/prisma.config.ts ./
 COPY apps/app2/prisma ./prisma/
 RUN DATABASE_URL="mysql://user:pass@localhost:3306/db" npx prisma generate
 COPY apps/app2/ ./
+COPY layers/ui/ /app/layers/ui/
 COPY layers/core/ /app/layers/core/
 COPY layers/auth/ /app/layers/auth/
+COPY layers/volunteers/ /app/layers/volunteers/
 # Commit construit, passé par la CI : il nomme le répertoire des fichiers de build
 # (`/_nuxt-<sha>/`, cf. nuxt.config.ts), ce qui rend le commit servi lisible dans la page.
 # Placé après les COPY : il change à chaque commit, et n'invalide ainsi que le build.

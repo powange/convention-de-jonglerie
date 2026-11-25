@@ -90,3 +90,41 @@ export async function generatePasswordResetEmailHtml(
   <p>Ce lien est valide pendant 1 heure.</p>
 </div>`
 }
+
+const MOMENTS = { MORNING: 'matin', AFTERNOON: 'après-midi', EVENING: 'soir' } as const
+
+/**
+ * Courriel « vos créneaux de bénévolat » (contrat d'hôte du layer bénévoles, même signature
+ * qu'app1). Version sobre : Flowvent n'a pas les gabarits de courriel d'app1.
+ */
+export async function generateVolunteerScheduleEmailHtml(
+  prenom: string,
+  _conventionName: string,
+  editionName: string,
+  timeSlots: Array<{
+    date: Date
+    timeOfDay: 'MORNING' | 'AFTERNOON' | 'EVENING'
+    teamName: string
+    startTime?: string
+    endTime?: string
+  }>,
+  actionUrl: string
+): Promise<string> {
+  const lignes = timeSlots
+    .map((c) => {
+      const jour = c.date.toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+      })
+      const heures = c.startTime && c.endTime ? ` ${c.startTime}–${c.endTime}` : ''
+      return `<li>${jour} (${MOMENTS[c.timeOfDay]})${heures} — ${c.teamName}</li>`
+    })
+    .join('')
+  return `<div>
+  <p>Bonjour ${prenom},</p>
+  <p>Vos créneaux de bénévolat pour « ${editionName} » :</p>
+  <ul>${lignes}</ul>
+  <p><a href="${actionUrl}">Voir mes créneaux</a></p>
+</div>`
+}

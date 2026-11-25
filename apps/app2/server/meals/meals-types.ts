@@ -1,0 +1,102 @@
+// Types des repas repris d'app1 (apps/app1/server/meals/meals-types.ts) : le port `meals` du layer
+// bénévoles les nomme. Flowvent n'a pas de module repas (`MealsPort.disponible` = false) ; ces types
+// ne servent qu'à la signature des méthodes neutres de son câblage. La sélection d'articles à
+// remettre (billetterie) n'existe pas dans Flowvent.
+type HandoutItemSelection = { id: number; [cle: string]: unknown }
+
+// DTO du module repas. Partagés par le service (server/meals) et le contrat du port
+// (layers/volunteers/server/ports/types.ts → MealsPort). `phases` est typé `unknown` car porté en `Json`
+// côté Prisma (le front le consomme comme un tableau de chaînes).
+
+/** Liaison repas ↔ article à remettre (junction VolunteerMealHandoutItem). */
+export interface MealHandoutLink {
+  id: number
+  mealId: number
+  handoutItemId: number
+}
+
+/** Définition de repas d'une édition (vue organisateur), avec ses liaisons d'articles. */
+export interface EditionMealRecord {
+  id: number
+  editionId: number
+  date: Date
+  mealType: string
+  enabled: boolean
+  phases: unknown
+  handoutItems: MealHandoutLink[]
+}
+
+/** Vue d'un repas pour un bénévole (sélection + éligibilité éventuelle). */
+export interface VolunteerMealView {
+  id: number
+  date: Date
+  mealType: string
+  phases: unknown
+  selectionId: number | null | undefined
+  accepted: boolean
+  /**
+   * Une assiette est-elle mise de côté pour ce repas&nbsp;?
+   *
+   * Réglé par un organisateur, jamais par le bénévole — d'où sa présence ici en lecture seule.
+   * Sans ce champ, la personne concernée n'avait aucun moyen de vérifier que sa demande avait
+   * bien été notée : la donnée existait en base et s'arrêtait à l'écran de gestion.
+   */
+  afterShow: boolean
+  eligible?: boolean
+}
+
+/** Bascule d'activation d'un repas (pour piloter les sélections artistes en aval). */
+export interface MealToggle {
+  mealId: number
+  date: Date
+  mealType: string
+  enabled: boolean
+}
+
+/** Entrée de mise à jour d'un repas (config + articles à remettre). */
+export interface MealUpdateInput {
+  id: number
+  enabled?: boolean
+  phases?: string[]
+  handoutItemIds?: HandoutItemSelection[]
+}
+
+/** Participant bénévole d'un repas (catering). */
+export interface MealVolunteerParticipant {
+  nom: string | null
+  prenom: string | null
+  email: string | null
+  phone: string | null
+  dietaryPreference: string | null
+  allergies: string | null
+  allergySeverity: string | null
+  emergencyContactName: string | null
+  emergencyContactPhone: string | null
+  /** Repas pris après le passage sur scène : la cuisine le garde au chaud. */
+  afterShow: boolean
+}
+
+/** Participant organisateur d'un repas (catering). */
+export interface MealOrganizerParticipant {
+  nom: string | null
+  prenom: string | null
+  email: string | null
+  phone: string | null
+  dietaryPreference: string | null
+  allergies: string | null
+  allergySeverity: string | null
+  /** Repas pris après le passage sur scène : la cuisine le garde au chaud. */
+  afterShow: boolean
+}
+
+/**
+ * Repas (activé) d'une date avec ses participants bénévoles acceptés et les organisateurs
+ * présents sur l'édition (catering).
+ */
+export interface CateringMeal {
+  id: number
+  mealType: string
+  phases: unknown
+  volunteers: MealVolunteerParticipant[]
+  organizers: MealOrganizerParticipant[]
+}

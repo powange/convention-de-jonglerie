@@ -19,13 +19,17 @@ on:
     branches: [main]
     paths:
       - 'apps/app2/**'
+      - 'layers/ui/**'
       - 'layers/core/**'
+      - 'layers/volunteers/**'
       - 'layers/auth/**'
       - '.github/workflows/publier-image-flowvent.yml'
   pull_request:
     paths:
       - 'apps/app2/**'
+      - 'layers/ui/**'
       - 'layers/core/**'
+      - 'layers/volunteers/**'
       - 'layers/auth/**'
       - '.github/workflows/publier-image-flowvent.yml'
   workflow_dispatch:
