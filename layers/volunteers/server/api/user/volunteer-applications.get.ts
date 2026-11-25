@@ -185,7 +185,10 @@ export default wrapApiHandler(
           id: app.eventId,
           name: app.event.name,
           startDate: app.event.startDate,
-          endDate: app.event.endDate,
+          // Un événement sans date de fin (Flowvent en crée) dure une journée. Sans ce repli,
+          // `new Date(null)` vaut 1970 : la candidature passait pour terminée et filait dans
+          // l'historique dès son dépôt.
+          endDate: app.event.endDate ?? app.event.startDate,
           timezone: app.event.timezone ?? null,
           volunteersAskDiet: s?.askDiet ?? false,
           volunteersAskAllergies: s?.askAllergies ?? false,

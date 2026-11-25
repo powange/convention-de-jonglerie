@@ -246,7 +246,7 @@
                       {{ t('volunteers.view_all_applications') }}
                     </UButton>
                     <UButton
-                      v-if="myApplication.status === 'ACCEPTED'"
+                      v-if="myApplication.status === 'ACCEPTED' && messagerieDisponible"
                       color="success"
                       variant="soft"
                       icon="i-heroicons-chat-bubble-bottom-center-text"
@@ -503,6 +503,8 @@ const editionIdComputed = computed(() => editionId)
 // peut joindre les responsables bénévoles de l'édition sans quitter la page.
 const { contacter: contacterResponsables, loading: contactEnCours } =
   useContactResponsablesBenevoles()
+/** Pas de messagerie dans l'app (`benevoles.messagerie`, cf. app.config du layer) : pas de contact. */
+const messagerieDisponible = useAppConfig().benevoles?.messagerie !== false
 const { teams: fetchedTeams } = useVolunteerTeams(editionIdComputed)
 
 // Candidature de l'utilisateur
