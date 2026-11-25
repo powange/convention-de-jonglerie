@@ -65,6 +65,24 @@ Circuit (le même qu'app1) : dépôt dans `temp/profiles/<id>/`, déplacé dans 
 l'enregistrement du profil, l'ancienne photo effacée ; un dépôt abandonné est supprimé après une
 heure par la tâche `cleanup-temp-uploads`. Seules les photos sont servies par `/uploads/**`.
 
+## Administrateurs
+
+L'administration (`/admin` : comptes, événements) est réservée aux comptes `isGlobalAdmin`. Un
+administrateur en nomme d'autres depuis la fiche d'un compte ; le PREMIER se nomme hors de
+l'interface :
+
+- **en développement**, depuis `apps/app2/` : `npm run admin:add <email>` (et `admin:remove`,
+  `admin:list`). Même script qu'app1, logique commune dans
+  `layers/core/scripts/gestion-administrateurs.ts`.
+- **en release ou en production**, les scripts ne sont pas dans l'image (comme pour app1) : dans la
+  console du conteneur de base de la stack (`flowvent-db-release` / `flowvent-db-prod`) :
+
+  ```sql
+  UPDATE User SET isGlobalAdmin = 1 WHERE email = '<adresse du compte>';
+  ```
+
+  puis se reconnecter : l'entrée « Administration » apparaît dans le menu du compte.
+
 ## Connexion Google et Facebook
 
 Les URL de retour sont **dérivées de `NUXT_PUBLIC_SITE_URL`** par le compose, et non de la requête :
