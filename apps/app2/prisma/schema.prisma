@@ -87,23 +87,26 @@ model PasswordResetToken {
 }
 
 model Event {
-  id          Int           @id @default(autoincrement())
+  id                Int           @id @default(autoincrement())
   /// Identifiant PUBLIC, celui des adresses (`/events/<publicId>/…`) : aléatoire, donc ni le
   /// nombre d'événements ni les pages publiques des autres ne se devinent en comptant. L'`id`
   /// numérique reste interne (relations, API du layer bénévoles).
-  publicId    String        @unique @default(nanoid(10)) @db.VarChar(16)
-  name        String
-  description String?       @db.Text
-  location    String?
-  startDate   DateTime?
+  publicId          String        @unique @default(nanoid(10)) @db.VarChar(16)
+  name              String
+  description       String?       @db.Text
+  location          String?
+  startDate         DateTime?
   // Métadonnées génériques lues par le layer bénévoles (comme l'`Event` d'app1).
-  endDate     DateTime?
-  status      EditionStatus @default(PUBLISHED)
-  timezone    String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  owner       User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId     Int
+  endDate           DateTime?
+  status            EditionStatus @default(PUBLISHED)
+  timezone          String?
+  /// Modules activés pour l'événement (page « Accueil de la gestion »), un par module comme les
+  /// `*Enabled` d'une édition d'app1. Le module bénévoles est actif par défaut.
+  volunteersEnabled Boolean       @default(true)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  owner             User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId           Int
 
   // Gestion des bénévoles (relations inverses, mêmes noms qu'app1)
   volunteerApplications       EditionVolunteerApplication[]

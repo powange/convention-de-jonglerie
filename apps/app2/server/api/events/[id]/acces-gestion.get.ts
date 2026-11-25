@@ -12,5 +12,13 @@ export default defineEventHandler(async (event) => {
   const eventId = await idDepuisLaRoute(event)
   const droits = await droitsSurEvenement(eventId, userId)
   if (!droits.voir) throw createError({ status: 404, message: 'Événement introuvable' })
-  return { droits, abonnementActif: await gestionOuverte(eventId, userId) }
+  const evenement = await prisma.event.findUniqueOrThrow({
+    where: { id: eventId },
+    select: { volunteersEnabled: true },
+  })
+  return {
+    droits,
+    abonnementActif: await gestionOuverte(eventId, userId),
+    modules: { benevoles: evenement.volunteersEnabled },
+  }
 })

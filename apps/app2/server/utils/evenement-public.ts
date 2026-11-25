@@ -35,6 +35,7 @@ export async function resoudreEvenement(
     select: {
       id: true,
       publicId: true,
+      volunteersEnabled: true,
       volunteerSettings: { select: { pagePublic: true, open: true } },
     },
   })
@@ -51,7 +52,8 @@ export async function resoudreEvenement(
       }))
   }
   const s = evenement.volunteerSettings
-  const estPublic = !!(s?.pagePublic || s?.open)
+  // Module bénévoles désactivé : la page publique n'existe plus pour un visiteur.
+  const estPublic = evenement.volunteersEnabled && !!(s?.pagePublic || s?.open)
 
   if (!impliquee && (numero || !estPublic)) return null
   return { id: evenement.id, publicId: evenement.publicId, impliquee, estPublic }
