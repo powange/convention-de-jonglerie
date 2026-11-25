@@ -10,7 +10,7 @@ import {
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { requireVolunteerManagementAccess } from '#volunteers/server/utils/permissions/volunteer-permissions'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 const bodySchema = z.object({ approve: z.boolean() })
 
@@ -24,7 +24,7 @@ export default wrapApiHandler(
   async (event) => {
     const editionId = validateEditionId(event)
     await exigerEchangesOuverts(editionId)
-    const user = await requireVolunteerManagementAccess(event, editionId)
+    const user = await useVolunteerPorts().organizers.requireManagementAccess(event, editionId)
 
     const swapId = String(getRouterParam(event, 'swapId') || '')
     if (!swapId) throw createError({ status: 400, message: 'Demande invalide' })
@@ -98,11 +98,8 @@ export default wrapApiHandler(
 
     /** Les deux bénévoles apprennent la décision, quelle qu'elle soit. */
     async function prevenirLesDeux(kind: 'DECIDED' | 'REFUSED') {
-      const edition = await prisma.edition.findUnique({
-        where: { id: editionId },
-        select: { name: true, convention: { select: { name: true } } },
-      })
-      const nom = edition?.name || edition?.convention.name || `Édition #${editionId}`
+      const nom =
+        (await useVolunteerPorts().eventScope.getDisplayName(editionId)) || `Édition #${editionId}`
 
       for (const destinataire of [demande!.requesterId, demande!.targetId]) {
         await safeNotify(

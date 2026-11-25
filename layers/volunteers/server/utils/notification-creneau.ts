@@ -73,11 +73,7 @@ export async function comptesAffectesAuCreneau(slotId: string): Promise<number[]
 
 /** Le fuseau de l'édition, pour que l'heure annoncée soit celle qu'on vivra sur place. */
 async function fuseauDeLEdition(editionId: number): Promise<string | null> {
-  const edition = await prisma.edition.findUnique({
-    where: { id: editionId },
-    select: { timezone: true },
-  })
-  return edition?.timezone ?? null
+  return useVolunteerPorts().eventScope.getTimezone(editionId)
 }
 
 interface ArgsChangement {

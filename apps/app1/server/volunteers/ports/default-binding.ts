@@ -24,11 +24,11 @@ import {
   type CreateNotificationData,
 } from '#server/utils/notification-service'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
-import { isArtistEligibleForMeal } from '#server/utils/volunteer-meals'
 import {
   requireVolunteerManagementAccess,
   requireVolunteerReadAccess,
-} from '#volunteers/server/utils/permissions/volunteer-permissions'
+} from '#server/utils/permissions/acces-benevoles-jonglerie'
+import { isArtistEligibleForMeal } from '#server/utils/volunteer-meals'
 
 function toCreateData(input: NotifyInput): CreateNotificationData {
   return { ...input, type: input.type as NotificationType }
@@ -92,6 +92,23 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
           }
         }
         return map
+      },
+      // Jonglerie : le fuseau est porté par l'édition.
+      async getTimezone(eventId) {
+        const edition = await prisma.edition.findUnique({
+          where: { id: eventId },
+          select: { timezone: true },
+        })
+        return edition?.timezone ?? null
+      },
+      // Jonglerie : le nom de l'édition, sinon celui de sa convention.
+      async getDisplayName(eventId) {
+        const edition = await prisma.edition.findUnique({
+          where: { id: eventId },
+          select: { name: true, convention: { select: { name: true } } },
+        })
+        if (!edition) return null
+        return edition.name || edition.convention.name || null
       },
     },
     ticketing: {

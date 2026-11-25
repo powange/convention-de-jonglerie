@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
+// Le fuseau passe par le port `eventScope` (et non plus par `prisma.edition`).
+const mockGetTimezone = vi.fn()
 const mockRequireManagement = vi.fn()
 const mockNotify = vi.fn()
 
@@ -7,6 +9,7 @@ vi.mock('#server/volunteers/ports/registry', () => ({
   useVolunteerPorts: () => ({
     organizers: { requireManagementAccess: mockRequireManagement },
     notifications: { notify: mockNotify },
+    eventScope: { getTimezone: mockGetTimezone },
   }),
 }))
 
@@ -73,7 +76,7 @@ beforeEach(() => {
     if (nom === 'editionOrganizerId') return '7'
     return undefined
   })
-  prismaMock.edition.findUnique.mockResolvedValue({ timezone: 'Europe/Paris' })
+  mockGetTimezone.mockResolvedValue('Europe/Paris')
   planningPublie(true)
   affectes({ benevoles: [], organisateurs: [] })
 })
@@ -175,7 +178,7 @@ describe('déplacer un créneau publié', () => {
   it('une notification impossible ne fait pas échouer le déplacement', async () => {
     // L'écriture est faite : répondre 500 ferait croire qu'elle ne l'est pas, et l'on recommencerait.
     affectes({ benevoles: [5] })
-    prismaMock.edition.findUnique.mockRejectedValue(new Error('base indisponible'))
+    mockGetTimezone.mockRejectedValue(new Error('base indisponible'))
 
     const reponse: any = await modifier(evenement)
 

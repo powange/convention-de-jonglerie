@@ -12,6 +12,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 const bodySchema = z.object({ accept: z.boolean() })
 
@@ -112,15 +113,12 @@ export default wrapApiHandler(
     return createSuccessResponse({ status: 'PENDING_MANAGER' })
 
     async function prevenir(destinataire: number, kind: 'REFUSED' | 'PEER_ACCEPTED') {
-      const edition = await prisma.edition.findUnique({
-        where: { id: editionId },
-        select: { name: true, convention: { select: { name: true } } },
-      })
+      const nomEvenement = await useVolunteerPorts().eventScope.getDisplayName(editionId)
       await safeNotify(
         () =>
           NotificationHelpers.volunteerSwap(destinataire, kind, {
             editionId,
-            editionName: edition?.name || edition?.convention.name || `Édition #${editionId}`,
+            editionName: nomEvenement || `Édition #${editionId}`,
             swapId: demande!.id,
             otherName: user.pseudo,
           }),
@@ -151,14 +149,9 @@ export default wrapApiHandler(
      * cette même fonction : c'est le motif établi pour atteindre `apps/app1` d'ici.
      */
     async function prevenirLesResponsables() {
-      const edition = await prisma.edition.findUnique({
-        where: { id: editionId },
-        select: {
-          name: true,
-          convention: { select: { name: true } },
-        },
-      })
-      if (!edition) return
+      // `null` : événement introuvable — on ne prévient personne, comme avant.
+      const nomEvenement = await useVolunteerPorts().eventScope.getDisplayName(editionId)
+      if (nomEvenement === null) return
 
       const { listerGestionnairesBenevoles } = await import('#server/utils/organizer-management')
       const gestionnaires = await listerGestionnairesBenevoles(editionId)
@@ -179,7 +172,7 @@ export default wrapApiHandler(
           () =>
             NotificationHelpers.volunteerSwap(destinataire, 'PEER_ACCEPTED', {
               editionId,
-              editionName: edition.name || edition.convention.name || `Édition #${editionId}`,
+              editionName: nomEvenement || `Édition #${editionId}`,
               swapId: demande!.id,
               otherName: user.pseudo,
             }),

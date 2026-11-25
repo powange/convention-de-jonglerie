@@ -110,10 +110,7 @@ export default wrapApiHandler(
     if (body.recurrence !== 'AUCUNE') {
       // Le fuseau de l'édition ancre les heures murales : sans lui, un changement d'heure au
       // milieu de la convention décalerait les créneaux suivants.
-      const edition = await prisma.edition.findUnique({
-        where: { id: editionId },
-        select: { timezone: true },
-      })
+      const fuseau = await useVolunteerPorts().eventScope.getTimezone(editionId)
 
       const repetitions = genererCreneauxRecurrents(
         { startDateTime: body.startDateTime, endDateTime: body.endDateTime },
@@ -124,7 +121,7 @@ export default wrapApiHandler(
           debutMontage: s?.setupStartDate,
           finDemontage: s?.teardownEndDate,
         },
-        edition?.timezone
+        fuseau
       )
 
       // Une génération vide — bornes ou fuseau illisibles — ne doit pas faire disparaître le

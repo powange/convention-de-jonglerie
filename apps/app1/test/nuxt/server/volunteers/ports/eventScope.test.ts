@@ -41,6 +41,57 @@ describe('port eventScope (câblage jonglerie par défaut)', () => {
     })
   })
 
+  /*
+   * Ces deux méthodes remplacent des lectures directes d'`Edition` que le layer bénévoles avait
+   * réintroduites (créneaux récurrents, rappels, notifications d'échanges) : le fuseau et le nom
+   * affiché doivent rester EXACTEMENT ceux d'avant.
+   */
+  describe('getTimezone', () => {
+    it("rend le fuseau de l'édition", async () => {
+      prismaMock.edition.findUnique.mockResolvedValue({ timezone: 'America/Montreal' })
+
+      const fuseau = await createDefaultVolunteerPorts().eventScope.getTimezone(10)
+
+      expect(fuseau).toBe('America/Montreal')
+      expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
+        where: { id: 10 },
+        select: { timezone: true },
+      })
+    })
+
+    it('rend null quand le fuseau ou l’édition manquent', async () => {
+      prismaMock.edition.findUnique.mockResolvedValueOnce({ timezone: null })
+      prismaMock.edition.findUnique.mockResolvedValueOnce(null)
+      const ports = createDefaultVolunteerPorts()
+
+      expect(await ports.eventScope.getTimezone(10)).toBeNull()
+      expect(await ports.eventScope.getTimezone(99)).toBeNull()
+    })
+  })
+
+  describe('getDisplayName', () => {
+    it("préfère le nom de l'édition", async () => {
+      prismaMock.edition.findUnique.mockResolvedValue({
+        name: 'Édition 2027',
+        convention: { name: 'Conv' },
+      })
+
+      expect(await createDefaultVolunteerPorts().eventScope.getDisplayName(10)).toBe('Édition 2027')
+    })
+
+    it("retombe sur le nom de la convention quand l'édition n'en a pas", async () => {
+      prismaMock.edition.findUnique.mockResolvedValue({ name: null, convention: { name: 'Conv' } })
+
+      expect(await createDefaultVolunteerPorts().eventScope.getDisplayName(10)).toBe('Conv')
+    })
+
+    it('rend null pour une édition introuvable — les appelants ne notifient alors personne', async () => {
+      prismaMock.edition.findUnique.mockResolvedValue(null)
+
+      expect(await createDefaultVolunteerPorts().eventScope.getDisplayName(99)).toBeNull()
+    })
+  })
+
   describe('getEventDisplayData', () => {
     it('mappe ville/pays/image/convention par eventId', async () => {
       prismaMock.edition.findMany.mockResolvedValue([
