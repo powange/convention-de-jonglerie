@@ -11,14 +11,28 @@ import { canManageTicketingById } from '#server/utils/permissions/edition-permis
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**
- * Le message rendu quand le test ne peut pas aboutir, quelle qu'en soit la raison.
+ * Le message rendu quand le test ne peut pas aboutir pour une raison qu'on ne sait pas nommer.
  *
- * Volontairement identique pour « aucune configuration » et « identifiants refusés » : deux
- * messages distincts feraient de cet endpoint un moyen de savoir quelles éditions ont une
- * billetterie HelloAsso, et lesquelles n'en ont pas.
+ * Il reste identique pour « aucune configuration enregistrée » : un message propre à ce cas dirait
+ * quelles éditions ont une billetterie HelloAsso.
  */
 const ERREUR_CONNEXION =
   'Connexion à HelloAsso impossible : vérifiez les identifiants du formulaire'
+
+/**
+ * Ce que HelloAsso a répondu, dit à l'organisateur.
+ *
+ * Tout tombait jusqu'ici dans le message unique ci-dessus, y compris un formulaire introuvable :
+ * un organisateur a retenté sept fois en trois heures (MAJJ 2.7, 25/11/2026) sans pouvoir savoir
+ * que ses identifiants étaient bons et que c'était le formulaire qui n'était pas trouvé. La garde
+ * de droits borne déjà la question aux éditions qu'on gère : nommer la cause n'apprend rien
+ * d'autre.
+ */
+const ERREURS_HELLOASSO: Record<number, string> = {
+  401: 'HelloAsso refuse ces identifiants : vérifiez le Client ID et le Client Secret',
+  403: "HelloAsso refuse l'accès à ce formulaire : le client API doit avoir le privilège « AccessPublicData »",
+  404: "Formulaire introuvable sur HelloAsso : vérifiez l'URL du formulaire (organisation, type, slug) et qu'il est bien publié",
+}
 
 const bodySchema = z.object({
   clientId: z.string().min(1),
@@ -83,9 +97,13 @@ export default wrapApiHandler(
     } catch (error: unknown) {
       console.error('HelloAsso test error:', error)
 
-      // Le détail va au journal, pas au client : l'utilitaire distingue les causes d'échec, et les
-      // relayer telles quelles redonnerait l'oracle que le message unique vient de fermer.
-      throw createError({ status: 400, message: ERREUR_CONNEXION })
+      // Les causes que l'utilitaire sait nommer (identifiants, droits, formulaire) sont rendues ;
+      // le reste — HelloAsso injoignable, réponse inattendue — garde le message générique.
+      const statut = (error as { statusCode?: number } | null)?.statusCode
+      throw createError({
+        status: 400,
+        message: (statut && ERREURS_HELLOASSO[statut]) || ERREUR_CONNEXION,
+      })
     }
   },
   { operationName: 'POST ticketing helloasso test' }

@@ -927,6 +927,7 @@ import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { normaliserTypeHelloAsso } from '~/utils/helloasso'
 
 import HelloAssoConfigModal from '../../../../../components/edition/ticketing/HelloAssoConfigModal.vue'
 import InfomaniakConfigModal from '../../../../../components/edition/ticketing/InfomaniakConfigModal.vue'
@@ -958,12 +959,14 @@ const helloAssoOrganizationSlug = ref('')
 const helloAssoFormType = ref('Event')
 const helloAssoFormSlug = ref('')
 
-// Options pour le type de formulaire HelloAsso
+// Options pour le type de formulaire HelloAsso : uniquement des valeurs que l'API accepte.
+// « Billetterie » envoyait `Ticketing` et « Formulaire » `Form`, que HelloAsso refuse : le test de
+// connexion échouait alors avec des identifiants corrects. Une billetterie HelloAsso est un
+// formulaire « Événement ».
 const formTypeOptions = [
-  { label: 'Événement', value: 'Event' },
-  { label: 'Billetterie', value: 'Ticketing' },
+  { label: 'Événement / billetterie', value: 'Event' },
   { label: 'Adhésion', value: 'Membership' },
-  { label: 'Formulaire', value: 'Form' },
+  { label: 'Formulaire de paiement', value: 'PaymentForm' },
   { label: 'Crowdfunding', value: 'CrowdFunding' },
   { label: 'Boutique', value: 'Shop' },
   { label: 'Don', value: 'Donation' },
@@ -1008,7 +1011,7 @@ const loadExistingConfig = async () => {
       const haConfig = response.data.config.helloAssoConfig
       helloAssoClientId.value = haConfig.clientId
       helloAssoOrganizationSlug.value = haConfig.organizationSlug
-      helloAssoFormType.value = haConfig.formType
+      helloAssoFormType.value = normaliserTypeHelloAsso(haConfig.formType)
       helloAssoFormSlug.value = haConfig.formSlug
       hasExistingConfig.value = true
     }
@@ -1186,7 +1189,7 @@ const { execute: executerEnregistrementHelloAsso } = useApiAction(
       // Mettre à jour les valeurs locales
       helloAssoClientId.value = config.clientId
       helloAssoOrganizationSlug.value = config.organizationSlug
-      helloAssoFormType.value = config.formType
+      helloAssoFormType.value = normaliserTypeHelloAsso(config.formType)
       helloAssoFormSlug.value = config.formSlug
       configModalRef.value?.setSaving(false)
       // Fermer la modal
@@ -1226,7 +1229,9 @@ const { execute: executerTestHelloAsso } = useApiAction<unknown, any>(
       title: 'Connexion réussie !',
       description: `Formulaire trouvé : ${resultat.form.name} (${resultat.form.organizationName})`,
     }),
-    errorMessages: { default: 'Échec de la connexion' },
+    // Pas de `default` : il passait AVANT le message du serveur, et tout échec se lisait « Échec
+    // de la connexion », y compris un formulaire introuvable avec des identifiants corrects.
+    // `useApiAction` affiche le message de l'API quand il n'y a pas de `default`.
     onSuccess: () => configModalRef.value?.setTesting(false),
     onError: () => configModalRef.value?.setTesting(false),
   }

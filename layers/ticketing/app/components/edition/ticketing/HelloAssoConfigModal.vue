@@ -236,10 +236,11 @@ const localConfig = ref<HelloAssoConfig>({
   formSlug: '',
 })
 
+// Libellés des types que l'API HelloAsso accepte (`Ticketing` n'en est pas un).
 const formTypeOptions = [
-  { label: 'Événement', value: 'Event' },
-  { label: 'Billetterie', value: 'Ticketing' },
+  { label: 'Événement / billetterie', value: 'Event' },
   { label: 'Adhésion', value: 'Membership' },
+  { label: 'Formulaire de paiement', value: 'PaymentForm' },
   { label: 'Don', value: 'Donation' },
   { label: 'Crowdfunding', value: 'CrowdFunding' },
   { label: 'Boutique', value: 'Shop' },

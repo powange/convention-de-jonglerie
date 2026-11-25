@@ -111,27 +111,57 @@ describe('POST /api/editions/[id]/ticketing/helloasso/test', () => {
     })
   })
 
-  describe('ce que la réponse laisse deviner', () => {
-    it('ne distingue pas « pas de configuration » d’un échec de connexion', async () => {
-      // Sans cela, l'endpoint renseigne sur les éditions qui ont une billetterie HelloAsso et
-      // celles qui n'en ont pas — une information que le refus de droit ne couvre plus une fois
-      // qu'on est gestionnaire d'une seule édition parmi d'autres.
-      prismaMock.helloAssoConfig.findFirst.mockResolvedValue(null)
+  describe('ce que la réponse dit à l’organisateur', () => {
+    /*
+     * Tout échec rendait le même message, formulaire introuvable compris : un organisateur a
+     * retenté sept fois en trois heures avec des identifiants peut-être corrects (MAJJ 2.7,
+     * 25/11/2026). La cause que HelloAsso donne est désormais nommée — la garde de droits borne
+     * déjà la question aux éditions qu'on gère.
+     */
+    const echecHelloAsso = (statusCode: number) =>
+      mockTestConnection.mockRejectedValue(Object.assign(new Error('refus'), { statusCode }))
 
+    it.each([
+      [401, /identifiants.*Client ID/i],
+      [403, /AccessPublicData/],
+      [404, /Formulaire introuvable/],
+    ])('nomme la cause quand HelloAsso répond %i', async (statut, attendu) => {
+      echecHelloAsso(statut)
+
+      const erreur = await envoyer({ ...corpsSansSecret, clientSecret: 's' }).catch((e: any) => e)
+
+      expect(erreur.statusCode).toBe(400)
+      expect(erreur.message).toMatch(attendu)
+    })
+
+    it('les trois causes donnent trois messages DIFFÉRENTS', async () => {
+      const messages = new Set<string>()
+      for (const statut of [401, 403, 404]) {
+        echecHelloAsso(statut)
+        const e = await envoyer({ ...corpsSansSecret, clientSecret: 's' }).catch((x: any) => x)
+        messages.add(e.message)
+      }
+      expect(messages.size).toBe(3)
+    })
+
+    it('garde le message générique pour une cause qu’on ne sait pas nommer', async () => {
+      mockTestConnection.mockRejectedValue(new Error('fetch failed'))
+
+      const erreur = await envoyer({ ...corpsSansSecret, clientSecret: 's' }).catch((e: any) => e)
+
+      expect(erreur.message).toMatch(/Connexion à HelloAsso impossible/)
+    })
+
+    it('ne distingue pas « pas de configuration » d’une cause inconnue', async () => {
+      // Un message propre à ce cas dirait quelles éditions ont une billetterie HelloAsso.
+      prismaMock.helloAssoConfig.findFirst.mockResolvedValue(null)
       const sansConfig = await envoyer().catch((e: any) => e)
 
-      // Une erreur telle que l'utilitaire la remonte : le test vérifie que l'endpoint ne la
-      // relaie pas telle quelle.
-      mockTestConnection.mockRejectedValue(
-        Object.assign(new Error('Identifiants HelloAsso invalides'), { statusCode: 401 })
-      )
-      const mauvaisIdentifiants = await envoyer({
-        ...corpsSansSecret,
-        clientSecret: 'mauvais',
-      }).catch((e: any) => e)
+      mockTestConnection.mockRejectedValue(new Error('fetch failed'))
+      const inconnue = await envoyer({ ...corpsSansSecret, clientSecret: 's' }).catch((e: any) => e)
 
-      expect(sansConfig.statusCode).toBe(mauvaisIdentifiants.statusCode)
-      expect(sansConfig.message).toBe(mauvaisIdentifiants.message)
+      expect(sansConfig.statusCode).toBe(inconnue.statusCode)
+      expect(sansConfig.message).toBe(inconnue.message)
     })
   })
 })
