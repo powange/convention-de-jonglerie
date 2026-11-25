@@ -69,7 +69,7 @@ runs:
     # `actions/checkout` reste dans le job appelant : cette action vit dans le dépôt, elle n'existe
     # pas tant que le code n'est pas là — elle ne peut donc pas faire le checkout elle-même.
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
         node-version: '24'
         cache: 'npm'
@@ -91,7 +91,7 @@ runs:
     - name: Restaurer node_modules (lecture seule)
       if: inputs.cache-mode == 'restaurer'
       id: deps-lecture
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: apps/app1/node_modules
         key: ${{ steps.cles.outputs.deps }}
@@ -99,7 +99,7 @@ runs:
     - name: Restaurer le client Prisma (lecture seule)
       if: inputs.cache-mode == 'restaurer'
       id: prisma-lecture
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: apps/app1/server/generated/prisma
         key: ${{ steps.cles.outputs.prisma }}

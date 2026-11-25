@@ -65,9 +65,6 @@ env:
   SEND_EMAILS: false
   # Bypass reCAPTCHA en test
   NUXT_RECAPTCHA_DEV_BYPASS: true
-  # Force les actions GitHub (checkout, cache, setup-node, upload-artifact)
-  # à utiliser le runtime Node 24 (au lieu de Node 20 déprécié)
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 # Monorepo : les commandes `run:` s'exécutent dans apps/app1. Les chemins des actions
 # (`uses:` cache/upload, hashFiles) restent relatifs à la racine → préfixés apps/app1/.
@@ -112,7 +109,7 @@ jobs:
       # la base, et `git diff HEAD^1 HEAD` donne exactement ce que la PR change par rapport à elle.
       # Une profondeur de 2 suffit à avoir ces deux commits.
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 2
 
@@ -140,7 +137,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Préparer l'environnement
         id: prep
@@ -156,7 +153,7 @@ jobs:
       # autres jobs attendaient ce job-là.
       - name: Vérifier le cache des dépendances
         id: verif-deps
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: apps/app1/node_modules
           key: ${{ steps.prep.outputs.deps-cache-key }}
@@ -164,7 +161,7 @@ jobs:
 
       - name: Vérifier le cache du client Prisma
         id: verif-prisma
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: apps/app1/server/generated/prisma
           key: ${{ steps.prep.outputs.prisma-cache-key }}
@@ -176,7 +173,7 @@ jobs:
         if: >-
           steps.verif-deps.outputs.cache-hit == 'true'
           && steps.verif-prisma.outputs.cache-hit != 'true'
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: apps/app1/node_modules
           key: ${{ steps.prep.outputs.deps-cache-key }}
@@ -203,14 +200,14 @@ jobs:
       # que personne ne lira.
       - name: Sauvegarder le cache des dépendances
         if: steps.verif-deps.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: apps/app1/node_modules
           key: ${{ steps.prep.outputs.deps-cache-key }}
 
       - name: Sauvegarder le cache du client Prisma
         if: steps.verif-prisma.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: apps/app1/server/generated/prisma
           key: ${{ steps.prep.outputs.prisma-cache-key }}
@@ -226,7 +223,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Préparer l'environnement
         uses: ./.github/actions/preparer-env
@@ -260,11 +257,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          # Historique complet : le filet sur les fichiers modifiés compare la branche à sa base,
-          # ce qu'une copie superficielle ne permet pas.
-          fetch-depth: 0
+        # Copie superficielle, comme partout ailleurs. Un `fetch-depth: 0` a longtemps tenu ici pour un
+        # filet qui comparait la branche à sa base ; la porte TS2345 compare désormais à une dette
+        # gelée sur tout le dépôt, et `typecheck-gate.mjs` n'appelle plus git.
+        uses: actions/checkout@v5
 
       - name: Préparer l'environnement
         uses: ./.github/actions/preparer-env
@@ -339,7 +335,7 @@ jobs:
       # comptages faits sur ces bases donnaient des ordres de grandeur différents ; celui-ci fait foi.
       - name: Conserver le journal de typage
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: typecheck-log
           path: |
@@ -376,7 +372,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Préparer l'environnement
         uses: ./.github/actions/preparer-env
@@ -413,7 +409,7 @@ jobs:
       # substitué. Cet artifact est donc un vrai build production, et non un build « parfumé e2e » :
       # c'est le job `playwright` qui porte `E2E_TEST`, au démarrage du serveur.
       - name: Publier le build pour le job playwright
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: build-output-${{ github.run_id }}
           path: apps/app1/.output/
@@ -427,7 +423,7 @@ jobs:
 
       - name: Upload build artifacts
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: build-artifacts-${{ github.run_id }}
           path: |
@@ -453,7 +449,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Préparer l'environnement
         uses: ./.github/actions/preparer-env
@@ -467,7 +463,7 @@ jobs:
 
       - name: Upload test results
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: test-results-unit-${{ github.run_id }}
           path: |
@@ -479,7 +475,7 @@ jobs:
 
       - name: Upload coverage reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-reports-unit-${{ github.run_id }}
           path: apps/app1/coverage/
@@ -554,7 +550,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Préparer l'environnement
         uses: ./.github/actions/preparer-env
@@ -578,7 +574,7 @@ jobs:
 
       - name: Upload test results
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: test-results-${{ matrix.test-group.name }}-${{ github.run_id }}
           path: |
@@ -592,7 +588,7 @@ jobs:
 
       - name: Upload coverage reports
         if: always() && matrix.test-group.name == 'database'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-reports-${{ matrix.test-group.name }}-${{ github.run_id }}
           path: apps/app1/coverage/
@@ -650,7 +646,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Le dump ne dépend que de ce qui le produit : l'historique des migrations, le schéma, et le
       # seed avec les trois utilitaires qu'il importe. Tant qu'aucun d'eux ne bouge, le reconstruire
@@ -667,7 +663,7 @@ jobs:
       # passage sur `main` — même comportement que le cache des node_modules du job `setup`.
       - name: Cache de la base de test
         id: cache-base
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /tmp/base-de-test.sql.gz
           key: base-de-test-${{ runner.os }}-${{ hashFiles('apps/app1/prisma/migrations/**', 'apps/app1/prisma/schema/**', 'apps/app1/scripts/seed-dev.ts', 'apps/app1/server/utils/email-hash.ts', 'apps/app1/server/utils/event-sync.ts', 'apps/app1/server/utils/prisma.ts') }}
@@ -717,7 +713,7 @@ jobs:
           echo "base de test $origine — $(du -h /tmp/base-de-test.sql.gz | cut -f1)"
 
       - name: Publier le dump
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: base-de-test-${{ github.run_id }}
           path: /tmp/base-de-test.sql.gz
@@ -906,7 +902,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Préparer l'environnement
         uses: ./.github/actions/preparer-env
@@ -921,7 +917,7 @@ jobs:
           cache-mode: restaurer
 
       - name: Récupérer la base de test
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: base-de-test-${{ github.run_id }}
           path: /tmp
@@ -953,7 +949,7 @@ jobs:
           fi
 
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('apps/app1/package-lock.json') }}
@@ -1029,7 +1025,7 @@ jobs:
           exit 1
 
       - name: Récupérer le build produit par le job build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: build-output-${{ github.run_id }}
           # Chemin relatif à la RACINE du dépôt, comme tous les chemins d'actions ici.
@@ -1167,7 +1163,7 @@ jobs:
       # run, et les lots se marcheraient dessus. Chacun garde donc son rapport.
       - name: Upload test report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-report-${{ github.run_id }}-${{ matrix.lot.cle }}
           path: |
@@ -1193,12 +1189,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Même principe que `setup` : vérifier sans télécharger, et ne rien faire si l'entrée existe.
       - name: Vérifier le cache des navigateurs
         id: verif
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('apps/app1/package-lock.json') }}
@@ -1214,7 +1210,7 @@ jobs:
 
       - name: Sauvegarder le cache des navigateurs
         if: steps.verif.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('apps/app1/package-lock.json') }}
@@ -1241,13 +1237,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Préparer Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Construire l’image Flowvent (sans la publier)
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: apps/app2/Dockerfile
@@ -1278,13 +1274,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Préparer Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Construire l'image d'app1 (sans la publier)
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: apps/app1/Dockerfile
@@ -1324,7 +1320,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Préparer l'environnement
         uses: ./.github/actions/preparer-env
@@ -1391,7 +1387,7 @@ jobs:
       # aucun checkout, bash refusait de démarrer dans un répertoire absent, et ce job échouait alors
       # que les douze autres étaient verts.
       - name: Checkout du script de verdict
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           sparse-checkout: apps/app1/scripts
           sparse-checkout-cone-mode: true
