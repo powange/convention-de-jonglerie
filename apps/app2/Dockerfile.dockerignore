@@ -5,6 +5,7 @@
 # petit, et rien d'app1 (sauvegardes, uploads) ne peut s'y glisser.
 *
 !apps/app2
+!layers/core
 !layers/auth
 
 # Artefacts et dépendances (régénérés dans l'image)

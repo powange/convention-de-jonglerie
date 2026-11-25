@@ -1,21 +1,7 @@
-/**
- * Helpers de validation/sanitisation (version minimale app2).
- * Seules les deux fonctions consommées par `layers/auth/` sont exposées.
- */
-
-/**
- * Sanitise une chaîne de caractères (trim + normalisation).
- * Retourne `null` pour une valeur vide/absente.
- */
-export function sanitizeString(value: string | null | undefined): string | null {
-  if (!value || typeof value !== 'string') return null
-  const trimmed = value.trim()
-  return trimmed === '' ? null : trimmed
-}
-
-/**
- * Sanitise un email (lowercase + trim).
- */
-export function sanitizeEmail(email: string): string {
-  return email.toLowerCase().trim()
-}
+// Implémentation commune : `layers/core/server/socle/validation-helpers.ts`, partagée avec app1.
+//
+// App2 en avait une copie réduite, à laquelle manquaient des fonctions que les layers attendent
+// (bénévoles notamment). Ce fichier reste l'adresse importée (`#server/utils/validation-helpers`) et ne fait
+// que réexporter. CHEMIN RELATIF obligatoire : les auto-imports de Nitro suivent ce `export *`,
+// et ne savent pas résoudre un alias (`#core/…` faisait disparaître toutes ces fonctions).
+export * from '../../../../layers/core/server/socle/validation-helpers'
