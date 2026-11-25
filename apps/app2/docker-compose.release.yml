@@ -74,12 +74,19 @@ services:
       NUXT_PORT: '3000'
       NODE_ENV: 'production'
       NUXT_ENV: 'release'
+      # Photos de profil déposées : sur le volume ci-dessous, qui survit aux redéploiements.
+      NUXT_FILE_STORAGE_MOUNT: '/uploads'
+    volumes:
+      - uploads_data:/uploads
     depends_on:
       flowvent-db-release:
         condition: service_healthy
 
 volumes:
   mysql_data:
+    driver: local
+  # Photos de profil déposées (montées en /uploads dans l'app).
+  uploads_data:
     driver: local
 
 networks:

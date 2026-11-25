@@ -53,7 +53,21 @@ export default defineNuxtConfig({
   },
 
   // `nuxt-qrcode` : le layer bénévoles affiche le QR code d'un bénévole (composant `Qrcode`).
-  modules: ['@nuxt/ui', 'nuxt-auth-utils', '@pinia/nuxt', '@nuxtjs/i18n', 'nuxt-qrcode'],
+  // `nuxt-file-storage` : photos de profil déposées (même circuit qu'app1, cf. fileStorage).
+  modules: [
+    '@nuxt/ui',
+    'nuxt-auth-utils',
+    '@pinia/nuxt',
+    '@nuxtjs/i18n',
+    'nuxt-qrcode',
+    'nuxt-file-storage',
+  ],
+
+  // Fichiers déposés : sur le volume monté en `/uploads` (docker-compose.*.yml). Dépôt d'abord dans
+  // `temp/`, déplacé à l'enregistrement du profil ; servis par server/routes/uploads/[...path].get.ts.
+  fileStorage: {
+    mount: process.env.NUXT_FILE_STORAGE_MOUNT || '/uploads',
+  },
 
   css: ['~/assets/css/main.css'],
 
@@ -98,7 +112,8 @@ export default defineNuxtConfig({
   // 2. `benevoles.json` : les clés que le layer emprunte aux fichiers communs d'app1 (common,
   //    public, gestion…), copiées une fois, et les libellés reformulés pour Flowvent
   //    (« événement » et non « édition »). Un test garantit que chaque clé employée se résout ;
-  // 3. `fr.json` : les libellés propres à Flowvent, dont ceux du layer d'auth.
+  // 3. `interface.json` : ceux des composants de layers/ui que Flowvent affiche (dépôt d'image) ;
+  // 4. `fr.json` : les libellés propres à Flowvent, dont ceux du layer d'auth.
   i18n: {
     defaultLocale: 'fr',
     strategy: 'no_prefix',
@@ -110,6 +125,7 @@ export default defineNuxtConfig({
           '../../../../layers/volunteers/i18n/locales/fr/volunteers.json',
           '../../../../layers/volunteers/i18n/locales/fr/gestion-volunteers.json',
           'benevoles.json',
+          'interface.json',
           'fr.json',
         ],
       },

@@ -1,9 +1,10 @@
 /**
  * Les tâches planifiées de Flowvent — le pendant de `apps/app1/server/utils/scheduled-tasks.ts`.
  *
- * Seules celles du layer bénévoles : les autres tâches d'app1 (favoris, billetterie, journal
- * d'erreurs…) servent des modules que Flowvent n'a pas. Mêmes noms, mêmes fréquences qu'app1 :
- * le nom est celui du fichier dans `layers/volunteers/server/tasks/`, que Nitro enregistre.
+ * Celles du layer bénévoles, et le nettoyage des dépôts temporaires (layers/core) : les autres
+ * tâches d'app1 (favoris, billetterie, journal d'erreurs…) servent des modules que Flowvent n'a
+ * pas. Mêmes noms, mêmes fréquences qu'app1 : le nom est celui du fichier dans le
+ * `server/tasks/` d'un layer, que Nitro enregistre.
  */
 export const FUSEAU_DES_TACHES = 'Europe/Paris'
 
@@ -25,5 +26,13 @@ export const TACHES_PLANIFIEES: TachePlanifiee[] = [
     description:
       "Ferme les demandes d'échange de créneau dont l'un des deux créneaux est déjà passé",
     cronExpression: '30 * * * *',
+  },
+  {
+    // Commune à app1 (layers/core/server/tasks/) : les photos de profil déposées mais jamais
+    // enregistrées restent dans `temp/` ; effacées après une heure de grâce.
+    name: 'cleanup-temp-uploads',
+    description:
+      "Supprime les photos déposées puis abandonnées dans le dossier temporaire (plus d'une heure)",
+    cronExpression: '15 * * * *',
   },
 ]

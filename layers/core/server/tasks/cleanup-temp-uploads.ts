@@ -1,7 +1,8 @@
-import { nettoyerEnvoisTemporaires, racineTemporaire } from '../utils/nettoyage-temp-uploads'
+import { nettoyerEnvoisTemporaires, racineTemporaire } from '../socle/nettoyage-temp-uploads'
 
 /**
- * Tâche planifiée : purge des envois temporaires abandonnés.
+ * Tâche planifiée : purge des envois temporaires abandonnés — commune à app1 et Flowvent, chacune
+ * la programme dans son catalogue.
  *
  * Les formulaires déposent leurs images dans `temp/` avant enregistrement, et le fichier n'est
  * déplacé qu'à la validation. Une saisie abandonnée laissait donc son image là, définitivement —

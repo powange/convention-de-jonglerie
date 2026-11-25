@@ -100,6 +100,8 @@ services:
       - ./nuxt.config.ts:/app/apps/app2/nuxt.config.ts:cached
       - ./app.config.ts:/app/apps/app2/app.config.ts:cached
       - ./tsconfig.json:/app/apps/app2/tsconfig.json:cached
+      # Photos de profil déposées : hors du code, sur un volume (comme en release et en prod).
+      - uploads_data:/uploads
       - ./prisma.config.ts:/app/apps/app2/prisma.config.ts:cached
       - ./i18n:/app/apps/app2/i18n:cached
       - ./scripts:/app/apps/app2/scripts:cached
@@ -128,4 +130,7 @@ volumes:
   mysql_data:
     driver: local
   node_modules:
+    driver: local
+  # Photos de profil déposées (montées en /uploads dans l'app).
+  uploads_data:
     driver: local
