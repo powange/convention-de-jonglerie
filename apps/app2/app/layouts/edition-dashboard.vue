@@ -87,6 +87,14 @@ const editionStore = useEditionStore()
 // L'id numérique (API, store) et l'identifiant public (adresses) de l'événement.
 const editionId = useEditionIdRef()
 const refPublique = computed(() => String(route.params.id))
+
+// Modules actifs (et droits) de l'événement : clé partagée, que l'accueil rafraîchit après un
+// changement de module.
+const { data: acces } = useFetch<{ modules: { benevoles: boolean } }>(
+  () => `/api/events/${refPublique.value}/acces-gestion`,
+  { key: `acces-gestion-${refPublique.value}`, server: false }
+)
+const moduleBenevoles = computed(() => acces.value?.modules.benevoles !== false)
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 const peutGerer = computed(() => editionStore.canManageVolunteers(edition.value))
 const estResponsable = ref(false)
@@ -155,6 +163,12 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
   return [
     [
       {
+        label: 'Accueil',
+        icon: 'i-heroicons-home',
+        to: `/events/${refPublique.value}/gestion`,
+        exact: true,
+      },
+      {
         label: "Informations de l'événement",
         icon: 'i-lucide-settings',
         to: `/events/${refPublique.value}/gestion/evenement`,
@@ -166,7 +180,7 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
       },
     ],
     // Sans aucun droit sur les bénévoles, la section n'apparaît pas (plutôt qu'un groupe vide).
-    ...(enfants.length
+    ...(enfants.length && moduleBenevoles.value
       ? [
           [
             {
@@ -180,13 +194,17 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
           ],
         ]
       : []),
-    [
-      {
-        label: 'Page publique des bénévoles',
-        icon: 'i-heroicons-eye',
-        to: `/events/${refPublique.value}/volunteers`,
-      },
-    ],
+    ...(moduleBenevoles.value
+      ? [
+          [
+            {
+              label: 'Page publique des bénévoles',
+              icon: 'i-heroicons-eye',
+              to: `/events/${refPublique.value}/volunteers`,
+            },
+          ],
+        ]
+      : []),
   ]
 })
 

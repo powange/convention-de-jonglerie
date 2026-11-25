@@ -36,6 +36,7 @@ export default defineEventHandler(async (event) => {
       status: true,
       ownerId: true,
       publicId: true,
+      volunteersEnabled: true,
       volunteerSettings: {
         select: {
           pagePublic: true,
@@ -77,8 +78,10 @@ export default defineEventHandler(async (event) => {
     volunteersMode: s?.mode ?? 'INTERNAL',
     // Lus par la page bénévoles du layer pour décider si elle s'ouvre à un visiteur : sans eux, la
     // page n'était JAMAIS publique dans Flowvent, même réglée comme telle.
-    volunteersPagePublic: s?.pagePublic ?? false,
-    volunteersOpen: s?.open ?? false,
+    // Module désactivé : ni page publique ni candidatures (les gestionnaires gardent l'aperçu).
+    volunteersEnabled: evenement.volunteersEnabled,
+    volunteersPagePublic: evenement.volunteersEnabled && (s?.pagePublic ?? false),
+    volunteersOpen: evenement.volunteersEnabled && (s?.open ?? false),
     volunteersOrganizersInTeams: s?.organizersInTeams ?? false,
     volunteersSetupStartDate: s?.setupStartDate ?? null,
     volunteersTeardownEndDate: s?.teardownEndDate ?? null,

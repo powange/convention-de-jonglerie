@@ -103,52 +103,36 @@ const { data: acces } = await useFetch<{
     estProprietaire: boolean
   }
   abonnementActif: boolean
+  modules?: { benevoles: boolean }
 }>(`/api/events/${route.params.id}/acces-gestion`)
 
+// La gestion se résume ici à deux portes : son accueil (qui ouvre chaque module selon les droits),
+// et la page que l'on partage aux bénévoles si leur module est actif.
 const cartes = computed(() => {
   const e = event.value
-  const d = acces.value?.droits
-  if (!e || !d) return []
+  const a = acces.value
+  if (!e || !a) return []
   const base = `/events/${e.publicId}`
   return [
-    d.benevoles && {
-      titre: 'Gestion des bénévoles',
-      description: 'Candidatures, équipes, planning, notifications.',
-      icone: 'i-heroicons-user-group',
+    {
+      titre: "Gestion de l'événement",
+      description: 'Bénévoles, organisateurs, informations, modules.',
+      icone: 'i-heroicons-squares-2x2',
       couleur: 'bg-primary/10 text-primary',
-      to: `${base}/gestion/volunteers/config`,
+      to: `${base}/gestion`,
     },
-    {
-      titre: 'Organisateurs',
-      description: d.organisateurs
-        ? 'Ajouter des co-organisateurs et régler leurs droits.'
-        : "L'équipe d'organisation de l'événement.",
-      icone: 'i-heroicons-user-plus',
-      couleur: 'bg-secondary/10 text-secondary',
-      to: `${base}/gestion/organisateurs`,
-    },
-    {
-      titre: "Informations de l'événement",
-      description: d.modifier ? 'Nom, lieu, dates, fuseau.' : 'Nom, lieu, dates (lecture seule).',
-      icone: 'i-lucide-settings',
-      couleur: 'bg-primary/10 text-primary',
-      to: `${base}/gestion/evenement`,
-    },
-    // La page que l'on partage aux bénévoles : ils y candidatent, puis y retrouvent leurs créneaux.
-    {
-      titre: 'Page des bénévoles',
-      description: 'Ce que voient les candidats, et le lien à partager.',
-      icone: 'i-heroicons-eye',
-      couleur: 'bg-secondary/10 text-secondary',
-      to: `${base}/volunteers`,
-    },
-  ].filter(Boolean) as {
-    titre: string
-    description: string
-    icone: string
-    couleur: string
-    to: string
-  }[]
+    ...(a.modules?.benevoles !== false
+      ? [
+          {
+            titre: 'Page des bénévoles',
+            description: 'Ce que voient les candidats, et le lien à partager.',
+            icone: 'i-heroicons-eye',
+            couleur: 'bg-secondary/10 text-secondary',
+            to: `${base}/volunteers`,
+          },
+        ]
+      : []),
+  ]
 })
 
 useSeoMeta({ title: () => (event.value ? `${event.value.name} — Flowvent` : 'Événement') })
