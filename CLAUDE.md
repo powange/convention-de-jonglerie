@@ -253,6 +253,9 @@ Cette commande s'arrête si une étape échoue.
 - **ULink** : Lien stylé (équivalent `NuxtLink` intégré au thème Nuxt UI)
 - **UIcon** : Icône (bibliothèque Nuxt Icon, ex. `i-heroicons-*`)
 - **UTooltip** : Infobulle au survol (`text`), utile pour nommer un bouton réduit à son icône
+- **UNavigationMenu** : Menu de navigation (`orientation="vertical"` pour une barre latérale, `items` avec `to`/`icon`/`exact`)
+- **UDrawer** : Tiroir latéral ou inférieur (`direction`, `v-model:open`), contenu dans le slot `#body`
+- **UAvatar** : Avatar (`src`, `alt` — affiche les initiales de `alt` sans image, `size`)
 - **UCollapsible** : Repli/dépli d'un bloc — le déclencheur va dans le slot par défaut, le contenu dans `#content` (`default-open`, `unmount-on-hide`)
 
 A Chaque fois que tu ajoutes un nouveau component Nuxt UI, ajoute-le à cette liste.

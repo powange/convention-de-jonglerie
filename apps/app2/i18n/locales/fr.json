@@ -106,7 +106,10 @@
     "verify_code": "Vérifier le code",
     "verify_email_title": "Vérifiez votre email",
     "verifying": "Vérification...",
-    "welcome_title": "Bienvenue !"
+    "welcome_title": "Bienvenue !",
+    "password_rule_digit": "Au moins un chiffre",
+    "password_rule_length": "Au moins 8 caractères",
+    "password_rule_uppercase": "Au moins une majuscule"
   },
   "common": {
     "confirm": "Confirmer",
