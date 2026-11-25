@@ -47,16 +47,7 @@ const PREFIXE_APP2 = 'apps/app2/'
  * et ne figurent pas ici ; `ci-verte` et `signaler-run-planifie` non plus, ils jugent les autres.
  */
 export const JOBS_PAR_PERIMETRE = {
-  complet: [
-    'lint',
-    'typecheck',
-    'build',
-    'test-unit',
-    'test',
-    'base-de-test',
-    'playwright',
-    'audit',
-  ],
+  complet: ['lint', 'typecheck', 'build', 'test-unit', 'test', 'base-de-test', 'playwright'],
   'app2-seul': ['lint', 'test-unit'],
   // `base-de-test` écrit le cache du dump SQL, `navigateurs` celui de Chromium. `setup`, qui écrit
   // node_modules et le client Prisma, tourne de toute façon.
@@ -64,7 +55,7 @@ export const JOBS_PAR_PERIMETRE = {
 }
 
 /** Les jobs ajoutés selon les fichiers touchés (hors push sur main, où rien n'est vérifié). */
-export const JOBS_SELON_FICHIERS = ['image-flowvent', 'image-app1']
+export const JOBS_SELON_FICHIERS = ['image-flowvent', 'image-app1', 'audit']
 
 /** Tous les jobs qui portent une condition dans le YAML. */
 export const JOBS_CONDITIONNES = [
@@ -154,6 +145,17 @@ const FICHIERS_IMAGE_APP1 = [
   '.github/workflows/tests.yml',
 ]
 
+/**
+ * `npm audit` n'apprend rien d'une PR qui ne change pas les dépendances : une vulnérabilité naît
+ * dans la base de npm, pas dans nos commits. Il tourne donc sur une PR qui touche le manifeste ou
+ * le verrou d'app1 — et chaque nuit, sur le run planifié, où un avis publié depuis se voit.
+ *
+ * @param {string[]} fichiers
+ */
+export function touchePourAudit(fichiers) {
+  return fichiers.some((f) => f === 'apps/app1/package.json' || f === 'apps/app1/package-lock.json')
+}
+
 /** @param {string[]} fichiers */
 export function touchePourImageApp1(fichiers) {
   return fichiers.some((f) => FICHIERS_IMAGE_APP1.includes(f) || f.startsWith('apps/app1/docker/'))
@@ -177,6 +179,7 @@ export function calculerJobs(evenement, fichiers, layersApp2) {
   const toutLancer = evenement !== 'pull_request' || utiles.length === 0
   if (toutLancer || touchePourFlowvent(utiles, layersApp2)) jobs.push('image-flowvent')
   if (toutLancer || touchePourImageApp1(utiles)) jobs.push('image-app1')
+  if (toutLancer || touchePourAudit(utiles)) jobs.push('audit')
   return { perimetre, raison, jobs }
 }
 
