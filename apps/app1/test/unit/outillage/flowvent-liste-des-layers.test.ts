@@ -4,20 +4,23 @@ import { join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 /**
- * Les layers que Flowvent (app2) étend sont recopiés à la main en SIX endroits :
+ * Les layers que Flowvent (app2) étend sont recopiés à la main en CINQ endroits :
  *
  *   apps/app2/nuxt.config.ts                     `extends` — la source
  *   apps/app2/Dockerfile                         `COPY layers/<x>/` — ce qui entre dans l'image
  *   apps/app2/Dockerfile.dockerignore            `!layers/<x>` — ce que le contexte laisse passer
  *   apps/app2/docker-compose.dev.yml             les montages du conteneur de dev
- *   .github/workflows/publier-image-flowvent.yml les filtres `push` ET `pull_request`
+ *   .github/workflows/publier-image-flowvent.yml le filtre `push` (publication sur main)
  *
  * Chaque oubli a son symptôme, et aucun n'est bruyant au bon moment :
  *  - absent du Dockerfile ou du dockerignore → l'image ne se construit plus, découvert à la
  *    publication sur `main` ;
  *  - absent des montages → le serveur de dev ne démarre plus, découvert par le premier qui le lance ;
- *  - absent des filtres du workflow → une PR qui casse Flowvent par ce layer ne le reconstruit PAS,
- *    et passe au vert. C'est le pire des trois : la garde existe et regarde ailleurs.
+ *  - absent du filtre du workflow → un merge qui touche ce layer ne republie pas l'image.
+ *
+ * La garde des PR (job `image-flowvent` de tests.yml) n'a PAS de copie : `perimetre-ci.mjs` lit
+ * `extends` à chaque run. C'était la copie la plus dangereuse — absente, une PR qui cassait
+ * Flowvent par ce layer ne le reconstruisait pas, et passait au vert.
  *
  * `layers/map` a été ajouté après coup, fichier par fichier : c'est exactement cette dérive.
  *
@@ -57,10 +60,6 @@ describe('Flowvent — la liste des layers est la même partout', () => {
     ),
     'publier-image-flowvent.yml (push)': ensemble(
       declencheur(workflow, 'push'),
-      /- 'layers\/([a-z0-9-]+)\/\*\*'/g
-    ),
-    'publier-image-flowvent.yml (pull_request)': ensemble(
-      declencheur(workflow, 'pull_request'),
       /- 'layers\/([a-z0-9-]+)\/\*\*'/g
     ),
   }
