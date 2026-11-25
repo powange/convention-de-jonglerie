@@ -184,7 +184,10 @@
         class="mb-6"
       >
         <template #actions>
-          <div v-if="canManageEdition" class="flex items-center gap-2">
+          <!-- Même règle que l'accès en aperçu : gérer les bénévoles OU modifier l'édition. Le
+               bouton suivait `canManageEdition`, qui ignore le droit de gérer les bénévoles : un
+               organisateur qui n'avait que lui ne le voyait pas. -->
+          <div v-if="peutGererBenevoles" class="flex items-center gap-2">
             <UButton
               size="xs"
               color="primary"
@@ -702,7 +705,7 @@ const shouldReduceDescription = computed(() => {
   return false
 })
 
-// Ancien canManageEdition gardé pour compatibilité avec le bouton "Gérer"
+// Ancien calcul, transmis aux sous-composants (le bouton « Gérer » suit `peutGererBenevoles`)
 const canManageEdition = computed(() => {
   if (!authStore.user || !edition.value) return false
   // Super Admin en mode admin

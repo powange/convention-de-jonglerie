@@ -611,6 +611,10 @@ const canViewVolunteersTable = computed(() => {
   if (!authStore.user || !edition.value) return false
   // Super Admin en mode admin
   if (authStore.isAdminModeActive) return true
+  // Le droit de gérer les bénévoles, tel que l'app hôte le calcule. Sans lui, la règle ne lisait que
+  // la liste des organisateurs de la convention d'app1 : dans Flowvent, qui ne la fournit pas, un
+  // organisateur déclaré voyait « Accès refusé » sur un tableau que le serveur lui ouvrait.
+  if (canManageVolunteers.value) return true
   // Créateur de l'édition
   if (edition.value.creatorId && edition.value.creatorId === authStore.user.id) return true
   // Auteur de la convention

@@ -212,38 +212,38 @@ const chargementCandidats = ref(false)
 const candidats = ref<any[]>([])
 const erreurCandidats = ref(false)
 
-// `immediate` : la présélection ci-dessus s'applique dès la construction, avant que cet
-// observateur existe. Sans cela, la page s'ouvrait avec un créneau choisi et une liste de
-// candidats vide — donc sur un message d'absence trompeur. Vu à l'inspection visuelle, pas par
-// les tests, qui interrogeaient l'API directement.
-//
-// Côté serveur en revanche, on ne charge rien : `$fetch` n'y porte pas le cookie de session,
-// l'API répondait 401 et Nuxt remplaçait la page entière par son écran d'erreur — au premier
-// affichage comme à chaque rafraîchissement. L'observateur se rejoue à l'hydratation : c'est de
-// là que part la requête, avec la session du navigateur.
-watch(
-  creneauCede,
-  async (id) => {
-    creneauVoulu.value = null
-    candidats.value = []
-    erreurCandidats.value = false
-    if (!id || import.meta.server) return
-    chargementCandidats.value = true
-    try {
-      const r = await $fetch<any>(`/api/editions/${editionId.value}/volunteers/swaps/candidates`, {
-        query: { assignmentId: id },
-      })
-      candidats.value = (r?.data ?? r)?.candidates ?? []
-    } catch {
-      // Un échec doit se voir : sans ce drapeau, le sélecteur annoncerait « aucun créneau
-      // échangeable », qui se lit comme une absence de candidat et non comme une panne.
-      erreurCandidats.value = true
-    } finally {
-      chargementCandidats.value = false
-    }
-  },
-  { immediate: true }
-)
+// Côté serveur, on ne charge rien : `$fetch` n'y porte pas le cookie de session, l'API répondait
+// 401 et Nuxt remplaçait la page entière par son écran d'erreur — au premier affichage comme à
+// chaque rafraîchissement.
+async function chargerCandidats(id: string | null | undefined) {
+  creneauVoulu.value = null
+  candidats.value = []
+  erreurCandidats.value = false
+  if (!id || import.meta.server) return
+  chargementCandidats.value = true
+  try {
+    const r = await $fetch<any>(`/api/editions/${editionId.value}/volunteers/swaps/candidates`, {
+      query: { assignmentId: id },
+    })
+    candidats.value = (r?.data ?? r)?.candidates ?? []
+  } catch {
+    // Un échec doit se voir : sans ce drapeau, le sélecteur annoncerait « aucun créneau
+    // échangeable », qui se lit comme une absence de candidat et non comme une panne.
+    erreurCandidats.value = true
+  } finally {
+    chargementCandidats.value = false
+  }
+}
+
+watch(creneauCede, chargerCandidats)
+
+// Premier chargement APRÈS le montage. La présélection ci-dessus s'applique dès la construction :
+// sans ce premier appel, la page s'ouvrait avec un créneau choisi et une liste de candidats vide.
+// Il était fait par un observateur `immediate`, mais celui-ci se rejouait au client PENDANT la
+// construction, avant l'hydratation : il passait `chargementCandidats` à vrai, et le premier rendu
+// du client (« Chargement… ») divergeait de celui du serveur (« Choisir un créneau ») — écart
+// d'hydratation à chaque ouverture de la page.
+onMounted(() => chargerCandidats(creneauCede.value))
 
 /** Les créneaux convoitables, avec la personne qui les tient — c'est elle qu'on sollicite. */
 const choixCandidats = computed(() =>

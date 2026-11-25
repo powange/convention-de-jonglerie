@@ -12,6 +12,13 @@
 import { fileURLToPath } from 'node:url'
 
 export default defineNuxtConfig({
+  // Feuilles communes : la mise en forme du Markdown rendu (`prose`) et l'habillage de FullCalendar.
+  // Sans elles, Flowvent affichait la description de la page bénévole en texte brut (ni titres ni
+  // puces) et ses plannings aux couleurs par défaut de FullCalendar.
+  css: [
+    fileURLToPath(new URL('./app/assets/css/prose.css', import.meta.url)),
+    fileURLToPath(new URL('./app/assets/css/fullcalendar.css', import.meta.url)),
+  ],
   alias: {
     // Pas `#ui` : Nuxt UI s'en sert déjà (`#ui/types`, `#ui/components/…`).
     '#ui-commun': fileURLToPath(new URL('./', import.meta.url)),
