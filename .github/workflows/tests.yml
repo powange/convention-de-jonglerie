@@ -1258,6 +1258,43 @@ jobs:
           cache-from: type=gha,scope=flowvent
           cache-to: type=gha,mode=max,scope=flowvent
 
+  # ---------------------------------------------------------------------------------------------
+  # L'image de production d'app1, construite SANS être publiée, quand la PR touche ce qui décide de
+  # son contenu : Dockerfile, `.dockerignore` (contexte = racine), `apps/app1/docker/`, dépendances.
+  # Aussi sur le run planifié et le déclenchement manuel — l'image de base `node:24-slim` flotte, et
+  # une nuit est le bon rythme pour apprendre qu'elle a cassé quelque chose.
+  #
+  # Le job `build` ne remplace pas celui-ci : il fait un `nuxt build` HORS de Docker. Une casse
+  # propre à l'image n'était découverte que par `publier-image.yml`, après le merge, et `:main`
+  # restait alors sur l'image précédente sans que rien ne le signale.
+  #
+  # Mêmes paramètres que la publication, cache compris (scope par défaut) : une PR relit les couches
+  # que `main` a écrites, et ce qu'elle écrit reste cantonné à sa PR.
+  image-app1:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    needs: [changements]
+    if: contains(needs.changements.outputs.jobs, ' image-app1 ')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Préparer Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Construire l'image d'app1 (sans la publier)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/app1/Dockerfile
+          target: runtime
+          push: false
+          build-args: |
+            BUILD_SHA=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   # Les vulnérabilités connues des dépendances. ⚠️ CE JOB NE BLOQUE PAS `ci-verte`, et c'est
   # délibéré : un avis publié pendant la nuit rendrait rouge une PR qui ne touche pas aux
   # dépendances, et bloquerait le dépôt pour une raison étrangère à son contenu. Il est là pour
@@ -1339,6 +1376,7 @@ jobs:
         playwright,
         navigateurs,
         image-flowvent,
+        image-app1,
       ]
     timeout-minutes: 5
 
