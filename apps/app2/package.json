@@ -44,6 +44,7 @@
     "@tiptap/extension-emoji": "^3.35.0",
     "@vueuse/core": "^14.3.0",
     "bcryptjs": "^3.0.3",
+    "cron": "^4.4.2",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "libphonenumber-js": "^1.13.1",

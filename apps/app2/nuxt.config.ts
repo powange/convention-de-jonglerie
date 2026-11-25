@@ -132,6 +132,12 @@ export default defineNuxtConfig({
     '/events/*/volunteers/**': { appLayout: 'evenement' },
   },
 
+  // Tâches Nitro : celles du layer bénévoles (layers/volunteers/server/tasks/) sont lancées par
+  // server/plugins/planificateur.ts — rappels de créneau, échanges expirés.
+  nitro: {
+    experimental: { tasks: true },
+  },
+
   runtimeConfig: {
     session: {
       // Mot de passe de chiffrement des cookies de session (NUXT_SESSION_PASSWORD).
