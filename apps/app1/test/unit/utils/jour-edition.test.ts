@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { jourDeLEdition } from '../../../app/utils/jour-edition'
+import { jourDeLEdition } from '#volunteers/app/utils/jour-edition'
 import {
   calculateVolunteersStatsByDay,
   calculateVolunteersStatsByTeam,

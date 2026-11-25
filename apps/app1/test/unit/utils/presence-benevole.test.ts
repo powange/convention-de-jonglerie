@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { estPresentPendant, fenetreDe } from '../../../shared/utils/presence-benevole'
+import { estPresentPendant, fenetreDe } from '#volunteers/shared/utils/presence-benevole'
 
 const creneau = (heureDebut: number, heureFin: number) => ({
   debut: Date.UTC(2026, 7, 1, heureDebut),

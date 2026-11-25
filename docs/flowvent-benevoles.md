@@ -44,18 +44,44 @@ Trois familles, selon qui s'en sert et à qui elles appartiennent :
    `edition-permissions`, `organizer-management`, `prisma-select-helpers`, `auth-utils`,
    `invitation`, `stores/editions`, `editionName`, et le lien avec les spectacles (artistes).
 
+## Le contrat d'hôte
+
+Après les lots 1 à 3, `layers/volunteers` n'emprunte plus à son app hôte qu'une liste courte et
+explicite de modules : **toute app qui étend le layer doit les fournir**, avec ses propres règles.
+L'interface des ports, elle, est fournie par le layer (`#volunteers/server/ports/types`), pour que
+chaque app implémente exactement la même.
+
+| Module attendu                                                                                 | Ce que le layer en utilise                                                                                                                         |
+| ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `#server/utils/auth-utils`                                                                     | `requireAuth`, `optionalAuth`, `requireResourceOwner`, type `AuthenticatedUser`                                                                    |
+| `#server/utils/api-helpers`                                                                    | `wrapApiHandler`, `createSuccessResponse`, `createPaginatedResponse`                                                                               |
+| `#server/utils/validation-helpers`                                                             | `validateEditionId`, `validateResourceId`, `validateStringId`, `validateStringResourceId`, `validatePagination`, `sanitizeEmail`, `sanitizeString` |
+| `#server/volunteers/ports/registry`                                                            | `useVolunteerPorts()` — le câblage des ports propre à l'app                                                                                        |
+| `#server/utils/prisma-select-helpers`                                                          | `userBasicSelect`, `userWithNameSelect`, `userWithProfileAndGravatarSelect`, `volunteerUserDetailedSelect`, `volunteerAssignmentDetailedInclude`   |
+| `#server/utils/organizer-management`                                                           | `canManageEditionVolunteers`                                                                                                                       |
+| `#server/utils/permissions/edition-permissions`                                                | `canManageMealsById`                                                                                                                               |
+| `#server/utils/permissions/team-slot-helpers`                                                  | (contrôle d'accès)                                                                                                                                 |
+| `#server/utils/notification-service`                                                           | `NotificationService`, `NotificationHelpers`, `safeNotify`                                                                                         |
+| `#server/utils/invitation`                                                                     | `createPendingUserAndInvite`                                                                                                                       |
+| `#server/utils/prisma-helpers`                                                                 | `fetchResourceOrFail`, `buildUpdateData`                                                                                                           |
+| `#server/utils/prisma`, `#server/types/prisma`, `#server/types/prisma-helpers`                 | client et types Prisma (`Prisma`, `PrismaTransaction`…)                                                                                            |
+| `#server/utils/emailService`, `#server/utils/rate-limiter`, `#server/utils/validation-schemas` | un usage chacun                                                                                                                                    |
+| `#server/meals/meals-types`                                                                    | types du port repas                                                                                                                                |
+| `~/stores/auth`                                                                                | `useAuthStore`                                                                                                                                     |
+| `~/stores/editions`, `~/utils/editionName`, `~/types`, `~/types/volunteer`                     | **interface** : à découpler au lot 6                                                                                                               |
+
 ## Les lots
 
-| Lot | Contenu                                                                                    | Touche app1 ?          |
-| --- | ------------------------------------------------------------------------------------------ | ---------------------- |
-| 1   | Famille 1 déplacée dans le layer, alias `#volunteers`                                      | oui, imports seulement |
-| 2   | Famille 2 rendue disponible aux deux apps                                                  | oui, imports seulement |
-| 3   | Famille 3 derrière des ports ; binding app1 inchangé                                       | oui                    |
-| 4   | Schéma d'app2 : `Event` aligné et les 14 modèles bénévoles                                 | non                    |
-| 5   | Ports serveur d'app2 (gestionnaire = propriétaire de l'event, notifications sans courriel) | non                    |
-| 6   | Découplage de l'interface du layer (« contexte d'événement » fourni par l'app)             | oui                    |
-| 7   | Écran de gestion de Flowvent : barre latérale, pages sous `/events/[id]`, options retirées | non                    |
-| 8   | Libellés : le layer est en 13 langues, Flowvent en français                                | non                    |
+| Lot  | Contenu                                                                                    | Touche app1 ?          |
+| ---- | ------------------------------------------------------------------------------------------ | ---------------------- |
+| 1 ✅ | Famille 1 déplacée dans le layer, alias `#volunteers` (#927)                               | oui, imports seulement |
+| 2 ✅ | Famille 2 dans le nouveau layer `layers/core`, alias `#core` (#928)                        | oui, imports seulement |
+| 3 ✅ | Derniers utilitaires bénévoles et interface des ports dans le layer ; contrat d'hôte écrit | oui, imports seulement |
+| 4    | Schéma d'app2 : `Event` aligné et les 14 modèles bénévoles                                 | non                    |
+| 5    | Ports serveur d'app2 (gestionnaire = propriétaire de l'event, notifications sans courriel) | non                    |
+| 6    | Découplage de l'interface du layer (« contexte d'événement » fourni par l'app)             | oui                    |
+| 7    | Écran de gestion de Flowvent : barre latérale, pages sous `/events/[id]`, options retirées | non                    |
+| 8    | Libellés : le layer est en 13 langues, Flowvent en français                                | non                    |
 
 Chaque lot touchant app1 est un **déplacement sans changement de comportement**, prouvé par ses
 suites de tests (unitaires et Nuxt) et par le serveur de dev.

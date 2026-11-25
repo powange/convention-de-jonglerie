@@ -8,7 +8,7 @@ import type {
   NotifyInput,
   TicketMealParticipant,
   VolunteerPorts,
-} from './types'
+} from '#volunteers/server/ports/types'
 
 import { infosAlimentaires, infosPersonnellesSelect } from '#core/server/utils/infos-personnelles'
 import * as mealsService from '#server/meals/meals-service'

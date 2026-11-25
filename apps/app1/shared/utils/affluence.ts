@@ -22,7 +22,7 @@
  * unitaires, hors Nuxt.
  */
 
-import type { FenetrePresence } from './presence-benevole'
+import type { FenetrePresence } from '#volunteers/shared/utils/presence-benevole'
 
 /**
  * Les quatre populations du graphique, **dans l'ordre de priorité**.
