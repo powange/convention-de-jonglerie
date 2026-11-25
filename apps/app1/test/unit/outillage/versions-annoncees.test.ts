@@ -114,7 +114,7 @@ describe('versions annoncées dans CLAUDE.md', () => {
     const precises = [...bloc.matchAll(/\bv?\d+\.\d+\.\d+\b/g)].map((m) => m[0])
 
     expect(
-      precises.filter((v) => v !== '3.5.38'), // la seule exception : la version fixée par `overrides`
+      precises.filter((v) => v !== '3.5.46'), // la seule exception : la version fixée par `overrides`
       `Ce bloc annonce des versions de correctif, qui seront fausses au prochain \`npm update\`. ` +
         `N'y mettre que les MAJEURES et renvoyer à package.json :\n${precises.join(', ')}`
     ).toEqual([])

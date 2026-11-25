@@ -141,6 +141,13 @@ const fetchBouchon = vi.hoisted(() => {
 
 ;(globalThis as any).__appelsVeille = appels
 vi.stubGlobal('$fetch', fetchBouchon)
+/*
+ * ⚠️ Le `$fetch` global ne suffit plus depuis Nuxt 4.7. L'auto-import `$fetch` (celui de
+ * `useApiAction`) vient de `#build/fetch`, et ce module est désormais évalué par l'environnement
+ * Nuxt AVANT ce fichier : son export est figé sur le vrai client, et le bouchon global n'y arrive
+ * jamais — les huit cas tombaient sur « aucun appel aux candidats ». On bouchonne donc le module.
+ */
+vi.mock('#build/fetch', () => ({ $fetch: fetchBouchon }))
 
 const page = () => import('../../../app/pages/admin/veille.vue').then((m) => m.default)
 

@@ -67,15 +67,26 @@ export default defineNuxtConfig({
     /**
      * Injection CSRF dans le `$fetch` global (Double Submit Cookie).
      *
-     * Nuxt 4.5+ génère `#build/fetch` avec `export const $fetch = globalThis.$fetch`
-     * (capture à l'évaluation du module) et l'entrée client l'importe AVANT d'exécuter
-     * les plugins. Impossible donc d'intercepter `$fetch` via un plugin client.
-     * On patche le template généré pour wrapper l'instance avec l'intercepteur qui
-     * ajoute le header `x-csrf-token` depuis le cookie (cf. server/utils/csrf.ts).
+     * Le `$fetch` client est créé à l'évaluation de `#build/fetch` (template `fetch.client.mjs`
+     * depuis Nuxt 4.7), que l'entrée client importe AVANT d'exécuter les plugins. Impossible donc
+     * de l'intercepter par un plugin client. On patche le template généré : l'instance de Nuxt
+     * est enveloppée d'un intercepteur qui ajoute l'en-tête `x-csrf-token` depuis le cookie
+     * (cf. server/utils/csrf.ts), et c'est l'enveloppe qui est exportée et posée sur `globalThis`.
+     *
+     * ⚠️ ÉCHOUE BRUYAMMENT si la cible a changé. Jusqu'à Nuxt 4.6, le patch visait `fetch.mjs` et
+     * sa ligne `export const $fetch = globalThis.$fetch` ; Nuxt 4.7 a restructuré ces templates,
+     * le patch ne trouvait plus rien et repartait SANS RIEN DIRE — toutes les requêtes
+     * POST/PUT/DELETE du navigateur tombaient alors en 403 « CSRF token manquant », connexion
+     * comprise. Un build qui casse vaut mieux qu'une application qui refuse toute écriture.
      */
     'app:templates'(app) {
-      const tpl = app.templates.find((t) => t.filename === 'fetch.mjs')
-      if (!tpl || typeof tpl.getContents !== 'function') return
+      const tpl = app.templates.find((t) => t.filename === 'fetch.client.mjs')
+      if (!tpl || typeof tpl.getContents !== 'function') {
+        throw new Error(
+          "[csrf] Template Nuxt `fetch.client.mjs` introuvable : l'injection du jeton CSRF dans " +
+            '$fetch ne peut plus se faire. Revoir le hook `app:templates` de nuxt.config.ts.'
+        )
+      }
 
       // `app:templates` se déclenche à CHAQUE régénération des templates — typiquement quand on
       // ajoute une page en développement. Sans ce garde, chaque passage capturait le
@@ -100,29 +111,35 @@ export default defineNuxtConfig({
           '  const m = document.cookie.match(/(?:^|; )csrf_token=([^;]+)/)',
           '  return m ? decodeURIComponent(m[1]) : null',
           '}',
-          'if (globalThis.$fetch && !globalThis.$fetch.__csrfWrapped) {',
-          '  globalThis.$fetch = globalThis.$fetch.create({',
-          '    onRequest({ options }) {',
-          "      const method = (options.method || 'GET').toString().toUpperCase()",
-          '      if (__CSRF_SAFE.has(method)) return',
-          '      const token = __readCsrfToken()',
-          '      if (!token) return',
-          '      const headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers || {})',
-          "      if (!headers.has('x-csrf-token')) headers.set('x-csrf-token', token)",
-          '      options.headers = headers',
-          '    },',
-          '  })',
-          '  globalThis.$fetch.__csrfWrapped = true',
-          '}',
+          'const __csrfFetch = __nuxtFetch.__csrfWrapped ? __nuxtFetch : __nuxtFetch.create({',
+          '  onRequest({ options }) {',
+          "    const method = (options.method || 'GET').toString().toUpperCase()",
+          '    if (__CSRF_SAFE.has(method)) return',
+          '    const token = __readCsrfToken()',
+          '    if (!token) return',
+          '    const headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers || {})',
+          "    if (!headers.has('x-csrf-token')) headers.set('x-csrf-token', token)",
+          '    options.headers = headers',
+          '  },',
+          '})',
+          '__csrfFetch.__csrfWrapped = true',
+          'globalThis.$fetch = __csrfFetch',
+          'export const $fetch = __csrfFetch',
         ].join('\n')
         // Seconde sécurité, indépendante du garde ci-dessus : si le bloc est déjà présent,
         // ne rien réinjecter. Une double déclaration de `__CSRF_SAFE` casserait le module.
         if (code.includes('__CSRF_SAFE')) return code
 
-        return code.replace(
-          'export const $fetch = globalThis.$fetch',
-          `${csrfWrap}\nexport const $fetch = globalThis.$fetch`
-        )
+        const EXPORT_NUXT = 'export const $fetch = '
+        if (!code.includes(EXPORT_NUXT)) {
+          throw new Error(
+            `[csrf] \`${EXPORT_NUXT}\` absent du template \`fetch.client.mjs\` : Nuxt a changé ` +
+              "sa forme, et l'injection du jeton CSRF ne s'appliquerait pas. Revoir le hook " +
+              '`app:templates` de nuxt.config.ts.'
+          )
+        }
+        // L'instance de Nuxt est gardée sous un autre nom ; l'export public devient l'enveloppe.
+        return `${code.replace(EXPORT_NUXT, 'const __nuxtFetch = ')}\n${csrfWrap}\n`
       }
     },
   },
