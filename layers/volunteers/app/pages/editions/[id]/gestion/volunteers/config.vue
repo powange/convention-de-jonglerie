@@ -406,13 +406,12 @@ definePageMeta({
   middleware: ['auth-protected'],
 })
 
-const route = useRoute()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
 const { erreur, succes } = useNotificateur()
 const { t } = useI18n()
 
-const editionId = Number(route.params.id)
+const editionId = useEditionId()
 
 /*
  * L'édition passe par le store, comme sur les autres pages du layer, et non par un appel direct

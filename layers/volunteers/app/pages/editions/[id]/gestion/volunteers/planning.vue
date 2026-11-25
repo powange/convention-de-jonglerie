@@ -193,11 +193,10 @@ import {
 } from '#volunteers/app/utils/volunteer-stats'
 
 const { t } = useI18n()
-const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { erreur, neutre, succes } = useNotificateur()
-const editionId = parseInt(route.params.id as string)
+const editionId = useEditionId()
 
 /**
  * Publier ou masquer le planning aux bénévoles.

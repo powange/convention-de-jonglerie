@@ -41,7 +41,7 @@
         v-for="ev in events"
         :key="ev.id"
         class="cursor-pointer transition hover:ring-2 hover:ring-primary"
-        @click="navigateTo(`/events/${ev.id}`)"
+        @click="navigateTo(`/events/${ev.publicId}`)"
       >
         <h3 class="truncate font-semibold">{{ ev.name }}</h3>
         <p v-if="ev.location" class="mt-2 flex items-center gap-1 text-sm text-muted">

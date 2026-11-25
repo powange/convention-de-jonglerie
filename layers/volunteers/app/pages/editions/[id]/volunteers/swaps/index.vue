@@ -145,9 +145,8 @@
 definePageMeta({ middleware: ['auth-protected'] })
 
 const { t } = useI18n()
-const route = useRoute()
 const editionStore = useEditionStore()
-const editionId = computed(() => Number(route.params.id))
+const editionId = useEditionIdRef()
 
 // L'édition est attendue plutôt que chargée au montage : le garde ci-dessous a besoin de son
 // réglage, et le lire sur un objet pas encore arrivé laisserait la page s'ouvrir malgré tout.

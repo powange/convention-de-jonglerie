@@ -132,7 +132,6 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
@@ -143,13 +142,12 @@ import { useVolunteerSettings, useVolunteerTeams } from '#imports'
 const { getParticipantTypeConfig } = useParticipantTypes()
 const volunteerConfig = getParticipantTypeConfig('volunteer')
 
-const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { succes } = useNotificateur()
 const { t } = useI18n()
 
-const editionId = parseInt(route.params.id as string)
+const editionId = useEditionId()
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 // Utiliser le composable pour les paramètres des bénévoles

@@ -40,7 +40,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
@@ -49,11 +48,10 @@ import { EditionVolunteerPlanningTeamManagement as TeamManagement } from '#compo
 
 import { useAccessControlPermissions } from '#volunteers/app/composables/useAccessControlPermissions'
 
-const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 
-const editionId = parseInt(route.params.id as string)
+const editionId = useEditionId()
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 // Vérifier le statut de contrôle d'accès pour les bénévoles

@@ -50,7 +50,7 @@
           </template>
           <template #right>
             <UButton
-              :to="`/events/${editionId}`"
+              :to="`/events/${refPublique}`"
               variant="ghost"
               color="neutral"
               icon="i-heroicons-arrow-top-right-on-square"
@@ -84,7 +84,9 @@ import { useEditionStore } from '~/stores/editions'
 const route = useRoute()
 const editionStore = useEditionStore()
 
-const editionId = computed(() => Number(route.params.id))
+// L'id numérique (API, store) et l'identifiant public (adresses) de l'événement.
+const editionId = useEditionIdRef()
+const refPublique = computed(() => String(route.params.id))
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 const peutGerer = computed(() => editionStore.canManageVolunteers(edition.value))
 const estResponsable = ref(false)
@@ -107,7 +109,7 @@ function pastilleMenu(...cles: string[]) {
 const sectionsOuvertes = ref(['benevoles'])
 
 const navigation = computed<NavigationMenuItem[][]>(() => {
-  const base = `/events/${editionId.value}/gestion/volunteers`
+  const base = `/events/${refPublique.value}/gestion/volunteers`
   const enfants: NavigationMenuItem[] = []
 
   if (peutGerer.value) {
@@ -155,7 +157,7 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
       {
         label: "Informations de l'événement",
         icon: 'i-lucide-settings',
-        to: `/events/${editionId.value}/gestion/evenement`,
+        to: `/events/${refPublique.value}/gestion/evenement`,
       },
     ],
     [
@@ -172,7 +174,7 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
       {
         label: 'Page publique des bénévoles',
         icon: 'i-heroicons-eye',
-        to: `/events/${editionId.value}/volunteers`,
+        to: `/events/${refPublique.value}/volunteers`,
       },
     ],
   ]

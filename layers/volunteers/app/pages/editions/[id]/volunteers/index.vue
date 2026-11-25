@@ -490,10 +490,9 @@ const { t } = useI18n()
 const { formatDateTimeRange: formaterPlage, formatDate: formaterDate } = useDateFormat()
 
 const toast = useToast()
-const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const editionId = parseInt(route.params.id as string)
+const editionId = useEditionId()
 
 // Utiliser le composable pour les paramètres des bénévoles
 const { settings: volunteersInfo, fetchSettings: fetchVolunteersSettings } =

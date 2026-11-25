@@ -88,6 +88,10 @@ model PasswordResetToken {
 
 model Event {
   id          Int           @id @default(autoincrement())
+  /// Identifiant PUBLIC, celui des adresses (`/events/<publicId>/…`) : aléatoire, donc ni le
+  /// nombre d'événements ni les pages publiques des autres ne se devinent en comptant. L'`id`
+  /// numérique reste interne (relations, API du layer bénévoles).
+  publicId    String        @unique @default(nanoid(10)) @db.VarChar(16)
   name        String
   description String?       @db.Text
   location    String?

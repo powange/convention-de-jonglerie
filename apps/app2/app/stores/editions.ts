@@ -10,6 +10,8 @@ import { defineStore } from 'pinia'
  */
 export interface EditionFlowvent {
   id: number
+  /** L'identifiant des adresses (`/events/<publicId>/…`). */
+  publicId: string
   name: string
   description: string | null
   location: string | null
@@ -21,6 +23,8 @@ export interface EditionFlowvent {
   convention: { name: string; authorId: number; organizers: unknown[] }
   peutGererBenevoles: boolean
   volunteersMode: 'INTERNAL' | 'EXTERNAL'
+  volunteersPagePublic: boolean
+  volunteersOpen: boolean
   volunteersOrganizersInTeams: boolean
   volunteersSetupStartDate: string | null
   volunteersTeardownEndDate: string | null
@@ -55,7 +59,11 @@ export const useEditionStore = defineStore('editions', {
       // et répondait 404 à l'organisateur sur la page de ses propres bénévoles, tant qu'elle
       // n'était pas publique. `useRequestFetch` transmet les en-têtes de la requête d'origine.
       const recuperer = import.meta.server ? useRequestFetch() : $fetch
-      const promesse = recuperer<EditionFlowvent>(`/api/events/${id}/edition`)
+      // Par l'identifiant PUBLIC quand le middleware l'a résolu : par numéro, l'API ne répond qu'à
+      // qui est impliqué, si bien qu'un visiteur d'une page publique n'y trouverait rien.
+      const ref =
+        useState<Record<number, string>>('identifiants-publics', () => ({})).value[id] ?? id
+      const promesse = recuperer<EditionFlowvent>(`/api/events/${ref}/edition`)
         .then((edition) => {
           const i = this.editions.findIndex((e) => e.id === id)
           if (i !== -1) this.editions[i] = edition
