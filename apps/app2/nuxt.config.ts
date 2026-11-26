@@ -180,6 +180,13 @@ export default defineNuxtConfig({
     // Pages bénévole du layer : centrées, comme sous le layout par défaut d'app1.
     '/events/*/volunteers': { appLayout: 'evenement' },
     '/events/*/volunteers/**': { appLayout: 'evenement' },
+    // Pages publiques du layer artistes (espace artiste, appels à spectacles, confirmation d'une
+    // notification) : même raison, elles ne posent pas de marges latérales et collaient aux bords.
+    '/events/*/artist-space': { appLayout: 'evenement' },
+    '/events/*/shows-call': { appLayout: 'evenement' },
+    '/events/*/shows-call/**': { appLayout: 'evenement' },
+    '/events/*/artists/**': { appLayout: 'evenement' },
+    '/shows-call/open': { appLayout: 'evenement' },
   },
 
   // Tâches Nitro : celles du layer bénévoles (layers/volunteers/server/tasks/) sont lancées par

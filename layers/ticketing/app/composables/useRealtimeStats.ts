@@ -131,8 +131,20 @@ export function useRealtimeStats(
         }
       }
 
-      connection.eventSource.onerror = (error) => {
-        console.error('[SSE Client] SSE error:', error)
+      connection.eventSource.onerror = () => {
+        /*
+         * ⚠️ PAS d'erreur en console ici : `onerror` se déclenche à CHAQUE coupure, y compris
+         * quand on quitte ou recharge la page (la requête est alors interrompue) et pendant les
+         * reconnexions automatiques du navigateur. Ces cas sont normaux ; les journaliser comme
+         * des pannes faisait apparaître « SSE error » sur les statistiques à chaque navigation.
+         * Seul l'échec définitif (tentatives épuisées, plus bas) est une erreur.
+         */
+        if (import.meta.dev) {
+          console.log(
+            '[SSE Client] Connexion interrompue, état',
+            connection.eventSource?.readyState
+          )
+        }
         connection.isConnected.value = false
 
         // EventSource se reconnecte automatiquement, mais on gère aussi manuellement
