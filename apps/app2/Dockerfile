@@ -61,6 +61,10 @@ COPY --from=builder /app/apps/app2/prisma ./prisma
 COPY --from=builder /app/apps/app2/prisma.config.ts ./
 COPY --from=builder /app/apps/app2/server/generated ./server/generated
 COPY --from=builder /app/apps/app2/package*.json ./
+# Gestion des administrateurs (`npm run admin:add <email>` dans la console du conteneur) : le script
+# et sa logique commune avec app1. `tsx` est une dépendance de production.
+COPY apps/app2/scripts/manage-admin.ts ./scripts/manage-admin.ts
+COPY layers/core/scripts/gestion-administrateurs.ts /app/layers/core/scripts/gestion-administrateurs.ts
 # Entrypoint : construit DATABASE_URL, applique les migrations (migrate deploy), démarre Nitro.
 COPY apps/app2/docker/entrypoint.sh /app/apps/app2/entrypoint.sh
 RUN chmod +x /app/apps/app2/entrypoint.sh

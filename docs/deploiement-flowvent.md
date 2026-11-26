@@ -91,11 +91,13 @@ L'administration (`/admin` : comptes, événements) est réservée aux comptes `
 administrateur en nomme d'autres depuis la fiche d'un compte ; le PREMIER se nomme hors de
 l'interface :
 
-- **en développement**, depuis `apps/app2/` : `npm run admin:add <email>` (et `admin:remove`,
-  `admin:list`). Même script qu'app1, logique commune dans
-  `layers/core/scripts/gestion-administrateurs.ts`.
-- **en release ou en production**, les scripts ne sont pas dans l'image (comme pour app1) : dans la
-  console du conteneur de base de la stack (`flowvent-db-release` / `flowvent-db-prod`) :
+- **partout**, avec le même script qu'app1 (logique commune dans
+  `layers/core/scripts/gestion-administrateurs.ts`) : `npm run admin:add <email>` (et
+  `admin:remove`, `admin:list`) — en développement depuis `apps/app2/`, en release ou en production
+  dans la console du conteneur **applicatif** de la stack (`flowvent-app-release` /
+  `flowvent-app-prod`). Le script est dans l'image, et reconstruit seul l'accès à la base à partir
+  des `MYSQL_*` du conteneur (la `DATABASE_URL` n'existe que dans le processus de l'entrypoint) ;
+- **à défaut**, dans la console du conteneur de base (`flowvent-db-release` / `flowvent-db-prod`) :
 
   ```sql
   UPDATE User SET isGlobalAdmin = 1 WHERE email = '<adresse du compte>';

@@ -11,9 +11,26 @@ import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 import { gererAdministrateurs } from '../../../layers/core/scripts/gestion-administrateurs'
 import { PrismaClient } from '../server/generated/prisma/client'
 
-const databaseUrl = process.env.DATABASE_URL
+/**
+ * En release et en production, `DATABASE_URL` n'existe que dans le processus de l'entrypoint, qui
+ * la construit à partir de MYSQL_* : une console ouverte dans le conteneur ne l'a pas. Même règle
+ * et mêmes défauts que docker/entrypoint.sh, pour que `npm run admin:add` y fonctionne aussi.
+ */
+function urlDeLaBase(): string | null {
+  const v = process.env
+  if (v.DATABASE_URL) return v.DATABASE_URL
+  if (!v.MYSQL_USER || !v.MYSQL_PASSWORD) return null
+  const e = encodeURIComponent
+  const hote = v.DATABASE_HOST || 'flowvent-db'
+  const port = v.DATABASE_PORT || '3306'
+  return `mysql://${e(v.MYSQL_USER)}:${e(v.MYSQL_PASSWORD)}@${hote}:${port}/${e(v.MYSQL_DATABASE || 'flowvent_db')}`
+}
+
+const databaseUrl = urlDeLaBase()
 if (!databaseUrl) {
-  console.error('❌ DATABASE_URL non définie')
+  console.error(
+    '❌ DATABASE_URL non définie, et MYSQL_USER / MYSQL_PASSWORD absents pour la construire'
+  )
   process.exit(1)
 }
 
