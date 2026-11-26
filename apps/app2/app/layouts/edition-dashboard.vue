@@ -43,9 +43,13 @@
             <UDashboardSidebarCollapse />
           </template>
           <template #left>
-            <div v-if="edition" data-entete-gestion class="flex flex-col">
-              <span class="text-sm font-semibold">{{ edition.name }}</span>
-              <span v-if="dates" class="text-xs text-muted">{{ dates }}</span>
+            <!-- Une ligne pour le nom, tronqué : sur téléphone, un nom long passait sur trois lignes
+                 et débordait de la barre, dont la hauteur est fixe. Le nom complet reste au survol. -->
+            <div v-if="edition" data-entete-gestion class="flex min-w-0 flex-col">
+              <span class="truncate text-sm font-semibold" :title="edition.name">
+                {{ edition.name }}
+              </span>
+              <span v-if="dates" class="truncate text-xs text-muted">{{ dates }}</span>
             </div>
           </template>
           <template #right>
@@ -55,6 +59,8 @@
               color="neutral"
               icon="i-heroicons-arrow-top-right-on-square"
               label="Voir l'événement"
+              aria-label="Voir l'événement"
+              :ui="{ label: 'max-sm:hidden' }"
             />
           </template>
         </UDashboardNavbar>

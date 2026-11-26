@@ -20,7 +20,7 @@
             <h2 class="text-xl font-bold">
               {{ [compte.prenom, compte.nom].filter(Boolean).join(' ') || compte.pseudo }}
             </h2>
-            <p class="text-sm text-muted">{{ compte.pseudo }} · {{ compte.email }}</p>
+            <p class="text-sm break-all text-muted">{{ compte.pseudo }} · {{ compte.email }}</p>
             <div class="mt-2 flex flex-wrap gap-2">
               <UBadge
                 :color="compte.isEmailVerified ? 'success' : 'warning'"
@@ -47,10 +47,13 @@
               {{ compte.lastLoginAt ? date(compte.lastLoginAt) : 'jamais' }}
             </p>
           </div>
+          <!-- Sur téléphone, l'interrupteur passe sous le reste : à côté, il serrait la colonne du
+               nom et des dates en une bande de quelques mots par ligne. -->
           <USwitch
             :model-value="compte.isGlobalAdmin"
             label="Administrateur"
             :disabled="estMoi && compte.isGlobalAdmin"
+            class="max-sm:w-full"
             @update:model-value="changerAdmin"
           />
         </div>

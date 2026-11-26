@@ -88,7 +88,18 @@
         :description="t('gestion.stock.missing_incomplete_hint', { count: resume.nonComptes })"
       />
 
-      <UTabs v-model="ongletActif" :items="onglets" color="primary" :ui="{ list: 'w-auto' }" />
+      <!-- Alignés à gauche et défilants, libellés entiers (`shrink-0`) : centrée, une rangée plus
+           large que l'écran perdait son début, inatteignable (53 px de trop à 390 px de large). -->
+      <UTabs
+        v-model="ongletActif"
+        :items="onglets"
+        color="primary"
+        :ui="{
+          root: 'items-start',
+          list: 'w-auto max-w-full overflow-x-auto',
+          trigger: 'shrink-0',
+        }"
+      />
 
       <!-- ONGLET 1 : ce qui manque -->
       <div v-if="ongletActif === 'racheter'" class="space-y-3">

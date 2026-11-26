@@ -1,6 +1,7 @@
 <template>
   <UContainer class="py-10">
-    <div class="mb-6 flex items-center justify-between gap-4">
+    <!-- Empilé sur téléphone : à côté du bouton, le titre passait sur deux lignes, serré. -->
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 class="text-2xl font-bold">Mes événements</h1>
         <p class="text-sm text-muted">Vos événements, et ceux dont vous êtes co-organisateur.</p>

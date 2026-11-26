@@ -1,5 +1,7 @@
 <template>
-  <div class="mx-auto max-w-4xl space-y-6">
+  <!-- `min-w-0` : dans la colonne flex du panneau, la page gardait sinon la largeur minimale de son
+       contenu et dépassait de 22 px sur téléphone. -->
+  <div class="mx-auto w-full min-w-0 max-w-4xl space-y-6">
     <ManagementPageHeader
       titre="Organisateurs"
       description="L'équipe qui gère l'événement avec vous, et ce que chacun peut faire."
