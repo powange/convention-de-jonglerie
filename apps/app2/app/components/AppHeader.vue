@@ -29,19 +29,35 @@
             class="max-sm:hidden"
           />
           <UDropdownMenu :items="userMenuItems">
+            <!-- Sur téléphone, l'avatar seul : un pseudo long poussait la barre hors de l'écran. -->
             <UButton
               :label="user?.pseudo || user?.email"
               :avatar="avatar"
               trailing-icon="i-heroicons-chevron-down"
               color="neutral"
               variant="soft"
+              :aria-label="user?.pseudo || user?.email"
+              :ui="{ label: 'max-sm:hidden', trailingIcon: 'max-sm:hidden' }"
             />
           </UDropdownMenu>
         </template>
         <template v-else>
-          <UButton to="/pricing" variant="ghost" color="neutral" label="Tarifs" />
-          <UButton to="/login" variant="ghost" color="neutral" label="Connexion" />
-          <UButton to="/register" color="primary" label="Créer un compte" />
+          <!-- Un seul bouton pour entrer : « Connexion » et « Créer un compte » menaient à la même
+               page (`/login` demande l'adresse, puis connecte ou crée le compte), et les deux ensemble
+               débordaient de l'écran d'un téléphone. « Tarifs » y est caché : l'accueil y renvoie. -->
+          <UButton
+            to="/pricing"
+            variant="ghost"
+            color="neutral"
+            label="Tarifs"
+            class="max-sm:hidden"
+          />
+          <UButton
+            to="/login"
+            color="primary"
+            icon="i-heroicons-arrow-right-end-on-rectangle"
+            label="Connexion"
+          />
         </template>
       </nav>
     </UContainer>
