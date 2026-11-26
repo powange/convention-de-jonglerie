@@ -122,6 +122,16 @@ export const useEditionStore = defineStore('editions', {
       return !!edition?.droits?.tresorerie
     },
 
+    /** Validation des repas : responsable de l'équipe qui valide, ou bénévole en créneau actif. */
+    async canAccessMealValidation(editionId: number): Promise<boolean> {
+      const recuperer = import.meta.server ? useRequestFetch() : $fetch
+      return recuperer<{ data?: { canAccess?: boolean } }>(
+        `/api/editions/${editionId}/permissions/can-access-meal-validation`
+      )
+        .then((r) => !!r?.data?.canAccess)
+        .catch(() => false)
+    },
+
     async isTeamLeader(editionId: number): Promise<boolean> {
       if (this._responsables[editionId]) return this._responsables[editionId]!
       const recuperer = import.meta.server ? useRequestFetch() : $fetch

@@ -70,7 +70,13 @@ describe('layers partagés — VueUse par import explicite', () => {
       for (const nom of NOMS) {
         const appel = new RegExp(`(^|[^.\\w])${nom}\\(`)
         if (!appel.test(texte)) continue
-        const importe = new RegExp(`import[^;]*\\b${nom}\\b[^;]*from`).test(texte)
+        // Depuis `#imports`, ce n'est pas un import explicite : c'est l'auto-import sous un autre
+        // nom, et Flowvent n'y trouve pas VueUse (`useDebounce` des repas, lot 7).
+        const importe = [
+          ...texte.matchAll(
+            new RegExp(`import\\s*\\{[^}]*\\b${nom}\\b[^}]*\\}\\s*from\\s*'([^']+)'`, 'g')
+          ),
+        ].some((m) => m[1] !== '#imports')
         const local = new RegExp(`(function|const|let) ${nom}\\b`).test(texte)
         if (!importe && !local) fautifs.push(`${f.slice(LAYERS.length + 1)} : ${nom}`)
       }

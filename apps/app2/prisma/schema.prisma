@@ -1553,8 +1553,7 @@ model VolunteerMeal {
   updatedAt DateTime          @updatedAt
 
   artistMealSelections    ArtistMealSelection[]
-  event                   Event?                     @relation(fields: [eventId], references: [id])
-  eventId                 Int?
+  event                   Event                      @relation(fields: [editionId], references: [id], onDelete: Cascade)
   mealSelections          VolunteerMealSelection[]
   organizerMealSelections OrganizerMealSelection[]
   handoutItems            VolunteerMealHandoutItem[]
@@ -2578,4 +2577,10 @@ model ApiErrorLog {
    * d'API en accepte cinquante par appel.
    */
   @@index([errorType, message(length: 191)])
+}
+
+enum VolunteerMealPhase {
+  SETUP
+  EVENT
+  TEARDOWN
 }

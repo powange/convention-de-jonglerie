@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { donneDroitAuRepas } from '../../../shared/utils/droit-au-repas'
+import { donneDroitAuRepas } from '../../../../../layers/meals/shared/utils/droit-au-repas'
 
 /**
  * Qui a droit à un repas.

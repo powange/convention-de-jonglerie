@@ -19,17 +19,17 @@ un **contrat d'hôte** : droits, store d'édition, ports.
 
 ## File
 
-| Lot | Contenu                                                                     | État         |
-| --- | --------------------------------------------------------------------------- | ------------ |
-| 0   | Courriels : transport commun (`layers/core/server/socle/envoi-courriel.ts`) | livré (#956) |
-| 1   | Socle des modules : catalogue, droits, activation, pages, fichiers          | en cours     |
-| 2   | Carte du site (zones, repères, import)                                      | à faire      |
-| 3   | Stock et prêts                                                              | à faire      |
-| 4   | Artistes et spectacles                                                      | à faire      |
-| 5   | Appel à spectacles (sans messagerie)                                        | à faire      |
-| 6   | Billetterie (HelloAsso)                                                     | à faire      |
-| 7   | Repas                                                                       | à faire      |
-| 8   | Trésorerie                                                                  | à faire      |
+| Lot | Contenu                                                                     | État           |
+| --- | --------------------------------------------------------------------------- | -------------- |
+| 0   | Courriels : transport commun (`layers/core/server/socle/envoi-courriel.ts`) | livré (#956)   |
+| 1   | Socle des modules : catalogue, droits, activation, pages, fichiers          | livré (#957)   |
+| 2   | Carte du site (zones, repères, import)                                      | livré (#959)   |
+| 3   | Stock et prêts                                                              | livré (#964)   |
+| 4   | Artistes et spectacles                                                      | livré (#970)   |
+| 5   | Appel à spectacles (sans messagerie)                                        | livré (#971)   |
+| 6   | Billetterie (HelloAsso)                                                     | livré (#981)   |
+| 7   | Repas                                                                       | livré (ce lot) |
+| 8   | Trésorerie                                                                  | à faire        |
 
 ## Le socle (lot 1) : ce qu'un module doit faire pour exister dans Flowvent
 
@@ -159,6 +159,30 @@ artistes par le contrat `organisateursHabilitesSurLesArtistes` (lot 5).
 configurable. Flowvent reçoit les réglages `ticketing*` sur `Event` (mêmes noms et défauts qu'app1),
 le journal des erreurs serveur (`ApiErrorLog`, où la billetterie signale ses échecs), et les tables
 de liaison aux repas, DORMANTES jusqu'au lot 7.
+
+## Repas (lot 7)
+
+Les points d'API repas restés dans app1 (mes repas, droit à la validation), les ports repas, le
+service des repas des bénévoles (`server/meals/meals-service.ts` et ses types), le droit au repas
+et la validation au comptoir rejoignent `layers/meals` (alias `#meals`), avec les traductions
+`gestion.meals` (`gestion-meals.json`). Les utilitaires serveur gardent leur adresse
+`#server/utils/…` et `#server/meals/…` par réexportation dans chaque app.
+
+L'implémentation des ports est COMMUNE aux deux apps, qui ont les mêmes modèles pour ce qu'elle
+lit : `createDefaultMealsPorts` (le port repas lui-même) et `portsBenevolesDesRepas` (les sections
+`meals`, `artists` et `ticketing` du port bénévoles, que chaque app étale dans son registre). Dans
+Flowvent, ces trois sections étaient neutres : elles deviennent réelles — un bénévole accepté y
+reçoit ses repas, et la liste des candidatures les montre. Le port artistes de Flowvent lit aussi
+le vrai catalogue des repas (`getEnabledMeals`).
+
+Flowvent reçoit la section « Repas » de la barre latérale (configuration, liste et doublons au droit
+`repas` ; validation ouverte aussi au responsable de l'équipe qui valide et au bénévole en
+créneau), le droit `canManageMealsOrValidation` complet, et le module devient disponible. La table
+`VolunteerMeal` y perd une colonne `eventId` inventée (vide) et gagne sa vraie relation à
+l'événement.
+
+Restent propres à app1 : les repas des **organisateurs** (pas d'organisateurs déclarés dans
+Flowvent).
 
 ## Notions « convention » à ramener à l'événement
 

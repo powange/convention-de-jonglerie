@@ -115,7 +115,7 @@ export const MODULES_EVENEMENT: readonly DefinitionModule[] = [
     description: 'Repas des bénévoles et des artistes, et leur validation.',
     icone: 'i-heroicons-cake',
     droit: 'repas',
-    disponible: false,
+    disponible: true,
   },
   {
     cle: 'billetterie',

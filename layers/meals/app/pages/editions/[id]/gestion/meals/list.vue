@@ -421,7 +421,7 @@ const { t } = useI18n()
 const { formatDateFull, formatDateWeekdayMonth, formatDateWeekdayMonthShort } = useDateFormat()
 const { erreur, succes } = useNotificateur()
 
-const editionId = computed(() => parseInt(route.params.id as string))
+const editionId = useEditionIdRef()
 
 // Utiliser le composable pour les paramètres des bénévoles
 const {

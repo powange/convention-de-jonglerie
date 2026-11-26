@@ -1,12 +1,12 @@
 import { z } from 'zod'
 
+import { donneDroitAuRepas } from '#meals/shared/utils/droit-au-repas'
 import { useMealsPorts } from '#server/meals/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageMealsOrValidation } from '#server/utils/permissions/edition-permissions'
 import { assurerRepasServiAuComptoir } from '#server/utils/repas-du-comptoir'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
-import { donneDroitAuRepas } from '~~/shared/utils/droit-au-repas'
 
 const validateMealSchema = z.object({
   type: z.enum(['volunteer', 'artist', 'participant', 'organizer']),

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { createDefaultMealsPorts } from '../../../../../server/meals/ports/default-binding'
+import { createDefaultMealsPorts } from '../../../../../../../layers/meals/server/ports/default-binding'
 
 // Mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

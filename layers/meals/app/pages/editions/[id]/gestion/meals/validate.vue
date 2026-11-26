@@ -584,13 +584,10 @@
 </template>
 
 <script setup lang="ts">
-import {
-  useDebounce,
-  useMealTypeLabel,
-  useAuthStore,
-  useEditionStore,
-  formatMealDate,
-} from '#imports'
+// Import explicite : Flowvent n'a pas les auto-imports de VueUse (`@vueuse/nuxt`, propre à app1).
+import { useDebounce } from '@vueuse/core'
+
+import { useMealTypeLabel, useAuthStore, useEditionStore, formatMealDate } from '#imports'
 
 import { repasConnu, repasDepuisUrl, requeteRepas } from '../../../../../utils/repas-dans-url'
 
@@ -607,7 +604,7 @@ const { erreur, succes } = useNotificateur()
 const { t } = useI18n()
 const { getMealTypeLabel } = useMealTypeLabel()
 
-const editionId = parseInt(route.params.id as string)
+const editionId = useEditionId()
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 // État

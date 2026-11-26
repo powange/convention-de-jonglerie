@@ -13,6 +13,7 @@
 !layers/stock
 !layers/artists
 !layers/ticketing
+!layers/meals
 
 # Artefacts et dépendances (régénérés dans l'image)
 **/node_modules
