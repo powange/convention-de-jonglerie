@@ -181,3 +181,5 @@ docker compose -f docker-compose.dev.yml up --build -d
 proxy vers le port 3001 du poste, comme pour `dev.juggling-convention.com`. Côté application, le
 domaine vient de `NUXT_PUBLIC_SITE_URL` (`apps/app2/.env`), qui alimente aussi
 `vite.server.allowedHosts` : aucun domaine n'est écrit dans le code.
+
+<!-- sonde du périmètre de CI leger, PR jetable, à fermer sans merger -->
