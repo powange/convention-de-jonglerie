@@ -150,7 +150,9 @@
     "vegetarian": "Végétarien",
     "collapse": "Replier",
     "expand": "Déplier",
-    "download": "Télécharger"
+    "download": "Télécharger",
+    "unsaved_changes": "Modifications non enregistrées",
+    "unsaved_changes_warning": "Vous avez des modifications qui n'ont pas été enregistrées. Si vous quittez cette page maintenant, elles seront perdues."
   },
   "components": {
     "date_time_picker": {
@@ -387,11 +389,16 @@
     "error_occurred": "Une erreur est survenue",
     "invalid_color": "Couleur invalide",
     "loading_error": "Erreur de chargement",
-    "required_field": "Ce champ est requis"
+    "required_field": "Ce champ est requis",
+    "chunk_load_failed_description": "La connexion a été interrompue pendant son chargement. Réessayez : le reste de la page reste utilisable.",
+    "chunk_load_failed_title": "Ce bloc n'a pas pu être chargé"
   },
   "forms": {
     "labels": {
       "select_date": "Sélectionner une date"
+    },
+    "placeholders": {
+      "select_timezone": "Sélectionnez un fuseau horaire"
     }
   },
   "gestion": {
@@ -796,6 +803,26 @@
       "stage_setup_max_length": "La mise en place sur scène ne peut pas dépasser 3000 caractères",
       "technical_needs_max_length": "Les besoins techniques ne peuvent pas dépasser 3000 caractères",
       "url_invalid": "L'URL doit commencer par http:// ou https://"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "Installer l'application",
+      "description": "Ajoutez Flowvent à votre écran d'accueil : il s'ouvrira comme une application, même avec un réseau capricieux.",
+      "button": "Installer maintenant",
+      "later": "Plus tard",
+      "success": {
+        "title": "Installation réussie",
+        "description": "Flowvent a été ajouté à votre écran d'accueil."
+      },
+      "cancelled": {
+        "title": "Installation annulée",
+        "description": "Vous pourrez l'installer plus tard depuis le menu de votre compte."
+      },
+      "error": {
+        "title": "Erreur d'installation",
+        "description": "Une erreur s'est produite lors de l'installation. Veuillez réessayer."
+      }
     }
   }
 }

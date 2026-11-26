@@ -68,6 +68,8 @@
 import type { DropdownMenuItem } from '@nuxt/ui'
 
 const { loggedIn, user, clear } = useUserSession()
+// L'état d'invitation est partagé avec le bandeau (`useInvitePwa`, layer ui).
+const { entreeDeMenuDisponible, installer: installerLApplication } = useInvitePwa()
 const toast = useToast()
 
 /*
@@ -106,6 +108,19 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
       ? [{ label: 'Administration', icon: 'i-heroicons-shield-check', to: '/admin' }]
       : []),
   ],
+  // Installer l'application, quand le navigateur le propose : le bandeau ne se présente qu'une
+  // fois puis se tait sept jours, et ce geste volontaire doit rester possible (comme dans app1).
+  ...(entreeDeMenuDisponible.value
+    ? [
+        [
+          {
+            label: "Installer l'application",
+            icon: 'i-heroicons-arrow-down-tray',
+            onSelect: () => installerLApplication(),
+          },
+        ],
+      ]
+    : []),
   [{ label: 'Se déconnecter', icon: 'i-heroicons-arrow-right-on-rectangle', onSelect: logout }],
 ])
 </script>
