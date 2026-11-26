@@ -2,17 +2,17 @@
  * Les organisateurs d'un événement Flowvent : leur forme dans l'API, et la garde commune des
  * points qui les gèrent (droit « gérer les organisateurs », cf. droits-evenement.ts).
  */
-import type { H3Event } from 'h3'
 
 import { z } from 'zod'
-
-import type { CleDroit, ColonneDroit, Droits } from '../../shared/modules-evenement'
 
 import { DROITS_PAR_DOMAINE, droitsProposes } from '../../shared/modules-evenement'
 
 import { droitsSurEvenement } from './droits-evenement'
 import { idDepuisLaRoute } from './evenement-public'
 import { estEnAttente } from './invitation'
+
+import type { CleDroit, ColonneDroit, Droits } from '../../shared/modules-evenement'
+import type { H3Event } from 'h3'
 
 export const selectionCompte = {
   id: true,

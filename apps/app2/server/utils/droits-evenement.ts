@@ -9,10 +9,12 @@
  * Abonnement (décision de l'utilisateur) : c'est celui du PROPRIÉTAIRE qui ouvre la gestion de
  * l'événement, à lui comme à ses organisateurs ; un organisateur n'a pas besoin du sien.
  */
-import type { ColonneDroit, ColonneModule, Droits, Modules } from '../../shared/modules-evenement'
 
 import { DROITS_PAR_DOMAINE, MODULES_EVENEMENT } from '../../shared/modules-evenement'
+
 import { getActiveSubscription } from './subscription'
+
+import type { ColonneDroit, ColonneModule, Droits, Modules } from '../../shared/modules-evenement'
 
 export type DroitsEvenement = Droits & {
   /** Voir l'événement et sa gestion. */

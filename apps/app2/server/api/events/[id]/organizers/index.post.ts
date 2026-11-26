@@ -1,7 +1,5 @@
 import { z } from 'zod'
 
-import { sanitizeEmail } from '#server/utils/validation-helpers'
-
 import { createPendingUserAndInvite } from '../../../../utils/invitation'
 import { NotificationService } from '../../../../utils/notification-service'
 import {
@@ -9,6 +7,8 @@ import {
   schemaDroits,
   exigerGestionDesOrganisateurs,
 } from '../../../../utils/organisateurs-evenement'
+
+import { sanitizeEmail } from '#server/utils/validation-helpers'
 
 /**
  * Ajoute un organisateur à l'événement (décision de l'utilisateur : compte existant OU invitation).

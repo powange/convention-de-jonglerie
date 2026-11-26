@@ -2,10 +2,10 @@ import { createReadStream } from 'node:fs'
 import { stat } from 'node:fs/promises'
 import { join } from 'node:path'
 
-import type { H3Event } from 'h3'
-
 import { canManageArtistsById } from '../../utils/permissions/edition-permissions'
 import { getAuthSession } from '../../utils/session-helpers'
+
+import type { H3Event } from 'h3'
 
 /**
  * Sert les fichiers déposés : `/uploads/<chemin>` → `<montage>/<chemin>` (volume `/uploads`).

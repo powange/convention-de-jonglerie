@@ -1,6 +1,6 @@
-import type { H3Event } from 'h3'
-
 import { droitsSurEvenement } from './droits-evenement'
+
+import type { H3Event } from 'h3'
 
 /**
  * Qui gère les bénévoles d'un événement Flowvent : son PROPRIÉTAIRE, un administrateur global, et

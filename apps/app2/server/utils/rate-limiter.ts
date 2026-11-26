@@ -58,7 +58,7 @@ export function createRateLimiter(config: RateLimitConfig) {
     const key = keyGenerator(event)
     const now = Date.now()
 
-    let record = attempts.get(key)
+    const record = attempts.get(key)
 
     if (!record || record.resetTime < now) {
       // Nouvelle fenêtre de temps

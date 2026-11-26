@@ -1,6 +1,6 @@
 import { validateUploadedFile } from '../../../../../layers/core/server/socle/upload-validation'
-import { uploadRateLimiter } from '../../utils/rate-limiter'
 import { dossierTemporaire } from '../../utils/photo-de-profil'
+import { uploadRateLimiter } from '../../utils/rate-limiter'
 
 /**
  * Dépôt TEMPORAIRE d'une photo de profil — même contrat qu'app1 (`apps/app1/server/api/files/

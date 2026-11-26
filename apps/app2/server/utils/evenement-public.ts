@@ -6,9 +6,9 @@
  * ou candidatures ouvertes) se trouve — on a reçu le lien ; par NUMÉRO, seuls ceux qui le gèrent
  * ou y ont candidaté le trouvent. Compter 1, 2, 3… ne mène donc plus aux pages publiques des autres.
  */
-import type { H3Event } from 'h3'
-
 import { droitsSurEvenement } from './droits-evenement'
+
+import type { H3Event } from 'h3'
 
 export const estUnNumero = (ref: string) => /^\d+$/.test(ref)
 

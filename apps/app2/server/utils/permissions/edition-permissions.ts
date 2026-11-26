@@ -9,11 +9,11 @@
  * l'a demandée. Pour une autre personne, la réponse est non — on ne prête pas les droits de l'un
  * à l'autre.
  */
-import type { CleDroit } from '../../../shared/modules-evenement'
-import type { DroitsEvenement } from '../droits-evenement'
-
 import { DROITS_PAR_DOMAINE, MODULES_EVENEMENT } from '../../../shared/modules-evenement'
 import { droitsSurEvenement } from '../droits-evenement'
+
+import type { CleDroit } from '../../../shared/modules-evenement'
+import type { DroitsEvenement } from '../droits-evenement'
 
 interface UtilisateurPourDroits {
   id: number

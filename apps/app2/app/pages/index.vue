@@ -55,7 +55,7 @@
 const { loggedIn } = useUserSession()
 
 useSeoMeta({
-  title: 'Flowvent — Organisation d\'événements',
+  title: "Flowvent — Organisation d'événements",
   description: 'Créez vos événements et gérez vos bénévoles avec un abonnement simple.',
 })
 
@@ -68,7 +68,7 @@ const features = [
   {
     icon: 'i-heroicons-user-group',
     title: 'Gérez vos bénévoles',
-    description: 'Accédez aux outils d\'organisation des bénévoles une fois abonné.',
+    description: "Accédez aux outils d'organisation des bénévoles une fois abonné.",
   },
   {
     icon: 'i-heroicons-credit-card',

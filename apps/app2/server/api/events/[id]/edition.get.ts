@@ -1,6 +1,3 @@
-import { optionalAuth } from '#server/utils/auth-utils'
-import { canManageEditionVolunteers } from '#server/utils/organizer-management'
-
 import {
   DROITS_PAR_DOMAINE,
   droitsProposes,
@@ -8,6 +5,9 @@ import {
 } from '../../../../shared/modules-evenement'
 import { droitsSurEvenement, selectionModules } from '../../../utils/droits-evenement'
 import { resoudreEvenement } from '../../../utils/evenement-public'
+
+import { optionalAuth } from '#server/utils/auth-utils'
+import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 
 /**
  * L'événement sous la forme « édition » qu'attend l'interface du layer bénévoles (cf.
