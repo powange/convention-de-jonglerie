@@ -1,5 +1,5 @@
-import { wrapApiHandler } from '#server/utils/api-helpers'
 import { assurerCarteLisible } from '#map/server/utils/carte-lisible'
+import { wrapApiHandler } from '#server/utils/api-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 // Convertit une couleur hex #RRGGBB en format KML (AABBGGRR)

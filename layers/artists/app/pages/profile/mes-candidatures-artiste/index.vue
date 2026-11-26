@@ -503,7 +503,7 @@
 </template>
 
 <script setup lang="ts">
-import { candidatureModifiable } from '~~/shared/utils/candidature-spectacle'
+import { candidatureModifiable } from '#core/shared/utils/candidature-spectacle'
 
 definePageMeta({
   layout: 'profile',

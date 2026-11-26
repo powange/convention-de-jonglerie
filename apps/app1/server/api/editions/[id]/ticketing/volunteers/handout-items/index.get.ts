@@ -1,7 +1,7 @@
+import { normaliserPhases } from '#core/shared/utils/phases-edition'
 import { isHttpError } from '#server/types/api'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
-import { normaliserPhases } from '~~/shared/utils/phases-edition'
 
 export default wrapApiHandler(
   async (event) => {

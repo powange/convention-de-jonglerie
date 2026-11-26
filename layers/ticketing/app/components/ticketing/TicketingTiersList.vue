@@ -321,7 +321,6 @@
 
 <script setup lang="ts">
 import { useEditionStore } from '~/stores/editions'
-import { formatMealDisplay } from '~/utils/meals'
 
 import {
   COLONNES_EXPORT_TARIFS,
@@ -334,9 +333,10 @@ import { isFixedPrice, type TicketingTier } from '../../utils/ticketing/tiers'
 
 import type { TableColumn } from '@nuxt/ui'
 
+import { formatMealDisplay } from '#core/app/utils/meals'
 import { telechargerFichier } from '#core/app/utils/telechargement'
 import { nomDeFichierCsv, versCsv } from '#core/shared/utils/csv'
-import { texteImprimable } from '~~/shared/utils/texte-imprimable'
+import { texteImprimable } from '#core/shared/utils/texte-imprimable'
 
 const { money, symbol } = useEditionCurrency()
 

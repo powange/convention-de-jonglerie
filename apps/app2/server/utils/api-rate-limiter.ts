@@ -16,3 +16,7 @@ export const personSearchRateLimiter = createRateLimiter({
     return user ? `person-search:${user.id}` : 'person-search:anonymous'
   },
 })
+
+// Dépôts de fichiers (photos d'artiste, visuels de spectacle) : même limiteur que les photos de
+// profil, déclaré dans rate-limiter.ts.
+export { uploadRateLimiter } from './rate-limiter'

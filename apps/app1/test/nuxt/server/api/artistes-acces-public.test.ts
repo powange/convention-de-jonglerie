@@ -34,7 +34,7 @@ vi.hoisted(() => {
   ;(globalThis as any).storeFileLocally = vi.fn(async () => 'fichier.jpg')
 })
 
-import deposerAffiche from '../../../../server/api/files/show.post'
+import deposerAffiche from '../../../../../../layers/artists/server/api/files/show.post'
 import maCandidature from '../../../../server/api/editions/[id]/shows-call/[showCallId]/my-application.get'
 import { trouverRoutePublique } from '../../../../server/constants/public-routes'
 import { global } from '../../globales-nitro'
@@ -137,7 +137,7 @@ describe('B6 — déposer l’affiche d’un spectacle', () => {
       metadata: { entityId: String(EDITION) },
       files: [{ name: 'affiche.jpg', content: 'data:image/jpeg;base64,AAA', size: 1024 }],
     })
-    prismaMock.edition.findUnique.mockResolvedValue(edition)
+    getEditionWithPermissions.mockResolvedValue(edition as never)
   })
 
   it('🔬 demande `canManageArtists`, le MÊME droit que créer un spectacle', async () => {
@@ -164,18 +164,19 @@ describe('B6 — déposer l’affiche d’un spectacle', () => {
 
   it('charge ce que `canManageArtists` a besoin de lire', async () => {
     /*
-     * ⚠️ On mesure la FORME de la requête, et ce n'est pas redondant : le mock de Prisma ignore
-     * l'`include`, donc les tests ci-dessus resteraient VERTS si les organisateurs cessaient
-     * d'être chargés. En vrai, `canManageArtists` lirait `undefined` et refuserait TOUT LE MONDE
-     * sauf le créateur — le défaut d'origine, déplacé.
+     * ⚠️ `canManageArtists` lit les organisateurs de l'édition : s'ils n'étaient pas chargés, il
+     * refuserait TOUT LE MONDE sauf le créateur — le défaut d'origine. Ce point d'API les chargeait
+     * lui-même ; il passe désormais par `getEditionWithPermissions`, le chargeur du contrat d'hôte
+     * (le même pour tous les points des artistes, et celui que Flowvent fournit à sa façon). On
+     * vérifie donc qu'il est appelé POUR LA PERSONNE de la session, et que c'est son résultat qui
+     * est jugé.
      */
     canManageArtists.mockReturnValue(true)
 
     await deposerAffiche({ context: { user: { id: 5 } } } as never)
 
-    const include = prismaMock.edition.findUnique.mock.calls[0][0].include
-    expect(include.convention.include.organizers).toBeTruthy()
-    expect(include.organizerPermissions).toBeTruthy()
+    expect(getEditionWithPermissions).toHaveBeenCalledWith(EDITION, { userId: 5 })
+    expect(canManageArtists.mock.calls[0][0]).toBe(edition)
   })
 
   it('refuse un anonyme', async () => {

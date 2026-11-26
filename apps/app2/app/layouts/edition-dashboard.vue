@@ -98,6 +98,10 @@ const { data: acces } = useFetch<{ modules: Modules; droits: Droits }>(
 )
 const moduleBenevoles = computed(() => acces.value?.modules.benevoles !== false)
 const carteDuSite = computed(() => !!acces.value?.modules.carte && !!acces.value?.droits.modifier)
+// Artistes et spectacles : module activé ET droit dédié (même règle qu'app1).
+const artistesOuverts = computed(
+  () => !!acces.value?.modules.artistes && !!acces.value?.droits.artistes
+)
 // Stock : le droit dédié, ou responsable d'une équipe de bénévoles (même règle qu'app1,
 // `canAccessStock`) — un responsable va chercher le matériel de son équipe.
 const stockOuvert = computed(
@@ -197,6 +201,35 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
           ]
         : []),
     ],
+    ...(artistesOuverts.value
+      ? [
+          [
+            {
+              label: 'Artistes',
+              icon: 'i-heroicons-star',
+              value: 'artistes',
+              children: [
+                {
+                  label: 'Gestion des artistes',
+                  icon: 'i-heroicons-users',
+                  to: `/events/${refPublique.value}/gestion/artists`,
+                  exact: true,
+                },
+                {
+                  label: 'Spectacles',
+                  icon: 'i-heroicons-sparkles',
+                  to: `/events/${refPublique.value}/gestion/artists/shows`,
+                },
+                {
+                  label: 'Notifications aux artistes',
+                  icon: 'i-heroicons-bell',
+                  to: `/events/${refPublique.value}/gestion/artists/notifications`,
+                },
+              ],
+            },
+          ],
+        ]
+      : []),
     ...(stockOuvert.value
       ? [
           [

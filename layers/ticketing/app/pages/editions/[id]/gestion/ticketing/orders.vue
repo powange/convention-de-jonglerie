@@ -1743,6 +1743,8 @@
 </template>
 
 <script setup lang="ts">
+// Import explicite : Flowvent n'a pas les auto-imports de VueUse (`@vueuse/nuxt`, propre à app1).
+import { refDebounced } from '@vueuse/core'
 import { onMounted, computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 

@@ -1,8 +1,8 @@
 import { infosAlimentaires, infosPersonnellesSelect } from '#core/server/utils/infos-personnelles'
+import { fromCents } from '#core/shared/utils/money'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { fromCents } from '~~/shared/utils/money'
 
 export default wrapApiHandler(
   async (event) => {

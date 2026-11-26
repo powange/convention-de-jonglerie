@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseMontantSaisi } from '../../../shared/utils/money'
+import { parseMontantSaisi } from '../../../../../layers/core/shared/utils/money'
 
 /**
  * L'analyse d'un montant tapé à la main.

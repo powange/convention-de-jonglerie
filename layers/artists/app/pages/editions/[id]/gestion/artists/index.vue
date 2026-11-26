@@ -841,6 +841,9 @@
 </template>
 
 <script setup lang="ts">
+// Import explicite : Flowvent n'a pas les auto-imports de VueUse (`@vueuse/nuxt`, propre à app1).
+import { useResizeObserver } from '@vueuse/core'
+
 import { useSaisieTemporisee, getAccommodationTypeLabel, markdownToHtml } from '#imports'
 
 // Chemin relatif, comme `filtres-artistes-url` juste en dessous : l'alias `~` ne résout pas
@@ -856,6 +859,7 @@ import { filtresDepuisUrl, requeteArtistes } from '../../../../../utils/filtres-
 
 import type { TableColumn } from '@nuxt/ui'
 
+import { resteAPayer, resteAVerserEnTout } from '#artists/shared/utils/reste-a-verser-a-un-artiste'
 import {
   dessinerCaseACocher,
   ENTETE_COCHE,
@@ -864,8 +868,7 @@ import {
 import { telechargerFichier } from '#core/app/utils/telechargement'
 import { nomDeFichierCsv, versCsv } from '#core/shared/utils/csv'
 import { formaterDateHeure, formaterJournee } from '#core/shared/utils/fuseau-edition'
-import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
-import { resteAPayer, resteAVerserEnTout } from '~~/shared/utils/reste-a-verser-a-un-artiste'
+import { DEFAULT_CURRENCY } from '#core/shared/utils/money'
 
 definePageMeta({
   middleware: ['auth-protected'],
@@ -877,7 +880,8 @@ const { t, locale } = useI18n()
 const { erreur, succes } = useNotificateur()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const editionId = computed(() => parseInt(route.params.id as string))
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionIdRef()
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 
 /**

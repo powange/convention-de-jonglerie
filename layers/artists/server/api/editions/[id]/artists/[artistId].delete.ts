@@ -1,5 +1,9 @@
 import { z } from 'zod'
 
+import {
+  numerosOrphelinsApresSuppression,
+  spectaclesVidesApresRetrait,
+} from '#artists/shared/utils/suppression-artiste'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import {
@@ -7,10 +11,6 @@ import {
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
-import {
-  numerosOrphelinsApresSuppression,
-  spectaclesVidesApresRetrait,
-} from '~~/shared/utils/suppression-artiste'
 
 /**
  * Ce que l'écran demande d'emporter avec l'artiste.

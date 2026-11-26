@@ -1,4 +1,4 @@
-import { texteImprimable } from '~~/shared/utils/texte-imprimable'
+import { texteImprimable } from '#core/shared/utils/texte-imprimable'
 
 /**
  * Ce qui part dans le PDF des artistes.

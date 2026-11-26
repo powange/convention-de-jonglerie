@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import handler from '../../../../../../server/api/editions/[id]/shows/index.get'
+import handler from '../../../../../../../../layers/artists/server/api/editions/[id]/shows/index.get'
 import { global } from '../../../../globales-nitro'
 
 const mockCanManageArtistsById = vi.hoisted(() => vi.fn())

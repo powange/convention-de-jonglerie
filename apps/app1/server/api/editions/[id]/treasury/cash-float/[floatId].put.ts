@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { toCents } from '#core/shared/utils/money'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTreasuryById } from '#server/utils/permissions/edition-permissions'
@@ -9,7 +10,6 @@ import {
   preteurNormalise,
 } from '#server/utils/treasury-guards'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { toCents } from '~~/shared/utils/money'
 
 const bodySchema = z.object({
   amount: z.number().positive().max(10_000_000),

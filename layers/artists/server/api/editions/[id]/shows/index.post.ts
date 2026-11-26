@@ -1,0 +1,128 @@
+import { z } from 'zod'
+
+import { replaceShowComposition, showActSchema } from '#artists/server/utils/show-acts'
+import {
+  replaceShowPerformances,
+  showPerformancesSchema,
+} from '#artists/server/utils/show-performances'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { handleFileUpload } from '#server/utils/file-helpers'
+import {
+  canManageArtists,
+  getEditionWithPermissions,
+} from '#server/utils/permissions/edition-permissions'
+import {
+  showCompositionInclude,
+  showPerformancesInclude,
+} from '#server/utils/prisma-select-helpers'
+import { validateEditionId } from '#server/utils/validation-helpers'
+
+const showSchema = z.object({
+  title: z.string().min(1, 'Le titre est requis').max(191),
+  type: z.enum(['STANDARD', 'CABARET']).optional().default('STANDARD'),
+  // 191 = taille de la colonne
+  companyName: z.string().max(191).optional().nullable(),
+  description: z.string().optional().nullable(),
+  // Sans plafond (comme description) : agrège les besoins techniques importés des candidatures
+  technicalNeeds: z.string().optional().nullable(),
+  // Le quand et le où : un spectacle peut être joué plusieurs fois, à des endroits différents
+  performances: showPerformancesSchema,
+  duration: z.number().int().positive().optional().nullable(),
+  imageUrl: z.string().optional().nullable(),
+  // artistIds pour un spectacle STANDARD, acts pour un CABARET dont les artistes
+  // sont portés par les numéros
+  artistIds: z.array(z.number().int().positive()).optional().default([]),
+  acts: z.array(showActSchema).optional().default([]),
+  handoutItemIds: z.array(z.number().int().positive()).optional().default([]),
+})
+
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+
+    // Vérifier les permissions
+    const edition = await getEditionWithPermissions(editionId, { userId: user.id })
+    if (!edition) {
+      throw createError({ status: 404, message: 'Édition non trouvée' })
+    }
+
+    const hasPermission = canManageArtists(edition, user)
+    if (!hasPermission) {
+      throw createError({
+        status: 403,
+        message: "Vous n'êtes pas autorisé à gérer les spectacles de cette édition",
+      })
+    }
+
+    const body = await readBody(event)
+    const validatedData = showSchema.parse(body)
+
+    // Création et composition dans la même transaction : un numéro invalide ne doit pas
+    // laisser derrière lui un spectacle à moitié constitué.
+    const show = await prisma.$transaction(async (tx) => {
+      const created = await tx.show.create({
+        data: {
+          editionId,
+          title: validatedData.title,
+          type: validatedData.type,
+          // Un cabaret n'a pas de compagnie unique : ses artistes sont ceux de ses numéros
+          companyName: validatedData.type === 'STANDARD' ? validatedData.companyName : null,
+          description: validatedData.description,
+          technicalNeeds: validatedData.technicalNeeds,
+          duration: validatedData.duration,
+          handoutItems: {
+            create: validatedData.handoutItemIds.map((handoutItemId) => ({
+              handoutItemId,
+            })),
+          },
+        },
+      })
+
+      // Représentations et numéros ont besoin de l'id du spectacle, d'où cette seconde étape
+      await replaceShowPerformances(tx, created.id, validatedData.performances)
+
+      await replaceShowComposition(
+        tx,
+        created.id,
+        validatedData.type,
+        validatedData.artistIds,
+        validatedData.acts
+      )
+
+      return created
+    })
+
+    // Gérer l'image avec le helper centralisé
+    const finalImageFilename = await handleFileUpload(validatedData.imageUrl, null, {
+      resourceId: show.id,
+      resourceType: 'shows',
+    })
+
+    // Mettre à jour l'image si nécessaire
+    const updatedShow = await prisma.show.update({
+      where: { id: show.id },
+      data: {
+        imageUrl: finalImageFilename || null,
+      },
+      include: {
+        ...showCompositionInclude,
+        handoutItems: {
+          include: {
+            handoutItem: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        ...showPerformancesInclude,
+      },
+    })
+
+    return createSuccessResponse({ show: updatedShow })
+  },
+  { operationName: 'CreateShow' }
+)

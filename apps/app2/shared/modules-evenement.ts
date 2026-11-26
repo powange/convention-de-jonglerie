@@ -103,10 +103,10 @@ export const MODULES_EVENEMENT: readonly DefinitionModule[] = [
     cle: 'artistes',
     colonne: 'artistsEnabled',
     libelle: 'Artistes et spectacles',
-    description: 'Artistes invités, spectacles et appels à spectacles.',
+    description: "Artistes invités, leurs spectacles, l'espace artiste.",
     icone: 'i-heroicons-star',
     droit: 'artistes',
-    disponible: false,
+    disponible: true,
   },
   {
     cle: 'repas',

@@ -203,7 +203,7 @@
  * groupes ne transmet plus.
  */
 import { versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
-import { nomCompletDUnCompte } from '~~/shared/utils/nom-affichable'
+import { nomCompletDUnCompte } from '#core/shared/utils/nom-affichable'
 
 interface AssignedUser {
   id: number

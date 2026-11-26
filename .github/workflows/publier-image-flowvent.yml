@@ -23,6 +23,7 @@ on:
       - 'layers/volunteers/**'
       - 'layers/map/**'
       - 'layers/stock/**'
+      - 'layers/artists/**'
       - 'layers/auth/**'
       - '.github/workflows/publier-image-flowvent.yml'
   workflow_dispatch:

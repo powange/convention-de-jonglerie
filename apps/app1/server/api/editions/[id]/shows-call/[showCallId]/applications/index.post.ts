@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { editionAccueilleDesCandidatures } from '#core/shared/utils/candidature-spectacle'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
@@ -9,7 +10,6 @@ import {
   createShowApplicationSchema,
   handleValidationError,
 } from '#server/utils/validation-schemas'
-import { editionAccueilleDesCandidatures } from '~~/shared/utils/candidature-spectacle'
 
 /**
  * Soumettre une candidature à un appel à spectacles

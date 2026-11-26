@@ -67,7 +67,8 @@ const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { avertir } = useNotificateur()
 
-const editionId = computed(() => parseInt(route.params.id as string))
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionIdRef()
 const showId = computed(() => parseInt(route.params.showId as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 const showsPath = computed(() => `/editions/${editionId.value}/gestion/artists/shows`)

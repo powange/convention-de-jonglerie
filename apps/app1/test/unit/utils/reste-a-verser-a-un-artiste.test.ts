@@ -5,7 +5,7 @@ import {
   drapeauxDeSolde,
   resteAPayer,
   resteAVerserEnTout,
-} from '~~/shared/utils/reste-a-verser-a-un-artiste'
+} from '#artists/shared/utils/reste-a-verser-a-un-artiste'
 
 /**
  * Ce qu'il reste à verser aux artistes.

@@ -1,9 +1,10 @@
 import { z } from 'zod'
 
+import { coordonneesBancairesRecues } from '#artists/server/utils/coordonnees-bancaires-recues'
+import { remiseDeLaFacture } from '#artists/server/utils/remise-de-la-facture'
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { coordonneesBancairesRecues } from '#server/utils/coordonnees-bancaires-recues'
-import { remiseDeLaFacture } from '#server/utils/remise-de-la-facture'
+import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
 import { deplacerJustificatif, supprimerJustificatif } from '#server/utils/treasury-receipt-files'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
@@ -47,13 +48,16 @@ export default wrapApiHandler(
         reimbursementReceiptUrl: true,
         consumablesReceiptUrl: true,
         invoiceUrl: true,
-        edition: { select: { id: true, conventionId: true } },
       },
     })
 
     if (!artiste) {
       throw createError({ status: 404, message: "Vous n'êtes pas artiste pour cette édition" })
     }
+    // L'édition (id, convention) où ranger les justificatifs — par le contrat d'hôte, qui la rend
+    // aussi pour un événement Flowvent (où l'événement tient lieu de convention).
+    const edition = await getEditionWithPermissions(editionId, { userId: user.id })
+    if (!edition) throw createError({ status: 404, message: 'Édition introuvable' })
 
     /*
      * Les justificatifs, déplacés du dossier temporaire vers celui de l'édition.
@@ -75,7 +79,7 @@ export default wrapApiHandler(
         throw createError({ status: 400, message: 'Justificatif invalide' })
       }
 
-      const deplacee = await deplacerJustificatif(recue, artiste.edition, 'artists')
+      const deplacee = await deplacerJustificatif(recue, edition, 'artists')
 
       /*
        * ⚠️ UN DÉPLACEMENT RATÉ NE DOIT PAS EFFACER CE QUI ÉTAIT LÀ. `deplacerJustificatif` rend
@@ -122,7 +126,7 @@ export default wrapApiHandler(
     // APRÈS l'écriture, et sans la faire échouer : la trace en base est ce qui compte, et un
     // fichier qui survit à sa référence est un désagrément, pas une perte.
     for (const ancienne of aSupprimer) {
-      await supprimerJustificatif(ancienne, artiste.edition, 'artists')
+      await supprimerJustificatif(ancienne, edition, 'artists')
     }
 
     return createSuccessResponse(misAJour)

@@ -1,4 +1,4 @@
-import { normaliserCoordonneeBancaire } from '~~/shared/utils/coordonnees-bancaires'
+import { normaliserCoordonneeBancaire } from '#core/shared/utils/coordonnees-bancaires'
 
 /**
  * Les versements à faire : ce que l'édition doit à des TIERS.

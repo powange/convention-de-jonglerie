@@ -135,15 +135,15 @@
 </template>
 
 <script setup lang="ts">
-import { formaterIbanParGroupes } from '~~/shared/utils/coordonnees-bancaires'
-import { nomCompletDUnCompte } from '~~/shared/utils/nom-affichable'
 import {
   detteDUnArtiste,
   drapeauxDeSolde,
   resteAPayer,
   resteAVerserEnTout,
   type ArtisteAPayer,
-} from '~~/shared/utils/reste-a-verser-a-un-artiste'
+} from '#artists/shared/utils/reste-a-verser-a-un-artiste'
+import { formaterIbanParGroupes } from '#core/shared/utils/coordonnees-bancaires'
+import { nomCompletDUnCompte } from '#core/shared/utils/nom-affichable'
 
 /**
  * Les artistes qu'il reste à payer, et de quoi les payer.

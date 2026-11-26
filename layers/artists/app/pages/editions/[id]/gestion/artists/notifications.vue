@@ -40,12 +40,12 @@ definePageMeta({
   middleware: ['auth-protected'],
 })
 
-const route = useRoute()
 const { t } = useI18n()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 
-const editionId = computed(() => Number(route.params.id))
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionIdRef()
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 
 // Même règle que les autres pages artistes : le droit de gérer les artistes

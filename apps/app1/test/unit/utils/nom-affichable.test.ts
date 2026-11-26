@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { nomAffichableDUnCompte, nomCompletDUnCompte } from '../../../shared/utils/nom-affichable'
+import {
+  nomAffichableDUnCompte,
+  nomCompletDUnCompte,
+} from '../../../../../layers/core/shared/utils/nom-affichable'
 
 /**
  * Comment nommer quelqu'un à l'écran.

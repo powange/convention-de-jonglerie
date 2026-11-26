@@ -1,5 +1,10 @@
 import { z } from 'zod'
 
+import {
+  normaliserPhases,
+  phasesDuBenevole,
+  phasesSeRencontrent,
+} from '#core/shared/utils/phases-edition'
 import { isHttpError } from '#server/types/api'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
@@ -15,11 +20,6 @@ import {
 import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
 import { resoudreLesValidateurs } from '#server/utils/ticketing/nom-du-validateur'
 import { detteDeCommande, montantARembourser } from '#server/utils/ticketing/remboursement-du'
-import {
-  normaliserPhases,
-  phasesDuBenevole,
-  phasesSeRencontrent,
-} from '~~/shared/utils/phases-edition'
 
 /**
  * Deux demandes distinctes, et c'est volontaire : un QR code présenté au scan doit porter son

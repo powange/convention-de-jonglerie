@@ -58,9 +58,9 @@ export function getTranslationsToLoad(path: string): string[] {
     // .list_description, qui restent dans gestion.json — buckets de nav.)
     {
       pattern: /^\/editions\/\d+\/gestion/,
-      // `gestion-stock` : les clés du stock, sorties dans layers/stock — le menu et l'accueil de la
-      // gestion en affichent sur toutes ces pages, comme quand elles vivaient dans gestion.json.
-      translations: ['gestion', 'gestion-stock'],
+      // `gestion-stock` / `gestion-artists` : clés sorties dans leur layer — le menu et l'accueil de
+      // la gestion en affichent sur toutes ces pages, comme quand elles vivaient dans gestion.json.
+      translations: ['gestion', 'gestion-stock', 'gestion-artists'],
     },
     /*
      * Vue d'ensemble racine : workshops (cartes de modules). Le libellé de la carte « tâches » vit
@@ -204,7 +204,7 @@ export function getTranslationsToLoad(path: string): string[] {
      */
     {
       pattern: /^\/profile\/mes-conventions/,
-      translations: ['edition', 'gestion', 'gestion-stock'],
+      translations: ['edition', 'gestion', 'gestion-stock', 'gestion-artists'],
     },
   ]
 
@@ -296,19 +296,19 @@ export const translationLoaders: Record<string, Record<string, () => Promise<any
     sv: () => import('~~/i18n/locales/sv/workshops.json'),
   },
   artists: {
-    en: () => import('~~/i18n/locales/en/artists.json'),
-    da: () => import('~~/i18n/locales/da/artists.json'),
-    de: () => import('~~/i18n/locales/de/artists.json'),
-    es: () => import('~~/i18n/locales/es/artists.json'),
-    fr: () => import('~~/i18n/locales/fr/artists.json'),
-    it: () => import('~~/i18n/locales/it/artists.json'),
-    nl: () => import('~~/i18n/locales/nl/artists.json'),
-    pl: () => import('~~/i18n/locales/pl/artists.json'),
-    pt: () => import('~~/i18n/locales/pt/artists.json'),
-    ru: () => import('~~/i18n/locales/ru/artists.json'),
-    uk: () => import('~~/i18n/locales/uk/artists.json'),
-    cs: () => import('~~/i18n/locales/cs/artists.json'),
-    sv: () => import('~~/i18n/locales/sv/artists.json'),
+    en: () => import('../../../../layers/artists/i18n/locales/en/artists.json'),
+    da: () => import('../../../../layers/artists/i18n/locales/da/artists.json'),
+    de: () => import('../../../../layers/artists/i18n/locales/de/artists.json'),
+    es: () => import('../../../../layers/artists/i18n/locales/es/artists.json'),
+    fr: () => import('../../../../layers/artists/i18n/locales/fr/artists.json'),
+    it: () => import('../../../../layers/artists/i18n/locales/it/artists.json'),
+    nl: () => import('../../../../layers/artists/i18n/locales/nl/artists.json'),
+    pl: () => import('../../../../layers/artists/i18n/locales/pl/artists.json'),
+    pt: () => import('../../../../layers/artists/i18n/locales/pt/artists.json'),
+    ru: () => import('../../../../layers/artists/i18n/locales/ru/artists.json'),
+    uk: () => import('../../../../layers/artists/i18n/locales/uk/artists.json'),
+    cs: () => import('../../../../layers/artists/i18n/locales/cs/artists.json'),
+    sv: () => import('../../../../layers/artists/i18n/locales/sv/artists.json'),
   },
   gestion: {
     en: () => import('~~/i18n/locales/en/gestion.json'),
@@ -324,6 +324,21 @@ export const translationLoaders: Record<string, Record<string, () => Promise<any
     uk: () => import('~~/i18n/locales/uk/gestion.json'),
     cs: () => import('~~/i18n/locales/cs/gestion.json'),
     sv: () => import('~~/i18n/locales/sv/gestion.json'),
+  },
+  'gestion-artists': {
+    en: () => import('../../../../layers/artists/i18n/locales/en/gestion-artists.json'),
+    da: () => import('../../../../layers/artists/i18n/locales/da/gestion-artists.json'),
+    de: () => import('../../../../layers/artists/i18n/locales/de/gestion-artists.json'),
+    es: () => import('../../../../layers/artists/i18n/locales/es/gestion-artists.json'),
+    fr: () => import('../../../../layers/artists/i18n/locales/fr/gestion-artists.json'),
+    it: () => import('../../../../layers/artists/i18n/locales/it/gestion-artists.json'),
+    nl: () => import('../../../../layers/artists/i18n/locales/nl/gestion-artists.json'),
+    pl: () => import('../../../../layers/artists/i18n/locales/pl/gestion-artists.json'),
+    pt: () => import('../../../../layers/artists/i18n/locales/pt/gestion-artists.json'),
+    ru: () => import('../../../../layers/artists/i18n/locales/ru/gestion-artists.json'),
+    uk: () => import('../../../../layers/artists/i18n/locales/uk/gestion-artists.json'),
+    cs: () => import('../../../../layers/artists/i18n/locales/cs/gestion-artists.json'),
+    sv: () => import('../../../../layers/artists/i18n/locales/sv/gestion-artists.json'),
   },
   'gestion-stock': {
     en: () => import('../../../../layers/stock/i18n/locales/en/gestion-stock.json'),

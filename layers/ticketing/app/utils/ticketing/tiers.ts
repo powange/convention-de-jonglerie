@@ -1,4 +1,4 @@
-import type { MealPhase } from '~/utils/meals'
+import type { MealPhase } from '#core/app/utils/meals'
 
 export interface TicketingTier {
   id: number

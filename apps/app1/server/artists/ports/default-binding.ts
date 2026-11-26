@@ -1,6 +1,6 @@
 // Câblage jonglerie des ports du module artistes. Écrit le bloc d'infos sur l'Edition et lit le
 // catalogue des repas (VolunteerMeal). Reste côté app ; le layer ne consomme que les interfaces.
-import type { ArtistsPorts } from './types'
+import type { ArtistsPorts } from '#artists/server/ports/types'
 
 import { invalidateEditionCache } from '#server/utils/cache-helpers'
 

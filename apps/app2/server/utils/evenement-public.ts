@@ -49,6 +49,11 @@ export async function resoudreEvenement(
       !!(await prisma.editionVolunteerApplication.findFirst({
         where: { eventId: evenement.id, userId },
         select: { id: true },
+      })) ||
+      // Un artiste de l'événement rejoint son espace artiste, même si l'événement n'est pas public.
+      !!(await prisma.editionArtist.findFirst({
+        where: { editionId: evenement.id, userId },
+        select: { id: true },
       }))
   }
   const s = evenement.volunteerSettings

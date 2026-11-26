@@ -209,7 +209,7 @@
 </template>
 
 <script setup lang="ts">
-import { normaliserPhases, type PhaseEdition } from '~~/shared/utils/phases-edition'
+import { normaliserPhases, type PhaseEdition } from '#core/shared/utils/phases-edition'
 
 interface VolunteerHandoutItem {
   id: number

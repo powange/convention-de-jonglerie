@@ -147,8 +147,8 @@ import type { TaskFiltersValue, TaskSort } from '~/components/tasks/TaskFilters.
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
-import { filtrerParEcheance, type FiltreEcheance } from '~~/shared/utils/filtre-echeance-taches'
 import { contientLaSaisie } from '#core/shared/utils/recherche-texte'
+import { filtrerParEcheance, type FiltreEcheance } from '~~/shared/utils/filtre-echeance-taches'
 
 definePageMeta({
   middleware: ['auth-protected'],

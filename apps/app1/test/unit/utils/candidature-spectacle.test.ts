@@ -4,7 +4,7 @@ import {
   appelOuvertAuxCandidatures,
   candidatureModifiable,
   editionAccueilleDesCandidatures,
-} from '../../../shared/utils/candidature-spectacle'
+} from '../../../../../layers/core/shared/utils/candidature-spectacle'
 
 /**
  * La règle « cette candidature est-elle encore modifiable ? », et celle du statut d'édition.

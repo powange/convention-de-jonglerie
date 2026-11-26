@@ -1,3 +1,4 @@
+import { numerosOrphelinsApresSuppression } from '#artists/shared/utils/suppression-artiste'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import {
@@ -5,7 +6,6 @@ import {
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
-import { numerosOrphelinsApresSuppression } from '~~/shared/utils/suppression-artiste'
 
 /**
  * Ce que la suppression de cet artiste laisserait derrière elle.

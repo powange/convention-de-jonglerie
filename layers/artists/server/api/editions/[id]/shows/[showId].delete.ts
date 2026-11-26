@@ -1,0 +1,58 @@
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { deleteOldFile } from '#server/utils/file-helpers'
+import {
+  canManageArtists,
+  getEditionWithPermissions,
+} from '#server/utils/permissions/edition-permissions'
+import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
+
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    const showId = validateResourceId(event, 'showId', 'spectacle')
+
+    // Vérifier les permissions
+    const edition = await getEditionWithPermissions(editionId, { userId: user.id })
+    if (!edition) {
+      throw createError({ status: 404, message: 'Édition non trouvée' })
+    }
+
+    const hasPermission = canManageArtists(edition, user)
+    if (!hasPermission) {
+      throw createError({
+        status: 403,
+        message: "Vous n'êtes pas autorisé à gérer les spectacles de cette édition",
+      })
+    }
+
+    // Vérifier que le spectacle existe et appartient à cette édition
+    const existingShow = await prisma.show.findFirst({
+      where: {
+        id: showId,
+        editionId,
+      },
+    })
+
+    if (!existingShow) {
+      throw createError({
+        status: 404,
+        message: 'Spectacle non trouvé',
+      })
+    }
+
+    // Supprimer l'image associée si elle existe
+    if (existingShow.imageUrl) {
+      await deleteOldFile(existingShow.imageUrl, showId, 'shows')
+    }
+
+    // Supprimer le spectacle (les associations avec les artistes seront supprimées en cascade)
+    await prisma.show.delete({
+      where: { id: showId },
+    })
+
+    return createSuccessResponse(null, 'Spectacle supprimé avec succès')
+  },
+  { operationName: 'DeleteShow' }
+)

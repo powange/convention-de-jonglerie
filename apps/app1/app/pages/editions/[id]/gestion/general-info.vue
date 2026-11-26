@@ -333,9 +333,9 @@ import { useEditionStore } from '~/stores/editions'
 import { countrySelectOptions } from '~/utils/countries'
 import { ancrerHorloge, horlogeMurale, relireHorloge } from '~/utils/horloge-edition'
 
+import { DEFAULT_CURRENCY, SUPPORTED_CURRENCIES } from '#core/shared/utils/money'
 import { premierJourDeSemaine } from '#core/shared/utils/semaine'
 import { useTimezones } from '#ui-commun/app/composables/useTimezones'
-import { DEFAULT_CURRENCY, SUPPORTED_CURRENCIES } from '~~/shared/utils/money'
 
 // La semaine commence le lundi en France, le dimanche ailleurs : la valeur suit la langue de qui
 // regarde plutôt que d'être figée. Sans elle, `UCalendar` démarre toujours le dimanche.

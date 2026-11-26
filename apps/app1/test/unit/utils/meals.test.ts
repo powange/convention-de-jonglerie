@@ -12,8 +12,8 @@ import {
   formatPhases,
   formatMealType,
   formatMealDisplay,
-} from '../../../app/utils/meals'
-import type { Meal } from '../../../app/utils/meals'
+} from '../../../../../layers/core/app/utils/meals'
+import type { Meal } from '../../../../../layers/core/app/utils/meals'
 
 // --- Helper de construction d'un repas réaliste ---
 const meal = (over: Partial<Meal> = {}): Meal => ({

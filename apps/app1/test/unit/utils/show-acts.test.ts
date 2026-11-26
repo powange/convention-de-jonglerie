@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { replaceShowComposition } from '../../../server/utils/show-acts'
+import { replaceShowComposition } from '../../../../../layers/artists/server/utils/show-acts'
 
 /**
  * Ce que ces tests verrouillent : **un numéro garde son identifiant** d'un enregistrement à

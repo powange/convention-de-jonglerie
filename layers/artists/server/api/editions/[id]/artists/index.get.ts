@@ -1,10 +1,10 @@
 import { createHash } from 'node:crypto'
 
+import { fromCents } from '#core/shared/utils/money'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageArtistsById } from '#server/utils/permissions/edition-permissions'
 import { sanitizeEmail, validateEditionId } from '#server/utils/validation-helpers'
-import { fromCents } from '~~/shared/utils/money'
 
 /** Au-delà, la liste complète redevient plus économique qu'une requête `IN` géante. */
 const MAX_ADRESSES = 50

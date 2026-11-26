@@ -91,7 +91,7 @@
 <script setup lang="ts">
 import { regrouperParCode, totalDesGroupes, type LigneTresorerie } from '~/utils/export-tresorerie'
 
-import { DEFAULT_CURRENCY, formatCents } from '~~/shared/utils/money'
+import { DEFAULT_CURRENCY, formatCents } from '#core/shared/utils/money'
 
 /**
  * La répartition par imputation : une ligne par code, et son total.

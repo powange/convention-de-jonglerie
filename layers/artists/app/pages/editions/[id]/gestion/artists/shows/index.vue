@@ -389,13 +389,12 @@ import { finDeRepresentation } from '../../../../../../utils/horaires-spectacle'
 
 import type { TableColumn, TableRow } from '@nuxt/ui'
 
-import { texteImprimable } from '~~/shared/utils/texte-imprimable'
+import { texteImprimable } from '#core/shared/utils/texte-imprimable'
 
 definePageMeta({
   middleware: ['auth-protected'],
 })
 
-const route = useRoute()
 const router = useRouter()
 const { t, locale } = useI18n()
 const editionStore = useEditionStore()
@@ -407,7 +406,8 @@ const getShowImageUrl = (show: any) => {
   return getImageUrl(show.imageUrl, 'show', show.id)
 }
 
-const editionId = computed(() => parseInt(route.params.id as string))
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionIdRef()
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 
 // Permissions — page réservée aux organisateurs qui gèrent les artistes

@@ -3,6 +3,15 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 const mockDeplacerJustificatif = vi.hoisted(() => vi.fn())
 const mockSupprimerJustificatif = vi.hoisted(() => vi.fn())
 
+/**
+ * L'édition (id, convention) où ranger les justificatifs : lue par le contrat d'hôte, que chaque app
+ * fournit — Flowvent n'a pas la relation `edition` d'un artiste vers une convention.
+ */
+const mockGetEditionWithPermissions = vi.hoisted(() => vi.fn())
+vi.mock('#server/utils/permissions/edition-permissions', () => ({
+  getEditionWithPermissions: mockGetEditionWithPermissions,
+}))
+
 vi.mock('#server/utils/treasury-receipt-files', () => ({
   deplacerJustificatif: mockDeplacerJustificatif,
   supprimerJustificatif: mockSupprimerJustificatif,
@@ -25,13 +34,16 @@ const ficheExistante = {
   id: 77,
   reimbursementReceiptUrl: `${DOSSIER}/le-mien.pdf`,
   consumablesReceiptUrl: null,
-  edition: { id: 22, conventionId: 3 },
 }
+
+/** L'édition que rend le contrat d'hôte. */
+const editionDeLArtiste = { id: 22, conventionId: 3 }
 
 describe('PUT /api/editions/[id]/my-payment-info', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     prismaMock.editionArtist.findUnique.mockResolvedValue(ficheExistante)
+    mockGetEditionWithPermissions.mockResolvedValue(editionDeLArtiste)
     prismaMock.editionArtist.update.mockResolvedValue({
       iban: null,
       bic: null,
@@ -113,11 +125,7 @@ describe('PUT /api/editions/[id]/my-payment-info', () => {
     const temporaire = '/uploads/temp/artists/22/billet.pdf'
     await envoyer({ reimbursementReceiptUrl: temporaire })
 
-    expect(mockDeplacerJustificatif).toHaveBeenCalledWith(
-      temporaire,
-      ficheExistante.edition,
-      'artists'
-    )
+    expect(mockDeplacerJustificatif).toHaveBeenCalledWith(temporaire, editionDeLArtiste, 'artists')
   })
 
   it('accepte de conserver le justificatif qui est DÉJÀ le sien', async () => {
@@ -174,7 +182,7 @@ describe('PUT /api/editions/[id]/my-payment-info', () => {
 
     expect(mockSupprimerJustificatif).toHaveBeenCalledWith(
       ficheExistante.reimbursementReceiptUrl,
-      ficheExistante.edition,
+      editionDeLArtiste,
       'artists'
     )
   })
