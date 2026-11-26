@@ -88,7 +88,7 @@
           <UFormField label="Formules" help="Aucune cochée : toutes.">
             <div class="flex flex-wrap gap-4 pt-1">
               <UCheckbox
-                v-for="f in FORMULES"
+                v-for="f in FORMULES_PAYANTES"
                 :key="f.cle"
                 :model-value="formulaire.formules.includes(f.cle)"
                 :label="f.libelle"
@@ -180,7 +180,7 @@
 import type { TableColumn, TableRow } from '@nuxt/ui'
 
 import { normaliserCode, resumeAvantage } from '#shared/codes-promo'
-import { FORMULES } from '#shared/formules'
+import { FORMULES, FORMULES_PAYANTES } from '#shared/formules'
 
 definePageMeta({ middleware: ['admin'] })
 useSeoMeta({ title: 'Codes promo — Administration Flowvent' })

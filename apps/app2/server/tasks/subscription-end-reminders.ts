@@ -8,8 +8,8 @@ import prisma from '../utils/prisma'
  * celle de l'avantage d'un code promo qui s'achève avec lui (règle et texte :
  * shared/rappel-fin-abonnement.ts). Un seul rappel par période (`Subscription.endReminderFor`).
  *
- * Le paiement étant simulé, aucun abonnement ne se renouvelle seul : sans ce rappel, la gestion
- * passerait en lecture seule sans que personne l'ait vu venir.
+ * Le paiement étant simulé, aucun abonnement ne se renouvelle seul : sans ce rappel, le compte
+ * retomberait en formule gratuite sans que personne l'ait vu venir.
  */
 export default defineTask({
   meta: {

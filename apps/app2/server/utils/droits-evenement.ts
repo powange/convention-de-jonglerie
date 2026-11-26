@@ -6,29 +6,24 @@
  *   qu'on lui a donnés (la liste : `DROITS_PAR_DOMAINE`, shared/modules-evenement.ts) ;
  * - un ADMINISTRATEUR global peut tout.
  *
- * Abonnement (décisions de l'utilisateur) : c'est celui du PROPRIÉTAIRE qui ouvre la gestion de
- * l'événement, à lui comme à ses organisateurs ; un organisateur n'a pas besoin du sien. Depuis les
- * formules par module (shared/formules.ts), un droit de module ne s'exerce EN ÉCRITURE que si la
- * formule du propriétaire couvre ce module ; les droits sur l'événement lui-même (modifier, la
- * carte, les organisateurs) demandent seulement un abonnement actif. Ce qui n'est pas couvert reste
- * consultable : une fin d'abonnement ne supprime rien, la gestion passe en LECTURE SEULE.
+ * Abonnement (décisions de l'utilisateur, 26/11/2026) : tous les modules sont compris dans toutes
+ * les formules, et tout compte a au moins la formule gratuite. La gestion ne passe donc en LECTURE
+ * SEULE que dans deux cas, sans jamais rien supprimer :
+ * - l'événement est ARCHIVÉ ;
+ * - son propriétaire a plus d'événements en cours que sa formule n'en tolère (fin d'abonnement,
+ *   descente de formule) : il en archive pour reprendre la main.
+ * Les plafonds de bénévoles, d'artistes et d'organisateurs, eux, ne bloquent que les AJOUTS
+ * (server/utils/quotas.ts).
  */
 
 import { useEvent } from 'nitropack/runtime'
 
-import { estModulePayant } from '../../shared/formules'
 import { DROITS_PAR_DOMAINE, MODULES_EVENEMENT } from '../../shared/modules-evenement'
 
+import { etatDesQuotas, evenementsEnSurnombre } from './quotas'
 import { couvertureDe, selectionCouverture } from './subscription'
 
-import type { Couverture } from './subscription'
-import type {
-  CleDroit,
-  ColonneDroit,
-  ColonneModule,
-  Droits,
-  Modules,
-} from '../../shared/modules-evenement'
+import type { ColonneDroit, ColonneModule, Droits, Modules } from '../../shared/modules-evenement'
 
 export type DroitsEvenement = Droits & {
   /** Voir l'événement et sa gestion. */
@@ -74,22 +69,27 @@ function requeteEnLecture(): boolean {
   }
 }
 
-/** Le droit `cle` est-il couvert par l'abonnement du propriétaire ? */
-export function droitCouvert(cle: CleDroit, couverture: Couverture) {
-  if (!couverture.actif) return false
-  const module = DROITS_PAR_DOMAINE.find((d) => d.cle === cle)?.module
-  return !estModulePayant(module) || couverture.modules.includes(module)
-}
+export type RaisonLectureSeule = 'archive' | 'surnombre'
 
-/** La couverture de l'abonnement du propriétaire de l'événement (rien si l'événement n'existe pas). */
-export async function couvertureDeLEvenement(eventId: number): Promise<Couverture> {
+/**
+ * Pourquoi la gestion de l'événement est en lecture seule, ou `null` si elle est ouverte. Hors
+ * administrateur.
+ */
+export async function lectureSeuleDeLEvenement(
+  eventId: number
+): Promise<RaisonLectureSeule | null> {
   const evenement = await prisma.event.findUnique({
     where: { id: eventId },
     select: {
+      archivedAt: true,
+      ownerId: true,
       owner: { select: { subscription: { select: selectionCouverture } } },
     },
   })
-  return couvertureDe(evenement?.owner.subscription)
+  if (!evenement) return null
+  if (evenement.archivedAt) return 'archive'
+  const couverture = couvertureDe(evenement.owner.subscription)
+  return (await evenementsEnSurnombre(evenement.ownerId, couverture)) ? 'surnombre' : null
 }
 
 export async function droitsSurEvenement(
@@ -97,13 +97,7 @@ export async function droitsSurEvenement(
   userId: number
 ): Promise<DroitsEvenement> {
   const [evenement, utilisateur, organisateur] = await Promise.all([
-    prisma.event.findUnique({
-      where: { id: eventId },
-      select: {
-        ownerId: true,
-        owner: { select: { subscription: { select: selectionCouverture } } },
-      },
-    }),
+    prisma.event.findUnique({ where: { id: eventId }, select: { ownerId: true } }),
     prisma.user.findUnique({
       where: { id: userId },
       select: { isGlobalAdmin: true },
@@ -117,15 +111,12 @@ export async function droitsSurEvenement(
   const estProprietaire = evenement.ownerId === userId
   const administrateur = !!utilisateur?.isGlobalAdmin
   const tout = estProprietaire || administrateur
-  const couverture = couvertureDe(evenement.owner.subscription)
-  const lecture = requeteEnLecture()
+  // Un administrateur n'est tenu ni par l'archivage ni par l'abonnement d'autrui ; les autres, si.
+  // Une lecture reste toujours permise : rien n'est jamais caché.
+  const ouvert =
+    administrateur || requeteEnLecture() || (await lectureSeuleDeLEvenement(eventId)) === null
   const parDomaine = Object.fromEntries(
-    DROITS_PAR_DOMAINE.map((d) => {
-      const accorde = tout || !!organisateur?.[d.colonne]
-      // Un administrateur n'est pas tenu par l'abonnement d'autrui ; les autres, si.
-      const ouvert = administrateur || lecture || droitCouvert(d.cle, couverture)
-      return [d.cle, accorde && ouvert]
-    })
+    DROITS_PAR_DOMAINE.map((d) => [d.cle, (tout || !!organisateur?.[d.colonne]) && ouvert])
   ) as Droits
   return {
     ...parDomaine,
@@ -136,17 +127,38 @@ export async function droitsSurEvenement(
 }
 
 /**
- * La gestion de l'événement est-elle ouverte en écriture ? Oui si le propriétaire a un abonnement
- * actif (quelle que soit la formule) — ou si la personne est administrateur. Sinon, elle reste
- * consultable en lecture seule.
+ * La gestion de l'événement est-elle ouverte en écriture pour cette personne ? Oui sauf archivage
+ * ou surnombre d'événements (`lectureSeuleDeLEvenement`) — et toujours pour un administrateur.
  */
 export async function gestionOuverte(eventId: number, userId: number): Promise<boolean> {
-  const [couverture, utilisateur] = await Promise.all([
-    couvertureDeLEvenement(eventId),
-    prisma.user.findUnique({
-      where: { id: userId },
-      select: { isGlobalAdmin: true },
-    }),
+  const utilisateur = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { isGlobalAdmin: true },
+  })
+  return !!utilisateur?.isGlobalAdmin || (await lectureSeuleDeLEvenement(eventId)) === null
+}
+
+/**
+ * Ce que la gestion dit de son état, à l'accueil et dans la barre latérale : pourquoi elle est en
+ * lecture seule (ou `null`), et les quotas de la formule du propriétaire.
+ */
+export async function etatDeLaGestion(eventId: number, userId: number) {
+  const [utilisateur, quotas] = await Promise.all([
+    prisma.user.findUnique({ where: { id: userId }, select: { isGlobalAdmin: true } }),
+    etatDesQuotas(eventId),
   ])
-  return !!utilisateur?.isGlobalAdmin || couverture.actif
+  const lectureSeule = utilisateur?.isGlobalAdmin ? null : await lectureSeuleDeLEvenement(eventId)
+  return {
+    lectureSeule,
+    quotas,
+    // ⚠️ Compatibilité, à retirer au lot suivant : les pages ouvertes AVANT le passage aux formules
+    // à la taille lisent encore ces deux champs (un module « hors formule » y passait en lecture
+    // seule). Tous les modules sont désormais couverts.
+    abonnementActif: lectureSeule === null,
+    abonnement: {
+      actif: lectureSeule === null,
+      formule: quotas.formule,
+      modules: MODULES_EVENEMENT.map((m) => m.cle),
+    },
+  }
 }

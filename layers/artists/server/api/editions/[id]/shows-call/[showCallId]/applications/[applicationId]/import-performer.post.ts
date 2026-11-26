@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { generateVolunteerQrCodeToken } from '#core/server/utils/token-generator'
+import { useArtistsPorts } from '#server/artists/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEmailHash } from '#server/utils/email-hash'
@@ -178,6 +179,10 @@ export default wrapApiHandler(
     })
 
     if (!artist) {
+      // Une nouvelle fiche d'artiste consomme une place du plafond de l'hôte, s'il en a un
+      // (Flowvent : la formule du propriétaire). Rattacher un artiste déjà là ne coûte rien.
+      await useArtistsPorts().quotas?.verifierAjoutArtiste(editionId, user.id)
+
       // Générer un QR token unique (même logique que /api/editions/[id]/artists)
       let qrCodeToken = generateVolunteerQrCodeToken()
       let attempts = 0

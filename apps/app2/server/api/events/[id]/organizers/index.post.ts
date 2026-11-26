@@ -7,6 +7,7 @@ import {
   schemaDroits,
   exigerGestionDesOrganisateurs,
 } from '../../../../utils/organisateurs-evenement'
+import { verifierAjout } from '../../../../utils/quotas'
 
 import { sanitizeEmail } from '#server/utils/validation-helpers'
 
@@ -36,6 +37,10 @@ export default defineEventHandler(async (event) => {
   }
   const { identifiant, prenom, nom, droits } = resultat.data
   const estUneAdresse = identifiant.includes('@')
+
+  // Le plafond de co-organisateurs de la formule du propriétaire (invitations en attente comprises),
+  // vérifié AVANT de créer un compte invité qui resterait orphelin.
+  await verifierAjout(eventId, 'organisateurs', { userId })
 
   const evenement = await prisma.event.findUniqueOrThrow({
     where: { id: eventId },

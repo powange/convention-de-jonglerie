@@ -1,9 +1,8 @@
 import { requireUserSession } from '#imports'
 
 import { resumeAvantage } from '../../../shared/codes-promo'
-import { modulesCouverts } from '../../../shared/formules'
 import prisma from '../../utils/prisma'
-import { isSubscriptionActive } from '../../utils/subscription'
+import { couvertureDe, isSubscriptionActive } from '../../utils/subscription'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
@@ -14,13 +13,16 @@ export default defineEventHandler(async (event) => {
   })
   const code = subscription?.promoCode
 
+  const couverture = couvertureDe(subscription)
   return {
     active: isSubscriptionActive(subscription),
+    // La formule qui s'applique (« decouverte » sans abonnement payant actif) et ses plafonds.
+    formule: couverture.formule,
+    plafonds: couverture.plafonds,
     subscription: subscription
       ? {
           plan: subscription.plan,
           formule: subscription.formule,
-          modules: modulesCouverts(subscription.formule, subscription.modules),
           status: subscription.status,
           currentPeriodEnd: subscription.currentPeriodEnd,
           amountPaid: subscription.amountPaid,

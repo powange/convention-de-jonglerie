@@ -59,7 +59,6 @@ export default defineEventHandler(async (event) => {
           select: {
             plan: true,
             formule: true,
-            modules: true,
             status: true,
             currentPeriodEnd: true,
           },

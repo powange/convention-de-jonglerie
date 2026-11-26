@@ -28,6 +28,10 @@ export default wrapApiHandler(
         message: 'Droits insuffisants pour gérer les bénévoles',
       })
 
+    // Le plafond de bénévoles acceptés de l'hôte, s'il en a un (Flowvent : la formule du
+    // propriétaire). Avant toute création, pour ne laisser ni compte ni candidature à moitié faits.
+    await useVolunteerPorts().quotas?.verifierAjoutBenevole(editionId, user.id)
+
     const body = bodySchema.parse(await readBody(event))
     const cleanEmail = sanitizeEmail(body.email)
 

@@ -1,10 +1,8 @@
-import { createError, type H3Event } from 'h3'
-
-import { CLES_FORMULES, PERIODES, modulesCouverts } from '../../shared/formules'
+import { CLES_FORMULES, FORMULE_GRATUITE, PERIODES, formule } from '../../shared/formules'
 
 import prisma from './prisma'
 
-import type { CleFormule, ModulePayant } from '../../shared/formules'
+import type { CleFormule, Plafonds } from '../../shared/formules'
 
 // Valeurs valides, centralisées dans shared/formules.ts et validées côté serveur (String en base).
 // `plan` porte la PÉRIODE (mensuel ou annuel) ; la formule vit dans `formule`.
@@ -15,12 +13,7 @@ export type SubscriptionPlan = (typeof SUBSCRIPTION_PLANS)[number]
 type SubscriptionLike = { status: string; currentPeriodEnd: Date } | null | undefined
 
 type SubscriptionAvecFormule =
-  | {
-      status: string
-      currentPeriodEnd: Date
-      formule: string
-      modules: unknown
-    }
+  | { status: string; currentPeriodEnd: Date; formule: string }
   | null
   | undefined
 
@@ -30,21 +23,25 @@ export function isSubscriptionActive(subscription: SubscriptionLike): boolean {
   return subscription.status === 'active' && subscription.currentPeriodEnd.getTime() > Date.now()
 }
 
-/** Ce que couvre un abonnement : rien s'il n'est pas actif. */
+/**
+ * La formule qui s'applique à un compte. Sans abonnement payant actif — jamais souscrit, ou
+ * arrivé à son terme —, c'est la formule gratuite : tout compte a des plafonds, aucun n'est sans
+ * formule (décision du 26/11/2026).
+ */
 export interface Couverture {
-  actif: boolean
-  formule: CleFormule | null
-  modules: ModulePayant[]
+  /** Un abonnement payant est en cours. */
+  payant: boolean
+  formule: CleFormule
+  plafonds: Plafonds
 }
 
 export function couvertureDe(subscription: SubscriptionAvecFormule): Couverture {
-  if (!subscription || !isSubscriptionActive(subscription)) {
-    return { actif: false, formule: null, modules: [] }
-  }
+  const actif = isSubscriptionActive(subscription)
+  const definition = (actif && formule(subscription!.formule)) || formule(FORMULE_GRATUITE)!
   return {
-    actif: true,
-    formule: subscription.formule as CleFormule,
-    modules: modulesCouverts(subscription.formule, subscription.modules),
+    payant: actif && definition.cle !== FORMULE_GRATUITE,
+    formule: definition.cle,
+    plafonds: definition.plafonds,
   }
 }
 
@@ -53,25 +50,13 @@ export const selectionCouverture = {
   status: true,
   currentPeriodEnd: true,
   formule: true,
-  modules: true,
 } as const
 
-/** Renvoie l'abonnement de l'utilisateur s'il est actif, sinon null. */
-export async function getActiveSubscription(userId: number) {
-  const subscription = await prisma.subscription.findUnique({ where: { userId } })
-  return isSubscriptionActive(subscription) ? subscription : null
-}
-
-/**
- * Garde SERVEUR : lève une 402 si l'utilisateur n'a pas d'abonnement actif (n'importe quelle
- * formule). Sert à ce qui demande SON PROPRE abonnement, comme créer un événement. La gestion d'un
- * événement, elle, passe par la couverture de l'abonnement de son propriétaire
- * (`droitsSurEvenement`, droits-evenement.ts).
- */
-export async function requireActiveSubscription(_event: H3Event, userId: number) {
-  const subscription = await getActiveSubscription(userId)
-  if (!subscription) {
-    throw createError({ statusCode: 402, statusMessage: 'Abonnement requis' })
-  }
-  return subscription
+/** La couverture d'un compte. */
+export async function couvertureDuCompte(userId: number): Promise<Couverture> {
+  const subscription = await prisma.subscription.findUnique({
+    where: { userId },
+    select: selectionCouverture,
+  })
+  return couvertureDe(subscription)
 }

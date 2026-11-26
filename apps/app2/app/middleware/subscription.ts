@@ -1,32 +1,22 @@
-// Protège les fonctionnalités d'organisation. Utilise useRequestFetch pour transmettre le cookie de
-// session lors du rendu côté serveur.
+// Protège la gestion d'un événement (`/events/:id/gestion/…`). Utilise useRequestFetch pour
+// transmettre le cookie de session lors du rendu côté serveur.
 //
-// Deux cas (décisions de l'utilisateur) :
-// - la GESTION D'UN ÉVÉNEMENT (`/events/:id/gestion/…`) s'ouvre à quiconque la voit (propriétaire,
-//   organisateur, administrateur). Si l'abonnement du PROPRIÉTAIRE est arrêté, ou que sa formule ne
-//   couvre pas le module, elle reste consultable en LECTURE SEULE : le serveur refuse les écritures
-//   (droits-evenement.ts) et la gestion l'annonce par un bandeau (layout edition-dashboard) ;
-// - ailleurs (créer un événement…), il faut son propre abonnement.
+// La gestion s'ouvre à quiconque la voit (propriétaire, organisateur, administrateur) ; une 404
+// (événement introuvable ou invisible pour la personne) renvoie à sa page publique. Tout compte a
+// au moins la formule gratuite (décision du 26/11/2026) : aucun abonnement n'est exigé ici. Quand la
+// gestion est en LECTURE SEULE (événement archivé, ou propriétaire en surnombre d'événements), le
+// serveur refuse les écritures (droits-evenement.ts) et le layout edition-dashboard l'annonce.
 export default defineNuxtRouteMiddleware(async (to) => {
   const { loggedIn } = useUserSession()
   if (!loggedIn.value) {
     return navigateTo('/login')
   }
 
-  const recuperer = useRequestFetch()
-  const ref = to.path.startsWith('/events/') ? String(to.params.id ?? '') : ''
-
+  const ref = String(to.params.id ?? '')
+  if (!ref || ref === 'new') return
   try {
-    if (ref && ref !== 'new') {
-      // Une 404 (événement introuvable ou invisible pour la personne) renvoie à sa page publique.
-      await recuperer(`/api/events/${encodeURIComponent(ref)}/acces-gestion`)
-      return
-    }
-    const status = await recuperer<{ active?: boolean }>('/api/subscription/status')
-    if (!status?.active) {
-      return navigateTo('/pricing')
-    }
+    await useRequestFetch()(`/api/events/${encodeURIComponent(ref)}/acces-gestion`)
   } catch {
-    return navigateTo(ref && ref !== 'new' ? `/events/${ref}` : '/pricing')
+    return navigateTo(`/events/${ref}`)
   }
 })

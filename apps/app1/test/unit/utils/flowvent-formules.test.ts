@@ -19,73 +19,103 @@ const f: Record<string, any> = {}
 new Function('exports', outputText)(f)
 
 /**
- * Les formules d'abonnement de Flowvent (`apps/app2/shared/formules.ts`) : la grille décidée par
- * l'utilisateur (Solo, Duo, Intégral), ce que chaque formule couvre, et la validation du choix de
- * modules au paiement.
+ * Les formules d'abonnement de Flowvent (`apps/app2/shared/formules.ts`) : la grille À LA TAILLE
+ * décidée par l'utilisateur le 26/11/2026 (Découverte gratuite, Association, Festival, Grand
+ * festival), leurs plafonds, et la règle « alerte à 80 %, tolérance de 10 %, puis plus d'ajout ».
  */
-describe('Flowvent — formules par module', () => {
+describe('Flowvent — formules à la taille', () => {
   it('tient la grille décidée (centimes TTC)', () => {
     const prix = Object.fromEntries(f.FORMULES.map((x: any) => [x.cle, x.prix]))
     expect(prix).toEqual({
-      solo: { monthly: 900, annual: 8400 },
-      duo: { monthly: 1500, annual: 14400 },
-      integral: { monthly: 2500, annual: 24000 },
+      decouverte: { monthly: 0, annual: 0 },
+      association: { monthly: 900, annual: 8400 },
+      festival: { monthly: 1900, annual: 18000 },
+      grand: { monthly: 3900, annual: 37200 },
     })
-    expect(f.prixMensuel('solo', 'annual')).toBe(700)
-    expect(f.prixMensuel('duo', 'annual')).toBe(1200)
-    expect(f.prixMensuel('integral', 'annual')).toBe(2000)
-    expect(f.prixMensuel('duo', 'monthly')).toBe(1500)
+    expect(f.prixMensuel('association', 'annual')).toBe(700)
+    expect(f.prixMensuel('festival', 'annual')).toBe(1500)
+    expect(f.prixMensuel('grand', 'annual')).toBe(3100)
   })
 
-  it('Intégral couvre les six modules payants, quels que soient les modules enregistrés', () => {
-    expect(f.modulesCouverts('integral', null)).toEqual([
-      'benevoles',
-      'artistes',
-      'repas',
-      'billetterie',
-      'tresorerie',
-      'stock',
-    ])
-    expect(f.modulesCouverts('integral', ['stock'])).toHaveLength(6)
+  it('tient les plafonds décidés (null : illimité)', () => {
+    const plafonds = Object.fromEntries(f.FORMULES.map((x: any) => [x.cle, x.plafonds]))
+    expect(plafonds).toEqual({
+      decouverte: { evenements: 1, benevoles: 15, artistes: 5, organisateurs: 1 },
+      association: { evenements: 1, benevoles: 75, artistes: 20, organisateurs: 3 },
+      festival: { evenements: 5, benevoles: 250, artistes: 60, organisateurs: 10 },
+      grand: { evenements: 15, benevoles: 1000, artistes: 200, organisateurs: null },
+    })
   })
 
-  it('Solo et Duo couvrent les modules choisis, jamais plus que la formule', () => {
-    expect(f.modulesCouverts('solo', ['stock'])).toEqual(['stock'])
-    expect(f.modulesCouverts('duo', ['benevoles', 'repas'])).toEqual(['benevoles', 'repas'])
-    // Une valeur en base trafiquée ne donne pas plus que la formule.
-    expect(f.modulesCouverts('solo', ['stock', 'billetterie'])).toEqual(['stock'])
-    expect(f.modulesCouverts('duo', ['carte', 'inconnu', 'repas'])).toEqual(['repas'])
+  it('les plafonds ne baissent jamais en montant de formule', () => {
+    for (let i = 1; i < f.FORMULES.length; i++) {
+      for (const c of f.COMPTEURS) {
+        const avant = f.FORMULES[i - 1].plafonds[c.cle]
+        const apres = f.FORMULES[i].plafonds[c.cle]
+        expect(
+          apres === null || (avant !== null && apres >= avant),
+          `${c.cle} en ${f.FORMULES[i].cle}`
+        ).toBe(true)
+      }
+    }
   })
 
-  it('une formule inconnue ou absente ne couvre rien', () => {
-    expect(f.modulesCouverts('gold', ['stock'])).toEqual([])
-    expect(f.modulesCouverts(null, null)).toEqual([])
+  it('la formule gratuite ne se souscrit pas et ne se remise pas', () => {
+    expect(f.CLES_FORMULES).toEqual(['association', 'festival', 'grand'])
+    expect(f.estFormulePayante('decouverte')).toBe(false)
+    expect(f.estFormulePayante('festival')).toBe(true)
+    expect(f.estFormulePayante('integral')).toBe(false)
   })
 
-  it('la carte du site n’est pas un module payant', () => {
-    expect(f.estModulePayant('carte')).toBe(false)
-    expect(f.estModulePayant('benevoles')).toBe(true)
+  it('tolère 10 % au-delà du plafond, arrondi à l’inférieur', () => {
+    expect(f.plafondTolere(75)).toBe(82)
+    expect(f.plafondTolere(250)).toBe(275)
+    expect(f.plafondTolere(3)).toBe(3)
+    expect(f.plafondTolere(null)).toBeNull()
   })
 
-  it('valide le choix de modules au paiement', () => {
-    expect(f.erreurChoixModules('solo', ['stock'])).toBeNull()
-    expect(f.erreurChoixModules('duo', ['benevoles', 'repas'])).toBeNull()
-    expect(f.erreurChoixModules('integral', [])).toBeNull()
-    expect(f.erreurChoixModules('solo', [])).toMatch(/1 module/)
-    expect(f.erreurChoixModules('duo', ['stock'])).toMatch(/2 modules/)
-    expect(f.erreurChoixModules('duo', ['stock', 'stock'])).toMatch(/deux fois/)
-    expect(f.erreurChoixModules('solo', ['carte'])).toMatch(/inconnu/)
-    expect(f.erreurChoixModules('platine', [])).toMatch(/inconnue/)
+  it('accepte un ajout jusqu’à la marge, pas au-delà', () => {
+    expect(f.peutAjouter(81, 75)).toBe(true)
+    expect(f.peutAjouter(82, 75)).toBe(false)
+    expect(f.peutAjouter(80, 75, 3)).toBe(false)
+    expect(f.peutAjouter(0, 1)).toBe(true)
+    expect(f.peutAjouter(1, 1)).toBe(false)
+    expect(f.peutAjouter(10_000, null)).toBe(true)
   })
 
-  it('désigne la plus petite formule pour un nombre de modules', () => {
-    expect([0, 1, 2, 3, 6].map(f.formulePourNombreDeModules)).toEqual([
-      null,
-      'solo',
-      'duo',
-      'integral',
-      'integral',
-    ])
+  it('dit où en est un compteur', () => {
+    expect(f.etatQuota(59, 75)).toBe('ok')
+    expect(f.etatQuota(60, 75)).toBe('alerte')
+    expect(f.etatQuota(75, 75)).toBe('atteint')
+    expect(f.etatQuota(78, 75)).toBe('tolerance')
+    expect(f.etatQuota(82, 75)).toBe('bloque')
+    expect(f.etatQuota(90, 75)).toBe('bloque')
+    // Sans marge (petit plafond) : plein, c'est bloqué.
+    expect(f.etatQuota(3, 3)).toBe('bloque')
+    expect(f.etatQuota(1, null)).toBe('ok')
+  })
+
+  it('désigne la plus petite formule payante pour une taille', () => {
+    expect(f.formulePourTaille({ benevoles: 40, artistes: 5 })).toBe('association')
+    expect(f.formulePourTaille({ benevoles: 40, artistes: 30 })).toBe('festival')
+    expect(f.formulePourTaille({ evenements: 4, benevoles: 50 })).toBe('festival')
+    expect(f.formulePourTaille({ benevoles: 600, organisateurs: 15 })).toBe('grand')
+    expect(f.formulePourTaille({ benevoles: 5000 })).toBeNull()
+  })
+
+  it('désigne la formule supérieure', () => {
+    expect(f.formuleSuperieure('decouverte')).toBe('association')
+    expect(f.formuleSuperieure('festival')).toBe('grand')
+    expect(f.formuleSuperieure('grand')).toBeNull()
+  })
+
+  it('propose la formule qui relève vraiment le plafond atteint', () => {
+    // Découverte et Association ont 1 événement : pour les événements, c'est Festival.
+    expect(f.formuleQuiReleve('decouverte', 'evenements')).toBe('festival')
+    expect(f.formuleQuiReleve('decouverte', 'benevoles')).toBe('association')
+    expect(f.formuleQuiReleve('festival', 'organisateurs')).toBe('grand')
+    expect(f.formuleQuiReleve('grand', 'benevoles')).toBeNull()
+    expect(f.formuleQuiReleve('grand', 'organisateurs')).toBeNull()
   })
 
   it('calcule la fin d’une période facturée', () => {
@@ -95,26 +125,43 @@ describe('Flowvent — formules par module', () => {
   })
 
   it('écrit les prix à la française', () => {
-    expect(f.euros(700)).toBe('7 €')
-    expect(f.euros(1250)).toBe('12,50 €')
-  })
-
-  it('chaque module payant existe dans le catalogue des modules', () => {
-    const catalogue = lire('shared/modules-evenement.ts')
-    const cles = [
-      ...catalogue
-        .slice(catalogue.indexOf('MODULES_EVENEMENT:'), catalogue.indexOf('DROITS_PAR_DOMAINE:'))
-        .matchAll(/cle: '(\w+)'/g),
-    ].map((m) => m[1])
-    expect(f.MODULES_PAYANTS.filter((m: string) => !cles.includes(m))).toEqual([])
-    // Tout module du catalogue, hors la carte, est payant : un module ajouté sans y penser serait
-    // offert à tous.
-    expect(cles.filter((c) => c !== 'carte' && !f.MODULES_PAYANTS.includes(c))).toEqual([])
+    expect(f.euros(700)).toBe('7\u00a0€')
+    expect(f.euros(1250)).toBe('12,50\u00a0€')
   })
 
   it('la lecture seule repose sur le contexte asynchrone de Nitro', () => {
-    // Sans lui, `useEvent()` lève : toute LECTURE d'un module hors formule serait refusée.
+    // Sans lui, `useEvent()` lève : toute LECTURE d'un événement archivé serait refusée.
     expect(lire('nuxt.config.ts')).toMatch(/asyncContext:\s*true/)
     expect(lire('server/utils/droits-evenement.ts')).toMatch(/useEvent\(\)\.method/)
+  })
+
+  it('les quatre points de contrôle des plafonds sont branchés', () => {
+    // Un util écrit et testé mais jamais appelé ne limite rien : on vérifie chaque appel.
+    expect(lire('server/api/events/index.post.ts')).toMatch(/verifierNouvelEvenement\(/)
+    expect(lire('server/api/events/[id]/organizers/index.post.ts')).toMatch(
+      /verifierAjout\(eventId, 'organisateurs'/
+    )
+    expect(lire('server/volunteers/ports/registry.ts')).toMatch(
+      /verifierAjout\(eventId, 'benevoles'/
+    )
+    expect(lire('server/artists/ports/registry.ts')).toMatch(/verifierAjout\(eventId, 'artistes'/)
+    const layers = resolve(APP2, '../../layers')
+    const benevoles = (c: string) =>
+      readFileSync(resolve(layers, 'volunteers/server/api/editions/[id]/volunteers', c), 'utf8')
+    for (const c of [
+      'add-manually.post.ts',
+      'create-user-and-add.post.ts',
+      'applications/[applicationId].patch.ts',
+    ]) {
+      expect(benevoles(c), c).toMatch(/quotas\?\.verifierAjoutBenevole\(/)
+    }
+    const artistes = (c: string) =>
+      readFileSync(resolve(layers, 'artists/server/api/editions/[id]', c), 'utf8')
+    for (const c of [
+      'artists/index.post.ts',
+      'shows-call/[showCallId]/applications/[applicationId]/import-performer.post.ts',
+    ]) {
+      expect(artistes(c), c).toMatch(/quotas\?\.verifierAjoutArtiste\(/)
+    }
   })
 })

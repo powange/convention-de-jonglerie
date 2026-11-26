@@ -278,7 +278,18 @@ export interface MealsPort {
   deleteVolunteerMealSelections(volunteerId: number): Promise<void>
 }
 
+/**
+ * Plafonds de l'hôte. Flowvent limite les bénévoles acceptés par événement selon la formule du
+ * propriétaire ; app1 n'a pas de plafond et ne fournit pas ce port.
+ */
+export interface QuotasPort {
+  /** Lève une erreur (402) si accepter un bénévole de plus dépasse le plafond toléré. */
+  verifierAjoutBenevole(eventId: number, userId: number): Promise<void>
+}
+
 export interface VolunteerPorts {
+  /** Facultatif : sans lui, aucun plafond. */
+  quotas?: QuotasPort
   notifications: NotificationPort
   email: EmailPort
   messenger: MessengerPort

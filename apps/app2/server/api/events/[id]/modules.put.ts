@@ -1,9 +1,7 @@
 import { z } from 'zod'
 
-import { estModulePayant, formule } from '../../../../shared/formules'
 import { modulesDisponibles } from '../../../../shared/modules-evenement'
 import {
-  couvertureDeLEvenement,
   droitsSurEvenement,
   modulesAffiches,
   selectionModules,
@@ -20,8 +18,8 @@ import type { CleModule } from '../../../../shared/modules-evenement'
  * Désactiver ne supprime rien : les données du module restent, et reviennent telles quelles à la
  * réactivation. Seuls disparaissent sa section de gestion et ses pages publiques.
  *
- * ACTIVER un module payant demande que la formule du propriétaire le couvre (402 sinon) — sauf pour
- * un administrateur. Désactiver reste toujours possible.
+ * Tous les modules sont compris dans toutes les formules (décision du 26/11/2026) : seul le droit
+ * compte.
  */
 const schema = z
   .object(
@@ -44,31 +42,6 @@ export default defineEventHandler(async (event) => {
 
   const resultat = schema.safeParse(await readBody(event))
   if (!resultat.success) throw createError({ status: 400, message: 'Données invalides' })
-
-  const allumes = Object.entries(resultat.data)
-    .filter(([cle, valeur]) => valeur === true && estModulePayant(cle))
-    .map(([cle]) => cle)
-  const administrateur = allumes.length
-    ? !!(
-        await prisma.user.findUnique({
-          where: { id: (user as { id: number }).id },
-          select: { isGlobalAdmin: true },
-        })
-      )?.isGlobalAdmin
-    : false
-  if (allumes.length && !administrateur) {
-    const couverture = await couvertureDeLEvenement(eventId)
-    const horsFormule = allumes.filter((cle) => !(couverture.modules as string[]).includes(cle))
-    if (horsFormule.length) {
-      const nom = formule(couverture.formule)?.libelle
-      throw createError({
-        status: 402,
-        message: !couverture.actif
-          ? "L'abonnement du propriétaire n'est pas actif : ce module ne peut pas être activé"
-          : `Ce module n'est pas compris dans la formule ${nom} du propriétaire`,
-      })
-    }
-  }
 
   const data = Object.fromEntries(
     modulesDisponibles()
