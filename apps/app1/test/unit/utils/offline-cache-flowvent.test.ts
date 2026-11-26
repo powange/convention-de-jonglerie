@@ -1,10 +1,30 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+
+import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
-import {
-  classifyRequest,
-  serviceWorkerUrl,
-  shouldPrecachePage,
-} from '../../../../app2/shared/utils/offline-cache'
+/*
+ * ⚠️ Lu COMME DU TEXTE puis transpilé, et non importé : un fichier TypeScript d'app2 ne se
+ * transforme qu'avec le tsconfig que Nuxt génère dans `apps/app2/.nuxt`, absent de la CI d'app1
+ * (« Tsconfig not found »). Même raison que les gardes `flowvent-*` de test/unit/outillage.
+ */
+const source = readFileSync(
+  resolve(__dirname, '../../../../app2/shared/utils/offline-cache.ts'),
+  'utf8'
+)
+const { outputText } = ts.transpileModule(source, {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+})
+const module_: Record<string, any> = {}
+new Function('exports', outputText)(module_)
+const classifyRequest = module_.classifyRequest as (
+  url: string,
+  destination: string,
+  origin: string
+) => string | null
+const serviceWorkerUrl = module_.serviceWorkerUrl as (buildId?: string) => string
+const shouldPrecachePage = module_.shouldPrecachePage as (pathname: string) => boolean
 
 /**
  * Le cache hors ligne de Flowvent (`apps/app2/shared/utils/offline-cache.ts`).
