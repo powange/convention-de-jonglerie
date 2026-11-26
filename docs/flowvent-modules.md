@@ -28,8 +28,8 @@ un **contrat d'hôte** : droits, store d'édition, ports.
 | 4   | Artistes et spectacles                                                      | livré (#970)   |
 | 5   | Appel à spectacles (sans messagerie)                                        | livré (#971)   |
 | 6   | Billetterie (HelloAsso)                                                     | livré (#981)   |
-| 7   | Repas                                                                       | livré (ce lot) |
-| 8   | Trésorerie                                                                  | à faire        |
+| 7   | Repas                                                                       | livré (#982)   |
+| 8   | Trésorerie                                                                  | livré (ce lot) |
 
 ## Le socle (lot 1) : ce qu'un module doit faire pour exister dans Flowvent
 
@@ -183,6 +183,29 @@ l'événement.
 
 Restent propres à app1 : les repas des **organisateurs** (pas d'organisateurs déclarés dans
 Flowvent).
+
+## Trésorerie (lot 8)
+
+La trésorerie n'était pas encore un layer : elle devient `layers/treasury` (alias `#treasury`) —
+pages, composants, utilitaires de l'interface (`etats-de-tresorerie`, exports, codes, plans
+comptables), utilitaires partagés (`avance-nom-libre`, `fonds-de-caisse`), points d'API (dont le
+dépôt des justificatifs `/api/files/treasury`) et utilitaires serveur, ceux-ci gardant leur adresse
+`#server/utils/treasury-*` par réexportation. Traductions `gestion.treasury` → `gestion-treasury.json`.
+
+Ce qui appartient à l'app hôte passe par le port `#server/treasury/ports/registry` :
+
+- `edition.lire` : l'identifiant, la devise, le comptage du fonds de caisse, et `conventionId` — le
+  PORTEUR DU PLAN COMPTABLE. La convention dans app1, où un plan se réutilise d'une année sur
+  l'autre ; l'événement lui-même dans Flowvent. C'est aussi lui qui range les justificatifs.
+- `edition.enregistrerComptageDuFonds`.
+- `organisateurs` : qui compte comme organisateur dans le périmètre des avances (cf.
+  `clausesDesPersonnesRattachees`, dont la clause des organisateurs est sortie). Organisateurs de la
+  convention dans app1 ; propriétaire et organisateurs déclarés de l'événement dans Flowvent.
+
+Flowvent reçoit les modèles de la trésorerie (mêmes noms, `editionId` et `TreasuryCode.conventionId`
+rattachés à l'événement, migration purement additive), le comptage du fonds de caisse sur `Event`,
+le domaine protégé des justificatifs (`/uploads/…/treasury/…`, lisibles par qui gère la
+trésorerie), la section « Trésorerie » de la barre latérale, et le module devient disponible.
 
 ## Notions « convention » à ramener à l'événement
 

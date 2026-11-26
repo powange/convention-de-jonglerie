@@ -58,7 +58,7 @@ describe('en-tête triable — une seule définition', () => {
      * remaniement mécanique peut commettre.
      */
     const ATTENDUS = [
-      'apps/app1/app/pages/editions/[id]/gestion/treasury/index.vue',
+      'layers/treasury/app/pages/editions/[id]/gestion/treasury/index.vue',
       'layers/stock/app/pages/editions/[id]/gestion/stock/missing.vue',
       'layers/stock/app/pages/editions/[id]/gestion/stock/[groupId].vue',
       'layers/artists/app/pages/editions/[id]/gestion/artists/index.vue',

@@ -66,6 +66,7 @@ export function getTranslationsToLoad(path: string): string[] {
         'gestion-artists',
         'gestion-ticketing',
         'gestion-meals',
+        'gestion-treasury',
       ],
     },
     /*
@@ -217,6 +218,7 @@ export function getTranslationsToLoad(path: string): string[] {
         'gestion-artists',
         'gestion-ticketing',
         'gestion-meals',
+        'gestion-treasury',
       ],
     },
   ]
@@ -382,6 +384,21 @@ export const translationLoaders: Record<string, Record<string, () => Promise<any
     uk: () => import('../../../../layers/meals/i18n/locales/uk/gestion-meals.json'),
     cs: () => import('../../../../layers/meals/i18n/locales/cs/gestion-meals.json'),
     sv: () => import('../../../../layers/meals/i18n/locales/sv/gestion-meals.json'),
+  },
+  'gestion-treasury': {
+    en: () => import('../../../../layers/treasury/i18n/locales/en/gestion-treasury.json'),
+    da: () => import('../../../../layers/treasury/i18n/locales/da/gestion-treasury.json'),
+    de: () => import('../../../../layers/treasury/i18n/locales/de/gestion-treasury.json'),
+    es: () => import('../../../../layers/treasury/i18n/locales/es/gestion-treasury.json'),
+    fr: () => import('../../../../layers/treasury/i18n/locales/fr/gestion-treasury.json'),
+    it: () => import('../../../../layers/treasury/i18n/locales/it/gestion-treasury.json'),
+    nl: () => import('../../../../layers/treasury/i18n/locales/nl/gestion-treasury.json'),
+    pl: () => import('../../../../layers/treasury/i18n/locales/pl/gestion-treasury.json'),
+    pt: () => import('../../../../layers/treasury/i18n/locales/pt/gestion-treasury.json'),
+    ru: () => import('../../../../layers/treasury/i18n/locales/ru/gestion-treasury.json'),
+    uk: () => import('../../../../layers/treasury/i18n/locales/uk/gestion-treasury.json'),
+    cs: () => import('../../../../layers/treasury/i18n/locales/cs/gestion-treasury.json'),
+    sv: () => import('../../../../layers/treasury/i18n/locales/sv/gestion-treasury.json'),
   },
   'gestion-stock': {
     en: () => import('../../../../layers/stock/i18n/locales/en/gestion-stock.json'),

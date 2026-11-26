@@ -55,7 +55,7 @@ const GARDE = 'assertPersonneRattacheeALEdition('
  * chaque exception est éprouvée positivement ci-dessous : elle doit ne faire que FILTRER.
  */
 const EXCEPTIONS: Record<string, string> = {
-  'apps/app1/server/api/editions/[id]/treasury/entries/reimburse.post.ts':
+  'layers/treasury/server/api/editions/[id]/treasury/entries/reimburse.post.ts':
     "Solde les avances d'une personne : le champ y est un FILTRE, borné à l'édition, jamais une écriture. Exiger le rattachement rendrait insoldable la dette de quelqu'un qui a quitté l'édition depuis — l'argent a été avancé, il reste dû.",
 }
 
@@ -141,11 +141,11 @@ describe("garde sur la personne qui a avancé l'argent — tous les points d'éc
      * appeler la garde, ou rejoindre EXCEPTIONS avec sa raison.
      */
     expect(ecrivains.map(({ chemin }) => chemin).sort()).toEqual([
-      'apps/app1/server/api/editions/[id]/treasury/cash-float/[floatId].put.ts',
-      'apps/app1/server/api/editions/[id]/treasury/cash-float/index.post.ts',
-      'apps/app1/server/api/editions/[id]/treasury/entries.post.ts',
-      'apps/app1/server/api/editions/[id]/treasury/entries/[entryId].put.ts',
-      'apps/app1/server/api/editions/[id]/treasury/entries/reimburse.post.ts',
+      'layers/treasury/server/api/editions/[id]/treasury/cash-float/[floatId].put.ts',
+      'layers/treasury/server/api/editions/[id]/treasury/cash-float/index.post.ts',
+      'layers/treasury/server/api/editions/[id]/treasury/entries.post.ts',
+      'layers/treasury/server/api/editions/[id]/treasury/entries/[entryId].put.ts',
+      'layers/treasury/server/api/editions/[id]/treasury/entries/reimburse.post.ts',
     ])
   })
 

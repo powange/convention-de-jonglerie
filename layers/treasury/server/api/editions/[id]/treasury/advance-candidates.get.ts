@@ -1,0 +1,85 @@
+import { z } from 'zod'
+
+import { useTreasuryPorts } from '#server/treasury/ports/registry'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { canManageTreasuryById } from '#server/utils/permissions/edition-permissions'
+import { userWithProfileAndGravatarSelect } from '#server/utils/prisma-select-helpers'
+import { clausesDesPersonnesRattachees } from '#server/utils/treasury-guards'
+import { validateEditionId } from '#server/utils/validation-helpers'
+
+/**
+ * Qui peut être désigné comme ayant avancé une dépense.
+ *
+ * La recherche d'utilisateurs ouverte aux non-administrateurs n'accepte qu'un email EXACT — un
+ * choix de confidentialité délibéré. Demander à un trésorier de connaître par cœur l'adresse du
+ * bénévole qui a payé les courses rendrait le champ inutilisable.
+ *
+ * On cherche donc parmi les personnes déjà rattachées à l'édition : organisateurs, bénévoles
+ * acceptés, artistes programmés. Aucune ouverture de confidentialité — le trésorier voit déjà ces
+ * personnes ailleurs dans la gestion — et c'est parmi elles que se trouve, en pratique, celle qui
+ * a sorti l'argent de sa poche.
+ */
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+
+    const allowed = await canManageTreasuryById(editionId, user.id, event)
+    if (!allowed) {
+      throw createError({ status: 403, message: 'Droits insuffisants pour gérer la trésorerie' })
+    }
+
+    const { search } = z
+      .object({ search: z.string().trim().max(100).optional() })
+      .parse(getQuery(event))
+
+    const ports = useTreasuryPorts()
+    const edition = await ports.edition.lire(editionId)
+    if (!edition) {
+      throw createError({ status: 404, message: 'Édition introuvable' })
+    }
+
+    /*
+     * ⚠️ LES MÊMES CLAUSES QUE LA GARDE D'ÉCRITURE, et pas une seconde écriture de la règle.
+     *
+     * Cette liste était le SEUL endroit du dépôt où le périmètre existait ; les quatre points qui
+     * enregistrent ne vérifiaient rien. Les faire consommer une définition commune est tout
+     * l'objet du lot : une liste et une garde qui répondent autrement à « qui peut avoir avancé
+     * cet argent ? » reproduiraient le défaut d'un cran plus loin, et en silence.
+     */
+    const clauses = clausesDesPersonnesRattachees(editionId)
+    const [organisateurs, benevoles, artistes] = await Promise.all([
+      ports.organisateurs
+        .comptesDesOrganisateurs(edition)
+        .then((ids) =>
+          prisma.user
+            .findMany({ where: { id: { in: ids } }, select: userWithProfileAndGravatarSelect })
+            .then((users) => users.map((user) => ({ user })))
+        ),
+      prisma.editionVolunteerApplication.findMany({
+        where: clauses.benevoles,
+        select: { user: { select: userWithProfileAndGravatarSelect } },
+      }),
+      prisma.editionArtist.findMany({
+        where: clauses.artistes,
+        select: { user: { select: userWithProfileAndGravatarSelect } },
+      }),
+    ])
+
+    // Une même personne peut être organisatrice ET bénévole : la Map la garde une seule fois.
+    const parId = new Map<number, (typeof organisateurs)[number]['user']>()
+    for (const { user: u } of [...organisateurs, ...benevoles, ...artistes]) {
+      if (u) parId.set(u.id, u)
+    }
+
+    const terme = search?.toLowerCase()
+    const users = [...parId.values()]
+      .filter((u) => !terme || (u.pseudo ?? '').toLowerCase().includes(terme))
+      .sort((a, b) => (a.pseudo ?? '').localeCompare(b.pseudo ?? ''))
+      .slice(0, 20)
+
+    return createSuccessResponse({ users })
+  },
+  { operationName: 'ListTreasuryAdvanceCandidates' }
+)

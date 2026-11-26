@@ -5,7 +5,7 @@ import {
   entetesDeLaTresorerie,
   preparerLignesTresorerie,
   type LigneTresorerieCsv,
-} from '../../../app/utils/export-tresorerie-csv'
+} from '../../../../../layers/treasury/app/utils/export-tresorerie-csv'
 
 /**
  * La trésorerie en CSV, pour que le comptable reprenne les écritures.

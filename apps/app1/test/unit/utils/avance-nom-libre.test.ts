@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import { avanceNormalisee } from '../../../server/utils/treasury-guards'
 import { avancesARembourser, type TreasuryLine } from '../../../server/utils/treasury-compute'
-import { cleDuNomAvance, nomAvanceAEnregistrer } from '../../../shared/utils/avance-nom-libre'
+import {
+  cleDuNomAvance,
+  nomAvanceAEnregistrer,
+} from '../../../../../layers/treasury/shared/utils/avance-nom-libre'
 
 /**
  * Les avances faites par quelqu'un SANS COMPTE.

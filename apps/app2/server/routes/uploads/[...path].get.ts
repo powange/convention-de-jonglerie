@@ -2,7 +2,10 @@ import { createReadStream } from 'node:fs'
 import { stat } from 'node:fs/promises'
 import { join } from 'node:path'
 
-import { canManageArtistsById } from '../../utils/permissions/edition-permissions'
+import {
+  canManageArtistsById,
+  canManageTreasuryById,
+} from '../../utils/permissions/edition-permissions'
 import { getAuthSession } from '../../utils/session-helpers'
 
 import type { H3Event } from 'h3'
@@ -56,6 +59,15 @@ const DOMAINES: DomaineFichiers[] = [
       })
       return sienne !== null
     },
+  },
+  // Justificatifs de la trésorerie (factures, tickets, preuves de virement) : lisibles seulement
+  // par qui gère la trésorerie de l'événement — même règle qu'app1.
+  {
+    motif: new RegExp(
+      `^(?:temp/treasury/(\\d+)|conventions/\\d+/editions/(\\d+)/treasury)/[A-Za-z0-9_-]+\\.(?:jpe?g|png|webp|pdf)$`,
+      'i'
+    ),
+    lecture: (eventId, userId, event) => canManageTreasuryById(eventId, userId, event),
   },
 ]
 

@@ -165,6 +165,7 @@ export default defineNuxtConfig({
     '../../layers/stock',
     '../../layers/artists',
     '../../layers/ticketing',
+    '../../layers/treasury',
     '../../layers/auth',
   ],
 

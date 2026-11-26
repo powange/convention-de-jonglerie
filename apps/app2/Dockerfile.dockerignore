@@ -14,6 +14,7 @@
 !layers/artists
 !layers/ticketing
 !layers/meals
+!layers/treasury
 
 # Artefacts et dépendances (régénérés dans l'image)
 **/node_modules

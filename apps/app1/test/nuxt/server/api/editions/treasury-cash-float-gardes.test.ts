@@ -20,12 +20,12 @@ vi.mock('#server/utils/auth-utils', () => ({
   requireAuth: vi.fn((event) => event.context.user),
 }))
 
-import lireLesApports from '../../../../../server/api/editions/[id]/treasury/cash-float/index.get'
-import creerUnApport from '../../../../../server/api/editions/[id]/treasury/cash-float/index.post'
-import supprimerUnApport from '../../../../../server/api/editions/[id]/treasury/cash-float/[floatId].delete'
-import corrigerUnApport from '../../../../../server/api/editions/[id]/treasury/cash-float/[floatId].put'
-import enregistrerLeComptage from '../../../../../server/api/editions/[id]/treasury/cash-float-count.put'
-import lireLaTresorerie from '../../../../../server/api/editions/[id]/treasury/index.get'
+import lireLesApports from '../../../../../../../layers/treasury/server/api/editions/[id]/treasury/cash-float/index.get'
+import creerUnApport from '../../../../../../../layers/treasury/server/api/editions/[id]/treasury/cash-float/index.post'
+import supprimerUnApport from '../../../../../../../layers/treasury/server/api/editions/[id]/treasury/cash-float/[floatId].delete'
+import corrigerUnApport from '../../../../../../../layers/treasury/server/api/editions/[id]/treasury/cash-float/[floatId].put'
+import enregistrerLeComptage from '../../../../../../../layers/treasury/server/api/editions/[id]/treasury/cash-float-count.put'
+import lireLaTresorerie from '../../../../../../../layers/treasury/server/api/editions/[id]/treasury/index.get'
 import { global } from '../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma

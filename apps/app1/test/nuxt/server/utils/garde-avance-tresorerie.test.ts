@@ -142,7 +142,7 @@ describe("garde sur la personne ayant avancé l'argent", () => {
    * « qui peut avoir avancé cet argent ? » reproduiraient le défaut d'un cran plus loin.
    */
   describe('clausesDesPersonnesRattachees', () => {
-    const clauses = clausesDesPersonnesRattachees(EDITION, CONVENTION)
+    const clauses = clausesDesPersonnesRattachees(EDITION)
 
     it('exige le statut ACCEPTED pour les bénévoles', () => {
       // Un bénévole en attente ou refusé n'est pas quelqu'un de l'édition : le lister ouvrirait la
@@ -150,11 +150,13 @@ describe("garde sur la personne ayant avancé l'argent", () => {
       expect(clauses.benevoles).toEqual({ eventId: EDITION, status: 'ACCEPTED' })
     })
 
-    it('rattache les organisateurs à la convention, et les artistes à l’édition', () => {
+    it('rattache les artistes à l’édition ; les organisateurs relèvent du port de l’app', () => {
       // Les deux portées DIFFÈRENT, et ce n'est pas une inattention : un organisateur l'est pour
-      // toute la convention, un artiste est programmé sur une édition précise.
-      expect(clauses.organisateurs).toEqual({ conventionId: CONVENTION })
+      // toute la convention (app1 ; l'événement dans Flowvent), un artiste est programmé sur une
+      // édition précise. La portée des organisateurs est vérifiée plus haut, par la requête que
+      // fait le port d'app1 (`conventionOrganizer.findFirst` sur la convention).
       expect(clauses.artistes).toEqual({ editionId: EDITION })
+      expect(clauses).not.toHaveProperty('organisateurs')
     })
   })
 })

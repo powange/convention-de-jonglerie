@@ -2,7 +2,7 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 
-import Filters from '../../../../app/components/treasury/Filters.vue'
+import Filters from '../../../../../../layers/treasury/app/components/treasury/Filters.vue'
 
 /**
  * Le champ de recherche de la trésorerie ne filtre plus à chaque touche.

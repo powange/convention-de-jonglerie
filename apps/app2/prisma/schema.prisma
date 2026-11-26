@@ -90,6 +90,8 @@ model User {
   apiErrorLogs                       ApiErrorLog[]
   ticketingCountersTouched           TicketingCounter[]                  @relation("TicketingCounterLastActor")
   entryValidationLogs                EntryValidationLog[]                @relation("EntryValidationLogActor")
+  treasuryAdvances                   TreasuryEntry[]                     @relation("TreasuryAdvances")
+  treasuryCashFloatLoans             TreasuryCashFloat[]                 @relation("TreasuryCashFloatLenders")
 }
 
 model PasswordResetToken {
@@ -105,48 +107,56 @@ model PasswordResetToken {
 }
 
 model Event {
-  id                               Int           @id @default(autoincrement())
+  id                               Int                  @id @default(autoincrement())
   /// Identifiant PUBLIC, celui des adresses (`/events/<publicId>/…`) : aléatoire, donc ni le
   /// nombre d'événements ni les pages publiques des autres ne se devinent en comptant. L'`id`
   /// numérique reste interne (relations, API du layer bénévoles).
-  publicId                         String        @unique @default(nanoid(10)) @db.VarChar(16)
+  publicId                         String               @unique @default(nanoid(10)) @db.VarChar(16)
   name                             String
-  description                      String?       @db.Text
+  description                      String?              @db.Text
   location                         String?
   startDate                        DateTime?
   // Métadonnées génériques lues par le layer bénévoles (comme l'`Event` d'app1).
   endDate                          DateTime?
-  status                           EditionStatus @default(PUBLISHED)
+  status                           EditionStatus        @default(PUBLISHED)
   timezone                         String?
   /// Modules activés pour l'événement (page « Accueil de la gestion »), un par module comme les
   /// `*Enabled` d'une édition d'app1. Le module bénévoles est actif par défaut.
-  volunteersEnabled                Boolean       @default(true)
+  volunteersEnabled                Boolean              @default(true)
   /// Les autres modules, inactifs par défaut comme dans app1 (cf. shared/modules-evenement.ts).
-  siteMapEnabled                   Boolean       @default(false)
-  stockEnabled                     Boolean       @default(false)
-  artistsEnabled                   Boolean       @default(false)
-  mealsEnabled                     Boolean       @default(false)
-  ticketingEnabled                 Boolean       @default(false)
-  treasuryEnabled                  Boolean       @default(false)
+  siteMapEnabled                   Boolean              @default(false)
+  stockEnabled                     Boolean              @default(false)
+  artistsEnabled                   Boolean              @default(false)
+  mealsEnabled                     Boolean              @default(false)
+  ticketingEnabled                 Boolean              @default(false)
+  treasuryEnabled                  Boolean              @default(false)
+  /// Dernier comptage du fonds de caisse, en centimes, et sa date (trésorerie, comme l'édition d'app1).
+  cashFloatCount                   Int?
+  cashFloatCountedAt               DateTime?
+  treasuryCodes                    TreasuryCode[]
+  treasuryEntries                  TreasuryEntry[]
+  treasurySourceCodes              TreasurySourceCode[]
+  treasuryCashFloats               TreasuryCashFloat[]
+  treasuryPayees                   TreasuryPayee[]
   /// Carte du site (layer `map`) : publique ou réservée à la gestion, et la carte externe
   /// (Google My Maps…) d'où l'on importe zones et repères. Mêmes colonnes que l'`Edition` d'app1.
-  mapPublic                        Boolean       @default(false)
+  mapPublic                        Boolean              @default(false)
   externalMapProvider              String?
   externalMapRef                   String?
   /// Informations pratiques données aux artistes (espace artiste) — layer `artists`, comme
   /// `Edition.artistInfo` d'app1.
-  artistInfo                       String?       @db.Text
+  artistInfo                       String?              @db.Text
   /// Réglages de la billetterie (layer `ticketing`), mêmes noms et défauts que l'`Edition` d'app1.
-  ticketingAllowOnsiteRegistration Boolean       @default(true)
-  ticketingAllowAnonymousOrders    Boolean       @default(false)
-  ticketingPaymentCash             Boolean       @default(true)
-  ticketingPaymentCard             Boolean       @default(true)
-  ticketingPaymentCheck            Boolean       @default(true)
-  ticketingSumupEnabled            Boolean       @default(false)
-  ticketingHandoutItemsEnabled     Boolean       @default(true)
-  createdAt                        DateTime      @default(now())
-  updatedAt                        DateTime      @updatedAt
-  owner                            User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ticketingAllowOnsiteRegistration Boolean              @default(true)
+  ticketingAllowAnonymousOrders    Boolean              @default(false)
+  ticketingPaymentCash             Boolean              @default(true)
+  ticketingPaymentCard             Boolean              @default(true)
+  ticketingPaymentCheck            Boolean              @default(true)
+  ticketingSumupEnabled            Boolean              @default(false)
+  ticketingHandoutItemsEnabled     Boolean              @default(true)
+  createdAt                        DateTime             @default(now())
+  updatedAt                        DateTime             @updatedAt
+  owner                            User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId                          Int
 
   // Gestion des bénévoles (relations inverses, mêmes noms qu'app1)
@@ -1861,6 +1871,7 @@ model TicketingTier {
   meals             TicketingTierMeal[]
   options           TicketingTierOption[]
   /// Rattachement éventuel à une ligne de trésorerie, qui tire alors son montant de ce tarif.
+  treasuryEntries   TreasuryEntryTier[]
 
   @@unique([externalTicketingId, helloAssoTierId])
   @@index([externalTicketingId])
@@ -2583,4 +2594,314 @@ enum VolunteerMealPhase {
   SETUP
   EVENT
   TEARDOWN
+}
+
+// =============================================================================
+// Trésorerie (lot 8 de docs/flowvent-modules.md) — modèles d'app1
+// (apps/app1/prisma/schema/treasury.prisma), sous les mêmes noms. L'ÉDITION est l'événement
+// (`editionId` → Event) ; le PORTEUR DU PLAN COMPTABLE aussi (`TreasuryCode.conventionId` → Event) :
+// sans convention, un événement a son propre plan.
+// =============================================================================
+// =============================================================================
+// Trésorerie d'une édition
+// =============================================================================
+//
+// Charges et produits d'une édition, en une vue.
+//
+// Les lignes provenant des artistes et de la billetterie ne sont **pas** recopiées ici : elles
+// sont calculées à la lecture depuis leur source. Un montant corrigé se répercute donc
+// immédiatement, là où une copie exigerait une resynchronisation et finirait par diverger en
+// silence. Seuls le code d'imputation choisi pour chaque source et les lignes saisies à la main
+// sont stockés.
+//
+// Tous les montants sont en centimes entiers, dans la devise de l'édition.
+
+enum TreasuryEntryKind {
+  EXPENSE // charge
+  INCOME // produit
+}
+
+/// Origine d'une ligne calculée, pour lui rattacher un code d'imputation.
+enum TreasurySource {
+  ARTIST_PAYMENT // cachets des artistes
+  ARTIST_REIMBURSEMENT // défraiements trajet
+  ARTIST_CONSUMABLES // consommables
+  TICKETING_PARTICIPANTS // billets comptés comme participants, remboursements déduits
+  TICKETING_DONATIONS // dons, sans contrepartie
+  TICKETING_OTHER // ventes annexes et tarifs non comptés comme participants
+}
+
+/// Code d'imputation comptable, défini au niveau de la convention.
+///
+/// Rattaché à la convention et non à l'édition : un plan comptable se réutilise d'une année sur
+/// l'autre. Volontairement libre — code et libellé — pour ne présumer d'aucune réglementation
+/// nationale, tout en évitant la saisie ligne à ligne qui produirait « 6257 » et « 6 257 » côte
+/// à côte, sans regroupement fiable possible.
+model TreasuryCode {
+  id           Int      @id @default(autoincrement())
+  conventionId Int
+  code         String   @db.VarChar(32)
+  label        String   @db.VarChar(120)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  event       Event                @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  entries     TreasuryEntry[]
+  sourceCodes TreasurySourceCode[]
+
+  @@unique([conventionId, code])
+  @@index([conventionId])
+}
+
+/// Ligne saisie à la main, en charge ou en produit.
+/// Les tarifs de billetterie dont une ligne de trésorerie tire son montant.
+///
+/// ⚠️ CE N'EST PAS UNE SOUSTRACTION, C'EST UN RÉACHEMINEMENT. Une ligne de commande dont le tarif
+/// est rattaché ici part vers ce produit nommé AU LIEU d'aller dans « Billetterie — entrées » ou
+/// « Billetterie — autres produits ». Rien n'est retranché après coup, donc aucun écart au centime
+/// n'est possible et le total de l'édition ne bouge pas : seule sa ventilation s'affine.
+///
+/// ⚠️ `@@unique([tierId])` : un tarif n'appartient qu'à UNE SEULE ligne. Sans cette contrainte,
+/// son montant serait compté deux fois — et une règle seulement vérifiée par le code finit
+/// toujours par être contournée par un autre chemin d'écriture.
+///
+/// `onDelete: Cascade` des deux côtés : supprimer la ligne défait les liens, et un tarif supprimé
+/// sort simplement du calcul sans laisser de lien orphelin.
+model TreasuryEntryTier {
+  entryId Int
+  tierId  Int
+  entry   TreasuryEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  tier    TicketingTier @relation(fields: [tierId], references: [id], onDelete: Cascade)
+
+  @@id([entryId, tierId])
+  @@unique([tierId])
+  @@index([entryId], map: "TreasuryEntryTier_entryId_fkey")
+}
+
+/// Un bénéficiaire à qui l'édition doit verser de l'argent : prestataire, salle, fournisseur.
+///
+/// ⚠️ RATTACHÉ À L'ÉDITION, et non à la convention — à la différence de `TreasuryCode` juste
+/// au-dessus, qui se réutilise d'une année sur l'autre. C'est la même décision que pour les
+/// coordonnées bancaires d'un artiste, et pour la même raison : un IBAN confié aux organisateurs
+/// d'une édition serait autrement lisible par ceux de toutes les autres, sans que son titulaire
+/// l'ait jamais accepté. Le prix est connu — un prestataire qui revient est ressaisi — et il est
+/// moins élevé que celui d'une donnée bancaire qui circule.
+///
+/// 📍 L'IBAN et le BIC sont stockés NORMALISÉS (majuscules, sans espaces) par
+/// `shared/utils/coordonnees-bancaires.ts`. Ce n'est pas cosmétique : c'est ce qui permet au
+/// regroupement des versements de reconnaître deux saisies du même compte. Sans normalisation,
+/// « FR76 1234 » et « fr7612 34 » produiraient deux virements au lieu d'un.
+model TreasuryPayee {
+  id        Int    @id @default(autoincrement())
+  editionId Int
+  /// À qui l'on verse, tel qu'on veut le lire sur l'ordre de virement.
+  label     String @db.VarChar(150)
+
+  /// Les coordonnées bancaires. Facultatives : on peut vouloir suivre ce qu'on doit à quelqu'un
+  /// avant d'avoir son RIB, et l'exiger ferait renoncer à enregistrer la dette.
+  iban String? @db.VarChar(34)
+  bic  String? @db.VarChar(11)
+
+  /// Note libre : numéro de facture, interlocuteur, conditions de paiement.
+  notes String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event   Event           @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  entries TreasuryEntry[]
+
+  /// Deux bénéficiaires du même nom dans une édition sont presque toujours un doublon de saisie,
+  /// et ils rendraient la carte des versements illisible — deux lignes identiques, deux totaux.
+  @@unique([editionId, label])
+  @@index([editionId])
+}
+
+model TreasuryEntry {
+  id             Int               @id @default(autoincrement())
+  editionId      Int
+  kind           TreasuryEntryKind
+  title          String            @db.VarChar(150)
+  description    String?           @db.Text
+  /// Montant en centimes, toujours positif : c'est `kind` qui porte le sens.
+  amount         Int
+  codeId         Int?
+  /// Justificatif : photo d'un ticket de caisse ou d'une facture, saisie depuis le téléphone.
+  /// Chemin public sous `/uploads/`, comme les autres images envoyées par les organisateurs.
+  imageUrl       String?
+  /// Montant attendu et non encore réglé. Bascule la ligne de « réglé » vers « engagé » : le
+  /// solde ne change pas, mais le réglé cesse de compter ce qui n'a pas été payé.
+  isForecast     Boolean           @default(false)
+  /// Dépense avancée de sa poche par quelqu'un — l'association lui doit ce montant.
+  /// Sans objet sur une recette, où le serveur le force à `null`.
+  advancedById   Int?
+  /// La même avance, quand la personne n'a PAS de compte : son nom, saisi librement.
+  ///
+  /// Exclusif de `advancedById` — le serveur efface l'un dès que l'autre est posé. Beaucoup de
+  /// ceux qui avancent de l'argent sur une convention ne sont pas inscrits sur le site : sans ce
+  /// champ, on ne pouvait pas dire à qui l'association devait ce montant.
+  advancedByName String?           @db.VarChar(150)
+  /// L'avance a-t-elle été remboursée à la personne ? Sans objet sans `advancedById`.
+  reimbursed     Boolean           @default(false)
+
+  /// QUAND l'avance a été remboursée, pour l'afficher au survol de la pastille.
+  ///
+  /// ⚠️ `NULL` NE VEUT PAS DIRE « PAS REMBOURSÉ » : la colonne est arrivée après le booléen, et les
+  /// avances soldées avant elle n'ont pas de date — 45 lignes au moment de la migration. C'est
+  /// `reimbursed` qui dit l'état, cette colonne ne dit que la date quand on la connaît. Afficher un
+  /// « remboursé le … » déduit de `updatedAt` serait un chiffre faux et plausible : cette colonne
+  /// bouge au moindre changement de libellé.
+  ///
+  /// 📍 Posée et effacée par `dateDuRemboursement` (`server/utils/treasury-guards.ts`), appelée par
+  /// les TROIS points qui écrivent `reimbursed`. Un remboursement déjà daté ne voit pas sa date
+  /// bouger quand on réenregistre la ligne.
+  reimbursedAt DateTime?
+
+  /// Le bénéficiaire à qui cette dépense doit être VERSÉE — prestataire, salle, fournisseur.
+  ///
+  /// ⚠️ EXCLUSIF DE L'AVANCE, et c'est l'invariant du dispositif. Une dépense est soit avancée par
+  /// quelqu'un — l'association lui doit de l'argent —, soit à régler à un tiers — l'association
+  /// doit de l'argent à ce tiers. Jamais les deux : la ligne compterait alors dans les deux
+  /// totaux, et le même montant serait réclamé deux fois.
+  ///
+  /// 📍 Normalisé et non refusé, comme l'avance : un formulaire qui bascule laisse traîner les
+  /// champs qu'il affichait, et rejeter la saisie pour cela serait incompréhensible. Voir
+  /// `reglementNormalise` dans `server/utils/treasury-guards.ts`.
+  ///
+  /// Cumulable en revanche avec `isForecast` : un devis signé non encore viré est à la fois
+  /// engagé et à régler.
+  payeeId Int?
+
+  /// Le versement a-t-il été effectué ? Sans objet sans `payeeId`.
+  ///
+  /// ⚠️ `disbursed` — « décaissé » — et NON `settled`, qui est déjà pris : `treasury-compute.ts`
+  /// emploie `settled` pour un MONTANT en centimes, celui qui est réellement réglé par opposition
+  /// à l'engagé. Un booléen du même nom l'écrasait silencieusement dans le type de la ligne, et
+  /// seul le typage l'a vu — les totaux auraient additionné un booléen à des centimes.
+  disbursed Boolean @default(false)
+
+  /// QUAND le versement a été fait.
+  ///
+  /// ⚠️ Même règle que `reimbursedAt` plus haut : `NULL` NE VEUT PAS DIRE « non réglé ». C'est
+  /// `settled` qui dit l'état, cette colonne ne dit que la date quand on la connaît. Déduire un
+  /// « réglé le … » de `updatedAt` serait un chiffre faux et plausible : cette colonne bouge au
+  /// moindre changement de libellé.
+  disbursedAt   DateTime?
+  /// Le jour où l'argent a bougé — celui du ticket de caisse, de la facture, du virement.
+  ///
+  /// À ne pas confondre avec `createdAt` juste en dessous, qui dit seulement quand la ligne a été
+  /// tapée dans l'outil. Les deux étaient confondues, et la seconde faisait office de première :
+  /// saisir le lundi les tickets du week-end datait tout du lundi.
+  ///
+  /// `@db.Date` et non un instant : une date d'opération est une date CIVILE. Le 12 juin reste le
+  /// 12 juin qu'on le lise depuis Paris ou depuis Montréal, alors qu'un instant se RELIT dans le
+  /// fuseau du lecteur et peut alors changer de jour. Le risque est donc à l'affichage, d'où le
+  /// formatage en UTC côté écran. Même choix que `EditionMeal.date`, lu comme lui en UTC.
+  ///
+  /// `null` sur les entrées antérieures à ce champ : on ne leur invente pas de date, et un tri
+  /// croissant les regroupe en tête.
+  operationDate DateTime?           @db.Date
+  /// Les tarifs dont cette ligne tire son montant. Vide = montant saisi à la main.
+  ///
+  /// Quand elle en porte, `amount` ci-dessus n'est PAS lu : le montant est recalculé à chaque
+  /// lecture depuis les commandes. On y laisse 0 plutôt qu'une valeur qui mentirait.
+  tiers         TreasuryEntryTier[]
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  event      Event          @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  code       TreasuryCode?  @relation(fields: [codeId], references: [id], onDelete: SetNull)
+  /// `SetNull` et non `Cascade` : un compte supprimé ne doit pas emporter la ligne comptable.
+  /// L'avance devient anonyme, la dépense reste.
+  advancedBy User?          @relation("TreasuryAdvances", fields: [advancedById], references: [id], onDelete: SetNull)
+  /// `SetNull` et non `Cascade`, pour la même raison que l'avance : supprimer un bénéficiaire du
+  /// carnet ne doit pas emporter les dépenses qu'on lui devait. La ligne perd son destinataire,
+  /// le montant reste.
+  payee      TreasuryPayee? @relation(fields: [payeeId], references: [id], onDelete: SetNull)
+
+  @@index([editionId])
+  @@index([codeId])
+  @@index([advancedById])
+  /// Ce que la carte des versements lit : les dépenses à régler, non encore versées.
+  @@index([editionId, payeeId, disbursed])
+}
+
+/// Code d'imputation choisi pour une origine calculée.
+///
+/// Un code par origine et non par artiste : un comptable impute l'ensemble des cachets sur un
+/// même compte, pas chaque artiste séparément.
+model TreasurySourceCode {
+  id        Int            @id @default(autoincrement())
+  editionId Int
+  source    TreasurySource
+  codeId    Int
+
+  event Event        @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  code  TreasuryCode @relation(fields: [codeId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, source])
+  @@index([codeId])
+}
+
+/// Un apport au FONDS DE CAISSE d'une édition : de l'espèce prêtée pour pouvoir rendre la monnaie.
+///
+/// ⚠️ CE N'EST PAS UNE `TreasuryEntry`, ET C'EST TOUT L'OBJET DE CETTE TABLE.
+///
+/// Un fonds de caisse est un **stock**, pas un flux : l'argent n'est ni consommé ni gagné, il
+/// change de poche. En écriture double, le constituer donne *débit Caisse / crédit Banque* —
+/// aucun compte de charge ni de produit n'est touché. Il n'a donc rien à faire dans un compte de
+/// résultat ni dans une répartition par imputation.
+///
+/// Le tenir HORS de `TreasuryEntry` fait que les cinq calculs qui dérivent des lignes de
+/// trésorerie — les deux pages, les exports CSV et PDF, le panneau des avances — ne *peuvent pas*
+/// le compter, même par mégarde. Un drapeau d'exclusion sur la ligne aurait exigé d'instruire
+/// chacun d'eux, et d'y penser encore au sixième.
+///
+/// 📍 Un prêteur qui RENONCE à sa restitution fait un don — et un don, lui, est un produit. C'est
+/// alors une vraie ligne de trésorerie créée exprès, avec son code d'imputation. C'est le seul
+/// chemin par lequel un fonds de caisse entre légitimement au résultat, et il est explicite.
+model TreasuryCashFloat {
+  id        Int @id @default(autoincrement())
+  editionId Int
+  /// Montant prêté, en centimes entiers, toujours positif.
+  amount    Int
+
+  /// Le prêteur, quand il a un compte sur le site.
+  ///
+  /// Un compte **ou** un nom libre, jamais les deux — même dualité que les avances
+  /// (`TreasuryEntry.advancedById`), et pour la même raison : beaucoup de ceux qui sortent de
+  /// l'argent sur une convention n'y sont pas inscrits. Le compte l'emporte, car il désigne une
+  /// personne sans ambiguïté là où un nom se regroupe par ressemblance.
+  lentById   Int?
+  /// Le même prêteur quand il n'a pas de compte : son nom, saisi librement.
+  ///
+  /// 📍 Normalisé par `nomAvanceAEnregistrer` et regroupé par `cleDuNomAvance`
+  /// (`shared/utils/avance-nom-libre.ts`) — les mêmes fonctions que les avances, pas une copie.
+  lentByName String? @db.VarChar(150)
+
+  /// Le jour où l'argent a été remis. Date CIVILE comme `TreasuryEntry.operationDate` : le 12 juin
+  /// reste le 12 juin qu'on le lise depuis Paris ou depuis Montréal.
+  operationDate DateTime? @db.Date
+
+  /// QUAND l'argent a été restitué au prêteur. **`NULL` veut dire « pas restitué ».**
+  ///
+  /// ⚠️ AUCUN BOOLÉEN À CÔTÉ, et c'est une leçon payée ailleurs. Sur les avances, `reimbursedAt`
+  /// est arrivé APRÈS `reimbursed` : 45 lignes déjà soldées n'ont pas de date, et `NULL` n'y
+  /// signifie donc pas « non remboursé » — c'est le booléen qui fait foi, la date ne dit que le
+  /// jour quand on le connaît. Sur une table neuve, une seule colonne porte l'état : les deux ne
+  /// peuvent pas se contredire, et il n'y a pas d'historique à ménager.
+  restitutedAt DateTime?
+
+  /// À quoi sert ce prêt, ou toute précision utile. Facultatif.
+  note      String?  @db.VarChar(300)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event  Event @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  /// `SetNull` et non `Cascade` : un compte supprimé ne doit pas effacer la dette. Le prêt devient
+  /// anonyme, l'association doit toujours cet argent. Même choix que `TreasuryEntry.advancedBy`.
+  lentBy User? @relation("TreasuryCashFloatLenders", fields: [lentById], references: [id], onDelete: SetNull)
+
+  @@index([editionId])
+  @@index([lentById])
 }

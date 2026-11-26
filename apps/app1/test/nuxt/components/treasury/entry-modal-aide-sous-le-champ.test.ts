@@ -2,7 +2,7 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { afterEach, describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
 
-import EntryModal from '../../../../app/components/treasury/EntryModal.vue'
+import EntryModal from '../../../../../../layers/treasury/app/components/treasury/EntryModal.vue'
 
 /**
  * « À régler à » : son texte d'aide se place SOUS le champ, pas à côté du libellé.

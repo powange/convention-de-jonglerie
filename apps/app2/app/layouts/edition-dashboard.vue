@@ -112,6 +112,10 @@ const valideLesRepas = ref(false)
 const repasOuverts = computed(
   () => !!acces.value?.modules.repas && (gereLesRepas.value || valideLesRepas.value)
 )
+// Trésorerie : module activé ET droit dédié (même règle qu'app1).
+const tresorerieOuverte = computed(
+  () => !!acces.value?.modules.tresorerie && !!acces.value?.droits.tresorerie
+)
 // Stock : le droit dédié, ou responsable d'une équipe de bénévoles (même règle qu'app1,
 // `canAccessStock`) — un responsable va chercher le matériel de son équipe.
 const stockOuvert = computed(
@@ -340,6 +344,35 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
                   label: 'Validation des repas',
                   icon: 'i-heroicons-check-badge',
                   to: `/events/${refPublique.value}/gestion/meals/validate`,
+                },
+              ],
+            },
+          ],
+        ]
+      : []),
+    ...(tresorerieOuverte.value
+      ? [
+          [
+            {
+              label: 'Trésorerie',
+              icon: 'i-heroicons-calculator',
+              value: 'tresorerie',
+              children: [
+                {
+                  label: 'Compte de résultat',
+                  icon: 'i-heroicons-document-chart-bar',
+                  to: `/events/${refPublique.value}/gestion/treasury`,
+                  exact: true,
+                },
+                {
+                  label: 'Répartition par imputation',
+                  icon: 'i-heroicons-squares-2x2',
+                  to: `/events/${refPublique.value}/gestion/treasury/breakdown`,
+                },
+                {
+                  label: 'Fonds de caisse',
+                  icon: 'i-heroicons-banknotes',
+                  to: `/events/${refPublique.value}/gestion/treasury/cash-float`,
                 },
               ],
             },
