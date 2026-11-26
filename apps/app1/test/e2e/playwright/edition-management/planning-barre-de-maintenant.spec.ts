@@ -12,9 +12,12 @@ import {
 
 const BASE = 'http://localhost:3000'
 
-/** Les éléments que FullCalendar rend pour l'instant présent, en vue timeline. */
-const LIGNE = '.fc-timeline-now-indicator-line'
-const FLECHE = '.fc-timeline-now-indicator-arrow'
+/**
+ * L'élément qu'EventCalendar rend pour l'instant présent, en vue timeline : la barre est sa bordure
+ * gauche, et son repère dans l'en-tête un point dessiné par `::before` (FullCalendar y mettait une
+ * flèche, élément à part).
+ */
+const LIGNE = '.ec-now-indicator'
 
 /**
  * Une barre verticale rouge marque l'instant présent sur le planning des bénévoles.
@@ -102,12 +105,12 @@ test.describe.serial('Planning — la barre de l’instant présent', () => {
    * Mesure la barre sur une page, ou rend `null` si le calendrier n'y est pas.
    *
    * La couleur est lue CALCULÉE et non par nom de classe : une variante que Tailwind n'aurait pas
-   * générée, ou une règle du thème qui écraserait celle de FullCalendar, laisseraient la classe en
+   * générée, ou une règle du thème qui écraserait celle du calendrier, laisseraient la classe en
    * place et la barre invisible.
    */
   const mesurer = async (page: import('@playwright/test').Page) =>
     page.evaluate(
-      ({ ligne, fleche }) => {
+      ({ ligne }) => {
         const el = document.querySelector(ligne) as HTMLElement | null
         if (!el) return null
         const s = getComputedStyle(el)
@@ -117,17 +120,20 @@ test.describe.serial('Planning — la barre de l’instant présent', () => {
           largeur: s.borderLeftWidth,
           hauteur: Math.round(r.height),
           gauche: Math.round(r.left),
-          fleche: Boolean(document.querySelector(fleche)),
+          // Le repère de l'en-tête : un point peint par `::before`, sur la même couleur.
+          fleche:
+            getComputedStyle(el, '::before').content !== 'none' &&
+            getComputedStyle(el, '::before').backgroundColor === s.borderLeftColor,
         }
       },
-      { ligne: LIGNE, fleche: FLECHE }
+      { ligne: LIGNE }
     )
 
   /**
    * Amener le calendrier sur la semaine de « maintenant ».
    *
    * Le planning ouvre en vue SEMAINE, sur la semaine du début de l'édition
-   * (`useVolunteerSchedule.ts` : `initialView: 'resourceTimelineWeek'`, `initialDate: startDate`).
+   * (`useVolunteerSchedule.ts` : `view: 'resourceTimelineWeek'`, `date: startDate`).
    * Ces specs calent l'édition sur `now − 24 h` : un LUNDI, ce début tombe le dimanche, donc dans la
    * semaine précédente — et « maintenant » se retrouve hors de la vue. Ni la barre de l'instant
    * présent ni le créneau ne sont alors rendus, et les deux specs échouaient chaque lundi.
@@ -144,7 +150,7 @@ test.describe.serial('Planning — la barre de l’instant présent', () => {
 
   test('elle s’affiche sur le planning de la gestion', async ({ page, goto }) => {
     await goto(`/editions/${editionId}/gestion/volunteers/planning`, { waitUntil: 'hydration' })
-    await expect(page.locator('.fc').first()).toBeVisible({ timeout: 40000 })
+    await expect(page.locator('.ec').first()).toBeVisible({ timeout: 40000 })
 
     await allerAAujourdhui(page)
 
@@ -153,12 +159,12 @@ test.describe.serial('Planning — la barre de l’instant présent', () => {
 
     expect(barre.couleur, 'la barre doit être rouge').toBe('rgb(255, 0, 0)')
     expect(barre.hauteur, 'une barre sans hauteur ne se voit pas').toBeGreaterThan(0)
-    expect(barre.fleche, 'la flèche marque l’heure dans l’en-tête').toBe(true)
+    expect(barre.fleche, 'le repère marque l’heure dans l’en-tête').toBe(true)
   })
 
   test('elle s’affiche aussi sur la page publique du bénévole', async ({ page, goto }) => {
     await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
-    await expect(page.locator('.fc').first()).toBeVisible({ timeout: 40000 })
+    await expect(page.locator('.ec').first()).toBeVisible({ timeout: 40000 })
 
     await allerAAujourdhui(page)
 

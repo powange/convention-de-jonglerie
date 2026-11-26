@@ -3,15 +3,16 @@ import { positionInitialeDuPlanning } from '../utils/position-initiale-planning'
 import { creneauAPourvoir, placesOccupees } from '../utils/remplissage-creneau'
 import { horairesEffectifs } from '../utils/retard-creneau'
 
-import type { CalendarOptions, EventInput } from '@fullcalendar/core'
-// `ResourceInput` vit dans le paquet `resource`, pas dans `core` : l'importer de `core`
-// ne résolvait rien, et le type des ressources était silencieusement perdu.
-import type { ResourceInput } from '@fullcalendar/resource'
 import type { ComputedRef, Ref } from 'vue'
 
-import { fuseauUtilisable } from '#core/shared/utils/fuseau-edition'
+import { fuseauUtilisable, versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
+import {
+  decalageDuFuseau,
+  heureMurale,
+  type OptionsCalendrier,
+} from '#ui-commun/app/utils/calendrier-flottant'
 
-// Type simplifié pour FullCalendar (compatible avec VolunteerTeam)
+// Type simplifié pour le calendrier (compatible avec VolunteerTeam)
 export interface VolunteerTeamCalendar {
   id: string
   name: string
@@ -29,12 +30,12 @@ export interface VolunteerTimeSlot {
    * `startDateTime` / `endDateTime`, et non `start` / `end`.
    *
    * Un créneau portait deux jeux de noms selon le point d'API qui le rendait — celui du schéma
-   * Prisma d'un côté, celui de FullCalendar de l'autre. Chaque rencontre entre les deux mondes
+   * Prisma d'un côté, celui du calendrier de l'autre. Chaque rencontre entre les deux mondes
    * exigeait un adaptateur, et un consommateur branché sur la mauvaise moitié lisait `undefined`
    * sans que rien ne le signale.
    *
    * Un seul nom désormais, de la base à l'écran : celui de la base. `start` / `end` ne survivent
-   * que dans les ÉVÉNEMENTS remis à FullCalendar, qui les impose.
+   * que dans les ÉVÉNEMENTS remis au calendrier, qui les impose.
    */
   startDateTime: string
   endDateTime: string
@@ -124,6 +125,18 @@ function obtenirInfobulle(): HTMLElement {
   return element
 }
 
+/**
+ * Masque l'infobulle.
+ *
+ * FullCalendar prévenait du retrait d'un créneau (`eventWillUnmount`), et l'infobulle s'effaçait
+ * avec lui. EventCalendar n'a pas ce rappel : on l'efface donc chaque fois que les créneaux sont
+ * renvoyés au calendrier, et au démontage — sans quoi elle resterait suspendue au-dessus d'un
+ * créneau qui n'existe plus.
+ */
+export function masquerInfobulleCreneau() {
+  if (infobulleCreneau) infobulleCreneau.style.display = 'none'
+}
+
 /** Près du curseur, mais jamais au-delà du bord de la fenêtre. */
 function positionnerInfobulle(infobulle: HTMLElement, evenement: MouseEvent) {
   if (infobulle.style.display === 'none') return
@@ -137,18 +150,6 @@ function positionnerInfobulle(infobulle: HTMLElement, evenement: MouseEvent) {
   infobulle.style.top = `${Math.max(marge, y)}px`
 }
 
-/**
- * Le jour d'une date, en heure LOCALE, au format `AAAA-MM-JJ`.
- *
- * `toISOString()` donnerait la date UTC : sur un calendrier ouvert au 25 à 00h30 en France, l'URL
- * porterait le 24, et le rechargement n'afficherait pas la même chose. Le même piège que pour le
- * découpage des statistiques par jour.
- */
-function jourLocal(date: Date): string {
-  const deuxChiffres = (n: number) => String(n).padStart(2, '0')
-  return `${date.getFullYear()}-${deuxChiffres(date.getMonth() + 1)}-${deuxChiffres(date.getDate())}`
-}
-
 export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
   const { t, locale } = useI18n()
   const { getUserAvatar, generateInitialsAvatar } = useAvatar()
@@ -156,7 +157,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
   /**
    * Le triangle d'alerte des créneaux qu'il reste à pourvoir.
    *
-   * Un emoji et non une icône Nuxt UI : FullCalendar construit ces nœuds en DOM natif, où aucun
+   * Un emoji et non une icône Nuxt UI : le calendrier construit ces nœuds en DOM natif, où aucun
    * composant Vue ne peut être monté. Le fichier s'en sert déjà pour la mention de retard.
    *
    * Le libellé passe par `title` ET `aria-label` : une couleur seule ne dit rien à qui ne la
@@ -283,40 +284,26 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
   const calendarRef = ref<any>(null)
   const ready = ref(false)
-  const plugins = shallowRef<any[]>([])
-  const allLocales = shallowRef<any[]>([])
 
-  // Charger les plugins dynamiquement
-  const loadPlugins = async () => {
-    try {
-      // `luxon3` est ce qui autorise un fuseau NOMMÉ (« Europe/Paris ») : sans ce greffon,
-      // FullCalendar n'accepte que `local` et `UTC`, et ignore silencieusement le reste.
-      const [resourceTimeline, timeline, interaction, luxon3, locales] = await Promise.all([
-        import('@fullcalendar/resource-timeline'),
-        import('@fullcalendar/timeline'),
-        import('@fullcalendar/interaction'),
-        import('@fullcalendar/luxon3'),
-        import('@fullcalendar/core/locales-all'),
-      ])
+  /**
+   * Une date-heure du lieu, telle que le calendrier l'affiche. `versChampLocal` rend
+   * `AAAA-MM-JJTHH:MM` dans le fuseau de l'édition (changements d'heure compris) — ou dans celui de
+   * la machine quand l'édition n'en déclare pas, comme le faisait `timeZone: 'local'`.
+   */
+  const versCalendrier = (instant: string) => versChampLocal(instant, fuseauDuCalendrier.value)
 
-      plugins.value = [
-        resourceTimeline.default,
-        timeline.default,
-        interaction.default,
-        luxon3.default,
-      ]
-      allLocales.value = locales.default
-    } catch (error) {
-      console.error('Error loading FullCalendar plugins:', error)
-    }
+  /** L'instant d'une heure murale rendue par le calendrier (sélection, glisser, étirer). */
+  const versInstantDuLieu = (date: Date) => {
+    const instant = versInstant(heureMurale(date), fuseauDuCalendrier.value)
+    return instant || date.toISOString()
   }
 
   // Configuration des ressources (équipes + "Non assigné")
-  const resources = computed((): ResourceInput[] => {
-    const teamResources: ResourceInput[] = unref(teams).map((team) => ({
+  const resources = computed(() => {
+    const teamResources = unref(teams).map((team) => ({
       id: team.id,
       title: team.name,
-      eventColor: team.color || '#3788d8',
+      eventBackgroundColor: team.color || '#3788d8',
       // Lus par `resourceLabelContent` : la nature d'une équipe change la lecture de toute sa
       // ligne — ses créneaux ne pèsent pas dans les heures à pourvoir.
       extendedProps: {
@@ -325,19 +312,22 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       },
     }))
 
-    // Ajouter une ressource "Non assigné" pour les créneaux sans équipe
+    // Ajouter une ressource "Non assigné" pour les créneaux sans équipe, EN DERNIER : c'est là que
+    // FullCalendar la rangeait (tri par identifiant, `unassigned` après ceux des équipes), et
+    // EventCalendar garde l'ordre reçu.
     return [
+      ...teamResources,
       {
         id: 'unassigned',
         title: t('edition.volunteers.unassigned_slots'),
-        eventColor: '#6b7280', // gris
+        eventBackgroundColor: '#6b7280', // gris
+        extendedProps: {},
       },
-      ...teamResources,
     ]
   })
 
-  // Conversion des créneaux en événements FullCalendar
-  const events = computed((): EventInput[] => {
+  // Conversion des créneaux en événements du calendrier
+  const events = computed(() => {
     return unref(timeSlots).map((slot) => {
       const slotTitle = slot.title || t('edition.volunteers.untitled_slot')
       // Les places se comptent toutes ensemble : un organisateur en occupe une, le compteur
@@ -359,10 +349,14 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       return {
         id: slot.id,
         title: `${slotTitle} ${counterInfo}`, // Titre simple pour les cas où eventContent n'est pas utilisé
-        start: adjustedStart,
-        end: adjustedEnd,
-        resourceId: slot.teamId || 'unassigned',
-        color: slot.color,
+        // Heures du LIEU, sans décalage : le calendrier les affiche telles quelles (cf.
+        // `calendrier-flottant`).
+        start: versCalendrier(adjustedStart),
+        end: versCalendrier(adjustedEnd),
+        resourceIds: [slot.teamId || 'unassigned'],
+        // Sans couleur propre, le créneau prend celle de son équipe (`eventBackgroundColor` de la
+        // ressource) : une couleur `undefined` explicite l'effacerait.
+        ...(slot.color ? { backgroundColor: slot.color } : {}),
         extendedProps: {
           // Calculé ici plutôt qu'à l'affichage : l'équipe du créneau, dont dépend la règle,
           // n'est pas accessible depuis le rendu d'un événement.
@@ -378,33 +372,118 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
           delayMinutes: slot.delayMinutes, // Retard du créneau
           originalStart: slot.startDateTime, // Heure de début originale
           originalEnd: slot.endDateTime, // Heure de fin originale
+          // Les instants affichés, retard compris, pour l'infobulle : les `Date` du calendrier
+          // portent l'heure murale, pas l'instant.
+          debutAffiche: adjustedStart,
+          finAffichee: adjustedEnd,
+          color: slot.color,
         },
       }
     })
   })
 
+  /** Le créneau tel que les rappels le remettent à la page, depuis un événement du calendrier. */
+  const creneauDepuisEvenement = (event: any, resourceId?: string): VolunteerTimeSlot => {
+    const rawTitle = event.extendedProps.slotTitle || String(event.title).split(' (')[0]
+    const equipe = resourceId ?? event.resourceIds?.[0]
+    return {
+      id: event.id,
+      title: rawTitle === t('edition.volunteers.untitled_slot') ? null : rawTitle,
+      // L'heure affichée, ramenée à un instant dans le fuseau du lieu.
+      startDateTime: versInstantDuLieu(event.start),
+      endDateTime: versInstantDuLieu(event.end),
+      teamId: equipe === 'unassigned' ? undefined : equipe,
+      maxVolunteers: event.extendedProps.maxVolunteers,
+      assignedVolunteers: event.extendedProps.assignedVolunteers,
+      color: event.extendedProps.color,
+      description: event.extendedProps.description,
+      assignedVolunteersList: event.extendedProps.assignedVolunteersList,
+    }
+  }
+
+  /**
+   * Le nom d'une équipe, suivi d'une icône quand elle n'est pas ordinaire.
+   *
+   * Une équipe volante ou autonome ne pèse pas dans les heures à pourvoir : sans repère, on lit
+   * sa ligne comme celle des autres et l'on s'étonne que ses créneaux ne comptent nulle part.
+   *
+   * ⚠️ Une ICÔNE et non le mot entier : cette colonne est étroite, et « Surveillance gymnase »
+   * suivi de « Volants » se tronquerait. Le sens passe par l'attribut `title`, donc par
+   * l'infobulle du navigateur — le calendrier construit cette colonne en DOM natif, où les
+   * composants Nuxt UI ne peuvent pas être montés. Elle est plus lente et moins jolie qu'un
+   * `UTooltip`, mais elle fonctionne partout, y compris à l'appui long sur mobile, et ne
+   * demande aucun positionnement à entretenir dans une colonne qui défile.
+   */
+  const resourceLabelContent = (arg: any) => {
+    const conteneur = document.createElement('div')
+    conteneur.className = 'flex items-center gap-1.5'
+
+    const nom = document.createElement('span')
+    nom.textContent = arg.resource.title
+    nom.style.minWidth = '0'
+    nom.style.overflow = 'hidden'
+    nom.style.textOverflow = 'ellipsis'
+    conteneur.appendChild(nom)
+
+    const proprietes = arg.resource.extendedProps as {
+      isFloatingTeam?: boolean
+      isAutonomousTeam?: boolean
+    }
+
+    /** Une pastille d'une seule lettre, dont le titre dit ce qu'elle signifie. */
+    const repere = (symbole: string, libelle: string, fond: string, encre: string) => {
+      const marque = document.createElement('span')
+      marque.textContent = symbole
+      // Le libellé complet reste accessible : au survol, et aux lecteurs d'écran.
+      marque.setAttribute('title', libelle)
+      marque.setAttribute('aria-label', libelle)
+      marque.style.display = 'inline-flex'
+      marque.style.alignItems = 'center'
+      marque.style.justifyContent = 'center'
+      marque.style.width = '18px'
+      marque.style.height = '18px'
+      marque.style.flexShrink = '0'
+      marque.style.fontSize = '0.7rem'
+      marque.style.lineHeight = '1'
+      marque.style.borderRadius = '9999px'
+      marque.style.backgroundColor = fond
+      marque.style.color = encre
+      marque.style.cursor = 'help'
+      conteneur.appendChild(marque)
+    }
+
+    if (proprietes?.isFloatingTeam) {
+      repere('⚡', t('volunteers.floating_team_badge'), 'rgba(56, 189, 248, 0.22)', '#0369a1')
+    }
+    if (proprietes?.isAutonomousTeam) {
+      repere('🔒', t('volunteers.autonomous_team_badge'), 'rgba(120, 120, 120, 0.22)', '#4b5563')
+    }
+
+    return { domNodes: [conteneur] }
+  }
+
   // Configuration du calendrier
-  const calendarOptions = reactive<CalendarOptions>({
-    plugins: plugins.value,
-    locales: allLocales.value,
+  const calendarOptions = reactive<OptionsCalendrier>({
+    // Formats de dates (titre, en-têtes, heures) dans la langue de l'interface : EventCalendar
+    // passe par `Intl`, aucun paquet de traductions à charger.
     locale: locale.value,
 
-    // Les heures s'affichent dans le fuseau de l'ÉDITION, pas dans celui du lecteur.
-    // `'local'` en repli : une édition peut ne pas déclarer de fuseau, et un planning aux heures
-    // du navigateur reste plus utile qu'un planning vide.
-    timeZone: fuseauDuCalendrier.value ?? 'local',
+    // L'INSTANT PRÉSENT dans le fuseau de l'édition (barre de l'heure actuelle, « Aujourd'hui »).
+    // Les créneaux, eux, arrivent en heures du lieu : cf. `calendrier-flottant`.
+    timeZone: decalageDuFuseau(fuseauDuCalendrier.value),
 
     // Vue timeline par ressource. Reprise de l'URL quand elle en porte une : un rechargement,
-    // ou un lien envoyé à quelqu'un, doit rouvrir la vue qu'on regardait.
-    initialView: vueInitiale ?? 'resourceTimelineWeek',
+    // ou un lien envoyé à quelqu'un, doit rouvrir la vue qu'on regardait. Mêmes noms de vue
+    // qu'avec FullCalendar : les liens déjà partagés restent valides.
+    view: vueInitiale ?? 'resourceTimelineWeek',
 
     // Date initiale : celle de l'URL, sinon le premier jour de l'événement.
-    initialDate: dateInitiale || startDate.value,
+    date: dateInitiale || String(startDate.value).slice(0, 10),
 
     // Période visible (limite la navigation)
     validRange: {
-      start: startDate.value,
-      end: endDate.value,
+      start: String(startDate.value).slice(0, 10),
+      end: String(endDate.value).slice(0, 10),
     },
 
     /*
@@ -414,9 +493,9 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
      * bénévole — parce que les deux pages emploient la même carte, laquelle passe par ce composable.
      * L'écrire dans chaque page aurait ouvert la porte à ce qu'elles divergent.
      *
-     * FullCalendar la place d'après l'horloge réelle, mais dans le FUSEAU DU CALENDRIER, réglé
-     * au-dessus sur celui de l'édition. C'est le bon repère : un planning se lit à l'heure du lieu
-     * où l'on est bénévole, pas à celle du navigateur.
+     * Le calendrier la place d'après l'horloge réelle, dans son `timeZone` — réglé sur le décalage
+     * actuel de l'édition. C'est le bon repère : un planning se lit à l'heure du lieu où l'on est
+     * bénévole, pas à celle du navigateur.
      *
      * Elle n'apparaît que si l'instant présent tombe dans la période affichée. Sur une édition à
      * venir, il n'y a donc rien à voir — et c'est juste : une barre posée au bord de l'écran
@@ -429,6 +508,9 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     slotMaxTime: '24:00:00',
     slotDuration: `00:${String(slotDurationMinutes.value).padStart(2, '0')}:00`, // Granularité dynamique
     slotLabelInterval: '01:00:00', // Libellés toutes les heures
+    // Largeur d'une case de granularité : à 15 minutes, 32 px (défaut) donnaient une heure de
+    // 128 px, bien plus large qu'avec FullCalendar. Celle-ci garde une heure d'environ 60 px.
+    slotWidth: slotWidthPour(slotDurationMinutes.value),
 
     // Configuration des ressources
     resources: [],
@@ -437,86 +519,22 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     events: [],
     editable: !isReadOnly.value,
     selectable: !isReadOnly.value,
+    // Les chevauchements sont permis par défaut (créneaux simultanés d'une même équipe) : il n'y
+    // a plus d'option `eventOverlap` / `selectOverlap` à poser.
 
-    // Gestion des chevauchements
-    eventOverlap: true, // Permet les chevauchements (par défaut: true)
-    selectOverlap: true, // Permet la sélection sur des événements existants
+    // La colonne des équipes porte un titre, comme sous FullCalendar (`resourceAreaHeaderContent`,
+    // sans équivalent ici) : il est posé par le composant, cf. `PlanningCard`.
 
-    // Hauteur des ressources
-    resourceAreaWidth: '15%', // Largeur de la colonne des équipes
-
-    // Personnalisation de l'en-tête de la zone des ressources
-    resourceAreaHeaderContent: t('edition.volunteers.teams'),
-
-    /**
-     * Le nom d'une équipe, suivi d'une icône quand elle n'est pas ordinaire.
-     *
-     * Une équipe volante ou autonome ne pèse pas dans les heures à pourvoir : sans repère, on lit
-     * sa ligne comme celle des autres et l'on s'étonne que ses créneaux ne comptent nulle part.
-     *
-     * ⚠️ Une ICÔNE et non le mot entier : cette colonne est étroite, et « Surveillance gymnase »
-     * suivi de « Volants » se tronquerait. Le sens passe par l'attribut `title`, donc par
-     * l'infobulle du navigateur — FullCalendar construit cette colonne en DOM natif, où les
-     * composants Nuxt UI ne peuvent pas être montés. Elle est plus lente et moins jolie qu'un
-     * `UTooltip`, mais elle fonctionne partout, y compris à l'appui long sur mobile, et ne
-     * demande aucun positionnement à entretenir dans une colonne qui défile.
-     */
-    resourceLabelContent: (arg) => {
-      const conteneur = document.createElement('div')
-      conteneur.className = 'flex items-center gap-1.5'
-
-      const nom = document.createElement('span')
-      nom.textContent = arg.resource.title
-      nom.style.minWidth = '0'
-      nom.style.overflow = 'hidden'
-      nom.style.textOverflow = 'ellipsis'
-      conteneur.appendChild(nom)
-
-      const proprietes = arg.resource.extendedProps as {
-        isFloatingTeam?: boolean
-        isAutonomousTeam?: boolean
-      }
-
-      /** Une pastille d'une seule lettre, dont le titre dit ce qu'elle signifie. */
-      const repere = (symbole: string, libelle: string, fond: string, encre: string) => {
-        const marque = document.createElement('span')
-        marque.textContent = symbole
-        // Le libellé complet reste accessible : au survol, et aux lecteurs d'écran.
-        marque.setAttribute('title', libelle)
-        marque.setAttribute('aria-label', libelle)
-        marque.style.display = 'inline-flex'
-        marque.style.alignItems = 'center'
-        marque.style.justifyContent = 'center'
-        marque.style.width = '18px'
-        marque.style.height = '18px'
-        marque.style.flexShrink = '0'
-        marque.style.fontSize = '0.7rem'
-        marque.style.lineHeight = '1'
-        marque.style.borderRadius = '9999px'
-        marque.style.backgroundColor = fond
-        marque.style.color = encre
-        marque.style.cursor = 'help'
-        conteneur.appendChild(marque)
-      }
-
-      if (proprietes?.isFloatingTeam) {
-        repere('⚡', t('volunteers.floating_team_badge'), 'rgba(56, 189, 248, 0.22)', '#0369a1')
-      }
-      if (proprietes?.isAutonomousTeam) {
-        repere('🔒', t('volunteers.autonomous_team_badge'), 'rgba(120, 120, 120, 0.22)', '#4b5563')
-      }
-
-      return { domNodes: [conteneur] }
-    },
+    resourceLabelContent,
 
     // Hauteur du calendrier
     height: 'auto',
 
     // Configuration de l'affichage
     headerToolbar: {
-      left: 'prev,next today',
+      start: 'prev,next today',
       center: 'title',
-      right: 'resourceTimelineDay,resourceTimelineWeek',
+      end: 'resourceTimelineDay,resourceTimelineWeek',
     },
 
     // Format du titre principal pour afficher le nom du jour
@@ -528,24 +546,12 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     },
 
     // Textes des boutons
-    buttonText: {
+    buttonText: (textes: Record<string, string>) => ({
+      ...textes,
       today: t('calendar.today'),
-      day: t('common.day'),
-      week: t('common.week'),
       resourceTimelineDay: t('edition.volunteers.day_view'),
       resourceTimelineWeek: t('edition.volunteers.week_view'),
-    },
-
-    // Format des en-têtes de jour avec nom du jour
-    dayHeaderContent: (arg) => {
-      const date = arg.date
-      const formatter = new Intl.DateTimeFormat('fr-FR', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-      })
-      return formatter.format(date)
-    },
+    }),
 
     // Configuration spécifique des vues
     views: {
@@ -555,16 +561,30 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
           minute: '2-digit',
           hour12: false,
         },
+        dayHeaderFormat: {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+        },
       },
       resourceTimelineWeek: {
-        dayHeaderContent: (arg) => {
-          const date = arg.date
-          const formatter = new Intl.DateTimeFormat('fr-FR', {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short',
-          })
-          return formatter.format(date)
+        /*
+         * SEPT JOURS À PARTIR DE LA DATE affichée, et non la semaine du calendrier : EventCalendar
+         * montrait du dimanche au samedi, jours hors de l'édition compris (grisés), et l'on
+         * ouvrait le planning sur un dimanche vide. Partir du premier jour de l'édition montre
+         * d'emblée ses journées, comme le faisait FullCalendar en rognant la semaine à la période
+         * autorisée.
+         */
+        // Rognée à la durée de l'édition quand elle est plus courte (cf. `joursDeLaVueSemaine`) :
+        // FullCalendar ne montrait que les jours autorisés de la semaine.
+        duration: { days: joursDeLaVueSemaine(startDate.value, endDate.value) },
+        // « 06 h », comme l'affichait FullCalendar en français sur la vue semaine.
+        slotLabelFormat: { hour: '2-digit' },
+        // « sam. 10/07 », comme sous FullCalendar.
+        dayHeaderFormat: {
+          weekday: 'short',
+          day: '2-digit',
+          month: '2-digit',
         },
       },
     },
@@ -579,7 +599,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
      * Un seul élément réutilisé, posé à la racine de la page : à l'intérieur du calendrier, il
      * serait coupé par le défilement des colonnes.
      */
-    eventDidMount: (arg) => {
+    eventDidMount: (arg: any) => {
       if (!import.meta.client) return
 
       const infobulle = obtenirInfobulle()
@@ -596,13 +616,14 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         titre.appendChild(texteTitre)
         infobulle.appendChild(titre)
 
-        // « 15h - 16h (1h) ». Les bornes de l'événement, donc décalées si le créneau a du
-        // retard : c'est l'heure à laquelle on se présente, pas celle prévue à l'origine.
-        // L'infobulle doit annoncer la même heure que la case qu'elle survole : sans le fuseau,
-        // FullCalendar affichait l'heure du lieu et l'infobulle celle du navigateur.
-        const plage = formatPlage(arg.event.start, arg.event.end, fuseauDuCalendrier.value)
+        // « 15h - 16h (1h) ». Les bornes affichées, donc décalées si le créneau a du retard :
+        // c'est l'heure à laquelle on se présente, pas celle prévue à l'origine. L'infobulle doit
+        // annoncer la même heure que la case qu'elle survole, d'où le fuseau de l'édition.
+        const debut = new Date(donnees.debutAffiche)
+        const fin = new Date(donnees.finAffichee)
+        const plage = formatPlage(debut, fin, fuseauDuCalendrier.value)
         if (plage) {
-          const duree = dureeTraduisible(arg.event.start, arg.event.end)
+          const duree = dureeTraduisible(debut, fin)
           const horaire = document.createElement('div')
           horaire.className = 'slot-tooltip-horaire'
           horaire.textContent = duree ? `${plage} (${t(duree.cle, duree.valeurs)})` : plage
@@ -656,10 +677,6 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         positionnerInfobulle(infobulle, evenement)
       }
 
-      const masquer = () => {
-        infobulle.style.display = 'none'
-      }
-
       /*
        * Des événements de POINTEUR, et le type de pointeur en garde.
        *
@@ -685,30 +702,24 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
        */
       const auDoigt = (evenement: PointerEvent) => evenement.pointerType === 'touch'
 
-      arg.el.addEventListener('pointerenter', (evenement) => {
+      arg.el.addEventListener('pointerenter', (evenement: Event) => {
         const pointeur = evenement as PointerEvent
         if (auDoigt(pointeur)) return
         afficher(pointeur)
       })
-      arg.el.addEventListener('pointermove', (evenement) => {
+      arg.el.addEventListener('pointermove', (evenement: Event) => {
         const pointeur = evenement as PointerEvent
         if (auDoigt(pointeur)) return
         positionnerInfobulle(infobulle, pointeur)
       })
-      arg.el.addEventListener('pointerleave', masquer)
+      arg.el.addEventListener('pointerleave', masquerInfobulleCreneau)
       // Un stylet ou une souris peut quitter la page sans repasser par le créneau ; et un appui
       // tactile qui aurait malgré tout ouvert l'infobulle ne doit pas la laisser derrière lui.
-      arg.el.addEventListener('pointercancel', masquer)
-      // Sans ça, l'infobulle reste suspendue au-dessus d'un créneau qui n'existe plus.
-      ;(arg.el as any).__masquerInfobulle = masquer
-    },
-
-    eventWillUnmount: (arg) => {
-      ;(arg.el as any).__masquerInfobulle?.()
+      arg.el.addEventListener('pointercancel', masquerInfobulleCreneau)
     },
 
     // Rendu HTML personnalisé pour les événements
-    eventContent: (arg) => {
+    eventContent: (arg: any) => {
       /** Une ligne « avatar + nom » telle qu'elle apparaît dans le créneau. */
       const lignePersonne = (user: any, organisateur = false): HTMLElement => {
         const ligne = document.createElement('div')
@@ -735,7 +746,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       }
 
       const event = arg.event
-      const slotTitle = event.extendedProps.slotTitle || event.title.split(' (')[0]
+      const slotTitle = event.extendedProps.slotTitle || String(event.title).split(' (')[0]
       const counterInfo = `(${placesOccupees(event.extendedProps as any)}/${event.extendedProps.maxVolunteers})`
       const assignedVolunteersList = event.extendedProps.assignedVolunteersList || []
       const delayMinutes = event.extendedProps.delayMinutes
@@ -831,121 +842,62 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     },
 
     // Gestion des clics et sélections
-    select: (selectInfo) => {
+    select: (selectInfo: any) => {
       if (!isReadOnly.value && onTimeSlotCreate) {
-        onTimeSlotCreate(selectInfo.startStr, selectInfo.endStr, selectInfo.resource?.id)
+        onTimeSlotCreate(
+          versInstantDuLieu(selectInfo.start),
+          versInstantDuLieu(selectInfo.end),
+          selectInfo.resource?.id
+        )
       }
       // Désélectionner après la création
       nextTick(() => {
-        if (calendarRef.value && calendarRef.value.getApi) {
-          calendarRef.value.getApi().unselect()
-        }
+        calendarRef.value?.getApi?.()?.unselect()
       })
     },
 
     // Gestion des événements
-    eventClick: (info) => {
+    eventClick: (info: any) => {
       // En mode lecture seule, permettre le clic pour afficher les détails (onTimeSlotClick)
       // mais pas pour éditer (onTimeSlotUpdate)
       const callback = isReadOnly.value ? onTimeSlotClick : onTimeSlotClick || onTimeSlotUpdate
-
-      if (callback) {
-        const event = info.event
-        // Utiliser le titre original depuis extendedProps
-        const rawTitle = event.extendedProps.slotTitle || event.title.split(' (')[0]
-        const slot: VolunteerTimeSlot = {
-          id: event.id,
-          title: rawTitle === t('edition.volunteers.untitled_slot') ? null : rawTitle,
-          startDateTime: event.startStr,
-          endDateTime: event.endStr,
-          teamId: event.extendedProps.teamId,
-          maxVolunteers: event.extendedProps.maxVolunteers,
-          assignedVolunteers: event.extendedProps.assignedVolunteers,
-          color: event.backgroundColor,
-          description: event.extendedProps.description,
-          assignedVolunteersList: event.extendedProps.assignedVolunteersList,
-        }
-        callback(slot)
-      }
+      // Le clic ouvre une modale : l'infobulle ne doit pas rester par-dessus.
+      masquerInfobulleCreneau()
+      if (callback) callback(creneauDepuisEvenement(info.event))
     },
 
     /**
-     * Vue ou date changée : FullCalendar appelle ce rappel dans les deux cas, y compris sur les
+     * Vue ou date changée : le calendrier appelle ce rappel dans les deux cas, y compris sur les
      * flèches de navigation. C'est donc le seul point d'où l'URL peut suivre ce qu'on regarde.
      *
-     * `activeStart` et non `currentStart` : sur la vue semaine, c'est la date réellement affichée
-     * à gauche, celle qu'il faut redonner au calendrier pour retrouver la même image.
+     * `currentStart` : sur la vue semaine, c'est la date réellement affichée à gauche, celle qu'il
+     * faut redonner au calendrier pour retrouver la même image.
      */
-    datesSet: (info) => {
+    datesSet: (info: any) => {
       if (!onVueChange) return
-      const jour = info.view.currentStart ?? info.start
-      onVueChange(info.view.type, jourLocal(jour))
+      const jour: Date = info.view.currentStart ?? info.start
+      onVueChange(info.view.type, heureMurale(jour).slice(0, 10))
     },
 
-    // Drag & drop des événements
-    eventDrop: (info) => {
-      const event = info.event
-      // Utiliser le titre original depuis extendedProps
-      const rawTitle = event.extendedProps.slotTitle || event.title.split(' (')[0]
-      const updatedSlot: VolunteerTimeSlot = {
-        id: event.id,
-        title: rawTitle === t('edition.volunteers.untitled_slot') ? null : rawTitle,
-        startDateTime: event.startStr,
-        endDateTime: event.endStr,
-        teamId:
-          event.getResources()[0]?.id === 'unassigned' ? undefined : event.getResources()[0]?.id,
-        maxVolunteers: event.extendedProps.maxVolunteers,
-        assignedVolunteers: event.extendedProps.assignedVolunteers,
-        // `backgroundColor` : `color` n'existe pas sur un événement FullCalendar rendu, la
-        // couleur valait donc toujours `undefined` ici.
-        color: event.backgroundColor,
-        description: event.extendedProps.description,
-        assignedVolunteersList: event.extendedProps.assignedVolunteersList,
-      }
-
+    // Drag & drop des événements. `newResource` n'est rempli que si l'équipe a changé.
+    eventDrop: (info: any) => {
       if (onTimeSlotUpdate) {
-        onTimeSlotUpdate(updatedSlot)
+        onTimeSlotUpdate(creneauDepuisEvenement(info.event, info.newResource?.id))
       }
     },
 
     // Redimensionnement des événements
-    eventResize: (info) => {
-      const event = info.event
-      // Utiliser le titre original depuis extendedProps
-      const rawTitle = event.extendedProps.slotTitle || event.title.split(' (')[0]
-      const updatedSlot: VolunteerTimeSlot = {
-        id: event.id,
-        title: rawTitle === t('edition.volunteers.untitled_slot') ? null : rawTitle,
-        startDateTime: event.startStr,
-        endDateTime: event.endStr,
-        teamId:
-          event.getResources()[0]?.id === 'unassigned' ? undefined : event.getResources()[0]?.id,
-        maxVolunteers: event.extendedProps.maxVolunteers,
-        assignedVolunteers: event.extendedProps.assignedVolunteers,
-        // `backgroundColor` : `color` n'existe pas sur un événement FullCalendar rendu, la
-        // couleur valait donc toujours `undefined` ici.
-        color: event.backgroundColor,
-        description: event.extendedProps.description,
-        assignedVolunteersList: event.extendedProps.assignedVolunteersList,
-      }
-
-      if (onTimeSlotUpdate) {
-        onTimeSlotUpdate(updatedSlot)
-      }
+    eventResize: (info: any) => {
+      if (onTimeSlotUpdate) onTimeSlotUpdate(creneauDepuisEvenement(info.event))
     },
   })
 
-  // Watcher pour mettre à jour les plugins et locales quand ils sont chargés
-  watch([plugins, allLocales], ([newPlugins, newLocales]) => {
-    calendarOptions.plugins = newPlugins
-    calendarOptions.locales = newLocales
-  })
-
   // L'édition se charge en asynchrone : le calendrier est souvent construit AVANT que son fuseau
-  // soit connu. Sans ce watcher, il resterait figé sur l'heure du navigateur, et seul un
-  // rechargement complet afficherait les bonnes heures.
+  // soit connu. Sans ce watcher, il resterait sur l'heure du navigateur, et seul un rechargement
+  // complet afficherait les bonnes heures. Les créneaux suivent d'eux-mêmes : `events` dépend
+  // du fuseau.
   watch(fuseauDuCalendrier, (nouveau) => {
-    calendarOptions.timeZone = nouveau ?? 'local'
+    calendarOptions.timeZone = decalageDuFuseau(nouveau)
   })
 
   // Watchers pour mettre à jour les ressources et événements
@@ -960,24 +912,13 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
   watch(
     events,
     (newEvents) => {
+      // Les créneaux sont redessinés : l'infobulle d'un créneau disparu ne doit pas survivre.
+      if (import.meta.client) masquerInfobulleCreneau()
       calendarOptions.events = newEvents
     },
     { deep: true, immediate: true }
   )
 
-  /**
-   * Recale le calendrier sur la période à couvrir, et seulement quand elle change.
-   *
-   * `timeSlots` figurait aussi dans la liste surveillée, pour le mode lecture seule où les
-   * bornes se déduisent des créneaux. C'était superflu — `startDate` et `endDate` sont des
-   * `computed` qui en dépendent déjà — et cela coûtait cher en gestion : ajouter ou supprimer
-   * un créneau réécrivait `initialDate`, ce qui ramenait la frise à son premier jour. On
-   * remplissait un planning en refaisant défiler la timeline après chaque créneau.
-   *
-   * La comparaison sur les valeurs précédentes est nécessaire : `startDate` renvoie une chaîne
-   * recalculée à chaque évaluation, si bien qu'un simple déclenchement du watcher ne dit pas
-   * que la période a bougé.
-   */
   /**
    * Pose la frise sur le premier créneau, une seule fois.
    *
@@ -986,75 +927,104 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
    * moins un, puis plus jamais — la replacer à chaque ajout ramènerait le défaut que les tests
    * de position verrouillent déjà, où remplir un planning obligeait à refaire défiler la frise
    * après chaque geste.
+   *
+   * ⚠️ Une position à part, et non `scrollTime` : EventCalendar plafonne celui-ci à la journée,
+   * alors que le premier créneau peut tomber le lendemain (« 34:00:00 »). Le composant
+   * `UiLazyEventCalendar` la pose lui-même (prop `defilement`).
    */
   const positionPosee = ref(false)
+  const positionInitiale = ref<string | null>(null)
 
   watch(
     [startDate, () => unref(timeSlots)],
     ([debut, creneaux]) => {
       if (positionPosee.value || !creneaux || creneaux.length === 0) return
 
-      const position = positionInitialeDuPlanning(debut, creneaux)
+      const position = positionInitialeDuPlanning(debut, creneaux, fuseauDuCalendrier.value)
       positionPosee.value = true
       if (!position) return
 
-      calendarOptions.scrollTime = position
-      // Les options sont lues au rendu ; le calendrier déjà monté ne les relit pas de lui-même.
-      calendarRef.value?.getApi?.()?.scrollToTime?.(position)
+      positionInitiale.value = position
     },
     { immediate: true }
   )
 
+  /**
+   * Recale le calendrier sur la période à couvrir, et seulement quand elle change.
+   *
+   * `timeSlots` figurait aussi dans la liste surveillée, pour le mode lecture seule où les
+   * bornes se déduisent des créneaux. C'était superflu — `startDate` et `endDate` sont des
+   * `computed` qui en dépendent déjà — et cela coûtait cher en gestion : ajouter ou supprimer
+   * un créneau réécrivait la date affichée, ce qui ramenait la frise à son premier jour. On
+   * remplissait un planning en refaisant défiler la timeline après chaque créneau.
+   *
+   * La comparaison sur les valeurs précédentes est nécessaire : `startDate` renvoie une chaîne
+   * recalculée à chaque évaluation, si bien qu'un simple déclenchement du watcher ne dit pas
+   * que la période a bougé.
+   */
   watch(
     [startDate, endDate],
     ([newStartDate, newEndDate], [ancienStart, ancienEnd] = []) => {
       if (!newStartDate || !newEndDate) return
       if (newStartDate === ancienStart && newEndDate === ancienEnd) return
 
-      calendarOptions.initialDate = newStartDate
+      calendarOptions.date = String(newStartDate).slice(0, 10)
       calendarOptions.validRange = {
-        start: newStartDate,
-        end: newEndDate,
+        start: String(newStartDate).slice(0, 10),
+        end: String(newEndDate).slice(0, 10),
+      }
+      calendarOptions.views.resourceTimelineWeek.duration = {
+        days: joursDeLaVueSemaine(newStartDate, newEndDate),
       }
     },
     { immediate: true }
   )
 
-  // Watcher pour la granularité
-  watch(
-    slotDurationMinutes,
-    (newDuration) => {
-      const formattedDuration = `00:${String(newDuration).padStart(2, '0')}:00`
+  // Granularité : le composant renvoie l'option au calendrier monté, qui se redessine seul (plus
+  // besoin de `setOption` à la main ni de `refetchEvents`, comme avec FullCalendar).
+  watch(slotDurationMinutes, (newDuration) => {
+    calendarOptions.slotDuration = `00:${String(newDuration).padStart(2, '0')}:00`
+    calendarOptions.slotWidth = slotWidthPour(newDuration)
+  })
 
-      // Mettre à jour l'option dans calendarOptions
-      calendarOptions.slotDuration = formattedDuration
+  // Plus de greffons à charger : EventCalendar arrive d'un bloc, chargé par le composant.
+  onMounted(() => {
+    ready.value = true
+  })
 
-      // Mettre à jour aussi via l'API si le calendrier est déjà initialisé
-      nextTick(() => {
-        if (calendarRef.value && ready.value) {
-          const calendarApi = calendarRef.value.getApi?.()
-          if (calendarApi) {
-            calendarApi.setOption('slotDuration', formattedDuration)
-            // Forcer le re-render du calendrier
-            calendarApi.refetchEvents()
-          }
-        }
-      })
-    },
-    { immediate: false }
-  )
-
-  // Initialisation
-  onMounted(async () => {
-    await loadPlugins()
-    nextTick(() => {
-      ready.value = true
-    })
+  onBeforeUnmount(() => {
+    if (import.meta.client) masquerInfobulleCreneau()
   })
 
   return {
     calendarRef,
     calendarOptions,
     ready,
+    positionInitiale,
   }
+}
+
+/**
+ * Largeur d'une case de la frise, pour qu'une heure fasse à peu près la même largeur (60 px)
+ * quelle que soit la granularité — comme sous FullCalendar, où élargir la granularité ne
+ * changeait pas l'échelle de lecture.
+ */
+function slotWidthPour(minutes: number): number {
+  return Math.max(12, Math.round((60 * minutes) / 60))
+}
+
+/**
+ * Nombre de jours de la vue « semaine » : ceux de la période autorisée, sept au plus.
+ *
+ * EventCalendar affiche toute la durée de la vue, jours hors période compris (grisés). Une
+ * édition de trois jours s'ouvrait donc sur trois jours utiles et quatre colonnes vides ;
+ * FullCalendar, lui, rognait la vue à la période. `end` est exclusif.
+ */
+export function joursDeLaVueSemaine(debut: string, fin: string): number {
+  const ecart = Math.round(
+    (Date.parse(`${String(fin).slice(0, 10)}T00:00:00Z`) -
+      Date.parse(`${String(debut).slice(0, 10)}T00:00:00Z`)) /
+      86_400_000
+  )
+  return Number.isFinite(ecart) ? Math.min(7, Math.max(1, ecart)) : 7
 }

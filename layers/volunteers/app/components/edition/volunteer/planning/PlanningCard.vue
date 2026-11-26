@@ -79,11 +79,15 @@
 
       <!-- Calendrier de planning -->
       <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <UiLazyFullCalendar
+        <!-- `--entete-ressources` : le titre de la colonne des équipes, que EventCalendar ne sait
+             pas poser (FullCalendar avait `resourceAreaHeaderContent`). Affiché par le CSS. -->
+        <UiLazyEventCalendar
           v-if="ready && calendarOptions && edition"
           ref="calendarRef"
           :options="calendarOptions"
+          :defilement="positionInitiale"
           class="volunteer-planning-calendar"
+          :style="{ '--entete-ressources': JSON.stringify(t('edition.volunteers.teams')) }"
         />
         <div v-else class="flex items-center justify-center py-8">
           <UIcon name="i-heroicons-arrow-path" class="animate-spin text-gray-400" size="20" />
@@ -242,7 +246,7 @@ const teamFilterOptions = computed(() => {
   }))
 })
 
-// Conversion des données API pour compatibilité avec FullCalendar
+// Conversion des données API pour le calendrier
 const convertedTimeSlots = computed(() => {
   return internalTimeSlots.value.map(
     (slot): VolunteerTimeSlot => ({
@@ -393,14 +397,14 @@ const editionEndDate = computed(() => {
     endDate = (props.edition?.endDate || new Date().toISOString().split('T')[0]) as string
   }
 
-  // Ajouter un jour à la date de fin car validRange.end est exclusif dans FullCalendar
+  // Ajouter un jour à la date de fin : `validRange.end` est exclusif
   const date = new Date(endDate)
   date.setDate(date.getDate() + 1)
   return date.toISOString().split('T')[0]
 })
 
 // Configuration du calendrier de planning
-const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
+const { calendarRef, calendarOptions, ready, positionInitiale } = useVolunteerSchedule({
   editionStartDate: editionStartDate,
   editionEndDate: editionEndDate,
   teams: filteredTeams,
@@ -414,7 +418,7 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
   dateInitiale,
   onVueChange: (vue: string, date: string) => {
     vueCourante.value = vue
-    // FullCalendar signale aussi la date au MONTAGE : sans cette comparaison, ouvrir la page
+    // Le calendrier signale aussi la date au MONTAGE : sans cette comparaison, ouvrir la page
     // suffisait à lui coller un `?date=` qu'on n'avait pas demandé. L'URL ne porte que ce qui
     // s'écarte de l'état d'arrivée — c'est la règle du fichier de filtres.
     dateCourante.value = date === jourDeDepart.value ? null : date
@@ -749,48 +753,94 @@ defineExpose({
 </script>
 
 <style>
-/* Styles pour le planning des bénévoles */
-.volunteer-planning-calendar {
-  /* Timeline resource view styling */
-  --fc-border-color: rgb(229 231 235); /* gray-200 */
-  --fc-neutral-bg-color: rgb(249 250 251); /* gray-50 */
+/*
+ * Planning des bénévoles (EventCalendar, vue « ligne de temps par équipe »).
+ *
+ * Non `scoped` : le calendrier construit son DOM lui-même, hors de la portée du compilateur de
+ * Vue. Les règles reprennent celles qu'avait FullCalendar, traduites dans les classes
+ * d'EventCalendar (`ec-*`), pour un rendu aussi proche que possible.
+ */
+/*
+ * Colonne des équipes. EventCalendar la dimensionne d'après son contenu (et publie lui-même
+ * `--ec-sidebar-width`, en style en ligne) : on borne donc la colonne elle-même, les noms trop longs
+ * passant à la ligne. Proche des 15 % de `resourceAreaWidth` sous FullCalendar.
+ */
+.volunteer-planning-calendar .ec-sidebar {
+  max-inline-size: 15rem;
 }
 
-.volunteer-planning-calendar .fc-theme-standard .fc-resource-timeline-divider {
-  border-color: rgb(229 231 235);
+/* Barre d'outils posée au-dessus de la grille, avec un peu d'air sous la carte. */
+.volunteer-planning-calendar .ec-toolbar {
+  padding: 0.25rem 0.25rem 0;
 }
 
-.volunteer-planning-calendar .fc-theme-standard .fc-scrollgrid {
-  border-color: rgb(229 231 235);
-}
-
-.volunteer-planning-calendar .fc-theme-standard td,
-.volunteer-planning-calendar .fc-theme-standard th {
-  border-color: rgb(229 231 235);
-}
-
-.volunteer-planning-calendar .fc-resource {
-  background-color: rgb(249 250 251);
+/* En-têtes de colonnes : le jour centré, les heures à gauche ; en gras et foncés, comme sous
+   FullCalendar. */
+.volunteer-planning-calendar .ec-header .ec-col-head,
+.volunteer-planning-calendar .ec-header .ec-slot {
+  font-weight: 700;
   color: rgb(17 24 39);
 }
 
-.volunteer-planning-calendar .fc-event {
-  border: 1px solid;
+.volunteer-planning-calendar .ec-header .ec-col-head {
+  text-align: center;
+}
+
+.volunteer-planning-calendar .ec-header .ec-slot {
+  text-align: start;
+}
+
+/* Vue jour : la ligne du jour répète le titre de la barre ; FullCalendar ne l'affichait pas. */
+.volunteer-planning-calendar .ec-day-view .ec-header .ec-col-head {
+  display: none;
+}
+
+/* Titre de la colonne des équipes (cf. `--entete-ressources` posé par le composant). */
+.volunteer-planning-calendar .ec-header .ec-sidebar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 0.5rem;
+  font-weight: 700;
+  color: rgb(17 24 39);
+}
+
+.volunteer-planning-calendar .ec-header .ec-sidebar::before {
+  content: var(--entete-ressources, '');
+}
+
+/* Colonne des équipes : noms alignés à gauche, sur fond gris clair. */
+.volunteer-planning-calendar .ec-body .ec-sidebar {
+  text-align: start;
+  background-color: rgb(249 250 251); /* gray-50 */
+  color: rgb(17 24 39);
+}
+
+.volunteer-planning-calendar .ec-row-head {
+  padding: 0.5rem;
+}
+
+/* Les créneaux */
+.volunteer-planning-calendar .ec-event {
+  border: 1px solid rgb(0 0 0 / 0.08);
   border-radius: 0.375rem;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   font-size: 0.875rem;
+  color: white;
   cursor: pointer;
-}
-
-.volunteer-planning-calendar .fc-event-title {
-  white-space: pre-line;
-  line-height: 1.3;
-  padding: 2px 4px;
-  font-size: 0.75rem;
-}
-
-.volunteer-planning-calendar .fc-event-main {
   padding: 1px 2px;
+}
+
+.volunteer-planning-calendar .ec-event:hover {
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Le contenu d'un créneau occupe toute sa largeur (le corps d'EventCalendar est un flex). */
+.volunteer-planning-calendar .ec-event-body {
+  min-width: 0;
+  width: 100%;
 }
 
 /* Styles pour le contenu personnalisé des événements */
@@ -798,6 +848,7 @@ defineExpose({
   padding: 2px 4px;
   font-size: 0.75rem;
   line-height: 1.2;
+  min-width: 0;
 }
 
 .volunteer-planning-calendar .slot-title {
@@ -858,10 +909,6 @@ defineExpose({
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
-}
-
-.volunteer-planning-calendar .user-avatar-1 {
-  background-color: rgb(34 197 94); /* green-500 */
 }
 
 /* Infobulle de survol d'un créneau. Posée à la racine de la page pour ne pas être coupée par le
@@ -930,18 +977,6 @@ defineExpose({
   border: 1px solid rgb(255 255 255 / 40%);
 }
 
-.volunteer-planning-calendar .user-avatar-2 {
-  background-color: rgb(251 146 60); /* orange-400 */
-}
-
-.volunteer-planning-calendar .user-avatar-3 {
-  background-color: rgb(168 85 247); /* purple-500 */
-}
-
-.volunteer-planning-calendar .user-avatar-4 {
-  background-color: rgb(236 72 153); /* pink-500 */
-}
-
 /* Le triangle d'alerte des créneaux qu'il reste à pourvoir, dans le créneau et dans l'infobulle. */
 .volunteer-planning-calendar .slot-alerte,
 .slot-tooltip .slot-alerte {
@@ -951,45 +986,31 @@ defineExpose({
   flex-shrink: 0;
 }
 
-.volunteer-planning-calendar .fc-event:hover {
-  box-shadow:
-    0 4px 6px -1px rgb(0 0 0 / 0.1),
-    0 2px 4px -2px rgb(0 0 0 / 0.1);
-}
-
-/* Dark mode support avec toggle manuel Nuxt UI */
-.dark .volunteer-planning-calendar {
-  --fc-border-color: rgb(55 65 81); /* gray-700 */
-  --fc-neutral-bg-color: rgb(31 41 55); /* gray-800 */
-}
-
-.dark .volunteer-planning-calendar .fc-theme-standard .fc-resource-timeline-divider {
-  border-color: rgb(55 65 81);
-}
-
-.dark .volunteer-planning-calendar .fc-theme-standard .fc-scrollgrid {
-  border-color: rgb(55 65 81);
-}
-
-.dark .volunteer-planning-calendar .fc-theme-standard td,
-.dark .volunteer-planning-calendar .fc-theme-standard th {
-  border-color: rgb(55 65 81);
-}
-
-.dark .volunteer-planning-calendar .fc-resource {
-  background-color: rgb(31 41 55);
+/* Mode sombre */
+.dark .volunteer-planning-calendar .ec-header .ec-col-head,
+.dark .volunteer-planning-calendar .ec-header .ec-slot,
+.dark .volunteer-planning-calendar .ec-header .ec-sidebar {
   color: rgb(243 244 246);
 }
 
-/* Responsive adjustments */
+.dark .volunteer-planning-calendar .ec-body .ec-sidebar {
+  background-color: rgb(31 41 55); /* gray-800 */
+  color: rgb(243 244 246);
+}
+
+/* Téléphone : la barre d'outils s'empile, centrée ; la colonne des équipes cède de la place à
+   la frise. */
 @media (max-width: 768px) {
-  .volunteer-planning-calendar .fc-toolbar {
+  .volunteer-planning-calendar .ec-sidebar {
+    max-inline-size: 7.5rem;
+  }
+
+  .volunteer-planning-calendar .ec-toolbar {
     flex-direction: column;
     gap: 0.5rem;
   }
 
-  .volunteer-planning-calendar .fc-toolbar-chunk {
-    display: flex;
+  .volunteer-planning-calendar .ec-toolbar > * {
     justify-content: center;
   }
 }

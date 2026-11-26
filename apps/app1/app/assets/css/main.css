@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "@nuxt/ui";
+@import 'tailwindcss';
+@import '@nuxt/ui';
 
 :root {
   --ui-container: --spacing(4) auto;
@@ -17,34 +17,36 @@
 /* Mode sombre Midnight Circus */
 html.dark {
   /* Override des couleurs grises pour un thème violet/indigo */
-  --color-gray-50: 237 233 254;  /* Violet très clair */
+  --color-gray-50: 237 233 254; /* Violet très clair */
   --color-gray-100: 221 214 254; /* Violet clair */
   --color-gray-200: 196 181 253; /* Violet doux */
   --color-gray-300: 165 145 251; /* Violet moyen */
   --color-gray-400: 129 102 249; /* Violet */
-  --color-gray-500: 103 75 215;  /* Violet foncé */
-  --color-gray-600: 79 55 183;   /* Indigo foncé */
-  --color-gray-700: 55 48 163;   /* Indigo très foncé */
-  --color-gray-800: 49 35 129;   /* Indigo profond */
-  --color-gray-900: 20 24 55;    /* Bleu nuit */
-  --color-gray-950: 10 14 39;    /* Bleu nuit profond */
+  --color-gray-500: 103 75 215; /* Violet foncé */
+  --color-gray-600: 79 55 183; /* Indigo foncé */
+  --color-gray-700: 55 48 163; /* Indigo très foncé */
+  --color-gray-800: 49 35 129; /* Indigo profond */
+  --color-gray-900: 20 24 55; /* Bleu nuit */
+  --color-gray-950: 10 14 39; /* Bleu nuit profond */
 }
 
 /* Application du fond Midnight Circus */
 body {
   background-color: white;
   color: rgb(15 23 42);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 html.dark body {
-  background-color: #0A0E27;
+  background-color: #0a0e27;
   color: rgb(237 233 254);
 }
 
 /* Override spécifique pour les composants Nuxt UI en mode sombre */
 html.dark .bg-gray-900 {
-  background-color: #0A0E27 !important;
+  background-color: #0a0e27 !important;
 }
 
 html.dark .bg-gray-800 {
@@ -52,11 +54,11 @@ html.dark .bg-gray-800 {
 }
 
 html.dark .bg-gray-700 {
-  background-color: #1A1F4A !important;
+  background-color: #1a1f4a !important;
 }
 
 html.dark .bg-gray-950 {
-  background-color: #0A0E27 !important;
+  background-color: #0a0e27 !important;
 }
 
 /* Effets visuels Midnight Circus pour le mode sombre */
@@ -68,11 +70,12 @@ html.dark .bg-gray-950 {
 
 /* Animation subtile */
 @keyframes sparkle {
-  0%, 100% { 
+  0%,
+  100% {
     opacity: 0;
     transform: scale(0.95);
   }
-  50% { 
+  50% {
     opacity: 1;
     transform: scale(1);
   }
@@ -80,14 +83,8 @@ html.dark .bg-gray-950 {
 
 /* Mise en forme du Markdown (`prose`) : layers/ui/app/assets/css/prose.css */
 
-/* ===== STYLES FULLCALENDAR avec variables Nuxt UI ===== */
-
-/* Suppression du message de licence FullCalendar */
-.fc-license-message {
-  display: none !important;
-}
-
-/* Le reste de l'habillage de FullCalendar : layers/ui/app/assets/css/fullcalendar.css */
+/* L'habillage de FullCalendar (agenda de l'accueil) : ./fullcalendar.css. Plus aucun module premium
+   n'est chargé : il n'y a plus de message de licence à masquer. */
 
 /* ===== STYLES LEAFLET MAP (marqueurs et zones) ===== */
 

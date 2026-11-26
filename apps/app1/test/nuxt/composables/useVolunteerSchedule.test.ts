@@ -2,7 +2,12 @@ import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { describe, it, expect, vi } from 'vitest'
 import { nextTick, ref } from 'vue'
 
-import { useVolunteerSchedule } from '../../../../../layers/volunteers/app/composables/useVolunteerSchedule'
+import { DateTime } from 'luxon'
+
+import {
+  joursDeLaVueSemaine,
+  useVolunteerSchedule,
+} from '../../../../../layers/volunteers/app/composables/useVolunteerSchedule'
 
 // Le composable traduit les libellés du calendrier : un `t` passe-plat suffit ici.
 mockNuxtImport('useI18n', () => () => ({
@@ -17,7 +22,8 @@ mockNuxtImport('useAvatar', () => () => ({ getUserAvatar: () => null }))
  * supprimé : on remplissait un planning en refaisant défiler la timeline après chaque geste.
  *
  * La cause tenait à un watcher qui surveillait `timeSlots` en plus des dates et réécrivait
- * `initialDate` — l'option qui commande la position de FullCalendar. Ces tests fixent la règle :
+ * la date affichée — l'option qui commande la position du calendrier (`date` sous
+ * EventCalendar, `initialDate` sous FullCalendar). Ces tests fixent la règle :
  * seule une période différente déplace la vue.
  */
 const creneau = (id: string, startDateTime: string, endDateTime: string) => ({
@@ -51,8 +57,8 @@ describe('useVolunteerSchedule — position de la frise', () => {
     const timeSlots = ref([creneau('1', '2026-09-25T10:00:00Z', '2026-09-25T12:00:00Z')])
     const { calendarOptions } = monter(timeSlots)
 
-    // L'organisateur a fait défiler la frise : FullCalendar suit `initialDate`
-    calendarOptions.initialDate = '2026-09-27'
+    // L'organisateur a fait défiler la frise : le calendrier suit `date`
+    calendarOptions.date = '2026-09-27'
 
     timeSlots.value = [
       ...timeSlots.value,
@@ -60,7 +66,7 @@ describe('useVolunteerSchedule — position de la frise', () => {
     ]
     await nextTick()
 
-    expect(calendarOptions.initialDate).toBe('2026-09-27')
+    expect(calendarOptions.date).toBe('2026-09-27')
   })
 
   it('ne déplace pas la vue quand un créneau est supprimé', async () => {
@@ -69,12 +75,12 @@ describe('useVolunteerSchedule — position de la frise', () => {
       creneau('2', '2026-09-26T14:00:00Z', '2026-09-26T16:00:00Z'),
     ])
     const { calendarOptions } = monter(timeSlots)
-    calendarOptions.initialDate = '2026-09-27'
+    calendarOptions.date = '2026-09-27'
 
     timeSlots.value = [timeSlots.value[0]!]
     await nextTick()
 
-    expect(calendarOptions.initialDate).toBe('2026-09-27')
+    expect(calendarOptions.date).toBe('2026-09-27')
   })
 
   it("recale la vue quand les dates de l'édition changent vraiment", async () => {
@@ -95,7 +101,7 @@ describe('useVolunteerSchedule — position de la frise', () => {
     debut.value = '2026-10-02'
     await nextTick()
 
-    expect(calendarOptions.initialDate).toBe('2026-10-02')
+    expect(calendarOptions.date).toBe('2026-10-02')
   })
 })
 
@@ -107,45 +113,45 @@ describe('useVolunteerSchedule — position de la frise', () => {
 describe('useVolunteerSchedule — position de départ sur le premier créneau', () => {
   it('se pose sur le premier créneau dès le premier chargement', async () => {
     const timeSlots = ref([creneau('1', '2026-09-26T10:00:00', '2026-09-26T12:00:00')])
-    const { calendarOptions } = monter(timeSlots)
+    const { positionInitiale } = monter(timeSlots)
     await nextTick()
 
-    expect(calendarOptions.scrollTime).toBe('34:00:00')
+    expect(positionInitiale.value).toBe('34:00:00')
   })
 
   it('ne pose rien tant qu’aucun créneau n’existe', async () => {
-    const { calendarOptions } = monter(ref([]))
+    const { positionInitiale } = monter(ref([]))
     await nextTick()
 
-    expect(calendarOptions.scrollTime).toBeUndefined()
+    expect(positionInitiale.value).toBeNull()
   })
 
   it('ne repose pas la frise quand un créneau est ajouté ensuite', async () => {
     const timeSlots = ref([creneau('1', '2026-09-26T10:00:00', '2026-09-26T12:00:00')])
-    const { calendarOptions } = monter(timeSlots)
+    const { positionInitiale } = monter(timeSlots)
     await nextTick()
 
     // L'organisateur a fait défiler, puis ajoute un créneau plus tôt dans la période
-    calendarOptions.scrollTime = '48:00:00'
+    positionInitiale.value = '48:00:00'
     timeSlots.value = [
       ...timeSlots.value,
       creneau('2', '2026-09-25T08:00:00', '2026-09-25T09:00:00'),
     ]
     await nextTick()
 
-    expect(calendarOptions.scrollTime).toBe('48:00:00')
+    expect(positionInitiale.value).toBe('48:00:00')
   })
 
   it('se pose au premier chargement, même si les créneaux arrivent après le montage', async () => {
     // Le cas réel : la page monte, puis l'appel réseau rapporte les créneaux.
     const timeSlots = ref<any[]>([])
-    const { calendarOptions } = monter(timeSlots)
+    const { positionInitiale } = monter(timeSlots)
     await nextTick()
 
     timeSlots.value = [creneau('1', '2026-09-27T09:30:00', '2026-09-27T11:00:00')]
     await nextTick()
 
-    expect(calendarOptions.scrollTime).toBe('57:30:00')
+    expect(positionInitiale.value).toBe('57:30:00')
   })
 })
 
@@ -153,7 +159,7 @@ describe('useVolunteerSchedule — position de départ sur le premier créneau',
  * Les repères de la colonne des équipes.
  *
  * Une équipe volante ou autonome ne pèse pas dans les heures à pourvoir : sans repère, on lit sa
- * ligne comme celle des autres. L'icône vit dans le DOM natif de FullCalendar, hors de portée des
+ * ligne comme celle des autres. L'icône vit dans le DOM natif du calendrier, hors de portée des
  * composants Nuxt UI — d'où l'infobulle par attribut `title`.
  */
 describe('useVolunteerSchedule — repères des équipes', () => {
@@ -169,7 +175,7 @@ describe('useVolunteerSchedule — repères des équipes', () => {
       onTimeSlotDelete: vi.fn(),
     } as any)
 
-  /** Le nœud que FullCalendar afficherait pour cette ressource. */
+  /** Le nœud que le calendrier afficherait pour cette ressource. */
   const libelleDe = (calendarOptions: any, ressource: any): HTMLElement =>
     calendarOptions.resourceLabelContent({ resource: ressource }).domNodes[0]
 
@@ -223,18 +229,17 @@ describe('useVolunteerSchedule — repères des équipes', () => {
  * L'heure d'un créneau est une heure de LIEU.
  *
  * « Le créneau accueil est à 14 h » veut dire 14 h sur place, que le planning soit consulté
- * depuis Paris, Tokyo ou un train. Sans fuseau posé, FullCalendar affiche dans celui du
- * navigateur, et le même créneau change d'heure selon qui regarde — ce qui est précisément ce
- * qu'un planning ne doit jamais faire.
- *
- * Ces tests tiennent l'OPTION passée à FullCalendar, et non le rendu : c'est elle qui commande,
- * et elle seule se teste sans monter un calendrier.
+ * depuis Paris, Tokyo ou un train. EventCalendar n'accepte pas de fuseau nommé : les créneaux lui
+ * arrivent en heures murales du lieu (dates « flottantes », cf. `calendrier-flottant`), et son
+ * `timeZone` ne porte que le décalage ACTUEL du lieu, pour placer l'instant présent.
  */
 describe('useVolunteerSchedule — fuseau de l’édition', () => {
-  it("affiche dans le fuseau de l'édition quand elle en déclare un", () => {
+  const decalageDeParis = () => DateTime.now().setZone('Europe/Paris').toFormat('ZZ')
+
+  it("place l'instant présent dans le fuseau de l'édition quand elle en déclare un", () => {
     const { calendarOptions } = monter(ref([]), ['2026-09-25', '2026-09-27'], 'Europe/Paris')
 
-    expect(calendarOptions.timeZone).toBe('Europe/Paris')
+    expect(calendarOptions.timeZone).toBe(decalageDeParis())
   })
 
   it("retombe sur la machine quand l'édition n'a pas de fuseau", () => {
@@ -246,8 +251,8 @@ describe('useVolunteerSchedule — fuseau de l’édition', () => {
   })
 
   it('retombe sur la machine quand le fuseau enregistré est invalide', () => {
-    // La valeur vient parfois d'un import. La donner telle quelle à FullCalendar afficherait des
-    // heures fausses sans rien signaler.
+    // La valeur vient parfois d'un import : la donner telle quelle afficherait des heures fausses
+    // sans rien signaler.
     const { calendarOptions } = monter(ref([]), ['2026-09-25', '2026-09-27'], 'Europe/Pariss')
 
     expect(calendarOptions.timeZone).toBe('local')
@@ -270,6 +275,102 @@ describe('useVolunteerSchedule — fuseau de l’édition', () => {
     fuseau.value = 'Europe/Paris'
     await nextTick()
 
-    expect(calendarOptions.timeZone).toBe('Europe/Paris')
+    expect(calendarOptions.timeZone).toBe(decalageDeParis())
+  })
+
+  it('remet les créneaux au calendrier en heures du lieu, changement d’heure compris', async () => {
+    // 08:00 UTC le 24 octobre = 10:00 à Paris (heure d'été) ; le 26, après le passage à l'heure
+    // d'hiver, 08:00 UTC = 09:00. Un décalage fixe se serait trompé d'une heure sur l'un des deux.
+    const timeSlots = ref([
+      creneau('1', '2026-10-24T08:00:00Z', '2026-10-24T10:00:00Z'),
+      creneau('2', '2026-10-26T08:00:00Z', '2026-10-26T10:00:00Z'),
+    ])
+    const { calendarOptions } = monter(timeSlots, ['2026-10-24', '2026-10-27'], 'Europe/Paris')
+    await nextTick()
+
+    const evenements = calendarOptions.events as any[]
+    expect(evenements.map((e) => [e.start, e.end])).toEqual([
+      ['2026-10-24T10:00', '2026-10-24T12:00'],
+      ['2026-10-26T09:00', '2026-10-26T11:00'],
+    ])
+  })
+
+  it('reconvertit en instant l’heure murale d’un glisser, quel que soit le fuseau de la machine', async () => {
+    const onTimeSlotUpdate = vi.fn()
+    const { calendarOptions } = useVolunteerSchedule({
+      teams: ref([]),
+      timeSlots: ref([]),
+      editionStartDate: ref('2026-10-24'),
+      editionEndDate: ref('2026-10-27'),
+      fuseau: 'Europe/Paris',
+      onTimeSlotUpdate,
+    } as any)
+
+    // Le calendrier rend des `Date` dont les champs LOCAUX portent l'heure affichée : 14 h à 16 h.
+    calendarOptions.eventDrop({
+      event: {
+        id: 's1',
+        title: 'Accueil (0/2)',
+        start: new Date(2026, 9, 24, 14, 0),
+        end: new Date(2026, 9, 24, 16, 0),
+        resourceIds: ['e1'],
+        extendedProps: { slotTitle: 'Accueil', maxVolunteers: 2, assignedVolunteers: 0 },
+      },
+      newResource: { id: 'e2' },
+    })
+
+    expect(onTimeSlotUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 's1',
+        // 14 h à Paris en octobre (heure d'été) = 12:00 UTC
+        startDateTime: '2026-10-24T12:00:00.000Z',
+        endDateTime: '2026-10-24T14:00:00.000Z',
+        // L'équipe d'arrivée, et non celle de départ
+        teamId: 'e2',
+      })
+    )
+  })
+
+  it('crée un créneau aux heures sélectionnées, ramenées à des instants', () => {
+    const onTimeSlotCreate = vi.fn()
+    const { calendarOptions } = useVolunteerSchedule({
+      teams: ref([]),
+      timeSlots: ref([]),
+      editionStartDate: ref('2026-10-24'),
+      editionEndDate: ref('2026-10-27'),
+      fuseau: 'Europe/Paris',
+      onTimeSlotCreate,
+    } as any)
+
+    calendarOptions.select({
+      start: new Date(2026, 9, 26, 9, 0),
+      end: new Date(2026, 9, 26, 10, 30),
+      resource: { id: 'unassigned' },
+    })
+
+    // Le 26, Paris est passé à l'heure d'hiver (UTC+1)
+    expect(onTimeSlotCreate).toHaveBeenCalledWith(
+      '2026-10-26T08:00:00.000Z',
+      '2026-10-26T09:30:00.000Z',
+      'unassigned'
+    )
+  })
+})
+
+/**
+ * La vue « semaine » couvre les jours de la période, sept au plus. EventCalendar montrait toute la
+ * semaine, jours hors de l'édition compris ; FullCalendar rognait la vue à la période autorisée.
+ */
+describe('joursDeLaVueSemaine', () => {
+  it('rend le nombre de jours de la période (fin exclusive)', () => {
+    expect(joursDeLaVueSemaine('2027-07-10', '2027-07-13')).toBe(3)
+  })
+
+  it('plafonne à sept jours', () => {
+    expect(joursDeLaVueSemaine('2027-07-01', '2027-07-20')).toBe(7)
+  })
+
+  it('accepte des dates complètes', () => {
+    expect(joursDeLaVueSemaine('2027-07-10T00:00:00.000Z', '2027-07-12T00:00:00.000Z')).toBe(2)
   })
 })

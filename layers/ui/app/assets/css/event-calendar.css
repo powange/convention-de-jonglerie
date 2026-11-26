@@ -1,0 +1,122 @@
+/*
+ * Habillage d'EventCalendar aux couleurs de Nuxt UI, partagé par les apps qui étendent `layers/ui`
+ * (plannings des bénévoles et du stock). Reprend celui qu'avait FullCalendar
+ * (`fullcalendar.css`), pour que le passage d'une bibliothèque à l'autre ne se voie pas : boutons
+ * de la barre, titre, bordures, fonds.
+ */
+
+/*
+ * Variables de base : couleurs de Nuxt UI.
+ *
+ * ⚠️ Sous `.ui-event-calendar` (posée par le composant `UiLazyEventCalendar`) : la feuille
+ * d'EventCalendar est chargée APRÈS celle-ci, avec le composant, et ses variables déclarées sur
+ * `.ec` l'emporteraient à spécificité égale.
+ */
+.ui-event-calendar .ec {
+  --ec-border-color: rgb(229 231 235); /* gray-200 */
+  --ec-bg-color: transparent;
+  --ec-text-color: rgb(17 24 39); /* gray-900 */
+  --ec-button-bg-color: transparent;
+  --ec-button-border-color: rgb(209 213 219); /* gray-300 */
+  --ec-button-text-color: rgb(55 65 81); /* gray-700 */
+  --ec-button-active-bg-color: var(--ui-primary);
+  --ec-button-active-border-color: var(--ui-primary);
+  --ec-button-active-text-color: white;
+  --ec-today-bg-color: transparent;
+  --ec-now-indicator-color: rgb(255 0 0); /* le rouge de la barre de FullCalendar */
+}
+
+.dark .ui-event-calendar .ec {
+  color-scheme: dark;
+  --ec-border-color: rgb(55 65 81); /* gray-700 */
+  --ec-text-color: rgb(243 244 246); /* gray-100 */
+  --ec-button-border-color: rgb(55 65 81);
+  --ec-button-text-color: rgb(209 213 219); /* gray-300 */
+  --ec-popup-bg-color: rgb(31 41 55); /* gray-800 */
+}
+
+/*
+ * La colonne des ressources reste OPAQUE : elle est collante, et la frise défile dessous. Sur fond
+ * transparent, les libellés d'heures se lisaient au travers du titre de la colonne. Le fond est
+ * celui des cartes qui accueillent les plannings (blanc, gris-800 en sombre).
+ */
+.ui-event-calendar .ec .ec-sidebar {
+  background-color: white;
+}
+
+.dark .ui-event-calendar .ec .ec-sidebar {
+  background-color: rgb(31 41 55); /* gray-800 */
+}
+
+/* Titre du calendrier */
+.ec .ec-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: rgb(17 24 39);
+}
+
+.dark .ec .ec-title {
+  color: rgb(249 250 251);
+}
+
+/* Boutons de la barre */
+.ec .ec-button {
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  line-height: 1.25rem;
+  border-radius: calc(var(--ui-radius, 0.25rem) * 1.5);
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 1px 2px 0 rgb(3 7 18 / 0.05);
+}
+
+.ec .ec-button:not(:disabled):hover {
+  background-color: rgb(249 250 251); /* gray-50 */
+  border-color: rgb(156 163 175); /* gray-400 */
+  color: rgb(17 24 39);
+}
+
+.ec .ec-button.ec-active,
+.ec .ec-button.ec-active:hover {
+  background-color: var(--ui-primary);
+  border-color: var(--ui-primary);
+  color: white;
+}
+
+.ec .ec-button:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ui-primary) 20%, transparent);
+}
+
+/* « Aujourd'hui » se distingue des flèches, comme sous FullCalendar. */
+.ec .ec-button.ec-today {
+  background-color: rgb(243 244 246); /* gray-100 */
+  font-weight: 600;
+}
+
+.dark .ec .ec-button:not(:disabled):hover {
+  background-color: rgb(31 41 55); /* gray-800 */
+  border-color: rgb(75 85 99); /* gray-600 */
+  color: rgb(243 244 246);
+}
+
+.dark .ec .ec-button.ec-today {
+  background-color: rgb(31 41 55);
+  color: rgb(229 231 235);
+}
+
+/* Un bouton désactivé (hors de la période autorisée) se lit comme tel. */
+.ec .ec-button:disabled {
+  opacity: 0.45;
+}
+
+/* Espacement des groupes de boutons */
+.ec .ec-button-group {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+.ec .ec-button-group > .ec-button {
+  border-radius: calc(var(--ui-radius, 0.25rem) * 1.5);
+}

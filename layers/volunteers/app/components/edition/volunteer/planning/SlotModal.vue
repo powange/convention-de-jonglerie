@@ -589,7 +589,9 @@ const supprimerLeCreneau = () => {
 watch([isOpen, () => formState.value.id], ([isOpenValue, slotId]) => {
   if (isOpenValue && !slotId && !props.readOnly) {
     nextTick(() => {
-      titleInput.value?.focus()
+      // `UInput` est un composant : c'est son champ (`inputRef`) qui prend le focus. Appeler
+      // `focus()` sur le composant levait « focus is not a function » à chaque création.
+      titleInput.value?.inputRef?.focus?.()
     })
   }
 })

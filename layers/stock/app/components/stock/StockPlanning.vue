@@ -1,7 +1,14 @@
 <template>
   <UCard :ui="{ body: 'p-0 sm:p-0' }">
     <div class="bg-white dark:bg-gray-800 rounded-lg">
-      <UiLazyFullCalendar v-if="ready" :options="calendarOptions" class="stock-planning-calendar" />
+      <!-- `--entete-ressources` : le titre de la colonne des objets, que EventCalendar ne sait pas
+           poser (FullCalendar avait `resourceAreaHeaderContent`). Affiché par le CSS. -->
+      <UiLazyEventCalendar
+        v-if="ready"
+        :options="calendarOptions"
+        class="stock-planning-calendar"
+        :style="{ '--entete-ressources': JSON.stringify($t('gestion.stock.item_name')) }"
+      />
       <div v-else class="flex items-center justify-center py-8">
         <UIcon name="i-heroicons-arrow-path" class="animate-spin text-gray-400" size="20" />
         <span class="ml-2 text-sm text-gray-500">{{ $t('common.loading') }}</span>
@@ -11,10 +18,17 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Planning des réservations d'un groupe de stock : une ligne par objet, ses sorties sur la frise.
+ *
+ * EventCalendar (licence MIT) et non plus FullCalendar, dont la vue « ligne de temps par
+ * ressource » relevait des modules premium. Les heures arrivent au calendrier en heures du LIEU
+ * (cf. `calendrier-flottant`) : EventCalendar n'accepte pas de fuseau nommé.
+ */
 import { useAvatar } from '#imports'
 
-import type { CalendarOptions, EventClickArg, EventInput } from '@fullcalendar/core'
-import type { ResourceInput } from '@fullcalendar/resource'
+import { versChampLocal } from '#core/shared/utils/fuseau-edition'
+import { decalageDuFuseau, type OptionsCalendrier } from '#ui-commun/app/utils/calendrier-flottant'
 
 type StockReservationStatus = 'RESERVED' | 'PICKED_UP' | 'RETURNED' | 'CANCELLED'
 
@@ -55,7 +69,7 @@ const props = defineProps<{
   items: PlanningItem[]
   /** Date de début du périmètre (setupStartDate ou startDate) */
   startDate: string | null
-  /** Date de fin du périmètre (teardownEndDate ou endDate). Sera +1 jour côté FC. */
+  /** Date de fin du périmètre (teardownEndDate ou endDate). Sera +1 jour côté calendrier. */
   endDate: string | null
   /** Fuseau de l'édition. Les réservations se lisent en heure de LIEU. */
   fuseau?: string | null
@@ -68,27 +82,13 @@ const emit = defineEmits<{
 const { t, locale } = useI18n()
 const { getUserAvatar, generateInitialsAvatar } = useAvatar()
 
-const plugins = shallowRef<any[]>([])
-const allLocales = shallowRef<any[]>([])
+// Plus de greffons à charger : EventCalendar arrive d'un bloc, chargé par le composant.
 const ready = ref(false)
-
-onMounted(async () => {
-  try {
-    const [resourceTimeline, timeline, interaction, locales] = await Promise.all([
-      import('@fullcalendar/resource-timeline'),
-      import('@fullcalendar/timeline'),
-      import('@fullcalendar/interaction'),
-      import('@fullcalendar/core/locales-all'),
-    ])
-    plugins.value = [resourceTimeline.default, timeline.default, interaction.default]
-    allLocales.value = locales.default
-    ready.value = true
-  } catch (error) {
-    console.error('Error loading FullCalendar plugins:', error)
-  }
+onMounted(() => {
+  ready.value = true
 })
 
-const resources = computed<ResourceInput[]>(() =>
+const resources = computed(() =>
   props.items.map((item) => ({
     id: String(item.id),
     title: `${item.name} (×${item.quantity})`,
@@ -116,8 +116,11 @@ function reservationLocationLabel(r: PlanningReservation): string {
   return parts.join(' · ')
 }
 
-const events = computed<EventInput[]>(() => {
-  const list: EventInput[] = []
+/** Une date-heure du lieu, telle que le calendrier l'affiche (cf. `calendrier-flottant`). */
+const versCalendrier = (instant: string) => versChampLocal(instant, props.fuseau)
+
+const events = computed(() => {
+  const list: Record<string, unknown>[] = []
   for (const item of props.items) {
     for (const r of item.reservations) {
       // Emplacement d'utilisation de la réservation (= où le matos doit être
@@ -127,10 +130,10 @@ const events = computed<EventInput[]>(() => {
       list.push({
         id: `r${r.id}`,
         title: r.usage,
-        start: r.startsAt,
-        end: r.endsAt,
-        resourceId: String(item.id),
-        color: statusColor(r.status),
+        start: versCalendrier(r.startsAt),
+        end: versCalendrier(r.endsAt),
+        resourceIds: [String(item.id)],
+        backgroundColor: statusColor(r.status),
         extendedProps: {
           reservationId: r.id,
           itemId: item.id,
@@ -146,7 +149,7 @@ const events = computed<EventInput[]>(() => {
   return list
 })
 
-// Ajouter un jour à endDate (validRange.end est exclusif côté FullCalendar)
+// Ajouter un jour à endDate (validRange.end est exclusif)
 const exclusiveEndDate = computed(() => {
   if (!props.endDate) return undefined
   const d = new Date(props.endDate)
@@ -154,45 +157,57 @@ const exclusiveEndDate = computed(() => {
   return d.toISOString().split('T')[0]
 })
 
-const calendarOptions = reactive<CalendarOptions>({
-  plugins: [],
-  locales: [],
+/**
+ * Nombre de jours de la vue « semaine » : ceux du périmètre, sept au plus. EventCalendar affiche
+ * toute la durée de la vue, jours hors périmètre compris (grisés) ; FullCalendar la rognait.
+ */
+const joursDeLaVue = computed(() => {
+  if (!props.startDate || !exclusiveEndDate.value) return 7
+  const ecart = Math.round(
+    (Date.parse(`${exclusiveEndDate.value}T00:00:00Z`) -
+      Date.parse(`${props.startDate.slice(0, 10)}T00:00:00Z`)) /
+      86_400_000
+  )
+  return Number.isFinite(ecart) ? Math.min(7, Math.max(1, ecart)) : 7
+})
+
+const calendarOptions = reactive<OptionsCalendrier>({
   locale: locale.value,
 
-  // Les heures s'affichent dans le fuseau de l'ÉDITION, pas dans celui du lecteur — c'est celui
-  // dans lequel la réservation a été saisie. `'local'` en repli : une édition peut ne pas
-  // déclarer de fuseau, et un planning aux heures du navigateur reste plus utile qu'un planning
-  // vide. Même choix que le planning des bénévoles.
-  timeZone: props.fuseau ?? 'local',
+  // L'instant présent dans le fuseau de l'édition ; les réservations, elles, arrivent en heures du
+  // lieu (cf. `calendrier-flottant`). Même choix que le planning des bénévoles.
+  timeZone: decalageDuFuseau(props.fuseau),
 
-  schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-  initialView: 'resourceTimelineWeek',
-  initialDate: props.startDate ?? undefined,
+  view: 'resourceTimelineWeek',
+  date: props.startDate?.slice(0, 10) ?? undefined,
   validRange: {
-    start: props.startDate ?? undefined,
+    start: props.startDate?.slice(0, 10) ?? undefined,
     end: exclusiveEndDate.value,
   },
   slotMinTime: '00:00:00',
   slotMaxTime: '24:00:00',
   slotDuration: '00:15:00',
   slotLabelInterval: '01:00:00',
-  resources: [] as ResourceInput[],
-  events: [] as EventInput[],
+  // Une heure d'environ 120 px (quatre cases de 30 px), comme sous FullCalendar.
+  slotWidth: 30,
+  resources: [],
+  events: [],
   editable: false,
   selectable: false,
-  resourceAreaWidth: '25%',
-  resourceAreaHeaderContent: t('gestion.stock.item_name'),
+  // Pas de barre de l'heure actuelle ici : FullCalendar ne l'affichait pas sur ce planning.
+  nowIndicator: false,
   height: 'auto',
   headerToolbar: {
-    left: 'prev,next today',
+    start: 'prev,next today',
     center: 'title',
-    right: 'resourceTimelineDay,resourceTimelineWeek',
+    end: 'resourceTimelineDay,resourceTimelineWeek',
   },
-  buttonText: {
+  buttonText: (textes: Record<string, string>) => ({
+    ...textes,
     today: t('calendar.today'),
     resourceTimelineDay: t('common.day'),
     resourceTimelineWeek: t('common.week'),
-  },
+  }),
   titleFormat: {
     day: 'numeric',
     month: 'long',
@@ -202,8 +217,13 @@ const calendarOptions = reactive<CalendarOptions>({
     resourceTimelineDay: {
       slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
     },
+    resourceTimelineWeek: {
+      duration: { days: joursDeLaVue.value },
+      slotLabelFormat: { hour: '2-digit' },
+      dayHeaderFormat: { weekday: 'short', day: '2-digit', month: '2-digit' },
+    },
   },
-  eventContent: (arg) => {
+  eventContent: (arg: any) => {
     const ext = arg.event.extendedProps as {
       quantityReserved: number
       user: ReservationUser
@@ -257,7 +277,7 @@ const calendarOptions = reactive<CalendarOptions>({
 
     return { domNodes: [container] }
   },
-  eventClick: (arg: EventClickArg) => {
+  eventClick: (arg: any) => {
     const reservationId = arg.event.extendedProps.reservationId as number
     const itemId = arg.event.extendedProps.itemId as number
     const item = props.items.find((i) => i.id === itemId)
@@ -268,21 +288,18 @@ const calendarOptions = reactive<CalendarOptions>({
 
 // Date de la première réservation, pour positionner la vue par défaut dessus
 const firstReservationDate = computed<string | null>(() => {
-  let earliest: number | null = null
+  let earliest: string | null = null
   for (const item of props.items) {
     for (const r of item.reservations) {
-      const t = new Date(r.startsAt).getTime()
-      if (!isNaN(t) && (earliest === null || t < earliest)) earliest = t
+      if (Number.isNaN(new Date(r.startsAt).getTime())) continue
+      if (earliest === null || new Date(r.startsAt) < new Date(earliest)) earliest = r.startsAt
     }
   }
-  return earliest !== null ? new Date(earliest).toISOString() : null
+  // Le JOUR du lieu : c'est lui que le calendrier affiche.
+  return earliest !== null ? versCalendrier(earliest).slice(0, 10) : null
 })
 
-// Sync les plugins, locales et données dans les options réactives
-watch([plugins, allLocales], ([newPlugins, newLocales]) => {
-  calendarOptions.plugins = newPlugins
-  calendarOptions.locales = newLocales
-})
+// Sync les données dans les options réactives
 watch(
   resources,
   (val) => {
@@ -302,17 +319,18 @@ watch(
   ([start, end, firstResa]) => {
     // Positionner la vue initiale sur la 1ère réservation si elle existe, sinon
     // sur la date de début de la période. Évite d'arriver sur une vue vide.
-    calendarOptions.initialDate = firstResa || start || undefined
-    calendarOptions.validRange = { start: start ?? undefined, end }
+    calendarOptions.date = firstResa || start?.slice(0, 10) || undefined
+    calendarOptions.validRange = { start: start?.slice(0, 10) ?? undefined, end }
+    calendarOptions.views.resourceTimelineWeek.duration = { days: joursDeLaVue.value }
   },
   { immediate: true }
 )
 // L'édition se charge en asynchrone : le calendrier est souvent construit AVANT que son fuseau
-// soit connu. Sans ce watcher, il resterait figé sur l'heure du navigateur.
+// soit connu. Les réservations suivent d'elles-mêmes (`events` dépend du fuseau).
 watch(
   () => props.fuseau,
   (nouveau) => {
-    calendarOptions.timeZone = nouveau ?? 'local'
+    calendarOptions.timeZone = decalageDuFuseau(nouveau)
   }
 )
 
@@ -326,51 +344,77 @@ watch(
 
 <style>
 /* Styles repris du planning bénévoles pour cohérence visuelle.
-   Non-scoped car FullCalendar génère le DOM dynamiquement et certains
-   sélecteurs ne sont pas atteignables via :deep() en mode scoped. */
-.stock-planning-calendar {
-  --fc-border-color: rgb(229 231 235); /* gray-200 */
-  --fc-neutral-bg-color: rgb(249 250 251); /* gray-50 */
-}
-.stock-planning-calendar .fc {
+   Non-scoped car le calendrier génère le DOM dynamiquement, hors de portée du compilateur. */
+.stock-planning-calendar .ec {
   font-size: 0.875rem;
 }
-.stock-planning-calendar .fc-theme-standard .fc-scrollgrid,
-.stock-planning-calendar .fc-theme-standard td,
-.stock-planning-calendar .fc-theme-standard th,
-.stock-planning-calendar .fc-theme-standard .fc-resource-timeline-divider {
-  border-color: rgb(229 231 235);
+/* Colonne des objets : EventCalendar la dimensionne d'après son contenu ; on la borne, comme les
+   25 % de `resourceAreaWidth` sous FullCalendar. */
+.stock-planning-calendar .ec-sidebar {
+  max-inline-size: 18rem;
 }
-/* Force la bordure droite sur chaque slot — la ligne « majeure » d'heure
-   est parfois manquante par défaut quand `slotDuration` < `slotLabelInterval`. */
-.stock-planning-calendar .fc-timeline-slot {
-  border-right: 1px solid rgb(229 231 235);
+@media (max-width: 768px) {
+  .stock-planning-calendar .ec-sidebar {
+    max-inline-size: 7.5rem;
+  }
 }
-.stock-planning-calendar .fc-timeline-slot-minor {
-  border-right-style: dotted;
+.stock-planning-calendar .ec-toolbar {
+  padding: 0.75rem 0.75rem 0;
 }
-.stock-planning-calendar .fc-resource {
+/* En-têtes : le jour centré, les heures à gauche, en gras (comme sous FullCalendar). */
+.stock-planning-calendar .ec-header .ec-col-head,
+.stock-planning-calendar .ec-header .ec-slot {
+  font-weight: 700;
+  color: rgb(17 24 39);
+}
+.stock-planning-calendar .ec-header .ec-col-head {
+  text-align: center;
+}
+.stock-planning-calendar .ec-header .ec-slot {
+  text-align: start;
+}
+.stock-planning-calendar .ec-day-view .ec-header .ec-col-head {
+  display: none;
+}
+/* Titre de la colonne des objets (cf. `--entete-ressources` posé par le composant). */
+.stock-planning-calendar .ec-header .ec-sidebar {
+  display: flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  font-weight: 700;
+  color: rgb(17 24 39);
+}
+.stock-planning-calendar .ec-header .ec-sidebar::before {
+  content: var(--entete-ressources, '');
+}
+.stock-planning-calendar .ec-body .ec-sidebar {
+  text-align: start;
   background-color: rgb(249 250 251);
   color: rgb(17 24 39);
 }
-.stock-planning-calendar .fc-event {
+.stock-planning-calendar .ec-row-head {
+  padding: 0.5rem;
+}
+.stock-planning-calendar .ec-event {
   cursor: pointer;
+  color: white;
+  border-radius: 0.25rem;
+}
+.stock-planning-calendar .ec-event-body {
+  min-width: 0;
+  width: 100%;
 }
 
-/* Variantes dark mode : bordures un peu plus claires pour rester lisibles
-   sur fond sombre. */
-.dark .stock-planning-calendar {
-  --fc-border-color: rgb(75 85 99); /* gray-600 */
-  --fc-neutral-bg-color: rgb(31 41 55); /* gray-800 */
+/* Variantes dark mode */
+.dark .stock-planning-calendar .ec {
+  --ec-border-color: rgb(75 85 99); /* gray-600 */
 }
-.dark .stock-planning-calendar .fc-theme-standard .fc-scrollgrid,
-.dark .stock-planning-calendar .fc-theme-standard td,
-.dark .stock-planning-calendar .fc-theme-standard th,
-.dark .stock-planning-calendar .fc-theme-standard .fc-resource-timeline-divider,
-.dark .stock-planning-calendar .fc-timeline-slot {
-  border-color: rgb(75 85 99);
+.dark .stock-planning-calendar .ec-header .ec-col-head,
+.dark .stock-planning-calendar .ec-header .ec-slot,
+.dark .stock-planning-calendar .ec-header .ec-sidebar {
+  color: rgb(243 244 246);
 }
-.dark .stock-planning-calendar .fc-resource {
+.dark .stock-planning-calendar .ec-body .ec-sidebar {
   background-color: rgb(31 41 55);
   color: rgb(243 244 246);
 }
@@ -379,6 +423,7 @@ watch(
   font-size: 0.75rem;
   line-height: 1.2;
   overflow: hidden;
+  min-width: 0;
 }
 .stock-planning-calendar .stock-event-title {
   font-weight: 600;
