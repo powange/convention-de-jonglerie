@@ -118,6 +118,28 @@
       "confirm_disable_description": "Jídlo zmizí z obrazovek, z výdejního místa a z kuchyňských počtů. Odpovědi dobrovolníků a umělců i již vydaná jídla jsou ZACHOVÁNY: objeví se znovu beze změny, pokud jídlo opět zapnete.",
       "confirm_disable_label": "Vypnout toto jídlo",
       "confirm_disable_title": "Vypnout toto jídlo?"
+    },
+    "organizers": {
+      "meals": {
+        "after_show": "Po představení",
+        "allergies": "Alergie",
+        "allergies_placeholder": "Potravinové alergie nebo intolerance",
+        "allergy_severity": "Závažnost alergie",
+        "already_validated": "Již potvrzeno",
+        "check_all": "Zaškrtnout vše",
+        "confirm_close_unsaved": "Máte neuložené změny. Opravdu chcete zavřít?",
+        "description": "Ve výchozím nastavení má organizátor přítomný na ročníku přístup ke všem jídlům. Odškrtněte ta, která si nevezme.",
+        "dietary_preference": "Stravovací režim",
+        "dietary_section": "Stravování",
+        "error_loading": "Jídla tohoto organizátora se nepodařilo načíst",
+        "error_saving": "Jídla tohoto organizátora se nepodařilo uložit",
+        "manage": "Spravovat jídla",
+        "no_meals": "Pro tento ročník není nastaveno žádné jídlo",
+        "saved_success": "Jídla tohoto organizátora byla uložena",
+        "title": "Jídla organizátora {name}",
+        "uncheck_all": "Odškrtnout vše",
+        "unsaved_changes": "Máte neuložené změny"
+      }
     }
   }
 }

@@ -118,6 +118,28 @@
       "confirm_disable_description": "Il pasto scomparirà dalle schermate, dal banco e dai conteggi della cucina. Le risposte dei volontari e degli artisti, così come i pasti già serviti, vengono CONSERVATI: riappariranno tali e quali se riattivi il pasto.",
       "confirm_disable_label": "Disattiva questo pasto",
       "confirm_disable_title": "Disattivare questo pasto?"
+    },
+    "organizers": {
+      "meals": {
+        "after_show": "Dopo lo spettacolo",
+        "allergies": "Allergie",
+        "allergies_placeholder": "Allergie o intolleranze alimentari",
+        "allergy_severity": "Gravità dell'allergia",
+        "already_validated": "Già convalidato",
+        "check_all": "Seleziona tutto",
+        "confirm_close_unsaved": "Hai modifiche non salvate. Vuoi davvero chiudere?",
+        "description": "Per impostazione predefinita, un organizzatore presente all'edizione ha accesso a tutti i pasti. Deseleziona quelli che non consumerà.",
+        "dietary_preference": "Regime alimentare",
+        "dietary_section": "Alimentazione",
+        "error_loading": "Impossibile caricare i pasti di questo organizzatore",
+        "error_saving": "Impossibile salvare i pasti di questo organizzatore",
+        "manage": "Gestisci i pasti",
+        "no_meals": "Nessun pasto è configurato per questa edizione",
+        "saved_success": "I pasti di questo organizzatore sono stati salvati",
+        "title": "Pasti di {name}",
+        "uncheck_all": "Deseleziona tutto",
+        "unsaved_changes": "Hai modifiche non salvate"
+      }
     }
   }
 }

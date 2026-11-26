@@ -78,8 +78,21 @@
                   {{ o.compte.email }}
                 </p>
               </div>
-              <div v-if="liste.peutGerer" class="flex gap-1">
-                <UTooltip v-if="o.compte.enAttente" text="Nouveau lien d'activation">
+              <div v-if="liste.peutGerer || repasOuverts" class="flex gap-1">
+                <!-- Repas de l'organisateur (module repas, droit dédié) — la modale vient du layer. -->
+                <UTooltip v-if="repasOuverts" text="Repas">
+                  <UButton
+                    icon="i-lucide-utensils"
+                    color="neutral"
+                    variant="ghost"
+                    aria-label="Repas"
+                    @click="ouvrirRepas(o)"
+                  />
+                </UTooltip>
+                <UTooltip
+                  v-if="liste.peutGerer && o.compte.enAttente"
+                  text="Nouveau lien d'activation"
+                >
                   <UButton
                     icon="i-heroicons-link"
                     color="neutral"
@@ -89,7 +102,7 @@
                     @click="nouveauLien(o.id, nom(o.compte))"
                   />
                 </UTooltip>
-                <UTooltip text="Retirer de l'équipe">
+                <UTooltip v-if="liste.peutGerer" text="Retirer de l'équipe">
                   <UButton
                     icon="i-heroicons-user-minus"
                     color="error"
@@ -177,6 +190,12 @@
       </UCard>
     </template>
 
+    <OrganizersMealsModal
+      v-model="repasOuvert"
+      :organizer="organisateurDesRepas"
+      :edition-id="editionId"
+    />
+
     <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
@@ -234,6 +253,21 @@ const confirmation = useConfirmation()
 const { data: liste, error: erreur, refresh } = await useFetch<Liste>(base)
 
 const nom = (c: Compte) => [c.prenom, c.nom].filter(Boolean).join(' ') || c.pseudo
+
+// ── Repas d'un organisateur (module repas) ─────────────────────────────────────────────────
+// Mêmes droits et modules que la barre latérale (clé partagée) : module activé ET droit `repas`.
+const editionId = useEditionIdRef()
+const { data: acces } = useFetch<{ modules: { repas?: boolean }; droits: { repas?: boolean } }>(
+  () => `/api/events/${refEvenement}/acces-gestion`,
+  { key: `acces-gestion-${refEvenement}`, server: false }
+)
+const repasOuverts = computed(() => !!acces.value?.modules.repas && !!acces.value?.droits.repas)
+const repasOuvert = ref(false)
+const organisateurDesRepas = ref<{ id: number; user: Compte } | null>(null)
+function ouvrirRepas(o: { id: number; compte: Compte }) {
+  organisateurDesRepas.value = { id: o.id, user: o.compte }
+  repasOuvert.value = true
+}
 
 // ── Lien d'invitation affiché ──────────────────────────────────────────────────────────────
 const lienAfficher = ref<{ lien: string; pour: string } | null>(null)
