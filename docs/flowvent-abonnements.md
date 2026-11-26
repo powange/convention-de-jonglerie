@@ -45,7 +45,12 @@ créer un événement, dans la limite de ses événements en cours.
 
 ### À la limite
 
-- **Alerte** à 80 % (état `alerte` de `etatQuota`, pour les jauges du lot suivant).
+- **Alerte** à 80 %, puis à la limite : un **courriel** au propriétaire, une fois par palier et par
+  compteur d'événement (`signalerSeuil`, texte dans `shared/alerte-quota.ts`, paliers déjà signalés
+  dans `Event.alertesQuota`). Pas de courriel pour le compteur d'événements : le tableau de bord
+  affiche « N événements en cours sur M ».
+- **Jauges** sur l'accueil de la gestion (`EditionJaugesFormule`) : orange dès 80 %, rouge à la
+  limite (la jauge d'événements reste orange : être plein y est le cas ordinaire).
 - **Tolérance** de 10 % au-delà du plafond, arrondie à l'inférieur (`plafondTolere` : 75 → 82,
   250 → 275 ; un petit plafond comme 3 n'a pas de marge).
 - Au-delà, l'**ajout** est refusé en **402**, avec un message qui nomme la formule qui relève ce
