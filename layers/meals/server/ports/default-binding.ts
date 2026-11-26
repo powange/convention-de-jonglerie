@@ -12,7 +12,7 @@ import type {
 } from './types'
 
 import { infosAlimentaires, infosPersonnellesSelect } from '#core/server/utils/infos-personnelles'
-import { donneDroitAuRepas } from '~~/shared/utils/droit-au-repas'
+import { donneDroitAuRepas } from '#meals/shared/utils/droit-au-repas'
 
 const artistUserSelect = {
   id: true,

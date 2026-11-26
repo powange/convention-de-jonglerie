@@ -2,14 +2,14 @@
  * Câblage des ports du layer bénévoles pour FLOWVENT (contrat d'hôte, cf. docs/flowvent-benevoles.md
  * et layers/volunteers/server/ports/types.ts).
  *
- * Le layer importe `#server/volunteers/ports/registry` : chaque app fournit le sien. Celui d'app1
- * branche les conventions, les éditions, la billetterie, les repas, les artistes et la messagerie ;
- * Flowvent n'a aucun de ces modules. Ses méthodes sans objet sont NEUTRES (listes vides, no-op),
- * jamais en échec : le layer en appelle certaines au fil d'opérations qui doivent aboutir — accepter
- * une candidature crée les sélections de repas, par exemple.
+ * Le layer importe `#server/volunteers/ports/registry` : chaque app fournit le sien. Repas,
+ * billetterie et artistes viennent du câblage partagé du layer repas ; ce qui reste propre à
+ * Flowvent est ici. Ses méthodes sans objet (messagerie) sont NEUTRES, jamais en échec : le layer
+ * les appelle au fil d'opérations qui doivent aboutir.
  */
 import type { VolunteerPorts } from '#volunteers/server/ports/types'
 
+import { portsBenevolesDesRepas } from '#meals/server/ports/liaisons-benevoles'
 import { requireAuth } from '#server/utils/auth-utils'
 import { sendEmail } from '#server/utils/emailService'
 import { NotificationService } from '#server/utils/notification-service'
@@ -73,53 +73,9 @@ const ports: VolunteerPorts = {
       return e?.name ?? null
     },
   },
-  // Pas de billetterie.
-  ticketing: {
-    async getMealTicketParticipants() {
-      return {}
-    },
-    async getHandoutItems() {
-      return {}
-    },
-  },
-  // Pas d'artistes ni de spectacles.
-  artists: {
-    async addEligibleMealSelections() {},
-    async removeMealSelections() {},
-    async getMealArtistParticipants() {
-      return {}
-    },
-    async getShowSchedule() {
-      return []
-    },
-  },
-  // Pas de module repas : la liste des candidatures n'inclut pas les repas.
-  meals: {
-    disponible: false,
-    async getEditionMealSchedule() {
-      return []
-    },
-    async updateEditionMealsConfig() {
-      return { meals: [], toggles: [] }
-    },
-    async getVolunteerSelfMeals() {
-      return []
-    },
-    async setVolunteerSelfMealAcceptances() {
-      return []
-    },
-    async getVolunteerMeals() {
-      return []
-    },
-    async setVolunteerMeals() {
-      return []
-    },
-    async getCateringMealsForDate() {
-      return []
-    },
-    async createVolunteerMealSelections() {},
-    async deleteVolunteerMealSelections() {},
-  },
+  // Repas, et ce que les repas lisent de la billetterie et des artistes : le câblage d'app1,
+  // partagé par le layer repas (mêmes modèles dans les deux apps).
+  ...portsBenevolesDesRepas(),
 }
 
 export function useVolunteerPorts(): VolunteerPorts {

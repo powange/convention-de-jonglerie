@@ -105,6 +105,13 @@ const artistesOuverts = computed(
 const billetterieOuverte = computed(
   () => !!acces.value?.modules.billetterie && !!acces.value?.droits.billetterie
 )
+// Repas : module activé ET (droit dédié OU validation des repas — responsable de l'équipe qui
+// valide, ou bénévole en créneau actif). La configuration et les listes restent au droit dédié.
+const gereLesRepas = computed(() => !!acces.value?.droits.repas)
+const valideLesRepas = ref(false)
+const repasOuverts = computed(
+  () => !!acces.value?.modules.repas && (gereLesRepas.value || valideLesRepas.value)
+)
 // Stock : le droit dédié, ou responsable d'une équipe de bénévoles (même règle qu'app1,
 // `canAccessStock`) — un responsable va chercher le matériel de son équipe.
 const stockOuvert = computed(
@@ -301,6 +308,44 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
           ],
         ]
       : []),
+    ...(repasOuverts.value
+      ? [
+          [
+            {
+              label: 'Repas',
+              icon: 'i-heroicons-cake',
+              value: 'repas',
+              children: [
+                ...(gereLesRepas.value
+                  ? [
+                      {
+                        label: 'Configuration des repas',
+                        icon: 'i-heroicons-cog-6-tooth',
+                        to: `/events/${refPublique.value}/gestion/meals`,
+                        exact: true,
+                      },
+                      {
+                        label: 'Liste des repas',
+                        icon: 'i-heroicons-list-bullet',
+                        to: `/events/${refPublique.value}/gestion/meals/list`,
+                      },
+                      {
+                        label: 'Doublons',
+                        icon: 'i-heroicons-document-duplicate',
+                        to: `/events/${refPublique.value}/gestion/meals/duplicates`,
+                      },
+                    ]
+                  : []),
+                {
+                  label: 'Validation des repas',
+                  icon: 'i-heroicons-check-badge',
+                  to: `/events/${refPublique.value}/gestion/meals/validate`,
+                },
+              ],
+            },
+          ],
+        ]
+      : []),
     ...(stockOuvert.value
       ? [
           [
@@ -361,7 +406,10 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
 
 onMounted(async () => {
   await editionStore.fetchEditionById(editionId.value).catch(() => null)
-  estResponsable.value = await editionStore.isTeamLeader(editionId.value)
+  ;[estResponsable.value, valideLesRepas.value] = await Promise.all([
+    editionStore.isTeamLeader(editionId.value),
+    editionStore.canAccessMealValidation(editionId.value),
+  ])
   rafraichirCompteursNavigation({ editionId: editionId.value }, compteursVisibles.value)
 })
 

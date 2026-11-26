@@ -112,18 +112,16 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
 
 // Layer meals : imports cœur via #imports (résolution cross-layer) plutôt que ~/ (qui pointe le layer).
 import { useAuthStore, useConfirmation, useEditionStore } from '#imports'
 
 const { t } = useI18n()
-const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { erreur } = useNotificateur()
 
-const editionId = parseInt(route.params.id as string)
+const editionId = useEditionId()
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 // Gestion des repas

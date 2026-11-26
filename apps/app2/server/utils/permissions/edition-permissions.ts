@@ -135,13 +135,15 @@ export async function canAccessEditionDataOrAccessControl(
 }
 
 /**
- * Gestion des repas OU validation des repas. La validation (bénévoles de l'équipe qui valide)
- * arrivera avec le module repas ; d'ici là, seule la gestion ouvre ces points.
+ * Gestion des repas OU validation des repas (responsable de l'équipe qui valide, ou bénévole en
+ * créneau actif) — même règle qu'app1, la seconde moitié venant du layer repas.
  */
 export async function canManageMealsOrValidation(
   eventId: number,
   userId: number,
   event?: unknown
 ): Promise<boolean> {
-  return await canManageMealsById(eventId, userId, event)
+  if (await canManageMealsById(eventId, userId, event)) return true
+  const { canAccessMealValidation } = await import('./meal-validation-permissions')
+  return await canAccessMealValidation(userId, eventId)
 }

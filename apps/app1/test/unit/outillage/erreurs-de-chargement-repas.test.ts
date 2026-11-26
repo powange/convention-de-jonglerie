@@ -117,7 +117,10 @@ describe('repas — les chargements n’avalent plus leur erreur', () => {
     // Sans ce cas, les précédents seraient satisfaits par une clé inventée, que les deux écrans
     // afficheraient brute à la place du message.
     const fr = JSON.parse(
-      fs.readFileSync(path.resolve(RACINE, 'apps/app1/i18n/locales/fr/gestion.json'), 'utf8')
+      fs.readFileSync(
+        path.resolve(RACINE, 'layers/meals/i18n/locales/fr/gestion-meals.json'),
+        'utf8'
+      )
     )
     const repas = fr.gestion.meals
     for (const cle of [

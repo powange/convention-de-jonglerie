@@ -263,14 +263,13 @@ interface RepasDeLEdition {
   mealType: string
 }
 
-const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { erreur } = useNotificateur()
 const { t } = useI18n()
 const { getMealTypeLabel } = useMealTypeLabel()
 
-const editionId = computed(() => parseInt(route.params.id as string))
+const editionId = useEditionIdRef()
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 
 const canAccess = computed(() => {

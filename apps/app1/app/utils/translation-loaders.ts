@@ -60,7 +60,13 @@ export function getTranslationsToLoad(path: string): string[] {
       pattern: /^\/editions\/\d+\/gestion/,
       // `gestion-stock` / `gestion-artists` : clés sorties dans leur layer — le menu et l'accueil de
       // la gestion en affichent sur toutes ces pages, comme quand elles vivaient dans gestion.json.
-      translations: ['gestion', 'gestion-stock', 'gestion-artists', 'gestion-ticketing'],
+      translations: [
+        'gestion',
+        'gestion-stock',
+        'gestion-artists',
+        'gestion-ticketing',
+        'gestion-meals',
+      ],
     },
     /*
      * Vue d'ensemble racine : workshops (cartes de modules). Le libellé de la carte « tâches » vit
@@ -204,7 +210,14 @@ export function getTranslationsToLoad(path: string): string[] {
      */
     {
       pattern: /^\/profile\/mes-conventions/,
-      translations: ['edition', 'gestion', 'gestion-stock', 'gestion-artists', 'gestion-ticketing'],
+      translations: [
+        'edition',
+        'gestion',
+        'gestion-stock',
+        'gestion-artists',
+        'gestion-ticketing',
+        'gestion-meals',
+      ],
     },
   ]
 
@@ -354,6 +367,21 @@ export const translationLoaders: Record<string, Record<string, () => Promise<any
     uk: () => import('../../../../layers/ticketing/i18n/locales/uk/gestion-ticketing.json'),
     cs: () => import('../../../../layers/ticketing/i18n/locales/cs/gestion-ticketing.json'),
     sv: () => import('../../../../layers/ticketing/i18n/locales/sv/gestion-ticketing.json'),
+  },
+  'gestion-meals': {
+    en: () => import('../../../../layers/meals/i18n/locales/en/gestion-meals.json'),
+    da: () => import('../../../../layers/meals/i18n/locales/da/gestion-meals.json'),
+    de: () => import('../../../../layers/meals/i18n/locales/de/gestion-meals.json'),
+    es: () => import('../../../../layers/meals/i18n/locales/es/gestion-meals.json'),
+    fr: () => import('../../../../layers/meals/i18n/locales/fr/gestion-meals.json'),
+    it: () => import('../../../../layers/meals/i18n/locales/it/gestion-meals.json'),
+    nl: () => import('../../../../layers/meals/i18n/locales/nl/gestion-meals.json'),
+    pl: () => import('../../../../layers/meals/i18n/locales/pl/gestion-meals.json'),
+    pt: () => import('../../../../layers/meals/i18n/locales/pt/gestion-meals.json'),
+    ru: () => import('../../../../layers/meals/i18n/locales/ru/gestion-meals.json'),
+    uk: () => import('../../../../layers/meals/i18n/locales/uk/gestion-meals.json'),
+    cs: () => import('../../../../layers/meals/i18n/locales/cs/gestion-meals.json'),
+    sv: () => import('../../../../layers/meals/i18n/locales/sv/gestion-meals.json'),
   },
   'gestion-stock': {
     en: () => import('../../../../layers/stock/i18n/locales/en/gestion-stock.json'),

@@ -138,7 +138,16 @@
     "items": "Articles",
     "items_selected": "éléments sélectionnés",
     "participant": "Participant",
-    "postal_code": "Code postal"
+    "postal_code": "Code postal",
+    "breakfast": "Petit-déjeuner",
+    "dinner": "Dîner",
+    "event": "Évènement",
+    "lunch": "Déjeuner",
+    "setup": "Montage",
+    "teardown": "Démontage",
+    "type": "Type",
+    "vegan": "Végan",
+    "vegetarian": "Végétarien"
   },
   "components": {
     "date_time_picker": {
@@ -336,12 +345,39 @@
       "users_found": "Utilisateurs trouvés",
       "volunteer_form": "Formulaire d'appel à bénévole",
       "volunteer_page": "Page bénévolat",
-      "week_view": "Semaine"
+      "week_view": "Semaine",
+      "catering_info": "Informations restauration",
+      "select_date": "Sélectionner une date"
     },
     "site_map": "Carte du site",
     "public_shows": "Spectacles",
     "status": {
       "cancelled": "Annulé"
+    },
+    "meals": {
+      "all_dates": "Toutes les dates",
+      "all_meal_types": "Tous les repas",
+      "all_phases": "Toutes les phases",
+      "all_types": "Tous les types",
+      "filter_date": "Filtrer par date",
+      "filter_meal_type": "Filtrer par repas",
+      "filter_phase": "Filtrer par phase",
+      "filter_type": "Filtrer par type",
+      "list_title": "Liste des repas",
+      "no_participants": "Aucun participant",
+      "search_placeholder": "Rechercher par nom, prénom ou email...",
+      "stats": {
+        "after_show": "Assiettes mises de côté",
+        "artists": "Repas artistes",
+        "by_diet": "Par régime alimentaire",
+        "by_meal_type": "Par type de repas",
+        "organizers": "Repas organisateurs",
+        "participants": "Repas participants",
+        "standard": "Standard",
+        "total": "Total de repas",
+        "volunteers": "Repas bénévoles",
+        "with_allergies": "Avec allergies"
+      }
     }
   },
   "errors": {

@@ -87,7 +87,10 @@ describe('repas — les libellés des écrans passent par i18n', () => {
     // 📍 Sans ce cas, les précédents seraient satisfaits par une clé inventée : le code citerait
     // un nom que personne n'a traduit, et l'écran afficherait la clé brute au lieu du libellé.
     const fr = JSON.parse(
-      fs.readFileSync(path.resolve(RACINE, 'apps/app1/i18n/locales/fr/gestion.json'), 'utf8')
+      fs.readFileSync(
+        path.resolve(RACINE, 'layers/meals/i18n/locales/fr/gestion-meals.json'),
+        'utf8'
+      )
     )
     const repas = fr.gestion.meals
     for (const cle of ['remaining_count', 'phase_setup', 'phase_event', 'phase_teardown']) {

@@ -4,9 +4,8 @@
  *
  * - `event` : le texte d'information des artistes est sur l'événement (`Event.artistInfo`) ; les
  *   appels à spectacles le lisent et l'affichent sous la forme commune d'une édition.
- * - `meals` : Flowvent n'a pas encore le module repas (lot 7 de docs/flowvent-modules.md) — aucun
- *   repas ouvert. Neutre plutôt qu'en échec : le layer l'appelle au fil d'écrans qui doivent
- *   s'afficher.
+ * - `meals` : le catalogue des repas activés de l'événement (module repas, `VolunteerMeal`), comme
+ *   dans app1.
  */
 import type { ArtistsPorts } from '#artists/server/ports/types'
 
@@ -64,7 +63,11 @@ const ports: ArtistsPorts = {
     },
   },
   meals: {
-    getEnabledMeals: async () => [],
+    getEnabledMeals: (editionId) =>
+      prisma.volunteerMeal.findMany({
+        where: { editionId, enabled: true },
+        orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
+      }),
   },
 }
 

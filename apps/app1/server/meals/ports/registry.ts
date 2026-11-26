@@ -1,9 +1,9 @@
 // Registre des ports du module repas. Par défaut, câblage jonglerie (default-binding) ; une 2ᵉ app
 // surcharge via setMealsPorts() (typiquement dans un plugin serveur). Même mécanisme que
 // server/volunteers/ports/registry.ts.
-import { createDefaultMealsPorts } from './default-binding'
+import type { MealsPorts } from '#meals/server/ports/types'
 
-import type { MealsPorts } from './types'
+import { createDefaultMealsPorts } from '#meals/server/ports/default-binding'
 
 let override: MealsPorts | null = null
 let cached: MealsPorts | null = null
