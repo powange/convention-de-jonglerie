@@ -250,8 +250,8 @@ import type {
   ConventionDashboardResponse,
 } from '~/types'
 import type { OrganizerRightsFormData } from '~/types/organizer'
-import { getEditionDisplayNameWithConvention } from '~/utils/editionName'
 
+import { getEditionDisplayNameWithConvention } from '#core/app/utils/editionName'
 import { estAdresseEmail } from '#core/shared/utils/adresse-email'
 
 // Charger les traductions du fichier edition.json pour les clés edition.*

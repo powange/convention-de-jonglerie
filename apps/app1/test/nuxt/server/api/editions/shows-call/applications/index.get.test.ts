@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import handler from '../../../../../../../server/api/editions/[id]/shows-call/[showCallId]/applications/index.get'
+import handler from '../../../../../../../../../layers/artists/server/api/editions/[id]/shows-call/[showCallId]/applications/index.get'
 
 const prismaMock = (globalThis as any).prisma
 

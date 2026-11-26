@@ -221,6 +221,11 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
                   to: `/events/${refPublique.value}/gestion/artists/shows`,
                 },
                 {
+                  label: 'Appels à spectacles',
+                  icon: 'i-heroicons-megaphone',
+                  to: `/events/${refPublique.value}/gestion/shows-call`,
+                },
+                {
                   label: 'Notifications aux artistes',
                   icon: 'i-heroicons-bell',
                   to: `/events/${refPublique.value}/gestion/artists/notifications`,

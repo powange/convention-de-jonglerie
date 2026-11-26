@@ -1,3 +1,4 @@
+import { useArtistsPorts } from '#server/artists/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { nonLusParCandidature } from '#server/utils/non-lus-de-candidature'
@@ -33,24 +34,7 @@ export default wrapApiHandler(
             name: true,
             visibility: true,
             deadline: true,
-            edition: {
-              select: {
-                id: true,
-                name: true,
-                startDate: true,
-                endDate: true,
-                city: true,
-                country: true,
-                imageUrl: true,
-                convention: {
-                  select: {
-                    id: true,
-                    name: true,
-                    logo: true,
-                  },
-                },
-              },
-            },
+            edition: { select: useArtistsPorts().event.selectionEditionAffichee },
           },
         },
         /*
@@ -70,8 +54,11 @@ export default wrapApiHandler(
 
     const nonLus = await nonLusParCandidature(applications, user.id)
 
+    // L'édition sous la forme commune affichée (app1 : édition + convention ; Flowvent : événement).
+    const { editionAffichee } = useArtistsPorts().event
     return applications.map((candidature) => ({
       ...candidature,
+      showCall: { ...candidature.showCall, edition: editionAffichee(candidature.showCall.edition) },
       unreadMessages: nonLus.get(candidature.id) ?? 0,
     }))
   },

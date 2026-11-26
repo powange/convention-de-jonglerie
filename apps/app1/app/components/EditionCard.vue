@@ -89,7 +89,8 @@
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
 import type { Edition } from '~/types'
 import { getCountryCode } from '~/utils/countries'
-import { getEditionDisplayName } from '~/utils/editionName'
+
+import { getEditionDisplayName } from '#core/app/utils/editionName'
 
 interface Props {
   edition: Edition

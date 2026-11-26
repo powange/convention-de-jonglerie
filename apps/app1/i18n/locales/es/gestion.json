@@ -675,10 +675,6 @@
       "organizers_in_teams_open": "Los organizadores pueden unirse a equipos y turnos",
       "organizers_in_teams_closed": "Los organizadores no participan en el voluntariado"
     },
-    "shows_call": {
-      "title": "Convocatoria de espectáculos",
-      "list_description": "Gestione las diferentes convocatorias de espectáculos para esta edición"
-    },
     "treasury": {
       "title": "Tesorería",
       "subtitle": "Gastos e ingresos de la edición. Las líneas procedentes de artistas y entradas se corrigen en su origen.",

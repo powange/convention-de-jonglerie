@@ -8,7 +8,7 @@ vi.mock('#server/utils/permissions/edition-permissions', () => ({
   canManageArtists: mockCanManageArtists,
 }))
 
-import handler from '../../../../../server/api/editions/[id]/shows-call/[showCallId]/applications/ids.get'
+import handler from '../../../../../../../layers/artists/server/api/editions/[id]/shows-call/[showCallId]/applications/ids.get'
 import { global } from '../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma

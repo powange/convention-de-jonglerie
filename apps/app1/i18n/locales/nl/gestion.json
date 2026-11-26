@@ -675,10 +675,6 @@
       "organizers_in_teams_open": "Organisatoren kunnen zich bij teams en tijdsloten voegen",
       "organizers_in_teams_closed": "Organisatoren nemen niet deel aan het vrijwilligerswerk"
     },
-    "shows_call": {
-      "title": "Show-oproep",
-      "list_description": "Beheer de verschillende show-oproepen voor deze editie"
-    },
     "treasury": {
       "title": "Financiën",
       "subtitle": "Uitgaven en inkomsten van de editie. Regels uit artiesten en ticketing worden bij de bron gecorrigeerd.",

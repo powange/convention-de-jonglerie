@@ -147,6 +147,10 @@
       "type_hint": "Ein Varieté besteht aus Nummern mit jeweils eigenen Künstlern.",
       "type_standard": "Show",
       "act_title_required": "Jede Nummer muss einen Titel haben"
+    },
+    "shows_call": {
+      "title": "Show-Aufruf",
+      "list_description": "Die verschiedenen Show-Aufrufe für diese Ausgabe verwalten"
     }
   }
 }

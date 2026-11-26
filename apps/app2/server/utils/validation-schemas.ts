@@ -65,9 +65,18 @@ export function handleValidationError(error: z.ZodError): never {
 
 // Validation générique (URL, nettoyage) : commune avec Flowvent. CHEMIN RELATIF (auto-imports).
 export {
+  isInternationalPhoneValid,
+  normalizePhoneE164,
+  phoneSchema,
   sanitizeData,
   urlSchema,
   validateAndSanitize,
 } from '../../../../layers/core/server/socle/validation-generique'
+// Candidatures aux appels à spectacles : dans le layer artistes.
+export {
+  createShowApplicationSchema,
+  showApplicationSchema,
+  showApplicationStatusSchema,
+} from '../../../../layers/artists/server/utils/schemas-candidature'
 // Modèle de spectacle : dans le layer artistes.
 export { showPresetSchema } from '../../../../layers/artists/server/utils/schema-modele-spectacle'

@@ -173,10 +173,10 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { categorieDeGestion } from '~/utils/categories-de-gestion'
-import { getEditionDisplayName } from '~/utils/editionName'
 
 import type { NavigationMenuItem } from '@nuxt/ui'
 
+import { getEditionDisplayName } from '#core/app/utils/editionName'
 import { ICONE_DE_MODULE_DANS_UN_LIEN } from '#ui-commun/app/utils/couleurs-de-module'
 import { moduleDeGestion } from '#ui-commun/app/utils/modules-de-gestion'
 

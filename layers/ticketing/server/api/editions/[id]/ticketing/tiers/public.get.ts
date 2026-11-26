@@ -1,7 +1,7 @@
+import { editionVisiblePubliquement } from '#core/shared/utils/visibilite-edition'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { applyCustomName } from '#server/utils/editions/ticketing/tiers'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { editionVisiblePubliquement } from '~~/shared/utils/visibilite-edition'
 
 /**
  * Route publique pour récupérer les tarifs actifs d'une édition

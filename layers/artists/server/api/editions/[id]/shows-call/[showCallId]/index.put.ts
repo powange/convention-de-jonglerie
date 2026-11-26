@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { apresLaReponse } from '#core/server/utils/apres-la-reponse'
 import { schemaUrlExterne } from '#core/shared/utils/url-externe'
+import { useArtistsPorts } from '#server/artists/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
@@ -230,11 +231,8 @@ export default wrapApiHandler(
       })
 
       if (priseDeMarque.count > 0) {
-        const editionData = await prisma.edition.findUnique({
-          where: { id: editionId },
-          select: { name: true, convention: { select: { name: true } } },
-        })
-        const editionName = editionData?.name || editionData?.convention?.name || ''
+        const editionData = await useArtistsPorts().event.lireEdition(editionId)
+        const editionName = editionData?.nomAffiche || ''
 
         apresLaReponse(
           event,

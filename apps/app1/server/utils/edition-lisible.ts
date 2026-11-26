@@ -1,7 +1,7 @@
 import type { H3Event } from 'h3'
 
+import { editionVisiblePubliquement } from '#core/shared/utils/visibilite-edition'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
-import { editionVisiblePubliquement } from '~~/shared/utils/visibilite-edition'
 
 /** Ce qu'il faut savoir d'une édition pour décider si un visiteur peut la lire. */
 export type EditionDontOnVerifieLaVisibilite = {

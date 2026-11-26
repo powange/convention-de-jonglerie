@@ -112,6 +112,108 @@ export const NotificationHelpers = {
   /** Bienvenue (layer d'auth) — sans objet pour Flowvent. */
   async welcome(_userId: number): Promise<void> {},
 
+  // ── Appels à spectacles (layer artistes) : mêmes notifications qu'app1, textes en clair. Les
+  // adresses passent par `/editions/:id/…`, que Flowvent réécrit vers l'identifiant public.
+
+  async showCallOpened(
+    userId: number,
+    showCallName: string,
+    editionName: string,
+    editionId: number
+  ) {
+    return NotificationService.create({
+      userId,
+      type: 'INFO',
+      titleText: 'Nouvel appel à spectacles 🎭',
+      messageText: `L'appel « ${showCallName} » pour « ${editionName} » est ouvert. Proposez votre spectacle !`,
+      actionText: 'Voir les appels ouverts',
+      category: 'artist',
+      entityType: 'Event',
+      entityId: String(editionId),
+      actionUrl: '/shows-call/open',
+    })
+  },
+
+  async showApplicationSubmitted(
+    userId: number,
+    artistName: string,
+    showTitle: string,
+    editionName: string,
+    editionId: number,
+    showCallId: number
+  ) {
+    return NotificationService.create({
+      userId,
+      type: 'INFO',
+      titleText: 'Nouvelle candidature artiste 🎪',
+      messageText: `${artistName} a soumis le spectacle « ${showTitle} » pour « ${editionName} ».`,
+      actionText: 'Voir les candidatures',
+      category: 'artist',
+      entityType: 'Event',
+      entityId: String(editionId),
+      actionUrl: `/editions/${editionId}/gestion/shows-call/${showCallId}/applications`,
+    })
+  },
+
+  async showApplicationAccepted(
+    userId: number,
+    showTitle: string,
+    editionName: string,
+    editionId: number
+  ) {
+    return NotificationService.create({
+      userId,
+      type: 'SUCCESS',
+      titleText: 'Spectacle retenu ! ✅',
+      messageText: `Votre spectacle « ${showTitle} » a été retenu pour « ${editionName} ».`,
+      actionText: 'Voir mes candidatures',
+      category: 'artist',
+      entityType: 'Event',
+      entityId: String(editionId),
+      actionUrl: '/profile/mes-candidatures-artiste',
+    })
+  },
+
+  async showApplicationRejected(
+    userId: number,
+    showTitle: string,
+    editionName: string,
+    editionId: number
+  ) {
+    return NotificationService.create({
+      userId,
+      type: 'WARNING',
+      titleText: 'Spectacle non retenu',
+      messageText: `Votre spectacle « ${showTitle} » n'a pas été retenu pour « ${editionName} ».`,
+      actionText: 'Voir mes candidatures',
+      category: 'artist',
+      entityType: 'Event',
+      entityId: String(editionId),
+      actionUrl: '/profile/mes-candidatures-artiste',
+    })
+  },
+
+  async showApplicationWithdrawn(
+    userId: number,
+    artistName: string,
+    showTitle: string,
+    editionName: string,
+    editionId: number,
+    showCallId: number
+  ) {
+    return NotificationService.create({
+      userId,
+      type: 'WARNING',
+      titleText: 'Candidature retirée',
+      messageText: `${artistName} a retiré sa candidature « ${showTitle} » pour ${editionName}.`,
+      actionText: 'Voir les candidatures',
+      category: 'artist',
+      entityType: 'Event',
+      entityId: String(editionId),
+      actionUrl: `/editions/${editionId}/gestion/shows-call/${showCallId}/applications`,
+    })
+  },
+
   async volunteerApplicationSubmitted(userId: number, editionName: string, editionId: number) {
     return NotificationService.create({
       userId,

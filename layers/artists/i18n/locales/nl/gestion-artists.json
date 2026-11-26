@@ -147,6 +147,10 @@
       "type_hint": "Een cabaret bestaat uit nummers, elk met eigen artiesten.",
       "type_standard": "Voorstelling",
       "act_title_required": "Elk nummer moet een titel hebben"
+    },
+    "shows_call": {
+      "title": "Show-oproep",
+      "list_description": "Beheer de verschillende show-oproepen voor deze editie"
     }
   }
 }

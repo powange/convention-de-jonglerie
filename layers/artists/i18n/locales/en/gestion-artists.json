@@ -147,6 +147,10 @@
       "type_hint": "A cabaret is made up of acts, each with its own performers.",
       "type_standard": "Show",
       "act_title_required": "Every act must have a title"
+    },
+    "shows_call": {
+      "title": "Call for shows",
+      "list_description": "Manage the different calls for shows for this edition"
     }
   }
 }

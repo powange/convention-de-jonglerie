@@ -217,18 +217,21 @@ definePageMeta({
   middleware: ['auth-protected'],
 })
 
-const route = useRoute()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
 const { erreur } = useNotificateur()
 const { t, locale } = useI18n()
 
-const editionId = Number(route.params.id)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 
 // Charger les données de l'édition
-const { data: edition, pending: loading } = await useFetch(`/api/editions/${editionId}`, {
-  key: `edition-${editionId}`,
-})
+// L'édition par le store, que chaque app fournit : un `useFetch('/api/editions/:id')` n'existe
+// que dans app1 (404 dans Flowvent).
+const magasinEdition = useEditionStore()
+const { data: edition, pending: loading } = await useAsyncData(`edition-${editionId}`, () =>
+  magasinEdition.fetchEditionById(editionId, { force: true })
+)
 
 // État
 const showCalls = ref<EditionShowCallWithStats[]>([])

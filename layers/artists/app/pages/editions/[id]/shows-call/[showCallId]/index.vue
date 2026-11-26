@@ -215,8 +215,8 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition, EditionShowCallPublic } from '~/types'
-import { getEditionDisplayName } from '~/utils/editionName'
 
+import { getEditionDisplayName } from '#core/app/utils/editionName'
 import { convertirRaccourcisEmoji, markdownToHtml } from '#core/app/utils/markdown'
 import { formaterDateHeure } from '#core/shared/utils/fuseau-edition'
 
@@ -228,15 +228,23 @@ const authStore = useAuthStore()
 const editionStore = useEditionStore()
 const { t, locale } = useI18n()
 
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 const showCallId = parseInt(route.params.showCallId as string)
 
 // Charger l'édition
+// L'édition par le store, que chaque app fournit : un `useFetch('/api/editions/:id')` n'existe
+// que dans app1 (404 dans Flowvent).
+const magasinEdition = useEditionStore()
 const {
   data: edition,
   pending: _editionLoading,
   error: _editionError,
-} = await useFetch<Edition>(`/api/editions/${editionId}`)
+} = await useAsyncData(
+  `appel-${editionId}-shows-call-show-all-d-index`,
+  async () =>
+    (await magasinEdition.fetchEditionById(editionId, { force: true })) as unknown as Edition
+)
 
 // Synchroniser avec le store
 watch(

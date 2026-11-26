@@ -675,10 +675,6 @@
       "organizers_in_teams_open": "Arrangører kan indgå i hold og vagter",
       "organizers_in_teams_closed": "Arrangører deltager ikke i frivilligarbejdet"
     },
-    "shows_call": {
-      "title": "Forestillingsopkald",
-      "list_description": "Administrer forskellige forestillingsopkald for dette arrangement"
-    },
     "treasury": {
       "title": "Økonomi",
       "subtitle": "Udgifter og indtægter for udgaven. Linjer fra kunstnere og billetsalg rettes ved kilden.",

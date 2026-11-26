@@ -2,6 +2,10 @@
   <div class="space-y-8">
     <ProfileHeader />
 
+    <!-- Catégories (bénévole, artiste, organisateur) : un appel à spectacles exige « Artiste », et
+         sa page renvoie ici pour l'activer. Même carte qu'app1 (layer d'auth). -->
+    <ProfileUserCategoriesCard />
+
     <div v-if="profil" class="grid grid-cols-1 gap-6 md:grid-cols-2">
       <UCard>
         <template #header>

@@ -49,7 +49,7 @@ mockNuxtImport('useRoute', () => () => ({
   query: {},
 }))
 
-import PageSondage from '../../../app/pages/survey/[token].vue'
+import PageSondage from '../../../../../layers/artists/app/pages/survey/[token].vue'
 
 const sondage = {
   showCall: {

@@ -147,6 +147,10 @@
       "type_hint": "En kabaret består af numre, hvert med sine egne artister.",
       "type_standard": "Forestilling",
       "act_title_required": "Hvert nummer skal have en titel"
+    },
+    "shows_call": {
+      "title": "Forestillingsopkald",
+      "list_description": "Administrer forskellige forestillingsopkald for dette arrangement"
     }
   }
 }
