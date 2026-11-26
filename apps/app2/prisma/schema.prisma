@@ -207,6 +207,8 @@ model Subscription {
   plan             String // "monthly" | "annual"
   status           String   @default("active") // "active" | "inactive"
   currentPeriodEnd DateTime
+  formule          String   @default("integral") // "solo" | "duo" | "integral" (shared/formules.ts)
+  modules          Json? // modules choisis pour Solo et Duo ; null pour Intégral, qui couvre tout
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }

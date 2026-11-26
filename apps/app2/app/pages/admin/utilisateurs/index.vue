@@ -48,7 +48,7 @@
           color="success"
           variant="subtle"
           size="sm"
-          :label="row.original.formule === 'annual' ? 'annuel' : 'mensuel'"
+          :label="libelleFormuleAbonnement(row.original.formule, row.original.periode ?? undefined)"
         />
         <span v-else class="text-sm text-muted">—</span>
       </template>
@@ -84,6 +84,7 @@ interface Compte {
   lastLoginAt: string | null
   abonne: boolean
   formule: string | null
+  periode: string | null
   evenements: number
   candidatures: number
 }

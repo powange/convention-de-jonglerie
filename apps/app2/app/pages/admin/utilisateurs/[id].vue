@@ -39,7 +39,7 @@
                 v-if="compte.abonnement"
                 :color="compte.abonnement.actif ? 'success' : 'neutral'"
                 variant="subtle"
-                :label="`Abonnement ${compte.abonnement.plan === 'annual' ? 'annuel' : 'mensuel'} ${compte.abonnement.actif ? 'actif' : 'expiré'}`"
+                :label="`${libelleFormuleAbonnement(compte.abonnement.formule, compte.abonnement.plan)} · ${libelleModulesCouverts(compte.abonnement.formule, compte.abonnement.modules)} · ${compte.abonnement.actif ? 'actif' : 'expiré'}`"
               />
             </div>
             <p class="mt-2 text-sm text-muted">
@@ -105,7 +105,12 @@ interface Compte {
   motDePasse: boolean
   google: boolean
   facebook: boolean
-  abonnement: { plan: string; actif: boolean } | null
+  abonnement: {
+    plan: string
+    formule: string
+    modules: unknown
+    actif: boolean
+  } | null
   events: (Evt & { startDate: string | null })[]
   coOrganise: Evt[]
   volunteerApplications: { id: number; status: string; event: Evt }[]

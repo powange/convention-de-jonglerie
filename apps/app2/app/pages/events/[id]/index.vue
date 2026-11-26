@@ -25,59 +25,57 @@
         {{ event.description }}
       </p>
 
-      <USeparator class="my-8" label="Fonctionnalités d'organisation" />
+      <USeparator v-if="acces?.droits.voir" class="my-8" label="Fonctionnalités d'organisation" />
 
-      <!-- Accès débloqué : par l'abonnement du PROPRIÉTAIRE (un organisateur n'a pas besoin du
-           sien), et chaque carte selon les droits de la personne. -->
-      <div v-if="acces?.abonnementActif" class="grid gap-4 sm:grid-cols-2">
-        <UCard
-          v-for="carte in cartes"
-          :key="carte.to"
-          class="cursor-pointer transition hover:ring-2 hover:ring-primary"
-          @click="navigateTo(carte.to)"
-        >
-          <div class="flex items-center gap-3">
-            <div class="flex size-11 items-center justify-center rounded-lg" :class="carte.couleur">
-              <UIcon :name="carte.icone" class="text-2xl" />
-            </div>
-            <div>
-              <p class="font-semibold">{{ carte.titre }}</p>
-              <p class="text-sm text-muted">{{ carte.description }}</p>
-            </div>
-          </div>
-        </UCard>
-      </div>
-
-      <!-- Paywall -->
-      <UCard v-else>
-        <div class="flex flex-col items-center py-6 text-center">
-          <div
-            class="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary"
+      <!-- La gestion s'ouvre à qui la voit ; sans abonnement actif du PROPRIÉTAIRE (un organisateur
+           n'a pas besoin du sien), elle reste consultable en lecture seule. -->
+      <div v-if="acces?.droits.voir" class="space-y-4">
+        <UAlert
+          v-if="!acces.abonnementActif"
+          color="warning"
+          variant="subtle"
+          icon="i-heroicons-lock-closed"
+          :title="
+            acces.droits.estProprietaire
+              ? 'Votre abonnement n’est pas actif : la gestion est en lecture seule'
+              : 'L’abonnement du propriétaire n’est plus actif : la gestion est en lecture seule'
+          "
+          description="Rien n'est supprimé. La gestion reprend dès qu'un abonnement couvre l'événement."
+          :actions="
+            acces.droits.estProprietaire
+              ? [
+                  {
+                    label: 'Voir les tarifs',
+                    to: '/pricing',
+                    color: 'warning',
+                    variant: 'solid',
+                  },
+                ]
+              : []
+          "
+        />
+        <div class="grid gap-4 sm:grid-cols-2">
+          <UCard
+            v-for="carte in cartes"
+            :key="carte.to"
+            class="cursor-pointer transition hover:ring-2 hover:ring-primary"
+            @click="navigateTo(carte.to)"
           >
-            <UIcon name="i-heroicons-lock-closed" class="text-2xl" />
-          </div>
-          <template v-if="acces?.droits.estProprietaire">
-            <p class="mt-3 font-semibold">Fonctionnalités réservées aux abonnés</p>
-            <p class="mt-1 max-w-md text-sm text-muted">
-              Abonnez-vous pour débloquer la gestion des bénévoles et les autres outils
-              d'organisation de vos événements — pour vous et vos co-organisateurs.
-            </p>
-            <UButton
-              class="mt-4"
-              to="/pricing"
-              label="Voir les tarifs"
-              icon="i-heroicons-credit-card"
-            />
-          </template>
-          <template v-else>
-            <p class="mt-3 font-semibold">Gestion momentanément indisponible</p>
-            <p class="mt-1 max-w-md text-sm text-muted">
-              L'abonnement du propriétaire de cet événement n'est plus actif : la gestion reprendra
-              dès qu'il sera renouvelé.
-            </p>
-          </template>
+            <div class="flex items-center gap-3">
+              <div
+                class="flex size-11 items-center justify-center rounded-lg"
+                :class="carte.couleur"
+              >
+                <UIcon :name="carte.icone" class="text-2xl" />
+              </div>
+              <div>
+                <p class="font-semibold">{{ carte.titre }}</p>
+                <p class="text-sm text-muted">{{ carte.description }}</p>
+              </div>
+            </div>
+          </UCard>
         </div>
-      </UCard>
+      </div>
     </div>
   </UContainer>
 </template>

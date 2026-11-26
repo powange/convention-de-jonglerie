@@ -6,15 +6,29 @@
  *   qu'on lui a donnés (la liste : `DROITS_PAR_DOMAINE`, shared/modules-evenement.ts) ;
  * - un ADMINISTRATEUR global peut tout.
  *
- * Abonnement (décision de l'utilisateur) : c'est celui du PROPRIÉTAIRE qui ouvre la gestion de
- * l'événement, à lui comme à ses organisateurs ; un organisateur n'a pas besoin du sien.
+ * Abonnement (décisions de l'utilisateur) : c'est celui du PROPRIÉTAIRE qui ouvre la gestion de
+ * l'événement, à lui comme à ses organisateurs ; un organisateur n'a pas besoin du sien. Depuis les
+ * formules par module (shared/formules.ts), un droit de module ne s'exerce EN ÉCRITURE que si la
+ * formule du propriétaire couvre ce module ; les droits sur l'événement lui-même (modifier, la
+ * carte, les organisateurs) demandent seulement un abonnement actif. Ce qui n'est pas couvert reste
+ * consultable : une fin d'abonnement ne supprime rien, la gestion passe en LECTURE SEULE.
  */
 
+import { useEvent } from 'nitropack/runtime'
+
+import { estModulePayant } from '../../shared/formules'
 import { DROITS_PAR_DOMAINE, MODULES_EVENEMENT } from '../../shared/modules-evenement'
 
-import { getActiveSubscription } from './subscription'
+import { couvertureDe, selectionCouverture } from './subscription'
 
-import type { ColonneDroit, ColonneModule, Droits, Modules } from '../../shared/modules-evenement'
+import type { Couverture } from './subscription'
+import type {
+  CleDroit,
+  ColonneDroit,
+  ColonneModule,
+  Droits,
+  Modules,
+} from '../../shared/modules-evenement'
 
 export type DroitsEvenement = Droits & {
   /** Voir l'événement et sa gestion. */
@@ -46,13 +60,54 @@ const AUCUN = {
   estProprietaire: false,
 } satisfies DroitsEvenement
 
+/**
+ * La requête en cours est-elle une lecture ? Lu par le contexte asynchrone de Nitro
+ * (`nitro.experimental.asyncContext`, nuxt.config.ts). Hors requête (tâche planifiée) ou si le
+ * contexte manque : non — on retient la règle la plus stricte.
+ */
+function requeteEnLecture(): boolean {
+  try {
+    const methode = useEvent().method
+    return methode === 'GET' || methode === 'HEAD'
+  } catch {
+    return false
+  }
+}
+
+/** Le droit `cle` est-il couvert par l'abonnement du propriétaire ? */
+export function droitCouvert(cle: CleDroit, couverture: Couverture) {
+  if (!couverture.actif) return false
+  const module = DROITS_PAR_DOMAINE.find((d) => d.cle === cle)?.module
+  return !estModulePayant(module) || couverture.modules.includes(module)
+}
+
+/** La couverture de l'abonnement du propriétaire de l'événement (rien si l'événement n'existe pas). */
+export async function couvertureDeLEvenement(eventId: number): Promise<Couverture> {
+  const evenement = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: {
+      owner: { select: { subscription: { select: selectionCouverture } } },
+    },
+  })
+  return couvertureDe(evenement?.owner.subscription)
+}
+
 export async function droitsSurEvenement(
   eventId: number,
   userId: number
 ): Promise<DroitsEvenement> {
   const [evenement, utilisateur, organisateur] = await Promise.all([
-    prisma.event.findUnique({ where: { id: eventId }, select: { ownerId: true } }),
-    prisma.user.findUnique({ where: { id: userId }, select: { isGlobalAdmin: true } }),
+    prisma.event.findUnique({
+      where: { id: eventId },
+      select: {
+        ownerId: true,
+        owner: { select: { subscription: { select: selectionCouverture } } },
+      },
+    }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { isGlobalAdmin: true },
+    }),
     prisma.editionOrganizer.findFirst({
       where: { editionId: eventId, organizer: { userId } },
       select: selectionDroits,
@@ -60,9 +115,17 @@ export async function droitsSurEvenement(
   ])
   if (!evenement) return AUCUN
   const estProprietaire = evenement.ownerId === userId
-  const tout = estProprietaire || !!utilisateur?.isGlobalAdmin
+  const administrateur = !!utilisateur?.isGlobalAdmin
+  const tout = estProprietaire || administrateur
+  const couverture = couvertureDe(evenement.owner.subscription)
+  const lecture = requeteEnLecture()
   const parDomaine = Object.fromEntries(
-    DROITS_PAR_DOMAINE.map((d) => [d.cle, tout || !!organisateur?.[d.colonne]])
+    DROITS_PAR_DOMAINE.map((d) => {
+      const accorde = tout || !!organisateur?.[d.colonne]
+      // Un administrateur n'est pas tenu par l'abonnement d'autrui ; les autres, si.
+      const ouvert = administrateur || lecture || droitCouvert(d.cle, couverture)
+      return [d.cle, accorde && ouvert]
+    })
   ) as Droits
   return {
     ...parDomaine,
@@ -73,15 +136,17 @@ export async function droitsSurEvenement(
 }
 
 /**
- * La gestion de l'événement est-elle ouverte ? Oui si le propriétaire a un abonnement actif — ou
- * si la personne est administrateur.
+ * La gestion de l'événement est-elle ouverte en écriture ? Oui si le propriétaire a un abonnement
+ * actif (quelle que soit la formule) — ou si la personne est administrateur. Sinon, elle reste
+ * consultable en lecture seule.
  */
 export async function gestionOuverte(eventId: number, userId: number): Promise<boolean> {
-  const [evenement, utilisateur] = await Promise.all([
-    prisma.event.findUnique({ where: { id: eventId }, select: { ownerId: true } }),
-    prisma.user.findUnique({ where: { id: userId }, select: { isGlobalAdmin: true } }),
+  const [couverture, utilisateur] = await Promise.all([
+    couvertureDeLEvenement(eventId),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { isGlobalAdmin: true },
+    }),
   ])
-  if (!evenement) return false
-  if (utilisateur?.isGlobalAdmin) return true
-  return !!(await getActiveSubscription(evenement.ownerId))
+  return !!utilisateur?.isGlobalAdmin || couverture.actif
 }
