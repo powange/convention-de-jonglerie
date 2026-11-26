@@ -133,7 +133,8 @@ export default defineNuxtConfig({
   // 2. `benevoles.json` : les clés que les layers empruntent aux fichiers communs d'app1 (common,
   //    public, gestion…), copiées une fois, et les libellés reformulés pour Flowvent
   //    (« événement » et non « édition »). Un test garantit que chaque clé employée se résout ;
-  // 3. `interface.json` : ceux des composants de layers/ui que Flowvent affiche (dépôt d'image) ;
+  // 3. `interface.json` : ceux de layers/ui que Flowvent affiche (dépôt d'image, invitation à installer,
+  //    fuseau horaire…) — le test flowvent-libelles-benevoles lit aussi ce layer ;
   // 4. `fr.json` : les libellés propres à Flowvent, dont ceux du layer d'auth.
   i18n: {
     defaultLocale: 'fr',

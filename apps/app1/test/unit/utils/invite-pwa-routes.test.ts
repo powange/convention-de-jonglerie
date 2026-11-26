@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { invitePwaAutorisee } from '../../../app/utils/invite-pwa-routes'
+import { invitePwaAutorisee } from '#ui-commun/app/utils/invite-pwa-routes'
 
 /**
  * Où l'on ne propose PAS d'installer l'application.
@@ -28,6 +28,8 @@ describe('invitePwaAutorisee', () => {
       ['/favorites', 'favoris'],
       ['/messenger', 'messagerie'],
       ['/conventions', 'conventions'],
+      ['/events/12', 'page d’un événement (Flowvent)'],
+      ['/dashboard', 'tableau de bord (Flowvent)'],
     ])('%s (%s)', (chemin) => {
       expect(invitePwaAutorisee(chemin)).toBe(true)
     })
@@ -43,6 +45,11 @@ describe('invitePwaAutorisee', () => {
       ['/profile', 'espace profil'],
       ['/profile/informations', 'informations personnelles'],
       ['/profile/mes-candidatures-benevole', 'ses candidatures'],
+      ['/admin', 'administration'],
+      ['/admin/utilisateurs/3', 'fiche d’un utilisateur en administration'],
+      ['/events/new', 'création d’un événement (Flowvent)'],
+      ['/events/12/gestion/organisateurs', 'gestion d’un événement (Flowvent)'],
+      ['/editions/42/gestion/artists/shows/new', 'nouveau spectacle'],
     ])('%s (%s)', (chemin) => {
       expect(invitePwaAutorisee(chemin)).toBe(false)
     })
@@ -70,6 +77,9 @@ describe('invitePwaAutorisee', () => {
       expect(invitePwaAutorisee('/editions/42/volunteersomething')).toBe(true)
       expect(invitePwaAutorisee('/blog/gestionnaire-de-convention')).toBe(true)
       expect(invitePwaAutorisee('/profiles-publics')).toBe(true)
+      expect(invitePwaAutorisee('/editions/42/news')).toBe(true)
+      // `/admin` n'est exclu qu'à la racine : un segment homonyme plus loin reste permis.
+      expect(invitePwaAutorisee('/editions/42/admin-info')).toBe(true)
     })
 
     it('bloque un appel à spectacles seulement sur `/apply`', () => {

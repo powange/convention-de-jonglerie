@@ -1,7 +1,40 @@
 {
+  "common": {
+    "unsaved_changes": "Modifications non enregistrées",
+    "unsaved_changes_warning": "Vous avez des modifications qui n'ont pas été enregistrées. Si vous quittez cette page maintenant, elles seront perdues."
+  },
   "components": {
     "convention_form": {
       "click_to_select_image": "Cliquez pour sélectionner une image"
+    }
+  },
+  "errors": {
+    "chunk_load_failed_description": "La connexion a été interrompue pendant son chargement. Réessayez : le reste de la page reste utilisable.",
+    "chunk_load_failed_title": "Ce bloc n'a pas pu être chargé"
+  },
+  "forms": {
+    "placeholders": {
+      "select_timezone": "Sélectionnez un fuseau horaire"
+    }
+  },
+  "pwa": {
+    "install": {
+      "button": "Installer maintenant",
+      "cancelled": {
+        "description": "Vous pourrez installer Flowvent plus tard depuis le menu de votre navigateur.",
+        "title": "Installation annulée"
+      },
+      "description": "Ajoutez Flowvent à votre écran d'accueil : il s'ouvrira comme une application, sans passer par le navigateur.",
+      "error": {
+        "description": "Une erreur s'est produite lors de l'installation. Veuillez réessayer.",
+        "title": "Erreur d'installation"
+      },
+      "later": "Plus tard",
+      "success": {
+        "description": "Flowvent a été ajouté à votre écran d'accueil.",
+        "title": "Installation réussie !"
+      },
+      "title": "Installer l'application"
     }
   },
   "upload": {

@@ -837,7 +837,8 @@
         "all_sources": "Alle Quellen",
         "country": "Land",
         "hide_imported": "Bereits importierte ausblenden",
-        "source": "Quelle"
+        "source": "Quelle",
+        "hide_past": "Vergangene ausblenden"
       },
       "ia": {
         "classified": "{count} Kandidat(en) von der KI klassifiziert",

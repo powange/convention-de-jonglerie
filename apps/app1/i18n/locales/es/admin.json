@@ -837,7 +837,8 @@
         "all_sources": "Todas las fuentes",
         "country": "País",
         "hide_imported": "Ocultar los ya importados",
-        "source": "Fuente"
+        "source": "Fuente",
+        "hide_past": "Ocultar las pasadas"
       },
       "ia": {
         "classified": "{count} candidato(s) clasificado(s) por la IA",

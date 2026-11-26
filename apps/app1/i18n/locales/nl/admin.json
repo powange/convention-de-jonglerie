@@ -837,7 +837,8 @@
         "all_sources": "Alle bronnen",
         "country": "Land",
         "hide_imported": "Al geïmporteerde verbergen",
-        "source": "Bron"
+        "source": "Bron",
+        "hide_past": "Verlopen verbergen"
       },
       "ia": {
         "classified": "{count} kandidaat/kandidaten geclassificeerd door de AI",

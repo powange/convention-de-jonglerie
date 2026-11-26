@@ -837,7 +837,8 @@
         "all_sources": "Alla källor",
         "country": "Land",
         "hide_imported": "Dölj de redan importerade",
-        "source": "Källa"
+        "source": "Källa",
+        "hide_past": "Dölj tidigare"
       },
       "ia": {
         "classified": "{count} kandidat(er) klassificerade av AI:n",

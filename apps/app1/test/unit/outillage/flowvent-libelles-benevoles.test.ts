@@ -29,6 +29,9 @@ const SOURCES = [
   'layers/meals/app',
   'layers/treasury/app',
   'layers/backup/app',
+  // Lu depuis l'invitation à installer l'application : il manquait déjà cinq clés à Flowvent
+  // (fuseau horaire, bloc non chargé, saisie non enregistrée), affichées brutes sans que rien ne le dise.
+  'layers/ui/app',
 ]
 
 /** Les clés construites à l'exécution : seul leur préfixe est connu, il doit avoir des entrées. */

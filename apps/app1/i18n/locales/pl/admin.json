@@ -837,7 +837,8 @@
         "all_sources": "Wszystkie źródła",
         "country": "Kraj",
         "hide_imported": "Ukryj już zaimportowane",
-        "source": "Źródło"
+        "source": "Źródło",
+        "hide_past": "Ukryj minione"
       },
       "ia": {
         "classified": "{count} kandydatów sklasyfikowanych przez SI",

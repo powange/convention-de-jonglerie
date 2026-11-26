@@ -12,6 +12,10 @@
  *
  * La fonction est PURE et prend le chemin en argument : elle se vérifie sans monter de composant
  * ni simuler de routeur, et c'est elle qui porte la décision.
+ *
+ * Une seule liste pour les deux applications (Juggling Convention et Flowvent) : elles partagent
+ * les layers qui portent ces écrans, donc les mêmes chemins. Une liste par application finirait
+ * par diverger sans que rien ne le signale.
  */
 
 /**
@@ -36,6 +40,12 @@ const CHEMINS_SANS_INVITE: RegExp[] = [
 
   // Tout l'espace profil : informations, mot de passe, candidatures, préférences.
   /\/profile(\/|$)/,
+
+  // L'administration du site : des écrans de travail, comme la gestion.
+  /^\/admin(\/|$)/,
+
+  // Les formulaires de création (`/events/new` de Flowvent, un nouveau spectacle…).
+  /\/new(\/|$)/,
 ]
 
 /**

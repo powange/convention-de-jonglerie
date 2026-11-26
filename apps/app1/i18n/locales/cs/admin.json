@@ -837,7 +837,8 @@
         "all_sources": "Všechny zdroje",
         "country": "Země",
         "hide_imported": "Skrýt již importované",
-        "source": "Zdroj"
+        "source": "Zdroj",
+        "hide_past": "Skrýt proběhlé"
       },
       "ia": {
         "classified": "{count} kandidátů klasifikováno AI",

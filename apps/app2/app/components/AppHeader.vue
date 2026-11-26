@@ -69,6 +69,10 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 const { loggedIn, user, clear } = useUserSession()
 const toast = useToast()
+const { t } = useI18n()
+
+// État partagé avec le bandeau : le navigateur n'émet `beforeinstallprompt` qu'une fois.
+const { entreeDeMenuDisponible, installer: installerLApplication } = useInvitePwa()
 
 /*
  * L'avatar du menu : la photo de profil (déposée, ou reprise de Google / Facebook), sinon les
@@ -106,6 +110,22 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
       ? [{ label: 'Administration', icon: 'i-heroicons-shield-check', to: '/admin' }]
       : []),
   ],
+  /*
+   * Installer l'application, à la demande — même entrée que dans le menu d'app1. Le bandeau se tait
+   * sept jours après « Plus tard » : sans elle, il ne resterait que le menu du navigateur, que peu
+   * de monde connaît. Elle n'apparaît que si le navigateur a réellement proposé l'installation.
+   */
+  ...(entreeDeMenuDisponible.value
+    ? [
+        [
+          {
+            label: t('pwa.install.title'),
+            icon: 'i-heroicons-arrow-down-tray',
+            onSelect: () => installerLApplication(),
+          },
+        ],
+      ]
+    : []),
   [{ label: 'Se déconnecter', icon: 'i-heroicons-arrow-right-on-rectangle', onSelect: logout }],
 ])
 </script>

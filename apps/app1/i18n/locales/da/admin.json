@@ -837,7 +837,8 @@
         "all_sources": "Alle kilder",
         "country": "Land",
         "hide_imported": "Skjul de allerede importerede",
-        "source": "Kilde"
+        "source": "Kilde",
+        "hide_past": "Skjul tidligere"
       },
       "ia": {
         "classified": "{count} kandidat(er) klassificeret af AI'en",
