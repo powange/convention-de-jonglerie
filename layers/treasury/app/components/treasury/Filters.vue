@@ -8,10 +8,20 @@
 -->
 <template>
   <div class="flex flex-col gap-1">
-    <div :class="empile ? 'flex flex-col gap-3' : 'flex flex-col gap-3 lg:flex-row lg:items-end'">
+    <!--
+      ⚠️ `flex-wrap` et une largeur MINIMALE pour la recherche : les autres champs ont des largeurs
+      fixes (près de 900 px à eux seuls, plus les actions de la page). Sur une seule ligne, la
+      recherche — seule à s'adapter — tombait à zéro vers 1400 px d'écran, et son libellé
+      chevauchait celui du code. Quand la place manque, les champs passent à la ligne.
+    -->
+    <div
+      :class="
+        empile ? 'flex flex-col gap-3' : 'flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-end'
+      "
+    >
       <UFormField
         :label="t('gestion.treasury.filter_search')"
-        :class="empile ? '' : 'min-w-0 flex-1'"
+        :class="empile ? '' : 'min-w-0 flex-1 lg:min-w-64'"
       >
         <UInput
           v-model="saisie"
