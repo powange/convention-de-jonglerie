@@ -124,6 +124,9 @@ model Event {
   /// Archivé : l'événement est passé en LECTURE SEULE complète par son propriétaire, et ne compte
   /// plus parmi ses événements en cours (le plafond de sa formule, shared/formules.ts).
   archivedAt                       DateTime?
+  /// Alertes de plafond déjà envoyées au propriétaire, par compteur : `{ "benevoles": "alerte" }`
+  /// (80 %) puis `"plein"` (limite atteinte). Un courriel par palier, jamais deux (quotas.ts).
+  alertesQuota                     Json?
   /// Modules activés pour l'événement (page « Accueil de la gestion »), un par module comme les
   /// `*Enabled` d'une édition d'app1. Le module bénévoles est actif par défaut.
   volunteersEnabled                Boolean              @default(true)

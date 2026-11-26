@@ -15,6 +15,7 @@
  */
 import { createError } from 'h3'
 
+import { contenuAlerte, doitAlerter, palierAlerte } from '../../shared/alerte-quota'
 import {
   COMPTEURS,
   etatQuota,
@@ -24,6 +25,7 @@ import {
   plafondTolere,
 } from '../../shared/formules'
 
+import { getSiteUrl, sendEmail } from './emailService'
 import prisma from './prisma'
 import { couvertureDe, couvertureDuCompte, selectionCouverture } from './subscription'
 
@@ -97,9 +99,73 @@ export async function verifierAjout(
   const plafond = couverture.plafonds[compteur]
   if (plafond === null) return
   const usage = await usageDeLEvenement(eventId, compteur)
-  if (!peutAjouter(usage, plafond, options.nombre ?? 1)) {
+  const nombre = options.nombre ?? 1
+  if (!peutAjouter(usage, plafond, nombre)) {
     throw createError({ status: 402, message: messageDeRefus(compteur, couverture) })
   }
+  // L'ajout passe : prévenir le propriétaire s'il franchit 80 % ou la limite. Sans attendre, et
+  // sans jamais faire échouer l'ajout.
+  signalerSeuil(eventId, compteur, usage + nombre, couverture).catch((e) =>
+    console.error('[quotas] alerte de plafond non envoyée :', e)
+  )
+}
+
+const LIBELLES_ALERTE: Record<CompteurParEvenement, string> = {
+  benevoles: 'bénévoles acceptés',
+  artistes: 'artistes',
+  organisateurs: 'co-organisateurs',
+}
+
+/**
+ * Écrit au propriétaire quand un compteur de l'événement franchit 80 % puis la limite de sa
+ * formule — une fois par palier et par compteur (`Event.alertesQuota`). Le texte :
+ * shared/alerte-quota.ts.
+ */
+export async function signalerSeuil(
+  eventId: number,
+  compteur: CompteurParEvenement,
+  usage: number,
+  couverture: Couverture
+): Promise<boolean> {
+  const plafond = couverture.plafonds[compteur]
+  const palier = palierAlerte(usage, plafond)
+  if (!palier || plafond === null) return false
+  const evenement = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: {
+      name: true,
+      publicId: true,
+      alertesQuota: true,
+      owner: { select: { email: true, prenom: true, pseudo: true } },
+    },
+  })
+  if (!evenement) return false
+  const deja = (evenement.alertesQuota ?? {}) as Record<string, unknown>
+  if (!doitAlerter(palier, deja[compteur])) return false
+
+  // Le palier est retenu AVANT l'envoi : deux ajouts simultanés n'écrivent pas deux fois.
+  await prisma.event.update({
+    where: { id: eventId },
+    data: { alertesQuota: { ...deja, [compteur]: palier } },
+  })
+  const releve = formuleQuiReleve(couverture.formule, compteur)
+  const site = getSiteUrl()
+  const contenu = contenuAlerte({
+    nom: evenement.owner.prenom || evenement.owner.pseudo,
+    evenement: evenement.name,
+    quoi: LIBELLES_ALERTE[compteur],
+    usage,
+    plafond,
+    marge: Math.max(0, (plafondTolere(plafond) ?? plafond) - usage),
+    formule: formule(couverture.formule)!.libelle,
+    formuleSuivante: releve
+      ? { libelle: formule(releve)!.libelle, plafond: formule(releve)!.plafonds[compteur] }
+      : null,
+    palier,
+    lienTarifs: `${site}/pricing`,
+    lienEvenement: `${site}/events/${evenement.publicId}/gestion`,
+  })
+  return sendEmail({ to: evenement.owner.email, ...contenu })
 }
 
 /** Garde de CRÉATION (ou de désarchivage) d'un événement par `ownerId`. */

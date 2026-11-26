@@ -89,6 +89,13 @@
         </UCard>
       </div>
 
+      <!-- Où en est la formule du propriétaire : jauges des quatre compteurs. -->
+      <EditionJaugesFormule
+        v-if="accueil.quotas"
+        :quotas="accueil.quotas"
+        :est-proprietaire="accueil.droits.estProprietaire"
+      />
+
       <!-- Modules : le point d'entrée où chaque nouveau module viendra s'ajouter. -->
       <UCard>
         <template #header>
@@ -136,6 +143,7 @@
  * Accueil de la gestion d'un événement : une carte par module que la personne peut ouvrir (avec ses
  * chiffres), et l'activation des modules — le point d'entrée où chaque module à venir s'ajoutera.
  */
+import type { Compteur, EtatQuota } from '#shared/formules'
 import type { CleModule, Droits, Modules } from '#shared/modules-evenement'
 
 import { modulesDisponibles } from '#shared/modules-evenement'
@@ -157,6 +165,11 @@ interface Accueil {
   droits: Droits & { estProprietaire: boolean }
   modules: Modules
   organisateurs: number
+  quotas?: {
+    formule: string
+    payant: boolean
+    compteurs: { cle: Compteur; usage: number; plafond: number | null; etat: EtatQuota }[]
+  }
   benevoles: null | {
     enAttente: number
     acceptes: number

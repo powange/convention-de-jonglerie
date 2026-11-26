@@ -2,6 +2,7 @@ import { requireUserSession } from '#imports'
 
 import { resumeAvantage } from '../../../shared/codes-promo'
 import prisma from '../../utils/prisma'
+import { evenementsEnCours } from '../../utils/quotas'
 import { couvertureDe, isSubscriptionActive } from '../../utils/subscription'
 
 export default defineEventHandler(async (event) => {
@@ -19,6 +20,8 @@ export default defineEventHandler(async (event) => {
     // La formule qui s'applique (« decouverte » sans abonnement payant actif) et ses plafonds.
     formule: couverture.formule,
     plafonds: couverture.plafonds,
+    // Ses événements non archivés, à rapprocher du plafond de la formule (tableau de bord).
+    evenementsEnCours: await evenementsEnCours(user.id),
     subscription: subscription
       ? {
           plan: subscription.plan,

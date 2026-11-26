@@ -33,6 +33,10 @@
         :label="`${planLabel} · ${plafondsLabel}`"
       />
     </div>
+    <!-- Le compteur qui vaut pour tout le compte : les autres sont sur l'accueil de chaque gestion. -->
+    <p v-if="compteurEvenements" class="-mt-3 mb-6 text-sm" :class="compteurEvenements.classe">
+      {{ compteurEvenements.texte }}
+    </p>
 
     <!-- Liste des événements -->
     <div v-if="pending" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -93,6 +97,18 @@ const planLabel = computed(() =>
   libelleFormuleAbonnement(subData.value?.subscription?.formule, subData.value?.subscription?.plan)
 )
 const plafondsLabel = computed(() => libellePlafondsFormule(subData.value?.formule))
+const compteurEvenements = computed(() => {
+  const plafond = subData.value?.plafonds?.evenements
+  const usage = subData.value?.evenementsEnCours
+  if (plafond === null || plafond === undefined || usage === undefined) return null
+  const plein = usage >= plafond
+  return {
+    texte: plein
+      ? `${usage} événement${usage > 1 ? 's' : ''} en cours sur ${plafond} : archivez un événement passé ou passez à une formule plus grande pour en créer un autre.`
+      : `${usage} événement${usage > 1 ? 's' : ''} en cours sur ${plafond} compris dans votre formule.`,
+    classe: plein ? 'text-warning' : 'text-muted',
+  }
+})
 
 function formatDate(d: string | Date) {
   return new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
