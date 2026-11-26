@@ -100,7 +100,7 @@ jobs:
   # Ce job court en même temps que `setup` (il ne lui doit rien) : il n'allonge pas le chemin
   # critique.
   changements:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       perimetre: ${{ steps.calcul.outputs.perimetre }}
@@ -132,7 +132,7 @@ jobs:
   # Ce job n'existe que pour garantir aux cinq autres que les deux entrées de cache existent avant
   # qu'ils ne les lisent. Il ne prépare rien pour lui-même.
   setup:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
       NODE_ENV: test
@@ -216,7 +216,7 @@ jobs:
 
   # Job pour le linting (rapide, pas besoin de DB)
   lint:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     env:
       NODE_ENV: test
@@ -248,7 +248,7 @@ jobs:
   # Job de vérification de types (vue-tsc) : attrape les variables/références non définies que
   # le build (esbuild, sans typecheck) et ESLint ne voient pas — ex. `edition is not defined`.
   typecheck:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     # 20 et non 10 : le job mourait à 2 min 30 en rupture de mémoire, donc sa durée passée ne dit
     # rien de celle d'un typage qui va jusqu'au bout. À réduire une fois la vraie durée mesurée.
     timeout-minutes: 20
@@ -381,7 +381,7 @@ jobs:
   # Lancé quand la PR peut changer le typage de Flowvent — app2, un layer qu'elle étend, ou ce
   # workflow — et chaque nuit (`typecheck-app2` dans scripts/perimetre-ci.mjs).
   typecheck-app2:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     needs: [changements]
     if: contains(needs.changements.outputs.jobs, ' typecheck-app2 ')
@@ -453,7 +453,7 @@ jobs:
 
   # Job pour valider que le build fonctionne
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     # `test` et non `production` ici : avec `NODE_ENV=production`, le `npm ci` du filet de cache
     # sauterait les devDependencies, donc Nuxt lui-même. C'est le seul STEP de build qui passe en
@@ -533,7 +533,7 @@ jobs:
   # limitée à `apps/app2/` peut la faire tomber. Une condition de job ne peut pas lire `matrix` ;
   # garder l'unitaire dans la matrice aurait donc obligé à faire tourner les trois suites ou aucune.
   test-unit:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       NODE_ENV: test
@@ -580,7 +580,7 @@ jobs:
     # `test (nuxt, npm run test:nuxt:run, false)`. Le check requis est `ci-verte` seul, donc ce nom
     # n'engage aucune règle de branche.
     name: test (${{ matrix.test-group.name }})
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       NODE_ENV: test
@@ -726,7 +726,7 @@ jobs:
   # un jeu de données FIGÉ : le seed tire 125 valeurs au hasard, et les geler d'un run à l'autre
   # changerait la nature des tests sans qu'on l'ait demandé.
   base-de-test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     needs: [setup, changements]
     if: contains(needs.changements.outputs.jobs, ' base-de-test ')
@@ -828,7 +828,7 @@ jobs:
     # `main` n'est pas protégée aujourd'hui ; si elle le devenait, ce sont ces quatre noms-là qu'il
     # faudrait exiger.
     name: playwright (${{ matrix.lot.cle }})
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     # Ce job ne builde plus rien : il consomme le `.output/` du job `build`. Le gain est en compute
     # et en justesse (un seul build, et c'est celui de production qui est testé).
@@ -1286,7 +1286,7 @@ jobs:
   # différente écrirait une entrée que personne ne lit. Un test le vérifie
   # (test/unit/scripts/perimetre-ci.test.ts).
   navigateurs:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     needs: [setup, changements]
     if: contains(needs.changements.outputs.jobs, ' navigateurs ')
@@ -1342,7 +1342,7 @@ jobs:
   # déclenchement manuel écrivent ; une PR relit ce que `main` a écrit. Un test le vérifie
   # (test/unit/scripts/perimetre-ci.test.ts).
   image-flowvent:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     needs: [changements]
     if: contains(needs.changements.outputs.jobs, ' image-flowvent ')
@@ -1379,7 +1379,7 @@ jobs:
   # Mêmes paramètres que la publication, cache compris (scope par défaut) : une PR relit les couches
   # que `main` a écrites. Elle ne les écrit pas : voir le job `image-flowvent`.
   image-app1:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     needs: [changements]
     if: contains(needs.changements.outputs.jobs, ' image-app1 ')
@@ -1422,7 +1422,7 @@ jobs:
   # commits : une PR qui ne change pas les dépendances n'apprenait rien, et c'est le run de la nuit
   # qui voit un avis publié depuis (cf. `touchePourAudit` dans scripts/perimetre-ci.mjs).
   audit:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 8
     needs: [setup, changements]
     if: contains(needs.changements.outputs.jobs, ' audit ')
@@ -1474,7 +1474,7 @@ jobs:
   # et GitHub traite un check « skipped » comme satisfait. Il passerait donc au vert précisément
   # quand il devrait bloquer.
   ci-verte:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: always()
     needs:
       [
@@ -1535,7 +1535,7 @@ jobs:
   # Seul job du workflow à écrire quoi que ce soit : `issues: write` lui est donc réservé, le reste
   # garde le plancher en lecture seule. Il ne tourne que sur `schedule`.
   signaler-run-planifie:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: always() && github.event_name == 'schedule'
     needs: [ci-verte]
     timeout-minutes: 5
