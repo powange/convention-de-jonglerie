@@ -17,7 +17,8 @@
           <div>
             <p class="font-semibold">Débloquez les fonctionnalités d'organisation</p>
             <p class="text-sm text-muted">
-              Un abonnement actif donne accès à la gestion des bénévoles de vos événements.
+              Un abonnement actif ouvre la création d'événements et tous les modules : bénévoles,
+              billetterie, artistes, repas, stock, trésorerie.
             </p>
           </div>
         </div>

@@ -99,7 +99,7 @@ const plans = [
     price: '19 €',
     period: 'mois',
     highlight: false,
-    features: ['Événements illimités', 'Gestion des bénévoles', 'Sans engagement'],
+    features: ['Événements illimités', "Tous les modules d'organisation", 'Sans engagement'],
   },
   {
     id: 'annual' as const,
@@ -115,7 +115,7 @@ const loadingPlan = ref<string | null>(null)
 
 async function subscribe(plan: 'monthly' | 'annual') {
   if (!loggedIn.value) {
-    await navigateTo('/register')
+    await navigateTo('/login')
     return
   }
   loadingPlan.value = plan

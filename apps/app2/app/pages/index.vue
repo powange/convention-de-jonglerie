@@ -1,79 +1,233 @@
 <template>
   <div>
-    <!-- Hero -->
-    <UContainer class="py-20 text-center">
-      <div class="mb-3 flex items-center justify-center gap-2">
-        <AppLogo class="h-9 w-auto text-highlighted" />
-        <span class="text-2xl font-bold tracking-tight">Flowvent</span>
-      </div>
-      <p class="mb-6 text-base font-medium text-primary">Le flow de vos événements</p>
-      <h1 class="mx-auto max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl">
-        Organisez vos événements, gérez vos bénévoles, sans prise de tête.
-      </h1>
-      <p class="mx-auto mt-6 max-w-2xl text-lg text-muted">
-        Créez un événement et débloquez les outils d'organisation grâce à un abonnement simple,
-        mensuel ou annuel.
-      </p>
-      <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <UButton
-          :to="loggedIn ? '/dashboard' : '/register'"
-          size="lg"
-          :label="loggedIn ? 'Accéder à mon espace' : 'Commencer gratuitement'"
-          icon="i-heroicons-rocket-launch"
-        />
-        <UButton to="/pricing" size="lg" color="neutral" variant="subtle" label="Voir les tarifs" />
-      </div>
-    </UContainer>
-
-    <!-- Fonctionnalités -->
-    <UContainer class="pb-20">
-      <div class="grid gap-6 sm:grid-cols-3">
-        <UCard v-for="feature in features" :key="feature.title">
-          <div
-            class="mb-3 flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary"
-          >
-            <UIcon :name="feature.icon" class="text-2xl" />
+    <!-- Accroche : ce que fait Flowvent, en une phrase, et un aperçu de l'événement « à la carte ». -->
+    <UPageHero
+      orientation="horizontal"
+      headline="Le flow de vos événements"
+      title="Tout votre événement, au même endroit."
+      description="Bénévoles, billetterie, artistes, repas, matériel, trésorerie&nbsp;: Flowvent réunit les outils d'organisation de votre festival, de votre convention ou de votre rencontre associative. Vous n'activez que ceux dont vous avez besoin."
+      :links="liensAccroche"
+      :ui="{ headline: 'text-primary' }"
+    >
+      <!-- Aperçu décoratif : il illustre les modules qu'on allume, il ne se manipule pas. -->
+      <UCard aria-hidden="true" class="shadow-xl ring-1 ring-default" :ui="{ body: 'space-y-3' }">
+        <div class="flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <p class="truncate font-semibold">Festival des arts de la rue</p>
+            <p class="flex items-center gap-1 text-sm text-muted">
+              <UIcon name="i-heroicons-calendar-days" /> 12 – 14 juillet
+            </p>
           </div>
-          <h3 class="font-semibold">{{ feature.title }}</h3>
-          <p class="mt-1 text-sm text-muted">{{ feature.description }}</p>
-        </UCard>
-      </div>
+          <UBadge color="secondary" variant="subtle" label="3 organisateurs" class="shrink-0" />
+        </div>
+        <USeparator />
+        <ul class="space-y-2">
+          <li
+            v-for="(module, i) in modules"
+            :key="module.cle"
+            class="flex items-center gap-3 rounded-md px-2 py-1.5"
+            :class="i < MODULES_ALLUMES ? 'bg-elevated' : 'opacity-60'"
+          >
+            <UIcon :name="module.icone" class="size-5 shrink-0 text-primary" />
+            <span class="flex-1 truncate text-sm">{{ module.libelle }}</span>
+            <UBadge
+              :color="i < MODULES_ALLUMES ? 'success' : 'neutral'"
+              variant="subtle"
+              size="sm"
+              :label="i < MODULES_ALLUMES ? 'Activé' : 'Désactivé'"
+            />
+          </li>
+        </ul>
+      </UCard>
+    </UPageHero>
+
+    <!-- Les modules : lus dans le catalogue partagé, un module porté plus tard y apparaît seul. -->
+    <UPageSection
+      id="modules"
+      headline="Les modules"
+      title="Un outil par besoin, tous reliés"
+      description="Chaque module se branche sur le même événement et les mêmes personnes&nbsp;: un bénévole retrouve ses créneaux, ses repas et son billet au même endroit."
+    >
+      <UPageGrid class="xl:grid-cols-4">
+        <UPageCard
+          v-for="module in modules"
+          :key="module.cle"
+          :icon="module.icone"
+          :title="module.libelle"
+          :description="presentation[module.cle]"
+          spotlight
+        />
+        <UPageCard
+          icon="i-heroicons-user-group"
+          title="Co-organisateurs"
+          description="Invitez votre équipe et donnez à chacun les droits de son domaine&nbsp;: la billetterie à l'une, le stock à l'autre."
+          spotlight
+        />
+      </UPageGrid>
+    </UPageSection>
+
+    <!-- Le parcours, en quatre étapes. -->
+    <UPageSection
+      id="comment"
+      headline="Comment ça marche"
+      title="Prêt en quelques minutes"
+      :ui="{ root: 'bg-elevated/50' }"
+    >
+      <ol class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <li v-for="(etape, i) in etapes" :key="etape.titre" class="flex flex-col gap-3">
+          <span
+            class="flex size-10 items-center justify-center rounded-full bg-primary font-bold text-inverted"
+          >
+            {{ i + 1 }}
+          </span>
+          <h3 class="font-semibold text-highlighted">{{ etape.titre }}</h3>
+          <p class="text-sm text-muted">{{ etape.description }}</p>
+        </li>
+      </ol>
+    </UPageSection>
+
+    <!-- Pourquoi Flowvent. -->
+    <UPageSection
+      headline="Pourquoi Flowvent"
+      title="Pensé pour les équipes d'organisation"
+      :features="atouts"
+    />
+
+    <!-- Dernier appel, avec l'abonnement en clair. -->
+    <UPageSection :ui="{ container: 'pt-0 sm:pt-0 lg:pt-0' }">
+      <UPageCTA
+        variant="subtle"
+        title="Lancez votre prochain événement"
+        description="Le compte est gratuit. Un abonnement mensuel ou annuel, sans engagement, débloque la création d'événements et tous les modules."
+        :links="liensFinaux"
+      />
 
       <UAlert
-        class="mt-10"
+        class="mt-8"
         color="warning"
         variant="subtle"
         icon="i-heroicons-information-circle"
         title="Version de démonstration"
         description="Le paiement est simulé : aucun prestataire réel n'est appelé et aucune carte n'est demandée. L'abonnement s'active immédiatement."
       />
-    </UContainer>
+    </UPageSection>
   </div>
 </template>
 
 <script setup lang="ts">
-const { loggedIn } = useUserSession()
+import type { ButtonProps, PageFeatureProps } from '@nuxt/ui'
+
+import { modulesDisponibles, type CleModule } from '#shared/modules-evenement'
+
+// Connecté, on n'a rien à faire sur la vitrine : `guest-only` envoie au tableau de bord.
+definePageMeta({ middleware: 'guest-only' })
 
 useSeoMeta({
   title: "Flowvent — Organisation d'événements",
-  description: 'Créez vos événements et gérez vos bénévoles avec un abonnement simple.',
+  description:
+    "Bénévoles, billetterie, artistes, repas, stock et trésorerie\u00a0: tous les outils d'organisation de votre événement, au même endroit.",
 })
 
-const features = [
+const modules = modulesDisponibles()
+
+/** Dans l'aperçu de l'accroche, les premiers modules sont allumés, les autres non. */
+const MODULES_ALLUMES = 5
+
+/*
+ * Le catalogue décrit chaque module pour l'organisateur qui l'allume ; l'accueil le présente à
+ * quelqu'un qui découvre Flowvent. `Record<CleModule, …>` : un module ajouté au catalogue fait
+ * échouer le typage tant que sa présentation manque, au lieu d'afficher une carte vide.
+ */
+const presentation: Record<CleModule, string> = {
+  benevoles:
+    'Une page publique pour candidater, des équipes, un planning des créneaux, les échanges entre bénévoles et les rappels.',
+  carte: 'Dessinez les zones et les repères du lieu, pour que chacun sache où aller.',
+  stock: 'Inventaire du matériel, emplacements sur le site et suivi des prêts.',
+  artistes:
+    'Artistes invités, spectacles, appels à spectacles, et un espace où chaque artiste suit sa venue.',
+  repas: 'Les repas des bénévoles, des artistes et des organisateurs, et leur validation.',
+  billetterie: "Vos tarifs et commandes HelloAsso, et le contrôle des billets à l'entrée.",
+  tresorerie: 'Dépenses, recettes et justificatifs, avec les montants de tous les modules.',
+}
+
+const liensAccroche: ButtonProps[] = [
+  { label: 'Créer mon compte', to: '/login', size: 'xl', icon: 'i-heroicons-rocket-launch' },
   {
-    icon: 'i-heroicons-calendar-days',
-    title: 'Créez vos événements',
-    description: 'Centralisez les informations clés de chaque événement en quelques clics.',
+    label: 'Comment ça marche',
+    to: '#comment',
+    size: 'xl',
+    color: 'neutral',
+    variant: 'subtle',
+    trailingIcon: 'i-heroicons-arrow-down',
+  },
+]
+
+const liensFinaux: ButtonProps[] = [
+  { label: 'Créer mon compte', to: '/login', icon: 'i-heroicons-rocket-launch' },
+  {
+    label: 'Voir les tarifs',
+    to: '/pricing',
+    color: 'neutral',
+    variant: 'subtle',
+    trailingIcon: 'i-heroicons-arrow-right',
+  },
+]
+
+const etapes = [
+  {
+    titre: 'Créez votre compte',
+    description: "Une adresse e-mail suffit, ou votre compte Google. C'est gratuit.",
   },
   {
-    icon: 'i-heroicons-user-group',
-    title: 'Gérez vos bénévoles',
-    description: "Accédez aux outils d'organisation des bénévoles une fois abonné.",
+    titre: 'Créez votre événement',
+    description: 'Abonnez-vous, puis indiquez le nom, le lieu et les dates.',
+  },
+  {
+    titre: 'Activez vos modules',
+    description: 'Allumez seulement ce qui vous sert. Désactiver un module ne supprime rien.',
+  },
+  {
+    titre: 'Embarquez votre équipe',
+    description:
+      'Invitez vos co-organisateurs. Les bénévoles et les artistes vous rejoignent par la page publique.',
+  },
+]
+
+const atouts: PageFeatureProps[] = [
+  {
+    icon: 'i-heroicons-squares-plus',
+    title: 'À la carte',
+    description:
+      "Un petit événement n'a pas besoin de tout. Vous composez le vôtre, et vous changez d'avis quand vous voulez.",
+  },
+  {
+    icon: 'i-heroicons-link',
+    title: 'Tout est relié',
+    description:
+      "Les modules partagent les mêmes personnes\u00a0: plus de tableurs à recopier d'un outil à l'autre.",
+  },
+  {
+    icon: 'i-heroicons-shield-check',
+    title: 'Des droits par domaine',
+    description:
+      'Chaque co-organisateur voit et modifie ce qui le concerne. Le propriétaire garde la main sur tout.',
+  },
+  {
+    icon: 'i-heroicons-device-phone-mobile',
+    title: 'Dans la poche',
+    description:
+      'Bénévoles et organisateurs consultent leur planning depuis leur téléphone, sur place.',
+  },
+  {
+    icon: 'i-heroicons-globe-europe-africa',
+    title: 'Au bon fuseau',
+    description: "Les horaires suivent le fuseau de l'événement, où que se trouve votre équipe.",
   },
   {
     icon: 'i-heroicons-credit-card',
-    title: 'Abonnement simple',
-    description: 'Mensuel ou annuel, sans engagement. Paiement simulé pour cette démo.',
+    title: 'Un abonnement simple',
+    description:
+      "Mensuel ou annuel, sans engagement. Vos co-organisateurs n'ont pas besoin du leur.",
   },
 ]
 </script>
