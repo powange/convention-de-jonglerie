@@ -11,7 +11,7 @@ import {
   lireEtatRestauration,
   restaurationEnCours,
   _reinitialiserJobs,
-} from '../../../../server/utils/backup-restore-job'
+} from '../../../../../../layers/backup/server/utils/backup-restore-job'
 
 vi.mock('fs', () => {
   const mod = { createReadStream: vi.fn() }

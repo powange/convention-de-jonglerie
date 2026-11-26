@@ -16,7 +16,7 @@ export function getTranslationsToLoad(path: string): string[] {
 
   // Routes statiques
   const routeTranslations: Record<string, string[]> = {
-    '/admin': ['admin', 'auth', 'profil'],
+    '/admin': ['admin', 'admin-backup', 'auth', 'profil'],
     '/editions': ['edition'],
     /*
      * ⚠️ `/conventions` NE TOMBAIT SOUS AUCUNE RÈGLE, et les clés `conventions.*` vivent dans
@@ -235,6 +235,21 @@ export function getTranslationsToLoad(path: string): string[] {
 }
 
 export const translationLoaders: Record<string, Record<string, () => Promise<any>>> = {
+  'admin-backup': {
+    en: () => import('../../../../layers/backup/i18n/locales/en/admin-backup.json'),
+    da: () => import('../../../../layers/backup/i18n/locales/da/admin-backup.json'),
+    de: () => import('../../../../layers/backup/i18n/locales/de/admin-backup.json'),
+    es: () => import('../../../../layers/backup/i18n/locales/es/admin-backup.json'),
+    fr: () => import('../../../../layers/backup/i18n/locales/fr/admin-backup.json'),
+    it: () => import('../../../../layers/backup/i18n/locales/it/admin-backup.json'),
+    nl: () => import('../../../../layers/backup/i18n/locales/nl/admin-backup.json'),
+    pl: () => import('../../../../layers/backup/i18n/locales/pl/admin-backup.json'),
+    pt: () => import('../../../../layers/backup/i18n/locales/pt/admin-backup.json'),
+    ru: () => import('../../../../layers/backup/i18n/locales/ru/admin-backup.json'),
+    uk: () => import('../../../../layers/backup/i18n/locales/uk/admin-backup.json'),
+    cs: () => import('../../../../layers/backup/i18n/locales/cs/admin-backup.json'),
+    sv: () => import('../../../../layers/backup/i18n/locales/sv/admin-backup.json'),
+  },
   admin: {
     en: () => import('~~/i18n/locales/en/admin.json'),
     da: () => import('~~/i18n/locales/da/admin.json'),

@@ -7,7 +7,7 @@ import { createWriteStream } from 'fs'
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import handler from '../../../../../server/api/admin/backup/upload.post'
+import handler from '../../../../../../../layers/backup/server/api/admin/backup/upload.post'
 
 const written = vi.hoisted(() => ({ chunks: [] as Buffer[], path: '' }))
 

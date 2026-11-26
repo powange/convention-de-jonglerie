@@ -166,6 +166,7 @@ export default defineNuxtConfig({
     '../../layers/artists',
     '../../layers/ticketing',
     '../../layers/treasury',
+    '../../layers/backup',
     '../../layers/auth',
   ],
 
@@ -534,6 +535,8 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    // Début du nom des archives de sauvegarde (layer backup).
+    sauvegarde: { prefixe: 'juggling-convention' },
     // Version Nuxt (injectée au build)
     nuxtVersion,
     // Private keys that are only available on the server

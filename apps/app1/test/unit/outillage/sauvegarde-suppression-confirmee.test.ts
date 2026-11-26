@@ -32,7 +32,7 @@ import { describe, expect, it } from 'vitest'
  * que le `confirm()` natif n'est pas revenu.
  */
 const RACINE = path.resolve(__dirname, '../../../../..')
-const PAGE = 'apps/app1/app/pages/admin/backup.vue'
+const PAGE = 'layers/backup/app/components/admin/GestionDesSauvegardes.vue'
 
 /** Le code de la page, commentaires retirés — ceux de HTML compris. */
 function sansCommentaires(): string {
@@ -89,7 +89,10 @@ describe('administration — supprimer une sauvegarde', () => {
     // 📍 Et c'est le cas qui empêche la régression inverse : le code peut passer les trois faits
     // à une phrase qui n'en cite aucun, et la modale n'en afficherait pas plus qu'avant.
     const admin = JSON.parse(
-      fs.readFileSync(path.resolve(RACINE, 'apps/app1/i18n/locales/fr/admin.json'), 'utf8')
+      fs.readFileSync(
+        path.resolve(RACINE, 'layers/backup/i18n/locales/fr/admin-backup.json'),
+        'utf8'
+      )
     ).admin
     for (const jeton of ['{filename}', '{date}', '{size}']) {
       expect(admin.backup_delete_confirm, jeton).toContain(jeton)

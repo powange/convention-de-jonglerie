@@ -39,7 +39,10 @@ import { describe, expect, it } from 'vitest'
  * lui, a ses propres cinq tests unitaires (`synchronisation-unique.test.ts`) ; ce qui restait à
  * prouver est que ce point d'API y passe.
  */
-const SOURCE = join(import.meta.dirname, '../../../server/api/admin/backup/create.post.ts')
+const SOURCE = join(
+  import.meta.dirname,
+  '../../../../../layers/backup/server/api/admin/backup/create.post.ts'
+)
 
 function code(): string {
   // Les commentaires sont retirés : ce fichier EXPLIQUE l'ancien `maxBuffer` et l'ancien

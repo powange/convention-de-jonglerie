@@ -149,7 +149,8 @@
     "vegan": "Végan",
     "vegetarian": "Végétarien",
     "collapse": "Replier",
-    "expand": "Déplier"
+    "expand": "Déplier",
+    "download": "Télécharger"
   },
   "components": {
     "date_time_picker": {

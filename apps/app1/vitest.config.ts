@@ -52,6 +52,8 @@ const aliasHorsNuxt = {
   '#meals': resolve(__dirname, '../../layers/meals'),
   // Déclaré par `layers/treasury/nuxt.config.ts`.
   '#treasury': resolve(__dirname, '../../layers/treasury'),
+  // Déclaré par `layers/backup/nuxt.config.ts`.
+  '#backup': resolve(__dirname, '../../layers/backup'),
 }
 
 export default defineConfig({

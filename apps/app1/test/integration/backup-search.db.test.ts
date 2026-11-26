@@ -5,7 +5,7 @@ import { promisify } from 'util'
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 
-import { backupsDir } from '../../server/utils/backup-files'
+import { backupsDir } from '../../../../layers/backup/server/utils/backup-files'
 import {
   collectSearchableTables,
   listSearchableTables,
@@ -13,7 +13,7 @@ import {
   scanDumpStructure,
   searchBackups,
   validateSearchRequest,
-} from '../../server/utils/backup-search'
+} from '../../../../layers/backup/server/utils/backup-search'
 import { prismaTest } from '../setup-db'
 
 const execFileAsync = promisify(execFile)

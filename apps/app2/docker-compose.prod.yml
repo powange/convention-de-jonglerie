@@ -86,6 +86,9 @@ services:
       NUXT_FILE_STORAGE_MOUNT: '/uploads'
     volumes:
       - uploads_data:/uploads
+      # Sauvegardes de la base faites depuis l'administration (layer backup) : elles doivent
+      # survivre aux redéploiements, comme les fichiers déposés.
+      - backups_data:/app/apps/app2/backups
     depends_on:
       flowvent-db-prod:
         condition: service_healthy
@@ -95,6 +98,9 @@ volumes:
     driver: local
   # Photos de profil déposées (montées en /uploads dans l'app).
   uploads_data:
+    driver: local
+  # Sauvegardes de la base (montées dans l'app, cf. ci-dessus).
+  backups_data:
     driver: local
 
 networks:
