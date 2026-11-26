@@ -143,5 +143,24 @@ de le désactiver. API : `/api/admin/promo-codes` (garde `exigerAdministrateur`)
 
 - Paiement **simulé** : aucun renouvellement automatique n'existe encore. `advantageEndsAt` est
   enregistré pour le jour où un prestataire facturera les périodes suivantes.
-- L'aperçu public n'est pas limité en débit : un code court se devine. Préférer des codes longs pour
-  les gratuités.
+- L'aperçu public est limité à vingt essais par minute et par adresse (`codePromoRateLimiter`). Un
+  code court reste plus facile à deviner : préférer des codes longs pour les gratuités.
+
+## Rappel avant la fin d'une période
+
+Le paiement étant simulé, aucun abonnement ne se renouvelle seul. La tâche planifiée
+`subscription-end-reminders` (`apps/app2/server/tasks/`, chaque jour à 9 h) écrit **15 jours avant**
+la fin de chaque période. Le message (`apps/app2/shared/rappel-fin-abonnement.ts`) dit :
+
+- la formule et la date de fin ; pour une gratuité, que la période offerte s'achève ;
+- ce que devient le code : acquis s'il est « à vie », encore valable au renouvellement si son
+  avantage court au-delà, sinon qu'il prend fin avec la période ;
+- qu'à défaut de renouvellement la gestion passe en lecture seule, sans rien supprimer.
+
+Un seul rappel par période (`Subscription.endReminderFor`). Un envoi échoué n'est pas retenu : le
+passage du lendemain réessaie. Comme les autres tâches, celle-ci ne tourne qu'en production, ou avec
+`ENABLE_CRON=true`.
+
+**Renouveler** la même formule (même période, mêmes modules) avant la fin **prolonge** la période :
+la nouvelle commence à la fin de l'ancienne. Un code « premier paiement » ne resservira pas : un
+avantage qui s'achève avant le début de la période payée ne la couvre pas.

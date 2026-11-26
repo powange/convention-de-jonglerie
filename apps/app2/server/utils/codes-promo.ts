@@ -52,9 +52,13 @@ export async function refusPourLeCompte(
 export async function codeRepris(
   userId: number,
   formule: string,
-  periode: string
+  periode: string,
+  /**
+   * Le début de la période payée. Un avantage qui s'achève avant ne la couvre pas : sans cela, un
+   * code « premier paiement » resservirait au renouvellement, qui commence à la fin de la période.
+   */
+  debut: Date = new Date()
 ): Promise<{ code: PromoCode; finAvantage: Date | null } | null> {
-  const maintenant = new Date()
   const abonnement = await prisma.subscription.findUnique({
     where: { userId },
     select: { advantageEndsAt: true, promoCode: true },
@@ -62,7 +66,7 @@ export async function codeRepris(
   const enCours = abonnement?.promoCode
   if (enCours && couvre(enCours, formule, periode)) {
     const fin = abonnement.advantageEndsAt
-    if (enCours.duration === 'forever' || (fin && fin > maintenant)) {
+    if (enCours.duration === 'forever' || (fin && fin > debut)) {
       return { code: enCours, finAvantage: enCours.duration === 'forever' ? null : fin }
     }
   }

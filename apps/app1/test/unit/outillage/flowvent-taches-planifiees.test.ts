@@ -21,16 +21,19 @@ const DEPOT = resolve(process.cwd(), '..', '..')
 const lire = (chemin: string) => readFileSync(join(DEPOT, chemin), 'utf8')
 
 describe('Flowvent — tâches planifiées', () => {
-  it('chaque tâche du catalogue existe dans un layer (bénévoles ou core)', () => {
+  it('chaque tâche du catalogue existe dans un layer (bénévoles ou core) ou dans Flowvent', () => {
     const noms = [
       ...lire('apps/app2/server/utils/taches-planifiees.ts').matchAll(/name:\s*'([^']+)'/g),
     ].map((m) => m[1]!)
     expect(noms.length).toBeGreaterThan(0)
     const absentes = noms.filter(
       (nom) =>
-        !['layers/volunteers/server/tasks', 'layers/core/server/tasks'].some((dossier) =>
-          existsSync(join(DEPOT, dossier, `${nom}.ts`))
-        )
+        ![
+          'layers/volunteers/server/tasks',
+          'layers/core/server/tasks',
+          // Propres à Flowvent (rappel de fin d'abonnement).
+          'apps/app2/server/tasks',
+        ].some((dossier) => existsSync(join(DEPOT, dossier, `${nom}.ts`)))
     )
     expect(absentes).toEqual([])
   })
