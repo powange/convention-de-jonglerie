@@ -77,11 +77,10 @@
  * seulement avec une équipe volante ; responsable d'équipe → notifications et renforts seuls).
  * Libellés en clair : Flowvent est en français seul, comme ses autres écrans.
  */
-import type { NavigationMenuItem } from '@nuxt/ui'
+import { useEditionStore } from '~/stores/editions'
 
 import type { Droits, Modules } from '#shared/modules-evenement'
-
-import { useEditionStore } from '~/stores/editions'
+import type { NavigationMenuItem } from '@nuxt/ui'
 
 const route = useRoute()
 const editionStore = useEditionStore()

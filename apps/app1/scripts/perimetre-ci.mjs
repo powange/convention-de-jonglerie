@@ -14,7 +14,11 @@
  *   5 à 12 minutes, sans modifier une ligne d'app1. ⚠️ On ne saute PAS TOUT : quatre tests
  *   d'outillage d'app1 lisent des fichiers d'app2 comme du texte (flowvent-libelles-benevoles,
  *   flowvent-modules-evenement, flowvent-taches-planifiees, notification-create-titre), donc une PR
- *   d'app2 peut faire tomber la suite UNITAIRE ; et ESLint tourne depuis la racine, sur app2 aussi.
+ *   d'app2 peut faire tomber la suite UNITAIRE ; et `lint` vérifie app2 (ESLint et Prettier).
+ *   ⚠️ Cette dernière affirmation a été FAUSSE jusqu'au 26/11/2026 : eslint.config.mjs excluait
+ *   `apps/app2/**` et `format:check` ne lisait pas app2, si bien que `lint` tournait pour rien sur
+ *   ces PR et qu'app2 n'avait aucun contrôle de code. Avant de justifier un job par ce qu'il
+ *   couvre, vérifier ce qu'il couvre.
  *
  * - `amorcage` — un push sur `main`. La règle de `main` exige `ci-verte` sur une branche À JOUR et
  *   les merges se font en squash : l'arbre qui arrive sur `main` est celui que la PR vient de
@@ -48,6 +52,7 @@ const PREFIXE_APP2 = 'apps/app2/'
  */
 export const JOBS_PAR_PERIMETRE = {
   complet: ['lint', 'typecheck', 'build', 'test-unit', 'test', 'base-de-test', 'playwright'],
+  // `lint` vérifie app2 (ESLint + Prettier), `test-unit` les tests d'outillage qui la lisent.
   'app2-seul': ['lint', 'test-unit'],
   // `base-de-test` écrit le cache du dump SQL, `navigateurs` celui de Chromium. `setup`, qui écrit
   // node_modules et le client Prisma, tourne de toute façon.

@@ -22,9 +22,6 @@ declare module '#auth-utils' {
     user?: User
     loggedInAt?: string
   }
-
-  // Pas de données de session « secure » spécifiques pour le moment.
-  interface SecureSessionData {}
 }
 
 export {}

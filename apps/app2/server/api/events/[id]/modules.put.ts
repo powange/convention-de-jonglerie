@@ -1,7 +1,5 @@
 import { z } from 'zod'
 
-import type { CleModule } from '../../../../shared/modules-evenement'
-
 import { modulesDisponibles } from '../../../../shared/modules-evenement'
 import {
   droitsSurEvenement,
@@ -9,6 +7,8 @@ import {
   selectionModules,
 } from '../../../utils/droits-evenement'
 import { idDepuisLaRoute } from '../../../utils/evenement-public'
+
+import type { CleModule } from '../../../../shared/modules-evenement'
 
 /**
  * Active ou désactive un ou plusieurs modules d'un événement (`{ stock: true }`…). Droit « modifier

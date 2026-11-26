@@ -55,13 +55,24 @@ const nuxtConfigs = await createConfigForNuxt({
 
 export default [
   ...reroot(nuxtConfigs),
-  // La 2ᵉ app est un projet Nuxt séparé avec sa propre config → exclue du lint principal.
+  // La 2ᵉ app (Flowvent) est lintée avec les mêmes règles : longtemps exclue en entier
+  // ('apps/app2/**'), elle n'avait AUCUN contrôle de code en CI hors son build Docker — alors que
+  // la CI disait le contraire. Seuls ses fichiers générés et ses dépendances restent exclus.
   // Le client Prisma généré ne doit jamais être linté (ignore explicite : l'intégration
   // gitignore de withNuxt ne couvre pas ce chemin de façon fiable en monorepo).
   // Les rapports Playwright embarquent un visualiseur minifié : lintés, ils produisent des
   // centaines d'erreurs qui noient les vraies. Gitignorés, mais l'intégration gitignore de
   // withNuxt ne couvre pas ce chemin en monorepo.
-  { ignores: ['apps/app2/**', `${APP_DIR}/server/generated/**`, 'playwright-report/**'] },
+  {
+    ignores: [
+      'apps/app2/node_modules/**',
+      'apps/app2/.nuxt/**',
+      'apps/app2/.output/**',
+      'apps/app2/server/generated/**',
+      `${APP_DIR}/server/generated/**`,
+      'playwright-report/**',
+    ],
+  },
   // Règles globales légères pour réduire le bruit sans masquer les erreurs importantes
   {
     files: ['**/*.{js,cjs,mjs,ts,tsx,vue}'],
@@ -139,10 +150,19 @@ export default [
       '@typescript-eslint/no-unused-vars': 'off',
     },
   },
-  // Pages/layouts des layers : mêmes exceptions que pour le cœur (le preset Nuxt ne couvre que
-  // l'app principale). Les noms de pages à un mot (index, list, validate…) sont légitimes.
+  // Pages/layouts des layers, pages/layouts/composants de Flowvent : mêmes exceptions que pour le cœur (le preset Nuxt
+  // ne couvre que l'app principale). Les noms de pages à un mot (index, list, validate…) sont
+  // légitimes.
   {
-    files: ['layers/*/app/pages/**/*.vue', 'layers/*/app/layouts/**/*.vue'],
+    files: [
+      'layers/*/app/pages/**/*.vue',
+      'layers/*/app/layouts/**/*.vue',
+      'apps/app2/app/pages/**/*.vue',
+      'apps/app2/app/layouts/**/*.vue',
+      // Les composants de Flowvent sont nommés par leur chemin (`edition/Header.vue` → `EditionHeader`),
+      // comme ceux d'app1, pour qui le preset Nuxt coupe déjà cette règle.
+      'apps/app2/app/components/**/*.vue',
+    ],
     rules: {
       'vue/multi-word-component-names': 'off',
     },

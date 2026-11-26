@@ -39,10 +39,19 @@
 
     <!-- Offres -->
     <div v-else class="mx-auto grid max-w-3xl gap-6 md:grid-cols-2">
-      <UCard v-for="plan in plans" :key="plan.id" :class="plan.highlight ? 'ring-2 ring-primary' : ''">
+      <UCard
+        v-for="plan in plans"
+        :key="plan.id"
+        :class="plan.highlight ? 'ring-2 ring-primary' : ''"
+      >
         <div class="flex items-center justify-between">
           <h3 class="text-lg font-semibold">{{ plan.name }}</h3>
-          <UBadge v-if="plan.highlight" color="primary" variant="subtle" label="Le plus avantageux" />
+          <UBadge
+            v-if="plan.highlight"
+            color="primary"
+            variant="subtle"
+            label="Le plus avantageux"
+          />
         </div>
         <p class="mt-4">
           <span class="text-3xl font-bold">{{ plan.price }}</span>

@@ -1,6 +1,6 @@
-import { optionalAuth } from '#server/utils/auth-utils'
-
 import { resoudreEvenement } from '../../../utils/evenement-public'
+
+import { optionalAuth } from '#server/utils/auth-utils'
 
 /**
  * `{ id, publicId }` d'un événement désigné par son numéro ou son identifiant public — ce dont

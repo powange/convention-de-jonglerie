@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
-import { fuseauUtilisable, versInstant } from '#core/shared/utils/fuseau-edition'
-
 import { droitsSurEvenement } from '../../utils/droits-evenement'
 import { idDepuisLaRoute } from '../../utils/evenement-public'
+
+import { fuseauUtilisable, versInstant } from '#core/shared/utils/fuseau-edition'
 
 /**
  * Modifie un événement : nom, description, lieu, dates de début et de fin, fuseau.

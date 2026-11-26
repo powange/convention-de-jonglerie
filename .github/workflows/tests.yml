@@ -81,8 +81,9 @@ jobs:
   # Le périmètre du run, et la liste des jobs qu'il lance.
   #
   #   complet    PR qui touche autre chose qu'app2, run planifié, déclenchement manuel
-  #   app2-seul  PR limitée à `apps/app2/` : setup, lint et test-unit seulement — quatre tests
-  #              d'outillage d'app1 lisent des fichiers d'app2, le reste ne lit qu'app1
+  #   app2-seul  PR limitée à `apps/app2/` : setup, lint et test-unit seulement — `lint` vérifie
+  #              app2 (ESLint + Prettier), quatre tests d'outillage d'app1 lisent des fichiers
+  #              d'app2, le reste ne lit qu'app1
   #   amorcage   push sur `main` : setup, base-de-test et navigateurs, qui écrivent les caches que
   #              TOUTES les PR lisent. Le code, lui, vient d'être testé dans sa PR : la règle de
   #              `main` exige `ci-verte` sur une branche à jour, et le squash ne change pas l'arbre.

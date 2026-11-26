@@ -1,3 +1,4 @@
+import { selectionDroits } from '../../../../utils/droits-evenement'
 import {
   droitsAffiches,
   droitsEnBase,
@@ -5,7 +6,6 @@ import {
   organisateurDeLaRoute,
   schemaDroits,
 } from '../../../../utils/organisateurs-evenement'
-import { selectionDroits } from '../../../../utils/droits-evenement'
 
 /** Règle les droits d'un organisateur (un ou plusieurs domaines à la fois). */
 const schema = schemaDroits.refine((d) => Object.keys(d).length > 0, 'Aucun droit à modifier')

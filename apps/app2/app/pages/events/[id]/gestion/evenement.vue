@@ -157,9 +157,9 @@
  * (`versChampLocal`) ; le serveur les ancre dans ce fuseau (PUT /api/events/:id). Changer le fuseau
  * réinterprète donc les heures affichées : 10 h reste 10 h, mais dans le nouveau fuseau.
  */
-import { versChampLocal } from '#core/shared/utils/fuseau-edition'
-
 import { useEditionStore } from '~/stores/editions'
+
+import { versChampLocal } from '#core/shared/utils/fuseau-edition'
 
 definePageMeta({ middleware: ['subscription'] })
 
