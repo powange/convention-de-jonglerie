@@ -216,6 +216,7 @@ model Subscription {
   promoCodeId      Int?
   advantageEndsAt  DateTime? // fin de l'avantage du code ; null avec un code : à vie
   amountPaid       Int? // centimes payés pour la période en cours (paiement simulé)
+  endReminderFor   DateTime? // fin de période pour laquelle le rappel est parti (un seul par période)
 
   @@index([promoCodeId])
 }

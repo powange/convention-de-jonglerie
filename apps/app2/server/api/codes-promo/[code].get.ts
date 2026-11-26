@@ -1,5 +1,6 @@
 import { prixRemise, resumeAvantage } from '../../../shared/codes-promo'
 import { FORMULES, PERIODES } from '../../../shared/formules'
+import { codePromoRateLimiter } from '../../utils/api-rate-limiter'
 import { chargerCode, refusPourLeCompte } from '../../utils/codes-promo'
 
 /**
@@ -12,6 +13,8 @@ import { chargerCode, refusPourLeCompte } from '../../utils/codes-promo'
  * erreur.
  */
 export default defineEventHandler(async (event) => {
+  // Limité en débit : un code court se devinerait en les essayant tous.
+  await codePromoRateLimiter(event)
   const session = await getUserSession(event)
   const utilisateur = session.user as { id: number; email?: string } | undefined
   const code = await chargerCode(getRouterParam(event, 'code'))

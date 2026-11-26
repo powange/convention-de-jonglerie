@@ -1,7 +1,8 @@
 /**
  * Les tâches planifiées de Flowvent — le pendant de `apps/app1/server/utils/scheduled-tasks.ts`.
  *
- * Celles du layer bénévoles, et le nettoyage des dépôts temporaires (layers/core) : les autres
+ * Celles du layer bénévoles, le nettoyage des dépôts temporaires (layers/core), et le rappel de fin
+ * d'abonnement, propre à Flowvent (server/tasks/ de l'app) : les autres
  * tâches d'app1 (favoris, billetterie, journal d'erreurs…) servent des modules que Flowvent n'a
  * pas. Mêmes noms, mêmes fréquences qu'app1 : le nom est celui du fichier dans le
  * `server/tasks/` d'un layer, que Nitro enregistre.
@@ -34,5 +35,13 @@ export const TACHES_PLANIFIEES: TachePlanifiee[] = [
     description:
       "Supprime les photos déposées puis abandonnées dans le dossier temporaire (plus d'une heure)",
     cronExpression: '15 * * * *',
+  },
+  {
+    // Propre à Flowvent (server/tasks/ de l'app) : le paiement est simulé, aucun abonnement ne se
+    // renouvelle seul ; on prévient 15 jours avant la fin de la période (shared/rappel-fin-abonnement.ts).
+    name: 'subscription-end-reminders',
+    description:
+      "Prévient par courriel, 15 jours avant, la fin d'un abonnement ou d'une période offerte",
+    cronExpression: '0 9 * * *',
   },
 ]

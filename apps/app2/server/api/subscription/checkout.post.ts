@@ -17,7 +17,11 @@ import {
 } from '../../../shared/formules'
 import { chargerCode, codeRepris, refusPourLeCompte } from '../../utils/codes-promo'
 import prisma, { Prisma } from '../../utils/prisma'
-import { SUBSCRIPTION_FORMULES, SUBSCRIPTION_PLANS } from '../../utils/subscription'
+import {
+  SUBSCRIPTION_FORMULES,
+  SUBSCRIPTION_PLANS,
+  isSubscriptionActive,
+} from '../../utils/subscription'
 
 import type { PromoCode } from '#server/types/prisma'
 
@@ -47,7 +51,23 @@ export default defineEventHandler(async (event) => {
   const erreur = erreurChoixModules(formule, modules)
   if (erreur) throw createError({ status: 400, message: erreur })
 
-  const debut = new Date()
+  // RENOUVELER la même formule avant la fin prolonge la période en cours : la nouvelle commence à sa
+  // fin (c'est ce que promet le courriel de rappel, shared/rappel-fin-abonnement.ts). Changer de
+  // formule, de période ou de modules, ou repartir après une interruption, commence maintenant.
+  const existant = await prisma.subscription.findUnique({
+    where: { userId },
+    select: { status: true, currentPeriodEnd: true, formule: true, plan: true, modules: true },
+  })
+  const memesModules =
+    JSON.stringify([...modulesCouverts(formule, modules)].sort()) ===
+    JSON.stringify([...modulesCouverts(existant?.formule, existant?.modules)].sort())
+  const renouvellement =
+    !!existant &&
+    isSubscriptionActive(existant) &&
+    existant.formule === formule &&
+    existant.plan === plan &&
+    memesModules
+  const debut = renouvellement ? existant.currentPeriodEnd : new Date()
   const finPremiere = finDePeriode(debut, plan)
   const prix = definitionFormule(formule)!.prix[plan]
 
@@ -56,7 +76,7 @@ export default defineEventHandler(async (event) => {
   let nouvelleUtilisation = false
   let avantageJusquau: Date | null = null
   const saisi = normaliserCode(resultat.data.code)
-  const repris = await codeRepris(userId, formule, plan)
+  const repris = await codeRepris(userId, formule, plan, debut)
   if (saisi && repris?.code.code !== saisi) {
     const code = await chargerCode(saisi)
     if (!code)
