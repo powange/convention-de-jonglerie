@@ -20,9 +20,9 @@ vi.mock('#server/utils/auth-utils', () => ({
   requireAuth: vi.fn((event) => event.context.user),
 }))
 
-import creer from '../../../../../server/api/editions/[id]/treasury/entries.post'
-import modifier from '../../../../../server/api/editions/[id]/treasury/entries/[entryId].put'
-import lire from '../../../../../server/api/editions/[id]/treasury/index.get'
+import creer from '../../../../../../../layers/treasury/server/api/editions/[id]/treasury/entries.post'
+import modifier from '../../../../../../../layers/treasury/server/api/editions/[id]/treasury/entries/[entryId].put'
+import lire from '../../../../../../../layers/treasury/server/api/editions/[id]/treasury/index.get'
 import { global } from '../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma

@@ -27,6 +27,7 @@ const SOURCES = [
   'layers/artists/app',
   'layers/ticketing/app',
   'layers/meals/app',
+  'layers/treasury/app',
 ]
 
 /** Les clés construites à l'exécution : seul leur préfixe est connu, il doit avoir des entrées. */

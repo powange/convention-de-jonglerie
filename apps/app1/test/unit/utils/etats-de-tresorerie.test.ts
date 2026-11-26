@@ -5,7 +5,7 @@ import {
   estAvancee,
   estPrevisionnelle,
   ETATS_DE_TRESORERIE,
-} from '../../../app/utils/etats-de-tresorerie'
+} from '../../../../../layers/treasury/app/utils/etats-de-tresorerie'
 
 /**
  * Le filtre par état d'une ligne de trésorerie.

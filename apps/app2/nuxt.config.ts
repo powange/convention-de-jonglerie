@@ -29,6 +29,7 @@ export default defineNuxtConfig({
   // - `artists` : artistes et spectacles, lots 4 et 5.
   // - `ticketing` : billetterie (HelloAsso seul), lot 6.
   // - `meals` : repas, lot 7.
+  // - `treasury` : trésorerie, lot 8.
   extends: [
     '../../layers/ui',
     '../../layers/core',
@@ -39,6 +40,7 @@ export default defineNuxtConfig({
     '../../layers/artists',
     '../../layers/ticketing',
     '../../layers/meals',
+    '../../layers/treasury',
   ],
 
   hooks: {
@@ -152,6 +154,7 @@ export default defineNuxtConfig({
           '../../../../layers/ticketing/i18n/locales/fr/ticketing.json',
           '../../../../layers/ticketing/i18n/locales/fr/gestion-ticketing.json',
           '../../../../layers/meals/i18n/locales/fr/gestion-meals.json',
+          '../../../../layers/treasury/i18n/locales/fr/gestion-treasury.json',
           'benevoles.json',
           'interface.json',
           'fr.json',

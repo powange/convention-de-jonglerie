@@ -133,7 +133,7 @@ export const MODULES_EVENEMENT: readonly DefinitionModule[] = [
     description: 'Dépenses, recettes et justificatifs.',
     icone: 'i-heroicons-banknotes',
     droit: 'tresorerie',
-    disponible: false,
+    disponible: true,
   },
 ]
 

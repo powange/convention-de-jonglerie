@@ -10,7 +10,7 @@ import {
   soldeDe,
   totalDesGroupes,
   type LigneTresorerie,
-} from '../../../app/utils/export-tresorerie'
+} from '../../../../../layers/treasury/app/utils/export-tresorerie'
 
 /**
  * L'export PDF de la trésorerie.

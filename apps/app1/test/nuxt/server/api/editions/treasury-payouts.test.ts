@@ -16,7 +16,7 @@ vi.mock('#server/utils/auth-utils', () => ({
   requireAuth: vi.fn((event) => event.context.user),
 }))
 
-import handler from '../../../../../server/api/editions/[id]/treasury/payouts.get'
+import handler from '../../../../../../../layers/treasury/server/api/editions/[id]/treasury/payouts.get'
 import { global } from '../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma

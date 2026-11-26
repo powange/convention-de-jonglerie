@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { codesProposes } from '../../../app/utils/codes-tresorerie'
+import { codesProposes } from '../../../../../layers/treasury/app/utils/codes-tresorerie'
 
 /**
  * Trois règles se superposent ici — le sens de la ligne, la recherche, le code déjà posé — et

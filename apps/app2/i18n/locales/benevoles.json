@@ -147,7 +147,9 @@
     "teardown": "Démontage",
     "type": "Type",
     "vegan": "Végan",
-    "vegetarian": "Végétarien"
+    "vegetarian": "Végétarien",
+    "collapse": "Replier",
+    "expand": "Déplier"
   },
   "components": {
     "date_time_picker": {

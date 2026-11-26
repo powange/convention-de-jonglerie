@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   etatDuFondsDeCaisse,
   type ApportDeFondsDeCaisse,
-} from '../../../shared/utils/fonds-de-caisse'
+} from '../../../../../layers/treasury/shared/utils/fonds-de-caisse'
 
 const apport = (p: Partial<ApportDeFondsDeCaisse> & { id: number; amount: number }) => ({
   lentById: null,

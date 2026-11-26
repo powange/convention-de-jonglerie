@@ -20,7 +20,7 @@ vi.mock('#server/utils/auth-utils', () => ({
   requireAuth: vi.fn((event) => event.context.user),
 }))
 
-import lire from '../../../../../server/api/editions/[id]/treasury/index.get'
+import lire from '../../../../../../../layers/treasury/server/api/editions/[id]/treasury/index.get'
 
 const prismaMock = (globalThis as any).prisma
 const evenement = { context: { params: { id: '21' }, user: { id: 3 } } }

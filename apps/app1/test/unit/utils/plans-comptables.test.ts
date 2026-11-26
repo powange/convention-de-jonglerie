@@ -7,7 +7,7 @@ import {
   filtrerComptes,
   type CompteDuPlan,
   type PlanComptable,
-} from '../../../app/utils/plans-comptables'
+} from '../../../../../layers/treasury/app/utils/plans-comptables'
 
 const ARBRE: CompteDuPlan[] = [
   {

@@ -20,10 +20,10 @@ vi.mock('#server/utils/auth-utils', () => ({
   requireAuth: vi.fn((event) => event.context.user),
 }))
 
-import lister from '../../../../../server/api/editions/[id]/treasury/payees/index.get'
-import creer from '../../../../../server/api/editions/[id]/treasury/payees/index.post'
-import modifier from '../../../../../server/api/editions/[id]/treasury/payees/[payeeId].put'
-import supprimer from '../../../../../server/api/editions/[id]/treasury/payees/[payeeId].delete'
+import lister from '../../../../../../../layers/treasury/server/api/editions/[id]/treasury/payees/index.get'
+import creer from '../../../../../../../layers/treasury/server/api/editions/[id]/treasury/payees/index.post'
+import modifier from '../../../../../../../layers/treasury/server/api/editions/[id]/treasury/payees/[payeeId].put'
+import supprimer from '../../../../../../../layers/treasury/server/api/editions/[id]/treasury/payees/[payeeId].delete'
 import { global } from '../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma
