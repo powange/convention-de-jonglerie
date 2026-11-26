@@ -8,10 +8,15 @@
  *
  * Trois périmètres :
  *
- * - `complet` — une PR qui touche autre chose qu'app2, le run planifié, le déclenchement manuel.
+ * - `complet` — une PR qui touche autre chose (code d'app1, layers, CI…), le run planifié, le
+ *   déclenchement manuel.
  *
- * - `app2-seul` — une PR qui ne touche que `apps/app2/` (Flowvent). Elle payait les 18 jobs d'app1,
- *   5 à 12 minutes, sans modifier une ligne d'app1. ⚠️ On ne saute PAS TOUT : quatre tests
+ * - `leger` — une PR qui ne touche que Flowvent (`apps/app2/`), la doc (`docs/`), les consignes de
+ *   Claude (`.claude/`) ou des `*.md` à la racine (`estLeger`). Une PR d'app2 payait les 18 jobs
+ *   d'app1, 5 à 12 minutes, sans modifier une ligne d'app1 ; et un seul fichier de `docs/` à côté
+ *   suffisait à y retomber (#969, 9 min). Aucun job lourd ne lit ces fichiers : seuls des tests
+ *   UNITAIRES d'outillage les lisent (documents-a-jour, versions-annoncees, flowvent-hors-image-app1),
+ *   et `test-unit` tourne. Ce périmètre s'est appelé `app2-seul` jusqu'au 26/11/2026. ⚠️ On ne saute PAS TOUT : quatre tests
  *   d'outillage d'app1 lisent des fichiers d'app2 comme du texte (flowvent-libelles-benevoles,
  *   flowvent-modules-evenement, flowvent-taches-planifiees, notification-create-titre), donc une PR
  *   d'app2 peut faire tomber la suite UNITAIRE ; et `lint` vérifie app2 (ESLint et Prettier).
@@ -53,7 +58,7 @@ const PREFIXE_APP2 = 'apps/app2/'
 export const JOBS_PAR_PERIMETRE = {
   complet: ['lint', 'typecheck', 'build', 'test-unit', 'test', 'base-de-test', 'playwright'],
   // `lint` vérifie app2 (ESLint + Prettier), `test-unit` les tests d'outillage qui la lisent.
-  'app2-seul': ['lint', 'test-unit'],
+  leger: ['lint', 'test-unit'],
   // `base-de-test` écrit le cache du dump SQL, `navigateurs` celui de Chromium. `setup`, qui écrit
   // node_modules et le client Prisma, tourne de toute façon.
   amorcage: ['base-de-test', 'navigateurs'],
@@ -80,6 +85,22 @@ export function layersEtendusParApp2(sourceConfig) {
 }
 
 /**
+ * Un fichier qu'aucun job lourd d'app1 ne lit : Flowvent, la doc, les consignes de Claude, un
+ * `*.md` à la RACINE. Un `*.md` ailleurs (apps/app1, layers) reste lourd : il peut être un
+ * fichier de contenu, et rien ne garantit que seul un test unitaire le lise.
+ *
+ * @param {string} f - chemin relatif à la racine du dépôt
+ */
+export function estLeger(f) {
+  return (
+    f.startsWith(PREFIXE_APP2) ||
+    f.startsWith('docs/') ||
+    f.startsWith('.claude/') ||
+    (!f.includes('/') && f.endsWith('.md'))
+  )
+}
+
+/**
  * @param {string} evenement - `github.event_name`
  * @param {string[]} fichiers - chemins modifiés, relatifs à la racine du dépôt (PR seulement)
  * @returns {{ perimetre: keyof typeof JOBS_PAR_PERIMETRE, raison: string }}
@@ -101,17 +122,17 @@ export function calculerPerimetre(evenement, fichiers) {
     return { perimetre: 'complet', raison: 'liste des fichiers modifiés vide ou illisible' }
   }
 
-  const horsApp2 = utiles.filter((f) => !f.startsWith(PREFIXE_APP2))
-  if (horsApp2.length > 0) {
+  const lourds = utiles.filter((f) => !estLeger(f))
+  if (lourds.length > 0) {
     return {
       perimetre: 'complet',
-      raison: `${horsApp2.length} fichier(s) hors de ${PREFIXE_APP2}, dont ${horsApp2[0]}`,
+      raison: `${lourds.length} fichier(s) que la suite d'app1 peut lire, dont ${lourds[0]}`,
     }
   }
 
   return {
-    perimetre: 'app2-seul',
-    raison: `les ${utiles.length} fichier(s) modifiés sont tous sous ${PREFIXE_APP2}`,
+    perimetre: 'leger',
+    raison: `les ${utiles.length} fichier(s) modifiés relèvent d'app2, de la doc ou de .claude`,
   }
 }
 

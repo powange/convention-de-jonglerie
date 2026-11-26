@@ -6,6 +6,7 @@ import { describe, it, expect } from 'vitest'
 import {
   calculerJobs,
   calculerPerimetre,
+  estLeger,
   JOBS_CONDITIONNES,
   JOBS_PAR_PERIMETRE,
   layersEtendusParApp2,
@@ -40,7 +41,8 @@ const SCENARIOS: Record<string, string[]> = {
   'complet avec Flowvent': calculerJobs('pull_request', ['layers/auth/a.ts'], LAYERS_APP2).jobs,
   'complet avec image app1': calculerJobs('pull_request', ['apps/app1/Dockerfile'], LAYERS_APP2)
     .jobs,
-  'app2-seul': calculerJobs('pull_request', ['apps/app2/a.ts'], LAYERS_APP2).jobs,
+  leger: calculerJobs('pull_request', ['apps/app2/a.ts'], LAYERS_APP2).jobs,
+  'leger, doc seule': calculerJobs('pull_request', ['docs/x.md'], LAYERS_APP2).jobs,
   amorcage: calculerJobs('push', [], LAYERS_APP2).jobs,
   planifié: calculerJobs('schedule', [], LAYERS_APP2).jobs,
 }
@@ -55,6 +57,39 @@ const runNominal = (lances: string[]): Besoins => {
   return besoins
 }
 
+describe('périmètre léger : app2, docs, .claude, *.md à la racine', () => {
+  it('un fichier de doc ne fait plus tourner la suite d’app1 (#969 : 9 min pour un .md)', () => {
+    expect(calculerPerimetre('pull_request', ['apps/app2/a.ts', 'docs/x.md']).perimetre).toBe(
+      'leger'
+    )
+    expect(calculerPerimetre('pull_request', ['docs/a/b.md']).perimetre).toBe('leger')
+    expect(calculerPerimetre('pull_request', ['.claude/skills/x/SKILL.md']).perimetre).toBe('leger')
+    expect(calculerPerimetre('pull_request', ['CLAUDE.md', 'README.md']).perimetre).toBe('leger')
+  })
+
+  it('⚠️ un .md hors de la racine, la CI ou un layer restent lourds', () => {
+    for (const f of [
+      'apps/app1/README.md',
+      'layers/faq/README.md',
+      '.github/workflows/tests.yml',
+      'docsx/a.md',
+      '.claudex/a',
+    ]) {
+      expect(estLeger(f), f).toBe(false)
+    }
+  })
+
+  it('la doc seule ne construit pas l’image Flowvent ; avec app2, si', () => {
+    expect(calculerJobs('pull_request', ['docs/x.md'], LAYERS_APP2).jobs).toEqual([
+      'lint',
+      'test-unit',
+    ])
+    expect(
+      calculerJobs('pull_request', ['docs/x.md', 'apps/app2/a.ts'], LAYERS_APP2).jobs
+    ).toContain('image-flowvent')
+  })
+})
+
 describe('périmètre de la CI', () => {
   it('une PR limitée à apps/app2 ne fait tourner que le nécessaire', () => {
     const r = calculerPerimetre('pull_request', [
@@ -62,16 +97,16 @@ describe('périmètre de la CI', () => {
       'apps/app2/package.json',
       '',
     ])
-    expect(r.perimetre).toBe('app2-seul')
+    expect(r.perimetre).toBe('leger')
   })
 
-  it('⚠️ un seul fichier hors de apps/app2 suffit à tout faire tourner — y compris un layer', () => {
+  it('⚠️ un seul fichier lourd suffit à tout faire tourner — y compris un layer', () => {
     expect(
       calculerPerimetre('pull_request', ['apps/app2/a.ts', 'layers/core/b.ts']).perimetre
     ).toBe('complet')
-    expect(calculerPerimetre('pull_request', ['apps/app2/a.ts', 'docs/x.md']).perimetre).toBe(
-      'complet'
-    )
+    expect(
+      calculerPerimetre('pull_request', ['apps/app2/a.ts', 'apps/app1/README.md']).perimetre
+    ).toBe('complet')
     expect(calculerPerimetre('pull_request', ['apps/app1/a.ts']).perimetre).toBe('complet')
   })
 
@@ -110,7 +145,7 @@ describe('périmètre de la CI', () => {
   })
 
   it('les périmètres lancent ce qu’ils promettent', () => {
-    expect(JOBS_PAR_PERIMETRE['app2-seul']).toEqual(['lint', 'test-unit'])
+    expect(JOBS_PAR_PERIMETRE['leger']).toEqual(['lint', 'test-unit'])
     expect(JOBS_PAR_PERIMETRE.amorcage).toEqual(['base-de-test', 'navigateurs'])
     // `navigateurs` n'a rien à faire ailleurs : `playwright` remplit le cache lui-même sur une PR.
     expect(JOBS_PAR_PERIMETRE.complet).not.toContain('navigateurs')
@@ -120,7 +155,7 @@ describe('périmètre de la CI', () => {
   })
 
   it('⚠️ la liste publiée se lit sans ambiguïté : `test` ne se reconnaît pas dans `test-unit`', () => {
-    const liste = listePourConditions(JOBS_PAR_PERIMETRE['app2-seul'])
+    const liste = listePourConditions(JOBS_PAR_PERIMETRE['leger'])
     expect(liste).toContain(' test-unit ')
     expect(liste).not.toContain(' test ')
     expect(listePourConditions(JOBS_PAR_PERIMETRE.complet)).toContain(' test ')
@@ -242,7 +277,7 @@ describe('verdict de ci-verte', () => {
   })
 
   it('⚠️ une liste absente (changements en échec) vaut « tout était requis »', () => {
-    const besoins = runNominal(SCENARIOS['app2-seul']!)
+    const besoins = runNominal(SCENARIOS['leger']!)
     besoins.changements = { result: 'failure' }
     for (const liste of [undefined, '', '   ']) {
       const r = rendreVerdict(besoins, liste)
@@ -262,7 +297,7 @@ describe('verdict de ci-verte', () => {
   })
 
   it('⚠️ un échec ou une annulation refuse, même sur un job non lancé', () => {
-    const jobs = SCENARIOS['app2-seul']!
+    const jobs = SCENARIOS['leger']!
     for (const result of ['failure', 'cancelled']) {
       const besoins = runNominal(jobs)
       besoins.playwright = { result }
@@ -271,7 +306,7 @@ describe('verdict de ci-verte', () => {
   })
 
   it('⚠️ un job ajouté plus tard est requis par défaut', () => {
-    const jobs = SCENARIOS['app2-seul']!
+    const jobs = SCENARIOS['leger']!
     const besoins = { ...runNominal(jobs), 'nouveau-job': { result: 'skipped' } }
     expect(rendreVerdict(besoins, listePourConditions(jobs)).vert).toBe(false)
   })

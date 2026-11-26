@@ -80,10 +80,11 @@ jobs:
   # ---------------------------------------------------------------------------------------------
   # Le périmètre du run, et la liste des jobs qu'il lance.
   #
-  #   complet    PR qui touche autre chose qu'app2, run planifié, déclenchement manuel
-  #   app2-seul  PR limitée à `apps/app2/` : setup, lint et test-unit seulement — `lint` vérifie
-  #              app2 (ESLint + Prettier), quatre tests d'outillage d'app1 lisent des fichiers
-  #              d'app2, le reste ne lit qu'app1
+  #   complet    PR qui touche du code d'app1, un layer, la CI…, run planifié, déclenchement manuel
+  #   leger      PR limitée à `apps/app2/`, `docs/`, `.claude/` ou des `*.md` à la racine : setup,
+  #              lint et test-unit seulement (+ image et typage de Flowvent si app2 est touchée).
+  #              `lint` vérifie app2 ; les tests d'outillage qui lisent app2, la doc et les skills
+  #              sont unitaires. Rien d'autre ne lit ces fichiers. (S'appelait `app2-seul`.)
   #   amorcage   push sur `main` : setup, base-de-test et navigateurs, qui écrivent les caches que
   #              TOUTES les PR lisent. Le code, lui, vient d'être testé dans sa PR : la règle de
   #              `main` exige `ci-verte` sur une branche à jour, et le squash ne change pas l'arbre.
@@ -527,7 +528,7 @@ jobs:
           include-hidden-files: true
 
   # La suite unitaire, sortie de la matrice `test` ci-dessous parce qu'elle tourne AUSSI dans le
-  # périmètre `app2-seul` : quatre de ses tests d'outillage lisent des fichiers d'app2 comme du texte
+  # périmètre `leger` : quatre de ses tests d'outillage lisent des fichiers d'app2 comme du texte
   # (libellés des bénévoles, modules, tâches planifiées, titres de notification), si bien qu'une PR
   # limitée à `apps/app2/` peut la faire tomber. Une condition de job ne peut pas lire `matrix` ;
   # garder l'unitaire dans la matrice aurait donc obligé à faire tourner les trois suites ou aucune.
@@ -573,7 +574,7 @@ jobs:
           path: apps/app1/coverage/
           retention-days: 30
 
-  # Tests en parallèle avec matrice — Nuxt et base, sautés dans le périmètre `app2-seul`.
+  # Tests en parallèle avec matrice — Nuxt et base, sautés dans le périmètre `leger`.
   test:
     # Sans ce `name`, GitHub nomme le check d'après TOUTE la valeur de matrice, commande comprise :
     # `test (nuxt, npm run test:nuxt:run, false)`. Le check requis est `ci-verte` seul, donc ce nom
