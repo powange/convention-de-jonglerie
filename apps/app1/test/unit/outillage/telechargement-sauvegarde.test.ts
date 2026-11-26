@@ -29,7 +29,10 @@ import { describe, expect, it } from 'vitest'
  * téléchargement de plusieurs centaines de mégaoctets — ce que le Buffer fournissait gratuitement.
  * Et il sert de contrôle d'existence, donc le 404 se déclenche toujours avant l'ouverture du flux.
  */
-const SOURCE = join(import.meta.dirname, '../../../server/api/admin/backup/download.get.ts')
+const SOURCE = join(
+  import.meta.dirname,
+  '../../../../../layers/backup/server/api/admin/backup/download.get.ts'
+)
 
 function code(): string {
   // Commentaires retirés : ce fichier cite `readFile` et `filename` pour expliquer l'ancien

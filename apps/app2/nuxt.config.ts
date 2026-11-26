@@ -30,6 +30,7 @@ export default defineNuxtConfig({
   // - `ticketing` : billetterie (HelloAsso seul), lot 6.
   // - `meals` : repas, lot 7.
   // - `treasury` : trésorerie, lot 8.
+  // - `backup` : sauvegarde et restauration de la base, depuis l'administration.
   extends: [
     '../../layers/ui',
     '../../layers/core',
@@ -41,6 +42,7 @@ export default defineNuxtConfig({
     '../../layers/ticketing',
     '../../layers/meals',
     '../../layers/treasury',
+    '../../layers/backup',
   ],
 
   hooks: {
@@ -155,6 +157,7 @@ export default defineNuxtConfig({
           '../../../../layers/ticketing/i18n/locales/fr/gestion-ticketing.json',
           '../../../../layers/meals/i18n/locales/fr/gestion-meals.json',
           '../../../../layers/treasury/i18n/locales/fr/gestion-treasury.json',
+          '../../../../layers/backup/i18n/locales/fr/admin-backup.json',
           'benevoles.json',
           'interface.json',
           'fr.json',
@@ -186,6 +189,8 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    // Début du nom des archives de sauvegarde (layer backup).
+    sauvegarde: { prefixe: 'flowvent' },
     session: {
       // Mot de passe de chiffrement des cookies de session (NUXT_SESSION_PASSWORD).
       password: process.env.NUXT_SESSION_PASSWORD || '',

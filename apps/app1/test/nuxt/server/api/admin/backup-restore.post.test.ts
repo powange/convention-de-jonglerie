@@ -6,11 +6,11 @@ import { Readable, PassThrough } from 'stream'
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
-import handler from '../../../../../server/api/admin/backup/restore.post'
+import handler from '../../../../../../../layers/backup/server/api/admin/backup/restore.post'
 import {
   attendreRestauration,
   _reinitialiserJobs,
-} from '../../../../../server/utils/backup-restore-job'
+} from '../../../../../../../layers/backup/server/utils/backup-restore-job'
 
 // Mock des modules Node.js : aucun accès disque ni processus mysql réel
 vi.mock('fs', () => {

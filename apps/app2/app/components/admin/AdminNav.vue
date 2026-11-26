@@ -15,5 +15,6 @@ const items: NavigationMenuItem[] = [
   { label: 'Tableau de bord', icon: 'i-heroicons-chart-bar', to: '/admin', exact: true },
   { label: 'Utilisateurs', icon: 'i-heroicons-users', to: '/admin/utilisateurs' },
   { label: 'Événements', icon: 'i-heroicons-calendar-days', to: '/admin/evenements' },
+  { label: 'Base de données', icon: 'i-heroicons-circle-stack', to: '/admin/backup' },
 ]
 </script>

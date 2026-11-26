@@ -20,3 +20,6 @@ prisma/*.db-journal
 
 # Journal et code de sortie du typage (job typecheck-app2 de la CI)
 typecheck.code
+
+# Sauvegardes de la base faites depuis l’administration (layer backup)
+/backups/

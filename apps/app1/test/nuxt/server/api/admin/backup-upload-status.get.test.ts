@@ -3,7 +3,7 @@ import path from 'path'
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import handler from '../../../../../server/api/admin/backup/upload-status.get'
+import handler from '../../../../../../../layers/backup/server/api/admin/backup/upload-status.get'
 
 vi.mock('fs/promises', () => {
   const mod = { stat: vi.fn() }

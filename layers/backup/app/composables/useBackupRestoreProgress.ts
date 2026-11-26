@@ -12,7 +12,7 @@
 import {
   restaurationEnCoursDapres,
   type EtapeRestauration,
-} from '~~/shared/utils/etapes-restauration'
+} from '#backup/shared/utils/etapes-restauration'
 
 export type { EtapeRestauration }
 

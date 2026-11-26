@@ -46,10 +46,13 @@ async function creerLaSauvegarde() {
     // Déterminer l'environnement (production, staging, development, etc.)
     const environment = process.env.NODE_ENV || 'development'
 
+    // Le site d'origine en tête du nom (`runtimeConfig.sauvegarde.prefixe`, fixé par chaque app).
+    const prefixe = (config.sauvegarde as { prefixe?: string } | undefined)?.prefixe || 'sauvegarde'
+
     // Générer un nom de fichier unique avec timestamp
     const timestamp = new Date().toISOString().replace(/:/g, '-').replace(/\./g, '-')
-    const sqlFilename = `juggling-convention-${environment}-database-${timestamp}.sql`
-    const archiveFilename = `juggling-convention-${environment}-backup-${timestamp}.tar.gz`
+    const sqlFilename = `${prefixe}-${environment}-database-${timestamp}.sql`
+    const archiveFilename = `${prefixe}-${environment}-backup-${timestamp}.tar.gz`
     const backupsDir = path.join(process.cwd(), 'backups')
     const sqlPath = path.join(backupsDir, sqlFilename)
     const archivePath = path.join(backupsDir, archiveFilename)
