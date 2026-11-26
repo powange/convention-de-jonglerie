@@ -254,7 +254,13 @@ export const useEditionStore = defineStore('editions', {
 
       this.loading = true
       this.error = null
-      const p = $fetch<Edition>(`/api/editions/${id}`)
+      // Au rendu serveur, `$fetch` part SANS le cookie de session : le serveur voit un anonyme, et
+      // une édition non publique revient vide — l'espace artiste restait blanc après l'hydratation
+      // (il chargeait l'édition par un `useFetch`, qui transmet les en-têtes, avant de passer par
+      // ce store). `useRequestFetch` transmet ceux de la requête d'origine (même règle que le
+      // store de Flowvent).
+      const recuperer = import.meta.server ? useRequestFetch() : $fetch
+      const p = recuperer<Edition>(`/api/editions/${id}`)
         .then((edition) => {
           const existingIndex = this.editions.findIndex((e) => e.id === id)
           if (existingIndex !== -1) {
