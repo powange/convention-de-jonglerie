@@ -81,4 +81,18 @@ describe('Flowvent — la liste des layers est la même partout', () => {
       ).toEqual({ manquants: [], enTrop: [] })
     })
   }
+
+  it('⚠️ la doc et le skill de déploiement renvoient à `extends` au lieu d’énumérer les layers', () => {
+    // Une sixième copie, dans /deploy-flowvent, citait 4 layers quand Flowvent en étendait 7 : elle
+    // ne décidait de rien, mais faisait croire qu'un merge sur layers/stock ne republiait pas
+    // l'image. Une liste recopiée dans un texte se périme comme une autre.
+    for (const chemin of [
+      '.claude/skills/deploy-flowvent/SKILL.md',
+      'docs/deploiement-flowvent.md',
+    ]) {
+      const texte = lire(chemin)
+      expect(texte, chemin).not.toMatch(/`layers\/[a-z0-9-]+\/\*\*`/)
+      expect(texte, chemin).toContain('extends')
+    }
+  })
 })
