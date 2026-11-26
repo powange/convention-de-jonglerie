@@ -110,12 +110,32 @@
     "select_all": "Tout sélectionner",
     "validate": "Valider",
     "view": "Voir",
-    "view_more": "Voir plus"
+    "view_more": "Voir plus",
+    "copy_error": "Erreur lors de la copie",
+    "copy_link": "Copier le lien",
+    "link_copied": "Lien copié",
+    "meals_short": "Repas",
+    "page_of": "Page {page} sur {total}",
+    "see_less": "Voir moins",
+    "see_more": "Voir plus"
   },
   "components": {
     "date_time_picker": {
       "clear": "Effacer",
       "placeholder": "Sélectionner une date"
+    },
+    "artist_application": {
+      "chat": {
+        "title": "Discussion"
+      }
+    },
+    "location_picker": {
+      "free_text": "Texte libre",
+      "free_text_placeholder": "Ex. : devant la buvette",
+      "markers": "Points de repère",
+      "on_map": "Sur la carte du site",
+      "select": "Choisir une zone ou un repère",
+      "zones": "Zones"
     }
   },
   "dates": {
@@ -139,7 +159,8 @@
       "qr_how_to_use": "Comment l'utiliser ?",
       "qr_instructions": "Présentez ce QR code à l'entrée de l'événement pour accéder en tant que bénévole.",
       "qr_modal_title": "Mon QR code bénévole",
-      "volunteer_management": "Gestion des bénévoles"
+      "volunteer_management": "Gestion des bénévoles",
+      "phone": "Téléphone"
     },
     "volunteers": {
       "add_error": "Erreur lors de l'ajout du bénévole",
@@ -231,7 +252,10 @@
       "title": "Artistes"
     },
     "meals": {
-      "title": "Repas"
+      "title": "Repas",
+      "breakfast": "Matin",
+      "dinner": "Soir",
+      "lunch": "Midi"
     },
     "organizers": {
       "teams": {
@@ -245,7 +269,11 @@
       "confirm_delete_item": "Supprimer l'objet « {name} » ?"
     },
     "ticketing": {
-      "title": "Billetterie"
+      "title": "Billetterie",
+      "artist_handout_items_help": "Sélectionnez les articles à remettre à cet artiste en particulier. Ils s'ajoutent à ceux remis à tous les artistes et à ceux de ses spectacles.",
+      "artist_handout_items_manage_for": "Articles à remettre — {name}",
+      "shows_handout_items_help": "Sélectionnez les articles à remettre aux artistes liés à ce spectacle lors de leur arrivée.",
+      "shows_handout_items_manage_for": "Articles à remettre — {title}"
     },
     "volunteers": {
       "config_title": "Configuration bénévolat",
@@ -396,6 +424,42 @@
       "withdraw": "Retirer",
       "withdrawal_error": "Erreur lors du retrait de la candidature",
       "withdrawal_success": "Candidature retirée avec succès"
+    },
+    "artists": {
+      "accepted": "Acceptées",
+      "additional_performers_count": "{count} artiste | {count} artistes",
+      "applications_description": "Suivez l'état de vos candidatures pour proposer vos spectacles aux différentes conventions",
+      "applied_on": "Postulé le",
+      "browse_open_calls": "Parcourir les appels à spectacles",
+      "call_closed": "Appel fermé",
+      "call_open": "Appel ouvert",
+      "category": "Catégorie",
+      "deadline": "Date limite",
+      "decided_on": "Décision le",
+      "duration": "Durée",
+      "duration_minutes": "{minutes} min",
+      "edit_application": "Modifier ma candidature",
+      "edit_application_short": "Modifier",
+      "my_applications": "Mes candidatures artiste",
+      "no_accepted_applications": "Aucune candidature acceptée",
+      "no_accepted_description": "Vous n'avez pas encore de candidature acceptée",
+      "no_applications": "Aucune candidature",
+      "no_applications_description": "Vous n'avez pas encore postulé comme artiste pour une convention",
+      "no_pending_applications": "Aucune candidature en attente",
+      "no_pending_description": "Vous n'avez actuellement aucune candidature en attente de réponse",
+      "no_rejected_applications": "Aucune candidature refusée",
+      "no_rejected_description": "Aucune de vos candidatures n'a été refusée",
+      "open_discussion": "Ouvrir la discussion",
+      "pending": "En attente",
+      "rejected": "Refusées",
+      "show_title": "Spectacle",
+      "view_edition": "Voir l'édition",
+      "view_edition_short": "Voir",
+      "withdraw": "Retirer ma candidature",
+      "withdraw_confirm": "Votre candidature « {title} » sera retirée, ainsi que la discussion que vous avez eue avec les organisateurs. Cette action est définitive.",
+      "withdraw_error": "Le retrait a échoué",
+      "withdraw_short": "Retirer",
+      "withdrawn": "Candidature retirée"
     }
   },
   "validation": {
@@ -436,5 +500,12 @@
     "staffing_period_undefined": "Cette période n’est pas définie sur l’événement",
     "swap_no_assignment": "Vous n'avez aucun créneau sur cet événement.",
     "volunteer_description_help": "Décrivez les missions, les horaires et les informations importantes pour les bénévoles de cet événement."
+  },
+  "ticketing": {
+    "tiers": {
+      "modal": {
+        "handout_items_label": "Articles à remettre"
+      }
+    }
   }
 }

@@ -1,5 +1,5 @@
+import { editionAccueilleDesCandidatures } from '#core/shared/utils/candidature-spectacle'
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { editionAccueilleDesCandidatures } from '~~/shared/utils/candidature-spectacle'
 import { STATUTS_VISIBLES_PUBLIQUEMENT } from '~~/shared/utils/visibilite-edition'
 
 /**

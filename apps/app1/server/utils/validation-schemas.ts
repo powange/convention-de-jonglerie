@@ -3,10 +3,21 @@ import { z } from 'zod'
 
 import { getSupportedLocalesCodes } from '~/utils/locales'
 
+import { urlSchema } from '../../../../layers/core/server/socle/validation-generique'
+
 import { schemaMotDePasse } from '#auth/shared/utils/regles-mot-de-passe'
+import { SUPPORTED_CURRENCIES } from '#core/shared/utils/money'
 import { isValidPronoun } from '#ui-commun/app/utils/pronouns'
-import { SUPPORTED_CURRENCIES } from '~~/shared/utils/money'
 import { CLES_SERVICES_EDITION, type CleServiceEdition } from '~~/shared/utils/services-d-edition'
+
+// Validation générique (URL, nettoyage) : commune avec Flowvent. CHEMIN RELATIF (auto-imports).
+export {
+  sanitizeData,
+  urlSchema,
+  validateAndSanitize,
+} from '../../../../layers/core/server/socle/validation-generique'
+// Modèle de spectacle : dans le layer artistes.
+export { showPresetSchema } from '../../../../layers/artists/server/utils/schema-modele-spectacle'
 
 /**
  * Validation d'un numéro de téléphone international.
@@ -48,13 +59,7 @@ export const phoneSchema = z
   .nullable()
   .optional()
   .refine((val) => !val || isInternationalPhoneValid(val), 'Numéro de téléphone invalide')
-export const urlSchema = z
-  .string()
-  .url('URL invalide')
-  .max(191, "L'URL ne peut pas dépasser 191 caractères")
-  .nullable()
-  .optional()
-  .or(z.literal(''))
+
 // Schéma pour les dates - accepte ISO strict et datetime-local pour la transition
 export const dateSchema = z
   .string()
@@ -589,34 +594,6 @@ export const updateOrganizerRightsSchema = z.object({
   title: z.string().max(100).optional().nullable(),
 })
 
-// Fonction utilitaire pour sanitiser les données avant validation
-export function sanitizeData(data: unknown): unknown {
-  if (typeof data !== 'object' || data === null) {
-    return data
-  }
-
-  const sanitized = { ...(data as Record<string, unknown>) }
-
-  // Trim des chaînes de caractères
-  Object.keys(sanitized).forEach((key) => {
-    if (typeof sanitized[key] === 'string') {
-      sanitized[key] = (sanitized[key] as string).trim()
-      // Conversion en minuscules pour les emails
-      if (key === 'email') {
-        sanitized[key] = (sanitized[key] as string).toLowerCase()
-      }
-    }
-  })
-
-  return sanitized
-}
-
-// Fonction utilitaire pour valider et nettoyer les données
-export function validateAndSanitize<T>(schema: z.ZodSchema<T>, data: unknown): T {
-  const sanitizedData = sanitizeData(data)
-  return schema.parse(sanitizedData)
-}
-
 // Fonction pour gérer les erreurs de validation Zod
 export function handleValidationError(error: z.ZodError): never {
   const formattedErrors = (error.issues || []).reduce(
@@ -871,107 +848,6 @@ export function createShowApplicationSchema(
 // Schéma par défaut (téléphone obligatoire) — conservé pour rétrocompat
 // avec les imports qui ne disposent pas du flag requirePhone du show call.
 export const showApplicationSchema = createShowApplicationSchema({ phoneRequired: true })
-
-// Schéma pour les presets de spectacle
-export const showPresetSchema = z
-  .object({
-    name: z
-      .string()
-      .min(2, 'Le nom du preset doit contenir au moins 2 caractères')
-      .max(100, 'Le nom du preset ne peut pas dépasser 100 caractères'),
-
-    // Infos artiste
-    artistName: z
-      .string()
-      .min(2, 'Le nom de scène doit contenir au moins 2 caractères')
-      .max(100, 'Le nom de scène ne peut pas dépasser 100 caractères'),
-    artistBio: z
-      .string()
-      .max(3000, 'La biographie ne peut pas dépasser 3000 caractères')
-      .nullable()
-      .optional(),
-    portfolioUrl: urlSchema,
-    videoUrl: urlSchema,
-    socialLinks: z
-      .string()
-      .max(2000, 'Les liens réseaux sociaux ne peuvent pas dépasser 2000 caractères')
-      .nullable()
-      .optional(),
-
-    // Infos spectacle
-    showTitle: z
-      .string()
-      .min(3, 'Le titre du spectacle doit contenir au moins 3 caractères')
-      .max(200, 'Le titre du spectacle ne peut pas dépasser 200 caractères'),
-    showDescription: z
-      .string()
-      .min(20, 'La description doit contenir au moins 20 caractères')
-      .max(5000, 'La description ne peut pas dépasser 5000 caractères'),
-    showDuration: z.coerce
-      .number()
-      .int('La durée doit être un nombre entier')
-      .min(1, 'La durée doit être au moins 1 minute')
-      .max(180, 'La durée ne peut pas dépasser 180 minutes'),
-    showCategory: z
-      .string()
-      .max(100, 'La catégorie ne peut pas dépasser 100 caractères')
-      .nullable()
-      .optional(),
-    technicalNeeds: z
-      .string()
-      .max(3000, 'Les besoins techniques ne peuvent pas dépasser 3000 caractères')
-      .nullable()
-      .optional(),
-    stageSetup: z
-      .string()
-      .max(3000, 'La mise en place sur scène ne peut pas dépasser 3000 caractères')
-      .nullable()
-      .optional(),
-
-    // Personnes supplémentaires
-    additionalPerformersCount: z.coerce
-      .number()
-      .int('Le nombre doit être un entier')
-      .min(0, 'Le nombre ne peut pas être négatif')
-      .max(50, 'Le nombre ne peut pas dépasser 50'),
-    additionalPerformers: z
-      .array(
-        z.object({
-          lastName: z
-            .string()
-            .min(2, 'Le nom doit contenir au moins 2 caractères')
-            .max(100, 'Le nom ne peut pas dépasser 100 caractères'),
-          firstName: z
-            .string()
-            .min(2, 'Le prénom doit contenir au moins 2 caractères')
-            .max(100, 'Le prénom ne peut pas dépasser 100 caractères'),
-          email: z.string().email('Email invalide'),
-          // Téléphone facultatif pour un preset : vide autorisé, sinon 6 à 20 caractères
-          phone: z
-            .string()
-            .max(20, 'Le numéro de téléphone ne peut pas dépasser 20 caractères')
-            .refine(
-              (val) => !val || val.length >= 6,
-              'Le numéro de téléphone doit contenir au moins 6 caractères'
-            )
-            .optional()
-            .default(''),
-        })
-      )
-      .optional()
-      .default([]),
-  })
-  .refine(
-    (data) => {
-      const count = data.additionalPerformersCount || 0
-      const performers = data.additionalPerformers || []
-      return performers.length === count
-    },
-    {
-      message: 'Le nombre de personnes supplémentaires doit correspondre aux informations fournies',
-      path: ['additionalPerformers'],
-    }
-  )
 
 // Schéma pour la mise à jour d'une candidature (statut, notes, spectacle associé)
 export const showApplicationStatusSchema = z.object({

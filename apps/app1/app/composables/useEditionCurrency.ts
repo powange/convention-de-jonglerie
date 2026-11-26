@@ -1,4 +1,4 @@
-import { currencySymbol, DEFAULT_CURRENCY, formatCents } from '~~/shared/utils/money'
+import { currencySymbol, DEFAULT_CURRENCY, formatCents } from '#core/shared/utils/money'
 
 /**
  * Met en forme un montant dans la devise de l'édition.

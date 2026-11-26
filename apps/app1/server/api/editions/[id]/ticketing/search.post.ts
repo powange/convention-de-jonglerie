@@ -1,6 +1,11 @@
 import { z } from 'zod'
 
 import { cleDeBoiteDeReception } from '#core/shared/utils/adresse-email'
+import {
+  normaliserPhases,
+  phasesDuBenevole,
+  phasesSeRencontrent,
+} from '#core/shared/utils/phases-edition'
 import { isHttpError } from '#server/types/api'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
@@ -16,11 +21,6 @@ import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-a
 import { resoudreLesValidateurs } from '#server/utils/ticketing/nom-du-validateur'
 import { detteDeCommande, montantARembourser } from '#server/utils/ticketing/remboursement-du'
 import { sanitizeEmail } from '#server/utils/validation-helpers'
-import {
-  normaliserPhases,
-  phasesDuBenevole,
-  phasesSeRencontrent,
-} from '~~/shared/utils/phases-edition'
 import {
   regrouperParPersonne,
   type CompteConnu,

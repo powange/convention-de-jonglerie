@@ -380,6 +380,9 @@
 </template>
 
 <script setup lang="ts">
+// Import explicite : Flowvent n'a pas les auto-imports de VueUse (`@vueuse/nuxt`, propre à app1).
+import { useDebounceFn } from '@vueuse/core'
+
 // Import explicite : plusieurs layers exportent un `filtresDepuisUrl`, et l'auto-import ne
 // saurait pas lequel prendre.
 import {

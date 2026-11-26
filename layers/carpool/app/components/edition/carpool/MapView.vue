@@ -68,7 +68,6 @@
 
 <script setup lang="ts">
 import { useLeafletMap } from '~/composables/useLeafletMap'
-import { escapeHtml } from '#map/app/utils/mapMarkers'
 
 import {
   cadreDesPoints,
@@ -80,6 +79,8 @@ import {
   type GenreDuPoint,
   type PointDuCovoiturage,
 } from '../../../utils/points-du-covoiturage'
+
+import { escapeHtml } from '#map/app/utils/mapMarkers'
 
 /**
  * La carte du covoiturage d'une édition : une épingle par VILLE, et le lieu de la convention.

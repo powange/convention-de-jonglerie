@@ -36,6 +36,7 @@ COPY layers/auth/ /app/layers/auth/
 COPY layers/volunteers/ /app/layers/volunteers/
 COPY layers/map/ /app/layers/map/
 COPY layers/stock/ /app/layers/stock/
+COPY layers/artists/ /app/layers/artists/
 # Commit construit, passé par la CI : il nomme le répertoire des fichiers de build
 # (`/_nuxt-<sha>/`, cf. nuxt.config.ts), ce qui rend le commit servi lisible dans la page.
 # Placé après les COPY : il change à chaque commit, et n'invalide ainsi que le build.

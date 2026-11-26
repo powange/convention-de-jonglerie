@@ -1,20 +1,20 @@
 import { z } from 'zod'
 
+import { coordonneesBancairesRecues } from '#artists/server/utils/coordonnees-bancaires-recues'
+import { remiseDeLaFacture } from '#artists/server/utils/remise-de-la-facture'
 import { oublierSessionDuCompte } from '#auth/server/utils/cache-session'
 import { misesAJourDuProfil } from '#core/server/utils/infos-personnelles'
 import { schemaAdresseEmail } from '#core/shared/utils/adresse-email'
+import { toCents } from '#core/shared/utils/money'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { coordonneesBancairesRecues } from '#server/utils/coordonnees-bancaires-recues'
 import {
   getEditionWithPermissions,
   canManageArtists,
 } from '#server/utils/permissions/edition-permissions'
 import { buildUpdateData } from '#server/utils/prisma-helpers'
-import { remiseDeLaFacture } from '#server/utils/remise-de-la-facture'
 import { deplacerJustificatif, supprimerJustificatif } from '#server/utils/treasury-receipt-files'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
-import { toCents } from '~~/shared/utils/money'
 
 const updateArtistSchema = z.object({
   /**

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
+import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
 /**
@@ -26,6 +27,17 @@ function champsDuModele(modele: string): string[] {
 const colonnes = [...catalogue.matchAll(/colonne: '(\w+)'/g)].map((m) => m[1]!)
 
 describe('Flowvent — catalogue des modules et des droits', () => {
+  /*
+   * App2 n'est couverte par AUCUN lint : une apostrophe dans une chaîne entre apostrophes
+   * (« l'espace artiste ») a cassé le build de Flowvent sans qu'aucun test ne le dise — les cas
+   * ci-dessous lisent le fichier comme du texte et ne le compilent pas. Celui-ci le PARSE.
+   */
+  it('le catalogue est du TypeScript valide', () => {
+    const source = ts.createSourceFile('modules-evenement.ts', catalogue, ts.ScriptTarget.Latest)
+    const erreurs = (source as unknown as { parseDiagnostics: ts.Diagnostic[] }).parseDiagnostics
+    expect(erreurs.map((e) => ts.flattenDiagnosticMessageText(e.messageText, ' '))).toEqual([])
+  })
+
   it('chaque interrupteur de module est une colonne booléenne de `Event`', () => {
     const modules = colonnes.filter((c) => c.endsWith('Enabled'))
     expect(modules.length).toBeGreaterThanOrEqual(7)

@@ -198,12 +198,13 @@
 </template>
 
 <script setup lang="ts">
-import { useMealTypeLabel } from '~/composables/useMeals'
 import { useEditionStore } from '~/stores/editions'
-import { formatMealDate } from '~/utils/meals'
 
 import { logoDuFournisseur, nomDuFournisseur } from '../../utils/ticketing/fournisseur'
 import { deleteOption, type TicketingOption } from '../../utils/ticketing/options'
+
+import { useMealTypeLabel } from '#core/app/composables/useMeals'
+import { formatMealDate } from '#core/app/utils/meals'
 
 const props = defineProps<{
   options: TicketingOption[]

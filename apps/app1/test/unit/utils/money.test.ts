@@ -7,7 +7,7 @@ import {
   isSupportedCurrency,
   sumCents,
   toCents,
-} from '../../../shared/utils/money'
+} from '../../../../../layers/core/shared/utils/money'
 
 describe('toCents', () => {
   it('convertit une unité courante en centimes', () => {

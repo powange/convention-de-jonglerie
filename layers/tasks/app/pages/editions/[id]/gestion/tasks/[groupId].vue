@@ -343,9 +343,9 @@
 import type { TaskFiltersValue, TaskSort } from '../../../../../components/tasks/TaskFilters.vue'
 
 import { valeurDepuisUrl } from '#core/shared/utils/filtres-url'
-import { filtrerParEcheance, type FiltreEcheance } from '~~/shared/utils/filtre-echeance-taches'
-import { nomAffichableDUnCompte } from '~~/shared/utils/nom-affichable'
+import { nomAffichableDUnCompte } from '#core/shared/utils/nom-affichable'
 import { contientLaSaisie } from '#core/shared/utils/recherche-texte'
+import { filtrerParEcheance, type FiltreEcheance } from '~~/shared/utils/filtre-echeance-taches'
 
 definePageMeta({
   layout: 'edition-dashboard',

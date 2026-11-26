@@ -46,6 +46,7 @@ export default defineEventHandler(async (event) => {
       mapPublic: true,
       externalMapProvider: true,
       externalMapRef: true,
+      artistInfo: true,
       volunteerSettings: {
         select: {
           pagePublic: true,
@@ -108,6 +109,10 @@ export default defineEventHandler(async (event) => {
     mapPublic: evenement.mapPublic,
     externalMapProvider: evenement.externalMapProvider,
     externalMapRef: evenement.externalMapRef,
+    // Artistes (layer `artists`) : le texte de l'espace artiste. Pas d'articles à remettre tant que
+    // la billetterie n'est pas portée (lot 6).
+    artistInfo: evenement.artistInfo,
+    ticketingHandoutItemsEnabled: false,
     droits: droits
       ? Object.fromEntries(
           DROITS_PAR_DOMAINE.map((d) => [d.cle, droits[d.cle] && droitsProposes().includes(d)])

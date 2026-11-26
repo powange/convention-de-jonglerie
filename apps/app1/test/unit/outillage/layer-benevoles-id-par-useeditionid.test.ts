@@ -13,9 +13,12 @@ import { describe, expect, it } from 'vitest'
  */
 const DEPOT = resolve(process.cwd(), '..', '..')
 // Chaque layer d'événement monté dans Flowvent : bénévoles, puis chaque module porté.
-const RACINES = ['layers/volunteers/app', 'layers/map/app', 'layers/stock/app'].map((r) =>
-  join(DEPOT, r)
-)
+const RACINES = [
+  'layers/volunteers/app',
+  'layers/map/app',
+  'layers/stock/app',
+  'layers/artists/app',
+].map((r) => join(DEPOT, r))
 const LECTURE_DIRECTE = /\b(?:route|useRoute\(\))\.params\.id\b/
 
 function fichiers(dossier: string): string[] {

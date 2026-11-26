@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 
-import { formatMealDate, formatMealDisplay } from '../../../app/utils/meals'
+import { formatMealDate, formatMealDisplay } from '../../../../../layers/core/app/utils/meals'
 
 /**
  * Le fuseau du LECTEUR ne doit pas déplacer la date d'un repas (constat F1 du carnet).

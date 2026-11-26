@@ -4,6 +4,7 @@ import { join } from 'node:path'
 
 import type { H3Event } from 'h3'
 
+import { canManageArtistsById } from '../../utils/permissions/edition-permissions'
 import { getAuthSession } from '../../utils/session-helpers'
 
 /**
@@ -19,19 +20,42 @@ import { getAuthSession } from '../../utils/session-helpers'
  */
 
 interface DomaineFichiers {
-  /** Le chemin complet, extension comprise. Le groupe 1, s'il existe, est l'id de l'événement. */
+  /** Le chemin complet, extension comprise. Son premier groupe capturé est l'id de l'événement. */
   motif: RegExp
   /** `public`, ou qui peut lire (session exigée). */
   lecture: 'public' | ((eventId: number, userId: number, event: H3Event) => Promise<boolean>)
 }
 
-const IMAGES = '(jpe?g|png|webp)'
+const IMAGES = '(?:jpe?g|png|webp)'
 
 const DOMAINES: DomaineFichiers[] = [
   // Photos de profil, publiques comme dans app1 (dépôt dans temp/, puis profiles/<id>/).
   {
     motif: new RegExp(`^(?:temp/)?profiles/\\d+/[A-Za-z0-9_-]+\\.${IMAGES}$`, 'i'),
     lecture: 'public',
+  },
+  // Visuels de spectacle : publics (affichés sur le programme), comme dans app1. Dépôt dans
+  // temp/shows/<événement>/, rangés ensuite dans shows/<spectacle>/.
+  {
+    motif: new RegExp(`^(?:temp/shows|shows)/\\d+/[A-Za-z0-9_-]+\\.${IMAGES}$`, 'i'),
+    lecture: 'public',
+  },
+  // Justificatifs des artistes (billets, notes de frais, factures) : ils portent des noms, des
+  // adresses, parfois un RIB. Lisibles seulement par qui gère les artistes de l'événement, ou par
+  // l'artiste lui-même — même règle qu'app1. L'événement tient lieu de convention dans le chemin.
+  {
+    motif: new RegExp(
+      `^(?:temp/artists/(\\d+)|conventions/\\d+/editions/(\\d+)/artists)/[A-Za-z0-9_-]+\\.(?:jpe?g|png|webp|pdf)$`,
+      'i'
+    ),
+    lecture: async (eventId, userId, event) => {
+      if (await canManageArtistsById(eventId, userId, event)) return true
+      const sienne = await prisma.editionArtist.findUnique({
+        where: { editionId_userId: { editionId: eventId, userId } },
+        select: { id: true },
+      })
+      return sienne !== null
+    },
   },
 ]
 
@@ -53,7 +77,13 @@ export default defineEventHandler(async (event) => {
 
   const prive = domaine.lecture !== 'public'
   if (domaine.lecture !== 'public') {
-    const eventId = Number(chemin.match(domaine.motif)?.[1])
+    // Le premier groupe capturé est l'id de l'événement (un motif peut en proposer plusieurs).
+    const eventId = Number(
+      chemin
+        .match(domaine.motif)
+        ?.slice(1)
+        .find((g) => g !== undefined)
+    )
     const session = await getAuthSession(event)
     const userId = (session?.user as { id?: number } | undefined)?.id
     const autorise =

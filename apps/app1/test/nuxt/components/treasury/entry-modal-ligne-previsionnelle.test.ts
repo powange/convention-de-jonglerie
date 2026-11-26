@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
 
 import EntryModal from '../../../../app/components/treasury/EntryModal.vue'
-import { parseMontantSaisi } from '../../../../shared/utils/money'
+import { parseMontantSaisi } from '../../../../../../layers/core/shared/utils/money'
 
 /**
  * Rouvrir une ligne PRÉVISIONNELLE pour la modifier.

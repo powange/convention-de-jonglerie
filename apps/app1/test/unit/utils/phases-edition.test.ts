@@ -4,7 +4,7 @@ import {
   normaliserPhases,
   phasesDuBenevole,
   phasesSeRencontrent,
-} from '../../../shared/utils/phases-edition'
+} from '../../../../../layers/core/shared/utils/phases-edition'
 
 /**
  * À quelles PHASES d'une édition un article à remettre s'applique.

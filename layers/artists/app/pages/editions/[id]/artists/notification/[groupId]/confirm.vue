@@ -68,6 +68,8 @@ interface Envoi {
   sentAt: string
 }
 
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 const envoi = ref<Envoi | null>(null)
 const chargement = ref(true)
 const erreur = ref('')
@@ -75,7 +77,7 @@ const erreur = ref('')
 onMounted(async () => {
   try {
     const reponse = await $fetch<{ data: Envoi }>(
-      `/api/editions/${route.params.id}/artists/notification/${route.params.groupId}/confirm`,
+      `/api/editions/${editionId}/artists/notification/${route.params.groupId}/confirm`,
       { method: 'POST' }
     )
     envoi.value = reponse.data

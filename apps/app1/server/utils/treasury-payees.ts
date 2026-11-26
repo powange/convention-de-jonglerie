@@ -4,7 +4,7 @@ import {
   coordonneeBancaireOuNull,
   LONGUEUR_MAX_BIC,
   LONGUEUR_MAX_IBAN,
-} from '~~/shared/utils/coordonnees-bancaires'
+} from '#core/shared/utils/coordonnees-bancaires'
 
 /**
  * Le carnet des bénéficiaires d'une édition : à qui l'on doit verser de l'argent.

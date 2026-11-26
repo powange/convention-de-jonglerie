@@ -1,3 +1,4 @@
+import { lirePresenceArtiste } from '#artists/shared/utils/presence-artiste'
 import { useArtistsPorts } from '#server/artists/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -10,7 +11,6 @@ import {
   getAvailableMealsOnArrival,
   getAvailableMealsOnDeparture,
 } from '#server/utils/volunteer-meals'
-import { lirePresenceArtiste } from '~~/shared/utils/presence-artiste'
 
 export default wrapApiHandler(
   async (event) => {

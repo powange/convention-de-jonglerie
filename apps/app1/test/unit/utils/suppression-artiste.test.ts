@@ -4,7 +4,7 @@ import {
   numerosOrphelinsApresSuppression,
   spectaclesVidesApresRetrait,
   type SpectacleAvecNumeros,
-} from '../../../shared/utils/suppression-artiste'
+} from '../../../../../layers/artists/shared/utils/suppression-artiste'
 
 /** Un cabaret dont les numéros portent les artistes indiqués. */
 function cabaret(

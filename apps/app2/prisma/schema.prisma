@@ -76,6 +76,14 @@ model User {
   stockPickupResponsibilities        StockItem[]                         @relation("StockPickupResponsible")
   stockReturnResponsibilities        StockItem[]                         @relation("StockReturnResponsible")
   stockReservations                  StockReservation[]
+  // Artistes et spectacles (layer `artists`) : mêmes noms qu'app1.
+  artistProfiles                     EditionArtist[]
+  validatedArtistEntries             EditionArtist[]                     @relation("ArtistEntryValidator")
+  artistPickupResponsibilities       EditionArtist[]                     @relation("ArtistPickupResponsible")
+  artistDropoffResponsibilities      EditionArtist[]                     @relation("ArtistDropoffResponsible")
+  showPresets                        ShowPreset[]
+  artistNotificationGroups           ArtistNotificationGroup[]
+  artistNotificationConfirmations    ArtistNotificationConfirmation[]
 }
 
 model PasswordResetToken {
@@ -119,6 +127,9 @@ model Event {
   mapPublic           Boolean       @default(false)
   externalMapProvider String?
   externalMapRef      String?
+  /// Informations pratiques données aux artistes (espace artiste) — layer `artists`, comme
+  /// `Edition.artistInfo` d'app1.
+  artistInfo          String?       @db.Text
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
   owner               User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
@@ -140,6 +151,11 @@ model Event {
   stockGroups                 StockGroup[]
   stockTags                   StockTag[]
   stockShoppingLists          StockShoppingList[]
+  artists                     EditionArtist[]
+  shows                       Show[]
+  artistNotificationGroups    ArtistNotificationGroup[]
+  handoutItems                TicketingHandoutItem[]
+  volunteerMeals              VolunteerMeal[]
 
   @@index([ownerId])
 }
@@ -842,6 +858,7 @@ model EditionZone {
   markers           EditionMarker[]
   stockItems        StockItem[]
   stockReservations StockReservation[]
+  showPerformances  ShowPerformance[]
 
   @@unique([editionId, externalMapObjectId])
   @@index([editionId])
@@ -871,6 +888,7 @@ model EditionMarker {
 
   stockItems        StockItem[]
   stockReservations StockReservation[]
+  showPerformances  ShowPerformance[]
 
   @@unique([editionId, externalMapObjectId])
   @@index([editionId])
@@ -1097,4 +1115,421 @@ model StockShoppingListItem {
   @@unique([listId, stockItemId])
   @@index([listId])
   @@index([stockItemId])
+}
+
+// =============================================================================
+// Artistes et spectacles (layer `artists`, partagé avec app1) — lot 4 de docs/flowvent-modules.md.
+// Sans l'appel à spectacles (lot 5) : ni candidatures, ni conversation de groupe.
+// =============================================================================
+
+enum ShowType {
+  STANDARD // Spectacle d'un seul tenant : les artistes sont associés au spectacle
+  CABARET // Suite de numéros : les artistes sont associés à un numéro
+}
+
+enum AccommodationType {
+  TENT // Tente
+  VEHICLE // Véhicule aménagé (van, camion, camping-car)
+  HOSTED // Hébergé (en dur, chez quelqu'un)
+  OTHER // Autre
+}
+
+model EditionArtist {
+  id                      Int       @id @default(autoincrement())
+  editionId               Int
+  userId                  Int
+  /// Arrivée et départ sur place, en INSTANTS.
+  ///
+  /// C'étaient des chaînes libres — la valeur brute d'un champ `datetime-local`, sans fuseau :
+  /// impossible à trier, à comparer, ou à afficher à l'heure du lieu. La carte de l'artiste les
+  /// affichait d'ailleurs telles quelles, « 2025-10-31T15:00 ».
+  ///
+  /// La migration qui les convertit ancre chaque valeur au fuseau de son édition, faute de quoi
+  /// une heure saisie « 15 h sur place » serait relue comme 15 h UTC.
+  arrivalDateTime         DateTime?
+  departureDateTime       DateTime?
+  qrCodeToken             String?   @unique
+  entryValidated          Boolean   @default(false)
+  entryValidatedAt        DateTime?
+  entryValidatedBy        Int?
+  // Montants en **centimes entiers**, dans la devise de l'édition. Les additionner en flottant
+  // ferait apparaître des écarts d'arrondi invisibles ligne à ligne mais réels au total ; la
+  // trésorerie les agrège avec ceux de la billetterie, déjà en centimes. Conversion depuis les
+  // unités courantes dans `shared/utils/money.ts`, jamais par un `* 100` disséminé.
+  payment                 Int?
+  paymentPaid             Boolean   @default(false)
+  reimbursementMax        Int?
+  reimbursementActual     Int?
+  reimbursementActualPaid Boolean   @default(false)
+  consumablesMax          Int?
+  consumablesActual       Int?
+  consumablesActualPaid   Boolean   @default(false)
+
+  /// Le justificatif du DÉFRAIEMENT : billet de train, facture d'essence, péage.
+  ///
+  /// ⚠️ Une URL écrite par le CLIENT, comme `imageUrl` en trésorerie : le serveur n'en garde que le
+  /// nom de fichier et ne suit jamais le chemin reçu — voir `artist-receipt-files.ts`. Un `PUT`
+  /// pourrait sinon y glisser `../../../../etc/passwd`.
+  ///
+  /// 📍 Images ET PDF : beaucoup de billets de train n'existent que sous cette forme, et il
+  /// faudrait sinon en faire une capture d'écran.
+  reimbursementReceiptUrl String?
+
+  /// Le justificatif des CONSOMMABLES. Même contrat que celui du défraiement ci-dessus.
+  consumablesReceiptUrl String?
+
+  /// LA FACTURE DE L'ARTISTE. Même contrat de dépôt que les deux justificatifs ci-dessus.
+  ///
+  /// 📍 C'est l'ARTISTE qui fournit sa facture — il la remet à la convention, pas l'inverse.
+  /// `invoiceRequested` dit qu'une facture lui est demandée, `invoiceProvided` qu'il l'a remise.
+  /// Les libellés français disaient l'inverse (« L'artiste demande une facture », « Facture
+  /// fournie à l'artiste ») : ils sont corrigés, aucune donnée n'ayant été saisie sous cette
+  /// lecture.
+  ///
+  /// 📍 Déposer un fichier ici vaut remise : l'écriture passe `invoiceProvided` à vrai. La case
+  /// reste cochable seule, pour une facture reçue par courriel ou sur papier — mais un fichier
+  /// présent et la case décochée serait une contradiction que personne ne saurait trancher.
+  invoiceUrl String?
+
+  /// Les coordonnées bancaires pour virer le cachet et les défraiements.
+  ///
+  /// ⚠️ PORTÉES PAR L'ARTISTE DE CETTE ÉDITION, et non par son compte. C'est délibéré, et c'est
+  /// une question de confidentialité avant d'être une question de modèle : sur le compte, l'IBAN
+  /// confié aux organisateurs d'une édition serait lisible par ceux de toutes les autres, sans que
+  /// la personne l'ait jamais accepté. Le prix est connu — un artiste invité deux fois le ressaisit
+  /// — et il est moins élevé que celui d'une donnée bancaire qui circule.
+  ///
+  /// 📍 PREMIÈRES DONNÉES BANCAIRES DU DÉPÔT. Lisibles par qui gère les artistes de l'édition
+  /// (`canManageArtistsById`), comme les montants et les justificatifs du même onglet.
+  ///
+  /// ⚠️ ET, DEPUIS LE 17/11/2026, par qui gère la TRÉSORERIE (`canManageTreasuryById`), pour le
+  /// seul point d'API des versements à faire (`/treasury/payouts`). Décision explicite de
+  /// l'utilisateur, et non un effet de bord : c'est le trésorier qui exécute les virements, lui
+  /// refuser l'IBAN lui ferait voir un versement à faire sans pouvoir le faire.
+  ///
+  /// La garde reste étroite : ce point d'API est le seul de la trésorerie à rendre des IBAN, et
+  /// la lecture générale (`/treasury`) n'en rend toujours aucun — elle alimente aussi des écrans
+  /// de consultation. Tous les autres lecteurs de cette table emploient un `select` explicite.
+  ///
+  /// Stockées NORMALISÉES — majuscules, sans espaces — par `shared/utils/coordonnees-bancaires.ts`,
+  /// de sorte que deux saisies du même compte se comparent.
+  iban                    String?            @db.VarChar(34)
+  bic                     String?            @db.VarChar(11)
+  organizerNotes          String?            @db.Text
+  accommodationAutonomous Boolean            @default(false)
+  accommodationType       AccommodationType?
+  accommodationTypeOther  String?            @db.Text
+  accommodationProposal   String?            @db.Text
+  invoiceRequested        Boolean            @default(false)
+  invoiceProvided         Boolean            @default(false)
+  feeRequested            Boolean            @default(false)
+  feeProvided             Boolean            @default(false)
+  pickupRequired          Boolean            @default(false)
+  pickupLocation          String?
+  pickupResponsibleId     Int?
+  dropoffRequired         Boolean            @default(false)
+  dropoffLocation         String?
+  dropoffResponsibleId    Int?
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entryValidatedByUser User?                 @relation("ArtistEntryValidator", fields: [entryValidatedBy], references: [id], onDelete: SetNull)
+  pickupResponsible    User?                 @relation("ArtistPickupResponsible", fields: [pickupResponsibleId], references: [id], onDelete: SetNull)
+  dropoffResponsible   User?                 @relation("ArtistDropoffResponsible", fields: [dropoffResponsibleId], references: [id], onDelete: SetNull)
+  shows                ShowArtist[]
+  mealSelections       ArtistMealSelection[]
+  handoutItems         ArtistHandoutItem[]
+  event                Event?                @relation(fields: [eventId], references: [id])
+  eventId              Int?
+
+  @@unique([editionId, userId])
+  @@index([editionId])
+  @@index([userId])
+  @@index([entryValidatedBy])
+  @@index([pickupResponsibleId])
+  @@index([dropoffResponsibleId])
+  @@index([qrCodeToken])
+}
+
+model Show {
+  id             Int      @id @default(autoincrement())
+  editionId      Int
+  title          String
+  type           ShowType @default(STANDARD)
+  // Compagnie ou nom de scène de l'artiste qui porte le spectacle. Propre aux spectacles
+  // STANDARD : dans un cabaret, chaque numéro a ses propres artistes, il n'y a pas de
+  // compagnie unique à afficher au niveau de la soirée.
+  companyName    String?
+  description    String?  @db.Text
+  technicalNeeds String?  @db.Text // Besoins techniques du spectacle (interne, non exposé publiquement)
+  // La durée appartient à l'œuvre, pas au passage : un spectacle joué deux fois dure aussi
+  // longtemps les deux soirs. Le quand et le où vivent dans `performances`.
+  duration       Int?
+  imageUrl       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  artists      ShowArtist[]
+  acts         ShowAct[]
+  handoutItems ShowHandoutItem[]
+  performances ShowPerformance[]
+  // Le groupe de messagerie dédié au spectacle, créé à la première utilisation
+  event        Event?            @relation(fields: [eventId], references: [id])
+  eventId      Int?
+
+  @@index([editionId])
+}
+
+model ShowPerformance {
+  id            Int      @id @default(autoincrement())
+  showId        Int
+  startDateTime DateTime
+  location      String?
+  zoneId        Int?
+  markerId      Int?
+  /// Une représentation peut être annoncée pendant qu'une autre reste en préparation.
+  isPublic      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  show   Show           @relation(fields: [showId], references: [id], onDelete: Cascade)
+  zone   EditionZone?   @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  marker EditionMarker? @relation(fields: [markerId], references: [id], onDelete: SetNull)
+
+  @@index([showId])
+  @@index([showId, startDateTime])
+  @@index([startDateTime])
+  @@index([zoneId])
+  @@index([markerId])
+}
+
+model ShowAct {
+  id             Int      @id @default(autoincrement())
+  showId         Int
+  title          String
+  // Compagnie ou nom de scène des artistes du numéro. Le pendant de `Show.companyName`, qui ne
+  // vaut que pour un spectacle STANDARD : dans un cabaret, chaque numéro a la sienne.
+  //
+  // Rempli à l'import d'une candidature, depuis son `artistName` — sans quoi ce nom, obligatoire
+  // pour le candidat et affiché partout dans l'appel à spectacle, disparaissait au moment précis
+  // où la candidature devenait un numéro.
+  companyName    String?
+  position       Int // Ordre de passage dans le déroulé du cabaret
+  duration       Int? // En minutes
+  description    String?  @db.Text
+  technicalNeeds String?  @db.Text // Besoins techniques (espace, son, lumière)
+  stageSetup     String?  @db.Text // Mise en place scène (état de la scène avant/après le numéro)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  show    Show         @relation(fields: [showId], references: [id], onDelete: Cascade)
+  artists ShowArtist[]
+
+  @@index([showId])
+  @@index([showId, position])
+}
+
+model ShowArtist {
+  id        Int      @id @default(autoincrement())
+  showId    Int
+  // Renseigné uniquement quand l'artiste participe via un numéro (spectacle CABARET).
+  // showId reste rempli dans tous les cas : c'est lui qui répond à « à quels spectacles
+  // cet artiste participe-t-il ? », question posée par la billetterie, l'espace artiste
+  // et le tableau de gestion.
+  actId     Int?
+  artistId  Int
+  createdAt DateTime @default(now())
+
+  show   Show          @relation(fields: [showId], references: [id], onDelete: Cascade)
+  act    ShowAct?      @relation(fields: [actId], references: [id], onDelete: Cascade)
+  artist EditionArtist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  // Un artiste peut apparaître dans plusieurs numéros du même cabaret, d'où actId dans la clé.
+  // Attention : MySQL considère deux NULL comme distincts, cette contrainte ne protège donc
+  // pas les liens sans numéro (actId null). Leur unicité est assurée par le code appelant,
+  // qui remplace l'ensemble des liens à chaque mise à jour d'un spectacle.
+  @@unique([showId, actId, artistId])
+  @@index([showId])
+  @@index([actId])
+  @@index([artistId])
+}
+
+model ArtistHandoutItem {
+  id            Int      @id @default(autoincrement())
+  artistId      Int
+  handoutItemId Int
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity      Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  artist      EditionArtist        @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
+
+  @@unique([artistId, handoutItemId])
+  @@index([artistId])
+  @@index([handoutItemId])
+}
+
+model ShowHandoutItem {
+  id            Int      @id @default(autoincrement())
+  showId        Int
+  handoutItemId Int
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity      Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  show        Show                 @relation(fields: [showId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
+
+  @@unique([showId, handoutItemId])
+  @@index([showId])
+  @@index([handoutItemId])
+}
+
+model ShowPreset {
+  id     Int    @id @default(autoincrement())
+  userId Int
+  name   String
+
+  // Infos artiste
+  artistName   String // Nom de scène
+  artistBio    String? @db.Text
+  portfolioUrl String?
+  videoUrl     String?
+  socialLinks  String? @db.Text
+
+  // Infos spectacle
+  showTitle                 String
+  showDescription           String  @db.Text
+  showDuration              Int
+  showCategory              String?
+  technicalNeeds            String? @db.Text
+  stageSetup                String? @db.Text // Mise en place sur scène (avant le numéro et état de la scène après)
+  additionalPerformersCount Int     @default(0)
+  additionalPerformers      Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model ArtistNotificationGroup {
+  id             String   @id @default(cuid())
+  editionId      Int
+  /// Facultatif : voir son jumeau côté bénévoles. L'envoi survit à son auteur.
+  senderId       Int?
+  title          String
+  message        String   @db.Text
+  targetType     String // 'all' ou 'shows'
+  selectedShows  Json? // Identifiants des spectacles visés si targetType = 'shows'
+  recipientCount Int
+  sentAt         DateTime @default(now())
+
+  sender        User?                            @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  confirmations ArtistNotificationConfirmation[]
+  event         Event?                           @relation(fields: [eventId], references: [id])
+  eventId       Int?
+
+  @@index([editionId])
+  @@index([senderId])
+}
+
+model ArtistNotificationConfirmation {
+  id                        String    @id @default(cuid())
+  artistNotificationGroupId String
+  userId                    Int
+  confirmedAt               DateTime?
+
+  notificationGroup ArtistNotificationGroup @relation(fields: [artistNotificationGroupId], references: [id], onDelete: Cascade)
+  /// Cascade, pour la même raison que son jumeau côté bénévoles : la ligne appartient au
+  /// destinataire.
+  user              User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([artistNotificationGroupId, userId])
+  @@index([userId])
+}
+
+// -----------------------------------------------------------------------------
+// Tables DORMANTES, portées avec les artistes parce que leurs requêtes les incluent : articles
+// remis (billetterie, lot 6) et repas (lot 7). Vides tant que ces modules ne sont pas portés ;
+// leurs écrans restent cachés (modules inactifs, aucun droit). Relations vers les modèles à venir
+// ajoutées avec eux.
+// -----------------------------------------------------------------------------
+
+model TicketingHandoutItem {
+  id         Int      @id @default(autoincrement())
+  editionId  Int
+  name       String
+  /// Cumulable : l'article est remis autant de fois qu'il est associé au
+  /// participant (ex. un artiste jouant dans deux spectacles). Par défaut il
+  /// n'est remis qu'une seule fois, quel que soit le nombre d'associations.
+  cumulative Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  shows   ShowHandoutItem[]
+  artists ArtistHandoutItem[]
+  event   Event?              @relation(fields: [eventId], references: [id])
+  eventId Int?
+
+  /// Deux articles de même nom dans une édition sont indiscernables partout : dans les huit
+  /// modales de sélection, et surtout au guichet, où la liste de remise affiche deux lignes
+  /// identiques. L'agrégation se faisant par identifiant, la règle « non cumulable » ne les
+  /// fusionne jamais — elle ne protège que d'un même article associé plusieurs fois.
+  ///
+  /// La colonne est en `utf8mb4_unicode_ci` : l'unicité est donc insensible à la casse et aux
+  /// accents, ce qui est bien l'intention — « Bracelet » et « bracelet » ne se distinguent pas
+  /// davantage à l'œil.
+  @@unique([editionId, name])
+  @@index([editionId])
+}
+
+enum VolunteerMealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+}
+
+model VolunteerMeal {
+  id        Int               @id @default(autoincrement())
+  editionId Int
+  date      DateTime          @db.Date
+  mealType  VolunteerMealType
+  enabled   Boolean           @default(true)
+  phases    Json              @default("[]")
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  artistMealSelections ArtistMealSelection[]
+  event                Event?                @relation(fields: [eventId], references: [id])
+  eventId              Int?
+
+  @@unique([editionId, date, mealType])
+  @@index([editionId])
+  @@index([date])
+}
+
+model ArtistMealSelection {
+  id         Int       @id @default(autoincrement())
+  artistId   Int
+  mealId     Int
+  accepted   Boolean   @default(true)
+  afterShow  Boolean   @default(false)
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  artist EditionArtist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  meal   VolunteerMeal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([artistId, mealId])
+  @@index([artistId])
+  @@index([mealId])
 }

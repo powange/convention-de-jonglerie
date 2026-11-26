@@ -101,6 +101,31 @@ ou responsable d'une équipe de bénévoles.
 ⚠️ Un layer ne doit pas compter sur les auto-imports de VueUse : app1 a `@vueuse/nuxt`, pas
 Flowvent (`useNow` y valait `undefined`, page en 500). Importer depuis `@vueuse/core`.
 
+## Artistes et spectacles (lot 4)
+
+Le code des spectacles vivait dans app1 (API, modèles de spectacle du profil, dépôts de fichiers,
+composants) : il rejoint `layers/artists` (alias `#artists`), avec ses utilitaires propres
+(suppression d'un artiste, reste à verser, présence, représentations, numéros, sélections et
+schéma des spectacles, type d'hébergement). Les traductions `artists.json` et `gestion.artists` /
+`gestion.shows` passent dans le layer. Partagés par plusieurs modules → `layers/core` (montants,
+coordonnées bancaires, nom affichable, phases de l'édition, validation générique, justificatifs,
+repas, sélection d'articles) ou `layers/ui` / `layers/map` (`UiMoneyInput`, `EditionLocationPicker`).
+
+Les points qui chargeaient l'édition d'app1 eux-mêmes (`prisma.edition` + convention) passent
+par `getEditionWithPermissions`, que les deux apps fournissent.
+
+**Tables dormantes** : la fiche d'un artiste et ses requêtes incluent les articles remis
+(billetterie) et les repas. Plutôt que de réordonner la file, leurs tables sont créées vides dans
+Flowvent (`TicketingHandoutItem`, `ArtistHandoutItem`, `ShowHandoutItem`, `VolunteerMeal`,
+`ArtistMealSelection`) ; leurs écrans restent cachés (modules inactifs, aucun droit), et
+`handout-items-actifs` y répond « non ». Les lots 6 et 7 les rendront vivantes.
+
+Propre à Flowvent : port artistes (texte d'accueil sur `Event.artistInfo`, aucun repas), messagerie
+neutre (`syncShowGroupParticipants`, `ShowApplicationChat` vide — pas de messagerie, décision de
+l'utilisateur), un artiste compte comme « impliqué » pour atteindre son espace sur un événement non
+public, et deux domaines de fichiers : visuels de spectacle (publics) et justificatifs d'artiste
+(qui gère les artistes, ou l'artiste lui-même).
+
 ## Notions « convention » à ramener à l'événement
 
 Flowvent n'a pas de convention : l'événement en tient lieu (`getEditionWithPermissions` rend

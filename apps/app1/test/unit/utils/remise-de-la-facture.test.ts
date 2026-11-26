@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { remiseDeLaFacture } from '../../../server/utils/remise-de-la-facture'
+import { remiseDeLaFacture } from '../../../../../layers/artists/server/utils/remise-de-la-facture'
 
 describe('remiseDeLaFacture', () => {
   it('coche la remise quand une facture est déposée', () => {

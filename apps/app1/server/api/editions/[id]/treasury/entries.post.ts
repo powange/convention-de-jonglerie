@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { toCents } from '#core/shared/utils/money'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTreasuryById } from '#server/utils/permissions/edition-permissions'
@@ -14,7 +15,6 @@ import {
 } from '#server/utils/treasury-guards'
 import { deplacerJustificatif } from '#server/utils/treasury-receipt-files'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { toCents } from '~~/shared/utils/money'
 
 /**
  * Le montant arrive en unité courante, comme partout dans les formulaires, et repart en centimes.

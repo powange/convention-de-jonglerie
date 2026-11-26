@@ -231,8 +231,8 @@ import type {
 } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
 
+import { candidatureModifiable } from '#core/shared/utils/candidature-spectacle'
 import { formaterDateHeure } from '#core/shared/utils/fuseau-edition'
-import { candidatureModifiable } from '~~/shared/utils/candidature-spectacle'
 
 const route = useRoute()
 // `buildLoginUrl` nettoie l'URL, refuse de boucler sur une page d'authentification et

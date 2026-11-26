@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { lirePresenceArtiste } from '../../../shared/utils/presence-artiste'
+import { lirePresenceArtiste } from '../../../../../layers/artists/shared/utils/presence-artiste'
 
 /**
  * Le défaut d'origine : le filtre des repas des artistes avait été recopié de celui des

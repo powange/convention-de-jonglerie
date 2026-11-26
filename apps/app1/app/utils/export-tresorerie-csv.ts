@@ -1,7 +1,7 @@
 import { regrouperParCode, type LigneTresorerie } from './export-tresorerie'
 
 import { versCsv } from '#core/shared/utils/csv'
-import { fromCents } from '~~/shared/utils/money'
+import { fromCents } from '#core/shared/utils/money'
 
 /**
  * La trésorerie d'une édition, en CSV.

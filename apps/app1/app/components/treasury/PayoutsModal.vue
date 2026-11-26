@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { formaterIbanParGroupes } from '~~/shared/utils/coordonnees-bancaires'
+import { formaterIbanParGroupes } from '#core/shared/utils/coordonnees-bancaires'
 
 interface LigneAVerser {
   cle: string

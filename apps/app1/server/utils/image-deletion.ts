@@ -1,10 +1,10 @@
-import { deleteOldFile } from './file-helpers'
 import { getConventionForEdit } from './permissions/convention-permissions'
 import { getEditionForEdit } from './permissions/edition-permissions'
 
 import type { Convention, Edition, User } from '#server/types/prisma'
 
 import { isHttpError } from '#server/types/api'
+import { deleteOldFile } from '#server/utils/file-helpers'
 
 /**
  * Ce qu'il faut savoir pour retrouver un FICHIER : son entité et son dossier, rien d'autre.

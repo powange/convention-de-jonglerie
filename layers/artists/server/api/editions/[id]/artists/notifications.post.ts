@@ -3,8 +3,10 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { NotificationService } from '#server/utils/notification-service'
-import { canManageArtistsById } from '#server/utils/permissions/edition-permissions'
-import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import {
+  canManageArtistsById,
+  getEditionWithPermissions,
+} from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 const notificationSchema = z.object({
@@ -41,10 +43,9 @@ export default wrapApiHandler(
       throw createError({ status: 400, message: 'Aucun spectacle sélectionné' })
     }
 
-    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
-      select: { id: true, name: true, convention: { select: { name: true } } },
-      errorMessage: 'Édition introuvable',
-    })
+    // Par le contrat d'hôte : une édition d'app1 comme un événement Flowvent (sa « convention »).
+    const edition = await getEditionWithPermissions(editionId, { userId: user.id })
+    if (!edition) throw createError({ status: 404, message: 'Édition introuvable' })
 
     // Un artiste joue parfois dans plusieurs spectacles visés : `distinct` évite de lui
     // envoyer le même message autant de fois.

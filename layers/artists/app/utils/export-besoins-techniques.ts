@@ -1,4 +1,4 @@
-import { texteImprimable } from '~~/shared/utils/texte-imprimable'
+import { texteImprimable } from '#core/shared/utils/texte-imprimable'
 
 /**
  * La feuille technique d'une édition, mise en tableaux.

@@ -1,18 +1,18 @@
 import { z } from 'zod'
 
+import { coordonneesBancairesRecues } from '#artists/server/utils/coordonnees-bancaires-recues'
 import { misesAJourDuProfil } from '#core/server/utils/infos-personnelles'
 import { generateVolunteerQrCodeToken } from '#core/server/utils/token-generator'
 import { schemaAdresseEmail } from '#core/shared/utils/adresse-email'
+import { toCents } from '#core/shared/utils/money'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { coordonneesBancairesRecues } from '#server/utils/coordonnees-bancaires-recues'
 import { createPendingUserAndInvite } from '#server/utils/invitation'
 import {
   getEditionWithPermissions,
   canManageArtists,
 } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { toCents } from '~~/shared/utils/money'
 
 // Un montant réel supérieur à son plafond rendrait l'artiste inéditable : le PUT
 // rejette cet état sur toute mise à jour, même sans rapport avec les montants.

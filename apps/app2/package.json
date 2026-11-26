@@ -52,7 +52,7 @@
     "cron": "^4.4.2",
     "fast-xml-parser": "^5.12.1",
     "jspdf": "^4.2.1",
-    "jspdf-autotable": "^5.0.7",
+    "jspdf-autotable": "^5.0.9",
     "libphonenumber-js": "^1.13.1",
     "luxon": "^3.7.2",
     "nodemailer": "^10.6.1",

@@ -2,7 +2,7 @@
 // setArtistsPorts() (2ᵉ app / tests). Même mécanisme que les autres modules.
 import { createDefaultArtistsPorts } from './default-binding'
 
-import type { ArtistsPorts } from './types'
+import type { ArtistsPorts } from '#artists/server/ports/types'
 
 let override: ArtistsPorts | null = null
 let cached: ArtistsPorts | null = null

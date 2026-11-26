@@ -685,13 +685,13 @@ import { getAccommodationTypeSelectOptions, getAllergySeveritySelectOptions } fr
 import type { AllergySeverityLevel } from '#core/app/utils/allergy-severity'
 
 import { estAdresseEmail } from '#core/shared/utils/adresse-email'
-import { versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
 import {
   bicEstPlausible,
   formaterIbanParGroupes,
   ibanEstPlausible,
-} from '~~/shared/utils/coordonnees-bancaires'
-import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
+} from '#core/shared/utils/coordonnees-bancaires'
+import { versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
+import { DEFAULT_CURRENCY } from '#core/shared/utils/money'
 
 const props = defineProps<{
   modelValue: boolean

@@ -934,13 +934,13 @@ import {
   markdownToHtml,
 } from '#imports'
 
-import { formaterDateHeure, versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
 import {
   bicEstPlausible,
   formaterIbanParGroupes,
   ibanEstPlausible,
   normaliserCoordonneeBancaire,
-} from '~~/shared/utils/coordonnees-bancaires'
+} from '#core/shared/utils/coordonnees-bancaires'
+import { formaterDateHeure, versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
 
 interface ArtistShowAct {
   id: number
@@ -1035,14 +1035,21 @@ const { t, locale } = useI18n()
 const { formatDateTime, formatDateFull } = useDateFormat()
 const { getMealTypeLabel } = useMealTypeLabel()
 
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 
-// Charger l'édition
+// Charger l'édition — par le store, que chaque app fournit (app1 : `/api/editions/:id` ; Flowvent :
+// son événement sous la forme d'une édition). Un `useFetch` direct sur `/api/editions/:id`
+// n'existait que dans app1, et laissait l'espace artiste vide dans Flowvent.
 const {
   data: edition,
   pending: _editionLoading,
   error: _editionError,
-} = await useFetch<Edition>(`/api/editions/${editionId}`)
+} = await useAsyncData(
+  `espace-artiste-edition-${editionId}`,
+  async () =>
+    (await editionStore.fetchEditionById(editionId, { force: true })) as unknown as Edition
+)
 
 // Informations artistes en HTML (rendu Markdown)
 const { data: artistInfoHtml } = await useAsyncData(`artist-info-${editionId}`, async () => {

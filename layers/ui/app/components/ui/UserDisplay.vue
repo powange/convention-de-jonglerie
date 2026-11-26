@@ -15,6 +15,9 @@
 </template>
 
 <script setup lang="ts">
+// Import explicite : Flowvent n'a pas les auto-imports de VueUse (`@vueuse/nuxt`, propre à app1).
+import { useTimeAgoIntl } from '@vueuse/core'
+
 interface User {
   id?: number
   pseudo: string

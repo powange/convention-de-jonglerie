@@ -1,6 +1,5 @@
-import { normaliserTexte } from '#core/shared/utils/recherche-texte'
-
 import { cleDeBoiteDeReception } from '#core/shared/utils/adresse-email'
+import { normaliserTexte } from '#core/shared/utils/recherche-texte'
 
 /**
  * Rapprocher les titres d'une même personne, au contrôle d'accès.

@@ -20,7 +20,12 @@ import { describe, expect, it } from 'vitest'
  */
 const DEPOT = resolve(process.cwd(), '..', '..')
 const APP2 = join(DEPOT, 'apps/app2')
-const SOURCES = ['layers/volunteers/app', 'layers/map/app', 'layers/stock/app']
+const SOURCES = [
+  'layers/volunteers/app',
+  'layers/map/app',
+  'layers/stock/app',
+  'layers/artists/app',
+]
 
 /** Les clés construites à l'exécution : seul leur préfixe est connu, il doit avoir des entrées. */
 const PREFIXES_DYNAMIQUES = ['pages.volunteers.dietary.', 'edition.volunteers.time_slots_options.']

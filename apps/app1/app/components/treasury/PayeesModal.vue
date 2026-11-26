@@ -109,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import { formaterIbanParGroupes, ibanEstPlausible } from '~~/shared/utils/coordonnees-bancaires'
+import { formaterIbanParGroupes, ibanEstPlausible } from '#core/shared/utils/coordonnees-bancaires'
 
 interface Payee {
   id: number

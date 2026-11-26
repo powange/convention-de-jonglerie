@@ -6,6 +6,30 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { MAX_ENVOIS_PAR_HEURE, uploadRateLimiter } from '../../../../server/utils/api-rate-limiter'
 
 const DOSSIER_DES_ENVOIS = join(process.cwd(), 'server/api/files')
+const LAYERS = join(process.cwd(), '..', '..', 'layers')
+
+/**
+ * Tous les points d'envoi : ceux d'app1, et ceux des layers partagés (les visuels de spectacle et
+ * les justificatifs d'artiste y sont passés avec le layer artistes). Sans les layers, un point
+ * déplacé sortirait de la garde sans que rien ne le dise.
+ */
+async function pointsDEnvoi(): Promise<{ nom: string; chemin: string }[]> {
+  const dossiers = [DOSSIER_DES_ENVOIS]
+  for (const layer of await readdir(LAYERS)) {
+    dossiers.push(join(LAYERS, layer, 'server/api/files'))
+  }
+  const points: { nom: string; chemin: string }[] = []
+  for (const dossier of dossiers) {
+    const fichiers = await readdir(dossier).catch(() => [] as string[])
+    for (const f of fichiers.filter((x) => x.endsWith('.post.ts'))) {
+      points.push({
+        nom: dossier === DOSSIER_DES_ENVOIS ? f : `${dossier.slice(LAYERS.length + 1)}/${f}`,
+        chemin: join(dossier, f),
+      })
+    }
+  }
+  return points
+}
 
 /*
  * ⚠️ AU SOMMET DU MODULE, et non dans le `describe` : son callback n'est pas `async`, et un `await`
@@ -52,15 +76,16 @@ describe('la limite des envois de fichiers', () => {
   })
 
   it('⚠️ EST APPELÉE PAR TOUS LES POINTS D’ENVOI, y compris ceux à venir', async () => {
-    const fichiers = (await readdir(DOSSIER_DES_ENVOIS)).filter((f) => f.endsWith('.post.ts'))
+    const fichiers = await pointsDEnvoi()
 
     // La sentinelle : si le dossier était vide ou mal résolu, le test passerait sans rien lire.
     expect(fichiers.length).toBeGreaterThanOrEqual(8)
+    expect(fichiers.map((f) => f.nom)).toContain('artists/server/api/files/show.post.ts')
 
     const sansLimite: string[] = []
     for (const fichier of fichiers) {
-      const source = await readFile(join(DOSSIER_DES_ENVOIS, fichier), 'utf8')
-      if (!source.includes('await uploadRateLimiter(event)')) sansLimite.push(fichier)
+      const source = await readFile(fichier.chemin, 'utf8')
+      if (!source.includes('await uploadRateLimiter(event)')) sansLimite.push(fichier.nom)
     }
 
     expect(sansLimite).toEqual([])
@@ -72,10 +97,10 @@ describe('la limite des envois de fichiers', () => {
      * envois tomberaient dans le même seau `upload:anonymous` : le premier abus bloquerait alors
      * **tout le monde**, ce qui est pire que pas de limite du tout.
      */
-    const fichiers = (await readdir(DOSSIER_DES_ENVOIS)).filter((f) => f.endsWith('.post.ts'))
+    const fichiers = await pointsDEnvoi()
 
-    for (const fichier of fichiers) {
-      const source = await readFile(join(DOSSIER_DES_ENVOIS, fichier), 'utf8')
+    for (const { nom: fichier, chemin } of fichiers) {
+      const source = await readFile(chemin, 'utf8')
       const limite = source.indexOf('await uploadRateLimiter(event)')
       const auth = Math.max(
         source.indexOf('requireAuth(event)'),

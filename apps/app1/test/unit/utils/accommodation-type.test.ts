@@ -4,7 +4,7 @@ import {
   ACCOMMODATION_TYPES,
   getAccommodationTypeLabel,
   getAccommodationTypeSelectOptions,
-} from '../../../app/utils/accommodation-type'
+} from '../../../../../layers/artists/app/utils/accommodation-type'
 
 // Fausse fonction de traduction : renvoie un libellé connu ou la clé brute.
 const t = (key: string) => {

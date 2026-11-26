@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { normaliserPhases, PHASES_EDITION, type PhaseEdition } from '~~/shared/utils/phases-edition'
+import {
+  normaliserPhases,
+  PHASES_EDITION,
+  type PhaseEdition,
+} from '#core/shared/utils/phases-edition'
 
 /**
  * Sélection d'articles à remettre avec, pour chacun, le nombre d'exemplaires.

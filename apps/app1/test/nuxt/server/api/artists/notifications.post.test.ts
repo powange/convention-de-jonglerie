@@ -5,9 +5,14 @@ import handler from '../../../../../../../layers/artists/server/api/editions/[id
 const prismaMock = (globalThis as any).prisma
 
 const canManageArtistsById = vi.hoisted(() => vi.fn())
+// L'édition (son nom, ou celui de sa convention) vient du contrat d'hôte, commun à app1 et Flowvent.
+const getEditionWithPermissions = vi.hoisted(() => vi.fn())
 const creerNotification = vi.hoisted(() => vi.fn())
 
-vi.mock('#server/utils/permissions/edition-permissions', () => ({ canManageArtistsById }))
+vi.mock('#server/utils/permissions/edition-permissions', () => ({
+  canManageArtistsById,
+  getEditionWithPermissions,
+}))
 vi.mock('#server/utils/notification-service', () => ({
   NotificationService: { create: creerNotification },
 }))
@@ -27,7 +32,7 @@ describe('/api/editions/[id]/artists/notifications POST', () => {
     g.getRouterParam = vi.fn().mockReturnValue('7')
     canManageArtistsById.mockResolvedValue(true)
     creerNotification.mockResolvedValue(undefined)
-    prismaMock.edition.findUnique.mockResolvedValue({
+    getEditionWithPermissions.mockResolvedValue({
       id: 7,
       name: 'Jongle en Zik',
       convention: { name: 'Zik' },

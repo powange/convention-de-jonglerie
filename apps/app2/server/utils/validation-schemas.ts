@@ -62,3 +62,12 @@ export function handleValidationError(error: z.ZodError): never {
     },
   })
 }
+
+// Validation générique (URL, nettoyage) : commune avec Flowvent. CHEMIN RELATIF (auto-imports).
+export {
+  sanitizeData,
+  urlSchema,
+  validateAndSanitize,
+} from '../../../../layers/core/server/socle/validation-generique'
+// Modèle de spectacle : dans le layer artistes.
+export { showPresetSchema } from '../../../../layers/artists/server/utils/schema-modele-spectacle'

@@ -6,7 +6,7 @@ import {
   formaterIbanParGroupes,
   ibanEstPlausible,
   normaliserCoordonneeBancaire,
-} from '~~/shared/utils/coordonnees-bancaires'
+} from '#core/shared/utils/coordonnees-bancaires'
 
 /**
  * Les IBAN d'exemple publiés par les banques centrales, et eux seuls.

@@ -88,3 +88,15 @@ export const editionMarkerSelect = {
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.EditionMarkerSelect
+
+// Sélections des spectacles : dans le layer artistes, partagées avec Flowvent. CHEMIN RELATIF
+// (auto-imports de Nitro).
+export {
+  showActsInclude,
+  showArtistsInclude,
+  showCompositionInclude,
+  showMarkerSelect,
+  showPerformancesInclude,
+  showZoneMarkerInclude,
+  showZoneSelect,
+} from '../../../../layers/artists/server/utils/selections-spectacles'

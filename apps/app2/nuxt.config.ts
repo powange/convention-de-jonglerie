@@ -26,6 +26,7 @@ export default defineNuxtConfig({
   //   (server/volunteers/ports/registry.ts…). Cf. docs/flowvent-benevoles.md.
   // - `map` : la carte du site (zones, repères, import), lot 2 de docs/flowvent-modules.md.
   // - `stock` : stock et prêts, lot 3.
+  // - `artists` : artistes et spectacles, lot 4.
   extends: [
     '../../layers/ui',
     '../../layers/core',
@@ -33,6 +34,7 @@ export default defineNuxtConfig({
     '../../layers/volunteers',
     '../../layers/map',
     '../../layers/stock',
+    '../../layers/artists',
   ],
 
   hooks: {
@@ -138,6 +140,8 @@ export default defineNuxtConfig({
           '../../../../layers/map/i18n/locales/fr/map.json',
           '../../../../layers/map/i18n/locales/fr/gestion-map.json',
           '../../../../layers/stock/i18n/locales/fr/gestion-stock.json',
+          '../../../../layers/artists/i18n/locales/fr/artists.json',
+          '../../../../layers/artists/i18n/locales/fr/gestion-artists.json',
           'benevoles.json',
           'interface.json',
           'fr.json',
@@ -196,6 +200,21 @@ export default defineNuxtConfig({
           return []
         }
       })(),
+    },
+    // Pré-bundlées dès le démarrage, comme dans app1 : la chaîne Markdown (dont `micromark` tire
+    // `debug`, en CommonJS — « does not provide an export named 'default' » sinon) et le glisser-
+    // déposer du stock. Découvertes en navigation, elles laissaient la première page en erreur.
+    optimizeDeps: {
+      include: [
+        'unified',
+        'remark-parse',
+        'remark-gfm',
+        'remark-rehype',
+        'rehype-sanitize',
+        'rehype-stringify',
+        'unist-util-visit',
+        'sortablejs',
+      ],
     },
   },
 })
