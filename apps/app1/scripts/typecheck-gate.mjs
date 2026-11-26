@@ -60,9 +60,18 @@ export function diagnostiquerAboutissement(journal, codeSortie) {
   return { abouti: true, raison: `typage mené à terme (code ${codeSortie})` }
 }
 
-/** Le journal cite les chemins depuis `apps/app1` ; git les donne depuis la racine. */
-export function normaliserChemin(chemin) {
-  return chemin.startsWith('../../') ? chemin.slice('../../'.length) : `apps/app1/${chemin}`
+/**
+ * Le journal cite les chemins depuis l'app typée ; git les donne depuis la racine.
+ *
+ * L'app vient de `TYPECHECK_APP` (`apps/app1` par défaut) : la même porte sert au typage de
+ * Flowvent (`apps/app2`), dont le journal cite ses propres fichiers sans préfixe — les attribuer à
+ * app1 rendrait sa dette gelée illisible, et la mélangerait à celle d'app1 au premier copier-coller.
+ *
+ * @param {string} chemin
+ * @param {string} [app]
+ */
+export function normaliserChemin(chemin, app = process.env.TYPECHECK_APP || 'apps/app1') {
+  return chemin.startsWith('../../') ? chemin.slice('../../'.length) : `${app}/${chemin}`
 }
 
 /**

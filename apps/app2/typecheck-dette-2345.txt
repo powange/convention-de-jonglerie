@@ -1,0 +1,24 @@
+# Dette de typage GELÉE — TS2345
+#
+# Ce fichier existe pour que la porte ne bloque que les erreurs NOUVELLES. Sans lui, elle
+# bloquait sur les erreurs préexistantes de tout fichier qu’une branche touche : mesuré sur
+# les 120 derniers commits, 15 d'entre eux (1 sur 8) auraient été refusés pour une dette
+# qu'ils n'avaient pas écrite — dont une PR dont le diff ne passait même pas près de la ligne.
+#
+# ⚠️ CE COMPTEUR DOIT DESCENDRE. Corriger une erreur rend son entrée périmée, et la porte
+# échoue tant qu’on ne l’a pas retirée — à dessein : une liste qu’on ne nettoie pas finit par
+# décrire un dépôt qui n'existe plus. Pour la régénérer après correction :
+#
+#   node scripts/typecheck-gate.mjs --figer <journal> typecheck-dette-2345.txt
+#
+# Le journal se récupère en artefact `typecheck-log` de n’importe quel passage de CI : la
+# mesure doit venir de LÀ, un poste de développement résolvant les paquets autrement (voir
+# le commentaire du job `typecheck` dans .github/workflows/tests.yml).
+#
+# Clé : <nombre>\t<chemin>\tTS<code>\t<message>. Pas de numéro de ligne, il bouge pour rien.
+# Total gelé : 6 erreur(s) sur 5 entrée(s).
+1	layers/artists/app/pages/editions/[id]/gestion/artists/index.vue	TS2345	Argument of type '{}' is not assignable to parameter of type 'string'.
+2	layers/artists/server/api/editions/[id]/artists/[artistId]/meals.get.ts	TS2345	Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+1	layers/map/app/pages/editions/[id]/gestion/map.vue	TS2345	Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+1	layers/map/server/api/editions/[id]/external-map/objects.get.ts	TS2345	Argument of type '{}' is not assignable to parameter of type 'string'.
+1	layers/volunteers/app/pages/editions/[id]/volunteers/index.vue	TS2345	Argument of type 'string | null' is not assignable to parameter of type 'string'.

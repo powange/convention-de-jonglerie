@@ -359,6 +359,97 @@ jobs:
       - name: Typecheck — échoue sur les TS2345 NOUVELLES (dette gelée ailleurs)
         run: node scripts/typecheck-gate.mjs --dette typecheck.log typecheck-dette-2345.txt 2345
 
+  # ---------------------------------------------------------------------------------------------
+  # Le typage de Flowvent (app2), avec la MÊME porte que celui d'app1 : le journal doit avoir
+  # abouti, aucun nom non défini (TS2304/TS2552), aucune TS2345 absente de la dette gelée
+  # (apps/app2/typecheck-dette-2345.txt).
+  #
+  # App2 n'avait aucun typage en CI : son build Docker n'attrape qu'une erreur qui empêche de
+  # construire, ni une variable non définie ni un argument du mauvais type — la classe d'erreur
+  # qui a déjà atteint la production d'app1. Mesuré le 26/11/2026 : 321 erreurs au total, 0 nom
+  # non défini, 6 TS2345 (toutes dans des layers typés dans le contexte de Flowvent).
+  #
+  # Trois différences avec le job `typecheck`, chacune nécessaire :
+  #  - app2 a son propre package-lock.json : installation à part, cache npm de setup-node indexé
+  #    sur ce verrou (pas de cache node_modules : `npm ci` d'app2 prend ~45 s) ;
+  #  - `layers/node_modules` est relié aux dépendances d'APP2, pas d'app1 : les layers doivent
+  #    résoudre leurs paquets comme Flowvent les résout (sans ce lien : 981 erreurs, dont 209
+  #    « module introuvable », au lieu de 321) ;
+  #  - `TYPECHECK_APP=apps/app2` : la porte attribue les chemins du journal à la bonne app.
+  #
+  # Lancé quand la PR peut changer le typage de Flowvent — app2, un layer qu'elle étend, ou ce
+  # workflow — et chaque nuit (`typecheck-app2` dans scripts/perimetre-ci.mjs).
+  typecheck-app2:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    needs: [changements]
+    if: contains(needs.changements.outputs.jobs, ' typecheck-app2 ')
+    defaults:
+      run:
+        working-directory: apps/app2
+    env:
+      TYPECHECK_APP: apps/app2
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: 'apps/app2/package-lock.json'
+
+      - name: Installer les dépendances d'app2
+        run: npm ci --prefer-offline --no-audit
+
+      # Le schéma ne lit pas la base : l'URL ne sert qu'à satisfaire prisma.config.ts.
+      - name: Générer le client Prisma d'app2
+        run: npx prisma generate
+        env:
+          DATABASE_URL: mysql://ci:ci@localhost:3306/ci
+
+      - name: Relier les layers aux dépendances d'app2
+        working-directory: layers
+        run: ln -sfn ../apps/app2/node_modules node_modules
+
+      - name: Typecheck — produire le journal
+        env:
+          NODE_OPTIONS: '--max-old-space-size=8192'
+        run: |
+          set +e
+          npx nuxt typecheck > typecheck.log 2>&1
+          echo $? > typecheck.code
+          set -e
+          echo "Code de sortie du typage : $(cat typecheck.code)"
+          echo "Lignes d'erreur de type : $(grep -cE 'error TS[0-9]+' typecheck.log || true)"
+
+      - name: Conserver le journal de typage
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: typecheck-log-app2
+          path: |
+            apps/app2/typecheck.log
+            apps/app2/typecheck.code
+          retention-days: 14
+
+      - name: Typecheck — le journal doit avoir ABOUTI
+        run: node ../app1/scripts/typecheck-gate.mjs --aboutissement typecheck.log "$(cat typecheck.code)"
+
+      - name: Typecheck — échoue sur les noms non définis (TS2304/TS2552)
+        run: |
+          if grep -qE "error TS(2304|2552)" typecheck.log; then
+            echo "::error::Référence(s) à des noms non définis détectée(s) :"
+            grep -E "error TS(2304|2552)" typecheck.log || true
+            exit 1
+          fi
+          echo "✅ Aucune référence non définie (TS2304/TS2552)."
+
+      - name: Typecheck — échoue sur les TS2345 NOUVELLES (dette gelée ailleurs)
+        run: node ../app1/scripts/typecheck-gate.mjs --dette typecheck.log typecheck-dette-2345.txt 2345
+
   # Job pour valider que le build fonctionne
   build:
     runs-on: ubuntu-22.04
@@ -1398,6 +1489,7 @@ jobs:
         navigateurs,
         image-flowvent,
         image-app1,
+        typecheck-app2,
       ]
     timeout-minutes: 5
 

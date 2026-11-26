@@ -82,6 +82,9 @@ describe('Chemins', () => {
     // Le journal cite depuis `apps/app1` ; git et la liste de dette, depuis la racine.
     expect(normaliserChemin('../../layers/a/b.ts')).toBe('layers/a/b.ts')
     expect(normaliserChemin('server/api/c.ts')).toBe('apps/app1/server/api/c.ts')
+    // Le typage de Flowvent passe par la même porte, son app en paramètre.
+    expect(normaliserChemin('server/api/c.ts', 'apps/app2')).toBe('apps/app2/server/api/c.ts')
+    expect(normaliserChemin('../../layers/a/b.ts', 'apps/app2')).toBe('layers/a/b.ts')
   })
 })
 

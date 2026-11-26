@@ -102,6 +102,7 @@ describe('périmètre de la CI', () => {
       expect(jobs, evt).toEqual([
         ...JOBS_PAR_PERIMETRE.complet,
         'image-flowvent',
+        'typecheck-app2',
         'image-app1',
         'audit',
       ])
@@ -159,12 +160,22 @@ describe('image de Flowvent', () => {
     expect(touchePourFlowvent(['apps/app1/x.ts'], [])).toBe(false)
   })
 
-  it('une PR d’app2 seule construit l’image en plus de lint et test-unit', () => {
+  it('une PR d’app2 seule construit l’image et type app2, en plus de lint et test-unit', () => {
     expect(calculerJobs('pull_request', ['apps/app2/a.ts'], LAYERS_APP2).jobs).toEqual([
       'lint',
       'test-unit',
       'image-flowvent',
+      'typecheck-app2',
     ])
+  })
+
+  it('⚠️ un layer étendu par app2 relance son typage — un changement pour app1 peut le casser', () => {
+    expect(calculerJobs('pull_request', ['layers/volunteers/x.ts'], LAYERS_APP2).jobs).toContain(
+      'typecheck-app2'
+    )
+    expect(calculerJobs('pull_request', ['apps/app1/x.ts'], LAYERS_APP2).jobs).not.toContain(
+      'typecheck-app2'
+    )
   })
 })
 
