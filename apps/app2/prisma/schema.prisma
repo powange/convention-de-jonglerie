@@ -1286,8 +1286,7 @@ model EditionArtist {
   shows                ShowArtist[]
   mealSelections       ArtistMealSelection[]
   handoutItems         ArtistHandoutItem[]
-  event                Event?                @relation(fields: [eventId], references: [id])
-  eventId              Int?
+  event                Event                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
 
   @@unique([editionId, userId])
   @@index([editionId])
@@ -1321,8 +1320,7 @@ model Show {
   handoutItems    ShowHandoutItem[]
   performances    ShowPerformance[]
   // Le groupe de messagerie dédié au spectacle, créé à la première utilisation
-  event           Event?               @relation(fields: [eventId], references: [id])
-  eventId         Int?
+  event           Event                @relation(fields: [editionId], references: [id], onDelete: Cascade)
   applications    ShowApplication[]
   conversation    Conversation?
   ticketingQuotas EditionArtistQuota[]
@@ -1483,8 +1481,7 @@ model ArtistNotificationGroup {
 
   sender        User?                            @relation(fields: [senderId], references: [id], onDelete: SetNull)
   confirmations ArtistNotificationConfirmation[]
-  event         Event?                           @relation(fields: [eventId], references: [id])
-  eventId       Int?
+  event         Event                            @relation(fields: [editionId], references: [id], onDelete: Cascade)
 
   @@index([editionId])
   @@index([senderId])
