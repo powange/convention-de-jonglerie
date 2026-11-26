@@ -118,6 +118,28 @@
       "confirm_disable_description": "A refeição desaparecerá dos ecrãs, do balcão e das contagens da cozinha. As respostas dos voluntários e dos artistas, bem como as refeições já servidas, são CONSERVADAS: reaparecerão tal como estavam se reativar a refeição.",
       "confirm_disable_label": "Desativar esta refeição",
       "confirm_disable_title": "Desativar esta refeição?"
+    },
+    "organizers": {
+      "meals": {
+        "after_show": "Após o espetáculo",
+        "allergies": "Alergias",
+        "allergies_placeholder": "Alergias ou intolerâncias alimentares",
+        "allergy_severity": "Gravidade da alergia",
+        "already_validated": "Já validada",
+        "check_all": "Marcar tudo",
+        "confirm_close_unsaved": "Tem alterações não guardadas. Deseja mesmo fechar?",
+        "description": "Por predefinição, um organizador presente na edição tem acesso a todas as refeições. Desmarque as que não irá tomar.",
+        "dietary_preference": "Regime alimentar",
+        "dietary_section": "Alimentação",
+        "error_loading": "Não foi possível carregar as refeições deste organizador",
+        "error_saving": "Não foi possível guardar as refeições deste organizador",
+        "manage": "Gerir as refeições",
+        "no_meals": "Não há nenhuma refeição configurada para esta edição",
+        "saved_success": "As refeições deste organizador foram guardadas",
+        "title": "Refeições de {name}",
+        "uncheck_all": "Desmarcar tudo",
+        "unsaved_changes": "Tem alterações não guardadas"
+      }
     }
   }
 }

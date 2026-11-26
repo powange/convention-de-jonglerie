@@ -24,8 +24,8 @@ vi.mock('../../../../../../../server/utils/permissions/edition-permissions', () 
 }))
 
 import { canManageMealsById } from '../../../../../../../server/utils/permissions/edition-permissions'
-import getHandler from '../../../../../../../server/api/editions/[id]/organizers/edition-organizers/[editionOrganizerId]/meals.get'
-import putHandler from '../../../../../../../server/api/editions/[id]/organizers/edition-organizers/[editionOrganizerId]/meals.put'
+import getHandler from '../../../../../../../../../layers/meals/server/api/editions/[id]/organizers/edition-organizers/[editionOrganizerId]/meals.get'
+import putHandler from '../../../../../../../../../layers/meals/server/api/editions/[id]/organizers/edition-organizers/[editionOrganizerId]/meals.put'
 
 const prismaMock = (globalThis as any).prisma
 const mockCanManageMeals = canManageMealsById as ReturnType<typeof vi.fn>

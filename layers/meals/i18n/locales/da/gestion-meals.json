@@ -118,6 +118,28 @@
       "confirm_disable_description": "Måltidet forsvinder fra skærmene, fra udskænkningen og fra køkkenets optællinger. Svarene fra frivillige og kunstnere samt allerede serverede måltider BEVARES: de vises uændret igen, hvis du aktiverer måltidet på ny.",
       "confirm_disable_label": "Slå dette måltid fra",
       "confirm_disable_title": "Slå dette måltid fra?"
+    },
+    "organizers": {
+      "meals": {
+        "after_show": "Efter forestillingen",
+        "allergies": "Allergier",
+        "allergies_placeholder": "Fødevareallergier eller -intolerancer",
+        "allergy_severity": "Allergiens alvorlighed",
+        "already_validated": "Allerede valideret",
+        "check_all": "Markér alle",
+        "confirm_close_unsaved": "Du har ugemte ændringer. Vil du virkelig lukke?",
+        "description": "Som standard har en arrangør, der deltager i udgaven, adgang til alle måltider. Fjern markeringen ved dem, vedkommende ikke skal have.",
+        "dietary_preference": "Kostpræference",
+        "dietary_section": "Kost",
+        "error_loading": "Kan ikke indlæse denne arrangørs måltider",
+        "error_saving": "Kan ikke gemme denne arrangørs måltider",
+        "manage": "Administrér måltider",
+        "no_meals": "Der er ikke oprettet noget måltid for denne udgave",
+        "saved_success": "Denne arrangørs måltider er gemt",
+        "title": "{name}s måltider",
+        "uncheck_all": "Fjern alle markeringer",
+        "unsaved_changes": "Du har ugemte ændringer"
+      }
     }
   }
 }

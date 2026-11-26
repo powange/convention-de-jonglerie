@@ -118,6 +118,28 @@
       "confirm_disable_description": "Måltiden försvinner från skärmarna, från utlämningen och från kökets räkningar. Svaren från volontärer och artister, liksom redan serverade måltider, BEVARAS: de visas oförändrade igen om du aktiverar måltiden på nytt.",
       "confirm_disable_label": "Stäng av den här måltiden",
       "confirm_disable_title": "Stänga av denna måltid?"
+    },
+    "organizers": {
+      "meals": {
+        "after_show": "Efter föreställningen",
+        "allergies": "Allergier",
+        "allergies_placeholder": "Matallergier eller intoleranser",
+        "allergy_severity": "Allergins allvarlighetsgrad",
+        "already_validated": "Redan validerad",
+        "check_all": "Markera alla",
+        "confirm_close_unsaved": "Du har osparade ändringar. Vill du verkligen stänga?",
+        "description": "Som standard har en arrangör som är på plats under upplagan tillgång till alla måltider. Avmarkera dem som hen inte ska ha.",
+        "dietary_preference": "Kostpreferens",
+        "dietary_section": "Kost",
+        "error_loading": "Det gick inte att läsa in den här arrangörens måltider",
+        "error_saving": "Det gick inte att spara den här arrangörens måltider",
+        "manage": "Hantera måltider",
+        "no_meals": "Ingen måltid är inställd för den här upplagan",
+        "saved_success": "Den här arrangörens måltider har sparats",
+        "title": "Måltider för {name}",
+        "uncheck_all": "Avmarkera alla",
+        "unsaved_changes": "Du har osparade ändringar"
+      }
     }
   }
 }

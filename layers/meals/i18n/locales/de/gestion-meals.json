@@ -118,6 +118,28 @@
       "confirm_disable_description": "Die Mahlzeit verschwindet aus den Ansichten, vom Ausgabetresen und aus den Küchenzählungen. Die Antworten der Helfer und Künstler sowie bereits ausgegebene Mahlzeiten BLEIBEN erhalten: sie erscheinen unverändert wieder, wenn du die Mahlzeit erneut aktivierst.",
       "confirm_disable_label": "Diese Mahlzeit deaktivieren",
       "confirm_disable_title": "Diese Mahlzeit deaktivieren?"
+    },
+    "organizers": {
+      "meals": {
+        "after_show": "Nach der Vorstellung",
+        "allergies": "Allergien",
+        "allergies_placeholder": "Lebensmittelallergien oder -unverträglichkeiten",
+        "allergy_severity": "Schweregrad der Allergie",
+        "already_validated": "Bereits bestätigt",
+        "check_all": "Alle auswählen",
+        "confirm_close_unsaved": "Sie haben ungespeicherte Änderungen. Möchten Sie wirklich schließen?",
+        "description": "Standardmäßig hat ein bei der Ausgabe anwesender Organisator Zugang zu allen Mahlzeiten. Wählen Sie die ab, die er nicht einnehmen wird.",
+        "dietary_preference": "Ernährungsweise",
+        "dietary_section": "Ernährung",
+        "error_loading": "Die Mahlzeiten dieses Organisators können nicht geladen werden",
+        "error_saving": "Die Mahlzeiten dieses Organisators können nicht gespeichert werden",
+        "manage": "Mahlzeiten verwalten",
+        "no_meals": "Für diese Ausgabe ist keine Mahlzeit eingerichtet",
+        "saved_success": "Die Mahlzeiten dieses Organisators wurden gespeichert",
+        "title": "Mahlzeiten von {name}",
+        "uncheck_all": "Alle abwählen",
+        "unsaved_changes": "Sie haben ungespeicherte Änderungen"
+      }
     }
   }
 }

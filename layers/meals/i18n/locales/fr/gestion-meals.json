@@ -118,6 +118,28 @@
       "validation_description": "Valider la prise des repas par les participants",
       "validation_title": "Validation des repas",
       "volunteers": "Bénévoles"
+    },
+    "organizers": {
+      "meals": {
+        "after_show": "Après spectacle",
+        "allergies": "Allergies",
+        "allergies_placeholder": "Allergies ou intolérances alimentaires",
+        "allergy_severity": "Gravité de l'allergie",
+        "already_validated": "Déjà validé",
+        "check_all": "Tout cocher",
+        "confirm_close_unsaved": "Vous avez des modifications non enregistrées. Voulez-vous vraiment fermer ?",
+        "description": "Par défaut, un organisateur présent sur l'édition a accès à tous les repas. Décochez ceux qu'il ne prendra pas.",
+        "dietary_preference": "Régime alimentaire",
+        "dietary_section": "Alimentation",
+        "error_loading": "Impossible de charger les repas de cet organisateur",
+        "error_saving": "Impossible d'enregistrer les repas de cet organisateur",
+        "manage": "Gérer les repas",
+        "no_meals": "Aucun repas n'est configuré pour cette édition",
+        "saved_success": "Les repas de cet organisateur ont été enregistrés",
+        "title": "Repas de {name}",
+        "uncheck_all": "Tout décocher",
+        "unsaved_changes": "Vous avez des modifications non enregistrées"
+      }
     }
   }
 }

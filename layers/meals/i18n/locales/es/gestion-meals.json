@@ -118,6 +118,28 @@
       "confirm_disable_description": "La comida desaparecerá de las pantallas, del mostrador y de los recuentos de cocina. Las respuestas de los voluntarios y de los artistas, así como las comidas ya servidas, se CONSERVAN: reaparecerán tal cual si vuelves a activar la comida.",
       "confirm_disable_label": "Desactivar esta comida",
       "confirm_disable_title": "¿Desactivar esta comida?"
+    },
+    "organizers": {
+      "meals": {
+        "after_show": "Tras el espectáculo",
+        "allergies": "Alergias",
+        "allergies_placeholder": "Alergias o intolerancias alimentarias",
+        "allergy_severity": "Gravedad de la alergia",
+        "already_validated": "Ya validada",
+        "check_all": "Marcar todo",
+        "confirm_close_unsaved": "Tienes cambios sin guardar. ¿Seguro que quieres cerrar?",
+        "description": "Por defecto, un organizador presente en la edición tiene acceso a todas las comidas. Desmarca las que no vaya a tomar.",
+        "dietary_preference": "Régimen alimentario",
+        "dietary_section": "Alimentación",
+        "error_loading": "No se han podido cargar las comidas de este organizador",
+        "error_saving": "No se han podido guardar las comidas de este organizador",
+        "manage": "Gestionar las comidas",
+        "no_meals": "No hay ninguna comida configurada para esta edición",
+        "saved_success": "Se han guardado las comidas de este organizador",
+        "title": "Comidas de {name}",
+        "uncheck_all": "Desmarcar todo",
+        "unsaved_changes": "Tienes cambios sin guardar"
+      }
     }
   }
 }

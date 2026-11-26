@@ -5,8 +5,10 @@ import {
   infosPersonnellesSelect,
   misesAJourDuProfil,
 } from '#core/server/utils/infos-personnelles'
+import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageMealsById } from '#server/utils/permissions/edition-permissions'
+import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const updateOrganizerMealsSchema = z.object({
   selections: z
