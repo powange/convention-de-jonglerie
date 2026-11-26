@@ -14,6 +14,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { sendEmail } from '#server/utils/emailService'
 import { NotificationService } from '#server/utils/notification-service'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
+import { verifierAjout } from '#server/utils/quotas'
 
 /** Fuseau par défaut : celui de Flowvent, tant qu'un événement n'en déclare pas. */
 const FUSEAU_PAR_DEFAUT = 'Europe/Paris'
@@ -29,6 +30,10 @@ async function exigerGestion(event: any, eventId: number) {
 }
 
 const ports: VolunteerPorts = {
+  // Le plafond de bénévoles acceptés par événement de la formule du propriétaire (shared/formules.ts).
+  quotas: {
+    verifierAjoutBenevole: (eventId, userId) => verifierAjout(eventId, 'benevoles', { userId }),
+  },
   notifications: {
     async notify(input) {
       await NotificationService.create(input as Parameters<typeof NotificationService.create>[0])

@@ -114,38 +114,11 @@
             <div class="flex flex-col items-end gap-1">
               <USwitch
                 :model-value="accueil.modules[m.cle]"
-                :disabled="
-                  !accueil.droits.modifier ||
-                  enregistrementModules ||
-                  (!accueil.modules[m.cle] && !couvert(m.cle))
-                "
+                :disabled="!accueil.droits.modifier || enregistrementModules"
                 :label="accueil.modules[m.cle] ? 'Activé' : 'Désactivé'"
                 :aria-label="`Module ${m.libelle}`"
                 @update:model-value="(v: boolean) => basculerModule(m.cle, v)"
               />
-              <!-- Un module hors formule ne s'active pas ; déjà actif, il reste consultable. -->
-              <template v-if="!couvert(m.cle)">
-                <UButton
-                  v-if="accueil.droits.estProprietaire"
-                  to="/pricing"
-                  size="xs"
-                  variant="link"
-                  color="primary"
-                  class="px-0"
-                  :label="
-                    accueil.modules[m.cle]
-                      ? 'Lecture seule · changer de formule'
-                      : 'Pas dans votre formule · changer'
-                  "
-                />
-                <span v-else class="text-xs text-muted">
-                  {{
-                    accueil.modules[m.cle]
-                      ? 'Lecture seule : hors formule du propriétaire'
-                      : 'Hors formule du propriétaire'
-                  }}
-                </span>
-              </template>
             </div>
           </div>
         </div>
@@ -165,7 +138,6 @@
  */
 import type { CleModule, Droits, Modules } from '#shared/modules-evenement'
 
-import { estModulePayant } from '#shared/formules'
 import { modulesDisponibles } from '#shared/modules-evenement'
 
 definePageMeta({ middleware: ['subscription'] })
@@ -184,7 +156,6 @@ interface Accueil {
   }
   droits: Droits & { estProprietaire: boolean }
   modules: Modules
-  abonnement: { actif: boolean; formule: string | null; modules: string[] }
   organisateurs: number
   benevoles: null | {
     enAttente: number
@@ -283,13 +254,6 @@ async function copierLien() {
     icon: 'i-heroicons-check',
     color: 'success',
   })
-}
-
-/** Le module est-il couvert par la formule du propriétaire ? La carte l'est dès qu'il est abonné. */
-function couvert(cle: CleModule) {
-  const a = accueil.value?.abonnement
-  if (!a?.actif) return false
-  return !estModulePayant(cle) || a.modules.includes(cle)
 }
 
 const voulu = ref<Partial<Modules>>({})

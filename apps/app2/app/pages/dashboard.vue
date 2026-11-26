@@ -15,10 +15,10 @@
         <div class="flex items-start gap-3">
           <UIcon name="i-heroicons-sparkles" class="mt-0.5 text-2xl text-primary" />
           <div>
-            <p class="font-semibold">Débloquez les fonctionnalités d'organisation</p>
+            <p class="font-semibold">Vous êtes en formule Découverte, gratuite</p>
             <p class="text-sm text-muted">
-              Un abonnement ouvre la création d'événements et les modules de votre formule :
-              bénévoles, billetterie, artistes, repas, stock, trésorerie.
+              Tous les modules, dans la limite de {{ plafondsLabel }}. Une formule payante voit plus
+              grand.
             </p>
           </div>
         </div>
@@ -30,7 +30,7 @@
         color="success"
         variant="subtle"
         icon="i-heroicons-check-badge"
-        :label="`${planLabel} · ${modulesLabel}`"
+        :label="`${planLabel} · ${plafondsLabel}`"
       />
     </div>
 
@@ -48,7 +48,15 @@
         <div class="flex items-start justify-between gap-2">
           <h3 class="truncate font-semibold">{{ ev.name }}</h3>
           <UBadge
-            v-if="!ev.estProprietaire"
+            v-if="ev.archivedAt"
+            color="neutral"
+            variant="subtle"
+            size="sm"
+            icon="i-heroicons-archive-box"
+            label="Archivé"
+          />
+          <UBadge
+            v-else-if="!ev.estProprietaire"
             color="secondary"
             variant="subtle"
             size="sm"
@@ -84,9 +92,7 @@ const subActive = computed(() => !!subData.value?.active)
 const planLabel = computed(() =>
   libelleFormuleAbonnement(subData.value?.subscription?.formule, subData.value?.subscription?.plan)
 )
-const modulesLabel = computed(() =>
-  libelleModulesCouverts(subData.value?.subscription?.formule, subData.value?.subscription?.modules)
-)
+const plafondsLabel = computed(() => libellePlafondsFormule(subData.value?.formule))
 
 function formatDate(d: string | Date) {
   return new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })

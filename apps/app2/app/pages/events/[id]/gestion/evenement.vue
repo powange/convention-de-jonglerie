@@ -88,9 +88,43 @@
             color="neutral"
             variant="soft"
             icon="i-heroicons-lock-closed"
-            title="Lecture seule : vous n'avez pas le droit de modifier cet événement."
+            :title="
+              evenement?.archivedAt
+                ? 'Lecture seule : cet événement est archivé.'
+                : 'Lecture seule : vous ne pouvez pas modifier cet événement pour le moment.'
+            "
           />
         </UForm>
+      </UCard>
+
+      <!-- Archiver : lecture seule complète, et une place libérée dans la formule du propriétaire.
+           Permis même quand la gestion est en lecture seule : c'est le moyen d'en sortir. -->
+      <UCard v-if="droits?.supprimer">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="font-semibold">
+              {{ evenement?.archivedAt ? 'Événement archivé' : "Archiver l'événement" }}
+            </p>
+            <p class="text-sm text-muted">
+              {{
+                evenement?.archivedAt
+                  ? `Archivé le ${new Date(evenement.archivedAt).toLocaleDateString('fr-FR')} : tout reste consultable, rien n'est modifiable. Le désarchiver reprend une place de votre formule.`
+                  : "Pour un événement passé : tout reste consultable, plus rien n'est modifiable, et il libère une place parmi les événements en cours de votre formule."
+              }}
+            </p>
+          </div>
+          <UButton
+            color="neutral"
+            variant="outline"
+            :icon="
+              evenement?.archivedAt ? 'i-heroicons-arrow-uturn-left' : 'i-heroicons-archive-box'
+            "
+            :label="evenement?.archivedAt ? 'Désarchiver' : 'Archiver'"
+            :loading="archivage"
+            class="shrink-0"
+            @click="basculerArchive"
+          />
+        </div>
       </UCard>
 
       <!-- Le propriétaire seul supprime (décision de l'utilisateur). -->
@@ -171,6 +205,7 @@ interface Evenement {
   startDate: string | null
   endDate: string | null
   timezone: string | null
+  archivedAt: string | null
 }
 interface Droits {
   voir: boolean
@@ -236,6 +271,25 @@ const { execute: enregistrer, loading: enregistrement } = useApiAction(
       await refresh()
       // L'en-tête et les pages bénévoles lisent l'événement dans le store : on le rafraîchit.
       await editionStore.fetchEditionById(id, { force: true }).catch(() => null)
+    },
+  }
+)
+
+const { execute: basculerArchive, loading: archivage } = useApiAction(
+  `/api/events/${refEvenement}/archive`,
+  {
+    method: 'POST',
+    body: () => ({ archive: !evenement.value?.archivedAt }),
+    // Lu au moment du message, AVANT le rafraîchissement : l'état d'avant dit ce qui vient d'être fait.
+    successMessage: {
+      get title() {
+        return evenement.value?.archivedAt ? 'Événement désarchivé' : 'Événement archivé'
+      },
+    },
+    errorMessages: { default: "L'archivage n'a pas abouti" },
+    // Le bandeau de lecture seule de la gestion lit l'accès : on le relit avec l'événement.
+    onSuccess: async () => {
+      await Promise.all([refresh(), refreshNuxtData(`acces-gestion-${refEvenement}`)])
     },
   }
 )

@@ -84,7 +84,18 @@ export interface ArtistsMealsPort {
   getEnabledMeals(editionId: number): Promise<ArtistEditionMeal[]>
 }
 
+/**
+ * Plafonds de l'hôte. Flowvent limite les artistes par événement selon la formule du propriétaire ;
+ * app1 n'a pas de plafond et ne fournit pas ce port.
+ */
+export interface ArtistsQuotasPort {
+  /** Lève une erreur (402) si ajouter une fiche d'artiste dépasse le plafond toléré. */
+  verifierAjoutArtiste(eventId: number, userId: number): Promise<void>
+}
+
 export interface ArtistsPorts {
+  /** Facultatif : sans lui, aucun plafond. */
+  quotas?: ArtistsQuotasPort
   event: ArtistsEventPort
   meals: ArtistsMealsPort
 }

@@ -39,7 +39,7 @@
                 v-if="compte.abonnement"
                 :color="compte.abonnement.actif ? 'success' : 'neutral'"
                 variant="subtle"
-                :label="`${libelleFormuleAbonnement(compte.abonnement.formule, compte.abonnement.plan)} · ${libelleModulesCouverts(compte.abonnement.formule, compte.abonnement.modules)} · ${compte.abonnement.actif ? 'actif' : 'expiré'}`"
+                :label="`${libelleFormuleAbonnement(compte.abonnement.formule, compte.abonnement.plan)} · ${compte.abonnement.actif ? 'actif' : 'expiré'}`"
               />
             </div>
             <p class="mt-2 text-sm text-muted">

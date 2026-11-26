@@ -67,31 +67,19 @@
       </template>
 
       <template #body>
-        <!-- Lecture seule : abonnement du propriétaire arrêté, ou module hors de sa formule. Les
+        <!-- Lecture seule : événement archivé, ou propriétaire en surnombre d'événements. Les
              données restent consultables ; le serveur refuse les écritures (droits-evenement.ts). -->
+        <!-- `shrink-0` : le corps du panneau est une colonne flexible, qui écrasait le bandeau à
+             la hauteur de son titre — description et boutons disparaissaient. -->
         <UAlert
-          v-if="lectureSeule"
+          v-if="bandeauLectureSeule"
+          class="shrink-0"
           color="warning"
           variant="subtle"
           icon="i-heroicons-lock-closed"
-          :title="lectureSeule"
-          :description="
-            acces?.droits.estProprietaire
-              ? 'Rien n’est supprimé. Choisissez une formule qui le couvre pour reprendre la main.'
-              : 'Rien n’est supprimé. La gestion reprendra quand le propriétaire de l’événement aura changé de formule.'
-          "
-          :actions="
-            acces?.droits.estProprietaire
-              ? [
-                  {
-                    label: 'Voir les formules',
-                    to: '/pricing',
-                    color: 'warning',
-                    variant: 'solid',
-                  },
-                ]
-              : []
-          "
+          :title="bandeauLectureSeule.titre"
+          :description="bandeauLectureSeule.description"
+          :actions="bandeauLectureSeule.actions"
         />
         <slot />
       </template>
@@ -114,8 +102,6 @@ import { useEditionStore } from '~/stores/editions'
 import type { Droits, Modules } from '#shared/modules-evenement'
 import type { NavigationMenuItem } from '@nuxt/ui'
 
-import { formule } from '#shared/formules'
-
 const route = useRoute()
 const editionStore = useEditionStore()
 
@@ -128,32 +114,61 @@ const refPublique = computed(() => String(route.params.id))
 const { data: acces } = useFetch<{
   modules: Modules
   droits: Droits & { estProprietaire: boolean }
-  abonnement: { actif: boolean; formule: string | null; modules: string[] }
+  lectureSeule: 'archive' | 'surnombre' | null
 }>(() => `/api/events/${refPublique.value}/acces-gestion`, {
   key: `acces-gestion-${refPublique.value}`,
   server: false,
 })
-/** Le module de la page ouverte, d'après le premier segment après `/gestion/`. */
-const MODULE_PAR_SEGMENT: Record<string, string> = {
-  volunteers: 'benevoles',
-  ticketing: 'billetterie',
-  artists: 'artistes',
-  'shows-call': 'artistes',
-  meals: 'repas',
-  treasury: 'tresorerie',
-  stock: 'stock',
-}
-const lectureSeule = computed(() => {
-  const a = acces.value?.abonnement
-  if (!a) return ''
-  if (!a.actif)
-    return "L'abonnement du propriétaire n'est plus actif : la gestion est en lecture seule."
-  const segment = route.path.split('/gestion/')[1]?.split('/')[0] ?? ''
-  const module = MODULE_PAR_SEGMENT[segment]
-  if (module && !a.modules.includes(module)) {
-    return `Ce module n'est pas compris dans la formule ${formule(a.formule)?.libelle ?? ''} : il reste consultable, en lecture seule.`
+/**
+ * Le bandeau de lecture seule. Deux raisons (droits-evenement.ts) : l'événement est archivé, ou son
+ * propriétaire a plus d'événements en cours que sa formule n'en tolère.
+ */
+const bandeauLectureSeule = computed(() => {
+  const a = acces.value
+  if (!a?.lectureSeule) return null
+  const proprietaire = a.droits.estProprietaire
+  if (a.lectureSeule === 'archive') {
+    return {
+      titre: 'Cet événement est archivé : sa gestion est en lecture seule.',
+      description: proprietaire
+        ? 'Rien n’est supprimé. Désarchivez-le depuis ses informations pour reprendre la gestion.'
+        : 'Rien n’est supprimé. Seul le propriétaire peut le désarchiver.',
+      actions: proprietaire
+        ? [
+            {
+              label: "Informations de l'événement",
+              to: `/events/${refPublique.value}/gestion/evenement`,
+              color: 'warning' as const,
+              variant: 'solid' as const,
+            },
+          ]
+        : [],
+    }
   }
-  return ''
+  return {
+    titre: proprietaire
+      ? 'Vous avez plus d’événements en cours que votre formule n’en comprend : la gestion est en lecture seule.'
+      : 'Le propriétaire a plus d’événements en cours que sa formule n’en comprend : la gestion est en lecture seule.',
+    description: proprietaire
+      ? 'Rien n’est supprimé. Archivez vos événements passés, ou choisissez une formule plus grande.'
+      : 'Rien n’est supprimé. La gestion reprendra quand le propriétaire aura archivé des événements ou changé de formule.',
+    actions: proprietaire
+      ? [
+          {
+            label: 'Voir les formules',
+            to: '/pricing',
+            color: 'warning' as const,
+            variant: 'solid' as const,
+          },
+          {
+            label: 'Mes événements',
+            to: '/dashboard',
+            color: 'warning' as const,
+            variant: 'outline' as const,
+          },
+        ]
+      : [],
+  }
 })
 
 const moduleBenevoles = computed(() => acces.value?.modules.benevoles !== false)

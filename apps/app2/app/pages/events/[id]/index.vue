@@ -27,30 +27,23 @@
 
       <USeparator v-if="acces?.droits.voir" class="my-8" label="Fonctionnalités d'organisation" />
 
-      <!-- La gestion s'ouvre à qui la voit ; sans abonnement actif du PROPRIÉTAIRE (un organisateur
-           n'a pas besoin du sien), elle reste consultable en lecture seule. -->
+      <!-- La gestion s'ouvre à qui la voit ; archivé, ou propriétaire en surnombre d'événements,
+           l'événement reste consultable en lecture seule (droits-evenement.ts). -->
       <div v-if="acces?.droits.voir" class="space-y-4">
         <UAlert
-          v-if="!acces.abonnementActif"
+          v-if="acces.lectureSeule"
           color="warning"
           variant="subtle"
           icon="i-heroicons-lock-closed"
           :title="
-            acces.droits.estProprietaire
-              ? 'Votre abonnement n’est pas actif : la gestion est en lecture seule'
-              : 'L’abonnement du propriétaire n’est plus actif : la gestion est en lecture seule'
+            acces.lectureSeule === 'archive'
+              ? 'Cet événement est archivé : sa gestion est en lecture seule'
+              : 'Trop d’événements en cours pour la formule du propriétaire : la gestion est en lecture seule'
           "
-          description="Rien n'est supprimé. La gestion reprend dès qu'un abonnement couvre l'événement."
+          description="Rien n'est supprimé."
           :actions="
-            acces.droits.estProprietaire
-              ? [
-                  {
-                    label: 'Voir les tarifs',
-                    to: '/pricing',
-                    color: 'warning',
-                    variant: 'solid',
-                  },
-                ]
+            acces.droits.estProprietaire && acces.lectureSeule === 'surnombre'
+              ? [{ label: 'Voir les formules', to: '/pricing', color: 'warning', variant: 'solid' }]
               : []
           "
         />
@@ -100,7 +93,7 @@ const { data: acces } = await useFetch<{
     benevoles: boolean
     estProprietaire: boolean
   }
-  abonnementActif: boolean
+  lectureSeule: 'archive' | 'surnombre' | null
   modules?: { benevoles: boolean }
 }>(`/api/events/${route.params.id}/acces-gestion`)
 

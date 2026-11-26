@@ -5,6 +5,7 @@ import { misesAJourDuProfil } from '#core/server/utils/infos-personnelles'
 import { generateVolunteerQrCodeToken } from '#core/server/utils/token-generator'
 import { schemaAdresseEmail } from '#core/shared/utils/adresse-email'
 import { toCents } from '#core/shared/utils/money'
+import { useArtistsPorts } from '#server/artists/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { createPendingUserAndInvite } from '#server/utils/invitation'
@@ -94,6 +95,10 @@ export default wrapApiHandler(
         message: "Vous n'êtes pas autorisé à gérer les artistes de cette édition",
       })
     }
+
+    // Le plafond d'artistes de l'hôte, s'il en a un (Flowvent : la formule du propriétaire). Avant
+    // toute création, pour ne pas laisser de compte invité orphelin.
+    await useArtistsPorts().quotas?.verifierAjoutArtiste(editionId, user.id)
 
     const body = await readBody(event)
     const validatedData = artistSchema.parse(body)

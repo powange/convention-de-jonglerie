@@ -9,7 +9,13 @@
  */
 import type { ArtistsPorts } from '#artists/server/ports/types'
 
+import { verifierAjout } from '#server/utils/quotas'
+
 const ports: ArtistsPorts = {
+  // Le plafond d'artistes par événement de la formule du propriétaire (shared/formules.ts).
+  quotas: {
+    verifierAjoutArtiste: (eventId, userId) => verifierAjout(eventId, 'artistes', { userId }),
+  },
   event: {
     setArtistInfo: (editionId, artistInfo) =>
       prisma.event.update({

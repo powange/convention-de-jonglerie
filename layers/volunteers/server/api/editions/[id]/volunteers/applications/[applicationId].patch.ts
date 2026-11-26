@@ -260,6 +260,11 @@ export default wrapApiHandler(
       throw createError({ status: 400, message: 'Transition interdite' })
     }
 
+    // Accepter consomme une place du plafond de bénévoles de l'hôte, s'il en a un (Flowvent).
+    if (target === 'ACCEPTED') {
+      await useVolunteerPorts().quotas?.verifierAjoutBenevole(editionId, user.id)
+    }
+
     // Mettre à jour le statut et la note d'acceptation
     const updateData: any = {
       status: target,

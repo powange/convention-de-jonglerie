@@ -1,5 +1,5 @@
 import { prixRemise, resumeAvantage } from '../../../shared/codes-promo'
-import { FORMULES, PERIODES } from '../../../shared/formules'
+import { FORMULES_PAYANTES, PERIODES } from '../../../shared/formules'
 import { codePromoRateLimiter } from '../../utils/api-rate-limiter'
 import { chargerCode, refusPourLeCompte } from '../../utils/codes-promo'
 
@@ -28,7 +28,8 @@ export default defineEventHandler(async (event) => {
 
   const prix: Record<string, Record<string, number | null>> = {}
   let premierRefus: string | null = null
-  for (const f of FORMULES) {
+  // La formule gratuite n'a rien à remiser.
+  for (const f of FORMULES_PAYANTES) {
     prix[f.cle] = {}
     for (const periode of PERIODES) {
       const refus = await refusPourLeCompte(code, {

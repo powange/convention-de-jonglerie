@@ -2,9 +2,8 @@ import { z } from 'zod'
 
 import { requireUserSession } from '#imports'
 
-import { modulesCouverts } from '../../../shared/formules'
 import prisma from '../../utils/prisma'
-import { requireActiveSubscription } from '../../utils/subscription'
+import { verifierNouvelEvenement } from '../../utils/quotas'
 
 const createEventSchema = z.object({
   name: z.string().trim().min(1, "Le nom de l'événement est requis").max(200),
@@ -15,9 +14,9 @@ const createEventSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
-  // Créer un événement demande SON PROPRE abonnement (décision de l'utilisateur : un co-organisateur
-  // sans abonnement gère les événements des autres, mais n'en crée pas). La page le filtrait seule.
-  const abonnement = await requireActiveSubscription(event, user.id)
+  // Tout compte peut créer un événement, dans la limite des événements EN COURS de sa formule — la
+  // formule gratuite comprise (décision du 26/11/2026, server/utils/quotas.ts).
+  await verifierNouvelEvenement(user.id)
   const data = createEventSchema.parse(await readBody(event))
 
   const created = await prisma.event.create({
@@ -27,11 +26,6 @@ export default defineEventHandler(async (event) => {
       location: data.location ?? null,
       startDate: data.startDate ?? null,
       ownerId: user.id,
-      // Le module bénévoles est actif par défaut (schéma) : seulement si la formule le couvre, pour
-      // qu'un nouvel événement ne s'ouvre pas sur un module en lecture seule.
-      volunteersEnabled: modulesCouverts(abonnement.formule, abonnement.modules).includes(
-        'benevoles'
-      ),
     },
   })
 

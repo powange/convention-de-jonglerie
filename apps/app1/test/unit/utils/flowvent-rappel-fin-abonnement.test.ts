@@ -19,7 +19,7 @@ const maintenant = new Date('2026-12-01T09:00:00Z')
 const dansJours = (n: number) => new Date(maintenant.getTime() + n * 24 * 60 * 60 * 1000)
 const base = {
   nom: 'Camille',
-  formule: 'Duo annuel',
+  formule: 'Festival annuel',
   fin: new Date('2026-12-12T10:00:00Z'),
   code: null,
   advantageEndsAt: null,
@@ -44,11 +44,12 @@ describe('Flowvent — rappel de fin d’abonnement', () => {
     expect(r.doitRappeler({ ...actif, endReminderFor: dansJours(-355) }, maintenant)).toBe(true)
   })
 
-  it('annonce la date de fin et la lecture seule, sans rien supprimer', () => {
+  it('annonce la date de fin et le retour à la formule gratuite, sans rien supprimer', () => {
     const { subject, text, html } = r.contenuRappel(base)
     expect(subject).toBe('Votre abonnement Flowvent se termine le 12 décembre 2026')
     expect(text).toContain('Bonjour Camille,')
-    expect(text).toContain('Votre formule Duo annuel prend fin le 12 décembre 2026.')
+    expect(text).toContain('Votre formule Festival annuel prend fin le 12 décembre 2026.')
+    expect(text).toContain('formule gratuite Découverte')
     expect(text).toContain('lecture seule')
     expect(text).toContain('https://flowvent.org/pricing')
     expect(html).toContain('href="https://flowvent.org/pricing"')

@@ -1,20 +1,28 @@
 /**
- * Comment nommer un abonnement à l'écran : « Duo annuel », et les modules qu'il couvre en clair.
+ * Comment nommer un abonnement à l'écran : « Festival annuel », et ce que la formule comprend.
  * Lu par le tableau de bord, le profil et l'administration.
  */
-import { formule as definitionFormule, modulesCouverts } from '#shared/formules'
-import { MODULES_EVENEMENT } from '#shared/modules-evenement'
+import { COMPTEURS, FORMULE_GRATUITE, formule as definitionFormule } from '#shared/formules'
 
-/** « Duo annuel », « Intégral mensuel ». */
+/** « Festival annuel », « Association mensuel » ; « Découverte (gratuite) » sans abonnement. */
 export function libelleFormuleAbonnement(cleFormule: string | null | undefined, plan?: string) {
+  if (!cleFormule || cleFormule === FORMULE_GRATUITE) return 'Découverte (gratuite)'
   const nom = definitionFormule(cleFormule)?.libelle ?? 'Abonnement'
   return `${nom} ${plan === 'annual' ? 'annuel' : 'mensuel'}`
 }
 
-/** Les noms des modules couverts : « Bénévoles, Repas » ; « tous les modules » pour Intégral. */
-export function libelleModulesCouverts(cleFormule: string | null | undefined, modules: unknown) {
-  if (cleFormule === 'integral') return 'tous les modules'
-  return modulesCouverts(cleFormule, modules)
-    .map((cle) => MODULES_EVENEMENT.find((m) => m.cle === cle)?.libelle ?? cle)
-    .join(', ')
+/**
+ * Les plafonds d'une formule en clair : « 1 événement en cours · 75 bénévoles · 20 artistes ·
+ * 3 co-organisateurs par événement ». Formule inconnue ou absente : la gratuite.
+ */
+export function libellePlafondsFormule(cleFormule: string | null | undefined) {
+  const f = definitionFormule(cleFormule) ?? definitionFormule(FORMULE_GRATUITE)!
+  return COMPTEURS.map((c) => {
+    const p = f.plafonds[c.cle]
+    if (p === null) return `${c.libelle.toLowerCase()} illimités`
+    // « par événement » une seule fois, à la fin.
+    return c.unite(p).replace(' par événement', '')
+  })
+    .join(' · ')
+    .concat(' par événement')
 }

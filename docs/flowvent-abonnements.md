@@ -1,22 +1,25 @@
-# Flowvent — abonnements par module
+# Flowvent — abonnements à la taille
 
 Ce document décrit comment Flowvent (app2) fait payer l'organisation d'un événement. Les décisions
-viennent du rapport « Tarifs de Flowvent » (26/11/2026), validé par l'utilisateur.
+viennent du rapport « Tarifs de Flowvent », **version 2** (26/11/2026), validée par l'utilisateur.
+La version 1 faisait payer au nombre de modules (Solo, Duo, Intégral, #996) : elle est remplacée.
 
 ## Les formules
 
-| Formule  | Modules                         | Au mois | À l'année         |
-| -------- | ------------------------------- | ------- | ----------------- |
-| Solo     | 1 au choix                      | 9 €     | 84 € (7 €/mois)   |
-| Duo      | 2 au choix                      | 15 €    | 144 € (12 €/mois) |
-| Intégral | les 6, et chaque module à venir | 25 €    | 240 € (20 €/mois) |
+Le prix suit la **taille** de l'organisation. **Tous les modules** sont compris dans toutes les
+formules, carte du site comprise.
 
-- Les **six modules payants** : bénévoles, artistes et spectacles, repas, billetterie, trésorerie,
-  stock et prêts.
-- La **carte du site** est incluse dans toutes les formules : elle sert de support au stock et aux
-  spectacles.
-- **Ni essai gratuit ni formule gratuite permanente.** Les remises et les gratuités passent par les
-  codes promo.
+| Formule        | Au mois | À l'année         | Événements en cours | Bénévoles acceptés | Artistes | Co-organisateurs |
+| -------------- | ------- | ----------------- | ------------------- | ------------------ | -------- | ---------------- |
+| Découverte     | gratuit | gratuit           | 1                   | 15                 | 5        | 1                |
+| Association    | 9 €     | 84 € (7 €/mois)   | 1                   | 75                 | 20       | 3                |
+| Festival       | 19 €    | 180 € (15 €/mois) | 5                   | 250                | 60       | 10               |
+| Grand festival | 39 €    | 372 € (31 €/mois) | 15                  | 1 000              | 200      | illimités        |
+
+- Les plafonds de bénévoles, d'artistes et de co-organisateurs valent **par événement** ; celui
+  d'événements vaut pour le compte du propriétaire. Au-delà du Grand festival : sur devis.
+- **Découverte** est la formule de tout compte sans abonnement payant actif : jamais souscrit, ou
+  arrivé à son terme. Elle ne se souscrit pas et ne se remise pas.
 - Prix TTC. Paiement **simulé** pour l'instant : aucun prestataire n'est appelé.
 
 La grille vit dans **`apps/app2/shared/formules.ts`**, écrite une fois et lue par l'API comme par
@@ -26,54 +29,80 @@ les écrans. Ce fichier n'importe aucune valeur : le test
 ## Qui paie
 
 L'abonnement est celui du **propriétaire** de l'événement. Il couvre tous ses co-organisateurs,
-qui n'ont pas à s'abonner. Bénévoles, artistes et acheteurs ne paient jamais. Créer un événement
-demande son propre abonnement, quelle que soit la formule (garde serveur dans
-`server/api/events/index.post.ts`).
+dans la limite de sa formule. Bénévoles, artistes et acheteurs ne paient jamais. Tout compte peut
+créer un événement, dans la limite de ses événements en cours.
 
-## Ce que la formule ouvre
+## Ce qui compte
 
-La règle est dans `droitsSurEvenement` (`apps/app2/server/utils/droits-evenement.ts`), par où passent
-tous les droits des layers partagés (`edition-permissions.ts`, ports des modules) :
+`apps/app2/server/utils/quotas.ts` compte et refuse :
 
-- un droit de **module payant** ne s'exerce **en écriture** que si la formule du propriétaire couvre
-  ce module ;
-- les droits sur l'**événement lui-même** (le modifier, la carte, les organisateurs) demandent
-  seulement un abonnement actif ;
-- un **administrateur** global n'est pas tenu par l'abonnement d'autrui.
+| Compteur         | Compte                                                | Ne compte pas                                  |
+| ---------------- | ----------------------------------------------------- | ---------------------------------------------- |
+| Événements       | les événements non archivés du propriétaire           | les archivés, ceux où l'on est co-organisateur |
+| Bénévoles        | les candidatures `ACCEPTED`, ajouts manuels compris   | les candidatures en attente ou refusées        |
+| Artistes         | les fiches d'artistes de l'événement                  | les candidatures d'appel à spectacles          |
+| Co-organisateurs | les lignes `EditionOrganizer`, invitations en attente | le propriétaire                                |
 
-### Lecture seule
+### À la limite
 
-Ce qui n'est pas couvert reste **consultable** : une fin d'abonnement ou un changement de formule ne
-supprime rien. Pour distinguer une lecture d'une écriture, la règle lit la méthode de la requête en
-cours par le **contexte asynchrone de Nitro** (`nitro.experimental.asyncContext: true` dans
-`nuxt.config.ts`). Une requête `GET` ou `HEAD` garde les droits de la personne ; toute autre méthode
-exige la couverture. Hors requête (tâche planifiée), la règle stricte s'applique.
+- **Alerte** à 80 % (état `alerte` de `etatQuota`, pour les jauges du lot suivant).
+- **Tolérance** de 10 % au-delà du plafond, arrondie à l'inférieur (`plafondTolere` : 75 → 82,
+  250 → 275 ; un petit plafond comme 3 n'a pas de marge).
+- Au-delà, l'**ajout** est refusé en **402**, avec un message qui nomme la formule qui relève ce
+  plafond (`formuleQuiReleve`). Rien de ce qui existe n'est jamais retiré ni bloqué.
+- Un administrateur global n'est pas soumis aux quotas.
 
-Côté écran, la gestion s'ouvre à quiconque la voit (middleware `subscription`). Le layout
-`edition-dashboard` affiche un bandeau « lecture seule » quand l'abonnement est arrêté ou que le
-module de la page n'est pas dans la formule.
+### Les points de contrôle
+
+| Ajout                              | Où                                                                                                  |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Créer un événement, le désarchiver | `server/api/events/index.post.ts`, `server/api/events/[id]/archive.post.ts`                         |
+| Ajouter un co-organisateur         | `server/api/events/[id]/organizers/index.post.ts` (avant de créer un compte invité)                 |
+| Accepter ou ajouter un bénévole    | layer `volunteers` : `applications/[applicationId].patch.ts`, `add-manually`, `create-user-and-add` |
+| Créer une fiche d'artiste          | layer `artists` : `artists/index.post.ts`, `import-performer.post.ts`                               |
+
+Dans les layers, le contrôle passe par un **port facultatif** du contrat d'hôte (`quotas` dans
+`VolunteerPorts` et `ArtistsPorts`). Flowvent le branche sur `quotas.ts` ; app1 ne le fournit pas et
+n'a donc aucun plafond. Le test `flowvent-formules.test.ts` vérifie que les quatre points restent
+branchés.
+
+## Lecture seule
+
+La règle est dans `droitsSurEvenement` (`apps/app2/server/utils/droits-evenement.ts`). La gestion
+d'un événement ne passe en **lecture seule** que dans deux cas, sans jamais rien supprimer :
+
+- l'événement est **archivé** ;
+- son propriétaire a **plus d'événements en cours que sa formule n'en tolère** (fin d'abonnement,
+  descente de formule) : il archive ceux qu'il veut pour reprendre la main (`surnombre`).
+
+Une lecture reste toujours permise. Pour la distinguer d'une écriture, la règle lit la méthode de la
+requête en cours par le **contexte asynchrone de Nitro** (`nitro.experimental.asyncContext: true`
+dans `nuxt.config.ts`). Hors requête (tâche planifiée), la règle stricte s'applique. Un
+administrateur n'est jamais en lecture seule.
+
+`acces-gestion` et `accueil` rendent `lectureSeule` (`'archive'`, `'surnombre'` ou `null`) et
+`quotas` (formule et état des quatre compteurs). Le layout `edition-dashboard` affiche le bandeau
+correspondant. Les champs `abonnementActif` et `abonnement` y restent un lot, pour les pages
+ouvertes avant le changement : à retirer ensuite.
 
 **Limite connue** : quelques actions du contrôle des entrées (scan, recherche, ajout manuel,
 remboursement) ne vérifient que le droit de voir l'événement, comme dans app1. Elles échappent à la
 lecture seule.
 
-### Activation des modules
+## Archivage
 
-Activer un module payant (`PUT /api/events/:id/modules`) demande que la formule le couvre (402
-sinon). Le désactiver reste toujours possible. À la création d'un événement, le module bénévoles
-n'est actif que si la formule le couvre.
+`POST /api/events/:id/archive` (`{ archive: true | false }`), par le propriétaire ou un
+administrateur, depuis les informations de l'événement. Archiver reste permis en lecture seule :
+c'est le moyen d'en sortir. Désarchiver reprend une place et est soumis au plafond.
 
 ## Données
 
-`Subscription` (schéma Prisma d'app2) :
-
-- `plan` : la **période**, `monthly` ou `annual` (nom historique) ;
-- `formule` : `solo`, `duo` ou `integral` — `integral` par défaut, ce qui a fait passer les
-  abonnements antérieurs en Intégral sans rien leur retirer ;
-- `modules` : les modules choisis pour Solo et Duo (JSON), `null` pour Intégral.
-
-`modulesCouverts()` ne rend jamais plus de modules que la formule n'en comprend, même si la colonne
-en contient davantage.
+- `Event.archivedAt` : date d'archivage, `null` pour un événement en cours.
+- `Subscription.plan` : la **période**, `monthly` ou `annual` (nom historique).
+- `Subscription.formule` : `association`, `festival` ou `grand`.
+- Migration `20261128090000_formules_a_la_taille` : `solo` → `association`, `duo` et `integral` →
+  `festival` (formule de prix équivalent, même échéance), mêmes correspondances pour les formules
+  visées par les codes promo ; la colonne `Subscription.modules` est supprimée.
 
 ## Codes promo
 
@@ -112,7 +141,7 @@ on n'annonce pas qu'il existe pour quelqu'un d'autre.
 
 - **Un seul code par abonnement** ; la réduction de l'annuel reste acquise en plus.
 - **Gratuité** : aucun moyen de paiement demandé. « Offert pendant N mois » ouvre exactement N mois ;
-  à leur terme l'abonnement s'arrête et la gestion passe en lecture seule. Personne n'est prélevé
+  à leur terme l'abonnement s'arrête et le compte revient à la formule Découverte. Personne n'est prélevé
   par surprise.
 - **Changement de formule** : sans nouveau code, le paiement reprend d'office celui de l'abonnement
   en cours s'il couvre la nouvelle formule et que son avantage court encore. Une gratuité reprise
@@ -155,7 +184,7 @@ la fin de chaque période. Le message (`apps/app2/shared/rappel-fin-abonnement.t
 - la formule et la date de fin ; pour une gratuité, que la période offerte s'achève ;
 - ce que devient le code : acquis s'il est « à vie », encore valable au renouvellement si son
   avantage court au-delà, sinon qu'il prend fin avec la période ;
-- qu'à défaut de renouvellement la gestion passe en lecture seule, sans rien supprimer.
+- qu'à défaut de renouvellement le compte revient à la formule Découverte, sans rien supprimer.
 
 Un seul rappel par période (`Subscription.endReminderFor`). Un envoi échoué n'est pas retenu : le
 passage du lendemain réessaie. Comme les autres tâches, celle-ci ne tourne qu'en production, ou avec

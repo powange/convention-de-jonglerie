@@ -9,14 +9,9 @@ import {
   prixRemise,
   resumeAvantage,
 } from '../../../shared/codes-promo'
-import {
-  erreurChoixModules,
-  finDePeriode,
-  formule as definitionFormule,
-  modulesCouverts,
-} from '../../../shared/formules'
+import { finDePeriode, formule as definitionFormule } from '../../../shared/formules'
 import { chargerCode, codeRepris, refusPourLeCompte } from '../../utils/codes-promo'
-import prisma, { Prisma } from '../../utils/prisma'
+import prisma from '../../utils/prisma'
 import {
   SUBSCRIPTION_FORMULES,
   SUBSCRIPTION_PLANS,
@@ -26,8 +21,10 @@ import {
 import type { PromoCode } from '#server/types/prisma'
 
 /**
- * Souscrire (ou changer de formule) : une formule (solo, duo, integral), une période (`plan` :
- * mensuel ou annuel), pour Solo et Duo les modules choisis, et éventuellement un code promo.
+ * Souscrire (ou changer de formule) : une formule payante (association, festival, grand), une
+ * période (`plan` : mensuel ou annuel), et éventuellement un code promo. Tous les modules sont
+ * compris dans toutes les formules ; ce qui distingue les formules, ce sont leurs plafonds
+ * (shared/formules.ts).
  *
  * Sans code saisi, le paiement reprend d'office celui de l'abonnement en cours s'il vaut encore pour
  * la nouvelle formule, ou un code « à vie » déjà utilisé (server/utils/codes-promo.ts). Un seul code
@@ -36,7 +33,6 @@ import type { PromoCode } from '#server/types/prisma'
 const checkoutSchema = z.object({
   plan: z.enum(SUBSCRIPTION_PLANS),
   formule: z.enum(SUBSCRIPTION_FORMULES),
-  modules: z.array(z.string()).max(10).optional(),
   code: z.string().max(64).optional().nullable(),
 })
 
@@ -46,27 +42,19 @@ export default defineEventHandler(async (event) => {
   const resultat = checkoutSchema.safeParse(await readBody(event))
   if (!resultat.success) throw createError({ status: 400, message: 'Données invalides' })
   const { plan, formule } = resultat.data
-  const modules = resultat.data.modules ?? []
-
-  const erreur = erreurChoixModules(formule, modules)
-  if (erreur) throw createError({ status: 400, message: erreur })
 
   // RENOUVELER la même formule avant la fin prolonge la période en cours : la nouvelle commence à sa
   // fin (c'est ce que promet le courriel de rappel, shared/rappel-fin-abonnement.ts). Changer de
-  // formule, de période ou de modules, ou repartir après une interruption, commence maintenant.
+  // formule ou de période, ou repartir après une interruption, commence maintenant.
   const existant = await prisma.subscription.findUnique({
     where: { userId },
-    select: { status: true, currentPeriodEnd: true, formule: true, plan: true, modules: true },
+    select: { status: true, currentPeriodEnd: true, formule: true, plan: true },
   })
-  const memesModules =
-    JSON.stringify([...modulesCouverts(formule, modules)].sort()) ===
-    JSON.stringify([...modulesCouverts(existant?.formule, existant?.modules)].sort())
   const renouvellement =
     !!existant &&
     isSubscriptionActive(existant) &&
     existant.formule === formule &&
-    existant.plan === plan &&
-    memesModules
+    existant.plan === plan
   const debut = renouvellement ? existant.currentPeriodEnd : new Date()
   const finPremiere = finDePeriode(debut, plan)
   const prix = definitionFormule(formule)!.prix[plan]
@@ -106,8 +94,6 @@ export default defineEventHandler(async (event) => {
 
   // ⚠️ Paiement SIMULÉ : aucun prestataire de paiement réel n'est appelé.
   // On considère le paiement réussi et on active immédiatement l'abonnement.
-  // Intégral couvre tout, y compris les modules à venir : rien à retenir.
-  const choisis = formule === 'integral' ? null : modulesCouverts(formule, modules)
   const data = {
     plan,
     formule,
@@ -138,10 +124,8 @@ export default defineEventHandler(async (event) => {
     }
     return tx.subscription.upsert({
       where: { userId },
-      create: { userId, ...data, modules: choisis ?? undefined },
-      // `modules: null` efface un choix précédent (passage à Intégral) ; Prisma veut `DbNull` pour
-      // une colonne Json.
-      update: { ...data, modules: choisis ?? Prisma.DbNull },
+      create: { userId, ...data },
+      update: data,
     })
   })
 
@@ -150,7 +134,6 @@ export default defineEventHandler(async (event) => {
     subscription: {
       plan: subscription.plan,
       formule: subscription.formule,
-      modules: modulesCouverts(subscription.formule, subscription.modules),
       status: subscription.status,
       currentPeriodEnd: subscription.currentPeriodEnd,
       amountPaid: subscription.amountPaid,

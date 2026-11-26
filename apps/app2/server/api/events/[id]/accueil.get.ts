@@ -1,7 +1,6 @@
 import {
-  couvertureDeLEvenement,
   droitsSurEvenement,
-  gestionOuverte,
+  etatDeLaGestion,
   modulesAffiches,
   selectionModules,
 } from '../../../utils/droits-evenement'
@@ -70,10 +69,7 @@ export default defineEventHandler(async (event) => {
       timezone: evenement.timezone,
     },
     droits,
-    abonnementActif: await gestionOuverte(eventId, userId),
-    // Ce que couvre l'abonnement du propriétaire : les modules hors formule restent consultables,
-    // en lecture seule (droits-evenement.ts).
-    abonnement: await couvertureDeLEvenement(eventId),
+    ...(await etatDeLaGestion(eventId, userId)),
     modules: modulesAffiches(evenement),
     organisateurs: evenement._count.editionOrganizers,
     benevoles,
