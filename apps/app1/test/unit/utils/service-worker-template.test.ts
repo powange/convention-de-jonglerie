@@ -16,12 +16,17 @@ import { classifyRequest } from '../../../shared/utils/offline-cache'
  * C'est arrivé deux fois en écrivant ce cache, chaque fois pour la même raison. D'où ce test.
  */
 
-const SOURCE = path.resolve(__dirname, '../../../server/routes/firebase-messaging-sw.js.ts')
+const ROUTE = path.resolve(__dirname, '../../../server/routes/firebase-messaging-sw.js.ts')
+// Le bloc de cache est commun à app1 et à Flowvent : il vit dans le layer `core`.
+const BLOC_DE_CACHE = path.resolve(
+  __dirname,
+  '../../../../../layers/core/server/socle/cache-hors-ligne-sw.ts'
+)
 
-/** Le fichier porte deux gabarits : le corps du worker, et le bloc de cache qu'il inclut. */
+/** Deux gabarits : le corps du worker (route d'app1), et le bloc de cache qu'il inclut (core). */
 const ANCHORS = [
-  { nom: 'corps du worker', debut: 'const swContent = `' },
-  { nom: 'bloc de cache', debut: '  return `' },
+  { nom: 'corps du worker', fichier: ROUTE, debut: 'const swContent = `' },
+  { nom: 'bloc de cache', fichier: BLOC_DE_CACHE, debut: '  return `' },
 ]
 
 function literalAfter(source: string, anchor: string): string {
@@ -36,10 +41,10 @@ function literalAfter(source: string, anchor: string): string {
 }
 
 describe('gabarits du service worker', () => {
-  const source = fs.readFileSync(SOURCE, 'utf8')
+  const lire = (fichier: string) => fs.readFileSync(fichier, 'utf8')
 
-  it.each(ANCHORS)('$nom : aucun accent grave égaré', ({ debut }) => {
-    const stray = literalAfter(source, debut)
+  it.each(ANCHORS)('$nom : aucun accent grave égaré', ({ fichier, debut }) => {
+    const stray = literalAfter(lire(fichier), debut)
       .split('\n')
       .map((line, index) => ({ line, index }))
       .filter(({ line }) => line.includes('`'))
@@ -52,10 +57,10 @@ describe('gabarits du service worker', () => {
 
   // Le worker est servi tel quel au navigateur : une erreur de syntaxe ne se verrait qu'à
   // l'exécution, et seulement chez les visiteurs.
-  it.each(ANCHORS)('$nom : produit du JavaScript analysable', ({ debut }) => {
+  it.each(ANCHORS)('$nom : produit du JavaScript analysable', ({ fichier, debut }) => {
     // Les interpolations sont remplacées par une valeur neutre : on vérifie la structure du
     // gabarit, pas les valeurs injectées à l'exécution.
-    const neutral = literalAfter(source, debut).replace(/\$\{[^}]*\}/g, 'null')
+    const neutral = literalAfter(lire(fichier), debut).replace(/\$\{[^}]*\}/g, 'null')
     expect(() => new Function(neutral)).not.toThrow()
   })
 

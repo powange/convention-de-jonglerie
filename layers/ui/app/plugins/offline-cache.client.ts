@@ -1,9 +1,16 @@
+/*
+ * ⚠️ `#shared` et non un chemin du layer : c'est le CONTRAT D'HÔTE. Chaque app fournit son
+ * `shared/utils/offline-cache.ts` — son classement des requêtes, ses pages et données à garder,
+ * l'adresse de son worker. app1 et Flowvent n'ont ni les mêmes pages ni le même worker (celui
+ * d'app1 porte aussi les notifications Firebase).
+ */
 import {
   classifyRequest,
+  DONNEES_A_CONSERVER,
   OFFLINE_CACHES,
   serviceWorkerUrl,
   shouldPrecachePage,
-} from '~~/shared/utils/offline-cache'
+} from '#shared/utils/offline-cache'
 
 /**
  * Enregistre le service worker pour tous les visiteurs, et met de côté les pages qui servent
@@ -88,23 +95,26 @@ export default defineNuxtPlugin(() => {
   }
 
   /**
-   * S'assure qu'une version de la liste des éditions est conservée.
+   * S'assure qu'une version des données déclarées par l'app est conservée (`DONNEES_A_CONSERVER`).
    *
-   * Sur un premier affichage, cette liste arrive avec le rendu serveur : le navigateur ne la
-   * demande jamais, donc le worker ne la voit pas passer et n'a rien à garder. À la réouverture
-   * hors ligne, l'accueil s'affichait alors sur une erreur réseau.
+   * Sur un premier affichage, ces données arrivent avec le rendu serveur : le navigateur ne les
+   * demande jamais, donc le worker ne les voit pas passer et n'a rien à garder. Dans app1, à la
+   * réouverture hors ligne, l'accueil s'affichait alors sur une erreur réseau (la liste des
+   * éditions).
    *
-   * Une seule requête suffit, quels que soient ses filtres : la recherche dans le cache tolère
-   * des paramètres différents.
+   * Une seule requête suffit par donnée, quels que soient ses filtres : la recherche dans le
+   * cache tolère des paramètres différents (`cle` = l'adresse sans paramètres).
    */
-  const keepEditionList = async () => {
-    try {
-      const cache = await caches.open(OFFLINE_CACHES.mapData)
-      const existing = await cache.match('/api/editions', { ignoreSearch: true })
-      if (existing) return
-      await cache.add('/api/editions?page=1&limit=12')
-    } catch (error) {
-      warn('liste des éditions non conservée :', error)
+  const keepDonnees = async () => {
+    for (const { cle, url } of DONNEES_A_CONSERVER) {
+      try {
+        const cache = await caches.open(OFFLINE_CACHES.mapData)
+        const existing = await cache.match(cle, { ignoreSearch: true })
+        if (existing) continue
+        await cache.add(url)
+      } catch (error) {
+        warn(`donnée non conservée (${cle}) :`, error)
+      }
     }
   }
 
@@ -197,7 +207,7 @@ export default defineNuxtPlugin(() => {
     }
 
     await keepPage(window.location.pathname)
-    await keepEditionList()
+    await keepDonnees()
     await keepPageAssets()
     planifier()
 

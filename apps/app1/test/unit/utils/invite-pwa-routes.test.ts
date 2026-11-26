@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { invitePwaAutorisee } from '../../../app/utils/invite-pwa-routes'
+import { invitePwaAutorisee } from '../../../../../layers/ui/app/utils/invite-pwa-routes'
 
 /**
  * Où l'on ne propose PAS d'installer l'application.

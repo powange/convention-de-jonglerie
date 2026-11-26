@@ -2,7 +2,7 @@ import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { nextTick } from 'vue'
 
-import PWAInstallBanner from '../../../app/components/PWAInstallBanner.vue'
+import PWAInstallBanner from '../../../../../layers/ui/app/components/PWAInstallBanner.vue'
 
 /**
  * L'invitation à installer l'application ne bloque plus rien, et se tait où il faut.

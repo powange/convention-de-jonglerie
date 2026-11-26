@@ -26,29 +26,32 @@
         v-if="afficherLeBandeau"
         class="fixed inset-x-0 bottom-0 z-40 p-4 sm:inset-x-auto sm:right-4 sm:bottom-4 sm:max-w-sm"
       >
-        <UAlert
-          :title="$t('pwa.install.title')"
-          :description="$t('pwa.install.description')"
-          icon="i-heroicons-arrow-down-tray"
-          color="primary"
-          variant="subtle"
-          class="shadow-lg"
-          :close="{ 'aria-label': $t('pwa.install.later') }"
-          :actions="[
-            {
-              label: $t('pwa.install.button'),
-              color: 'primary',
-              onClick: () => installer(),
-            },
-            {
-              label: $t('pwa.install.later'),
-              color: 'neutral',
-              variant: 'ghost',
-              onClick: () => reporter(),
-            },
-          ]"
-          @update:open="reporter()"
-        />
+        <!-- Fond OPAQUE sous l'encart : la variante `subtle` est translucide, et le texte de la page
+             se lisait au travers du bandeau, posé par-dessus. -->
+        <div class="rounded-lg bg-default shadow-lg">
+          <UAlert
+            :title="$t('pwa.install.title')"
+            :description="$t('pwa.install.description')"
+            icon="i-heroicons-arrow-down-tray"
+            color="primary"
+            variant="subtle"
+            :close="{ 'aria-label': $t('pwa.install.later') }"
+            :actions="[
+              {
+                label: $t('pwa.install.button'),
+                color: 'primary',
+                onClick: () => installer(),
+              },
+              {
+                label: $t('pwa.install.later'),
+                color: 'neutral',
+                variant: 'ghost',
+                onClick: () => reporter(),
+              },
+            ]"
+            @update:open="reporter()"
+          />
+        </div>
       </div>
     </Transition>
   </ClientOnly>

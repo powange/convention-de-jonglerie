@@ -123,6 +123,16 @@ export function classifyRequest(url: string, destination: string, origin: string
  * celles qu'on cherche à soulager. On s'en tient donc à ce qui sert vraiment sur place : la
  * carte du site, et l'accueil comme point d'entrée.
  */
+/**
+ * Données à garder dès la première visite, même si le navigateur ne les a pas demandées (elles
+ * arrivent avec le rendu serveur). Lu par le plugin de cache du layer `ui`.
+ *
+ * La liste des éditions : sans elle, l'accueil hors ligne s'affichait sur une erreur réseau.
+ */
+export const DONNEES_A_CONSERVER: { cle: string; url: string }[] = [
+  { cle: '/api/editions', url: '/api/editions?page=1&limit=12' },
+]
+
 export function shouldPrecachePage(pathname: string): boolean {
   if (pathname === '/') return true
   return /^\/editions\/\d+\/map\/?$/.test(pathname)
