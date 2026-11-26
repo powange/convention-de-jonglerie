@@ -336,6 +336,19 @@ describe('le workflow et le script sont d’accord', () => {
     for (const c of ecrites) expect(c).toBe(lue[0])
   })
 
+  it('⚠️ aucune PR n’écrit de cache Docker — 4 Go perdus et le quota dépassé le 26/11', () => {
+    // Un cache écrit dans une PR n’est lisible que par elle. Les couches Docker en `mode=max` des
+    // PR avaient porté le cache du dépôt à 11 Go pour un quota de 10 : GitHub évince alors au plus
+    // ancien accès, jusqu’aux node_modules qu’écrit `setup`.
+    const ecritures = [...src.matchAll(/^ +cache-to: (.+)$/gm)].map((m) => m[1]!)
+    expect(ecritures.length, 'plus aucun cache-to : ce cas peut être retiré').toBeGreaterThan(0)
+    for (const e of ecritures) {
+      expect(e, e).toMatch(
+        /^\$\{\{ github\.event_name != 'pull_request' && 'type=gha[^']*' \|\| '' \}\}$/
+      )
+    }
+  })
+
   it('⚠️ le run planifié existe, et seul le signalement peut écrire', () => {
     expect(src).toMatch(/^ {2}schedule:\n {4}- cron: '[^']+'$/m)
     const ecrivains = [...blocs].filter(([, b]) => /^ {6}[\w-]+: write$/m.test(b)).map(([n]) => n)
