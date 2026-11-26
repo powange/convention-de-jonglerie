@@ -24,6 +24,7 @@ on:
       - 'layers/map/**'
       - 'layers/stock/**'
       - 'layers/artists/**'
+      - 'layers/ticketing/**'
       - 'layers/auth/**'
       - '.github/workflows/publier-image-flowvent.yml'
   workflow_dispatch:

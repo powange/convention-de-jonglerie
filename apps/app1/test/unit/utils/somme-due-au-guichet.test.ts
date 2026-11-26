@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { sommeDueAuGuichet, type DettesDuBillet } from '../../../shared/utils/somme-due-au-guichet'
+import {
+  sommeDueAuGuichet,
+  type DettesDuBillet,
+} from '../../../../../layers/ticketing/shared/utils/somme-due-au-guichet'
 
 /**
  * Laquelle des trois dettes le guichet annonce-t-il ?

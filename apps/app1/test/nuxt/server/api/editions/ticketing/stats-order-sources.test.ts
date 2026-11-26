@@ -9,7 +9,7 @@ vi.mock('../../../../../../server/utils/permissions/edition-permissions', () => 
   canManageTicketingById: droitAccorde,
 }))
 
-import handler from '../../../../../../server/api/editions/[id]/ticketing/stats/order-sources.get'
+import handler from '../../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/stats/order-sources.get'
 import { global } from '../../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma

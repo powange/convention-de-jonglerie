@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { entierPositifDuChamp } from '../../../app/utils/champ-numerique'
+import { entierPositifDuChamp } from '../../../../../layers/ticketing/app/utils/champ-numerique'
 
 /**
  * Ce qu'un champ numérique de formulaire contient réellement.

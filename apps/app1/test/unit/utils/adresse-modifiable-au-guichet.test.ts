@@ -4,7 +4,7 @@ import {
   adresseAEcrire,
   comptesQuiRefusent,
   verdictDAdresse,
-} from '../../../shared/utils/adresse-modifiable-au-guichet'
+} from '../../../../../layers/ticketing/shared/utils/adresse-modifiable-au-guichet'
 
 /**
  * Le droit du guichet à réécrire l'adresse de courriel d'un compte.

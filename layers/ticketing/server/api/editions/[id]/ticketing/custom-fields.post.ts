@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { Prisma } from '#server/utils/prisma'
-import { dedoublonnerAssociations } from '~~/shared/utils/dedoublonnage-associations'
+import { dedoublonnerAssociations } from '#ticketing/shared/utils/dedoublonnage-associations'
 
 const bodySchema = z.object({
   label: z.string().min(1),

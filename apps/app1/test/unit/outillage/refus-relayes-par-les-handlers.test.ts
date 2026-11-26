@@ -120,7 +120,7 @@ describe('les refus 4xx ne deviennent pas des 500', () => {
      * `catch` doit relayer avant de journaliser et avant de lever son 500.
      */
     const source = await readFile(
-      join(DEPOT, 'apps/app1/server/api/editions/[id]/ticketing/validate-entry.post.ts'),
+      join(DEPOT, 'layers/ticketing/server/api/editions/[id]/ticketing/validate-entry.post.ts'),
       'utf8'
     )
     const bloc = corpsDesCatch(source).find((b) => /status(?:Code)?:\s*500/.test(b))!

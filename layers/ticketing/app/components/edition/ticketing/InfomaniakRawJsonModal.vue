@@ -2,7 +2,11 @@
   <UModal v-model:open="isOpen" :ui="{ width: 'sm:max-w-5xl' }">
     <template #header>
       <div class="flex items-center gap-3">
-        <img src="~/assets/img/infomaniak/logo.svg" alt="Infomaniak" class="w-8 h-8 rounded-lg" />
+        <img
+          src="../../../assets/img/infomaniak/logo.svg"
+          alt="Infomaniak"
+          class="w-8 h-8 rounded-lg"
+        />
         <div>
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
             {{ $t('gestion.ticketing.infomaniak_raw_json_title') }}

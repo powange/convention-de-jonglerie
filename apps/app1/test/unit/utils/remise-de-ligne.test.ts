@@ -5,7 +5,7 @@ import {
   montantBrutDeLaLigne,
   montantNetDeLaLigne,
   remiseDeLaLigne,
-} from '../../../shared/utils/remise-de-ligne'
+} from '../../../../../layers/core/shared/utils/remise-de-ligne'
 
 /**
  * La remise accordée sur une ligne de commande.

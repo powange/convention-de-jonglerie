@@ -6,7 +6,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
-import { dedoublonnerAssociations } from '~~/shared/utils/dedoublonnage-associations'
+import { dedoublonnerAssociations } from '#ticketing/shared/utils/dedoublonnage-associations'
 
 const bodySchema = z.object({
   quotas: z.array(

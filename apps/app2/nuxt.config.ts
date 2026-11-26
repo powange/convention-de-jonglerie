@@ -26,7 +26,8 @@ export default defineNuxtConfig({
   //   (server/volunteers/ports/registry.ts…). Cf. docs/flowvent-benevoles.md.
   // - `map` : la carte du site (zones, repères, import), lot 2 de docs/flowvent-modules.md.
   // - `stock` : stock et prêts, lot 3.
-  // - `artists` : artistes et spectacles, lot 4.
+  // - `artists` : artistes et spectacles, lots 4 et 5.
+  // - `ticketing` : billetterie (HelloAsso seul), lot 6.
   extends: [
     '../../layers/ui',
     '../../layers/core',
@@ -35,6 +36,7 @@ export default defineNuxtConfig({
     '../../layers/map',
     '../../layers/stock',
     '../../layers/artists',
+    '../../layers/ticketing',
   ],
 
   hooks: {
@@ -145,6 +147,8 @@ export default defineNuxtConfig({
           '../../../../layers/artists/i18n/locales/fr/shows-call.json',
           '../../../../layers/artists/i18n/locales/fr/gestion-shows-call.json',
           '../../../../layers/artists/i18n/locales/fr/survey.json',
+          '../../../../layers/ticketing/i18n/locales/fr/ticketing.json',
+          '../../../../layers/ticketing/i18n/locales/fr/gestion-ticketing.json',
           'benevoles.json',
           'interface.json',
           'fr.json',

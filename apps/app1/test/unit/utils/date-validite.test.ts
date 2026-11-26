@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { estUneDateDeValiditeLisible, instantDeValidite } from '../../../shared/utils/date-validite'
+import {
+  estUneDateDeValiditeLisible,
+  instantDeValidite,
+} from '../../../../../layers/ticketing/shared/utils/date-validite'
 
 /**
  * Deux défauts se répondent ici, et le second est né de la correction du premier.

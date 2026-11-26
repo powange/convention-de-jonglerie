@@ -1,7 +1,7 @@
 // Câblage jonglerie des ports du module billetterie. Lit/écrit les champs `ticketing*` portés par
 // Edition et l'existence de l'Edition. Reste côté app ; le layer ne consomme que les interfaces
 // (types.ts). Une 2ᵉ app fournit sa propre implémentation via setTicketingPorts().
-import type { TicketingPorts, TicketingSettings } from './types'
+import type { TicketingPorts, TicketingSettings } from '#ticketing/server/ports/types'
 
 import { buildUpdateData } from '#server/utils/prisma-helpers'
 
@@ -76,6 +76,45 @@ export function createDefaultTicketingPorts(): TicketingPorts {
           select: { id: true },
         })
         return !!edition
+      },
+      async lireEdition(editionId) {
+        const e = await prisma.edition.findUnique({
+          where: { id: editionId },
+          select: {
+            id: true,
+            name: true,
+            status: true,
+            timezone: true,
+            startDate: true,
+            endDate: true,
+            ticketingHandoutItemsEnabled: true,
+            convention: { select: { name: true } },
+          },
+        })
+        if (!e) return null
+        return {
+          id: e.id,
+          name: e.name,
+          nomAffiche: e.name || e.convention?.name || '',
+          status: e.status,
+          timezone: e.timezone,
+          startDate: e.startDate,
+          endDate: e.endDate,
+          handoutItemsEnabled: e.ticketingHandoutItemsEnabled ?? true,
+        }
+      },
+      async editionsComparables(editionId) {
+        const e = await prisma.edition.findUnique({
+          where: { id: editionId },
+          select: { conventionId: true },
+        })
+        if (!e) return []
+        return prisma.edition.findMany({
+          where: { conventionId: e.conventionId, id: { not: editionId } },
+          select: { id: true, name: true, startDate: true, endDate: true },
+          // La plus récente d'abord : on compare presque toujours à l'année précédente.
+          orderBy: { startDate: 'desc' },
+        })
       },
     },
   }

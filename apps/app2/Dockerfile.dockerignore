@@ -12,6 +12,7 @@
 !layers/map
 !layers/stock
 !layers/artists
+!layers/ticketing
 
 # Artefacts et dépendances (régénérés dans l'image)
 **/node_modules

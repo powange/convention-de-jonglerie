@@ -1764,7 +1764,11 @@ import { logoDuFournisseur, nomDuFournisseur } from '../../../../../utils/ticket
 import { fetchOrders, type Order } from '../../../../../utils/ticketing/orders'
 import { fetchTiers, type TicketingTier } from '../../../../../utils/ticketing/tiers'
 
-import { aUneRemise, montantNetDeLaLigne, remiseDeLaLigne } from '~~/shared/utils/remise-de-ligne'
+import {
+  aUneRemise,
+  montantNetDeLaLigne,
+  remiseDeLaLigne,
+} from '#core/shared/utils/remise-de-ligne'
 
 const { money } = useEditionCurrency()
 
@@ -1779,7 +1783,8 @@ useSeoMeta({
   title: () => `${$t('gestion.ticketing.orders_title')} - ${$t('gestion.ticketing.title')}`,
 })
 
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 const loading = ref(true)

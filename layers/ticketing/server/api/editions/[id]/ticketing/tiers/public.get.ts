@@ -1,4 +1,5 @@
 import { editionVisiblePubliquement } from '#core/shared/utils/visibilite-edition'
+import { useTicketingPorts } from '#server/ticketing/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { applyCustomName } from '#server/utils/editions/ticketing/tiers'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -15,10 +16,7 @@ export default wrapApiHandler(
   async (event) => {
     const editionId = validateEditionId(event)
 
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      select: { status: true },
-    })
+    const edition = await useTicketingPorts().event.lireEdition(editionId)
 
     // Même réponse pour « n'existe pas » et « existe mais cachée » : distinguer les deux
     // rendrait la route bavarde sur ce qu'elle est justement censée taire.

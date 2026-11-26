@@ -30,7 +30,7 @@ vi.mock('#server/utils/editions/ticketing/user-info-update', () => ({
   updateUserInfo: vi.fn(),
 }))
 
-import validateHandler from '../../../../../../server/api/editions/[id]/ticketing/validate-entry.post'
+import validateHandler from '../../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/validate-entry.post'
 import { global } from '../../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma

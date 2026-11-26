@@ -1,6 +1,6 @@
+import { chercherLesDoublons, type CompteAComparer } from '#core/shared/utils/doublons-utilisateurs'
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { chercherLesDoublons, type CompteAComparer } from '~~/shared/utils/doublons-utilisateurs'
 
 /**
  * GET /api/admin/users/doublons

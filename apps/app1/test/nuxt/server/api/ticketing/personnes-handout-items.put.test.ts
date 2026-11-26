@@ -6,9 +6,9 @@ vi.mock('#server/utils/permissions/edition-permissions', () => ({
   canManageTicketingById: mockCanManage,
 }))
 
-import artistesHandler from '../../../../../server/api/editions/[id]/ticketing/artists/handout-items/index.put'
-import organisateursHandler from '../../../../../server/api/editions/[id]/ticketing/organizers/handout-items/index.put'
-import benevolesHandler from '../../../../../server/api/editions/[id]/ticketing/volunteers/handout-items/index.put'
+import artistesHandler from '../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/artists/handout-items/index.put'
+import organisateursHandler from '../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/organizers/handout-items/index.put'
+import benevolesHandler from '../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/volunteers/handout-items/index.put'
 import { global } from '../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma

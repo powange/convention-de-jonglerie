@@ -845,7 +845,6 @@ import type { TitreAffiche } from '../../../../../components/ticketing/Participa
 
 import { formaterDateHeure } from '#core/shared/utils/fuseau-edition'
 
-const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { avertir, erreur, notifier, succes } = useNotificateur()
@@ -888,7 +887,8 @@ const pastilleDeNature = (nature: NatureDeTitre) => {
   }
 }
 
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 // Vérifier les permissions de contrôle d'accès pour les bénévoles en créneau

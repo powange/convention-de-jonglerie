@@ -29,7 +29,7 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <img
-                  src="~/assets/img/helloasso/logo.svg"
+                  src="../../../../../assets/img/helloasso/logo.svg"
                   alt="HelloAsso"
                   class="h-14 w-14 rounded-lg"
                 />
@@ -723,14 +723,14 @@
           </div>
         </UCard>
 
-        <!-- Infomaniak -->
-        <UCard>
+        <!-- Infomaniak (si l'app le propose, cf. app.config `billetterie.infomaniak`) -->
+        <UCard v-if="appConfig.billetterie.infomaniak">
           <div class="space-y-6">
             <!-- En-tête avec statut -->
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <img
-                  src="~/assets/img/infomaniak/logo.svg"
+                  src="../../../../../assets/img/infomaniak/logo.svg"
                   alt="Infomaniak"
                   class="h-14 w-14 rounded-lg"
                 />
@@ -922,12 +922,13 @@
 </template>
 
 <script setup lang="ts">
+// Import explicite : le composant s'enregistre sous `UiConfirmModal` (layers/ui) ; `<ConfirmModal>`
+// sans import ne se résolvait pas — la modale ne s'ouvrait jamais, dans app1 comme dans Flowvent.
 import { onMounted, computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-import { normaliserTypeHelloAsso } from '~/utils/helloasso'
 
 import HelloAssoConfigModal from '../../../../../components/edition/ticketing/HelloAssoConfigModal.vue'
 import InfomaniakConfigModal from '../../../../../components/edition/ticketing/InfomaniakConfigModal.vue'
@@ -936,9 +937,13 @@ import { resumeDeconnexionBilletterie } from '../../../../../utils/suppression-b
 import type { InfomaniakConfig } from '../../../../../components/edition/ticketing/InfomaniakConfigModal.vue'
 import type { TabsItem } from '@nuxt/ui'
 
+import { normaliserTypeHelloAsso } from '#ticketing/app/utils/helloasso'
+import ConfirmModal from '#ui-commun/app/components/ui/ConfirmModal.vue'
+
 const { money, symbol } = useEditionCurrency()
 
 const route = useRoute()
+const appConfig = useAppConfig()
 const router = useRouter()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
@@ -950,7 +955,8 @@ useSeoMeta({
   title: () => `${t('gestion.ticketing.external_link_title')} - ${t('gestion.ticketing.title')}`,
 })
 
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 const helloAssoClientId = ref('')

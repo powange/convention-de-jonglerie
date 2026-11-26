@@ -33,6 +33,8 @@ export interface EditionFlowvent {
   volunteersSwapsEnabled: boolean
   volunteersHasFloatingTeam: boolean
   mealsEnabled: boolean
+  /** Devise des montants (billetterie) : absente dans Flowvent, l'euro par défaut s'applique. */
+  currency?: string | null
   /** Droits par domaine de la personne connectée, calculés par le serveur ; `null` : visiteur. */
   droits: Droits | null
   [cle: string]: unknown

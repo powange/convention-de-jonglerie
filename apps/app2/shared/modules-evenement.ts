@@ -124,7 +124,7 @@ export const MODULES_EVENEMENT: readonly DefinitionModule[] = [
     description: 'Tarifs, commandes HelloAsso et contrôle des entrées.',
     icone: 'i-heroicons-ticket',
     droit: 'billetterie',
-    disponible: false,
+    disponible: true,
   },
   {
     cle: 'tresorerie',

@@ -20,8 +20,8 @@ const RACINE = join(import.meta.dirname, '../../../../..')
 
 /** Les trois écrans qui annoncent une dette, et le chemin de leur source. */
 const APPELANTS = [
-  'apps/app1/server/api/editions/[id]/ticketing/search.post.ts',
-  'apps/app1/server/api/editions/[id]/ticketing/verify.post.ts',
+  'layers/ticketing/server/api/editions/[id]/ticketing/search.post.ts',
+  'layers/ticketing/server/api/editions/[id]/ticketing/verify.post.ts',
   'layers/ticketing/server/api/editions/[id]/ticketing/orders.get.ts',
 ]
 

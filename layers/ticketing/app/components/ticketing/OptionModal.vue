@@ -174,7 +174,8 @@
 import { computed, ref, watch } from 'vue'
 
 import { useEditionStore } from '~/stores/editions'
-import { entierPositifDuChamp } from '~/utils/champ-numerique'
+
+import { entierPositifDuChamp } from '#ticketing/app/utils/champ-numerique'
 
 const { currency } = useEditionCurrency()
 

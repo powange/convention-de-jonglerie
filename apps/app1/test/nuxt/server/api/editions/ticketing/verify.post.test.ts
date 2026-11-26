@@ -24,7 +24,7 @@ vi.mock('#server/utils/auth-utils', () => ({
   requireAuth: vi.fn((event) => event.context.user),
 }))
 
-import verifyHandler from '../../../../../../server/api/editions/[id]/ticketing/verify.post'
+import verifyHandler from '../../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/verify.post'
 import { global } from '../../../../globales-nitro'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts

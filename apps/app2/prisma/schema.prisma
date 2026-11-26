@@ -87,6 +87,9 @@ model User {
   showApplications                   ShowApplication[]
   decidedShowApplications            ShowApplication[]                   @relation("ShowApplicationDecider")
   showCallSurveyVotes                ShowCallSurveyVote[]
+  apiErrorLogs                       ApiErrorLog[]
+  ticketingCountersTouched           TicketingCounter[]                  @relation("TicketingCounterLastActor")
+  entryValidationLogs                EntryValidationLog[]                @relation("EntryValidationLogActor")
 }
 
 model PasswordResetToken {
@@ -102,64 +105,87 @@ model PasswordResetToken {
 }
 
 model Event {
-  id                  Int           @id @default(autoincrement())
+  id                               Int           @id @default(autoincrement())
   /// Identifiant PUBLIC, celui des adresses (`/events/<publicId>/…`) : aléatoire, donc ni le
   /// nombre d'événements ni les pages publiques des autres ne se devinent en comptant. L'`id`
   /// numérique reste interne (relations, API du layer bénévoles).
-  publicId            String        @unique @default(nanoid(10)) @db.VarChar(16)
-  name                String
-  description         String?       @db.Text
-  location            String?
-  startDate           DateTime?
+  publicId                         String        @unique @default(nanoid(10)) @db.VarChar(16)
+  name                             String
+  description                      String?       @db.Text
+  location                         String?
+  startDate                        DateTime?
   // Métadonnées génériques lues par le layer bénévoles (comme l'`Event` d'app1).
-  endDate             DateTime?
-  status              EditionStatus @default(PUBLISHED)
-  timezone            String?
+  endDate                          DateTime?
+  status                           EditionStatus @default(PUBLISHED)
+  timezone                         String?
   /// Modules activés pour l'événement (page « Accueil de la gestion »), un par module comme les
   /// `*Enabled` d'une édition d'app1. Le module bénévoles est actif par défaut.
-  volunteersEnabled   Boolean       @default(true)
+  volunteersEnabled                Boolean       @default(true)
   /// Les autres modules, inactifs par défaut comme dans app1 (cf. shared/modules-evenement.ts).
-  siteMapEnabled      Boolean       @default(false)
-  stockEnabled        Boolean       @default(false)
-  artistsEnabled      Boolean       @default(false)
-  mealsEnabled        Boolean       @default(false)
-  ticketingEnabled    Boolean       @default(false)
-  treasuryEnabled     Boolean       @default(false)
+  siteMapEnabled                   Boolean       @default(false)
+  stockEnabled                     Boolean       @default(false)
+  artistsEnabled                   Boolean       @default(false)
+  mealsEnabled                     Boolean       @default(false)
+  ticketingEnabled                 Boolean       @default(false)
+  treasuryEnabled                  Boolean       @default(false)
   /// Carte du site (layer `map`) : publique ou réservée à la gestion, et la carte externe
   /// (Google My Maps…) d'où l'on importe zones et repères. Mêmes colonnes que l'`Edition` d'app1.
-  mapPublic           Boolean       @default(false)
-  externalMapProvider String?
-  externalMapRef      String?
+  mapPublic                        Boolean       @default(false)
+  externalMapProvider              String?
+  externalMapRef                   String?
   /// Informations pratiques données aux artistes (espace artiste) — layer `artists`, comme
   /// `Edition.artistInfo` d'app1.
-  artistInfo          String?       @db.Text
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
-  owner               User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId             Int
+  artistInfo                       String?       @db.Text
+  /// Réglages de la billetterie (layer `ticketing`), mêmes noms et défauts que l'`Edition` d'app1.
+  ticketingAllowOnsiteRegistration Boolean       @default(true)
+  ticketingAllowAnonymousOrders    Boolean       @default(false)
+  ticketingPaymentCash             Boolean       @default(true)
+  ticketingPaymentCard             Boolean       @default(true)
+  ticketingPaymentCheck            Boolean       @default(true)
+  ticketingSumupEnabled            Boolean       @default(false)
+  ticketingHandoutItemsEnabled     Boolean       @default(true)
+  createdAt                        DateTime      @default(now())
+  updatedAt                        DateTime      @updatedAt
+  owner                            User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId                          Int
 
   // Gestion des bénévoles (relations inverses, mêmes noms qu'app1)
-  volunteerApplications       EditionVolunteerApplication[]
-  volunteerTeams              VolunteerTeam[]
-  volunteerTimeSlots          VolunteerTimeSlot[]
-  volunteerNotificationGroups VolunteerNotificationGroup[]
-  volunteerComments           VolunteerComment[]
-  volunteerSwapRequests       VolunteerSwapRequest[]
-  volunteerSettings           EventVolunteerSettings?
-  volunteerAutoAssignRuns     VolunteerAutoAssignRun[]
-  volunteerAutoAssignPlans    VolunteerAutoAssignPlan[]
-  editionOrganizers           EditionOrganizer[]
-  zones                       EditionZone[]
-  markers                     EditionMarker[]
-  stockGroups                 StockGroup[]
-  stockTags                   StockTag[]
-  stockShoppingLists          StockShoppingList[]
-  artists                     EditionArtist[]
-  shows                       Show[]
-  artistNotificationGroups    ArtistNotificationGroup[]
-  handoutItems                TicketingHandoutItem[]
-  volunteerMeals              VolunteerMeal[]
-  showCalls                   EditionShowCall[]
+  volunteerApplications          EditionVolunteerApplication[]
+  volunteerTeams                 VolunteerTeam[]
+  volunteerTimeSlots             VolunteerTimeSlot[]
+  volunteerNotificationGroups    VolunteerNotificationGroup[]
+  volunteerComments              VolunteerComment[]
+  volunteerSwapRequests          VolunteerSwapRequest[]
+  volunteerSettings              EventVolunteerSettings?
+  volunteerAutoAssignRuns        VolunteerAutoAssignRun[]
+  volunteerAutoAssignPlans       VolunteerAutoAssignPlan[]
+  editionOrganizers              EditionOrganizer[]
+  zones                          EditionZone[]
+  markers                        EditionMarker[]
+  stockGroups                    StockGroup[]
+  stockTags                      StockTag[]
+  stockShoppingLists             StockShoppingList[]
+  artists                        EditionArtist[]
+  shows                          Show[]
+  artistNotificationGroups       ArtistNotificationGroup[]
+  handoutItems                   TicketingHandoutItem[]
+  volunteerMeals                 VolunteerMeal[]
+  showCalls                      EditionShowCall[]
+  externalTicketing              ExternalTicketing?
+  sumupConfig                    SumupConfig?
+  tiers                          TicketingTier[]
+  ticketingQuotas                TicketingQuota[]
+  options                        TicketingOption[]
+  orders                         TicketingOrder[]
+  volunteerTicketingHandoutItems EditionVolunteerHandoutItem[]
+  organizerTicketingHandoutItems EditionOrganizerHandoutItem[]
+  organizerTicketingQuotas       EditionOrganizerQuota[]
+  volunteerTicketingQuotas       EditionVolunteerQuota[]
+  artistTicketingQuotas          EditionArtistQuota[]
+  artistTicketingHandoutItems    EditionArtistHandoutItem[]
+  tierCustomFields               TicketingTierCustomField[]
+  ticketingCounters              TicketingCounter[]
+  entryValidationLogs            EntryValidationLog[]
 
   @@index([ownerId])
 }
@@ -239,31 +265,34 @@ model Organizer {
 /// Organisateur affecté à un événement. Nom et champs d'app1 : le layer interroge
 /// `prisma.editionOrganizer` et ses relations par ces noms. `editionId` désigne l'`Event`.
 model EditionOrganizer {
-  id                  Int                       @id @default(autoincrement())
+  id                  Int                           @id @default(autoincrement())
   editionId           Int
   organizerId         Int
   /// Droits par domaine (décision de l'utilisateur : un droit par domaine, chaque module ajoute le
   /// sien). Le propriétaire de l'événement a tout, sans ligne ici.
-  canEditEvent        Boolean                   @default(false)
-  canManageOrganizers Boolean                   @default(false)
-  canManageVolunteers Boolean                   @default(false)
-  canManageStock      Boolean                   @default(false)
-  canManageArtists    Boolean                   @default(false)
-  canManageMeals      Boolean                   @default(false)
-  canManageTicketing  Boolean                   @default(false)
-  canManageTreasury   Boolean                   @default(false)
+  canEditEvent        Boolean                       @default(false)
+  canManageOrganizers Boolean                       @default(false)
+  canManageVolunteers Boolean                       @default(false)
+  canManageStock      Boolean                       @default(false)
+  canManageArtists    Boolean                       @default(false)
+  canManageMeals      Boolean                       @default(false)
+  canManageTicketing  Boolean                       @default(false)
+  canManageTreasury   Boolean                       @default(false)
   arrivalDateTime     String?
   departureDateTime   String?
-  qrCodeToken         String?                   @unique
-  entryValidated      Boolean                   @default(false)
+  qrCodeToken         String?                       @unique
+  entryValidated      Boolean                       @default(false)
   entryValidatedAt    DateTime?
   entryValidatedBy    Int?
-  createdAt           DateTime                  @default(now())
-  updatedAt           DateTime                  @updatedAt
-  event               Event                     @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  organizer           Organizer                 @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  createdAt           DateTime                      @default(now())
+  updatedAt           DateTime                      @updatedAt
+  event               Event                         @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  organizer           Organizer                     @relation(fields: [organizerId], references: [id], onDelete: Cascade)
   teamAssignments     OrganizerTeamAssignment[]
   slotAssignments     OrganizerSlotAssignment[]
+  handoutItems        EditionOrganizerHandoutItem[]
+  quotas              EditionOrganizerQuota[]
+  mealSelections      OrganizerMealSelection[]
 
   @@unique([editionId, organizerId])
   @@index([editionId])
@@ -399,6 +428,7 @@ model EditionVolunteerApplication {
   user                 User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
   addedBy              User?                       @relation("ManuallyAddedVolunteers", fields: [addedById], references: [id], onDelete: SetNull)
   teamAssignments      ApplicationTeamAssignment[]
+  mealSelections       VolunteerMealSelection[]
 
   @@unique([eventId, userId])
   @@index([eventId])
@@ -501,10 +531,12 @@ model VolunteerTeam {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
-  event                Event                       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event                Event                         @relation(fields: [eventId], references: [id], onDelete: Cascade)
   timeSlots            VolunteerTimeSlot[]
   assignedApplications ApplicationTeamAssignment[]
   assignedOrganizers   OrganizerTeamAssignment[]
+  handoutItems         EditionVolunteerHandoutItem[]
+  ticketingQuotas      EditionVolunteerQuota[]
 
   @@index([eventId])
 }
@@ -1274,15 +1306,16 @@ model Show {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  artists      ShowArtist[]
-  acts         ShowAct[]
-  handoutItems ShowHandoutItem[]
-  performances ShowPerformance[]
+  artists         ShowArtist[]
+  acts            ShowAct[]
+  handoutItems    ShowHandoutItem[]
+  performances    ShowPerformance[]
   // Le groupe de messagerie dédié au spectacle, créé à la première utilisation
-  event        Event?            @relation(fields: [eventId], references: [id])
-  eventId      Int?
-  applications ShowApplication[]
-  conversation Conversation?
+  event           Event?               @relation(fields: [eventId], references: [id])
+  eventId         Int?
+  applications    ShowApplication[]
+  conversation    Conversation?
+  ticketingQuotas EditionArtistQuota[]
 
   @@index([editionId])
 }
@@ -1480,10 +1513,16 @@ model TicketingHandoutItem {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  shows   ShowHandoutItem[]
-  artists ArtistHandoutItem[]
-  event   Event?              @relation(fields: [eventId], references: [id])
-  eventId Int?
+  event                          Event                                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  tiers                          TicketingTierHandoutItem[]
+  options                        TicketingOptionHandoutItem[]
+  volunteerTicketingHandoutItems EditionVolunteerHandoutItem[]
+  artistTicketingHandoutItems    EditionArtistHandoutItem[]
+  organizerTicketingHandoutItems EditionOrganizerHandoutItem[]
+  customFields                   TicketingTierCustomFieldHandoutItem[]
+  shows                          ShowHandoutItem[]
+  artists                        ArtistHandoutItem[]
+  meals                          VolunteerMealHandoutItem[]
 
   /// Deux articles de même nom dans une édition sont indiscernables partout : dans les huit
   /// modales de sélection, et surtout au guichet, où la liste de remise affiche deux lignes
@@ -1513,9 +1552,15 @@ model VolunteerMeal {
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
 
-  artistMealSelections ArtistMealSelection[]
-  event                Event?                @relation(fields: [eventId], references: [id])
-  eventId              Int?
+  artistMealSelections    ArtistMealSelection[]
+  event                   Event?                     @relation(fields: [eventId], references: [id])
+  eventId                 Int?
+  mealSelections          VolunteerMealSelection[]
+  organizerMealSelections OrganizerMealSelection[]
+  handoutItems            VolunteerMealHandoutItem[]
+  tiers                   TicketingTierMeal[]
+  options                 TicketingOptionMeal[]
+  participantValidations  TicketingOrderItemMeal[]
 
   @@unique([editionId, date, mealType])
   @@index([editionId])
@@ -1685,4 +1730,852 @@ model Conversation {
   showId            Int?             @unique
   show              Show?            @relation(fields: [showId], references: [id], onDelete: Cascade)
   createdAt         DateTime         @default(now())
+}
+
+// =============================================================================
+// Billetterie (layer `ticketing`) — lot 6 de docs/flowvent-modules.md, HelloAsso seul dans
+// l'interface. Avec les tables de liaison aux repas que ses requêtes lisent (DORMANTES jusqu'au
+// lot 7), et le journal des erreurs serveur (ApiErrorLog) où elle signale ses échecs d'écriture.
+// =============================================================================
+
+enum ExternalTicketingProvider {
+  HELLOASSO
+  INFOMANIAK
+  BILLETWEB
+  WEEZEVENT
+  OTHER
+}
+
+enum ExternalTicketingStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+}
+
+model ExternalTicketing {
+  id         String                    @id @default(cuid())
+  editionId  Int                       @unique
+  provider   ExternalTicketingProvider
+  status     ExternalTicketingStatus   @default(ACTIVE)
+  lastSyncAt DateTime?
+  createdAt  DateTime                  @default(now())
+  updatedAt  DateTime                  @updatedAt
+
+  event            Event                      @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  helloAssoConfig  HelloAssoConfig?
+  infomaniakConfig InfomaniakConfig?
+  tiers            TicketingTier[]
+  options          TicketingOption[]
+  orders           TicketingOrder[]
+  tierCustomFields TicketingTierCustomField[]
+
+  @@index([editionId])
+  @@index([provider])
+  @@index([status])
+}
+
+model HelloAssoConfig {
+  id                  String   @id @default(cuid())
+  externalTicketingId String   @unique
+  clientId            String
+  clientSecret        String // Encrypted
+  organizationSlug    String
+  formType            String // Event, Membership, Donation, etc.
+  formSlug            String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  externalTicketing ExternalTicketing @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+
+  @@index([externalTicketingId])
+}
+
+model SumupConfig {
+  id           Int      @id @default(autoincrement())
+  editionId    Int      @unique
+  // Encrypted (AES-256-GCM) — clé d'affiliation SumUp du marchand.
+  // Type Text car la valeur chiffrée (iv:encrypted:authTag en base64) peut dépasser
+  // la limite VARCHAR(191) par défaut de Prisma + MySQL utf8mb4.
+  affiliateKey String   @db.Text
+  appId        String // App ID déclaré sur le dashboard SumUp (ex: com.example.myapp)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  event Event @relation(fields: [editionId], references: [id], onDelete: Cascade)
+
+  @@index([editionId])
+}
+
+model InfomaniakConfig {
+  id                  String   @id @default(cuid())
+  externalTicketingId String   @unique
+  apiKey              String // Encrypted (AES-256-GCM) — clé API shop (événements, zones, tarifs)
+  apiKeyGuichet       String? // Encrypted (AES-256-GCM) — clé API guichet (commandes, billets)
+  applicationPassword String? // Encrypted (AES-256-GCM) — mot de passe applicatif (header Authorization)
+  currency            String   @default("2") // 1 = CHF, 2 = EUR
+  eventId             Int? // ID de l'événement sélectionné
+  eventName           String? // Nom de l'événement (pour affichage)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  externalTicketing ExternalTicketing @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+
+  @@index([externalTicketingId])
+}
+
+model TicketingTier {
+  id                  Int       @id @default(autoincrement())
+  externalTicketingId String? // Null si tarif manuel (non HelloAsso)
+  helloAssoTierId     Int? // ID du tarif dans HelloAsso, null si tarif manuel
+  editionId           Int // Toujours associé à une édition
+  name                String
+  customName          String? // Nom personnalisé (prioritaire sur name si défini)
+  description         String?   @db.Text
+  price               Int // Prix en centimes
+  minAmount           Int? // Montant minimum (pour tarifs libres)
+  maxAmount           Int? // Montant maximum (pour tarifs libres)
+  isActive            Boolean   @default(true)
+  position            Int       @default(0) // Pour l'ordre d'affichage
+  countAsParticipant  Boolean   @default(true) // Si ce tarif compte comme participant dans les stats
+  validFrom           DateTime? // Date de début de validité (optionnel)
+  validUntil          DateTime? // Date de fin de validité (optionnel)
+  /// Quand le porteur de ce tarif est PRÉSENT sur place — à ne pas confondre avec `validFrom` et
+  /// `validUntil` juste au-dessus, qui disent quand le BILLET peut servir.
+  ///
+  /// La distinction se voit sur un pass week-end vendu jusqu'au dernier jour : sa validité court
+  /// jusqu'à la fermeture, sa présence s'arrête au départ du festivalier. C'est cette seconde date
+  /// qui fait redescendre la courbe d'affluence — sans elle, aucune sortie n'étant enregistrée, la
+  /// courbe ne pouvait que monter.
+  ///
+  /// N'a de sens que si `countAsParticipant` : un tee-shirt ou un don n'amène personne.
+  presenceFrom        DateTime?
+  presenceUntil       DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  externalTicketing ExternalTicketing?                    @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  event             Event                                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  quotas            TicketingTierQuota[]
+  handoutItems      TicketingTierHandoutItem[]
+  orderItems        TicketingOrderItem[]
+  customFields      TicketingTierCustomFieldAssociation[]
+  meals             TicketingTierMeal[]
+  options           TicketingTierOption[]
+  /// Rattachement éventuel à une ligne de trésorerie, qui tire alors son montant de ce tarif.
+
+  @@unique([externalTicketingId, helloAssoTierId])
+  @@index([externalTicketingId])
+  @@index([editionId])
+}
+
+model TicketingQuota {
+  id          Int      @id @default(autoincrement())
+  editionId   Int
+  title       String
+  description String?  @db.Text
+  quantity    Int // Nombre (toujours positif)
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  event        Event                           @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  tiers        TicketingTierQuota[]
+  options      TicketingOptionQuota[]
+  customFields TicketingTierCustomFieldQuota[]
+  organizers   EditionOrganizerQuota[]
+  volunteers   EditionVolunteerQuota[]
+  artists      EditionArtistQuota[]
+
+  @@index([editionId])
+}
+
+model EditionVolunteerHandoutItem {
+  id            Int      @id @default(autoincrement())
+  editionId     Int
+  handoutItemId Int
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity      Int      @default(1)
+  teamId        String? // NULL = global (tous les bénévoles), défini = équipe spécifique
+  /// Les phases où cet article est remis : `SETUP`, `EVENT`, `TEARDOWN`.
+  ///
+  /// ⚠️ TABLEAU VIDE = TOUTES LES PHASES, et c'est ce qui rend la migration sans rattrapage :
+  /// les associations existantes gardent exactement le comportement qu'elles avaient.
+  ///
+  /// ⚠️⚠️ MÊME FORME ET MÊME VOCABULAIRE QUE `VolunteerMeal.phases`, délibérément. Ces deux
+  /// réglages répondent à la même question — « à quel moment de l'édition cela s'applique-t-il ? » —
+  /// et les écrire différemment obligerait à traduire de l'un vers l'autre à chaque lecture, pour
+  /// finir par diverger.
+  phases        Json     @default("[]")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  event       Event                @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
+  team        VolunteerTeam?       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, handoutItemId, teamId])
+  @@index([editionId])
+  @@index([handoutItemId])
+  @@index([teamId])
+}
+
+model EditionArtistHandoutItem {
+  id            Int      @id @default(autoincrement())
+  editionId     Int
+  handoutItemId Int
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity      Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  event       Event                @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, handoutItemId])
+  @@index([editionId])
+  @@index([handoutItemId])
+}
+
+model EditionOrganizerHandoutItem {
+  id            Int      @id @default(autoincrement())
+  editionId     Int
+  handoutItemId Int
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity      Int      @default(1)
+  organizerId   Int? // NULL = global (tous les organisateurs), défini = organisateur spécifique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  event       Event                @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  organizer   EditionOrganizer?    @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, handoutItemId, organizerId])
+  @@index([editionId])
+  @@index([handoutItemId])
+  @@index([organizerId])
+}
+
+model EditionOrganizerQuota {
+  id          Int      @id @default(autoincrement())
+  editionId   Int
+  quotaId     Int
+  organizerId Int? // NULL = tous les organisateurs de l'édition
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  event     Event             @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  quota     TicketingQuota    @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+  organizer EditionOrganizer? @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, quotaId, organizerId])
+  @@index([editionId])
+  @@index([quotaId])
+  @@index([organizerId])
+}
+
+model EditionVolunteerQuota {
+  id        Int      @id @default(autoincrement())
+  editionId Int
+  quotaId   Int
+  teamId    String? // NULL = tous les bénévoles acceptés
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event          @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  quota TicketingQuota @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+  team  VolunteerTeam? @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, quotaId, teamId])
+  @@index([editionId])
+  @@index([quotaId])
+  @@index([teamId])
+}
+
+model EditionArtistQuota {
+  id        Int      @id @default(autoincrement())
+  editionId Int
+  quotaId   Int
+  showId    Int? // NULL = tous les artistes de l'édition
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event          @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  quota TicketingQuota @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+  show  Show?          @relation(fields: [showId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, quotaId, showId])
+  @@index([editionId])
+  @@index([quotaId])
+  @@index([showId])
+}
+
+model TicketingTierQuota {
+  id      Int @id @default(autoincrement())
+  tierId  Int
+  quotaId Int
+
+  tier  TicketingTier  @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  quota TicketingQuota @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+
+  @@unique([tierId, quotaId])
+  @@index([tierId])
+  @@index([quotaId])
+}
+
+model TicketingTierHandoutItem {
+  id            Int @id @default(autoincrement())
+  tierId        Int
+  handoutItemId Int
+
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity    Int                  @default(1)
+  tier        TicketingTier        @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
+
+  @@unique([tierId, handoutItemId])
+  @@index([tierId])
+  @@index([handoutItemId])
+}
+
+model TicketingTierOption {
+  id       Int @id @default(autoincrement())
+  tierId   Int
+  optionId Int
+
+  tier   TicketingTier   @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  option TicketingOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([tierId, optionId])
+  @@index([tierId])
+  @@index([optionId])
+}
+
+model TicketingOptionQuota {
+  id       Int @id @default(autoincrement())
+  optionId Int
+  quotaId  Int
+
+  option TicketingOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  quota  TicketingQuota  @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+
+  @@unique([optionId, quotaId])
+  @@index([optionId])
+  @@index([quotaId])
+}
+
+model TicketingOptionHandoutItem {
+  id            Int @id @default(autoincrement())
+  optionId      Int
+  handoutItemId Int
+
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity    Int                  @default(1)
+  option      TicketingOption      @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
+
+  @@unique([optionId, handoutItemId])
+  @@index([optionId])
+  @@index([handoutItemId])
+}
+
+model TicketingOption {
+  id                  Int      @id @default(autoincrement())
+  /// ⚠️ Renseigné même pour une option créée À LA MAIN : `createOption` exige une configuration
+  /// de billetterie externe et y rattache l'option. Ce champ ne dit donc PAS d'où vient l'option
+  /// — contrairement au tarif, dont l'équivalent reste bien nul quand il est manuel.
+  externalTicketingId String?
+  /// ID de l'option chez HelloAsso, nul si l'option a été saisie ici. C'est LUI qui distingue une
+  /// option importée d'une option manuelle.
+  helloAssoOptionId   String?
+  editionId           Int // Toujours associé à une édition
+  name                String
+  description         String?  @db.Text
+  type                String // TextInput, CheckBox, Select, etc.
+  isRequired          Boolean  @default(false)
+  choices             Json? // Array de choix pour les Select/MultipleChoice
+  price               Int? // Prix de l'option en centimes (null si pas de prix)
+  position            Int      @default(0) // Pour l'ordre d'affichage
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  externalTicketing   ExternalTicketing?           @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  event               Event                        @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  quotas              TicketingOptionQuota[]
+  handoutItems        TicketingOptionHandoutItem[]
+  orderItemSelections TicketingOrderItemOption[]
+  tiers               TicketingTierOption[]
+  meals               TicketingOptionMeal[]
+
+  @@unique([externalTicketingId, helloAssoOptionId])
+  @@index([externalTicketingId])
+  @@index([editionId])
+}
+
+model TicketingOrder {
+  id                  Int     @id @default(autoincrement())
+  externalTicketingId String? // Nullable pour les commandes manuelles
+  helloAssoOrderId    Int? // Nullable pour les commandes manuelles
+  editionId           Int // Lien direct vers l'édition
+
+  // Informations du payeur
+  payerFirstName String
+  payerLastName  String
+  payerEmail     String
+
+  // Montant et statut
+  amount        Int // Montant total en centimes
+  status        String // Processed, Refunded, etc.
+  paymentMethod String? // Type de paiement : cash, card, check, null si non payé
+  checkNumber   String? // Numéro du chèque si paymentMethod = 'check'
+
+  // Date de la commande
+  orderDate DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event             Event                @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  externalTicketing ExternalTicketing?   @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  items             TicketingOrderItem[]
+
+  @@unique([externalTicketingId, helloAssoOrderId])
+  @@index([externalTicketingId])
+  @@index([editionId])
+  @@index([payerEmail])
+}
+
+model TicketingOrderItem {
+  id              Int  @id @default(autoincrement())
+  orderId         Int // Lien vers TicketingOrder
+  helloAssoItemId Int? // Nullable pour les participants ajoutés manuellement
+  tierId          Int? // Lien vers le tarif HelloAsso
+
+  // Informations du participant (peut différer du payeur)
+  firstName String?
+  lastName  String?
+  email     String?
+
+  // Détails du billet
+  name   String? // Nom du tarif
+  type   String? // Type d'item HelloAsso (Donation, Payment, Membership, etc.)
+  amount Int // Prix payé en centimes
+  state  String // Processed, Refunded, etc.
+  qrCode String? // Code QR pour le contrôle d'accès
+
+  // Champs personnalisés (réponses aux custom fields)
+  customFields Json?
+
+  // Validation d'entrée
+  entryValidated   Boolean   @default(false)
+  entryValidatedAt DateTime?
+  entryValidatedBy Int?
+
+  /// Quand ce billet a été annulé ici, et par qui.
+  ///
+  /// Le FAIT de l'annulation vit dans `state` (`Canceled`), lu par la porte, les statistiques, les
+  /// repas et la trésorerie. Ces deux colonnes n'ajoutent que la trace — comme `entryValidatedAt`
+  /// et `entryValidatedBy` juste au-dessus le font pour l'entrée.
+  ///
+  /// `null` sur une ligne `Canceled` signifie donc « annulée ailleurs qu'ici » : les 12 lignes
+  /// annulées de la production viennent de HelloAsso.
+  canceledAt   DateTime?
+  canceledById Int?
+
+  /// La REMISE accordée après coup sur ce billet, en centimes.
+  ///
+  /// ⚠️ À NE PAS CONFONDRE AVEC `refunded` JUSTE EN DESSOUS, qui est autre chose. Celui-là
+  /// concerne un billet ANNULÉ : il dit si l'on a rendu l'argent d'une entrée à laquelle la
+  /// personne n'a plus droit. Ici le billet reste VIVANT — droit d'entrée, repas, articles à
+  /// remettre, quotas, tout est inchangé — et l'on rend seulement une partie du prix : un geste
+  /// commercial, une erreur de tarif, un dédommagement.
+  ///
+  /// ⚠️ ET CELLE-CI PÈSE SUR LA TRÉSORERIE, contrairement à `refunded`. Ce dernier n'a aucun effet
+  /// parce que l'annulation a déjà retiré la totalité du montant avant lui. Rien n'a été retiré
+  /// d'un billet vivant : si la remise n'était pas soustraite de l'encaissé, celui-ci resterait au
+  /// prix plein et se tromperait du montant rendu — sans erreur, sans alerte, et le compte ne
+  /// tomberait qu'au bilan.
+  ///
+  /// `0` est l'absence de remise, pas une remise de zéro : les deux se valent ici, et un entier
+  /// évite d'avoir à distinguer `null` de `0` dans chaque somme.
+  ///
+  /// 📍 Le système ENREGISTRE, il ne rembourse pas. HelloAsso ne sait pas rembourser partiellement
+  /// — c'est déjà noté plus bas pour `sourceCanceledAt` — donc le mouvement d'argent se fait à la
+  /// main, et ces colonnes en gardent la trace.
+  discountAmount Int       @default(0)
+  discountedAt   DateTime?
+  discountedById Int?
+
+  /// La remise a-t-elle été RENDUE à la personne, et quand, et par qui ?
+  ///
+  /// ⚠️ ACCORDER N'EST PAS RENDRE, exactement comme annuler n'est pas rembourser. Sur une commande
+  /// déjà réglée, une remise accordée reste de l'argent qu'on doit tant que les espèces ne sont pas
+  /// sorties. Le guichet affiche cette somme et coche cette case devant la personne.
+  ///
+  /// ⚠️ UNE CASE DISTINCTE DE `refunded`, et c'est un choix. Les deux pourraient paraître
+  /// interchangeables — les deux disent « l'argent est sorti » — mais ils ne portent pas sur la
+  /// même somme : `refunded` solde le prix ENTIER d'un billet annulé, celle-ci solde la seule
+  /// remise d'un billet vivant. Un billet remisé puis annulé doit son prix entier MOINS la remise
+  /// déjà rendue ; avec une case unique, rien ne dirait laquelle des deux sommes est sortie, et
+  /// l'on rendrait deux fois.
+  ///
+  /// 📍 Sans objet sur une commande en attente de paiement : la remise y réduit ce qui reste à
+  /// payer, aucun argent ne bouge. `montantARembourser` l'écarte déjà par `commandeReglee`.
+  discountPaidBack     Boolean   @default(false)
+  discountPaidBackAt   DateTime?
+  discountPaidBackById Int?
+
+  /// A-t-on rendu l'argent à la personne, et quand, et qui l'a rendu ?
+  ///
+  /// **Annulé ne veut pas dire remboursé**, et c'est toute la raison d'être de ces colonnes : un
+  /// billet réglé puis annulé reste de l'argent qu'on doit tant que cette case n'est pas cochée.
+  /// Le guichet s'en sert pour afficher la somme due à qui présente son billet.
+  ///
+  /// Un oui/non et non un montant : le choix est assumé, un remboursement partiel — frais retenus
+  /// — n'est pas exprimable ici.
+  ///
+  /// ⚠️ Sans effet sur la trésorerie, volontairement. Le montant quitte l'encaissé dès
+  /// l'annulation, remboursé ou non ; ces colonnes ne servent qu'à savoir à qui l'on doit encore.
+  refunded     Boolean   @default(false)
+  refundedAt   DateTime?
+  refundedById Int?
+
+  /// Quand la billetterie externe a, à son tour, annoncé ce billet annulé.
+  ///
+  /// Sert à une seule chose, mais elle compte : repérer un **double remboursement**. On annule ici,
+  /// on rend l'argent à la main — HelloAsso ne sachant pas rembourser partiellement — puis
+  /// quelqu'un rembourse AUSSI chez le fournisseur. La personne a été payée deux fois, et rien ne
+  /// le disait.
+  ///
+  /// L'alerte se déduit de deux colonnes : `refundedById` renseigné (quelqu'un d'ici a coché la
+  /// case) ET `sourceCanceledAt` renseigné. Le rattrapage du 28/09 a délibérément laissé
+  /// `refundedById` nul sur les lignes annulées par HelloAsso : sans quoi elles déclencheraient
+  /// toutes une fausse alerte.
+  ///
+  /// Posée par la synchronisation, jamais par un geste d'ici.
+  sourceCanceledAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order           TicketingOrder             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  tier            TicketingTier?             @relation(fields: [tierId], references: [id])
+  mealAccess      TicketingOrderItemMeal[]
+  selectedOptions TicketingOrderItemOption[]
+
+  @@index([orderId])
+  @@index([tierId])
+  @@index([helloAssoItemId])
+  @@index([email])
+  @@index([qrCode])
+  @@index([entryValidated])
+}
+
+model TicketingTierCustomField {
+  id                     Int      @id @default(autoincrement())
+  helloAssoCustomFieldId Int? // ID du custom field dans HelloAsso (null si manuel)
+  externalTicketingId    String? // Lien vers la configuration HelloAsso (null si manuel)
+  editionId              Int // Lien direct vers l'édition
+  label                  String   @db.Text
+  type                   String // YesNo, ChoiceList, TextInput, etc.
+  isRequired             Boolean  @default(false)
+  values                 Json? // Array de valeurs possibles (pour ChoiceList)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  externalTicketing ExternalTicketing?                    @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  event             Event                                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  tiers             TicketingTierCustomFieldAssociation[]
+  quotas            TicketingTierCustomFieldQuota[]
+  handoutItems      TicketingTierCustomFieldHandoutItem[]
+
+  @@unique([externalTicketingId, helloAssoCustomFieldId])
+  @@index([externalTicketingId])
+  @@index([editionId])
+}
+
+model TicketingTierCustomFieldAssociation {
+  id            Int @id @default(autoincrement())
+  tierId        Int
+  customFieldId Int
+
+  tier        TicketingTier            @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  customField TicketingTierCustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+
+  @@unique([tierId, customFieldId])
+  @@index([tierId])
+  @@index([customFieldId])
+}
+
+model TicketingTierCustomFieldQuota {
+  id            Int     @id @default(autoincrement())
+  customFieldId Int
+  quotaId       Int
+  choiceValue   String? // Si le custom field est de type ChoiceList, le choix spécifique qui déclenche le quota
+
+  customField TicketingTierCustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+  quota       TicketingQuota           @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+
+  @@unique([customFieldId, quotaId, choiceValue])
+  @@index([customFieldId])
+  @@index([quotaId])
+}
+
+model TicketingTierCustomFieldHandoutItem {
+  id            Int     @id @default(autoincrement())
+  customFieldId Int
+  handoutItemId Int
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity      Int     @default(1)
+  choiceValue   String? // Si le custom field est de type ChoiceList, le choix spécifique qui déclenche la remise
+
+  customField TicketingTierCustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem     @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
+
+  @@unique([customFieldId, handoutItemId, choiceValue])
+  @@index([customFieldId])
+  @@index([handoutItemId])
+}
+
+model TicketingOrderItemOption {
+  id           Int      @id @default(autoincrement())
+  orderItemId  Int
+  optionId     Int
+  amount       Int      @default(0) // Prix payé pour cette option en centimes
+  customFields Json? // Réponses aux custom fields de l'option
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orderItem TicketingOrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  option    TicketingOption    @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([orderItemId, optionId])
+  @@index([orderItemId])
+  @@index([optionId])
+}
+
+model TicketingCounter {
+  id        Int      @id @default(autoincrement())
+  editionId Int
+  name      String
+  token     String   @unique @default(cuid())
+  value     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// Dernier compte à avoir modifié la valeur.
+  ///
+  /// Un compteur se partage par QR code : plusieurs personnes l'incrémentent, et rien ne
+  /// permettait de comprendre un total aberrant après coup. `updatedAt` disait quand, pas qui.
+  ///
+  /// Volontairement le DERNIER acteur, et non un journal complet : une ligne par geste ferait du
+  /// volume à l'échelle d'une convention et demanderait une purge, alors que retrouver qui
+  /// appeler suffit presque toujours.
+  ///
+  /// `SetNull` plutôt que `Cascade` : supprimer ou anonymiser un compte ne doit pas emporter le
+  /// compteur d'une édition.
+  lastActorId Int?
+
+  event     Event @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  lastActor User? @relation("TicketingCounterLastActor", fields: [lastActorId], references: [id], onDelete: SetNull)
+
+  @@index([editionId])
+  @@index([token])
+  @@index([lastActorId])
+}
+
+enum EntryMovement {
+  VALIDATED
+  INVALIDATED
+}
+
+enum EntryParticipantKind {
+  TICKET
+  VOLUNTEER
+  ARTIST
+  ORGANIZER
+}
+
+model EntryValidationLog {
+  id              Int                  @id @default(autoincrement())
+  editionId       Int
+  participantKind EntryParticipantKind
+  participantId   Int
+  movement        EntryMovement
+  actorId         Int?
+  createdAt       DateTime             @default(now())
+
+  event Event @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  actor User? @relation("EntryValidationLogActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([editionId, createdAt])
+  @@index([participantKind, participantId])
+  @@index([actorId])
+}
+
+model VolunteerMealSelection {
+  id          Int       @id @default(autoincrement())
+  volunteerId Int
+  mealId      Int
+  accepted    Boolean   @default(true)
+  /// Repas pris APRÈS le passage sur scène, comme pour les artistes : l'assiette se garde au
+  /// chaud. Un bénévole de régie ou de plateau finit après le service, et la cuisine doit le
+  /// savoir pour ne pas tout ranger.
+  afterShow   Boolean   @default(false)
+  consumedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  volunteer EditionVolunteerApplication @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  meal      VolunteerMeal               @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([volunteerId, mealId])
+  @@index([volunteerId])
+  @@index([mealId])
+}
+
+model OrganizerMealSelection {
+  id                 Int       @id @default(autoincrement())
+  editionOrganizerId Int
+  mealId             Int
+  accepted           Boolean   @default(true)
+  /// Repas pris après le spectacle. Attention : une ligne n'existait jusqu'ici que pour une
+  /// EXCEPTION (repas décoché) ou une consommation. Marquer l'après-spectacle en crée donc une
+  /// là où il n'y en avait pas, avec `accepted: true` — c'est le seul moyen de porter
+  /// l'information, et le modèle le prévoit déjà pour tracer les consommations.
+  afterShow          Boolean   @default(false)
+  consumedAt         DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  editionOrganizer EditionOrganizer @relation(fields: [editionOrganizerId], references: [id], onDelete: Cascade)
+  meal             VolunteerMeal    @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([editionOrganizerId, mealId])
+  @@index([editionOrganizerId])
+  @@index([mealId])
+}
+
+model VolunteerMealHandoutItem {
+  id            Int      @id @default(autoincrement())
+  mealId        Int
+  handoutItemId Int
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity      Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  meal        VolunteerMeal        @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
+
+  @@unique([mealId, handoutItemId])
+  @@index([mealId])
+  @@index([handoutItemId])
+}
+
+model TicketingTierMeal {
+  id        Int      @id @default(autoincrement())
+  tierId    Int
+  mealId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tier TicketingTier @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  meal VolunteerMeal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([tierId, mealId])
+  @@index([tierId])
+  @@index([mealId])
+}
+
+model TicketingOptionMeal {
+  id        Int      @id @default(autoincrement())
+  optionId  Int
+  mealId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  option TicketingOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  meal   VolunteerMeal   @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([optionId, mealId])
+  @@index([optionId])
+  @@index([mealId])
+}
+
+model TicketingOrderItemMeal {
+  id          Int       @id @default(autoincrement())
+  orderItemId Int
+  mealId      Int
+  consumedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  orderItem TicketingOrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  meal      VolunteerMeal      @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([orderItemId, mealId])
+  @@index([orderItemId])
+  @@index([mealId])
+}
+
+model ApiErrorLog {
+  id String @id @default(cuid())
+
+  // Informations sur l'erreur
+  message    String  @db.Text
+  statusCode Int
+  stack      String? @db.LongText
+  errorType  String? // Type d'erreur (ValidationError, DatabaseError, etc.)
+
+  // Contexte de la requête
+  method    String // GET, POST, PUT, DELETE, etc.
+  url       String  @db.Text
+  path      String // URL path sans query params
+  userAgent String? @db.Text
+  ip        String?
+  referer   String? @db.Text // Page d'origine de la requête
+  origin    String? // Domaine d'origine
+
+  // Données de la requête
+  headers     Json? // Headers de la requête (sans données sensibles)
+  body        Json? // Corps de la requête (sans données sensibles)
+  queryParams Json? // Paramètres de requête
+
+  // Détails d'erreur SQL/Prisma (pour erreurs base de données)
+  prismaDetails Json? // Code d'erreur Prisma, détails MySQL, etc.
+
+  // Informations utilisateur
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id])
+
+  // Métadonnées
+  resolved   Boolean   @default(false) // Marqué comme résolu par un admin
+  resolvedBy Int?
+  resolvedAt DateTime?
+  adminNotes String?   @db.Text
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([statusCode])
+  @@index([path])
+  @@index([userId])
+  @@index([resolved])
+  @@index([resolved, createdAt]) // Index composite pour filtrer par resolved + tri par date
+  /**
+   * L'écran d'administration filtre par TYPE puis trie par date — c'est son usage principal, et
+   * aucun index ne le servait : il balayait la table, que la purge ne vide qu'à 90 jours.
+   */
+  @@index([errorType, createdAt])
+  /**
+   * La déduplication des clés i18n manquantes cherche `(errorType, message)`. `message` est un
+   * `Text`, que MySQL ne peut indexer que sur un préfixe : 191 caractères suffisent largement — une
+   * clé i18n est bornée à 200 et ses premiers segments la distinguent déjà.
+   * Sans cet index, chaque clé reçue déclenchait un balayage complet de la table, et le point
+   * d'API en accepte cinquante par appel.
+   */
+  @@index([errorType, message(length: 191)])
 }

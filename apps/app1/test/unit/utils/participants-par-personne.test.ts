@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   compterLesParticipants,
   type BilletACompter,
-} from '../../../shared/utils/participants-par-personne'
+} from '../../../../../layers/ticketing/shared/utils/participants-par-personne'
 
 /**
  * Le contrôle d'accès affichait « x / y » en comptant des LIGNES DE COMMANDE. Une personne qui

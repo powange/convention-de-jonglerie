@@ -2,7 +2,7 @@
 // setTicketingPorts() (2ᵉ app / tests). Même mécanisme que les autres modules.
 import { createDefaultTicketingPorts } from './default-binding'
 
-import type { TicketingPorts } from './types'
+import type { TicketingPorts } from '#ticketing/server/ports/types'
 
 let override: TicketingPorts | null = null
 let cached: TicketingPorts | null = null

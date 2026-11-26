@@ -3,7 +3,7 @@ import path from 'node:path'
 
 import { describe, it, expect } from 'vitest'
 
-import { dedoublonnerAssociations } from '../../../shared/utils/dedoublonnage-associations'
+import { dedoublonnerAssociations } from '../../../../../layers/ticketing/shared/utils/dedoublonnage-associations'
 
 /**
  * Le dédoublonnage des associations, et le fait que les cinq points d'écriture l'appliquent

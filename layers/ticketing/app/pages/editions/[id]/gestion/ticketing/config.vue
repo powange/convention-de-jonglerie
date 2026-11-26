@@ -217,9 +217,9 @@
                 />
               </div>
 
-              <!-- Sous-option SumUp -->
+              <!-- Sous-option SumUp (si l'app la propose, cf. app.config `billetterie.sumup`) -->
               <div
-                v-if="paymentCard"
+                v-if="paymentCard && appConfig.billetterie.sumup"
                 class="ml-8 pl-4 border-l-2 border-blue-200 dark:border-blue-800 space-y-3"
               >
                 <div class="flex items-center justify-between">
@@ -378,13 +378,16 @@
 </template>
 
 <script setup lang="ts">
+// Import explicite : le composant s'enregistre sous `UiConfirmModal` (layers/ui) ; `<ConfirmModal>`
+// sans import ne se résolvait pas — la modale ne s'ouvrait jamais, dans app1 comme dans Flowvent.
 import { type Ref, computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
-const route = useRoute()
+import ConfirmModal from '#ui-commun/app/components/ui/ConfirmModal.vue'
+
+const appConfig = useAppConfig()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
 const { t } = useI18n()
@@ -395,7 +398,8 @@ useSeoMeta({
   title: () => `${t('gestion.ticketing.config_title')} - ${t('gestion.ticketing.title')}`,
 })
 
-const editionId = computed(() => parseInt(route.params.id as string))
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionIdRef()
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 
 // Permissions — gestion de la billetterie (droit dédié, édition ou convention).

@@ -8,7 +8,7 @@ import {
   echecDeBribe,
   reprendreLeChargement,
   surEchecDeChargement,
-} from '../../../app/utils/composant-differe'
+} from '../../../../../layers/ui/app/utils/composant-differe'
 
 /**
  * Ce que ces tests prouvent, et pourquoi ils ne se contentent pas des deux prédicats.
