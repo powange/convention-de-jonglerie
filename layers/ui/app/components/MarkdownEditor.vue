@@ -13,7 +13,7 @@
       v-if="!disabled"
       :editor="editor"
       :items="toolbarItems"
-      class="border-b border-muted py-2 px-8 sm:px-16 overflow-x-auto"
+      class="border-b border-muted py-2 px-2 sm:px-16 flex-wrap"
     />
     <UEditorToolbar v-if="!disabled" :editor="editor" :items="bubbleItems" layout="bubble" />
     <UEditorEmojiMenu

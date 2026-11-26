@@ -38,10 +38,14 @@
             {{ t('volunteers.export_pdf') }}
           </UButton>
         </div>
-        <div class="flex items-center gap-4">
+        <!-- `flex-wrap` : sur téléphone, les deux filtres et l'astuce ne tiennent pas sur une ligne ; la
+             granularité sortait de la carte. -->
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
           <!-- Filtre par équipes -->
           <div class="flex items-center gap-2">
-            <span class="text-sm text-gray-600 dark:text-gray-400">Équipes :</span>
+            <span class="whitespace-nowrap text-sm text-gray-600 dark:text-gray-400"
+              >Équipes :</span
+            >
             <USelect
               v-model="selectedTeams"
               :items="teamFilterOptions"
@@ -55,7 +59,9 @@
           </div>
           <!-- Sélecteur de granularité -->
           <div class="flex items-center gap-2">
-            <span class="text-sm text-gray-600 dark:text-gray-400">Granularité :</span>
+            <span class="whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+              Granularité :
+            </span>
             <USelect
               v-model="selectedGranularity"
               :items="granularityOptions"

@@ -4,7 +4,14 @@
       <UIcon name="i-heroicons-shield-check" class="text-primary" />
       Administration
     </h1>
-    <UNavigationMenu :items="items" highlight />
+    <!-- Sur téléphone, les quatre entrées ne tiennent pas sur une ligne (166 px de trop à 390 px) :
+         elles passent à la ligne, libellés entiers, au lieu d'élargir la page ou d'être tronquées. -->
+    <UNavigationMenu
+      :items="items"
+      highlight
+      class="max-w-full"
+      :ui="{ list: 'flex-wrap', linkLabel: 'overflow-visible whitespace-nowrap' }"
+    />
   </div>
 </template>
 

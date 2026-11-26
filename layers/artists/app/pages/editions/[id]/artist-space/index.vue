@@ -20,8 +20,10 @@
     <div v-else class="space-y-6">
       <!-- En-tête artiste -->
       <UCard>
-        <div class="flex items-start justify-between gap-4">
-          <div class="flex items-center gap-4">
+        <!-- Sur téléphone, le bouton du QR code passe sous l'identité : à côté, il sortait de la
+             carte (24 px à 390 px de large). -->
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div class="flex min-w-0 items-center gap-4">
             <div
               class="flex items-center justify-center w-14 h-14 rounded-xl bg-yellow-100 dark:bg-yellow-900/30"
             >
@@ -31,7 +33,7 @@
               <h1 class="text-xl font-bold text-gray-900 dark:text-white">
                 {{ artist.firstName }} {{ artist.lastName }}
               </h1>
-              <p class="text-sm text-gray-500">{{ artist.email }}</p>
+              <p class="text-sm break-all text-gray-500">{{ artist.email }}</p>
               <p class="text-sm text-gray-400 mt-1">
                 {{ $t('artists.artist_space_subtitle') }}
               </p>
@@ -41,6 +43,7 @@
             icon="i-heroicons-qr-code"
             color="primary"
             variant="soft"
+            class="self-start"
             @click="qrModalOpen = true"
           >
             {{ $t('artists.view_qr_code') }}
