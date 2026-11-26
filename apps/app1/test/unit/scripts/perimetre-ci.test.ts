@@ -349,6 +349,24 @@ describe('le workflow et le script sont d’accord', () => {
     }
   })
 
+  it('⚠️ les lots de la suite Nuxt la couvrent EN ENTIER (1/n … n/n, sans trou)', () => {
+    // Un lot oublié ne fait rien rougir : ses fichiers ne tournent plus, c'est tout.
+    const lots = [...src.matchAll(/test:nuxt:run -- --shard=(\d+)\/(\d+)/g)].map((m) => [
+      Number(m[1]),
+      Number(m[2]),
+    ])
+    expect(
+      lots.length,
+      'la suite Nuxt n’est plus découpée : ce cas peut être retiré'
+    ).toBeGreaterThan(1)
+    const total = lots[0]![1]
+    expect(lots.every(([, n]) => n === total)).toBe(true)
+    expect(lots.map(([k]) => k).sort()).toEqual(Array.from({ length: total }, (_, i) => i + 1))
+    expect(src, 'une entrée non découpée ferait tourner la suite en double').not.toMatch(
+      /cmd: 'npm run test:nuxt:run'/
+    )
+  })
+
   it('⚠️ le run planifié existe, et seul le signalement peut écrire', () => {
     expect(src).toMatch(/^ {2}schedule:\n {4}- cron: '[^']+'$/m)
     const ecrivains = [...blocs].filter(([, b]) => /^ {6}[\w-]+: write$/m.test(b)).map(([n]) => n)
