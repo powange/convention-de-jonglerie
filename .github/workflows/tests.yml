@@ -483,6 +483,10 @@ jobs:
 
   # Tests en parallèle avec matrice — Nuxt et base, sautés dans le périmètre `app2-seul`.
   test:
+    # Sans ce `name`, GitHub nomme le check d'après TOUTE la valeur de matrice, commande comprise :
+    # `test (nuxt, npm run test:nuxt:run, false)`. Le check requis est `ci-verte` seul, donc ce nom
+    # n'engage aucune règle de branche.
+    name: test (${{ matrix.test-group.name }})
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     env:
@@ -503,7 +507,14 @@ jobs:
       matrix:
         # `unit` est sorti dans son propre job, `test-unit` : voir au-dessus.
         test-group:
-          - { name: 'nuxt', cmd: 'npm run test:nuxt:run', db: false }
+          # La suite Nuxt en DEUX lots. Seule sur un runner, elle fixait la durée de toute PR : 394 à
+          # 516 s sur 530 fichiers, quand Playwright et la base finissaient vers 5 min. `--shard`
+          # répartit les FICHIERS (pas les cas), chaque lot sur sa machine. Pas de fusion de rapports
+          # (`--merge-reports`) : la suite Nuxt ne produit pas de couverture.
+          #
+          # Le nom ne porte pas de `/` : il entre dans des noms d'artifacts, où il est interdit.
+          - { name: 'nuxt-1', cmd: 'npm run test:nuxt:run -- --shard=1/2', db: false }
+          - { name: 'nuxt-2', cmd: 'npm run test:nuxt:run -- --shard=2/2', db: false }
           - { name: 'database', cmd: 'npm run test:db:run', db: true }
 
     services:
