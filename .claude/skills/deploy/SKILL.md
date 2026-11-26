@@ -13,6 +13,18 @@ Déclenche le redéploiement d'une stack hébergée chez le partenaire.
 qui construit et publie cette image — sur `main` uniquement, par le workflow `publier-image.yml`, qui pousse
 `:main` et `:sha-<commit>`.
 
+⚠️ **Le commit à déployer n’est PAS toujours `origin/main`.** `publier-image.yml` ignore les commits
+qui ne touchent que `apps/app2/` (Flowvent) : ils ne changent rien à l’image d’app1, la republier
+coûtait 5½ min et changeait le nom de `/_nuxt-<sha>/`, donc invalidait le cache CDN pour rien. Le
+commit qu’on doit voir servi est le dernier qui touche autre chose qu’app2 :
+
+```bash
+SHA=$(git log -1 --format=%H origin/main -- . ':!apps/app2')
+```
+
+Toutes les étapes ci-dessous partent de lui. Comparer à `origin/main` après un merge Flowvent ferait
+attendre une image qui ne sera jamais construite, et conclure à tort que la bascule a échoué.
+
 Conséquence à ne jamais oublier : **déclencher le webhook avant la fin de ce job redéploie l'image
 PRÉCÉDENTE**. Le webhook répond 204, la pile redémarre, l'application répond — et rien de nouveau
 n'est livré. C'est exactement le genre de silence que ce dispositif cherchait à supprimer, déplacé
@@ -51,14 +63,15 @@ répond après bascule prouve donc que les migrations sont passées.
 
 ### 1. Vérifier ce qui va partir
 
-- `git log origin/main -1` — est-ce bien le commit attendu ?
+- `git log -1 origin/main -- . ':!apps/app2'` — est-ce bien le commit attendu ? (le dernier hors app2,
+  cf. plus haut)
 - Une migration non appliquée en production ? Si oui, l'annoncer explicitement.
 - **L'image de ce commit est-elle publiée ?** C'est elle que les piles vont tirer :
 
 La publication a son propre workflow, `publier-image.yml` — la question est donc directe :
 
 ```bash
-SHA=$(git rev-parse origin/main)
+SHA=$(git log -1 --format=%H origin/main -- . ':!apps/app2')
 until gh run list --workflow=publier-image.yml --limit 5 \
     --json headSha,status,conclusion \
     --jq ".[] | select(.headSha==\"$SHA\") | select(.status==\"completed\") | .conclusion" \
@@ -101,7 +114,7 @@ for u in https://test.juggling-convention.com https://juggling-convention.com; d
   printf '%-40s ' "$u"
   curl -s --max-time 30 "$u/" | grep -oE '/_nuxt-[A-Za-z0-9]+/' | head -1
 done
-git rev-parse origin/main | cut -c1-12   # ce qu'on doit y lire après la bascule
+git log -1 --format=%H origin/main -- . ':!apps/app2' | cut -c1-12   # ce qu'on doit y lire après la bascule
 ```
 
 Le noter avant de déclencher. Un répertoire `/_nuxt/` nu signifie une image construite sans
@@ -151,7 +164,7 @@ Attendre que le répertoire des assets porte le nouveau commit, avec une boucle 
 suite de `sleep` :
 
 ```bash
-ATTENDU=$(git rev-parse origin/main | cut -c1-12)
+ATTENDU=$(git log -1 --format=%H origin/main -- . ':!apps/app2' | cut -c1-12)
 U=https://test.juggling-convention.com
 until curl -s --max-time 20 "$U/" | grep -q "/_nuxt-$ATTENDU/"; do sleep 25; done
 curl -s --max-time 20 "$U/" | grep -oE '/_nuxt-[A-Za-z0-9]+/' | head -1
@@ -191,7 +204,8 @@ il ne coûte que la répétition.
 
 ## Revenir à un build précédent
 
-La CI publie aussi `:sha-<commit>`. Pour revenir en arrière sans reconstruire, remplacer `:main`
+La CI publie aussi `:sha-<commit>` — pour les seuls commits qui touchent autre chose qu’app2, les
+autres ne construisant pas d’image. Pour revenir en arrière sans reconstruire, remplacer `:main`
 par cette étiquette dans le compose de la pile concernée, puis redéployer. C'est plus sûr et plus
 rapide qu'un `git revert` suivi d'une nouvelle construction.
 
