@@ -823,7 +823,7 @@ import OrganizerDetailsCard from './OrganizerDetailsCard.vue'
 import VolunteerDetailsCard from './VolunteerDetailsCard.vue'
 
 import { formaterDateHeure } from '#core/shared/utils/fuseau-edition'
-import { sommeDueAuGuichet } from '~~/shared/utils/somme-due-au-guichet'
+import { sommeDueAuGuichet } from '#ticketing/shared/utils/somme-due-au-guichet'
 
 const { money } = useEditionCurrency()
 

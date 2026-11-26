@@ -29,7 +29,7 @@ import { describe, it, expect } from 'vitest'
 const RACINE = path.resolve(__dirname, '../../../../..')
 
 const FICHIERS = [
-  'apps/app1/server/utils/editions/ticketing/helloasso.ts',
+  'layers/ticketing/server/utils/editions/ticketing/helloasso.ts',
   'layers/ticketing/server/api/editions/[id]/ticketing/helloasso/import.post.ts',
   'layers/ticketing/server/api/editions/[id]/ticketing/helloasso/tiers.post.ts',
 ]

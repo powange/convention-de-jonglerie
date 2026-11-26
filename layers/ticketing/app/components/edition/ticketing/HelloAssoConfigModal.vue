@@ -199,7 +199,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import { buildHelloAssoUrl, parseHelloAssoUrl } from '~/utils/helloasso'
+import { buildHelloAssoUrl, parseHelloAssoUrl } from '#ticketing/app/utils/helloasso'
 
 interface HelloAssoConfig {
   clientId: string

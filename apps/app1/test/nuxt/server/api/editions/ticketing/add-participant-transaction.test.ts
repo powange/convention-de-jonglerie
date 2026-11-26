@@ -20,7 +20,7 @@ vi.mock('#server/utils/editions/ticketing/tiers', () => ({
   applyCustomName: (tier: unknown) => tier,
 }))
 
-import handler from '../../../../../../server/api/editions/[id]/ticketing/add-participant-manually.post'
+import handler from '../../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/add-participant-manually.post'
 import { global } from '../../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma

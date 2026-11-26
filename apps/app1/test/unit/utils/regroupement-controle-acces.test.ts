@@ -8,7 +8,7 @@ import {
   titresAValider,
   type CompteConnu,
   type TitreRapprochable,
-} from '../../../shared/utils/regroupement-controle-acces'
+} from '../../../../../layers/ticketing/shared/utils/regroupement-controle-acces'
 
 /**
  * Rapprocher les titres d'une même personne au contrôle d'accès.

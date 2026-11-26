@@ -140,6 +140,26 @@ l'événement de convention. Dans Flowvent, la relation d'un appel vers l'évén
 `edition`, et une table `Conversation` DORMANTE (réduite à ses liens) répond aux requêtes qui
 comptent les non-lus. Un appel en ligne ouvre l'événement aux visiteurs (sa page se partage).
 
+## Billetterie (lot 6)
+
+Les points d'API restés dans app1 (contrôle d'accès, guichet, statistiques, articles des
+bénévoles, artistes et organisateurs) et ses utilitaires rejoignent `layers/ticketing` (alias
+`#ticketing`), avec les traductions `ticketing` et `gestion.ticketing`. Les utilitaires SERVEUR y
+gardent leur adresse `#server/utils/…` par une réexportation dans chaque app — les tests les
+simulent à cette adresse. `encryption`, `sse-manager`, `recherche-mots-cles` et le verrou
+`synchronisation-unique` passent dans `core`.
+
+Le port billetterie (types dans le layer) gagne `lireEdition` (statut, fuseau, dates, articles
+remis activés) et `editionsComparables` (même convention dans app1, autres événements du même
+propriétaire dans Flowvent). La validation d'une entrée d'artiste prévient les responsables des
+artistes par le contrat `organisateursHabilitesSurLesArtistes` (lot 5).
+
+**HelloAsso seul dans Flowvent** : `app.config` du layer, `billetterie.infomaniak` et
+`billetterie.sumup` à `false` dans Flowvent (sections cachées), logo d'un billet vendu sur place
+configurable. Flowvent reçoit les réglages `ticketing*` sur `Event` (mêmes noms et défauts qu'app1),
+le journal des erreurs serveur (`ApiErrorLog`, où la billetterie signale ses échecs), et les tables
+de liaison aux repas, DORMANTES jusqu'au lot 7.
+
 ## Notions « convention » à ramener à l'événement
 
 Flowvent n'a pas de convention : l'événement en tient lieu (`getEditionWithPermissions` rend

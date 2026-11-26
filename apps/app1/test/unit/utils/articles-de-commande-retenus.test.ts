@@ -4,7 +4,7 @@ import {
   articleRetenu,
   articlesRetenus,
   filtresDArticlesActifs,
-} from '../../../shared/utils/articles-de-commande-retenus'
+} from '../../../../../layers/ticketing/shared/utils/articles-de-commande-retenus'
 
 /**
  * Le tri des articles d'une commande selon les filtres de l'écran.

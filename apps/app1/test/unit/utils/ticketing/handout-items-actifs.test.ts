@@ -16,9 +16,13 @@ import {
  * ⚠️ C'est un écart ASSUMÉ avec le reste du projet : aucun autre module ne refuse ses pages ni
  * ses points d'API quand son drapeau est éteint.
  */
-const trouverEdition = vi.fn()
+const trouverEdition = vi.hoisted(() => vi.fn())
 
-vi.stubGlobal('prisma', { edition: { findUnique: trouverEdition } })
+// L'édition se lit par le port de la billetterie (`lireEdition`), que chaque app fournit : celle
+// d'app1 lit l'`Edition`, celle de Flowvent son événement.
+vi.mock('#server/ticketing/ports/registry', () => ({
+  useTicketingPorts: () => ({ event: { lireEdition: trouverEdition } }),
+}))
 vi.stubGlobal('createError', (options: { status: number; message: string }) => {
   const erreur = new Error(options.message) as Error & { status: number }
   erreur.status = options.status
@@ -29,13 +33,13 @@ describe('articlesARemettreActifs', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('rend vrai quand l’édition l’active', async () => {
-    trouverEdition.mockResolvedValue({ ticketingHandoutItemsEnabled: true })
+    trouverEdition.mockResolvedValue({ handoutItemsEnabled: true })
 
     expect(await articlesARemettreActifs(21)).toBe(true)
   })
 
   it('rend faux quand l’édition l’éteint', async () => {
-    trouverEdition.mockResolvedValue({ ticketingHandoutItemsEnabled: false })
+    trouverEdition.mockResolvedValue({ handoutItemsEnabled: false })
 
     expect(await articlesARemettreActifs(21)).toBe(false)
   })
@@ -48,15 +52,12 @@ describe('articlesARemettreActifs', () => {
     expect(await articlesARemettreActifs(999)).toBe(true)
   })
 
-  it('n’interroge que le drapeau, pas toute l’édition', async () => {
-    trouverEdition.mockResolvedValue({ ticketingHandoutItemsEnabled: true })
+  it('lit l’édition par le port de la billetterie, pour la bonne édition', async () => {
+    trouverEdition.mockResolvedValue({ handoutItemsEnabled: true })
 
     await articlesARemettreActifs(21)
 
-    expect(trouverEdition).toHaveBeenCalledWith({
-      where: { id: 21 },
-      select: { ticketingHandoutItemsEnabled: true },
-    })
+    expect(trouverEdition).toHaveBeenCalledWith(21)
   })
 })
 
@@ -64,13 +65,13 @@ describe('exigerArticlesARemettreActifs', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('laisse passer quand la fonctionnalité est active', async () => {
-    trouverEdition.mockResolvedValue({ ticketingHandoutItemsEnabled: true })
+    trouverEdition.mockResolvedValue({ handoutItemsEnabled: true })
 
     await expect(exigerArticlesARemettreActifs(21)).resolves.toBeUndefined()
   })
 
   it('REFUSE en 403 quand elle est éteinte', async () => {
-    trouverEdition.mockResolvedValue({ ticketingHandoutItemsEnabled: false })
+    trouverEdition.mockResolvedValue({ handoutItemsEnabled: false })
 
     await expect(exigerArticlesARemettreActifs(21)).rejects.toMatchObject({
       status: 403,

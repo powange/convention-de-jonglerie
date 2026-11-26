@@ -4,7 +4,7 @@ import path from 'node:path'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it } from 'vitest'
 
-import EchecDeChargement from '../../../app/components/ui/EchecDeChargement.vue'
+import EchecDeChargement from '../../../../../layers/ui/app/components/ui/EchecDeChargement.vue'
 
 /**
  * ⚠️ LES LOCALES SE LISENT SUR LE DISQUE, PAS PAR `import`. Un `import` d'un fichier de locale

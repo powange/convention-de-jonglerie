@@ -348,7 +348,8 @@ const authStore = useAuthStore()
 const { erreur, succes } = useNotificateur()
 const { t } = useI18n()
 
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 // Ce segment porte un **jeton**, pas un identifiant : c'est lui que contient le QR code affiché à
 // l'entrée, et c'est ce qui permet de partager un compteur sans partager de droits. Le paramètre
 // s'appelait `counterId`, ce qui avait fini par contaminer l'API — d'où le renommage.

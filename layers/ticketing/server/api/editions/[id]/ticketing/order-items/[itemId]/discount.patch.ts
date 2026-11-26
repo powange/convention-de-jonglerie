@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
+import { montantBrutDeLaLigne } from '#core/shared/utils/remise-de-ligne'
 import { isHttpError } from '#server/types/api'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
-import { montantBrutDeLaLigne } from '~~/shared/utils/remise-de-ligne'
 
 const bodySchema = z.object({
   /**

@@ -1,3 +1,4 @@
+import { montantNetDeLaLigne, remiseDeLaLigne } from '#core/shared/utils/remise-de-ligne'
 import { isHttpError } from '#server/types/api'
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -11,8 +12,7 @@ import {
   articleRetenu,
   articlesRetenus,
   filtresDArticlesActifs,
-} from '~~/shared/utils/articles-de-commande-retenus'
-import { montantNetDeLaLigne, remiseDeLaLigne } from '~~/shared/utils/remise-de-ligne'
+} from '#ticketing/shared/utils/articles-de-commande-retenus'
 
 interface CustomFieldAnswer {
   name: string

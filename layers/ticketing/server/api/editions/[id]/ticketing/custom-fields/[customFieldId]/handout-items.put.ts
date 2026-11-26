@@ -5,7 +5,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { exigerArticlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
-import { dedoublonnerAssociations } from '~~/shared/utils/dedoublonnage-associations'
+import { dedoublonnerAssociations } from '#ticketing/shared/utils/dedoublonnage-associations'
 
 const bodySchema = z.object({
   // Liste d'associations : un article par ligne, avec éventuellement une

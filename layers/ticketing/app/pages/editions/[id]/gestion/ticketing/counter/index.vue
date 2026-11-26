@@ -154,14 +154,14 @@ import { useEditionStore } from '~/stores/editions'
 
 import { useTicketingCountersList } from '#imports'
 
-const route = useRoute()
 const router = useRouter()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { erreur, succes } = useNotificateur()
 const { t } = useI18n()
 
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 const {

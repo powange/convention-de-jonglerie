@@ -1,5 +1,5 @@
 /**
- * Le verrou d'exécution unique vit désormais dans `apps/app1/server/utils` — constat O1 de
+ * Le verrou d'exécution unique vit désormais dans `layers/core/server/socle` — constat O1 de
  * l'administration : la création de sauvegarde en avait besoin, et un point d'API
  * d'administration n'a pas à dépendre d'un layer de billetterie.
  *
@@ -15,4 +15,4 @@
 export {
   synchronisationUnique,
   synchronisationsEnCours,
-} from '../../../../apps/app1/server/utils/synchronisation-unique'
+} from '../../../core/server/socle/synchronisation-unique'

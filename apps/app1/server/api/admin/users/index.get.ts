@@ -1,9 +1,9 @@
+import { fragmentsDeTelephone } from '#core/shared/utils/doublons-utilisateurs'
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { notificationStreamManager } from '#server/utils/notification-stream-manager'
 import { alternativesMotCle, motsClesDeLaRequete } from '#server/utils/recherche-mots-cles'
 import { validatePagination } from '#server/utils/validation-helpers'
-import { fragmentsDeTelephone } from '~~/shared/utils/doublons-utilisateurs'
 
 /** Les champs qu'un mot-clé peut viser. L'identifiant s'y ajoute, mais lui n'est pas du texte. */
 const CHAMPS_RECHERCHE = ['email', 'pseudo', 'nom', 'prenom', 'phone'] as const

@@ -18,6 +18,7 @@ const RACINES = [
   'layers/map/app',
   'layers/stock/app',
   'layers/artists/app',
+  'layers/ticketing/app',
 ].map((r) => join(DEPOT, r))
 const LECTURE_DIRECTE = /\b(?:route|useRoute\(\))\.params\.id\b/
 
@@ -55,6 +56,24 @@ describe('layers d’événement — id de l’événement', () => {
     const appelDirect = /\/api\/editions\/\$\{[^}]+\}[`'"]/
     const fautifs = RACINES.flatMap(fichiers)
       .filter((f) => appelDirect.test(readFileSync(f, 'utf8')))
+      .map((f) => f.slice(DEPOT.length + 1))
+    expect(fautifs).toEqual([])
+  })
+
+  /*
+   * Un layer ne vise JAMAIS une app par un chemin relatif (`../../apps/app1/…`) : il passe par
+   * `#server/…`, `~/…` ou un alias de layer. Le script de réécriture des imports en a produit trois
+   * fois au fil du portage ; dans Flowvent, ces fichiers n'existent pas — page en erreur au build.
+   */
+  it('aucun layer n’importe une app par un chemin relatif', () => {
+    const versUneApp = /(?:from|import\()\s*'(?:\.\.\/)+apps\/app\d/
+    const racinesLayers = readdirSync(join(DEPOT, 'layers'))
+      .filter((l) => l !== 'node_modules' && statSync(join(DEPOT, 'layers', l)).isDirectory())
+      .map((l) => join(DEPOT, 'layers', l))
+    const fautifs = racinesLayers
+      .flatMap(fichiers)
+      .filter((f) => !f.includes('/node_modules/'))
+      .filter((f) => versUneApp.test(readFileSync(f, 'utf8')))
       .map((f) => f.slice(DEPOT.length + 1))
     expect(fautifs).toEqual([])
   })

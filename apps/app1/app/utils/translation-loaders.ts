@@ -60,7 +60,7 @@ export function getTranslationsToLoad(path: string): string[] {
       pattern: /^\/editions\/\d+\/gestion/,
       // `gestion-stock` / `gestion-artists` : clés sorties dans leur layer — le menu et l'accueil de
       // la gestion en affichent sur toutes ces pages, comme quand elles vivaient dans gestion.json.
-      translations: ['gestion', 'gestion-stock', 'gestion-artists'],
+      translations: ['gestion', 'gestion-stock', 'gestion-artists', 'gestion-ticketing'],
     },
     /*
      * Vue d'ensemble racine : workshops (cartes de modules). Le libellé de la carte « tâches » vit
@@ -204,7 +204,7 @@ export function getTranslationsToLoad(path: string): string[] {
      */
     {
       pattern: /^\/profile\/mes-conventions/,
-      translations: ['edition', 'gestion', 'gestion-stock', 'gestion-artists'],
+      translations: ['edition', 'gestion', 'gestion-stock', 'gestion-artists', 'gestion-ticketing'],
     },
   ]
 
@@ -266,19 +266,19 @@ export const translationLoaders: Record<string, Record<string, () => Promise<any
     sv: () => import('~~/i18n/locales/sv/auth.json'),
   },
   ticketing: {
-    en: () => import('~~/i18n/locales/en/ticketing.json'),
-    da: () => import('~~/i18n/locales/da/ticketing.json'),
-    de: () => import('~~/i18n/locales/de/ticketing.json'),
-    es: () => import('~~/i18n/locales/es/ticketing.json'),
-    fr: () => import('~~/i18n/locales/fr/ticketing.json'),
-    it: () => import('~~/i18n/locales/it/ticketing.json'),
-    nl: () => import('~~/i18n/locales/nl/ticketing.json'),
-    pl: () => import('~~/i18n/locales/pl/ticketing.json'),
-    pt: () => import('~~/i18n/locales/pt/ticketing.json'),
-    ru: () => import('~~/i18n/locales/ru/ticketing.json'),
-    uk: () => import('~~/i18n/locales/uk/ticketing.json'),
-    cs: () => import('~~/i18n/locales/cs/ticketing.json'),
-    sv: () => import('~~/i18n/locales/sv/ticketing.json'),
+    en: () => import('../../../../layers/ticketing/i18n/locales/en/ticketing.json'),
+    da: () => import('../../../../layers/ticketing/i18n/locales/da/ticketing.json'),
+    de: () => import('../../../../layers/ticketing/i18n/locales/de/ticketing.json'),
+    es: () => import('../../../../layers/ticketing/i18n/locales/es/ticketing.json'),
+    fr: () => import('../../../../layers/ticketing/i18n/locales/fr/ticketing.json'),
+    it: () => import('../../../../layers/ticketing/i18n/locales/it/ticketing.json'),
+    nl: () => import('../../../../layers/ticketing/i18n/locales/nl/ticketing.json'),
+    pl: () => import('../../../../layers/ticketing/i18n/locales/pl/ticketing.json'),
+    pt: () => import('../../../../layers/ticketing/i18n/locales/pt/ticketing.json'),
+    ru: () => import('../../../../layers/ticketing/i18n/locales/ru/ticketing.json'),
+    uk: () => import('../../../../layers/ticketing/i18n/locales/uk/ticketing.json'),
+    cs: () => import('../../../../layers/ticketing/i18n/locales/cs/ticketing.json'),
+    sv: () => import('../../../../layers/ticketing/i18n/locales/sv/ticketing.json'),
   },
   workshops: {
     en: () => import('~~/i18n/locales/en/workshops.json'),
@@ -339,6 +339,21 @@ export const translationLoaders: Record<string, Record<string, () => Promise<any
     uk: () => import('../../../../layers/artists/i18n/locales/uk/gestion-artists.json'),
     cs: () => import('../../../../layers/artists/i18n/locales/cs/gestion-artists.json'),
     sv: () => import('../../../../layers/artists/i18n/locales/sv/gestion-artists.json'),
+  },
+  'gestion-ticketing': {
+    en: () => import('../../../../layers/ticketing/i18n/locales/en/gestion-ticketing.json'),
+    da: () => import('../../../../layers/ticketing/i18n/locales/da/gestion-ticketing.json'),
+    de: () => import('../../../../layers/ticketing/i18n/locales/de/gestion-ticketing.json'),
+    es: () => import('../../../../layers/ticketing/i18n/locales/es/gestion-ticketing.json'),
+    fr: () => import('../../../../layers/ticketing/i18n/locales/fr/gestion-ticketing.json'),
+    it: () => import('../../../../layers/ticketing/i18n/locales/it/gestion-ticketing.json'),
+    nl: () => import('../../../../layers/ticketing/i18n/locales/nl/gestion-ticketing.json'),
+    pl: () => import('../../../../layers/ticketing/i18n/locales/pl/gestion-ticketing.json'),
+    pt: () => import('../../../../layers/ticketing/i18n/locales/pt/gestion-ticketing.json'),
+    ru: () => import('../../../../layers/ticketing/i18n/locales/ru/gestion-ticketing.json'),
+    uk: () => import('../../../../layers/ticketing/i18n/locales/uk/gestion-ticketing.json'),
+    cs: () => import('../../../../layers/ticketing/i18n/locales/cs/gestion-ticketing.json'),
+    sv: () => import('../../../../layers/ticketing/i18n/locales/sv/gestion-ticketing.json'),
   },
   'gestion-stock': {
     en: () => import('../../../../layers/stock/i18n/locales/en/gestion-stock.json'),

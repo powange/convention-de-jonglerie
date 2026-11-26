@@ -34,15 +34,20 @@ import { describe, expect, it } from 'vitest'
  */
 const SOURCE = join(
   import.meta.dirname,
-  '../../../server/api/editions/[id]/ticketing/validate-entry.post.ts'
+  '../../../../../layers/ticketing/server/api/editions/[id]/ticketing/validate-entry.post.ts'
 )
 
 const code = () => readFileSync(SOURCE, 'utf8')
+// La lecture passe désormais par le contrat d'hôte `organisateursHabilitesSurLesArtistes` (commun à
+// l'appel à spectacles, et que Flowvent fournit à sa façon) ; l'invariant ne change pas : UNE
+// lecture, AVANT la boucle sur les participants.
 
 describe('guichet — la lecture des habilitations est hors de la boucle', () => {
   it('⚠️ LA REQUÊTE PRÉCÈDE LA BOUCLE SUR LES PARTICIPANTS', () => {
     const src = code()
-    const requete = src.indexOf('const habilitations = await prisma.edition.findUnique')
+    const requete = src.indexOf(
+      'const responsablesDesArtistes = await organisateursHabilitesSurLesArtistes('
+    )
     const boucle = src.indexOf('for (const artistId of body.participantIds)')
 
     expect(requete, 'la lecture des habilitations a disparu').toBeGreaterThan(-1)
@@ -59,7 +64,9 @@ describe('guichet — la lecture des habilitations est hors de la boucle', () =>
      * la boucle, ce qui ne corrigerait rien tout en donnant l'apparence du correctif.
      */
     const occurrences =
-      code().match(/const habilitations = await prisma\.edition\.findUnique/g) ?? []
+      code().match(
+        /const responsablesDesArtistes = await organisateursHabilitesSurLesArtistes\(/g
+      ) ?? []
 
     expect(occurrences.length, 'la requête est écrite plus d’une fois').toBe(1)
   })

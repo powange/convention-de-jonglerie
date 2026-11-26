@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
-import { dedoublonnerAssociations } from '~~/shared/utils/dedoublonnage-associations'
+import { dedoublonnerAssociations } from '#ticketing/shared/utils/dedoublonnage-associations'
 
 const bodySchema = z.object({
   tierIds: z.array(z.number()).optional(),

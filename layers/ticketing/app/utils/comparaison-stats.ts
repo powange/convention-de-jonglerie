@@ -3,7 +3,7 @@ import {
   axeCommun,
   creneauDepuisOuverture,
   etiquettesDeCreneaux,
-} from '~~/shared/utils/recalage-editions'
+} from '#ticketing/shared/utils/recalage-editions'
 
 /**
  * Superposer les statistiques de deux éditions.

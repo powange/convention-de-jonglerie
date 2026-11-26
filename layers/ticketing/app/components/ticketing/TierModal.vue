@@ -319,12 +319,12 @@
 import { computed, ref, watch } from 'vue'
 
 import { useEditionStore } from '~/stores/editions'
-import { entierPositifDuChamp } from '~/utils/champ-numerique'
 
 import { isFreePrice } from '../../utils/ticketing/tiers'
 
 import { versChampLocal, versInstant } from '#core/shared/utils/fuseau-edition'
 import { DEFAULT_CURRENCY } from '#core/shared/utils/money'
+import { entierPositifDuChamp } from '#ticketing/app/utils/champ-numerique'
 
 interface TicketingTier {
   id: number

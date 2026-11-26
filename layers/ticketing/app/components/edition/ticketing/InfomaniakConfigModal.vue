@@ -2,7 +2,11 @@
   <UModal v-model:open="isOpen" size="2xl">
     <template #header>
       <div class="flex items-center gap-3">
-        <img src="~/assets/img/infomaniak/logo.svg" alt="Infomaniak" class="w-10 h-10 rounded-lg" />
+        <img
+          src="../../../assets/img/infomaniak/logo.svg"
+          alt="Infomaniak"
+          class="w-10 h-10 rounded-lg"
+        />
         <div>
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
             {{ isEditing ? 'Modifier' : 'Configurer' }} Infomaniak

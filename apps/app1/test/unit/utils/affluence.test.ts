@@ -9,7 +9,7 @@ import {
   tranchesDepuisBornes,
   type PersonnePresente,
   type PresenceDeclaree,
-} from '../../../shared/utils/affluence'
+} from '../../../../../layers/ticketing/shared/utils/affluence'
 
 /**
  * L'affluence : combien de PERSONNES sont sur place, quand, et à quel titre.

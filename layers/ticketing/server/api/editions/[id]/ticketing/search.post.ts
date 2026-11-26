@@ -1,0 +1,938 @@
+import { z } from 'zod'
+
+import { cleDeBoiteDeReception } from '#core/shared/utils/adresse-email'
+import {
+  normaliserPhases,
+  phasesDuBenevole,
+  phasesSeRencontrent,
+} from '#core/shared/utils/phases-edition'
+import { isHttpError } from '#server/types/api'
+import { requireAuth } from '#server/utils/auth-utils'
+import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
+import { conditionsMotsCles, motsClesDeLaRequete } from '#server/utils/recherche-mots-cles'
+import { benevolePresentSurPlace } from '#server/utils/ticketing/benevoles-presents'
+import { lignesQuiDonnentAcces } from '#server/utils/ticketing/billets-qui-comptent'
+import {
+  aggregateHandoutItems,
+  calculateHandoutItemsForTicket,
+  handoutItemsIncludes,
+} from '#server/utils/ticketing/handout-items'
+import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
+import { resoudreLesValidateurs } from '#server/utils/ticketing/nom-du-validateur'
+import { detteDeCommande, montantARembourser } from '#server/utils/ticketing/remboursement-du'
+import { sanitizeEmail } from '#server/utils/validation-helpers'
+import {
+  regrouperParPersonne,
+  type CompteConnu,
+  type TitreRapprochable,
+} from '#ticketing/shared/utils/regroupement-controle-acces'
+
+const bodySchema = z.object({
+  searchTerm: z.string().min(1),
+})
+
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+
+    const editionId = validateEditionId(event)
+
+    // Vérifier les permissions (gestionnaires OU bénévoles en créneau actif de contrôle d'accès)
+    const allowed = await canAccessEditionDataOrAccessControl(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        status: 403,
+        message: 'Droits insuffisants pour accéder à cette fonctionnalité',
+      })
+
+    const body = bodySchema.parse(await readBody(event))
+    const searchTerm = sanitizeEmail(body.searchTerm)
+
+    // La recherche se fait mot à mot : chercher le terme entier dans chaque champ séparément
+    // faisait échouer « Jean Dupont », qui n'est ni un prénom ni un nom. L'util est celui de la
+    // recherche d'utilisateurs de l'administration — même question, même réponse, et il normalise
+    // au passage les accents.
+    const mots = motsClesDeLaRequete(searchTerm)
+
+    // Une recherche qui ne porte aucun mot ne cherche rien : `min(1)` laisse passer une chaîne
+    // d'espaces, et une liste de conditions vide dans un `AND` ne restreint pas — l'écran rendrait
+    // alors les vingt premiers billets de l'édition comme s'ils correspondaient.
+    if (mots.length === 0) {
+      return createSuccessResponse({ tickets: [], volunteers: [], artists: [], organizers: [] })
+    }
+
+    // L'interrupteur de l'édition coupe la remise elle-même, et pas seulement l'entrée de menu :
+    // éteint, le guichet ne réclame plus rien à personne. Lu une fois pour les quatre populations.
+    const articlesActifs = await articlesARemettreActifs(editionId)
+
+    try {
+      // Rechercher dans tous les billets de l'édition (externes et manuels)
+      const orderItems = await prisma.ticketingOrderItem.findMany({
+        where: {
+          order: {
+            editionId,
+          },
+          // Un don n'est pas une entrée. Il porte le nom du payeur et, sur les données réelles, un
+          // code QR : chercher « Dupont » ramenait donc son don à côté de son billet, sans que
+          // rien à l'écran ne les distingue.
+          //
+          // Sous `AND` et non étalé : le `OR` du fragment écraserait celui de la recherche par nom
+          // juste en dessous, et le filtre disparaîtrait sans bruit.
+          //
+          // Chaque MOT du terme doit se retrouver dans un champ, d'où le second fragment : chercher
+          // le terme entier dans chaque champ séparément faisait échouer « Jean Dupont », qui n'est
+          // ni un prénom ni un nom.
+          AND: [
+            lignesQuiDonnentAcces(),
+            ...conditionsMotsCles(mots, ['firstName', 'lastName', 'email']),
+          ],
+        },
+        include: {
+          order: {
+            include: {
+              // La provenance, comme au scan : sans elle, une commande HelloAsso ouverte depuis
+              // la recherche s'affichait avec le logo du site.
+              externalTicketing: { select: { provider: true } },
+              items: {
+                include: {
+                  tier: {
+                    include: handoutItemsIncludes,
+                  },
+                  selectedOptions: {
+                    include: {
+                      option: {
+                        include: {
+                          handoutItems: {
+                            include: {
+                              handoutItem: true,
+                            },
+                          },
+                        },
+                      },
+                    },
+                    orderBy: { id: 'asc' },
+                  },
+                },
+                orderBy: { id: 'asc' },
+              },
+            },
+          },
+          selectedOptions: {
+            include: {
+              option: {
+                include: {
+                  handoutItems: {
+                    include: {
+                      handoutItem: true,
+                    },
+                  },
+                },
+              },
+            },
+            orderBy: { id: 'asc' },
+          },
+        },
+        take: 20, // Limiter à 20 résultats
+      })
+
+      // Rechercher dans les artistes
+      const artists = await prisma.editionArtist.findMany({
+        where: {
+          editionId: editionId,
+          // Même règle que pour les billets : chaque mot du terme doit se retrouver quelque part.
+          AND: [...conditionsMotsCles(mots, ['user.prenom', 'user.nom', 'user.email'])],
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              prenom: true,
+              nom: true,
+              email: true,
+              phone: true,
+              // L'écran fige le champ quand l'adresse est vérifiée : la laisser saisir
+              // pour que le serveur la refuse ensuite est pire que ne pas la proposer.
+              isEmailVerified: true,
+            },
+          },
+          // Articles demandés pour cet artiste en particulier : chargés avec lui plutôt que
+          // par une requête de plus dans la boucle qui suit.
+          handoutItems: { include: { handoutItem: true } },
+          // distinct : un artiste jouant dans plusieurs numéros d'un cabaret a autant de
+          // liens ShowArtist pour le même spectacle, qui apparaîtrait sinon en double
+          shows: {
+            distinct: ['showId'],
+            include: {
+              show: {
+                include: {
+                  handoutItems: {
+                    include: {
+                      handoutItem: true,
+                    },
+                  },
+                  // Le quand et le où vivent dans les représentations : un spectacle peut être
+                  // joué plusieurs fois, à des endroits différents.
+                  performances: {
+                    select: { id: true, startDateTime: true, location: true },
+                    orderBy: { startDateTime: 'asc' },
+                  },
+                },
+              },
+            },
+          },
+        },
+        take: 20, // Limiter à 20 résultats
+      })
+
+      // Rechercher dans les organisateurs
+      const organizers = await prisma.editionOrganizer.findMany({
+        where: {
+          editionId: editionId,
+          organizer: {
+            AND: [...conditionsMotsCles(mots, ['user.prenom', 'user.nom', 'user.email'])],
+          },
+        },
+        include: {
+          organizer: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  prenom: true,
+                  nom: true,
+                  email: true,
+                  phone: true,
+                  isEmailVerified: true,
+                },
+              },
+            },
+          },
+        },
+        take: 20, // Limiter à 20 résultats
+      })
+
+      // Rechercher dans les bénévoles disponibles pendant l'événement
+      // On exclut ceux qui sont uniquement disponibles pour le montage/démontage
+      const volunteers = await prisma.editionVolunteerApplication.findMany({
+        where: {
+          eventId: editionId,
+          status: 'ACCEPTED',
+          ...benevolePresentSurPlace(),
+          AND: [...conditionsMotsCles(mots, ['user.prenom', 'user.nom', 'user.email'])],
+        },
+        select: {
+          id: true,
+          entryValidated: true,
+          entryValidatedAt: true,
+          entryValidatedBy: true,
+          userSnapshotPhone: true,
+          // Les trois phases : le guichet signale celui qui n'est pas attendu PENDANT
+          // l'événement, pour ne pas le confondre avec un bénévole ordinaire.
+          eventAvailability: true,
+          setupAvailability: true,
+          teardownAvailability: true,
+          user: {
+            select: {
+              id: true,
+              prenom: true,
+              nom: true,
+              email: true,
+              phone: true,
+              // L'écran fige le champ quand l'adresse est vérifiée : la laisser saisir
+              // pour que le serveur la refuse ensuite est pire que ne pas la proposer.
+              isEmailVerified: true,
+            },
+          },
+          teamAssignments: {
+            select: {
+              team: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+              isLeader: true,
+            },
+          },
+        },
+        take: 20, // Limiter à 20 résultats
+      })
+
+      // Qui a validé, pour les QUATRE populations d'un coup.
+      //
+      // Quatre relevés distincts vivaient ici, et celui des billets manquait — comme il manquait
+      // dans `verify.post.ts` (constat B2). Un seul appel les remplace : une requête au lieu de
+      // quatre, et surtout un seul endroit qui puisse encore oublier une population.
+      //
+      // Placé ICI et non plus haut : les bénévoles sont la dernière des quatre listes à être
+      // constituée. Les identifiants des billets viennent des lignes trouvées ET des autres
+      // lignes de leur commande, puisque la modale affiche la commande entière.
+      const nomDuValidateur = await resoudreLesValidateurs([
+        ...orderItems.flatMap((item) => [item, ...item.order.items]).map((l) => l.entryValidatedBy),
+        ...artists.map((a) => a.entryValidatedBy),
+        ...organizers.map((o) => o.entryValidatedBy),
+        ...volunteers.map((v) => v.entryValidatedBy),
+      ])
+
+      // Récupérer les créneaux assignés aux bénévoles
+      const volunteerUserIds = volunteers.map((v) => v.user.id)
+      const volunteerAssignments = await prisma.volunteerAssignment.findMany({
+        where: {
+          userId: { in: volunteerUserIds },
+          timeSlot: {
+            eventId: editionId,
+          },
+        },
+        include: {
+          timeSlot: {
+            include: {
+              team: true,
+            },
+          },
+        },
+        orderBy: {
+          timeSlot: {
+            startDateTime: 'asc',
+          },
+        },
+      })
+      // Grouper les assignments par userId
+      const assignmentsByUserId = new Map<number, typeof volunteerAssignments>()
+      volunteerAssignments.forEach((assignment) => {
+        if (!assignmentsByUserId.has(assignment.userId)) {
+          assignmentsByUserId.set(assignment.userId, [])
+        }
+        assignmentsByUserId.get(assignment.userId)!.push(assignment)
+      })
+
+      // Récupérer les articles à remettre pour chaque bénévole
+      const handoutItemsByVolunteerId = new Map<
+        number,
+        Array<{ id: number; name: string; quantity: number }>
+      >()
+      const mealsByVolunteerId = new Map<
+        number,
+        Array<{ id: number; date: Date; mealType: string; phases: string[] }>
+      >()
+
+      /*
+       * DEUX requêtes pour toute la page, au lieu de deux ou trois PAR bénévole.
+       *
+       * Toutes les associations de l'édition tiennent dans une seule lecture — les globales
+       * (`teamId` nul) comme celles des équipes —, et le rapprochement se fait ensuite en
+       * mémoire. La règle de surcharge est inchangée : une équipe ne remplace le global que si
+       * elle porte au moins un article, une équipe vide y retombe.
+       *
+       * L'inclusion de `team` a disparu au passage : elle n'était lue nulle part en aval.
+       */
+      const associationsBenevoles = volunteers.length
+        ? await prisma.editionVolunteerHandoutItem.findMany({
+            where: { editionId },
+            include: { handoutItem: true },
+          })
+        : []
+
+      const articlesGlobauxBenevoles = associationsBenevoles.filter((a) => a.teamId === null)
+      const articlesParEquipe = new Map<string, typeof associationsBenevoles>()
+      for (const association of associationsBenevoles) {
+        if (association.teamId === null) continue
+        const liste = articlesParEquipe.get(association.teamId) ?? []
+        liste.push(association)
+        articlesParEquipe.set(association.teamId, liste)
+      }
+
+      const selectionsRepasBenevoles = volunteers.length
+        ? await prisma.volunteerMealSelection.findMany({
+            where: {
+              volunteerId: { in: volunteers.map((v) => v.id) },
+              accepted: true,
+              meal: { enabled: true },
+            },
+            include: {
+              meal: { include: { handoutItems: { include: { handoutItem: true } } } },
+            },
+            // `date` seule ne départage pas deux repas du même jour : l'ordre affiché dépendait
+            // alors du plan de requête. `mealType` le rend déterministe, et aligne cet écran sur
+            // les cinq autres lectures de repas du dépôt.
+            orderBy: [{ meal: { date: 'asc' } }, { meal: { mealType: 'asc' } }],
+          })
+        : []
+      const repasParBenevole = new Map<number, typeof selectionsRepasBenevoles>()
+      for (const selection of selectionsRepasBenevoles) {
+        const liste = repasParBenevole.get(selection.volunteerId) ?? []
+        liste.push(selection)
+        repasParBenevole.set(selection.volunteerId, liste)
+      }
+
+      for (const volunteer of volunteers) {
+        const teamIds = volunteer.teamAssignments.map((assignment) => assignment.team.id)
+
+        // Les articles des équipes du bénévole ; à défaut, les articles globaux (surcharge).
+        const teamSpecificItems = teamIds.flatMap((id) => articlesParEquipe.get(id) ?? [])
+        const volunteerHandoutItems =
+          teamSpecificItems.length > 0 ? teamSpecificItems : articlesGlobauxBenevoles
+
+        /*
+         * Puis les PHASES : un article réservé au montage ne va pas à qui ne vient que pendant
+         * l'événement, et réciproquement.
+         *
+         * ⚠️ LE FILTRE VIENT APRÈS LA SURCHARGE, et c'est délibéré. Les deux règles répondent à
+         * des questions différentes : la surcharge dit QUELLE LISTE s'applique — celle de
+         * l'équipe remplace la globale —, les phases disent QUI dans cette liste est concerné.
+         * Les mêler ferait retomber sur la liste globale un bénévole dont l'équipe a bien des
+         * articles, simplement pas pour sa phase : on lui remettrait alors des articles que
+         * l'organisation avait justement remplacés.
+         *
+         * Une liste de phases vide ne restreint rien : c'est l'état de toutes les associations
+         * antérieures à ce réglage.
+         */
+        const phasesDuBeneficiaire = phasesDuBenevole(volunteer)
+        const articlesDeLaPhase = volunteerHandoutItems.filter((association) =>
+          phasesSeRencontrent(normaliserPhases(association.phases), phasesDuBeneficiaire)
+        )
+
+        // Collecter les articles (équipes) ; l'agrégation a lieu après les repas.
+        const volunteerItemEntries: any[] = [...articlesDeLaPhase]
+
+        const volunteerMeals = repasParBenevole.get(volunteer.id) ?? []
+
+        mealsByVolunteerId.set(
+          volunteer.id,
+          volunteerMeals.map((selection) => ({
+            id: selection.meal.id,
+            date: selection.meal.date,
+            mealType: selection.meal.mealType,
+            phases: Array.isArray(selection.meal.phases) ? (selection.meal.phases as string[]) : [],
+          }))
+        )
+
+        // Ajouter les articles à remettre des repas
+        volunteerMeals.forEach((selection) => {
+          selection.meal.handoutItems.forEach((mealItem) => {
+            volunteerItemEntries.push(mealItem)
+          })
+        })
+
+        // Agréger : un article non cumulable n'est remis qu'une fois, un article
+        // cumulable autant de fois qu'il est associé (équipes + repas).
+        handoutItemsByVolunteerId.set(
+          volunteer.id,
+          (articlesActifs ? aggregateHandoutItems(volunteerItemEntries) : []).map((item) => ({
+            id: item.id,
+            name: item.name,
+            quantity: item.quantity,
+          }))
+        )
+      }
+
+      // Récupérer les articles à remettre pour chaque organisateur.
+      //
+      // DEUX requêtes pour toute la page, au lieu de quatre PAR organisateur — dont celle des
+      // articles globaux, rigoureusement identique à chaque tour et pourtant rejouée. Trente
+      // organisateurs déclenchaient cent vingt requêtes, sur l'écran le plus sollicité de
+      // l'événement.
+      const handoutItemsByOrganizerId = new Map<
+        number,
+        Array<{ id: number; name: string; quantity: number }>
+      >()
+
+      if (organizers.length > 0 && articlesActifs) {
+        const associations = await prisma.editionOrganizerHandoutItem.findMany({
+          where: {
+            editionId,
+            // ⚠️ Pas de `in: [...ids, null]` : il produit `IN (…, NULL)`, et en SQL une
+            // comparaison avec NULL n'est jamais vraie — les articles globaux disparaîtraient
+            // sans la moindre erreur.
+            OR: [{ organizerId: { in: organizers.map((o) => o.id) } }, { organizerId: null }],
+          },
+          select: {
+            organizerId: true,
+            quantity: true,
+            // Une seule requête depuis que le modèle porte la relation. Il fallait auparavant
+            // relire les articles à part, faute de pouvoir écrire cet `include` — la table était
+            // la seule des neuf à n'avoir que la colonne `handoutItemId`.
+            handoutItem: true,
+          },
+        })
+
+        const enAssociation = (a: (typeof associations)[number]) => [
+          { handoutItem: a.handoutItem, quantity: a.quantity },
+        ]
+
+        // `organizerId` nul vaut « tous les organisateurs » : ces associations valent pour
+        // chacun, en plus de celles qui le nomment.
+        const globales = associations.filter((a) => a.organizerId === null).flatMap(enAssociation)
+        const parOrganisateur = new Map<number, ReturnType<typeof enAssociation>>()
+        for (const association of associations) {
+          if (association.organizerId === null) continue
+          const liste = parOrganisateur.get(association.organizerId) ?? []
+          liste.push(...enAssociation(association))
+          parOrganisateur.set(association.organizerId, liste)
+        }
+
+        // Les articles attachés aux repas auxquels chacun est inscrit. Un ticket de cantine est
+        // un article comme un autre : les bénévoles et les artistes le recevaient, pas les
+        // organisateurs, alors qu'ils s'inscrivent aux mêmes repas.
+        //
+        // Une requête pour toute la page, et non une par personne : c'est le travers dont cette
+        // boucle vient d'être débarrassée.
+        const selectionsDeRepas = await prisma.organizerMealSelection.findMany({
+          where: {
+            editionOrganizerId: { in: organizers.map((o) => o.id) },
+            accepted: true,
+            meal: { enabled: true },
+          },
+          include: { meal: { include: { handoutItems: { include: { handoutItem: true } } } } },
+          // Cette lecture n'avait aucun ordre : les repas d'un organisateur sortaient dans
+          // celui que la base voulait bien rendre. Les quatre populations affichent désormais
+          // les leurs dans le même ordre.
+          orderBy: [{ meal: { date: 'asc' } }, { meal: { mealType: 'asc' } }],
+        })
+        const repasParOrganisateur = new Map<number, typeof selectionsDeRepas>()
+        for (const selection of selectionsDeRepas) {
+          const liste = repasParOrganisateur.get(selection.editionOrganizerId) ?? []
+          liste.push(selection)
+          repasParOrganisateur.set(selection.editionOrganizerId, liste)
+        }
+
+        for (const organizer of organizers) {
+          // Même agrégation que pour les trois autres populations : un article donné à la fois
+          // globalement et nommément n'est remis qu'une fois s'il n'est pas cumulable.
+          const agreges = aggregateHandoutItems([
+            ...globales,
+            ...(parOrganisateur.get(organizer.id) ?? []),
+            ...(repasParOrganisateur.get(organizer.id) ?? []).flatMap(
+              (selection) => selection.meal.handoutItems
+            ),
+          ])
+          handoutItemsByOrganizerId.set(
+            organizer.id,
+            agreges.map((item) => ({ id: item.id, name: item.name, quantity: item.quantity }))
+          )
+        }
+      }
+
+      // Récupérer les articles à remettre pour chaque artiste
+      const handoutItemsByArtistId = new Map<
+        number,
+        Array<{ id: number; name: string; quantity: number }>
+      >()
+      const mealsByArtistId = new Map<
+        number,
+        Array<{ id: number; date: Date; mealType: string; phases: string[] }>
+      >()
+
+      // Articles remis à TOUS les artistes de l'édition : une seule requête pour
+      // l'ensemble des artistes, et aucune s'il n'y en a pas dans les résultats.
+      const editionArtistHandoutItems = artists.length
+        ? await prisma.editionArtistHandoutItem.findMany({
+            where: { editionId },
+            include: { handoutItem: true },
+          })
+        : []
+
+      // Les repas de tous les artistes affichés, en UNE requête au lieu d'une par personne.
+      const selectionsRepasArtistes = artists.length
+        ? await prisma.artistMealSelection.findMany({
+            where: {
+              artistId: { in: artists.map((a) => a.id) },
+              accepted: true,
+              meal: { enabled: true },
+            },
+            include: {
+              meal: { include: { handoutItems: { include: { handoutItem: true } } } },
+            },
+            orderBy: [{ meal: { date: 'asc' } }, { meal: { mealType: 'asc' } }],
+          })
+        : []
+      const repasParArtiste = new Map<number, typeof selectionsRepasArtistes>()
+      for (const selection of selectionsRepasArtistes) {
+        const liste = repasParArtiste.get(selection.artistId) ?? []
+        liste.push(selection)
+        repasParArtiste.set(selection.artistId, liste)
+      }
+
+      for (const artist of artists) {
+        // Collecter les articles de tous les spectacles ; l'agrégation a lieu
+        // après les repas. Un artiste jouant dans deux spectacles reçoit deux
+        // fois un article cumulable, une seule fois un article non cumulable.
+        // Trois sources s'additionnent : tous les artistes, cet artiste en particulier,
+        // et chacun de ses spectacles.
+        const artistItemEntries: any[] = [...editionArtistHandoutItems, ...artist.handoutItems]
+        artist.shows.forEach((showArtist) => {
+          showArtist.show.handoutItems.forEach((item) => {
+            artistItemEntries.push(item)
+          })
+        })
+
+        const artistMeals = repasParArtiste.get(artist.id) ?? []
+
+        mealsByArtistId.set(
+          artist.id,
+          artistMeals.map((selection) => ({
+            id: selection.meal.id,
+            date: selection.meal.date,
+            mealType: selection.meal.mealType,
+            phases: Array.isArray(selection.meal.phases) ? (selection.meal.phases as string[]) : [],
+          }))
+        )
+
+        // Ajouter les articles à remettre des repas
+        artistMeals.forEach((selection) => {
+          selection.meal.handoutItems.forEach((mealItem) => {
+            artistItemEntries.push(mealItem)
+          })
+        })
+
+        handoutItemsByArtistId.set(
+          artist.id,
+          (articlesActifs ? aggregateHandoutItems(artistItemEntries) : []).map((item) => ({
+            id: item.id,
+            name: item.name,
+            quantity: item.quantity,
+          }))
+        )
+      }
+
+      const results = {
+        tickets: orderItems.map((item) => ({
+          type: 'ticket',
+          isRefunded: item.order.status === 'Refunded', // Flag pour indiquer si la commande est annulée
+          participant: {
+            found: true,
+            ticket: {
+              id: item.id, // ID de OrderItem
+              helloAssoItemId: item.helloAssoItemId,
+              name: item.name,
+              amount: item.amount,
+              state: item.state,
+              // Annulé ne veut pas dire remboursé : le guichet affiche la somme due tant que
+              // cette case n'est pas cochée.
+              refunded: item.refunded,
+              refundedAt: item.refundedAt,
+              // La REMISE et son sort : le guichet doit pouvoir dire que la dette vient d'elle, et
+              // appeler le bon point d'API — rembourser un billet vivant est refusé par le serveur.
+              discountAmount: item.discountAmount,
+              discountPaidBack: item.discountPaidBack,
+              discountPaidBackAt: item.discountPaidBackAt,
+              /** Voir `verify.post.ts` : la même règle, au même endroit du contrat. */
+              refundDue: montantARembourser({
+                state: item.state,
+                refunded: item.refunded,
+                amount: item.amount,
+                // Voir `montantARembourser` : une remise non rendue est une dette, au même titre
+                // qu'un billet annulé non remboursé.
+                discountAmount: item.discountAmount,
+                discountPaidBack: item.discountPaidBack,
+                selectedOptions: item.selectedOptions,
+                order: { status: item.order.status, paymentMethod: item.order.paymentMethod },
+              }),
+              /**
+               * La dette de la COMMANDE entière — même contrat qu'au scan, et pour la même raison :
+               * trouver quelqu'un par son nom ou par son code QR ne doit pas annoncer deux sommes
+               * différentes.
+               */
+              detteDeLaCommande: detteDeCommande(
+                item.order.items.map((ligne) => ({
+                  id: ligne.id,
+                  name: ligne.name,
+                  amount: ligne.amount,
+                  firstName: ligne.firstName,
+                  lastName: ligne.lastName,
+                  state: ligne.state,
+                  refunded: ligne.refunded,
+                  selectedOptions: ligne.selectedOptions,
+                })),
+                { status: item.order.status, paymentMethod: item.order.paymentMethod }
+              ),
+              qrCode: item.qrCode,
+              user: {
+                firstName: item.firstName,
+                lastName: item.lastName,
+                email: item.email,
+              },
+              order: {
+                /**
+                 * ⚠️ CE N'EST PAS L'IDENTIFIANT DE LA COMMANDE, mais son numéro chez HelloAsso —
+                 * `null` dès qu'elle a été saisie sur place. Le nom trompe, et il a trompé : le
+                 * guichet s'en servait pour réunir les lignes d'une même commande, ce qui
+                 * marchait pour HelloAsso et jamais pour les ventes sur place. D'où `orderId`
+                 * juste en dessous, qui, lui, identifie la commande.
+                 */
+                id: item.order.helloAssoOrderId,
+                /** L'identifiant interne de la commande. Toujours présent, quelle que soit l'origine. */
+                orderId: item.order.id,
+                status: item.order.status,
+                /** `null` quand la commande a été saisie sur place. */
+                provider: item.order.externalTicketing?.provider ?? null,
+                payer: {
+                  firstName: item.order.payerFirstName,
+                  lastName: item.order.payerLastName,
+                  email: item.order.payerEmail,
+                },
+                items: item.order.items.map((orderItem) => ({
+                  id: orderItem.id, // ID de OrderItem
+                  helloAssoItemId: orderItem.helloAssoItemId,
+                  name: orderItem.name,
+                  type: orderItem.type,
+                  amount: orderItem.amount,
+                  state: orderItem.state,
+                  refunded: orderItem.refunded,
+                  refundedAt: orderItem.refundedAt,
+                  qrCode: orderItem.qrCode,
+                  firstName: orderItem.firstName,
+                  lastName: orderItem.lastName,
+                  email: orderItem.email,
+                  customFields: orderItem.customFields as any,
+                  entryValidated: orderItem.entryValidated,
+                  entryValidatedAt: orderItem.entryValidatedAt,
+                  entryValidatedBy: nomDuValidateur(orderItem.entryValidatedBy),
+                  tier: orderItem.tier
+                    ? {
+                        id: orderItem.tier.id,
+                        name: orderItem.tier.name,
+                      }
+                    : null,
+                  // La liste complète, tarif + options + champs personnalisés déjà agrégés :
+                  // elle est portée par le billet et non par son tarif, puisque ses sources le
+                  // débordent.
+                  handoutItems: articlesActifs ? calculateHandoutItemsForTicket(orderItem) : [],
+                  selectedOptions: orderItem.selectedOptions.map((so) => ({
+                    id: so.id,
+                    amount: so.amount,
+                    option: {
+                      id: so.option.id,
+                      name: so.option.name,
+                      type: so.option.type,
+                      price: so.option.price,
+                    },
+                  })),
+                })),
+              },
+              customFields: item.customFields as any,
+              entryValidated: item.entryValidated,
+              entryValidatedAt: item.entryValidatedAt,
+              entryValidatedBy: nomDuValidateur(item.entryValidatedBy),
+              // Les articles de l'option ne sont plus recopiés ici : ils sont déjà dans la
+              // liste agrégée du billet. Les deux sérialisations divergeaient d'ailleurs —
+              // l'une portait la quantité, l'autre non — et le client honorait ou perdait la
+              // quantité selon celle qu'il lisait.
+              selectedOptions: item.selectedOptions.map((so) => ({
+                id: so.id,
+                amount: so.amount,
+                option: {
+                  id: so.option.id,
+                  name: so.option.name,
+                  type: so.option.type,
+                  price: so.option.price,
+                },
+              })),
+            },
+          },
+        })),
+        volunteers: volunteers.map((application) => {
+          const assignments = assignmentsByUserId.get(application.user.id) || []
+          const handoutItems = handoutItemsByVolunteerId.get(application.id) || []
+          const meals = mealsByVolunteerId.get(application.id) || []
+          return {
+            type: 'volunteer',
+            participant: {
+              found: true,
+              volunteer: {
+                id: application.id,
+                user: {
+                  firstName: application.user.prenom,
+                  lastName: application.user.nom,
+                  email: application.user.email,
+                  // Porté jusqu'à l'écran : c'est lui qui décide de figer le champ.
+                  isEmailVerified: application.user.isEmailVerified,
+                  phone: application.userSnapshotPhone || application.user.phone,
+                },
+                teams: application.teamAssignments.map((assignment) => ({
+                  id: assignment.team.id,
+                  name: assignment.team.name,
+                  isLeader: assignment.isLeader,
+                })),
+                timeSlots: assignments.map((assignment) => ({
+                  id: assignment.timeSlot.id,
+                  title: assignment.timeSlot.title,
+                  team: assignment.timeSlot.team?.name,
+                  startDateTime: assignment.timeSlot.startDateTime,
+                  endDateTime: assignment.timeSlot.endDateTime,
+                })),
+                handoutItems: handoutItems,
+                meals: meals,
+                entryValidated: application.entryValidated,
+                entryValidatedAt: application.entryValidatedAt,
+                entryValidatedBy: nomDuValidateur(application.entryValidatedBy),
+                eventAvailability: application.eventAvailability,
+                setupAvailability: application.setupAvailability,
+                teardownAvailability: application.teardownAvailability,
+              },
+            },
+          }
+        }),
+        artists: artists.map((artist) => {
+          const handoutItems = handoutItemsByArtistId.get(artist.id) || []
+          const meals = mealsByArtistId.get(artist.id) || []
+          return {
+            type: 'artist',
+            participant: {
+              found: true,
+              artist: {
+                id: artist.id,
+                user: {
+                  firstName: artist.user.prenom,
+                  lastName: artist.user.nom,
+                  email: artist.user.email,
+                  // Porté jusqu'à l'écran : c'est lui qui décide de figer le champ.
+                  isEmailVerified: artist.user.isEmailVerified,
+                  phone: artist.user.phone,
+                },
+                shows: artist.shows.map((showArtist) => ({
+                  id: showArtist.show.id,
+                  title: showArtist.show.title,
+                  performances: showArtist.show.performances,
+                })),
+                handoutItems: handoutItems,
+                meals: meals,
+                entryValidated: artist.entryValidated,
+                entryValidatedAt: artist.entryValidatedAt,
+                entryValidatedBy: nomDuValidateur(artist.entryValidatedBy),
+              },
+            },
+          }
+        }),
+        organizers: organizers.map((editionOrganizer) => {
+          const handoutItems = handoutItemsByOrganizerId.get(editionOrganizer.id) || []
+          return {
+            type: 'organizer',
+            participant: {
+              found: true,
+              organizer: {
+                id: editionOrganizer.id,
+                user: {
+                  firstName: editionOrganizer.organizer.user.prenom,
+                  lastName: editionOrganizer.organizer.user.nom,
+                  email: editionOrganizer.organizer.user.email,
+                  // Porté jusqu'à l'écran : c'est lui qui décide de figer le champ.
+                  isEmailVerified: editionOrganizer.organizer.user.isEmailVerified,
+                  phone: editionOrganizer.organizer.user.phone,
+                },
+                title: editionOrganizer.organizer.title,
+                handoutItems,
+                entryValidated: editionOrganizer.entryValidated,
+                entryValidatedAt: editionOrganizer.entryValidatedAt,
+                entryValidatedBy: nomDuValidateur(editionOrganizer.entryValidatedBy),
+              },
+            },
+          }
+        }),
+        total: orderItems.length + volunteers.length + artists.length + organizers.length,
+      }
+
+      /*
+       * ─── Le rapprochement par PERSONNE ──────────────────────────────────────────────────────
+       *
+       * Une même personne peut porter un billet, une candidature de bénévole, une fiche d'artiste
+       * et une place d'organisateur : quatre tables, quatre drapeaux de validation, et jusqu'ici
+       * quatre recherches. Ce bloc dit QUI est qui ; il ne valide rien.
+       *
+       * ⚠️ LA TABLE DES COMPTES SE CONSTRUIT SANS REQUÊTE : les bénévoles, artistes et
+       * organisateurs trouvés portent déjà leurs comptes, et c'est avec eux qu'un billet doit se
+       * rapprocher. Chercher des comptes au-delà serait inutile — un billet dont la personne n'est
+       * pas dans les résultats n'a rien à rejoindre.
+       *
+       * 📍 LIMITE CONNUE : une recherche par NUMÉRO DE COMMANDE ne ramène que le billet, donc rien
+       * à quoi le rapprocher. C'est acceptable — on cherche une personne par son nom quand on veut
+       * tous ses titres — mais il faut le savoir avant de s'étonner.
+       */
+      const comptesParBoite = new Map<string, CompteConnu[]>()
+      const noterLeCompte = (
+        user: { id: number; prenom?: string | null; nom?: string | null },
+        email?: string | null
+      ) => {
+        const boite = cleDeBoiteDeReception(email)
+        if (!boite) return
+        const liste = comptesParBoite.get(boite) ?? []
+        // Un même compte peut arriver par plusieurs titres : on ne le note qu'une fois, sinon il
+        // paraîtrait « ambigu » face à lui-même et aucun billet ne se rapprocherait.
+        if (!liste.some((compte) => compte.userId === user.id)) {
+          liste.push({ userId: user.id, prenom: user.prenom, nom: user.nom })
+        }
+        comptesParBoite.set(boite, liste)
+      }
+
+      for (const application of volunteers) {
+        noterLeCompte(application.user, application.user.email)
+      }
+      for (const artist of artists) {
+        noterLeCompte(artist.user, artist.user.email)
+      }
+      for (const editionOrganizer of organizers) {
+        noterLeCompte(editionOrganizer.organizer.user, editionOrganizer.organizer.user.email)
+      }
+
+      const titres: TitreRapprochable[] = [
+        ...orderItems.map((item) => ({
+          nature: 'ticket' as const,
+          id: item.id,
+          email: item.email,
+          prenom: item.firstName,
+          nom: item.lastName,
+          entryValidated: item.entryValidated,
+        })),
+        ...volunteers.map((application) => ({
+          nature: 'volunteer' as const,
+          id: application.id,
+          userId: application.user.id,
+          email: application.user.email,
+          prenom: application.user.prenom,
+          nom: application.user.nom,
+          entryValidated: application.entryValidated,
+        })),
+        ...artists.map((artist) => ({
+          nature: 'artist' as const,
+          id: artist.id,
+          userId: artist.user.id,
+          email: artist.user.email,
+          prenom: artist.user.prenom,
+          nom: artist.user.nom,
+          entryValidated: artist.entryValidated,
+        })),
+        ...organizers.map((editionOrganizer) => ({
+          nature: 'organizer' as const,
+          id: editionOrganizer.id,
+          userId: editionOrganizer.organizer.user.id,
+          email: editionOrganizer.organizer.user.email,
+          prenom: editionOrganizer.organizer.user.prenom,
+          nom: editionOrganizer.organizer.user.nom,
+          entryValidated: editionOrganizer.entryValidated,
+        })),
+      ]
+
+      /*
+       * Rendu EN PLUS des quatre listes, jamais à leur place : aucune information actuellement
+       * affichée ne doit disparaître. L'écran s'en sert pour proposer une validation groupée ; les
+       * listes restent la source de tout le détail.
+       */
+      const personnes = regrouperParPersonne(titres, comptesParBoite)
+
+      return createSuccessResponse({ results, personnes })
+    } catch (error: unknown) {
+      /*
+       * Un refus DÉJÀ ÉCRIT reste lisible — constat D6. Sans ce relais, ce `catch` réécrit en
+       * 500 générique les 4xx levés dans le `try`, y compris par les fonctions qu'il appelle :
+       * au comptoir, « Erreur lors de la validation » remplace « Ce billet a été remboursé », et
+       * la différence est entre comprendre et appeler quelqu'un.
+       */
+      if (isHttpError(error)) throw error
+      console.error('Database search error:', error)
+      throw createError({
+        status: 500,
+        message: 'Erreur lors de la recherche de billets',
+      })
+    }
+  },
+  { operationName: 'POST ticketing search' }
+)

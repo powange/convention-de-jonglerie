@@ -5,7 +5,7 @@ import {
   axeCommun,
   libelleDuRepere,
   repereDepuisOuverture,
-} from '../../../shared/utils/recalage-editions'
+} from '../../../../../layers/ticketing/shared/utils/recalage-editions'
 
 /**
  * Le recalage de deux éditions l'une sur l'autre.

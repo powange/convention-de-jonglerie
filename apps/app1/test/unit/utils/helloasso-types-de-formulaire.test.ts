@@ -4,7 +4,11 @@ import {
   cheminDuFormulaire,
   normaliserTypeFormulaire,
 } from '../../../server/utils/editions/ticketing/helloasso'
-import { buildHelloAssoUrl, normaliserTypeHelloAsso, parseHelloAssoUrl } from '~/utils/helloasso'
+import {
+  buildHelloAssoUrl,
+  normaliserTypeHelloAsso,
+  parseHelloAssoUrl,
+} from '#ticketing/app/utils/helloasso'
 
 /**
  * Les types de formulaire envoyés à HelloAsso.

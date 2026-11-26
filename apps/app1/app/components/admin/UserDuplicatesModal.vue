@@ -125,7 +125,10 @@
 </template>
 
 <script setup lang="ts">
-import type { GrappeDeDoublons, MotifDeRapprochement } from '~~/shared/utils/doublons-utilisateurs'
+import type {
+  GrappeDeDoublons,
+  MotifDeRapprochement,
+} from '#core/shared/utils/doublons-utilisateurs'
 
 interface CompteDouble {
   id: number

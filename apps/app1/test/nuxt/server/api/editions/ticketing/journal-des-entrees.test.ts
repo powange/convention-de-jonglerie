@@ -17,6 +17,10 @@ vi.mock('#server/utils/permissions/edition-permissions', () => ({
   canAccessEditionDataOrAccessControl: mockCanAccessEditionData,
 }))
 
+// Qui répond des artistes : contrat d'hôte, lu une fois avant la boucle sur les participants.
+vi.mock('#server/utils/organisateurs-des-artistes', () => ({
+  organisateursHabilitesSurLesArtistes: vi.fn().mockResolvedValue([]),
+}))
 vi.mock('#server/utils/auth-utils', () => ({
   requireAuth: vi.fn((event) => event.context.user),
 }))
@@ -34,8 +38,8 @@ vi.mock('#server/utils/editions/ticketing/user-info-update', () => ({
   updateUserInfo: vi.fn(),
 }))
 
-import invalidateHandler from '../../../../../../server/api/editions/[id]/ticketing/invalidate-entry.post'
-import validateHandler from '../../../../../../server/api/editions/[id]/ticketing/validate-entry.post'
+import invalidateHandler from '../../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/invalidate-entry.post'
+import validateHandler from '../../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/validate-entry.post'
 import { global } from '../../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma

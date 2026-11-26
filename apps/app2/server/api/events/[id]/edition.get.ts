@@ -47,6 +47,9 @@ export default defineEventHandler(async (event) => {
       externalMapProvider: true,
       externalMapRef: true,
       artistInfo: true,
+      ticketingHandoutItemsEnabled: true,
+      ticketingAllowOnsiteRegistration: true,
+      ticketingAllowAnonymousOrders: true,
       volunteerSettings: {
         select: {
           pagePublic: true,
@@ -109,10 +112,12 @@ export default defineEventHandler(async (event) => {
     mapPublic: evenement.mapPublic,
     externalMapProvider: evenement.externalMapProvider,
     externalMapRef: evenement.externalMapRef,
-    // Artistes (layer `artists`) : le texte de l'espace artiste. Pas d'articles à remettre tant que
-    // la billetterie n'est pas portée (lot 6).
+    // Artistes (layer `artists`) : le texte de l'espace artiste.
     artistInfo: evenement.artistInfo,
-    ticketingHandoutItemsEnabled: false,
+    // Billetterie (layer `ticketing`) : réglages lus par ses écrans, sous les noms d'app1.
+    ticketingHandoutItemsEnabled: evenement.ticketingHandoutItemsEnabled,
+    ticketingAllowOnsiteRegistration: evenement.ticketingAllowOnsiteRegistration,
+    ticketingAllowAnonymousOrders: evenement.ticketingAllowAnonymousOrders,
     droits: droits
       ? Object.fromEntries(
           DROITS_PAR_DOMAINE.map((d) => [d.cle, droits[d.cle] && droitsProposes().includes(d)])

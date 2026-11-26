@@ -101,6 +101,10 @@ const carteDuSite = computed(() => !!acces.value?.modules.carte && !!acces.value
 const artistesOuverts = computed(
   () => !!acces.value?.modules.artistes && !!acces.value?.droits.artistes
 )
+// Billetterie : module activé ET droit dédié (même règle qu'app1).
+const billetterieOuverte = computed(
+  () => !!acces.value?.modules.billetterie && !!acces.value?.droits.billetterie
+)
 // Stock : le droit dédié, ou responsable d'une équipe de bénévoles (même règle qu'app1,
 // `canAccessStock`) — un responsable va chercher le matériel de son équipe.
 const stockOuvert = computed(
@@ -200,6 +204,69 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
           ]
         : []),
     ],
+    ...(billetterieOuverte.value
+      ? [
+          [
+            {
+              label: 'Billetterie',
+              icon: 'i-heroicons-ticket',
+              value: 'billetterie',
+              children: [
+                {
+                  label: 'Configuration',
+                  icon: 'i-heroicons-cog-6-tooth',
+                  to: `/events/${refPublique.value}/gestion/ticketing/config`,
+                },
+                {
+                  label: 'Lier une billetterie externe',
+                  icon: 'i-heroicons-link',
+                  to: `/events/${refPublique.value}/gestion/ticketing/external`,
+                },
+                {
+                  label: 'Tarifs & options',
+                  icon: 'i-heroicons-currency-euro',
+                  to: `/events/${refPublique.value}/gestion/ticketing/tiers`,
+                },
+                {
+                  label: 'Quotas',
+                  icon: 'i-heroicons-chart-bar',
+                  to: `/events/${refPublique.value}/gestion/ticketing/quotas`,
+                },
+                // Seulement si l'événement remet des articles (même condition qu'app1).
+                ...(edition.value?.ticketingHandoutItemsEnabled !== false
+                  ? [
+                      {
+                        label: 'Articles à remettre',
+                        icon: 'i-heroicons-gift',
+                        to: `/events/${refPublique.value}/gestion/ticketing/handout-items`,
+                      },
+                    ]
+                  : []),
+                {
+                  label: 'Commandes',
+                  icon: 'i-heroicons-shopping-cart',
+                  to: `/events/${refPublique.value}/gestion/ticketing/orders`,
+                },
+                {
+                  label: 'Compteurs',
+                  icon: 'i-heroicons-calculator',
+                  to: `/events/${refPublique.value}/gestion/ticketing/counter`,
+                },
+                {
+                  label: 'Statistiques',
+                  icon: 'i-heroicons-chart-bar',
+                  to: `/events/${refPublique.value}/gestion/ticketing/stats`,
+                },
+                {
+                  label: "Contrôle d'accès",
+                  icon: 'i-heroicons-shield-check',
+                  to: `/events/${refPublique.value}/gestion/ticketing/access-control`,
+                },
+              ],
+            },
+          ],
+        ]
+      : []),
     ...(artistesOuverts.value
       ? [
           [

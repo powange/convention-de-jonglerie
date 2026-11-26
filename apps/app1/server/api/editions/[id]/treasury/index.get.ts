@@ -1,3 +1,4 @@
+import { montantNetDeLaLigne } from '#core/shared/utils/remise-de-ligne'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTreasuryById } from '#server/utils/permissions/edition-permissions'
@@ -9,7 +10,6 @@ import {
   type TreasurySourceKey,
 } from '#server/utils/treasury-compute'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { montantNetDeLaLigne } from '~~/shared/utils/remise-de-ligne'
 
 /**
  * GET /api/editions/:id/treasury

@@ -46,6 +46,8 @@ const aliasHorsNuxt = {
   // Déclarés par `layers/stock/nuxt.config.ts` et `layers/artists/nuxt.config.ts`.
   '#stock': resolve(__dirname, '../../layers/stock'),
   '#artists': resolve(__dirname, '../../layers/artists'),
+  // Déclaré par `layers/ticketing/nuxt.config.ts`.
+  '#ticketing': resolve(__dirname, '../../layers/ticketing'),
 }
 
 export default defineConfig({

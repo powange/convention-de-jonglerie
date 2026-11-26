@@ -1,5 +1,5 @@
-import helloAssoLogo from '~/assets/img/helloasso/logo.svg'
-import infomaniakLogo from '~/assets/img/infomaniak/logo.svg'
+import helloAssoLogo from '#ticketing/app/assets/img/helloasso/logo.svg'
+import infomaniakLogo from '#ticketing/app/assets/img/infomaniak/logo.svg'
 
 /**
  * D'où vient un tarif, une commande — et comment le montrer.
@@ -18,7 +18,10 @@ const logosParFournisseur: Record<string, string> = {
  *
  * Chemin public et non import : le fichier vit dans `public/`, il est servi tel quel.
  */
-const LOGO_DU_SITE = '/logos/logo-jc.svg'
+/** Le logo du site (vente sur place), propre à chaque app : cf. app.config `billetterie.logoDuSite`. */
+function logoDuSite(): string {
+  return useAppConfig().billetterie?.logoDuSite ?? '/logos/logo-jc.svg'
+}
 
 /** Le nom du fournisseur tel qu'il s'écrit, plutôt que la constante de la base. */
 const nomsDeFournisseur: Record<string, string> = {
@@ -36,7 +39,7 @@ const nomsDeFournisseur: Record<string, string> = {
  * comme une origine inconnue — alors qu'elle veut dire « créé sur le site ».
  */
 export function logoDuFournisseur(provider?: string | null): string {
-  return (provider && logosParFournisseur[provider]) || LOGO_DU_SITE
+  return (provider && logosParFournisseur[provider]) || logoDuSite()
 }
 
 /** Le nom lisible d'un fournisseur, ou `null` quand l'élément vient du site. */

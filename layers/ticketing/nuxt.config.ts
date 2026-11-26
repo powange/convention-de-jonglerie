@@ -1,5 +1,14 @@
-// Layer « ticketing » — module billetterie (PR 1 : cœur config/gestion auto-suffisant). Le serveur
-// consomme les permissions du cœur via #server (getEditionWithPermissions, canEditEdition…). Les
-// endpoints cross-module (validation/contrôle d'accès, *-not-validated) et liés aux champs Edition
-// (settings, sumup, external, stats) ainsi que les pages restent en core pour la PR 2.
-export default defineNuxtConfig({})
+import { fileURLToPath } from 'node:url'
+
+// Layer « ticketing » — module billetterie (tarifs, options, articles remis, quotas, commandes,
+// contrôle des entrées, guichet, statistiques, fournisseurs externes). Partagé entre app1 et
+// Flowvent (lot 6 de docs/flowvent-modules.md ; Flowvent n'y propose que HelloAsso).
+//
+// Ses modules s'importent par l'alias `#ticketing`. Les utilitaires serveur gardent leur adresse
+// `#server/utils/…` (chaque app les réexporte) ; ce qui reste propre à l'app hôte — droits,
+// ports (server/ticketing/ports), administration — se résout aussi par `#server`.
+export default defineNuxtConfig({
+  alias: {
+    '#ticketing': fileURLToPath(new URL('./', import.meta.url)),
+  },
+})

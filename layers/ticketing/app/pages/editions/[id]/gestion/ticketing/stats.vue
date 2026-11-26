@@ -623,16 +623,22 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-import { comparerSeries, libelleDEdition } from '~/utils/comparaison-stats'
-import { PERIODES_DACHAT, indicesDansLesPeriodes, serieSurIndices } from '~/utils/periodes-achats'
 
-// Import explicite : plusieurs layers exportent un `requeteStats`-like et des constantes de même
-// famille, et l'auto-import ne saurait pas lequel prendre.
 import {
   reglagesDepuisUrl,
   requeteStats,
   TYPES_DE_PRESENCE_STATS,
 } from '../../../../../utils/filtres-stats'
+
+import { comparerSeries, libelleDEdition } from '#ticketing/app/utils/comparaison-stats'
+import {
+  PERIODES_DACHAT,
+  indicesDansLesPeriodes,
+  serieSurIndices,
+} from '#ticketing/app/utils/periodes-achats'
+
+// Import explicite : plusieurs layers exportent un `requeteStats`-like et des constantes de même
+// famille, et l'auto-import ne saurait pas lequel prendre.
 
 const { money } = useEditionCurrency()
 
@@ -677,7 +683,8 @@ const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { t } = useI18n()
 
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 // Vérifier l'accès à cette page — gestion de la billetterie (droit dédié).

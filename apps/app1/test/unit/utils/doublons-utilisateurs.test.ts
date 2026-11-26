@@ -9,7 +9,7 @@ import {
   fragmentsDeTelephone,
   TAILLE_DE_GRAPPE_SUSPECTE,
   type CompteAComparer,
-} from '../../../shared/utils/doublons-utilisateurs'
+} from '../../../../../layers/core/shared/utils/doublons-utilisateurs'
 
 const compte = (id: number, p: Partial<CompteAComparer> = {}): CompteAComparer => ({
   id,

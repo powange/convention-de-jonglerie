@@ -31,7 +31,7 @@ vi.mock('#server/utils/auth-utils', () => ({
 }))
 
 const handler = (
-  await import('../../../../../server/api/editions/[id]/ticketing/stats/affluence.get')
+  await import('../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/stats/affluence.get')
 ).default
 
 const prismaMock = (globalThis as any).prisma
