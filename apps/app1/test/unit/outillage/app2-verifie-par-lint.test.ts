@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest'
  * Flowvent (app2) n'a eu, pendant des mois, AUCUN contrôle de code en CI hors son build Docker :
  * `eslint.config.mjs` excluait `apps/app2/**`, et `format:check` ne lisait qu'app1 et les layers.
  * La CI affirmait pourtant le contraire — c'est même sur cette affirmation qu'avait été justifié
- * le maintien du job `lint` dans le périmètre `app2-seul`.
+ * le maintien du job `lint` dans le périmètre `app2-seul` (aujourd'hui `leger`).
  *
  * Ces cas gardent la couverture : une exclusion d'app2 remise en entier, ou un `format:check` qui
  * la perdrait, ne ferait rien rougir d'autre.
