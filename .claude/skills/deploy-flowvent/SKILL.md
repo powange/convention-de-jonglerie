@@ -26,8 +26,10 @@ L'argument détermine la cible :
 ## ⚠️ Ce qui diffère d'app1 : l'image ne suit pas chaque commit
 
 `publier-image-flowvent.yml` ne se déclenche que si un commit touche `apps/app2/**`, l'un des layers
-que Flowvent étend (`layers/auth/**`, `core`, `ui`, `volunteers`) ou le workflow lui-même. Un lot qui
-ne concerne qu'app1 ne publie **aucune** image Flowvent.
+que Flowvent étend ou le workflow lui-même. La liste de ces layers est celle d'`extends` dans
+`apps/app2/nuxt.config.ts` — elle grandit à chaque module porté, et le filtre du workflow la reprend
+(un test le vérifie) ; ne pas la recopier ici, elle s'y périmerait. Un lot qui ne concerne qu'app1 ne
+publie **aucune** image Flowvent.
 
 Deux conséquences :
 

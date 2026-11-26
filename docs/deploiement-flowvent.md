@@ -10,9 +10,10 @@ Trois environnements :
 
 ## La chaîne, en une phrase
 
-Un merge sur `main` qui touche `apps/app2/**` ou `layers/auth/**` fait construire et publier par la
-CI l'image `ghcr.io/powange/flowvent:main` (et `:sha-<commit>`). Le webhook Portainer de la stack
-la fait ensuite tirer : l'hôte ne construit jamais rien. Le conteneur applique les migrations au
+Un merge sur `main` qui touche `apps/app2/**` ou l'un des layers que Flowvent étend (ceux d'`extends`
+dans `apps/app2/nuxt.config.ts`) fait construire et publier par la CI l'image
+`ghcr.io/powange/flowvent:main` (et `:sha-<commit>`). Le webhook Portainer de la stack la fait
+ensuite tirer : l'hôte ne construit jamais rien. Le conteneur applique les migrations au
 démarrage, puis sert l'application.
 
 Sur une PR qui touche ces chemins, la même image est construite **sans être publiée**. Cette garde
