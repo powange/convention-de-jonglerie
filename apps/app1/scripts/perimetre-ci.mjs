@@ -60,7 +60,7 @@ export const JOBS_PAR_PERIMETRE = {
 }
 
 /** Les jobs ajoutés selon les fichiers touchés (hors push sur main, où rien n'est vérifié). */
-export const JOBS_SELON_FICHIERS = ['image-flowvent', 'image-app1', 'audit']
+export const JOBS_SELON_FICHIERS = ['image-flowvent', 'typecheck-app2', 'image-app1', 'audit']
 
 /** Tous les jobs qui portent une condition dans le YAML. */
 export const JOBS_CONDITIONNES = [
@@ -182,7 +182,9 @@ export function calculerJobs(evenement, fichiers, layersApp2) {
   const utiles = fichiers.map((f) => f.trim()).filter(Boolean)
   // Hors PR (planifié, manuel) ou sans liste lisible : tout ce qui dépend des fichiers tourne.
   const toutLancer = evenement !== 'pull_request' || utiles.length === 0
-  if (toutLancer || touchePourFlowvent(utiles, layersApp2)) jobs.push('image-flowvent')
+  // Le typage de Flowvent suit la même règle que son image : ce qui peut la casser peut le casser.
+  if (toutLancer || touchePourFlowvent(utiles, layersApp2))
+    jobs.push('image-flowvent', 'typecheck-app2')
   if (toutLancer || touchePourImageApp1(utiles)) jobs.push('image-app1')
   if (toutLancer || touchePourAudit(utiles)) jobs.push('audit')
   return { perimetre, raison, jobs }

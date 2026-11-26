@@ -17,3 +17,6 @@ server/generated
 *.db-journal
 prisma/*.db
 prisma/*.db-journal
+
+# Journal et code de sortie du typage (job typecheck-app2 de la CI)
+typecheck.code
