@@ -77,4 +77,38 @@ describe('positionInitialeDuPlanning', () => {
 
     expect(position).toBe('31:15:00')
   })
+
+  /*
+   * Sous Flowvent, l'édition arrive sous forme complète. Y accoler « T00:00:00 » rendait une date
+   * invalide : la frise ne se posait jamais sur le premier créneau.
+   */
+  it('accepte une date de début complète, et n’en garde que le jour', () => {
+    const position = positionInitialeDuPlanning('2026-10-02T00:00:00.000Z', [
+      { startDateTime: '2026-10-03T07:15:00' },
+    ])
+
+    expect(position).toBe('31:15:00')
+  })
+
+  /*
+   * Le calendrier affiche ses journées à l'heure du LIEU : la frise vise l'heure murale du
+   * créneau là-bas, quel que soit le fuseau de la machine qui regarde.
+   */
+  it('vise l’heure du lieu quand l’édition déclare un fuseau', () => {
+    // 08:00 UTC = 10:00 à Paris en octobre (heure d'été) ; 16:00 UTC = 01:00 le lendemain à Tokyo.
+    expect(
+      positionInitialeDuPlanning(
+        '2026-10-02',
+        [{ startDateTime: '2026-10-02T08:00:00Z' }],
+        'Europe/Paris'
+      )
+    ).toBe('10:00:00')
+    expect(
+      positionInitialeDuPlanning(
+        '2026-10-02',
+        [{ startDateTime: '2026-10-02T16:00:00Z' }],
+        'Asia/Tokyo'
+      )
+    ).toBe('25:00:00')
+  })
 })

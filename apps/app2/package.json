@@ -31,13 +31,7 @@
     "docker:release:down": "docker compose -f docker-compose.release.yml down"
   },
   "dependencies": {
-    "@fullcalendar/core": "^6.1.22",
-    "@fullcalendar/interaction": "^6.1.20",
-    "@fullcalendar/luxon3": "^6.1.21",
-    "@fullcalendar/resource": "^6.1.20",
-    "@fullcalendar/resource-timeline": "^6.1.20",
-    "@fullcalendar/timeline": "^6.1.20",
-    "@fullcalendar/vue3": "^6.1.20",
+    "@event-calendar/core": "^5.22.0",
     "@internationalized/date": "^3.12.4",
     "@nuxt/ui": "^4.12.2",
     "@nuxtjs/i18n": "^10.4.0",

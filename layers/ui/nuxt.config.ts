@@ -12,12 +12,13 @@
 import { fileURLToPath } from 'node:url'
 
 export default defineNuxtConfig({
-  // Feuilles communes : la mise en forme du Markdown rendu (`prose`) et l'habillage de FullCalendar.
-  // Sans elles, Flowvent affichait la description de la page bénévole en texte brut (ni titres ni
-  // puces) et ses plannings aux couleurs par défaut de FullCalendar.
+  // Feuilles communes : la mise en forme du Markdown rendu (`prose`) et l'habillage d'EventCalendar
+  // (plannings des bénévoles et du stock). Sans elles, Flowvent affichait la description de la page
+  // bénévole en texte brut (ni titres ni puces) et ses plannings aux couleurs par défaut du
+  // calendrier. FullCalendar, qui ne sert plus qu'à l'agenda de l'accueil d'app1, y a son habillage.
   css: [
     fileURLToPath(new URL('./app/assets/css/prose.css', import.meta.url)),
-    fileURLToPath(new URL('./app/assets/css/fullcalendar.css', import.meta.url)),
+    fileURLToPath(new URL('./app/assets/css/event-calendar.css', import.meta.url)),
   ],
   alias: {
     // Pas `#ui` : Nuxt UI s'en sert déjà (`#ui/types`, `#ui/components/…`).

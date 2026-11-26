@@ -1,10 +1,7 @@
 /*
- * Habillage de FullCalendar aux couleurs de Nuxt UI, partagé par les apps qui étendent `layers/ui`
- * (plannings des bénévoles, du stock). Venu du main.css d'app1.
- *
- * La règle qui masquait le message de licence de FullCalendar (`.fc-license-message`) n'est PAS
- * ici : elle reste propre à app1. Masquer cet avertissement est une décision de licence, pas de
- * style — chaque app la prend pour elle.
+ * Habillage de FullCalendar aux couleurs de Nuxt UI, pour l'agenda de l'accueil — seul calendrier
+ * d'app1 encore servi par FullCalendar, dans ses modules GRATUITS (MIT). Les plannings des
+ * bénévoles et du stock sont passés à EventCalendar (cf. layers/ui/app/assets/css/event-calendar.css).
  */
 
 /* Variables CSS de base pour FullCalendar utilisant les couleurs Nuxt UI */

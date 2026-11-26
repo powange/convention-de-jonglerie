@@ -239,6 +239,8 @@ export default defineNuxtConfig({
         'rehype-stringify',
         'unist-util-visit',
         'sortablejs',
+        // Les plannings des bénévoles et du stock (EventCalendar) : même raison.
+        '@event-calendar/core',
       ],
     },
   },

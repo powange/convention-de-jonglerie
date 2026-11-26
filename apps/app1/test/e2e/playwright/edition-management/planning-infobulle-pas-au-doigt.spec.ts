@@ -99,7 +99,7 @@ test.describe.serial('Planning — l’infobulle d’un créneau', () => {
     await expect(aujourdhui).toBeVisible({ timeout: 40000 })
     if (await aujourdhui.isEnabled()) await aujourdhui.click()
 
-    const creneau = page.locator('.fc-event').filter({ hasText: TITRE_CRENEAU }).first()
+    const creneau = page.locator('.ec-event').filter({ hasText: TITRE_CRENEAU }).first()
     await expect(creneau).toBeVisible({ timeout: 40000 })
     return { page, context, creneau }
   }
@@ -142,6 +142,13 @@ test.describe.serial('Planning — l’infobulle d’un créneau', () => {
     await expect(page.locator(INFOBULLE), 'ouverte par l’événement de compatibilité').toBeHidden()
 
     // Et le geste complet : l'appui ouvre la modale, qui porte l'information au tactile.
+    //
+    // ⚠️ Le créneau est d'abord CENTRÉ à l'écran : la colonne des équipes d'EventCalendar est
+    // collante, et sur un écran de téléphone elle recouvre le début d'un créneau qui y défile
+    // dessous ; en mode développement, la bulle des outils de Nuxt occupe le bas de l'écran.
+    // Playwright tape au centre de l'élément, qui tombait sous l'une ou l'autre — un doigt, lui,
+    // tape la partie visible.
+    await creneau.evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'center' }))
     await creneau.tap()
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 15000 })
 

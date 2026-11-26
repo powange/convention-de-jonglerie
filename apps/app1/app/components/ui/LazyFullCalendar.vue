@@ -19,6 +19,11 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * FullCalendar chargé à la demande — pour l'agenda de l'accueil seulement (modules gratuits).
+ * Les plannings des bénévoles et du stock utilisent EventCalendar (`UiLazyEventCalendar`,
+ * layers/ui), qui remplace les vues timeline premium de FullCalendar.
+ */
 import type { CalendarOptions } from '@fullcalendar/core'
 
 interface Props {

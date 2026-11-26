@@ -49,6 +49,7 @@ const MAJEURES_ATTENDUES: Record<string, string> = {
   bcryptjs: 'bcryptjs',
   'Chart.js': 'chart.js',
   FullCalendar: '@fullcalendar/core',
+  EventCalendar: '@event-calendar/core',
   ESLint: 'eslint',
   Vitest: 'vitest',
   'Nuxt Test Utils': '@nuxt/test-utils',

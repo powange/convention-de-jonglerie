@@ -528,7 +528,9 @@ export default defineNuxtConfig({
   // 77 ko compressés (69 % de la feuille principale) téléchargés par chaque visiteur, drapeau
   // affiché ou non. Les drapeaux passent par la collection Iconify `flag`, comme les autres
   // icônes : seuls ceux réellement rendus produisent du CSS. Cf. app/components/FlagIcon.vue.
-  css: ['~/assets/css/main.css'],
+  // `fullcalendar.css` : habillage de l'agenda de l'accueil, seul calendrier encore servi par
+  // FullCalendar (les plannings sont passés à EventCalendar, cf. layers/ui).
+  css: ['~/assets/css/main.css', '~/assets/css/fullcalendar.css'],
   // Configuration pour nuxt-file-storage
   fileStorage: {
     mount: process.env.NUXT_FILE_STORAGE_MOUNT || '/uploads',
@@ -664,16 +666,11 @@ export default defineNuxtConfig({
         '@fullcalendar/daygrid',
         '@fullcalendar/list',
         '@fullcalendar/interaction',
-        // Les vues timeline manquaient à cette liste : leurs classes n'étaient pas pré-bundlées
-        // comme celles dont elles héritent, et l'héritage cassait à l'exécution — « Class
-        // constructor ResourceTimelineView cannot be invoked without 'new' ». L'exception
-        // interrompait l'hydratation, figeant le planning des bénévoles et son menu.
-        '@fullcalendar/resource',
-        '@fullcalendar/resource-timeline',
-        // Même raison pour l'adaptateur luxon, qui donne au calendrier les fuseaux nommés : il
-        // étend les classes ci-dessus, et l'héritage casse pareillement s'il n'est pas pré-bundlé.
-        '@fullcalendar/luxon3',
         '@fullcalendar/core/locales-all',
+        // Les plannings (bénévoles, stock) : EventCalendar, qui remplace les vues timeline premium
+        // de FullCalendar. Découvert en navigation, il ferait ré-optimiser Vite au premier
+        // affichage d'un planning — la page blanche décrite plus bas pour SortableJS.
+        '@event-calendar/core',
         'rehype-sanitize',
         'rehype-stringify',
         'remark-gfm',

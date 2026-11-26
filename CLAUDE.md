@@ -77,7 +77,9 @@ TypeScript **5** · Nuxt i18n **10** · VueUse **14**
 **Authentification & sécurité :** nuxt-auth-utils **0.5** (session par cookie scellé) ·
 bcryptjs **3**
 
-**Visualisation & UI :** Chart.js **4** · FullCalendar **6** · Nuxt QRCode **0.4**
+**Visualisation & UI :** Chart.js **4** · FullCalendar **6** (agenda de l'accueil d'app1, modules
+gratuits seulement) · EventCalendar **5** (plannings des bénévoles et du stock, licence MIT —
+remplace les vues timeline premium de FullCalendar) · Nuxt QRCode **0.4**
 
 **Outils :** ESLint **10** · Vitest **4** · Nuxt Test Utils **4** · Nuxt Scripts **0.13** ·
 Nuxt Image **2** · Prettier **3**
