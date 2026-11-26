@@ -34,6 +34,50 @@
       </div>
     </div>
 
+    <!-- Code promo : arrivé par un lien (`?code=…`) ou saisi ici ; retenu 30 jours. -->
+    <div class="mx-auto max-w-3xl space-y-3">
+      <UAlert
+        v-if="codeActif && apercu?.valide"
+        color="secondary"
+        variant="subtle"
+        icon="i-heroicons-ticket"
+        :title="`Code ${apercu.code} appliqué : ${apercu.resume}`"
+        description="Les prix remisés sont affichés sur les formules concernées."
+        :actions="[
+          { label: 'Retirer le code', color: 'neutral', variant: 'link', onClick: retirerCode },
+        ]"
+      />
+      <UAlert
+        v-else-if="codeActif && apercu && !apercu.valide"
+        color="warning"
+        variant="subtle"
+        icon="i-heroicons-exclamation-triangle"
+        :title="`Code ${codeActif} : ${apercu.raison}`"
+        :actions="[
+          { label: 'Retirer le code', color: 'neutral', variant: 'link', onClick: retirerCode },
+        ]"
+      />
+      <div v-else-if="!codeActif" class="flex flex-wrap items-center justify-center gap-2">
+        <span class="text-sm text-muted">Vous avez un code ?</span>
+        <UInput
+          v-model="codeSaisi"
+          placeholder="CODE"
+          size="sm"
+          class="w-40 font-mono"
+          aria-label="Code promo"
+          @keydown.enter="appliquerCode"
+        />
+        <UButton
+          size="sm"
+          color="neutral"
+          variant="outline"
+          label="Appliquer"
+          :disabled="!codeSaisi"
+          @click="appliquerCode"
+        />
+      </div>
+    </div>
+
     <!-- Déjà abonné : la formule en cours, et la possibilité d'en changer plus bas. -->
     <UAlert
       v-if="subActive && abonnement"
@@ -77,14 +121,38 @@
         </div>
         <p class="text-sm text-muted">{{ f.accroche }}</p>
         <div>
-          <p>
+          <p v-if="prixAvecCode(f.cle) !== null">
+            <s class="mr-1 text-muted">{{ euros(prixMensuel(f.cle, periode)) }}</s>
+            <span class="text-3xl font-bold">
+              {{
+                prixAvecCode(f.cle) === 0
+                  ? 'Offert'
+                  : euros(
+                      periode === 'annual'
+                        ? Math.round(prixAvecCode(f.cle)! / 12)
+                        : prixAvecCode(f.cle)!
+                    )
+              }}
+            </span>
+            <span v-if="prixAvecCode(f.cle) !== 0" class="text-muted"> /mois</span>
+          </p>
+          <p v-else>
             <span class="text-3xl font-bold">{{ euros(prixMensuel(f.cle, periode)) }}</span>
             <span class="text-muted"> /mois</span>
           </p>
           <p class="text-xs text-muted">
-            {{
-              periode === 'annual' ? `facturé ${euros(f.prix.annual)} par an` : 'sans engagement'
-            }}
+            <template v-if="prixAvecCode(f.cle) !== null">
+              {{ apercu?.valide ? apercu.resume : '' }}
+              <template v-if="periode === 'annual' && prixAvecCode(f.cle)! > 0">
+                · facturé {{ euros(prixAvecCode(f.cle)!) }} par an
+              </template>
+            </template>
+            <template v-else>
+              {{
+                periode === 'annual' ? `facturé ${euros(f.prix.annual)} par an` : 'sans engagement'
+              }}
+              <span v-if="codeActif && apercu?.valide"> · code non valable sur cette formule</span>
+            </template>
           </p>
         </div>
         <ul class="flex-1 space-y-2 text-sm">
@@ -172,18 +240,29 @@
 
     <UAccordion class="mx-auto max-w-5xl" :items="FAQ" />
 
-    <!-- Choix des modules d'une formule Solo ou Duo. -->
+    <!-- Confirmation de la souscription : choix des modules (Solo, Duo), et code qui serait perdu. -->
     <UModal
       v-model:open="choixOuvert"
       :title="`Formule ${formule(formuleChoisie)?.libelle ?? ''}`"
       :description="
-        formule(formuleChoisie)?.nombreModules === 1
-          ? 'Choisissez le module compris dans votre formule.'
-          : 'Choisissez les 2 modules compris dans votre formule.'
+        nombreAChoisir === 0
+          ? 'Tous les modules, et ceux à venir.'
+          : nombreAChoisir === 1
+            ? 'Choisissez le module compris dans votre formule.'
+            : 'Choisissez les 2 modules compris dans votre formule.'
       "
     >
       <template #body>
-        <div class="grid gap-3">
+        <UAlert
+          v-if="codePerdu"
+          class="mb-4"
+          color="warning"
+          variant="subtle"
+          icon="i-heroicons-exclamation-triangle"
+          :title="`Votre code ${codePerdu} ne vaut pas pour cette formule`"
+          description="En la choisissant, vous perdez sa remise."
+        />
+        <div v-if="nombreAChoisir > 0" class="grid gap-3">
           <UCheckbox
             v-for="m in MODULES_A_CHOISIR"
             :key="m.cle"
@@ -198,11 +277,15 @@
       </template>
       <template #footer>
         <div class="flex w-full flex-wrap items-center justify-between gap-2">
-          <p class="text-sm text-muted">{{ selection.length }} / {{ nombreAChoisir }}</p>
+          <p class="text-sm text-muted">
+            <template v-if="nombreAChoisir > 0"
+              >{{ selection.length }} / {{ nombreAChoisir }}</template
+            >
+          </p>
           <div class="flex gap-2">
             <UButton color="neutral" variant="ghost" label="Annuler" @click="choixOuvert = false" />
             <UButton
-              :label="`Souscrire · ${formuleChoisie ? euros(prixMensuel(formuleChoisie, periode)) : ''}/mois`"
+              :label="libelleSouscrire"
               :disabled="selection.length !== nombreAChoisir"
               :loading="loading"
               @click="execute"
@@ -222,6 +305,7 @@
  */
 import type { CleFormule, ModulePayant, Periode } from '#shared/formules'
 
+import { couvre, normaliserCode } from '#shared/codes-promo'
 import {
   FORMULES,
   MODULES_PAYANTS,
@@ -248,6 +332,53 @@ const subActive = computed(() => !!subData.value?.active)
 const abonnement = computed(() => subData.value?.subscription ?? null)
 
 const periode = ref<Periode>(abonnement.value?.plan === 'monthly' ? 'monthly' : 'annual')
+
+// Code promo : arrivé par le lien `/pricing?code=…`, ou saisi. Retenu dans un cookie pendant
+// 30 jours, pour survivre à la création du compte. Le paiement le revérifie toujours.
+const route = useRoute()
+const codeCookie = useCookie<string | null>('flowvent_code_promo', {
+  maxAge: 60 * 60 * 24 * 30,
+  sameSite: 'lax',
+})
+if (typeof route.query.code === 'string' && normaliserCode(route.query.code)) {
+  codeCookie.value = normaliserCode(route.query.code)
+}
+const codeActif = computed(() => normaliserCode(codeCookie.value))
+const codeSaisi = ref('')
+
+type Apercu =
+  | { valide: false; raison: string }
+  | {
+      valide: true
+      code: string
+      resume: string
+      advantage: string
+      prix: Record<string, Record<string, number | null>>
+    }
+const recuperer = useRequestFetch()
+const { data: apercu } = await useAsyncData<Apercu | null>(
+  'apercu-code-promo',
+  () =>
+    codeActif.value
+      ? recuperer<Apercu>(`/api/codes-promo/${encodeURIComponent(codeActif.value)}`)
+      : Promise.resolve(null),
+  { watch: [codeActif] }
+)
+
+/** Le prix remisé de la période facturée (centimes), ou `null` si aucun code ne vaut ici. */
+function prixAvecCode(cle: CleFormule): number | null {
+  const a = apercu.value
+  return a?.valide ? (a.prix[cle]?.[periode.value] ?? null) : null
+}
+
+function appliquerCode() {
+  const code = normaliserCode(codeSaisi.value)
+  if (code) codeCookie.value = code
+  codeSaisi.value = ''
+}
+function retirerCode() {
+  codeCookie.value = null
+}
 
 /** Les modules payants, avec leur nom et une ligne de description courte. */
 const RESUMES: Record<ModulePayant, string> = {
@@ -320,12 +451,44 @@ function basculer(cle: ModulePayant, coche: boolean) {
     : selection.value.filter((m) => m !== cle)
 }
 
+/**
+ * Le code de l'abonnement en cours, si la formule choisie le ferait perdre — et qu'aucun autre code
+ * valable ne le remplace. Le serveur le reprend d'office quand il couvre la formule
+ * (server/utils/codes-promo.ts) ; on prévient seulement quand ce n'est pas le cas.
+ */
+const codePerdu = computed(() => {
+  const enCours = abonnement.value?.codePromo
+  const cle = formuleChoisie.value
+  if (!enCours || !cle) return null
+  if (prixAvecCode(cle) !== null) return null
+  const courtEncore =
+    enCours.duration === 'forever' ||
+    (!!enCours.advantageEndsAt && new Date(enCours.advantageEndsAt) > new Date())
+  if (!courtEncore) return null
+  return couvre(enCours, cle, periode.value) ? null : enCours.code
+})
+
+const libelleSouscrire = computed(() => {
+  const cle = formuleChoisie.value
+  if (!cle) return 'Souscrire'
+  const remise = prixAvecCode(cle)
+  if (remise === 0) return 'Souscrire · offert'
+  const parMois =
+    remise === null
+      ? prixMensuel(cle, periode.value)
+      : periode.value === 'annual'
+        ? Math.round(remise / 12)
+        : remise
+  return `Souscrire · ${euros(parMois)}/mois`
+})
+
 const { execute, loading } = useApiAction('/api/subscription/checkout', {
   method: 'POST',
   body: () => ({
     plan: periode.value,
     formule: formuleChoisie.value,
     modules: formuleChoisie.value === 'integral' ? [] : selection.value,
+    code: apercu.value?.valide ? codeActif.value : null,
   }),
   successMessage: {
     title: 'Abonnement activé',
@@ -334,6 +497,8 @@ const { execute, loading } = useApiAction('/api/subscription/checkout', {
   errorMessages: { default: "Échec de l'abonnement" },
   onSuccess: async () => {
     choixOuvert.value = false
+    // Le code a servi : il ne doit plus s'afficher ni se représenter.
+    codeCookie.value = null
     await refresh()
     await navigateTo('/dashboard')
   },
@@ -347,6 +512,12 @@ async function choisir(cle: CleFormule) {
   formuleChoisie.value = cle
   const n = formule(cle)?.nombreModules
   if (n === null || n === undefined) {
+    // Intégral : rien à choisir — sauf à prévenir qu'un code serait perdu.
+    if (codePerdu.value) {
+      selection.value = []
+      choixOuvert.value = true
+      return
+    }
     await execute()
     return
   }

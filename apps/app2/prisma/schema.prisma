@@ -55,6 +55,7 @@ model User {
   events              Event[]
   subscription        Subscription?
   passwordResetTokens PasswordResetToken[]
+  promoCodeRedemptions PromoCodeRedemption[]
 
   // Gestion des bénévoles (relations inverses, mêmes noms qu'app1)
   volunteerApplications              EditionVolunteerApplication[]
@@ -211,6 +212,53 @@ model Subscription {
   modules          Json? // modules choisis pour Solo et Duo ; null pour Intégral, qui couvre tout
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+  promoCode        PromoCode? @relation(fields: [promoCodeId], references: [id], onDelete: SetNull)
+  promoCodeId      Int?
+  advantageEndsAt  DateTime? // fin de l'avantage du code ; null avec un code : à vie
+  amountPaid       Int? // centimes payés pour la période en cours (paiement simulé)
+
+  @@index([promoCodeId])
+}
+
+/// Code promo (shared/codes-promo.ts) : remise en pourcentage, montant retiré ou gratuité, sur des
+/// formules et des périodes données, pour une durée donnée. Réglages calqués sur les coupons Stripe.
+/// Un code utilisé ne se supprime pas : il se désactive (`active`), et ses bénéficiaires gardent
+/// leur avantage jusqu'à son terme.
+model PromoCode {
+  id             Int                   @id @default(autoincrement())
+  code           String                @unique @db.VarChar(64)
+  label          String? // note interne de l'administration
+  advantage      String // "percent" | "amount" | "free"
+  value          Int                   @default(0) // pourcentage (1-100) ou centimes
+  formules       Json? // formules visées ; null : toutes
+  periods        Json? // "monthly" | "annual" ; null : les deux
+  duration       String // "once" | "months" | "forever"
+  durationMonths Int?
+  startsAt       DateTime?
+  expiresAt      DateTime?
+  maxRedemptions Int?
+  reservedEmail  String? // réservé à cette adresse ; null : tout le monde
+  active         Boolean               @default(true)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  redemptions    PromoCodeRedemption[]
+  subscriptions  Subscription[]
+}
+
+/// Une utilisation d'un code par un compte (une seule par compte et par code).
+model PromoCodeRedemption {
+  id          Int       @id @default(autoincrement())
+  promoCode   PromoCode @relation(fields: [promoCodeId], references: [id], onDelete: Restrict)
+  promoCodeId Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int
+  formule     String
+  plan        String
+  amountPaid  Int // centimes payés pour la première période
+  createdAt   DateTime  @default(now())
+
+  @@unique([promoCodeId, userId])
+  @@index([userId])
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════════
