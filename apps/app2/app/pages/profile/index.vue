@@ -39,7 +39,8 @@
         </template>
         <template v-if="abonnementActif">
           <UBadge color="success" variant="subtle" :label="libelleFormule" />
-          <p class="mt-2 text-sm text-muted">Actif jusqu'au {{ dateFin }}</p>
+          <p class="mt-2 text-sm">{{ modulesCouverts }}</p>
+          <p class="mt-1 text-sm text-muted">Actif jusqu'au {{ dateFin }}</p>
         </template>
         <p v-else class="text-sm text-muted">Aucun abonnement actif.</p>
         <template #footer>
@@ -48,7 +49,7 @@
             variant="link"
             color="primary"
             trailing-icon="i-heroicons-arrow-right"
-            :label="abonnementActif ? 'Gérer mon abonnement' : 'Voir les offres'"
+            :label="abonnementActif ? 'Changer de formule' : 'Voir les offres'"
             class="px-0"
           />
         </template>
@@ -120,8 +121,14 @@ const abonnementActif = computed(
     new Date(profil.value.subscription.currentPeriodEnd) > new Date()
 )
 const libelleFormule = computed(() =>
-  profil.value?.subscription?.plan === 'annual' ? 'Formule annuelle' : 'Formule mensuelle'
+  libelleFormuleAbonnement(profil.value?.subscription?.formule, profil.value?.subscription?.plan)
 )
+const modulesCouverts = computed(() => {
+  const s = profil.value?.subscription
+  if (!s) return ''
+  const liste = libelleModulesCouverts(s.formule, s.modules)
+  return liste ? `Comprend : ${liste}` : ''
+})
 const dateFin = computed(() =>
   profil.value?.subscription
     ? new Date(profil.value.subscription.currentPeriodEnd).toLocaleDateString('fr-FR')

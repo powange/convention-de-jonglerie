@@ -22,7 +22,15 @@ export default defineEventHandler(async (event) => {
       googleId: true,
       facebookId: true,
       _count: { select: { events: true } },
-      subscription: { select: { plan: true, status: true, currentPeriodEnd: true } },
+      subscription: {
+        select: {
+          plan: true,
+          formule: true,
+          modules: true,
+          status: true,
+          currentPeriodEnd: true,
+        },
+      },
     },
   })
   if (!compte) throw createError({ status: 404, message: 'Utilisateur introuvable' })

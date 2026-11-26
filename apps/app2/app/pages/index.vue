@@ -98,7 +98,7 @@
       <UPageCTA
         variant="subtle"
         title="Lancez votre prochain événement"
-        description="Le compte est gratuit. Un abonnement mensuel ou annuel, sans engagement, débloque la création d'événements et tous les modules."
+        description="Le compte est gratuit. Un abonnement Solo, Duo ou Intégral, au mois ou à l'année, débloque la création d'événements et les modules dont vous avez besoin."
         :links="liensFinaux"
       />
 
@@ -225,9 +225,9 @@ const atouts: PageFeatureProps[] = [
   },
   {
     icon: 'i-heroicons-credit-card',
-    title: 'Un abonnement simple',
+    title: 'Payez vos modules',
     description:
-      "Mensuel ou annuel, sans engagement. Vos co-organisateurs n'ont pas besoin du leur.",
+      "Un module, deux, ou tous, dès 7 € par mois. Vos co-organisateurs n'ont pas besoin du leur.",
   },
 ]
 </script>

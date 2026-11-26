@@ -1,4 +1,5 @@
 import {
+  couvertureDeLEvenement,
   droitsSurEvenement,
   gestionOuverte,
   modulesAffiches,
@@ -70,6 +71,9 @@ export default defineEventHandler(async (event) => {
     },
     droits,
     abonnementActif: await gestionOuverte(eventId, userId),
+    // Ce que couvre l'abonnement du propriétaire : les modules hors formule restent consultables,
+    // en lecture seule (droits-evenement.ts).
+    abonnement: await couvertureDeLEvenement(eventId),
     modules: modulesAffiches(evenement),
     organisateurs: evenement._count.editionOrganizers,
     benevoles,

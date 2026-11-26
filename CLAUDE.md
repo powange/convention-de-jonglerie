@@ -262,5 +262,6 @@ Cette commande s'arrête si une étape échoue.
 - **UDrawer** : Tiroir latéral ou inférieur (`direction`, `v-model:open`), contenu dans le slot `#body`
 - **UAvatar** : Avatar (`src`, `alt` — affiche les initiales de `alt` sans image, `size`)
 - **UCollapsible** : Repli/dépli d'un bloc — le déclencheur va dans le slot par défaut, le contenu dans `#content` (`default-open`, `unmount-on-hide`)
+- **UAccordion** : Liste de questions/réponses repliables (`items` avec `label` et `content`), utilisée pour la FAQ de la page tarifs de Flowvent
 
 A Chaque fois que tu ajoutes un nouveau component Nuxt UI, ajoute-le à cette liste.

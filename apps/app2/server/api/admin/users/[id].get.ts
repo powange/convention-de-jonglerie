@@ -26,7 +26,15 @@ export default defineEventHandler(async (event) => {
           isGlobalAdmin: true,
           createdAt: true,
           lastLoginAt: true,
-          subscription: { select: { plan: true, status: true, currentPeriodEnd: true } },
+          subscription: {
+            select: {
+              plan: true,
+              formule: true,
+              modules: true,
+              status: true,
+              currentPeriodEnd: true,
+            },
+          },
           events: {
             orderBy: { createdAt: 'desc' },
             select: { id: true, publicId: true, name: true, startDate: true, createdAt: true },

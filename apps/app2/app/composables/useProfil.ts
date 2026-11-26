@@ -17,7 +17,13 @@ export interface Profil {
   googleLinked: boolean
   facebookLinked: boolean
   eventsCount: number
-  subscription: { plan: string; status: string; currentPeriodEnd: string } | null
+  subscription: {
+    plan: string
+    formule: string
+    modules: unknown
+    status: string
+    currentPeriodEnd: string
+  } | null
 }
 
 /**

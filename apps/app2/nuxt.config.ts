@@ -191,8 +191,11 @@ export default defineNuxtConfig({
 
   // Tâches Nitro : celles du layer bénévoles (layers/volunteers/server/tasks/) sont lancées par
   // server/plugins/planificateur.ts — rappels de créneau, échanges expirés.
+  // Contexte asynchrone : `droitsSurEvenement` (server/utils/droits-evenement.ts) lit la méthode de
+  // la requête en cours pour laisser LIRE ce que la formule ne couvre pas (lecture seule). Sans lui,
+  // toute lecture d'un module non couvert serait refusée.
   nitro: {
-    experimental: { tasks: true },
+    experimental: { tasks: true, asyncContext: true },
   },
 
   runtimeConfig: {

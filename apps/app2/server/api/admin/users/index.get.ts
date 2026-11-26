@@ -55,7 +55,15 @@ export default defineEventHandler(async (event) => {
         isGlobalAdmin: true,
         createdAt: true,
         lastLoginAt: true,
-        subscription: { select: { plan: true, status: true, currentPeriodEnd: true } },
+        subscription: {
+          select: {
+            plan: true,
+            formule: true,
+            modules: true,
+            status: true,
+            currentPeriodEnd: true,
+          },
+        },
         _count: { select: { events: true, volunteerApplications: true } },
       },
     }),
@@ -67,7 +75,8 @@ export default defineEventHandler(async (event) => {
     comptes: comptes.map(({ subscription, _count, ...c }) => ({
       ...c,
       abonne: isSubscriptionActive(subscription),
-      formule: subscription?.plan ?? null,
+      formule: subscription?.formule ?? null,
+      periode: subscription?.plan ?? null,
       evenements: _count.events,
       candidatures: _count.volunteerApplications,
     })),

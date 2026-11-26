@@ -37,7 +37,10 @@ describe('Flowvent — tâches planifiées', () => {
 
   it('les tâches Nitro sont activées dans la configuration de Flowvent', () => {
     // Sans `experimental.tasks`, Nitro n'enregistre pas les tâches et `runTask` lève à chaque fois.
-    expect(lire('apps/app2/nuxt.config.ts')).toMatch(/experimental:\s*\{\s*tasks:\s*true\s*\}/)
+    // D'autres options peuvent voisiner (`asyncContext`, pour la lecture seule des formules).
+    expect(lire('apps/app2/nuxt.config.ts')).toMatch(
+      /experimental:\s*\{[^}]*\btasks:\s*true\b[^}]*\}/
+    )
   })
 
   it('le plugin lance les tâches derrière le verrou partagé', () => {

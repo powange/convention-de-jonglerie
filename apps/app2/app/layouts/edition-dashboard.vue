@@ -67,6 +67,32 @@
       </template>
 
       <template #body>
+        <!-- Lecture seule : abonnement du propriétaire arrêté, ou module hors de sa formule. Les
+             données restent consultables ; le serveur refuse les écritures (droits-evenement.ts). -->
+        <UAlert
+          v-if="lectureSeule"
+          color="warning"
+          variant="subtle"
+          icon="i-heroicons-lock-closed"
+          :title="lectureSeule"
+          :description="
+            acces?.droits.estProprietaire
+              ? 'Rien n’est supprimé. Choisissez une formule qui le couvre pour reprendre la main.'
+              : 'Rien n’est supprimé. La gestion reprendra quand le propriétaire de l’événement aura changé de formule.'
+          "
+          :actions="
+            acces?.droits.estProprietaire
+              ? [
+                  {
+                    label: 'Voir les formules',
+                    to: '/pricing',
+                    color: 'warning',
+                    variant: 'solid',
+                  },
+                ]
+              : []
+          "
+        />
         <slot />
       </template>
     </UDashboardPanel>
@@ -88,6 +114,8 @@ import { useEditionStore } from '~/stores/editions'
 import type { Droits, Modules } from '#shared/modules-evenement'
 import type { NavigationMenuItem } from '@nuxt/ui'
 
+import { formule } from '#shared/formules'
+
 const route = useRoute()
 const editionStore = useEditionStore()
 
@@ -97,10 +125,37 @@ const refPublique = computed(() => String(route.params.id))
 
 // Modules actifs (et droits) de l'événement : clé partagée, que l'accueil rafraîchit après un
 // changement de module.
-const { data: acces } = useFetch<{ modules: Modules; droits: Droits }>(
-  () => `/api/events/${refPublique.value}/acces-gestion`,
-  { key: `acces-gestion-${refPublique.value}`, server: false }
-)
+const { data: acces } = useFetch<{
+  modules: Modules
+  droits: Droits & { estProprietaire: boolean }
+  abonnement: { actif: boolean; formule: string | null; modules: string[] }
+}>(() => `/api/events/${refPublique.value}/acces-gestion`, {
+  key: `acces-gestion-${refPublique.value}`,
+  server: false,
+})
+/** Le module de la page ouverte, d'après le premier segment après `/gestion/`. */
+const MODULE_PAR_SEGMENT: Record<string, string> = {
+  volunteers: 'benevoles',
+  ticketing: 'billetterie',
+  artists: 'artistes',
+  'shows-call': 'artistes',
+  meals: 'repas',
+  treasury: 'tresorerie',
+  stock: 'stock',
+}
+const lectureSeule = computed(() => {
+  const a = acces.value?.abonnement
+  if (!a) return ''
+  if (!a.actif)
+    return "L'abonnement du propriétaire n'est plus actif : la gestion est en lecture seule."
+  const segment = route.path.split('/gestion/')[1]?.split('/')[0] ?? ''
+  const module = MODULE_PAR_SEGMENT[segment]
+  if (module && !a.modules.includes(module)) {
+    return `Ce module n'est pas compris dans la formule ${formule(a.formule)?.libelle ?? ''} : il reste consultable, en lecture seule.`
+  }
+  return ''
+})
+
 const moduleBenevoles = computed(() => acces.value?.modules.benevoles !== false)
 const carteDuSite = computed(() => !!acces.value?.modules.carte && !!acces.value?.droits.modifier)
 // Artistes et spectacles : module activé ET droit dédié (même règle qu'app1).

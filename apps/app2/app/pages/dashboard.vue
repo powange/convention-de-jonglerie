@@ -17,8 +17,8 @@
           <div>
             <p class="font-semibold">Débloquez les fonctionnalités d'organisation</p>
             <p class="text-sm text-muted">
-              Un abonnement actif ouvre la création d'événements et tous les modules : bénévoles,
-              billetterie, artistes, repas, stock, trésorerie.
+              Un abonnement ouvre la création d'événements et les modules de votre formule :
+              bénévoles, billetterie, artistes, repas, stock, trésorerie.
             </p>
           </div>
         </div>
@@ -30,7 +30,7 @@
         color="success"
         variant="subtle"
         icon="i-heroicons-check-badge"
-        :label="`Abonnement ${planLabel} actif`"
+        :label="`${planLabel} · ${modulesLabel}`"
       />
     </div>
 
@@ -82,7 +82,10 @@ const events = computed(() => eventsData.value?.events ?? [])
 const { data: subData } = await useFetch('/api/subscription/status')
 const subActive = computed(() => !!subData.value?.active)
 const planLabel = computed(() =>
-  subData.value?.subscription?.plan === 'annual' ? 'annuel' : 'mensuel'
+  libelleFormuleAbonnement(subData.value?.subscription?.formule, subData.value?.subscription?.plan)
+)
+const modulesLabel = computed(() =>
+  libelleModulesCouverts(subData.value?.subscription?.formule, subData.value?.subscription?.modules)
 )
 
 function formatDate(d: string | Date) {

@@ -2,7 +2,8 @@
 
 Application **Nuxt 4 autonome** (`apps/app2/`, nom de produit **Flowvent**), indépendante de l'app principale. Un utilisateur se
 connecte, crée un événement, puis débloque les **fonctionnalités d'organisation** (gestion des
-bénévoles…) via un **abonnement mensuel ou annuel**.
+bénévoles…) via un **abonnement par module** — Solo, Duo ou Intégral, au mois ou à l'année
+(cf. [docs/flowvent-abonnements.md](../../docs/flowvent-abonnements.md)).
 
 > ⚠️ **Paiement simulé** : aucun prestataire de paiement réel n'est appelé. Le « paiement » réussit
 > immédiatement et active l'abonnement (persisté en base).
