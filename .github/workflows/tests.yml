@@ -1228,7 +1228,15 @@ jobs:
   # App2 n’a ni lint, ni typage, ni tests propres en CI : ce build est sa seule vérification.
   #
   # Le cache Docker porte le même `scope` que la publication : une PR lit les couches que `main` a
-  # écrites, et ce qu’elle écrit reste cantonné à sa PR.
+  # écrites.
+  #
+  # ⚠️ UNE PR LIT CE CACHE, ELLE NE L'ÉCRIT PAS. Un cache écrit dans une PR n'est lisible que par
+  # cette PR : il ne sert plus à rien une fois mergée, et il compte dans le quota de 10 Go du dépôt.
+  # Mesuré le 26/11/2026 : 11 Go occupés, dont 10,3 de couches Docker et 4 Go écrits par des PR.
+  # GitHub évince alors au plus ancien accès, et le prochain cache node_modules (nouveau lockfile)
+  # pouvait disparaître entre son écriture par `setup` et sa lecture. Seuls le run planifié et le
+  # déclenchement manuel écrivent ; une PR relit ce que `main` a écrit. Un test le vérifie
+  # (test/unit/scripts/perimetre-ci.test.ts).
   image-flowvent:
     runs-on: ubuntu-22.04
     timeout-minutes: 30
@@ -1252,7 +1260,7 @@ jobs:
           build-args: |
             BUILD_SHA=${{ github.sha }}
           cache-from: type=gha,scope=flowvent
-          cache-to: type=gha,mode=max,scope=flowvent
+          cache-to: ${{ github.event_name != 'pull_request' && 'type=gha,mode=max,scope=flowvent' || '' }}
 
   # ---------------------------------------------------------------------------------------------
   # L'image de production d'app1, construite SANS être publiée, quand la PR touche ce qui décide de
@@ -1265,7 +1273,7 @@ jobs:
   # restait alors sur l'image précédente sans que rien ne le signale.
   #
   # Mêmes paramètres que la publication, cache compris (scope par défaut) : une PR relit les couches
-  # que `main` a écrites, et ce qu'elle écrit reste cantonné à sa PR.
+  # que `main` a écrites. Elle ne les écrit pas : voir le job `image-flowvent`.
   image-app1:
     runs-on: ubuntu-22.04
     timeout-minutes: 30
@@ -1289,7 +1297,7 @@ jobs:
           build-args: |
             BUILD_SHA=${{ github.sha }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: ${{ github.event_name != 'pull_request' && 'type=gha,mode=max' || '' }}
 
   # Les vulnérabilités connues des dépendances. ⚠️ CE JOB NE BLOQUE PAS `ci-verte`, et c'est
   # délibéré : un avis publié pendant la nuit rendrait rouge une PR qui ne touche pas aux
