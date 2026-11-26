@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   filtresDeSpectaclesDepuisUrl,
   requeteCandidaturesDeSpectacles,
-} from '../../../app/utils/filtres-candidatures-spectacles'
+} from '../../../../../layers/artists/app/utils/filtres-candidatures-spectacles'
 
 /**
  * Les filtres des candidatures à un appel à spectacles.

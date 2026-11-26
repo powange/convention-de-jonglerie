@@ -147,6 +147,10 @@
       "type_hint": "Un cabaret è composto da numeri, ognuno con i propri artisti.",
       "type_standard": "Spettacolo",
       "act_title_required": "Ogni numero deve avere un titolo"
+    },
+    "shows_call": {
+      "title": "Bando per spettacoli",
+      "list_description": "Gestisci i diversi bandi per spettacoli per questa edizione"
     }
   }
 }

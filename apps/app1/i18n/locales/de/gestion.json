@@ -675,10 +675,6 @@
       "organizers_in_teams_open": "Organisatoren können Teams und Zeitfenstern beitreten",
       "organizers_in_teams_closed": "Organisatoren nehmen nicht am Helferbereich teil"
     },
-    "shows_call": {
-      "title": "Show-Aufruf",
-      "list_description": "Die verschiedenen Show-Aufrufe für diese Ausgabe verwalten"
-    },
     "treasury": {
       "title": "Buchhaltung",
       "subtitle": "Ausgaben und Einnahmen der Ausgabe. Zeilen aus Künstlern und Ticketing werden an ihrer Quelle korrigiert.",

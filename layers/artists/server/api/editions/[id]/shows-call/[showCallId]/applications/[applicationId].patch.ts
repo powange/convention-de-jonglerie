@@ -1,5 +1,6 @@
 import type { Prisma } from '#server/types/prisma'
 
+import { useArtistsPorts } from '#server/artists/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
@@ -170,10 +171,7 @@ export default wrapApiHandler(
 
     // Notifier l'artiste si le statut change vers ACCEPTED ou REJECTED
     if (validatedData.status && validatedData.status !== application.status) {
-      const editionData = await prisma.edition.findUnique({
-        where: { id: editionId },
-        select: { name: true },
-      })
+      const editionData = await useArtistsPorts().event.lireEdition(editionId)
       const editionName = editionData?.name || ''
 
       if (validatedData.status === 'ACCEPTED') {

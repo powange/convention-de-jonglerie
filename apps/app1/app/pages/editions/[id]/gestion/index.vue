@@ -734,7 +734,8 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-import { getEditionDisplayName } from '~/utils/editionName'
+
+import { getEditionDisplayName } from '#core/app/utils/editionName'
 
 // Sans ce garde, la page se rendait côté serveur pour un visiteur anonyme, puis affichait
 // « Accès refusé » après hydratation : ne pas être connecté y était confondu avec ne pas avoir

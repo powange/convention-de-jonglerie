@@ -782,14 +782,17 @@
 </template>
 
 <script setup lang="ts">
+// Import explicite : Flowvent n'a pas les auto-imports de VueUse (`@vueuse/nuxt`, propre à app1).
+import { useDebounceFn } from '@vueuse/core'
+
 import type { ApiError } from '~/composables/useApiAction'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition, EditionShowCallPublic, ShowApplication, ShowPreset } from '~/types'
-import { getEditionDisplayName } from '~/utils/editionName'
 
 import type { FormSubmitEvent } from '@nuxt/ui'
 
+import { getEditionDisplayName } from '#core/app/utils/editionName'
 import { markdownToHtml } from '#core/app/utils/markdown'
 import { estAdresseEmail } from '#core/shared/utils/adresse-email'
 
@@ -803,7 +806,8 @@ const { t } = useI18n()
 const confirmation = useConfirmation()
 const { formatDate } = useDateFormat()
 
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 const showCallId = parseInt(route.params.showCallId as string)
 
 // Type pour une personne supplémentaire
@@ -1187,11 +1191,18 @@ const hasAlreadyApplied = computed(
 )
 
 // Charger l'édition
+// L'édition par le store, que chaque app fournit : un `useFetch('/api/editions/:id')` n'existe
+// que dans app1 (404 dans Flowvent).
+const magasinEdition = useEditionStore()
 const {
   data: edition,
   pending: _editionLoading,
   error: _editionError,
-} = await useFetch<Edition>(`/api/editions/${editionId}`)
+} = await useAsyncData(
+  `appel-${editionId}-shows-call-show-all-d-apply`,
+  async () =>
+    (await magasinEdition.fetchEditionById(editionId, { force: true })) as unknown as Edition
+)
 
 // Synchroniser avec le store
 watch(

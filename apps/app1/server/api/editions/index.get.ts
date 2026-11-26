@@ -1,11 +1,11 @@
 import type { GetEditionsResponse } from '#server/types/api-responses'
 
+import { filtreStatutEdition, type StatutEdition } from '#core/shared/utils/visibilite-edition'
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { getCountryVariants } from '#server/utils/countries'
 import { editionListSelect } from '#server/utils/prisma-select-helpers'
 import { conditionsMotsCles, motsClesDeLaRequete } from '#server/utils/recherche-mots-cles'
 import { validatePagination } from '#server/utils/validation-helpers'
-import { filtreStatutEdition, type StatutEdition } from '~~/shared/utils/visibilite-edition'
 
 export default wrapApiHandler<GetEditionsResponse>(
   async (event) => {

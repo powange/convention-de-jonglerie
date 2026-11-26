@@ -105,7 +105,8 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition } from '~/types'
-import { getEditionDisplayName } from '~/utils/editionName'
+
+import { getEditionDisplayName } from '#core/app/utils/editionName'
 
 const route = useRoute()
 // Sans `returnTo`, qui veut commenter se connecte puis atterrit sur l'accueil, loin de

@@ -1,7 +1,7 @@
 import type { MapMarker } from '~/composables/useLeafletMap'
 import type { Edition } from '~/types'
-import { getEditionDisplayName } from '~/utils/editionName'
 
+import { getEditionDisplayName } from '#core/app/utils/editionName'
 import { fuseauUtilisable, journeeDans } from '#core/shared/utils/fuseau-edition'
 import { createCustomMarkerIcon, escapeHtml, getEditionStatus } from '#map/app/utils/mapMarkers'
 

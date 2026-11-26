@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import liste from '../../../../../server/api/survey/[token].get'
-import vote from '../../../../../server/api/survey/[token]/vote.put'
+import liste from '../../../../../../../layers/artists/server/api/survey/[token].get'
+import vote from '../../../../../../../layers/artists/server/api/survey/[token]/vote.put'
 
 const prismaMock = (globalThis as any).prisma
 

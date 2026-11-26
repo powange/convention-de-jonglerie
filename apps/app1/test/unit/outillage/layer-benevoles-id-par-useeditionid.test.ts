@@ -45,4 +45,17 @@ describe('layers d’événement — id de l’événement', () => {
       .map((f) => f.slice(DEPOT.length + 1))
     expect(fautifs).toEqual([])
   })
+
+  /*
+   * L'ÉDITION se charge par le store (`editionStore.fetchEditionById`), que chaque app fournit —
+   * jamais par `/api/editions/:id`, qui n'existe que dans app1 : dans Flowvent, la page sortait
+   * vide (espace artiste, pages des appels à spectacles).
+   */
+  it('aucune page ni composant ne charge l’édition par /api/editions/:id', () => {
+    const appelDirect = /\/api\/editions\/\$\{[^}]+\}[`'"]/
+    const fautifs = RACINES.flatMap(fichiers)
+      .filter((f) => appelDirect.test(readFileSync(f, 'utf8')))
+      .map((f) => f.slice(DEPOT.length + 1))
+    expect(fautifs).toEqual([])
+  })
 })

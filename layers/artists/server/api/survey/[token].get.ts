@@ -1,3 +1,4 @@
+import { useArtistsPorts } from '#server/artists/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 
@@ -21,18 +22,7 @@ export default wrapApiHandler(
         id: true,
         name: true,
         surveyOpen: true,
-        edition: {
-          select: {
-            id: true,
-            name: true,
-            convention: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
+        edition: { select: useArtistsPorts().event.selectionEditionAffichee },
       },
     })
 
@@ -138,7 +128,7 @@ export default wrapApiHandler(
         id: showCall.id,
         name: showCall.name,
         surveyOpen: showCall.surveyOpen,
-        edition: showCall.edition,
+        edition: useArtistsPorts().event.editionAffichee(showCall.edition),
       },
       applications,
       myVotes,

@@ -147,6 +147,10 @@
       "type_hint": "Un cabaré se compone de números, cada uno con sus propios artistas.",
       "type_standard": "Espectáculo",
       "act_title_required": "Cada número debe tener un título"
+    },
+    "shows_call": {
+      "title": "Convocatoria de espectáculos",
+      "list_description": "Gestione las diferentes convocatorias de espectáculos para esta edición"
     }
   }
 }

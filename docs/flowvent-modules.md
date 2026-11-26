@@ -126,6 +126,20 @@ l'utilisateur), un artiste compte comme « impliqué » pour atteindre son espac
 public, et deux domaines de fichiers : visuels de spectacle (publics) et justificatifs d'artiste
 (qui gère les artistes, ou l'artiste lui-même).
 
+## Appel à spectacles (lot 5)
+
+API, pages de gestion et publiques, annuaire des appels ouverts (`/shows-call/open`) et sondage par
+jeton rejoignent `layers/artists`, avec les traductions `shows-call`, `gestion-shows-call`,
+`survey` et `gestion.shows_call` (dans `gestion-artists`). Restent dans app1 les deux points de la
+conversation d'une candidature : c'est la messagerie, que Flowvent n'a pas (décision).
+
+Le port artistes gagne `lireEdition` (statut, dates, nom affiché) et une sélection d'affichage
+propre à chaque app (`selectionEditionAffichee` + `editionAffichee`) : l'édition d'app1 a ville,
+pays, image et convention, l'événement de Flowvent non — le lieu y tient lieu de ville, et
+l'événement de convention. Dans Flowvent, la relation d'un appel vers l'événement garde le nom
+`edition`, et une table `Conversation` DORMANTE (réduite à ses liens) répond aux requêtes qui
+comptent les non-lus. Un appel en ligne ouvre l'événement aux visiteurs (sa page se partage).
+
 ## Notions « convention » à ramener à l'événement
 
 Flowvent n'a pas de convention : l'événement en tient lieu (`getEditionWithPermissions` rend

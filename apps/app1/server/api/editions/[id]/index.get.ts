@@ -1,10 +1,10 @@
+import { editionVisiblePubliquement } from '#core/shared/utils/visibilite-edition'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { optionalAuth } from '#server/utils/auth-utils'
 import { compterMesTachesDeLEdition } from '#server/utils/mes-taches-de-l-edition'
 import { checkAdminMode } from '#server/utils/organizer-management'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { visibiliteDuBenevolat } from '#volunteers/server/utils/visibilite-benevoles'
-import { editionVisiblePubliquement } from '~~/shared/utils/visibilite-edition'
 
 export default wrapApiHandler(
   async (event) => {

@@ -36,6 +36,7 @@ export async function resoudreEvenement(
       id: true,
       publicId: true,
       volunteersEnabled: true,
+      artistsEnabled: true,
       volunteerSettings: { select: { pagePublic: true, open: true } },
     },
   })
@@ -58,7 +59,15 @@ export async function resoudreEvenement(
   }
   const s = evenement.volunteerSettings
   // Module bénévoles désactivé : la page publique n'existe plus pour un visiteur.
-  const estPublic = evenement.volunteersEnabled && !!(s?.pagePublic || s?.open)
+  // Un appel à spectacles en ligne (fermé, privé ou public — tout sauf hors ligne) ouvre aussi
+  // l'événement aux visiteurs : sa page se partage, et un artiste y candidate sans être connu.
+  const appelEnLigne =
+    evenement.artistsEnabled &&
+    !!(await prisma.editionShowCall.findFirst({
+      where: { editionId: evenement.id, visibility: { not: 'OFFLINE' } },
+      select: { id: true },
+    }))
+  const estPublic = (evenement.volunteersEnabled && !!(s?.pagePublic || s?.open)) || appelEnLigne
 
   if (!impliquee && (numero || !estPublic)) return null
   return { id: evenement.id, publicId: evenement.publicId, impliquee, estPublic }

@@ -147,6 +147,10 @@
       "type_cabaret": "Cabaret",
       "type_hint": "Un cabaret est composé de numéros, chacun avec ses propres artistes.",
       "type_standard": "Spectacle"
+    },
+    "shows_call": {
+      "title": "Appel à spectacles",
+      "list_description": "Gérez les différents appels à spectacles pour cette édition"
     }
   }
 }

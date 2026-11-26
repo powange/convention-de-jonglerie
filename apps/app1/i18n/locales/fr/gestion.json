@@ -686,10 +686,6 @@
       "swaps_description": "Valider les échanges de créneaux entre bénévoles",
       "teams_description": "Organiser les équipes de bénévoles"
     },
-    "shows_call": {
-      "title": "Appel à spectacles",
-      "list_description": "Gérez les différents appels à spectacles pour cette édition"
-    },
     "treasury": {
       "add_entry": "Ajouter une ligne",
       "add_expense": "Ajouter une charge",

@@ -675,10 +675,6 @@
       "organizers_in_teams_open": "Organizatorzy mogą dołączać do zespołów i zmian",
       "organizers_in_teams_closed": "Organizatorzy nie uczestniczą w wolontariacie"
     },
-    "shows_call": {
-      "title": "Nabór spektakli",
-      "list_description": "Zarządzaj różnymi naborami spektakli na tę edycję"
-    },
     "treasury": {
       "title": "Finanse",
       "subtitle": "Koszty i przychody edycji. Pozycje pochodzące od artystów i z biletów poprawia się u źródła.",

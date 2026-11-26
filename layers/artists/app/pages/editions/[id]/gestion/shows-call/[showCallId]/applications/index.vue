@@ -299,12 +299,13 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { EditionShowCallBasic, ShowApplication, ShowApplicationStatus } from '~/types'
+
 // Import explicite : d'autres écrans exportent des filtres d'URL de même famille, et l'auto-import
 // ne saurait pas lequel prendre.
 import {
   filtresDeSpectaclesDepuisUrl,
   requeteCandidaturesDeSpectacles,
-} from '~/utils/filtres-candidatures-spectacles'
+} from '#artists/app/utils/filtres-candidatures-spectacles'
 
 definePageMeta({
   middleware: ['auth-protected'],
@@ -316,7 +317,8 @@ const editionStore = useEditionStore()
 const { erreur, info, succes } = useNotificateur()
 const { t, locale } = useI18n()
 
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 const showCallId = parseInt(route.params.showCallId as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 

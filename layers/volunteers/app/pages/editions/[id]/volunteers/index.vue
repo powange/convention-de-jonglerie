@@ -470,11 +470,11 @@
 // App components & stores
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-import { getEditionDisplayName } from '~/utils/editionName'
 
 import { useVolunteerTeams, useVolunteerSettings } from '#imports'
 
 import { requiresEmergencyContact } from '#core/app/utils/allergy-severity'
+import { getEditionDisplayName } from '#core/app/utils/editionName'
 import { markdownToHtml } from '#core/app/utils/markdown'
 import {
   extraireErreursChamps,

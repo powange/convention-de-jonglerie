@@ -147,6 +147,10 @@
       "type_hint": "Kabaret se skládá z čísel, každé má vlastní účinkující.",
       "type_standard": "Představení",
       "act_title_required": "Každé číslo musí mít název"
+    },
+    "shows_call": {
+      "title": "Výzva k přihláškám představení",
+      "list_description": "Spravujte různé výzvy k přihláškám představení pro tuto akci"
     }
   }
 }

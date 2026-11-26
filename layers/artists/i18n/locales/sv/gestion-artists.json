@@ -147,6 +147,10 @@
       "type_hint": "En kabaré består av nummer, vart och ett med egna artister.",
       "type_standard": "Föreställning",
       "act_title_required": "Varje nummer måste ha en titel"
+    },
+    "shows_call": {
+      "title": "Föreställningsutlysning",
+      "list_description": "Hantera olika föreställningsutlysningar för detta evenemang"
     }
   }
 }

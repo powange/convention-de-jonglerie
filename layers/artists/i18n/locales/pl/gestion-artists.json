@@ -147,6 +147,10 @@
       "type_hint": "Kabaret składa się z numerów, każdy z własnymi artystami.",
       "type_standard": "Spektakl",
       "act_title_required": "Każdy numer musi mieć tytuł"
+    },
+    "shows_call": {
+      "title": "Nabór spektakli",
+      "list_description": "Zarządzaj różnymi naborami spektakli na tę edycję"
     }
   }
 }

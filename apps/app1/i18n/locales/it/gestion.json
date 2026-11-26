@@ -675,10 +675,6 @@
       "organizers_in_teams_open": "Gli organizzatori possono unirsi alle squadre e ai turni",
       "organizers_in_teams_closed": "Gli organizzatori non partecipano al volontariato"
     },
-    "shows_call": {
-      "title": "Bando per spettacoli",
-      "list_description": "Gestisci i diversi bandi per spettacoli per questa edizione"
-    },
     "treasury": {
       "title": "Tesoreria",
       "subtitle": "Spese ed entrate dell'edizione. Le righe provenienti da artisti e biglietteria si correggono alla fonte.",

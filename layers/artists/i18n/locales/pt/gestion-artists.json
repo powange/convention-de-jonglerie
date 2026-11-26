@@ -147,6 +147,10 @@
       "type_hint": "Um cabaré é composto por números, cada um com os seus artistas.",
       "type_standard": "Espetáculo",
       "act_title_required": "Cada número deve ter um título"
+    },
+    "shows_call": {
+      "title": "Convocatória de espetáculos",
+      "list_description": "Gerir as diferentes convocatórias de espetáculos para esta edição"
     }
   }
 }

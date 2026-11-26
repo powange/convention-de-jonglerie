@@ -526,8 +526,8 @@ import { useFavoritesEditionsStore } from '~/stores/favoritesEditions'
 import type { Edition } from '~/types'
 import { getCalendarOptions, type CalendarEventData } from '~/utils/calendar'
 import { getCountryCode } from '~/utils/countries'
-import { getEditionDisplayName } from '~/utils/editionName'
 
+import { getEditionDisplayName } from '#core/app/utils/editionName'
 import { markdownToHtml } from '#core/app/utils/markdown'
 
 const { t } = useI18n()

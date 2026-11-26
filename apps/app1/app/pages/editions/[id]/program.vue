@@ -134,8 +134,8 @@
 
 <script setup lang="ts">
 import { useEditionStore } from '~/stores/editions'
-import { getEditionDisplayName } from '~/utils/editionName'
 
+import { getEditionDisplayName } from '#core/app/utils/editionName'
 import {
   abreviationFuseau,
   differeDuFuseauLecteur,

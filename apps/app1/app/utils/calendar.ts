@@ -1,8 +1,8 @@
 import { DateTime } from 'luxon'
 
-import { getEditionDisplayName } from './editionName'
-
 import type { EventInput } from '@fullcalendar/core'
+
+import { getEditionDisplayName } from '#core/app/utils/editionName'
 
 export interface CalendarEvent {
   id: number

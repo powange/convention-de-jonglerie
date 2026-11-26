@@ -2,6 +2,7 @@
  * Validation générique, commune à app1 et Flowvent : URL facultative, nettoyage des chaînes avant
  * validation. Chaque app la réexporte depuis son `#server/utils/validation-schemas`.
  */
+import { isValidPhoneNumber, parsePhoneNumberFromString } from 'libphonenumber-js'
 import { z } from 'zod'
 
 export const urlSchema = z
@@ -39,3 +40,31 @@ export function validateAndSanitize<T>(schema: z.ZodSchema<T>, data: unknown): T
   const sanitizedData = sanitizeData(data)
   return schema.parse(sanitizedData)
 }
+
+/**
+ * Validation d'un numéro de téléphone international.
+ * Accepte uniquement le format E.164 (`+[code pays][numéro]`) parsable par
+ * libphonenumber-js. La chaîne vide / null est gérée par les schémas appelants
+ * (optionnel ou non).
+ */
+export function isInternationalPhoneValid(value: string): boolean {
+  if (!value) return false
+  const trimmed = value.trim()
+  if (!trimmed.startsWith('+')) return false
+  return isValidPhoneNumber(trimmed)
+}
+
+/**
+ * Normalise un numéro en E.164 si possible, sinon retourne la valeur trimée.
+ */
+export function normalizePhoneE164(value: string | null | undefined): string {
+  if (!value) return ''
+  const parsed = parsePhoneNumberFromString(value.trim())
+  return parsed?.isValid() ? parsed.number : value.trim()
+}
+
+export const phoneSchema = z
+  .string()
+  .nullable()
+  .optional()
+  .refine((val) => !val || isInternationalPhoneValid(val), 'Numéro de téléphone invalide')

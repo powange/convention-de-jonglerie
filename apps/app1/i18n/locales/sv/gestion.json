@@ -675,10 +675,6 @@
       "organizers_in_teams_open": "Arrangörer kan ingå i lag och pass",
       "organizers_in_teams_closed": "Arrangörer deltar inte i volontärarbetet"
     },
-    "shows_call": {
-      "title": "Föreställningsutlysning",
-      "list_description": "Hantera olika föreställningsutlysningar för detta evenemang"
-    },
     "treasury": {
       "title": "Ekonomi",
       "subtitle": "Utgifter och intäkter för upplagan. Rader från artister och biljetter rättas vid källan.",

@@ -115,7 +115,8 @@ import { DateTime } from 'luxon'
 
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
 import type { ConventionServiceKeys } from '~/utils/convention-services'
-import { getEditionDisplayName } from '~/utils/editionName'
+
+import { getEditionDisplayName } from '#core/app/utils/editionName'
 
 interface EditionLike {
   id: number

@@ -205,12 +205,12 @@
 
 <script setup lang="ts">
 import { useEditionStore } from '~/stores/editions'
-import { getEditionDisplayName } from '~/utils/editionName'
 
 import type { EditionMarker } from '#map/app/composables/useEditionMarkers'
 import type { EditionZone } from '#map/app/composables/useEditionZones'
 import type { ExternalMapProvider } from '#map/shared/utils/external-map'
 
+import { getEditionDisplayName } from '#core/app/utils/editionName'
 import { formaterHeure, formaterJournee } from '#core/shared/utils/fuseau-edition'
 import ZonesLegend from '#map/app/components/edition/zones/ZonesLegend.vue'
 import {

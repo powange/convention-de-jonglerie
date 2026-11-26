@@ -1,5 +1,5 @@
+import { filtreStatutEdition } from '#core/shared/utils/visibilite-edition'
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { filtreStatutEdition } from '~~/shared/utils/visibilite-edition'
 
 /**
  * URLs des éditions pour le sitemap.

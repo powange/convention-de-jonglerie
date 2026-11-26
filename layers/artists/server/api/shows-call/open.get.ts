@@ -1,6 +1,7 @@
 import { editionAccueilleDesCandidatures } from '#core/shared/utils/candidature-spectacle'
+import { STATUTS_VISIBLES_PUBLIQUEMENT } from '#core/shared/utils/visibilite-edition'
+import { useArtistsPorts } from '#server/artists/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { STATUTS_VISIBLES_PUBLIQUEMENT } from '~~/shared/utils/visibilite-edition'
 
 /**
  * Les statuts d'édition que cette liste publique peut annoncer.
@@ -42,9 +43,9 @@ export default wrapApiHandler(
         OR: [{ deadline: null }, { deadline: { gte: now } }],
         edition: {
           status: { in: STATUTS_ANNONCABLES },
-          endDate: {
-            gte: now,
-          },
+          // « Pas encore terminée » : chaque app le dit à sa façon (date de fin facultative dans
+          // Flowvent).
+          ...useArtistsPorts().event.filtreEditionsPasTerminees(now),
         },
       },
       select: {
@@ -60,28 +61,7 @@ export default wrapApiHandler(
         askTechnicalNeeds: true,
         askStageSetup: true,
         askAccommodation: true,
-        edition: {
-          select: {
-            id: true,
-            name: true,
-            startDate: true,
-            endDate: true,
-            // Le fuseau de la convention : la date limite s'affiche dedans, et non dans celui du
-            // lecteur. Cette page rassemble des éditions de plusieurs pays — c'est précisément
-            // l'endroit où l'écart se voit.
-            timezone: true,
-            city: true,
-            country: true,
-            imageUrl: true,
-            convention: {
-              select: {
-                id: true,
-                name: true,
-                logo: true,
-              },
-            },
-          },
-        },
+        edition: { select: useArtistsPorts().event.selectionEditionAffichee },
       },
       orderBy: [
         { deadline: 'asc' }, // Par date limite croissante
@@ -104,8 +84,10 @@ export default wrapApiHandler(
       (a, b) => Number(a.deadline === null) - Number(b.deadline === null)
     )
 
+    // L'édition sous la forme commune affichée (app1 : édition + convention ; Flowvent : événement).
+    const { editionAffichee } = useArtistsPorts().event
     return {
-      showCalls: classes,
+      showCalls: classes.map((appel) => ({ ...appel, edition: editionAffichee(appel.edition) })),
       count: classes.length,
     }
   },

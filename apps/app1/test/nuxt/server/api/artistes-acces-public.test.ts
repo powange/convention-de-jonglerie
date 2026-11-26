@@ -35,7 +35,7 @@ vi.hoisted(() => {
 })
 
 import deposerAffiche from '../../../../../../layers/artists/server/api/files/show.post'
-import maCandidature from '../../../../server/api/editions/[id]/shows-call/[showCallId]/my-application.get'
+import maCandidature from '../../../../../../layers/artists/server/api/editions/[id]/shows-call/[showCallId]/my-application.get'
 import { trouverRoutePublique } from '../../../../server/constants/public-routes'
 import { global } from '../../globales-nitro'
 

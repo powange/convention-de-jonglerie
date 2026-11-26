@@ -675,10 +675,6 @@
       "organizers_in_teams_open": "Organizers can join teams and time slots",
       "organizers_in_teams_closed": "Organizers do not take part in volunteering"
     },
-    "shows_call": {
-      "title": "Call for shows",
-      "list_description": "Manage the different calls for shows for this edition"
-    },
     "treasury": {
       "title": "Treasury",
       "subtitle": "Expenses and income of the edition. Lines from artists and ticketing are corrected at their source.",

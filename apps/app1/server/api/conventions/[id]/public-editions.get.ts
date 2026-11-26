@@ -1,6 +1,6 @@
+import { filtreStatutEdition } from '#core/shared/utils/visibilite-edition'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { validateConventionId } from '#server/utils/validation-helpers'
-import { filtreStatutEdition } from '~~/shared/utils/visibilite-edition'
 
 export default wrapApiHandler(
   async (event) => {

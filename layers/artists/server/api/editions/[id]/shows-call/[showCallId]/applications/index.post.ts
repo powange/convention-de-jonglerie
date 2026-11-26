@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { editionAccueilleDesCandidatures } from '#core/shared/utils/candidature-spectacle'
+import { useArtistsPorts } from '#server/artists/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
@@ -43,9 +44,7 @@ export default wrapApiHandler(
     }
 
     // Récupérer l'édition
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-    })
+    const edition = await useArtistsPorts().event.lireEdition(editionId)
 
     if (!edition) {
       throw createError({

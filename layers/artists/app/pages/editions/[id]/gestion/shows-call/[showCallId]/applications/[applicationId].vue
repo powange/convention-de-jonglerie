@@ -575,7 +575,8 @@ const editionStore = useEditionStore()
 const { erreur } = useNotificateur()
 const { t, locale } = useI18n()
 
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 const showCallId = parseInt(route.params.showCallId as string)
 const applicationId = computed(() => parseInt(route.params.applicationId as string))
 

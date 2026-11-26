@@ -84,6 +84,9 @@ model User {
   showPresets                        ShowPreset[]
   artistNotificationGroups           ArtistNotificationGroup[]
   artistNotificationConfirmations    ArtistNotificationConfirmation[]
+  showApplications                   ShowApplication[]
+  decidedShowApplications            ShowApplication[]                   @relation("ShowApplicationDecider")
+  showCallSurveyVotes                ShowCallSurveyVote[]
 }
 
 model PasswordResetToken {
@@ -156,6 +159,7 @@ model Event {
   artistNotificationGroups    ArtistNotificationGroup[]
   handoutItems                TicketingHandoutItem[]
   volunteerMeals              VolunteerMeal[]
+  showCalls                   EditionShowCall[]
 
   @@index([ownerId])
 }
@@ -1277,6 +1281,8 @@ model Show {
   // Le groupe de messagerie dédié au spectacle, créé à la première utilisation
   event        Event?            @relation(fields: [eventId], references: [id])
   eventId      Int?
+  applications ShowApplication[]
+  conversation Conversation?
 
   @@index([editionId])
 }
@@ -1532,4 +1538,151 @@ model ArtistMealSelection {
   @@unique([artistId, mealId])
   @@index([artistId])
   @@index([mealId])
+}
+
+// =============================================================================
+// Appels à spectacles (layer `artists`) — lot 5 de docs/flowvent-modules.md. La relation vers
+// l'événement garde le nom d'app1, `edition` : les requêtes des appels la parcourent.
+// =============================================================================
+
+enum ShowCallMode {
+  INTERNAL // Formulaire interne sur la plateforme
+  EXTERNAL // URL externe vers un autre formulaire
+}
+
+enum ShowCallVisibility {
+  OFFLINE // Hors ligne, invisible partout (pages publiques, listes)
+  CLOSED // Fermé, pas de candidature possible mais visible
+  PRIVATE // Ouvert aux candidatures via lien direct uniquement
+  PUBLIC // Ouvert et listé partout
+}
+
+enum ShowApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model EditionShowCall {
+  id                Int                @id @default(autoincrement())
+  editionId         Int
+  name              String // Nom de l'appel (ex: "Scène ouverte", "Gala", "Spectacles longs")
+  visibility        ShowCallVisibility @default(OFFLINE)
+  mode              ShowCallMode       @default(INTERNAL)
+  externalUrl       String?
+  description       String?            @db.Text
+  deadline          DateTime?
+  // Champs demandés (configurables par l'organisateur)
+  askPortfolioUrl   Boolean            @default(true)
+  askVideoUrl       Boolean            @default(true)
+  askTechnicalNeeds Boolean            @default(true)
+  askStageSetup     Boolean            @default(false) // Demander la mise en place sur scène (avant le numéro et état de la scène après)
+  askAccommodation  Boolean            @default(false)
+  askDepartureCity  Boolean            @default(false) // Demander la ville de départ pour le défraiement
+  askSocialLinks    Boolean            @default(false) // Demander les réseaux sociaux
+  requirePhone      Boolean            @default(true) // Téléphone obligatoire dans le formulaire de candidature (contact + performers)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  // Date de la diffusion aux comptes artiste, à l'ouverture au public. Renseignée une seule fois :
+  // c'est elle qui empêche de rediffuser à chaque bascule en PUBLIC.
+  openedNotifiedAt DateTime?
+
+  // Sondage
+  surveyToken String? @unique
+  surveyOpen  Boolean @default(false)
+
+  edition      Event                @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  applications ShowApplication[]
+  surveyVotes  ShowCallSurveyVote[]
+
+  @@unique([editionId, name])
+  @@index([editionId])
+}
+
+model ShowApplication {
+  id         Int                   @id @default(autoincrement())
+  showCallId Int
+  userId     Int
+  status     ShowApplicationStatus @default(PENDING)
+
+  // Infos artiste
+  artistName   String // Nom de scène
+  artistBio    String? @db.Text // Présentation de l'artiste
+  portfolioUrl String? // Site web / portfolio
+  videoUrl     String? // Lien vidéo de démonstration
+  socialLinks  String? @db.Text // Liens réseaux sociaux (un par ligne)
+
+  // Infos spectacle proposé
+  showTitle                 String // Titre du spectacle
+  showDescription           String  @db.Text // Description détaillée
+  showDuration              Int // Durée en minutes
+  showCategory              String? // Type (jonglage, acrobatie, magie, etc.)
+  technicalNeeds            String? @db.Text // Besoins techniques (espace, son, lumière)
+  stageSetup                String? @db.Text // Mise en place sur scène (avant le numéro et état de la scène après)
+  additionalPerformersCount Int     @default(0) // Nombre de personnes supplémentaires dans le spectacle
+  additionalPerformers      Json? // Infos de contact des personnes supplémentaires [{lastName, firstName, email, phone}]
+
+  // Logistique
+  accommodationNeeded Boolean @default(false)
+  accommodationNotes  String? @db.Text
+  departureCity       String? // Ville de départ pour le défraiement
+
+  // Gestion par les organisateurs
+  organizerNotes String?   @db.Text // Notes internes organisateurs
+  decidedAt      DateTime?
+  decidedById    Int?
+
+  // Lien vers un spectacle de l'édition (un même spectacle peut être lié à
+  // plusieurs candidatures — cas d'un spectacle collectif où chaque artiste
+  // postule séparément)
+  showId Int?
+
+  // Traçabilité
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  showCall     EditionShowCall      @relation(fields: [showCallId], references: [id], onDelete: Cascade)
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  decidedBy    User?                @relation("ShowApplicationDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  show         Show?                @relation(fields: [showId], references: [id], onDelete: SetNull)
+  conversation Conversation? // Conversation avec les organisateurs
+  surveyVotes  ShowCallSurveyVote[]
+
+  @@unique([showCallId, userId])
+  @@index([showCallId])
+  @@index([userId])
+  @@index([status])
+  @@index([showId])
+}
+
+model ShowCallSurveyVote {
+  id            Int      @id @default(autoincrement())
+  showCallId    Int
+  applicationId Int
+  userId        Int
+  score         Int // 1 à 5
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  showCall    EditionShowCall @relation(fields: [showCallId], references: [id], onDelete: Cascade)
+  application ShowApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([showCallId, applicationId, userId])
+  @@index([showCallId])
+  @@index([applicationId])
+  @@index([userId])
+}
+
+// Conversation DORMANTE : Flowvent n'a pas de messagerie (décision de l'utilisateur), mais les
+// requêtes des candidatures sélectionnent `conversation { id }` pour compter les non-lus. Réduite à
+// ses liens, toujours vide : la sélection rend `null`, et les non-lus valent zéro.
+model Conversation {
+  id                String           @id @default(cuid())
+  showApplicationId Int?             @unique
+  showApplication   ShowApplication? @relation(fields: [showApplicationId], references: [id], onDelete: Cascade)
+  showId            Int?             @unique
+  show              Show?            @relation(fields: [showId], references: [id], onDelete: Cascade)
+  createdAt         DateTime         @default(now())
 }

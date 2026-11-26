@@ -173,6 +173,8 @@
       "select_description": "Vous pouvez sélectionner plusieurs catégories (optionnel)",
       "select_label": "Je suis...",
       "title": "Mes catégories"
-    }
+    },
+    "save_changes": "Sauvegarder les modifications",
+    "saving": "Sauvegarde..."
   }
 }

@@ -1,3 +1,4 @@
+import { useArtistsPorts } from '#server/artists/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { optionalAuth } from '#server/utils/auth-utils'
 import {
@@ -25,16 +26,7 @@ export default wrapApiHandler(
     }
 
     // Récupérer l'édition pour vérifier qu'elle est publiée
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      select: {
-        id: true,
-        name: true,
-        status: true,
-        startDate: true,
-        endDate: true,
-      },
-    })
+    const edition = await useArtistsPorts().event.lireEdition(editionId)
 
     if (!edition) {
       throw createError({
