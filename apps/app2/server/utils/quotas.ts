@@ -140,7 +140,7 @@ export async function signalerSeuil(
     },
   })
   if (!evenement) return false
-  const deja = (evenement.alertesQuota ?? {}) as Record<string, unknown>
+  const deja = (evenement.alertesQuota ?? {}) as Record<string, string>
   if (!doitAlerter(palier, deja[compteur])) return false
 
   // Le palier est retenu AVANT l'envoi : deux ajouts simultanés n'écrivent pas deux fois.
