@@ -98,7 +98,7 @@
       <UPageCTA
         variant="subtle"
         title="Lancez votre prochain événement"
-        description="Le compte est gratuit. Un abonnement Solo, Duo ou Intégral, au mois ou à l'année, débloque la création d'événements et les modules dont vous avez besoin."
+        description="Le compte est gratuit, et la formule Découverte suffit pour un premier événement. Quand il grandit, les formules Association, Festival et Grand festival relèvent les plafonds de bénévoles, d'artistes et d'événements. Tous les modules sont compris dans chacune."
         :links="liensFinaux"
       />
 
@@ -180,7 +180,7 @@ const etapes = [
   },
   {
     titre: 'Créez votre événement',
-    description: 'Abonnez-vous, puis indiquez le nom, le lieu et les dates.',
+    description: 'Indiquez le nom, le lieu et les dates. La formule gratuite suffit pour démarrer.',
   },
   {
     titre: 'Activez vos modules',
@@ -198,7 +198,7 @@ const atouts: PageFeatureProps[] = [
     icon: 'i-heroicons-squares-plus',
     title: 'À la carte',
     description:
-      "Un petit événement n'a pas besoin de tout. Vous composez le vôtre, et vous changez d'avis quand vous voulez.",
+      "Un petit événement n'a pas besoin de tout. Vous n'allumez que les modules utiles, sans que le prix change, et vous changez d'avis quand vous voulez.",
   },
   {
     icon: 'i-heroicons-link',
@@ -225,9 +225,9 @@ const atouts: PageFeatureProps[] = [
   },
   {
     icon: 'i-heroicons-credit-card',
-    title: 'Payez vos modules',
+    title: 'Un prix à votre taille',
     description:
-      "Un module, deux, ou tous, dès 7 € par mois. Vos co-organisateurs n'ont pas besoin du leur.",
+      "Tous les modules dans chaque formule, gratuit pour démarrer, puis dès 7 € par mois à l'année. Vos co-organisateurs n'ont pas besoin de leur propre abonnement.",
   },
 ]
 </script>

@@ -32,7 +32,7 @@ export function doitRappeler(a: AbonnementARappeler, maintenant: Date): boolean 
 export interface ContenuRappel {
   /** Le nom à saluer : le prénom, à défaut le pseudo (jamais nul). */
   nom: string
-  /** « Duo annuel ». */
+  /** « Festival annuel ». */
   formule: string
   fin: Date | string
   code: { code: string; advantage: string; duration: string } | null

@@ -1,9 +1,10 @@
 # Flowvent — Plateforme d'organisation d'événements (SaaS, abonnement simulé)
 
 Application **Nuxt 4 autonome** (`apps/app2/`, nom de produit **Flowvent**), indépendante de l'app principale. Un utilisateur se
-connecte, crée un événement, puis débloque les **fonctionnalités d'organisation** (gestion des
-bénévoles…) via un **abonnement par module** — Solo, Duo ou Intégral, au mois ou à l'année
-(cf. [docs/flowvent-abonnements.md](../../docs/flowvent-abonnements.md)).
+connecte, crée un événement et utilise tous les **modules d'organisation** (bénévoles, artistes,
+billetterie…). Le prix suit la **taille** : formule gratuite Découverte, puis Association, Festival
+ou Grand festival, au mois ou à l'année, qui relèvent les plafonds d'événements, de bénévoles,
+d'artistes et de co-organisateurs (cf. [docs/flowvent-abonnements.md](../../docs/flowvent-abonnements.md)).
 
 > ⚠️ **Paiement simulé** : aucun prestataire de paiement réel n'est appelé. Le « paiement » réussit
 > immédiatement et active l'abonnement (persisté en base).
