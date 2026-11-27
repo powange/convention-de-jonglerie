@@ -31,6 +31,7 @@ export type CleModule =
   | 'billetterie'
   | 'tresorerie'
   | 'faq'
+  | 'programme'
 
 export type ColonneDroit =
   | 'canEditEvent'
@@ -51,6 +52,7 @@ export type ColonneModule =
   | 'ticketingEnabled'
   | 'treasuryEnabled'
   | 'faqEnabled'
+  | 'programEnabled'
 
 export interface DefinitionModule {
   cle: CleModule
@@ -144,6 +146,17 @@ export const MODULES_EVENEMENT: readonly DefinitionModule[] = [
     description: 'Questions fréquentes, publiques ou internes, et leur page publique.',
     icone: 'i-heroicons-question-mark-circle',
     // Un contenu public de l'événement : relève de « modifier l'événement », comme la carte.
+    droit: 'modifier',
+    disponible: true,
+  },
+  {
+    cle: 'programme',
+    colonne: 'programEnabled',
+    libelle: 'Programme',
+    description:
+      'La frise de l’événement : représentations des spectacles et moments libres (ouverture, repas, scène ouverte…), et sa page publique.',
+    icone: 'i-heroicons-calendar-days',
+    // Comme la FAQ et la carte : un contenu public de l'événement, droit « modifier ».
     droit: 'modifier',
     disponible: true,
   },

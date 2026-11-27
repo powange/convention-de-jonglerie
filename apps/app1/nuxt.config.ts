@@ -159,6 +159,7 @@ export default defineNuxtConfig({
     '../../layers/meals',
     '../../layers/tasks',
     '../../layers/faq',
+    '../../layers/program',
     '../../layers/lost-found',
     '../../layers/workshops',
     '../../layers/carpool',

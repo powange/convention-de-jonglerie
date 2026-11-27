@@ -1,7 +1,8 @@
+import { canManageProgram } from '#program/server/utils/permissions/program-permissions'
+import { construireFriseProgramme } from '#program/shared/utils/program-timeline'
+import { useProgramPorts } from '#server/program/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { canManageProgram } from '#server/utils/permissions/program-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { construireFriseProgramme } from '~~/shared/utils/program-timeline'
 
 /**
  * Programme d'une édition : workshops, spectacles et éléments libres réunis en une seule frise.
@@ -17,19 +18,9 @@ export default wrapApiHandler(
   async (event) => {
     const editionId = validateEditionId(event)
 
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      select: {
-        id: true,
-        programEnabled: true,
-        programPagePublic: true,
-        workshopsEnabled: true,
-        artistsEnabled: true,
-        siteMapEnabled: true,
-        mapPublic: true,
-        timezone: true,
-      },
-    })
+    // Les réglages viennent de l'app hôte (édition d'app1, événement de Flowvent).
+    const ports = useProgramPorts()
+    const edition = await ports.lireReglages(editionId)
 
     if (!edition) {
       throw createError({ status: 404, message: 'Édition non trouvée' })
@@ -81,19 +72,8 @@ export default wrapApiHandler(
     const lieuDeCarte = { select: { id: true, name: true, color: true } }
 
     const [workshops, spectacles, elements] = await Promise.all([
-      edition.workshopsEnabled
-        ? prisma.workshop.findMany({
-            where: { editionId },
-            select: {
-              id: true,
-              title: true,
-              description: true,
-              startDateTime: true,
-              endDateTime: true,
-              location: { select: { name: true, zone: lieuDeCarte, marker: lieuDeCarte } },
-            },
-          })
-        : [],
+      // Les ateliers relèvent de l'app hôte (Flowvent n'en a pas : liste vide).
+      edition.workshopsEnabled ? ports.lireAteliers(editionId) : [],
       edition.artistsEnabled
         ? // Le programme liste les représentations, pas les spectacles : un spectacle joué deux
           // fois occupe deux moments de la frise. Le filtre sur `isPublic` est posé ici plutôt

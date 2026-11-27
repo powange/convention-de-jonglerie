@@ -147,13 +147,13 @@ import {
   grouperParJournee,
   nomDuLieu,
   type EntreeProgramme,
-} from '~~/shared/utils/program-timeline'
+} from '#program/shared/utils/program-timeline'
 
-const route = useRoute()
 const { t, locale } = useI18n()
 const editionStore = useEditionStore()
 
-const editionId = computed(() => parseInt(route.params.id as string))
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionIdRef).
+const editionId = useEditionIdRef()
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 const loading = computed(() => editionStore.loading)
 

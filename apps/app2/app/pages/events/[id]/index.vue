@@ -183,6 +183,7 @@ interface PagePublique {
   benevoles: { candidaturesOuvertes: boolean } | null
   appels: { id: number; nom: string; ouvert: boolean; dateLimite: string | null }[]
   faq: boolean
+  programme: boolean
   droits: { voir: boolean; estProprietaire: boolean } | null
 }
 
@@ -270,6 +271,17 @@ const participations = computed<Participation[]>(() => {
       couleur: 'bg-secondary/10 text-secondary',
       to: `${base}/shows-call/${a.id}`,
     })),
+    ...(p.programme
+      ? [
+          {
+            titre: 'Programme',
+            description: 'Spectacles et moments forts, jour par jour.',
+            icone: 'i-heroicons-calendar-days',
+            couleur: 'bg-warning/10 text-warning',
+            to: `${base}/program`,
+          },
+        ]
+      : []),
     ...(p.faq
       ? [
           {

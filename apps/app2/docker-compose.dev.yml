@@ -121,6 +121,7 @@ services:
       - ../../layers/treasury:/app/layers/treasury:cached
       - ../../layers/backup:/app/layers/backup:cached
       - ../../layers/faq:/app/layers/faq:cached
+      - ../../layers/program:/app/layers/program:cached
       # node_modules et dossiers de build dans des volumes (pas synchronisés avec l'hôte)
       - node_modules:/app/apps/app2/node_modules
       - ./.nuxt:/app/apps/app2/.nuxt

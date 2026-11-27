@@ -7,7 +7,7 @@ import {
   grouperParJournee,
   nomDuLieu,
   type EntreeProgramme,
-} from '../../../shared/utils/program-timeline'
+} from '#program/shared/utils/program-timeline'
 
 describe('construireFriseProgramme', () => {
   it('réunit les trois sources dans l’ordre chronologique', () => {
@@ -66,6 +66,22 @@ describe('construireFriseProgramme', () => {
     })
     expect(frise).toHaveLength(1)
     expect(frise[0]!.publie).toBe(true)
+  })
+
+  it('garde un workshop sans heure de fin, sans fin', () => {
+    // Un workshop peut se passer d'heure de fin : la frise levait sur `null.toISOString()`.
+    const frise = construireFriseProgramme({
+      workshops: [
+        {
+          id: 8,
+          title: 'Jonglage libre',
+          startDateTime: '2026-09-26T10:00:00.000Z',
+          endDateTime: null,
+        },
+      ],
+    })
+    expect(frise).toHaveLength(1)
+    expect(frise[0]!.fin).toBeNull()
   })
 
   it('écarte les brouillons par défaut, spectacles comme éléments', () => {

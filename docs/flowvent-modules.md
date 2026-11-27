@@ -225,6 +225,27 @@ Le layer `faq` existait déjà (pages publique et de gestion, API) ; il est bran
 - **Pages** : `useEditionId()` au lieu de `parseInt(route.params.id)` (garde étendue au layer).
 - **Libellés** : les 27 clés empruntées à app1 sont dans `apps/app2/i18n/locales/benevoles.json`.
 
+## Programme (27/11/2026)
+
+Sorti d'app1 dans `layers/program` (alias `#program`), qu'étendent app1 et Flowvent : la frise
+(`GET /api/editions/:id/program`), les éléments libres (`program-items/**`), la page publique
+`/editions/:id/program` et la page de composition, les composants `ProgramLieuCell` /
+`ProgramLieuBadges`, et les utilitaires `program-timeline` / `program-conversion`
+(`#program/shared/utils/…`), `program-validation` / `program-location` / `program-permissions`
+(`#program/server/utils/…`). L'import par IA (`program-import`, `program-days`,
+`program-page-slicing`, `program-fidelity`) reste dans app1.
+
+- **Port** `#server/program/ports/registry` (type : `#program/server/ports/types`) : lire les
+  réglages (édition d'app1, événement de Flowvent), enregistrer la page publique, lire les ateliers,
+  créer un atelier (facultatif). App1 lit et crée ses workshops ; Flowvent n'en a pas (liste vide,
+  conversion vers un atelier refusée en 400).
+- **Visibilité** : `PUT /api/editions/:id/program/visibility` (point du layer) ; la page appelait la
+  mise à jour générale de l'édition, propre à app1.
+- **Flowvent** : module `programme` (`Event.programEnabled`), droit « modifier » ;
+  `Event.programPagePublic` ; table `EditionProgramItem` ; entrée « Programme » de la barre de
+  gestion ; carte « Programme » sur la page publique de l'événement quand il est publié.
+- **Défaut corrigé** : un workshop sans heure de fin faisait lever la frise (`enIso(null)`).
+
 ## Notions « convention » à ramener à l'événement
 
 Flowvent n'a pas de convention : l'événement en tient lieu (`getEditionWithPermissions` rend

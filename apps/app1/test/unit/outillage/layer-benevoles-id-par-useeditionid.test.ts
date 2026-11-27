@@ -22,6 +22,7 @@ const RACINES = [
   'layers/meals/app',
   'layers/treasury/app',
   'layers/faq/app',
+  'layers/program/app',
 ].map((r) => join(DEPOT, r))
 const LECTURE_DIRECTE = /\b(?:route|useRoute\(\))\.params\.id\b/
 

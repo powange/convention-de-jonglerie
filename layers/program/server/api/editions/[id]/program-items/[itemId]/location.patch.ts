@@ -1,19 +1,17 @@
-import { z } from 'zod'
-
+import { canManageProgram } from '#program/server/utils/permissions/program-permissions'
+import { assurerLieuDeLEdition } from '#program/server/utils/program-location'
+import { programItemLocationSchema } from '#program/server/utils/program-validation'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canManageProgram } from '#server/utils/permissions/program-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
-const schema = z.object({ isPublic: z.boolean() })
-
 /**
- * Publie ou remet en brouillon un élément, sans toucher au reste.
+ * Change le lieu d'un élément, sans toucher au reste.
  *
  * Un point dédié plutôt que le `PUT` : celui-ci attend l'élément complet, parce que la règle
  * « fin après début » ne se vérifie pas sur un fragment. Depuis la frise, on ne dispose que d'une
- * ligne — lui faire réémettre tout l'élément pour changer une case exposerait à écraser un champ
- * au passage.
+ * ligne — lui faire réémettre tout l'élément pour changer son lieu exposerait à réécrire un titre
+ * ou un horaire modifié entre-temps ailleurs.
  */
 export default wrapApiHandler(
   async (event) => {
@@ -29,18 +27,24 @@ export default wrapApiHandler(
       throw createError({ status: 403, message: 'Droits insuffisants' })
     }
 
-    const { isPublic } = schema.parse(await readBody(event))
+    const { locationName, zoneId, markerId } = programItemLocationSchema.parse(
+      await readBody(event)
+    )
+
+    // Sans ce contrôle, un identifiant deviné rattacherait le créneau à la carte d'une autre
+    // convention. Les clés étrangères garantissent que la zone existe, pas qu'elle est la bonne.
+    await assurerLieuDeLEdition(editionId, zoneId, markerId)
 
     // Le filtre sur l'édition empêche d'atteindre l'élément d'une autre convention.
     const misAJour = await prisma.editionProgramItem.updateMany({
       where: { id: itemId, editionId },
-      data: { isPublic },
+      data: { locationName, zoneId, markerId },
     })
     if (misAJour.count === 0) {
       throw createError({ status: 404, message: 'Élément de programmation introuvable' })
     }
 
-    return { success: true, data: { isPublic } }
+    return { success: true, data: { locationName, zoneId, markerId } }
   },
-  { operationName: 'Visibilité d’un élément de programmation' }
+  { operationName: 'Lieu d’un élément de programmation' }
 )

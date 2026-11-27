@@ -52,9 +52,9 @@ model User {
   isArtist               Boolean           @default(false)
   isOrganizer            Boolean           @default(false)
 
-  events              Event[]
-  subscription        Subscription?
-  passwordResetTokens PasswordResetToken[]
+  events               Event[]
+  subscription         Subscription?
+  passwordResetTokens  PasswordResetToken[]
   promoCodeRedemptions PromoCodeRedemption[]
 
   // Gestion des bénévoles (relations inverses, mêmes noms qu'app1)
@@ -120,7 +120,7 @@ model Event {
   /// Adresse postale du lieu, affichée sur la page publique (avec un lien vers la carte).
   addressLine1                     String?
   addressLine2                     String?
-  postalCode                       String?  @db.VarChar(20)
+  postalCode                       String?              @db.VarChar(20)
   city                             String?
   country                          String?
   /// Coordonnées GPS du lieu (carte de la page publique) : calculées depuis l'adresse à
@@ -132,13 +132,13 @@ model Event {
   /// Affiche de l'événement (`/uploads/events/<id>/<fichier>`), publique.
   imageUrl                         String?
   /// Liens publics de l'événement.
-  officialWebsiteUrl               String?  @db.VarChar(500)
-  ticketingUrl                     String?  @db.VarChar(500)
-  facebookUrl                      String?  @db.VarChar(500)
-  instagramUrl                     String?  @db.VarChar(500)
+  officialWebsiteUrl               String?              @db.VarChar(500)
+  ticketingUrl                     String?              @db.VarChar(500)
+  facebookUrl                      String?              @db.VarChar(500)
+  instagramUrl                     String?              @db.VarChar(500)
   /// La page de l'événement (`/events/<publicId>`) est visible de tous, sans connexion. Choisi par
   /// l'organisateur : fermée par défaut, pour qu'aucun événement en préparation ne s'expose seul.
-  pagePublique                     Boolean  @default(false)
+  pagePublique                     Boolean              @default(false)
   startDate                        DateTime?
   // Métadonnées génériques lues par le layer bénévoles (comme l'`Event` d'app1).
   endDate                          DateTime?
@@ -164,6 +164,10 @@ model Event {
   /// l'`Edition` d'app1.
   faqEnabled                       Boolean              @default(false)
   faqPagePublic                    Boolean              @default(false)
+  /// Programme (layer `program`) : module actif, et sa page publique visible des visiteurs. Mêmes
+  /// noms que l'`Edition` d'app1.
+  programEnabled                   Boolean              @default(false)
+  programPagePublic                Boolean              @default(false)
   /// Dernier comptage du fonds de caisse, en centimes, et sa date (trésorerie, comme l'édition d'app1).
   cashFloatCount                   Int?
   cashFloatCountedAt               DateTime?
@@ -231,20 +235,21 @@ model Event {
   ticketingCounters              TicketingCounter[]
   entryValidationLogs            EntryValidationLog[]
   faqEntries                     FaqEntry[]
+  programItems                   EditionProgramItem[]
 
   @@index([ownerId])
 }
 
 model Subscription {
-  id               Int      @id @default(autoincrement())
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId           Int      @unique
+  id               Int        @id @default(autoincrement())
+  user             User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           Int        @unique
   plan             String // "monthly" | "annual"
-  status           String   @default("active") // "active" | "inactive"
+  status           String     @default("active") // "active" | "inactive"
   currentPeriodEnd DateTime
-  formule          String   @default("association") // "association" | "festival" | "grand" (shared/formules.ts)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  formule          String     @default("association") // "association" | "festival" | "grand" (shared/formules.ts)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
   promoCode        PromoCode? @relation(fields: [promoCodeId], references: [id], onDelete: SetNull)
   promoCodeId      Int?
   advantageEndsAt  DateTime? // fin de l'avantage du code ; null avec un code : à vie
@@ -989,6 +994,7 @@ model EditionZone {
   stockItems        StockItem[]
   stockReservations StockReservation[]
   showPerformances  ShowPerformance[]
+  programItems      EditionProgramItem[]
 
   @@unique([editionId, externalMapObjectId])
   @@index([editionId])
@@ -1019,6 +1025,7 @@ model EditionMarker {
   stockItems        StockItem[]
   stockReservations StockReservation[]
   showPerformances  ShowPerformance[]
+  programItems      EditionProgramItem[]
 
   @@unique([editionId, externalMapObjectId])
   @@index([editionId])
@@ -3004,4 +3011,35 @@ model FaqEntry {
   @@index([editionId])
   @@index([editionId, displayOrder])
   @@index([editionId, isPublic])
+}
+
+/// Un élément LIBRE du programme d'un événement (layer `program`), même forme que dans app1 : un
+/// moment qui n'est ni un spectacle ni un atelier (ouverture, repas, scène ouverte…).
+model EditionProgramItem {
+  id        Int   @id @default(autoincrement())
+  edition   Event @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  editionId Int
+
+  title       String  @db.VarChar(200)
+  description String? @db.Text
+
+  startDateTime DateTime
+  endDateTime   DateTime?
+
+  locationName String?        @db.VarChar(150)
+  zone         EditionZone?   @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  zoneId       Int?
+  marker       EditionMarker? @relation(fields: [markerId], references: [id], onDelete: SetNull)
+  markerId     Int?
+
+  isPublic Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([editionId])
+  @@index([editionId, isPublic])
+  @@index([startDateTime])
+  @@index([zoneId])
+  @@index([markerId])
 }
