@@ -81,3 +81,15 @@ export async function afficheAEnregistrer(
   await effacerAffiche(actuelle, eventId)
   return `/uploads/${dossierAffiche(eventId)}/${definitif}`
 }
+
+/**
+ * Le chemin sur le disque d'une image définitive de l'événement (affiche, icône de l'application),
+ * ou `null` si l'URL ne désigne pas un fichier de son dossier.
+ */
+export function fichierDeLEvenement(
+  url: string | null | undefined,
+  eventId: number
+): string | null {
+  const nom = nomDans(url, dossierAffiche(eventId))
+  return nom ? getFileLocally(nom, dossierAffiche(eventId)) : null
+}

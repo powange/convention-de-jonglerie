@@ -25,6 +25,10 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 const { loggedIn, user, clear } = useUserSession()
 // L'état d'invitation est partagé avec le bandeau (`useInvitePwa`, layer ui).
 const { entreeDeMenuDisponible, installer: installerLApplication } = useInvitePwa()
+const applicationEvenement = useApplicationEvenement()
+const route = useRoute()
+// Sur la page d'un événement, le navigateur propose d'installer l'application de CET événement.
+const surUnEvenement = computed(() => !!evenementDuChemin(route.path))
 const toast = useToast()
 
 /*
@@ -48,7 +52,12 @@ async function logout() {
   } finally {
     await clear()
     toast.add({ title: 'Déconnexion réussie', icon: 'i-heroicons-check-circle', color: 'success' })
-    await navigateTo('/login')
+    // Dans l'application d'un événement, la reconnexion y ramène.
+    await navigateTo(
+      applicationEvenement.value
+        ? `/login?returnTo=${encodeURIComponent(`/events/${applicationEvenement.value}/app`)}`
+        : '/login'
+    )
   }
 }
 
@@ -56,12 +65,17 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
   [{ label: user.value?.email ?? '', type: 'label' }],
   [
     { label: 'Mon profil', icon: 'i-heroicons-user', to: '/profile' },
-    { label: 'Tableau de bord', icon: 'i-heroicons-squares-2x2', to: '/dashboard' },
-    { label: 'Tarifs', icon: 'i-heroicons-credit-card', to: '/pricing' },
-    // Réservé aux administrateurs ; les pages et l'API le revérifient (server/utils/administration.ts).
-    ...((user.value as { isGlobalAdmin?: boolean } | null)?.isGlobalAdmin
-      ? [{ label: 'Administration', icon: 'i-heroicons-shield-check', to: '/admin' }]
-      : []),
+    // L'application d'un événement n'ouvre que lui : ni tableau de bord, ni tarifs, ni administration.
+    ...(applicationEvenement.value
+      ? []
+      : [
+          { label: 'Tableau de bord', icon: 'i-heroicons-squares-2x2', to: '/dashboard' },
+          { label: 'Tarifs', icon: 'i-heroicons-credit-card', to: '/pricing' },
+          // Réservé aux administrateurs ; les pages et l'API le revérifient (server/utils/administration.ts).
+          ...((user.value as { isGlobalAdmin?: boolean } | null)?.isGlobalAdmin
+            ? [{ label: 'Administration', icon: 'i-heroicons-shield-check', to: '/admin' }]
+            : []),
+        ]),
   ],
   // Installer l'application, quand le navigateur le propose : le bandeau ne se présente qu'une
   // fois puis se tait sept jours, et ce geste volontaire doit rester possible (comme dans app1).
@@ -69,7 +83,9 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
     ? [
         [
           {
-            label: "Installer l'application",
+            label: surUnEvenement.value
+              ? "Installer l'application de l'événement"
+              : "Installer l'application",
             icon: 'i-heroicons-arrow-down-tray',
             onSelect: () => installerLApplication(),
           },

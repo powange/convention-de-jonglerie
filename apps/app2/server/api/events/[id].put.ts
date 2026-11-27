@@ -52,6 +52,7 @@ const schema = z
     city: texte(191),
     country: texte(191),
     imageUrl: z.string().max(500).nullable().optional(),
+    appIconUrl: z.string().max(191).nullable().optional(),
     officialWebsiteUrl: lien,
     ticketingUrl: lien,
     facebookUrl: lien,
@@ -97,6 +98,7 @@ export default defineEventHandler(async (event) => {
     where: { id },
     select: {
       imageUrl: true,
+      appIconUrl: true,
       addressLine1: true,
       postalCode: true,
       city: true,
@@ -106,6 +108,8 @@ export default defineEventHandler(async (event) => {
     },
   })
   const imageUrl = await afficheAEnregistrer(d.imageUrl, actuel.imageUrl, id)
+  // L'icône de l'application suit le même circuit que l'affiche (dépôt temporaire, puis définitif).
+  const appIconUrl = await afficheAEnregistrer(d.appIconUrl, actuel.appIconUrl, id)
   /** `undefined` (absent) ne change rien ; une chaîne vide efface. */
   const facultatif = (v: string | null | undefined) => (v === undefined ? undefined : v || null)
 
@@ -148,6 +152,7 @@ export default defineEventHandler(async (event) => {
       city: facultatif(d.city),
       country: facultatif(d.country),
       imageUrl,
+      appIconUrl,
       officialWebsiteUrl: facultatif(d.officialWebsiteUrl),
       ticketingUrl: facultatif(d.ticketingUrl),
       facebookUrl: facultatif(d.facebookUrl),
