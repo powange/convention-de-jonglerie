@@ -94,6 +94,15 @@
         </div>
       </div>
 
+      <!-- Les sections publiées de l'événement (programme, carte, FAQ, bénévoles). -->
+      <EvenementOnglets
+        :public-id="e.publicId"
+        :programme="page.programme"
+        :carte="page.carte"
+        :faq="page.faq"
+        :benevoles="!!page.benevoles"
+      />
+
       <!-- Le lieu sur une carte, quand ses coordonnées GPS sont connues. -->
       <!-- Sans ClientOnly : le composant ne touche à Leaflet que dans onMounted (navigateur). -->
       <EvenementCarteDuLieu
@@ -272,39 +281,6 @@ const participations = computed<Participation[]>(() => {
       couleur: 'bg-secondary/10 text-secondary',
       to: `${base}/shows-call/${a.id}`,
     })),
-    ...(p.programme
-      ? [
-          {
-            titre: 'Programme',
-            description: 'Spectacles et moments forts, jour par jour.',
-            icone: 'i-heroicons-calendar-days',
-            couleur: 'bg-warning/10 text-warning',
-            to: `${base}/program`,
-          },
-        ]
-      : []),
-    ...(p.carte
-      ? [
-          {
-            titre: 'Carte du site',
-            description: 'Les zones et les repères du lieu, pour s’y retrouver.',
-            icone: 'i-heroicons-map',
-            couleur: 'bg-primary/10 text-primary',
-            to: `${base}/map`,
-          },
-        ]
-      : []),
-    ...(p.faq
-      ? [
-          {
-            titre: 'Questions fréquentes',
-            description: 'Les réponses aux questions que l’on se pose avant de venir.',
-            icone: 'i-heroicons-question-mark-circle',
-            couleur: 'bg-info/10 text-info',
-            to: `${base}/faq`,
-          },
-        ]
-      : []),
     ...(e.value.liens.billetterie
       ? [
           {
