@@ -385,7 +385,8 @@
         "with_allergies": "Avec allergies"
       }
     },
-    "program": "Programme"
+    "program": "Programme",
+    "map": "Carte"
   },
   "errors": {
     "error_occurred": "Une erreur est survenue",

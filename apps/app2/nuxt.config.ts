@@ -185,6 +185,10 @@ export default defineNuxtConfig({
     // Pages publiques du layer artistes (espace artiste, appels à spectacles, confirmation d'une
     // notification) : même raison, elles ne posent pas de marges latérales et collaient aux bords.
     '/events/*/artist-space': { appLayout: 'evenement' },
+    // Pages publiques des layers programme, FAQ et carte : même conteneur centré.
+    '/events/*/program': { appLayout: 'evenement' },
+    '/events/*/faq': { appLayout: 'evenement' },
+    '/events/*/map': { appLayout: 'evenement' },
     '/events/*/shows-call': { appLayout: 'evenement' },
     '/events/*/shows-call/**': { appLayout: 'evenement' },
     '/events/*/artists/**': { appLayout: 'evenement' },

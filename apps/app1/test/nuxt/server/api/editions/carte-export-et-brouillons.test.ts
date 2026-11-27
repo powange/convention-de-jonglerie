@@ -10,7 +10,7 @@ vi.mock('../../../../../../../layers/program/server/utils/permissions/program-pe
   canManageProgram,
 }))
 
-import exporterKml from '../../../../../server/api/editions/[id]/export.kml.get'
+import exporterKml from '../../../../../../../layers/map/server/api/editions/[id]/export.kml.get'
 import lireProgramme from '../../../../../../../layers/program/server/api/editions/[id]/program.get'
 import { trouverRoutePublique } from '../../../../../server/constants/public-routes'
 import { global } from '../../../globales-nitro'

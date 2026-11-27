@@ -10,6 +10,13 @@ const ports: MapPorts = {
       where: { id: editionId },
       select: { id: true, siteMapEnabled: true, mapPublic: true },
     }),
+  async lireNom(editionId) {
+    const e = await prisma.edition.findUnique({
+      where: { id: editionId },
+      select: { name: true, convention: { select: { name: true } } },
+    })
+    return e ? e.name || e.convention.name : null
+  },
   enregistrerVisibilite: (editionId, mapPublic) =>
     prisma.edition.update({
       where: { id: editionId },

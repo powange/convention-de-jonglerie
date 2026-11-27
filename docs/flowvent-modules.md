@@ -78,8 +78,9 @@ les ateliers et le covoiturage d'app1 l'importent désormais par `#map/…`.
   besoin (un `parseInt(route.params.id)` rend `NaN` dans Flowvent). Garde :
   `layer-benevoles-id-par-useeditionid.test.ts`, étendue à la carte.
 - `fetch-helpers` est passé dans `layers/core/server/socle/` (réexporté par chaque app).
-- Restent dans app1 : la page PUBLIQUE de la carte (`/editions/:id/map`, liée au programme) et
-  l'export KML.
+- La page PUBLIQUE de la carte (`/editions/:id/map`) et l'export KML ont rejoint le layer le
+  27/11/2026, une fois le programme partagé (`layers/program`) : le port y gagne `lireNom` (nom de
+  la carte exportée). `useApiFetch` est passé dans `layers/core`.
 
 ## Stock et prêts (lot 3)
 

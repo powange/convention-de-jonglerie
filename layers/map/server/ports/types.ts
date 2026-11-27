@@ -19,6 +19,8 @@ export interface CarteExterne {
 export interface MapPorts {
   /** Les drapeaux qui décident qui lit la carte ; `null` si l'édition n'existe pas. */
   lireDrapeaux(editionId: number): Promise<DrapeauxCarte | null>
+  /** Le nom à donner à la carte exportée (KML) : celui de l'édition ou de l'événement. */
+  lireNom(editionId: number): Promise<string | null>
   /** Rend la carte publique, ou la réserve à la gestion. */
   enregistrerVisibilite(
     editionId: number,
