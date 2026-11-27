@@ -10,6 +10,7 @@ import {
   envoyerCourriel,
   type EmailOptions,
 } from '../../../../layers/core/server/socle/envoi-courriel'
+import { gabaritCourriel } from '../../shared/gabarit-courriel'
 
 export type { EmailOptions } from '../../../../layers/core/server/socle/envoi-courriel'
 
@@ -43,41 +44,55 @@ export function generateVerificationCode(): string {
 }
 
 /**
- * Génère le HTML de l'email de vérification de compte.
+ * Courriel de vérification de compte : le code à recopier, et le lien vers la page de saisie.
  */
 export async function generateVerificationEmailHtml(
   code: string,
   prenom: string,
   email: string
 ): Promise<string> {
-  const verifyUrl = `${getSiteUrl()}/verify-email?email=${encodeURIComponent(email)}`
-  return `<div>
-  <p>Bonjour ${prenom},</p>
-  <p>Votre code de vérification est : <strong class="code">${code}</strong></p>
-  <p><a href="${verifyUrl}">Vérifier mon compte</a></p>
-</div>`
+  const siteUrl = getSiteUrl()
+  return gabaritCourriel({
+    siteUrl,
+    titre: 'Vérifiez votre adresse e-mail',
+    apercu: `Votre code de vérification Flowvent : ${code}`,
+    salutation: `Bonjour ${prenom}`,
+    paragraphes: ['Bienvenue sur Flowvent ! Pour activer votre compte, saisissez ce code :'],
+    code,
+    bouton: {
+      libelle: 'Vérifier mon compte',
+      url: `${siteUrl}/verify-email?email=${encodeURIComponent(email)}`,
+    },
+    note: 'Ce code est valable 15 minutes.',
+    raison: 'Vous recevez ce courriel car un compte Flowvent vient d’être créé avec cette adresse.',
+  })
 }
 
 /**
- * Génère le HTML de l'email de réinitialisation de mot de passe.
+ * Courriel de réinitialisation du mot de passe.
  */
 export async function generatePasswordResetEmailHtml(
   resetLink: string,
   prenom: string
 ): Promise<string> {
-  return `<div>
-  <p>Bonjour ${prenom},</p>
-  <p>Vous avez demandé la réinitialisation de votre mot de passe.</p>
-  <p><a href="${resetLink}">Réinitialiser mon mot de passe</a></p>
-  <p>Ce lien est valide pendant 1 heure.</p>
-</div>`
+  return gabaritCourriel({
+    siteUrl: getSiteUrl(),
+    titre: 'Réinitialisez votre mot de passe',
+    apercu: 'Le lien pour choisir un nouveau mot de passe Flowvent.',
+    salutation: `Bonjour ${prenom}`,
+    paragraphes: [
+      'Vous avez demandé à réinitialiser le mot de passe de votre compte Flowvent. Choisissez-en un nouveau avec le bouton ci-dessous.',
+    ],
+    bouton: { libelle: 'Choisir un nouveau mot de passe', url: resetLink },
+    note: 'Ce lien est valable 1 heure. Si vous n’êtes pas à l’origine de cette demande, ignorez ce courriel : votre mot de passe ne change pas.',
+  })
 }
 
 const MOMENTS = { MORNING: 'matin', AFTERNOON: 'après-midi', EVENING: 'soir' } as const
 
 /**
  * Courriel « vos créneaux de bénévolat » (contrat d'hôte du layer bénévoles, même signature
- * qu'app1). Version sobre : Flowvent n'a pas les gabarits de courriel d'app1.
+ * qu'app1), dans le gabarit des courriels de Flowvent (shared/gabarit-courriel.ts).
  */
 export async function generateVolunteerScheduleEmailHtml(
   prenom: string,
@@ -92,21 +107,23 @@ export async function generateVolunteerScheduleEmailHtml(
   }>,
   actionUrl: string
 ): Promise<string> {
-  const lignes = timeSlots
-    .map((c) => {
-      const jour = c.date.toLocaleDateString('fr-FR', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-      })
-      const heures = c.startTime && c.endTime ? ` ${c.startTime}–${c.endTime}` : ''
-      return `<li>${jour} (${MOMENTS[c.timeOfDay]})${heures} — ${c.teamName}</li>`
+  const lignes = timeSlots.map((c) => {
+    const jour = c.date.toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
     })
-    .join('')
-  return `<div>
-  <p>Bonjour ${prenom},</p>
-  <p>Vos créneaux de bénévolat pour « ${editionName} » :</p>
-  <ul>${lignes}</ul>
-  <p><a href="${actionUrl}">Voir mes créneaux</a></p>
-</div>`
+    const heures = c.startTime && c.endTime ? ` · ${c.startTime}–${c.endTime}` : ''
+    return `${jour.charAt(0).toUpperCase()}${jour.slice(1)} (${MOMENTS[c.timeOfDay]})${heures} — ${c.teamName}`
+  })
+  return gabaritCourriel({
+    siteUrl: getSiteUrl(),
+    titre: 'Vos créneaux de bénévolat',
+    apercu: `Votre planning de bénévole pour « ${editionName} ».`,
+    salutation: `Bonjour ${prenom}`,
+    paragraphes: [`Voici vos créneaux de bénévolat pour « ${editionName} » :`],
+    liste: lignes,
+    bouton: { libelle: 'Voir mes créneaux', url: actionUrl },
+    raison: `Vous recevez ce courriel car vous êtes bénévole sur « ${editionName} ».`,
+  })
 }

@@ -52,7 +52,12 @@ function echapper(texte: string): string {
     .replace(/"/g, '&quot;')
 }
 
-export function contenuAlerte(c: ContenuAlerte): { subject: string; html: string; text: string } {
+export function contenuAlerte(c: ContenuAlerte): {
+  subject: string
+  html: string
+  text: string
+  phrases: string[]
+} {
   const subject =
     c.palier === 'plein'
       ? `${c.evenement} : la limite de ${c.quoi} de votre formule est atteinte`
@@ -82,5 +87,6 @@ ${phrases.map((p) => `  <p>${echapper(p)}</p>`).join('\n')}
     `Voir les formules : ${c.lienTarifs}`,
     `Ouvrir l'événement : ${c.lienEvenement}`,
   ].join('\n')
-  return { subject, html, text }
+  // `phrases` : pour l'habillage complet du courriel (shared/gabarit-courriel.ts, côté appelant).
+  return { subject, html, text, phrases }
 }
