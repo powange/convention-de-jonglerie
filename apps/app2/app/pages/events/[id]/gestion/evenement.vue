@@ -276,6 +276,79 @@
             <UCard>
               <template #header>
                 <h2 class="flex items-center gap-2 font-semibold">
+                  <UIcon name="i-heroicons-device-phone-mobile" class="text-primary" /> Application
+                  mobile
+                </h2>
+              </template>
+              <div class="space-y-5">
+                <p class="text-sm text-muted">
+                  Organisateurs, bénévoles et artistes installent l'événement sur leur téléphone,
+                  comme une application à son nom : elle s'ouvre sur ce qui les concerne (gestion,
+                  espace bénévole, espace artiste), sans le reste de Flowvent.
+                </p>
+
+                <UFormField
+                  label="Lien à partager"
+                  name="lienApplication"
+                  description="Ouvert sur un téléphone, il propose d'installer l'application (menu du navigateur → « Installer » ou « Ajouter à l'écran d'accueil »)."
+                >
+                  <UFieldGroup class="w-full">
+                    <UInput :model-value="lienApplication" readonly class="w-full" />
+                    <UButton
+                      color="neutral"
+                      variant="outline"
+                      icon="i-heroicons-clipboard-document"
+                      aria-label="Copier le lien de l'application"
+                      @click="copierLienApplication"
+                    />
+                  </UFieldGroup>
+                </UFormField>
+
+                <UFormField
+                  label="Icône"
+                  name="appIconUrl"
+                  description="Carrée, 512 × 512 px de préférence (recadrée au centre sinon). Sans icône, l'affiche, puis celle de Flowvent."
+                >
+                  <div class="flex items-start gap-4">
+                    <!-- Aperçu de ce qui sera posé sur l'écran d'accueil. -->
+                    <img
+                      :src="
+                        etat.appIconUrl ||
+                        etat.imageUrl ||
+                        '/favicons/android-chrome-192x192.png?v=v1'
+                      "
+                      alt="Aperçu de l'icône de l'application"
+                      class="size-16 shrink-0 rounded-2xl object-cover ring-1 ring-default"
+                    />
+                    <UiImageUpload
+                      v-if="droits?.modifier"
+                      v-model="etat.appIconUrl"
+                      class="min-w-0 flex-1"
+                      :endpoint="{ type: 'edition', id }"
+                      :options="{
+                        validation: {
+                          maxSize: 5 * 1024 * 1024,
+                          allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+                          allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
+                        },
+                        resetAfterUpload: false,
+                      }"
+                      alt="Icône de l'application"
+                      placeholder="Choisissez l'icône"
+                      :allow-delete="!!etat.appIconUrl"
+                      @uploaded="
+                        (r: { imageUrl?: string }) => r.imageUrl && (etat.appIconUrl = r.imageUrl)
+                      "
+                      @deleted="etat.appIconUrl = ''"
+                    />
+                  </div>
+                </UFormField>
+              </div>
+            </UCard>
+
+            <UCard>
+              <template #header>
+                <h2 class="flex items-center gap-2 font-semibold">
                   <UIcon name="i-heroicons-link" class="text-primary" /> Liens externes
                 </h2>
               </template>
@@ -401,6 +474,7 @@ interface Evenement {
   city: string | null
   country: string | null
   imageUrl: string | null
+  appIconUrl: string | null
   officialWebsiteUrl: string | null
   ticketingUrl: string | null
   facebookUrl: string | null
@@ -447,6 +521,7 @@ function etatDepuis(e: Evenement | undefined) {
     city: e?.city ?? '',
     country: e?.country ?? '',
     imageUrl: e?.imageUrl ?? '',
+    appIconUrl: e?.appIconUrl ?? '',
     officialWebsiteUrl: e?.officialWebsiteUrl ?? '',
     ticketingUrl: e?.ticketingUrl ?? '',
     facebookUrl: e?.facebookUrl ?? '',
@@ -515,6 +590,19 @@ function remplirAdresse(a: AdresseTrouvee) {
   if (!etat.location.trim() && a.nomDuLieu) etat.location = a.nomDuLieu
 }
 
+/** L'adresse de l'application de l'événement, à partager (son écran de démarrage). */
+const origine = useRequestURL().origin
+const lienApplication = computed(() => `${origine}/events/${refEvenement}/app`)
+const toast = useToast()
+async function copierLienApplication() {
+  try {
+    await navigator.clipboard.writeText(lienApplication.value)
+    toast.add({ title: 'Lien copié', icon: 'i-heroicons-check', color: 'success' })
+  } catch {
+    toast.add({ title: 'Copie impossible : sélectionnez le lien', color: 'warning' })
+  }
+}
+
 const { execute: enregistrer, loading: enregistrement } = useApiAction(
   `/api/events/${refEvenement}`,
   {
@@ -532,6 +620,7 @@ const { execute: enregistrer, loading: enregistrement } = useApiAction(
       city: etat.city,
       country: etat.country,
       imageUrl: etat.imageUrl || null,
+      appIconUrl: etat.appIconUrl || null,
       officialWebsiteUrl: etat.officialWebsiteUrl.trim(),
       ticketingUrl: etat.ticketingUrl.trim(),
       facebookUrl: etat.facebookUrl.trim(),

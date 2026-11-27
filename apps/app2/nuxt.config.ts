@@ -95,8 +95,8 @@ export default defineNuxtConfig({
 
   // Icônes : même déclaration qu'app1. Les PNG et l'ICO sortent de `npm run favicons` (générateur
   // commun, scripts/favicons/) ; `favicon.svg`, tiré d'AppLogo, suit le mode sombre du navigateur.
-  // Le manifeste est dynamique (server/api/site.webmanifest.get.ts). `?v=` : Cloudflare garde les
-  // fichiers publics 4 h, l'incrémenter après une régénération.
+  // `?v=` : Cloudflare garde les fichiers publics 4 h, l'incrémenter après une régénération. Le
+  // manifeste n'est PAS déclaré ici : `app.vue` choisit celui de Flowvent ou celui de l'événement.
   app: {
     buildAssetsDir,
 
@@ -111,7 +111,6 @@ export default defineNuxtConfig({
           href: '/favicons/favicon-192x192.png?v=2',
         },
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicons/favicon-180x180.png?v=2' },
-        { rel: 'manifest', href: '/api/site.webmanifest?v=2' },
         { rel: 'alternate icon', href: '/favicon.ico?v=2' },
       ],
     },

@@ -131,6 +131,10 @@ model Event {
   contactEmail                     String?
   /// Affiche de l'événement (`/uploads/events/<id>/<fichier>`), publique.
   imageUrl                         String?
+  /// Icône de l'application de l'événement (`/uploads/events/<id>/<fichier>`), carrée : celle que
+  /// l'on voit sur l'écran d'accueil du téléphone une fois l'événement installé. Sans elle, l'affiche
+  /// recadrée, puis l'icône de Flowvent.
+  appIconUrl                       String?
   /// Liens publics de l'événement.
   officialWebsiteUrl               String?              @db.VarChar(500)
   ticketingUrl                     String?              @db.VarChar(500)

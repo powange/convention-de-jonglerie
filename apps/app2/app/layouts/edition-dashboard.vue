@@ -3,7 +3,7 @@
     <UDashboardSidebar collapsible resizable :ui="{ overlay: 'z-50', content: 'z-50' }">
       <template #header="{ collapsed }">
         <div class="flex w-full items-center justify-between">
-          <NuxtLink v-if="!collapsed" to="/dashboard" class="flex items-center gap-2">
+          <NuxtLink v-if="!collapsed" :to="accueilDuLogo" class="flex items-center gap-2">
             <AppLogo class="h-6 w-auto" />
           </NuxtLink>
           <UDashboardSidebarCollapse
@@ -111,6 +111,11 @@ const editionStore = useEditionStore()
 // L'id numérique (API, store) et l'identifiant public (adresses) de l'événement.
 const editionId = useEditionIdRef()
 const refPublique = computed(() => String(route.params.id))
+// Le logo ramène au tableau de bord ; dans l'application d'un événement, à son écran de démarrage.
+const applicationEvenement = useApplicationEvenement()
+const accueilDuLogo = computed(() =>
+  applicationEvenement.value ? `/events/${applicationEvenement.value}/app` : '/dashboard'
+)
 
 // Modules actifs (et droits) de l'événement : clé partagée, que l'accueil rafraîchit après un
 // changement de module.

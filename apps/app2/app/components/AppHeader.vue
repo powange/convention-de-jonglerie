@@ -1,8 +1,9 @@
 <template>
   <header class="sticky top-0 z-10 border-b border-default bg-default/75 backdrop-blur">
     <UContainer class="flex h-16 items-center justify-between gap-4">
-      <!-- Le logo mène toujours à l'accueil, connecté ou non (le tableau de bord a son bouton). -->
-      <NuxtLink to="/" class="flex items-center gap-2">
+      <!-- Le logo mène à l'accueil, connecté ou non (le tableau de bord a son bouton) ; dans
+           l'application d'un événement, à son écran de démarrage. -->
+      <NuxtLink :to="accueil" class="flex items-center gap-2">
         <AppLogo class="h-8 w-auto text-highlighted" />
         <span class="flex flex-col leading-tight">
           <span class="text-lg font-semibold">Flow<span style="color: #ff6a00">vent</span></span>
@@ -13,6 +14,7 @@
       <nav class="flex items-center gap-2">
         <template v-if="loggedIn">
           <UButton
+            v-if="!applicationEvenement"
             to="/dashboard"
             variant="ghost"
             color="neutral"
@@ -21,6 +23,7 @@
             class="max-sm:hidden"
           />
           <UButton
+            v-if="!applicationEvenement"
             to="/pricing"
             variant="ghost"
             color="neutral"
@@ -37,6 +40,7 @@
                page (`/login` demande l'adresse, puis connecte ou crée le compte), et les deux ensemble
                débordaient de l'écran d'un téléphone. « Tarifs » y est caché : l'accueil y renvoie. -->
           <UButton
+            v-if="!applicationEvenement"
             to="/pricing"
             variant="ghost"
             color="neutral"
@@ -45,7 +49,7 @@
           />
           <UColorModeButton />
           <UButton
-            to="/login"
+            :to="connexion"
             color="primary"
             icon="i-heroicons-arrow-right-end-on-rectangle"
             label="Connexion"
@@ -58,4 +62,12 @@
 
 <script setup lang="ts">
 const { loggedIn } = useUserSession()
+const applicationEvenement = useApplicationEvenement()
+const accueil = computed(() =>
+  applicationEvenement.value ? `/events/${applicationEvenement.value}/app` : '/'
+)
+// Dans l'application d'un événement, la connexion y ramène.
+const connexion = computed(() =>
+  applicationEvenement.value ? `/login?returnTo=${encodeURIComponent(accueil.value)}` : '/login'
+)
 </script>
