@@ -532,24 +532,24 @@ interface EntreeDePopup {
   markerId: number | null
 }
 
-const { data: frise } = useApiFetch<{ entrees: EntreeDePopup[]; fuseau: string | null }>(
-  `/api/editions/${editionId.value}/program`,
-  {
-    lazy: true,
-    transform: (payload: any) => ({
-      entrees: ((payload?.data?.entrees ?? payload?.entrees ?? []) as any[]).map((e) => ({
-        titre: e.titre,
-        debut: e.debut,
-        fin: e.fin ?? null,
-        duree: e.duree ?? e.duration ?? null,
-        source: e.source,
-        zoneId: e.zone?.id ?? null,
-        markerId: e.repere?.id ?? null,
-      })),
-      fuseau: payload?.data?.fuseau ?? payload?.fuseau ?? null,
-    }),
-  }
-)
+// `useFetch` et non `useApiFetch` : le `transform` lit l'enveloppe lui-même. Le typage générique
+// de `useApiFetch` dépasse le budget d'instanciation de TypeScript dans Flowvent (TS2589), qui
+// emportait en cascade des erreurs d'autres pages.
+const { data: frise } = useFetch(`/api/editions/${editionId.value}/program`, {
+  lazy: true,
+  transform: (payload: any): { entrees: EntreeDePopup[]; fuseau: string | null } => ({
+    entrees: ((payload?.data?.entrees ?? payload?.entrees ?? []) as any[]).map((e) => ({
+      titre: e.titre,
+      debut: e.debut,
+      fin: e.fin ?? null,
+      duree: e.duree ?? e.duration ?? null,
+      source: e.source,
+      zoneId: e.zone?.id ?? null,
+      markerId: e.repere?.id ?? null,
+    })),
+    fuseau: payload?.data?.fuseau ?? payload?.fuseau ?? null,
+  }),
+})
 
 /**
  * Ce qui n'est pas encore terminé.

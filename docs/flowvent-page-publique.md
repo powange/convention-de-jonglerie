@@ -58,3 +58,8 @@ Dès que deux de ces sections existent (programme, carte), la page gagnera des *
 celle d'une édition d'app1.
 
 **Défaut connu** : supprimer un événement ne supprime pas son affiche du disque (fichier orphelin).
+
+## Onglets
+
+Depuis le 27/11 : Informations, Programme, Carte du site, FAQ, Bénévoles — chacun seulement s'il
+est publié (`EvenementOnglets`, sur la page de l'événement et dans `EditionHeader`).
