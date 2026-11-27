@@ -39,3 +39,18 @@ export const codePromoRateLimiter = createRateLimiter({
     return `code-promo:${ip}`
   },
 })
+
+/**
+ * Recherche d'adresse du formulaire de l'événement (`GET /api/adresses/recherche`), relayée vers
+ * Nominatim, dont la règle d'usage est d'une requête par seconde : trente par minute et par
+ * compte suffisent à un champ temporisé, et évitent qu'un compte fasse bannir le serveur.
+ */
+export const adresseSearchRateLimiter = createRateLimiter({
+  windowMs: 60 * 1000,
+  max: 30,
+  message: 'Trop de recherches d’adresse, veuillez réessayer dans une minute',
+  keyGenerator: (event) => {
+    const user = event.context.user
+    return user ? `adresse-search:${user.id}` : 'adresse-search:anonymous'
+  },
+})

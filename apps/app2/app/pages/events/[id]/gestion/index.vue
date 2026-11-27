@@ -134,6 +134,15 @@
           modules.
         </p>
       </UCard>
+
+      <!-- Tout en bas : archiver ou supprimer, le propriétaire seul. -->
+      <EvenementZoneSensible
+        v-if="accueil.droits.supprimer"
+        :ref-evenement="refEvenement"
+        :nom="accueil.evenement.name"
+        :archived-at="accueil.evenement.archivedAt"
+        @archive="refresh"
+      />
     </template>
   </div>
 </template>
@@ -142,6 +151,7 @@
 /**
  * Accueil de la gestion d'un événement : une carte par module que la personne peut ouvrir (avec ses
  * chiffres), et l'activation des modules — le point d'entrée où chaque module à venir s'ajoutera.
+ * Tout en bas, pour le propriétaire : archiver ou supprimer l'événement.
  */
 import type { Compteur, EtatQuota } from '#shared/formules'
 import type { CleModule, Droits, Modules } from '#shared/modules-evenement'
@@ -161,8 +171,9 @@ interface Accueil {
     startDate: string | null
     endDate: string | null
     timezone: string | null
+    archivedAt: string | null
   }
-  droits: Droits & { estProprietaire: boolean }
+  droits: Droits & { estProprietaire: boolean; supprimer: boolean }
   modules: Modules
   organisateurs: number
   quotas?: {
