@@ -176,22 +176,20 @@
           </UFormField>
 
           <div class="grid gap-4 sm:grid-cols-2">
-            <UFormField
-              v-for="l in CHAMPS_LIENS"
-              :key="l.cle"
-              :label="l.libelle"
-              :name="l.cle"
-              :error="erreursLiens[l.cle]"
-            >
-              <UInput
-                v-model="etat[l.cle]"
-                type="url"
-                class="w-full"
-                :icon="l.icone"
-                placeholder="https://…"
-                :disabled="!droits?.modifier"
-              />
-            </UFormField>
+            <!-- La boucle sur un <template> : posée sur UFormField, la variable n'existe pas dans
+                 son slot pour le typage de la CI (TS2304). -->
+            <template v-for="l in CHAMPS_LIENS" :key="l.cle">
+              <UFormField :label="l.libelle" :name="l.cle" :error="erreursLiens[l.cle]">
+                <UInput
+                  v-model="etat[l.cle]"
+                  type="url"
+                  class="w-full"
+                  :icon="l.icone"
+                  placeholder="https://…"
+                  :disabled="!droits?.modifier"
+                />
+              </UFormField>
+            </template>
           </div>
 
           <div v-if="droits?.modifier" class="flex justify-end">
