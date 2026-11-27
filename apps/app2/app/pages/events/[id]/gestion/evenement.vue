@@ -176,20 +176,56 @@
           </UFormField>
 
           <div class="grid gap-4 sm:grid-cols-2">
-            <!-- La boucle sur un <template> : posée sur UFormField, la variable n'existe pas dans
-                 son slot pour le typage de la CI (TS2304). -->
-            <template v-for="l in CHAMPS_LIENS" :key="l.cle">
-              <UFormField :label="l.libelle" :name="l.cle" :error="erreursLiens[l.cle]">
-                <UInput
-                  v-model="etat[l.cle]"
-                  type="url"
-                  class="w-full"
-                  :icon="l.icone"
-                  placeholder="https://…"
-                  :disabled="!droits?.modifier"
-                />
-              </UFormField>
-            </template>
+            <!-- Écrits un par un : une boucle dont la variable sert DANS le slot de UFormField
+                 n'était pas vue du typage de la CI (TS2304), ni sur le composant ni sur un template. -->
+            <UFormField
+              label="Site officiel"
+              name="officialWebsiteUrl"
+              :error="erreursLiens.officialWebsiteUrl"
+            >
+              <UInput
+                v-model="etat.officialWebsiteUrl"
+                type="url"
+                class="w-full"
+                icon="i-heroicons-globe-alt"
+                placeholder="https://…"
+                :disabled="!droits?.modifier"
+              />
+            </UFormField>
+            <UFormField
+              label="Billetterie en ligne"
+              name="ticketingUrl"
+              :error="erreursLiens.ticketingUrl"
+            >
+              <UInput
+                v-model="etat.ticketingUrl"
+                type="url"
+                class="w-full"
+                icon="i-heroicons-ticket"
+                placeholder="https://…"
+                :disabled="!droits?.modifier"
+              />
+            </UFormField>
+            <UFormField label="Facebook" name="facebookUrl" :error="erreursLiens.facebookUrl">
+              <UInput
+                v-model="etat.facebookUrl"
+                type="url"
+                class="w-full"
+                icon="i-simple-icons-facebook"
+                placeholder="https://…"
+                :disabled="!droits?.modifier"
+              />
+            </UFormField>
+            <UFormField label="Instagram" name="instagramUrl" :error="erreursLiens.instagramUrl">
+              <UInput
+                v-model="etat.instagramUrl"
+                type="url"
+                class="w-full"
+                icon="i-simple-icons-instagram"
+                placeholder="https://…"
+                :disabled="!droits?.modifier"
+              />
+            </UFormField>
           </div>
 
           <div v-if="droits?.modifier" class="flex justify-end">
@@ -381,12 +417,12 @@ function etatDepuis(e: Evenement | undefined) {
   }
 }
 
-/** Les liens publics de l'événement. */
+/** Les liens publics de l'événement (les champs du formulaire, pour leur validation). */
 const CHAMPS_LIENS = [
-  { cle: 'officialWebsiteUrl', libelle: 'Site officiel', icone: 'i-heroicons-globe-alt' },
-  { cle: 'ticketingUrl', libelle: 'Billetterie en ligne', icone: 'i-heroicons-ticket' },
-  { cle: 'facebookUrl', libelle: 'Facebook', icone: 'i-simple-icons-facebook' },
-  { cle: 'instagramUrl', libelle: 'Instagram', icone: 'i-simple-icons-instagram' },
+  { cle: 'officialWebsiteUrl' },
+  { cle: 'ticketingUrl' },
+  { cle: 'facebookUrl' },
+  { cle: 'instagramUrl' },
 ] as const
 
 const etat = reactive(etatDepuis(evenement.value))
