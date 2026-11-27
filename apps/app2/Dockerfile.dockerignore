@@ -16,6 +16,7 @@
 !layers/meals
 !layers/treasury
 !layers/backup
+!layers/faq
 
 # Artefacts et dépendances (régénérés dans l'image)
 **/node_modules

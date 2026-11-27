@@ -152,7 +152,8 @@
     "expand": "Déplier",
     "download": "Télécharger",
     "unsaved_changes": "Modifications non enregistrées",
-    "unsaved_changes_warning": "Vous avez des modifications qui n'ont pas été enregistrées. Si vous quittez cette page maintenant, elles seront perdues."
+    "unsaved_changes_warning": "Vous avez des modifications qui n'ont pas été enregistrées. Si vous quittez cette page maintenant, elles seront perdues.",
+    "public": "Public"
   },
   "components": {
     "date_time_picker": {
@@ -456,6 +457,29 @@
     },
     "workshops": {
       "title": "Workshops"
+    },
+    "faq": {
+      "edit_entry": "Modifier l'entrée",
+      "new_entry": "Nouvelle entrée",
+      "question": "Question",
+      "question_placeholder": "Ex: À quelle heure ouvrent les portes ?",
+      "answer": "Réponse",
+      "is_public": "Visible publiquement",
+      "is_public_help": "Si activé, l'entrée apparaît dans la FAQ publique de l’événement.",
+      "title": "FAQ",
+      "description": "Paramétrez les questions/réponses affichées aux visiteurs sur la page publique de l’événement.",
+      "export_pdf": "Exporter en PDF",
+      "page_public": "Page publique visible",
+      "page_public_help": "Si activé, l'onglet FAQ est visible sur la page publique de l’événement.",
+      "empty_state": "Aucune entrée pour le moment. Créez votre première question/réponse.",
+      "search_placeholder": "Rechercher dans la FAQ…",
+      "no_results": "Aucun résultat pour « {query} »",
+      "make_private": "Rendre privée",
+      "make_public": "Rendre public",
+      "export_pdf_public": "FAQ publique",
+      "export_pdf_all": "Tout, statuts compris",
+      "export_pdf_empty": "Aucune entrée à exporter",
+      "confirm_delete": "Supprimer l'entrée « {question} » ?"
     }
   },
   "organizers": {
@@ -824,5 +848,12 @@
         "description": "Une erreur s'est produite lors de l'installation. Veuillez réessayer."
       }
     }
+  },
+  "faq": {
+    "title": "FAQ",
+    "description": "Retrouvez ici les réponses aux questions les plus fréquentes sur cet événement.",
+    "empty_state": "Aucune question publiée pour le moment.",
+    "search_placeholder": "Rechercher dans la FAQ…",
+    "no_results": "Aucun résultat pour « {query} »"
   }
 }

@@ -12,6 +12,7 @@ import { formatDeReponseJson, schemaJsonDepuisZod } from '../../lib/schema-json-
 
 import { importSchema } from './import-edition.post'
 
+import { htmlVersTexte } from '#core/shared/utils/html-to-text'
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import {
   AI_TIMEOUTS,
@@ -54,7 +55,6 @@ import {
 } from '#server/utils/jugglingedge-scraper'
 import { extractWebContent, formatExtractionForAI } from '#server/utils/web-content-extractor'
 import { fuseauDImport } from '~~/shared/utils/fuseau-depuis-import'
-import { htmlVersTexte } from '~~/shared/utils/html-to-text'
 import { editionDayKeys } from '~~/shared/utils/program-days'
 import { construireElementsDeJournee, type ElementLu } from '~~/shared/utils/program-import'
 import { decouperParJournee } from '~~/shared/utils/program-page-slicing'

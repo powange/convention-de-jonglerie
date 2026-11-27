@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { htmlVersTexte } from '../../../shared/utils/html-to-text'
+import { htmlVersTexte } from '#core/shared/utils/html-to-text'
 
 /**
  * Cette conversion sert le relevé d'un programme : ce sont l'ordre et la séparation des lignes

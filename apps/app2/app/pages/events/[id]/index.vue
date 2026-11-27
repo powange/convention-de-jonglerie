@@ -182,6 +182,7 @@ interface PagePublique {
   pagePublique: boolean
   benevoles: { candidaturesOuvertes: boolean } | null
   appels: { id: number; nom: string; ouvert: boolean; dateLimite: string | null }[]
+  faq: boolean
   droits: { voir: boolean; estProprietaire: boolean } | null
 }
 
@@ -269,6 +270,17 @@ const participations = computed<Participation[]>(() => {
       couleur: 'bg-secondary/10 text-secondary',
       to: `${base}/shows-call/${a.id}`,
     })),
+    ...(p.faq
+      ? [
+          {
+            titre: 'Questions fréquentes',
+            description: 'Les réponses aux questions que l’on se pose avant de venir.',
+            icone: 'i-heroicons-question-mark-circle',
+            couleur: 'bg-info/10 text-info',
+            to: `${base}/faq`,
+          },
+        ]
+      : []),
     ...(e.value.liens.billetterie
       ? [
           {

@@ -12,6 +12,11 @@ export interface FaqDirectoryPort {
    * `pagePublic: false` → page publique masquée (un éditeur garde l'accès, pas un visiteur).
    */
   getFaqVisibility(editionId: number): Promise<{ enabled: boolean; pagePublic: boolean }>
+  /**
+   * Rend la page publique de la FAQ visible des visiteurs, ou la masque. Appelé par
+   * `PUT /api/editions/:id/faq/visibility`, après vérification de `canManageFAQ`.
+   */
+  setFaqPagePublic(editionId: number, pagePublic: boolean): Promise<void>
 }
 
 export interface FaqPorts {

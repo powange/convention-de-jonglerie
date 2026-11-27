@@ -43,6 +43,7 @@ const aliasHorsNuxt = {
   '#volunteers': resolve(__dirname, '../../layers/volunteers'),
   // Déclaré par `layers/map/nuxt.config.ts`.
   '#map': resolve(__dirname, '../../layers/map'),
+  '#faq': resolve(__dirname, '../../layers/faq'),
   // Déclarés par `layers/stock/nuxt.config.ts` et `layers/artists/nuxt.config.ts`.
   '#stock': resolve(__dirname, '../../layers/stock'),
   '#artists': resolve(__dirname, '../../layers/artists'),

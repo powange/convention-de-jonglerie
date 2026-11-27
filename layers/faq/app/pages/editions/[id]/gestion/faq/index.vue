@@ -224,7 +224,7 @@ import {
 import { nomFichierFaq, preparerFaqPourPdf } from '../../../../../utils/faq-pdf'
 
 import { requeteAvec, texteDepuisUrl } from '#core/shared/utils/filtres-url'
-import { htmlVersTexte } from '~~/shared/utils/html-to-text'
+import { htmlVersTexte } from '#core/shared/utils/html-to-text'
 
 // Layer faq : imports du cœur applicatif via #imports (auto-imports fusionnés entre layers).
 
@@ -243,7 +243,8 @@ interface FaqEntry {
 
 const route = useRoute()
 const { t } = useI18n()
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 if (Number.isNaN(editionId)) {
   throw createError({ statusCode: 404, statusMessage: 'Édition introuvable', fatal: true })
 }
@@ -323,7 +324,8 @@ async function fetchEntries() {
 }
 
 const { execute: executerBasculePagePublic, loading: savingPagePublic } = useApiAction(
-  `/api/editions/${editionId}`,
+  // Le point du layer, et non la mise à jour générale de l'édition (propre à chaque app).
+  `/api/editions/${editionId}/faq/visibility`,
   {
     method: 'PUT',
     body: () => ({ faqPagePublic: faqPagePublicLocal.value }),
@@ -480,7 +482,9 @@ function deleteEntry(entry: FaqEntry) {
     titre: t('common.delete'),
     description: t('gestion.faq.confirm_delete', { question: entry.question }),
     libelleConfirmer: t('common.delete'),
-    agir: () => performDeleteEntry(entry),
+    agir: async () => {
+      await performDeleteEntry(entry)
+    },
   })
 }
 

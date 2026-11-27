@@ -2,7 +2,7 @@
 // (2ᵉ app / tests). Même mécanisme que les autres modules.
 import { createDefaultFaqPorts } from './default-binding'
 
-import type { FaqPorts } from './types'
+import type { FaqPorts } from '#faq/server/ports/types'
 
 let override: FaqPorts | null = null
 let cached: FaqPorts | null = null

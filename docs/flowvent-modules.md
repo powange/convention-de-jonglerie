@@ -207,6 +207,24 @@ rattachés à l'événement, migration purement additive), le comptage du fonds 
 le domaine protégé des justificatifs (`/uploads/…/treasury/…`, lisibles par qui gère la
 trésorerie), la section « Trésorerie » de la barre latérale, et le module devient disponible.
 
+## FAQ (27/11/2026)
+
+Le layer `faq` existait déjà (pages publique et de gestion, API) ; il est branché dans Flowvent.
+
+- **Catalogue** : module `faq` (`Event.faqEnabled`), relevant du droit « modifier l'événement »
+  comme la carte (`canManageFAQ` = `modifier`, côté serveur et dans le store) — pas de droit à
+  part. `Event.faqPagePublic` rend sa page publique visible des visiteurs.
+- **Ports** : leur type est passé dans le layer (`#faq/server/ports/types`, alias déclaré par
+  `layers/faq/nuxt.config.ts`) ; chaque app câble `#server/faq/ports/registry`. Nouveau port
+  `setFaqPagePublic`, appelé par `PUT /api/editions/:id/faq/visibility` (point du layer) : la page
+  de gestion appelait la mise à jour générale de l'édition, propre à app1.
+- **Contrat d'hôte** : `aAccesGestionEdition` (`server/utils/permissions/acces-gestion-edition.ts`,
+  « voir l'événement ») ; `getEditionWithPermissions` accepte un visiteur sans identifiant.
+- **Utilitaires partagés** : `highlight.ts` passé d'app1 à `layers/ui/app/utils/`,
+  `html-to-text.ts` à `layers/core/shared/utils/` (`#core/shared/utils/html-to-text`).
+- **Pages** : `useEditionId()` au lieu de `parseInt(route.params.id)` (garde étendue au layer).
+- **Libellés** : les 27 clés empruntées à app1 sont dans `apps/app2/i18n/locales/benevoles.json`.
+
 ## Notions « convention » à ramener à l'événement
 
 Flowvent n'a pas de convention : l'événement en tient lieu (`getEditionWithPermissions` rend

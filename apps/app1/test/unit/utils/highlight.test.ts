@@ -6,7 +6,7 @@ import {
   countMatches,
   highlightText,
   highlightHtml,
-} from '../../../app/utils/highlight'
+} from '../../../../../layers/ui/app/utils/highlight'
 
 const MARK_CLASS = 'bg-yellow-200 dark:bg-yellow-700/60 text-inherit rounded px-0.5'
 

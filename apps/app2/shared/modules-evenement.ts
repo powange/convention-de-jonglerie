@@ -30,6 +30,7 @@ export type CleModule =
   | 'repas'
   | 'billetterie'
   | 'tresorerie'
+  | 'faq'
 
 export type ColonneDroit =
   | 'canEditEvent'
@@ -49,6 +50,7 @@ export type ColonneModule =
   | 'mealsEnabled'
   | 'ticketingEnabled'
   | 'treasuryEnabled'
+  | 'faqEnabled'
 
 export interface DefinitionModule {
   cle: CleModule
@@ -133,6 +135,16 @@ export const MODULES_EVENEMENT: readonly DefinitionModule[] = [
     description: 'Dépenses, recettes et justificatifs.',
     icone: 'i-heroicons-banknotes',
     droit: 'tresorerie',
+    disponible: true,
+  },
+  {
+    cle: 'faq',
+    colonne: 'faqEnabled',
+    libelle: 'FAQ',
+    description: 'Questions fréquentes, publiques ou internes, et leur page publique.',
+    icone: 'i-heroicons-question-mark-circle',
+    // Un contenu public de l'événement : relève de « modifier l'événement », comme la carte.
+    droit: 'modifier',
     disponible: true,
   },
 ]

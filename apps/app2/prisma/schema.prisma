@@ -160,6 +160,10 @@ model Event {
   mealsEnabled                     Boolean              @default(false)
   ticketingEnabled                 Boolean              @default(false)
   treasuryEnabled                  Boolean              @default(false)
+  /// FAQ (layer `faq`) : module actif, et sa page publique visible des visiteurs. Mêmes noms que
+  /// l'`Edition` d'app1.
+  faqEnabled                       Boolean              @default(false)
+  faqPagePublic                    Boolean              @default(false)
   /// Dernier comptage du fonds de caisse, en centimes, et sa date (trésorerie, comme l'édition d'app1).
   cashFloatCount                   Int?
   cashFloatCountedAt               DateTime?
@@ -226,6 +230,7 @@ model Event {
   tierCustomFields               TicketingTierCustomField[]
   ticketingCounters              TicketingCounter[]
   entryValidationLogs            EntryValidationLog[]
+  faqEntries                     FaqEntry[]
 
   @@index([ownerId])
 }
@@ -2980,4 +2985,23 @@ model TreasuryCashFloat {
 
   @@index([editionId])
   @@index([lentById])
+}
+
+/// Une question de la FAQ d'un événement (layer `faq`), même forme que dans app1. La réponse est en
+/// Markdown, rendue côté client par `markdownToHtml` (assainie).
+model FaqEntry {
+  id           Int      @id @default(autoincrement())
+  editionId    Int
+  question     String   @db.VarChar(500)
+  answer       String   @db.Text
+  isPublic     Boolean  @default(false)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  edition Event @relation(fields: [editionId], references: [id], onDelete: Cascade)
+
+  @@index([editionId])
+  @@index([editionId, displayOrder])
+  @@index([editionId, isPublic])
 }
