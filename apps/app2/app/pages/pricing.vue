@@ -89,14 +89,14 @@
       :description="`Active jusqu'au ${formatDate(abonnement.currentPeriodEnd)}. Choisissez une autre formule ci-dessous pour en changer.`"
     />
 
-    <!-- Les trois formules payantes. -->
-    <div class="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
+    <!-- Les quatre formules, la gratuite comprise, sur une même ligne. -->
+    <div class="mx-auto grid max-w-7xl gap-6 md:grid-cols-2 lg:grid-cols-4">
       <UCard
-        v-for="f in FORMULES_PAYANTES"
+        v-for="f in FORMULES"
         :key="f.cle"
         :class="[
           'relative transition',
-          f.cle === formuleConseillee
+          f.cle === formuleMiseEnValeur
             ? 'ring-2 ring-secondary md:-translate-y-1'
             : f.cle === FORMULE_MISE_EN_AVANT
               ? 'ring-2 ring-primary'
@@ -107,13 +107,13 @@
         <div class="flex items-center justify-between gap-2">
           <h2 class="text-xl font-semibold">{{ f.libelle }}</h2>
           <UBadge
-            v-if="f.cle === formuleConseillee"
+            v-if="f.cle === formuleMiseEnValeur"
             color="secondary"
             variant="subtle"
             label="Pour vous"
           />
           <UBadge
-            v-else-if="subActive && abonnement?.formule === f.cle"
+            v-else-if="estFormuleDuCompte(f.cle)"
             color="success"
             variant="subtle"
             label="Votre formule"
@@ -126,7 +126,13 @@
           />
         </div>
         <p class="text-sm text-muted">{{ f.accroche }}</p>
-        <div>
+
+        <!-- La gratuite : ni prix ni code promo. -->
+        <div v-if="!estFormulePayante(f.cle)">
+          <p><span class="text-3xl font-bold">Gratuit</span></p>
+          <p class="text-xs text-muted">sans limite de durée</p>
+        </div>
+        <div v-else>
           <p v-if="prixAvecCode(f.cle) !== null">
             <s class="mr-1 text-muted">{{ euros(prixMensuel(f.cle, periode)) }}</s>
             <span class="text-3xl font-bold">
@@ -161,17 +167,49 @@
             </template>
           </p>
         </div>
-        <ul class="flex-1 divide-y divide-default text-sm">
-          <li
-            v-for="c in COMPTEURS"
-            :key="c.cle"
-            class="flex items-baseline justify-between gap-3 py-1.5"
-          >
-            <span class="text-muted">{{ libelleCompteur(c.cle) }}</span>
-            <span class="font-semibold tabular-nums">{{ libellePlafond(f.plafonds[c.cle]) }}</span>
-          </li>
-        </ul>
+
+        <!-- Libellés courts : les lignes restent alignées d'une carte à l'autre, même étroites. -->
+        <div class="flex-1">
+          <ul class="divide-y divide-default text-sm">
+            <li
+              v-for="c in COMPTEURS"
+              :key="c.cle"
+              class="flex items-baseline justify-between gap-3 py-1.5"
+            >
+              <span class="text-muted">{{ c.libelle }}</span>
+              <span class="font-semibold tabular-nums">{{
+                libellePlafond(f.plafonds[c.cle])
+              }}</span>
+            </li>
+          </ul>
+          <p class="mt-1 text-xs text-muted">
+            Bénévoles, artistes et co-organisateurs : par événement.
+          </p>
+        </div>
+
+        <!-- La gratuite ne se souscrit pas : c'est la formule de tout compte sans abonnement. -->
+        <template v-if="!estFormulePayante(f.cle)">
+          <UButton
+            v-if="!loggedIn"
+            block
+            size="lg"
+            to="/register"
+            color="neutral"
+            variant="subtle"
+            label="Créer un compte"
+          />
+          <UButton
+            v-else
+            block
+            size="lg"
+            color="neutral"
+            variant="subtle"
+            disabled
+            :label="subActive ? 'Après votre abonnement' : 'Votre formule actuelle'"
+          />
+        </template>
         <UButton
+          v-else
           block
           size="lg"
           :color="f.cle === FORMULE_MISE_EN_AVANT ? 'primary' : 'neutral'"
@@ -182,36 +220,6 @@
         />
       </UCard>
     </div>
-
-    <!-- La formule gratuite : celle de tout compte sans abonnement payant. -->
-    <UCard class="mx-auto max-w-5xl" variant="subtle">
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div class="space-y-1">
-          <p class="font-semibold">
-            {{ gratuite.libelle }}, gratuite
-            <UBadge
-              v-if="loggedIn && !subActive"
-              class="ml-2"
-              color="success"
-              variant="subtle"
-              label="Votre formule"
-            />
-          </p>
-          <p class="text-sm text-muted">
-            {{ gratuite.accroche }} {{ libellePlafondsFormule(gratuite.cle) }}, tous les modules
-            compris.
-          </p>
-        </div>
-        <UButton
-          v-if="!loggedIn"
-          to="/register"
-          color="neutral"
-          variant="outline"
-          label="Créer un compte"
-          class="shrink-0"
-        />
-      </div>
-    </UCard>
 
     <!-- Le calculateur : on indique la taille de son événement, la page désigne la formule. -->
     <UCard class="mx-auto max-w-5xl" variant="subtle">
@@ -305,8 +313,9 @@ import type { CleFormulePayante, Compteur, Periode } from '#shared/formules'
 import { couvre, normaliserCode } from '#shared/codes-promo'
 import {
   COMPTEURS,
-  FORMULES_PAYANTES,
+  FORMULES,
   FORMULE_GRATUITE,
+  estFormulePayante,
   euros,
   formule,
   formulePourTaille,
@@ -446,6 +455,16 @@ const tientEnGratuite = computed(() =>
 const formuleConseillee = computed(() =>
   tientEnGratuite.value ? null : formulePourTaille({ ...besoins })
 )
+/** La formule que le calculateur désigne, la gratuite comprise. */
+const formuleMiseEnValeur = computed(() =>
+  tientEnGratuite.value ? FORMULE_GRATUITE : formuleConseillee.value
+)
+
+/** La formule qui s'applique au compte connecté : la gratuite sans abonnement payant actif. */
+function estFormuleDuCompte(cle: string) {
+  if (!loggedIn.value) return false
+  return subActive.value ? abonnement.value?.formule === cle : cle === FORMULE_GRATUITE
+}
 
 // Souscription.
 const formuleChoisie = ref<CleFormulePayante | null>(null)
