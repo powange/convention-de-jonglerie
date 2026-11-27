@@ -119,8 +119,16 @@ import type { ButtonProps, PageFeatureProps } from '@nuxt/ui'
 
 import { modulesDisponibles, type CleModule } from '#shared/modules-evenement'
 
-// Connecté, on n'a rien à faire sur la vitrine : `guest-only` envoie au tableau de bord.
-definePageMeta({ middleware: 'guest-only' })
+// L'accueil reste ouvert aux personnes connectées (le logo y ramène) : leur appel à l'action mène
+// au tableau de bord plutôt qu'à la création d'un compte. Après une connexion, c'est le tableau de
+// bord qui s'ouvre (app.config `auth.destinationApresConnexion`).
+const { loggedIn } = useUserSession()
+/** Le premier bouton : créer un compte, ou rejoindre son tableau de bord une fois connecté. */
+const lienPrincipal = computed(() =>
+  loggedIn.value
+    ? { label: 'Mon tableau de bord', to: '/dashboard', icon: 'i-heroicons-squares-2x2' }
+    : { label: 'Créer mon compte', to: '/login', icon: 'i-heroicons-rocket-launch' }
+)
 
 useSeoMeta({
   title: "Flowvent — Organisation d'événements",
@@ -153,8 +161,8 @@ const presentation: Record<CleModule, string> = {
     'La frise de votre événement, spectacles et moments forts, publiée quand elle est prête.',
 }
 
-const liensAccroche: ButtonProps[] = [
-  { label: 'Créer mon compte', to: '/login', size: 'xl', icon: 'i-heroicons-rocket-launch' },
+const liensAccroche = computed<ButtonProps[]>(() => [
+  { ...lienPrincipal.value, size: 'xl' },
   {
     label: 'Comment ça marche',
     to: '#comment',
@@ -163,10 +171,10 @@ const liensAccroche: ButtonProps[] = [
     variant: 'subtle',
     trailingIcon: 'i-heroicons-arrow-down',
   },
-]
+])
 
-const liensFinaux: ButtonProps[] = [
-  { label: 'Créer mon compte', to: '/login', icon: 'i-heroicons-rocket-launch' },
+const liensFinaux = computed<ButtonProps[]>(() => [
+  lienPrincipal.value,
   {
     label: 'Voir les tarifs',
     to: '/pricing',
@@ -174,7 +182,7 @@ const liensFinaux: ButtonProps[] = [
     variant: 'subtle',
     trailingIcon: 'i-heroicons-arrow-right',
   },
-]
+])
 
 const etapes = [
   {

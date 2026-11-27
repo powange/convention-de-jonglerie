@@ -1,8 +1,8 @@
 <template>
   <header class="sticky top-0 z-10 border-b border-default bg-default/75 backdrop-blur">
     <UContainer class="flex h-16 items-center justify-between gap-4">
-      <!-- Connecté, l'accueil renvoie de toute façon au tableau de bord : on y va directement. -->
-      <NuxtLink :to="loggedIn ? '/dashboard' : '/'" class="flex items-center gap-2">
+      <!-- Le logo mène toujours à l'accueil, connecté ou non (le tableau de bord a son bouton). -->
+      <NuxtLink to="/" class="flex items-center gap-2">
         <AppLogo class="h-8 w-auto text-highlighted" />
         <span class="flex flex-col leading-tight">
           <span class="text-lg font-semibold">Flow<span style="color: #ff6a00">vent</span></span>

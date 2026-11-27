@@ -45,6 +45,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
       }
     }
 
-    return navigateTo('/')
+    return navigateTo(useAppConfig().auth.destinationApresConnexion)
   }
 })

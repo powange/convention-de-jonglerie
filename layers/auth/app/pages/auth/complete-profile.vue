@@ -166,7 +166,8 @@ const skipCategories = async () => {
 }
 
 const redirectToFinalDestination = async () => {
-  // Le cookie sera lu par le serveur si nécessaire, sinon on redirige vers la page d'accueil
-  await navigateTo('/')
+  // Le cookie sera lu par le serveur si nécessaire, sinon la destination de l'application
+  // (app.config `auth.destinationApresConnexion`).
+  await navigateTo(useAppConfig().auth.destinationApresConnexion)
 }
 </script>

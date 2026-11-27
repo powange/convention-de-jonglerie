@@ -578,8 +578,12 @@ const handlePasswordSubmit = async () => {
     const returnTo = useRoute().query.returnTo as string
     const { isAuthPage, cleanReturnTo } = useReturnTo()
 
-    // Utiliser l'URL nettoyée ou rediriger vers l'accueil si c'est une page d'auth
-    const finalDestination = returnTo && !isAuthPage(returnTo) ? cleanReturnTo(returnTo) : '/'
+    // La page demandée, nettoyée ; à défaut (ou si c'était une page d'auth), la destination que
+    // l'application a choisie (app.config `auth.destinationApresConnexion`).
+    const finalDestination =
+      returnTo && !isAuthPage(returnTo)
+        ? cleanReturnTo(returnTo)
+        : useAppConfig().auth.destinationApresConnexion
 
     router.push(finalDestination)
   } catch (e: unknown) {
