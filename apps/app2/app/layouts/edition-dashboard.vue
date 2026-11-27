@@ -62,6 +62,9 @@
               aria-label="Voir l'événement"
               :ui="{ label: 'max-sm:hidden' }"
             />
+            <!-- Comme sur le reste du site : le thème, et le compte connecté avec son menu. -->
+            <UColorModeButton />
+            <AppUserMenu />
           </template>
         </UDashboardNavbar>
       </template>

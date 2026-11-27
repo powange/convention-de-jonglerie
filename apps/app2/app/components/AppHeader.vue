@@ -29,18 +29,7 @@
             label="Tarifs"
             class="max-sm:hidden"
           />
-          <UDropdownMenu :items="userMenuItems">
-            <!-- Sur téléphone, l'avatar seul : un pseudo long poussait la barre hors de l'écran. -->
-            <UButton
-              :label="user?.pseudo || user?.email"
-              :avatar="avatar"
-              trailing-icon="i-heroicons-chevron-down"
-              color="neutral"
-              variant="soft"
-              :aria-label="user?.pseudo || user?.email"
-              :ui="{ label: 'max-sm:hidden', trailingIcon: 'max-sm:hidden' }"
-            />
-          </UDropdownMenu>
+          <AppUserMenu />
         </template>
         <template v-else>
           <!-- Un seul bouton pour entrer : « Connexion » et « Créer un compte » menaient à la même
@@ -66,62 +55,5 @@
 </template>
 
 <script setup lang="ts">
-import type { DropdownMenuItem } from '@nuxt/ui'
-
-const { loggedIn, user, clear } = useUserSession()
-// L'état d'invitation est partagé avec le bandeau (`useInvitePwa`, layer ui).
-const { entreeDeMenuDisponible, installer: installerLApplication } = useInvitePwa()
-const toast = useToast()
-
-/*
- * L'avatar du menu : la photo de profil (déposée, ou reprise de Google / Facebook), sinon les
- * initiales du pseudo. La session ne porte pas la photo (cf. layers/auth/shared/utils/
- * utilisateur-de-session.ts) : on la lit dans le profil, partagé avec l'espace « Mon profil »
- * (même clé), si bien qu'une photo changée là-bas se voit ici sans rechargement.
- */
-const { data: profil } = useProfil({ immediate: loggedIn.value, watch: [loggedIn] })
-const { getUserAvatar } = useAvatar()
-const avatar = computed(() => ({
-  src: profil.value?.profilePicture
-    ? getUserAvatar({ id: profil.value.id, profilePicture: profil.value.profilePicture }, 64)
-    : undefined,
-  alt: user.value?.pseudo || user.value?.email || '',
-}))
-
-async function logout() {
-  try {
-    await $fetch('/api/auth/logout', { method: 'POST' })
-  } finally {
-    await clear()
-    toast.add({ title: 'Déconnexion réussie', icon: 'i-heroicons-check-circle', color: 'success' })
-    await navigateTo('/login')
-  }
-}
-
-const userMenuItems = computed<DropdownMenuItem[][]>(() => [
-  [{ label: user.value?.email ?? '', type: 'label' }],
-  [
-    { label: 'Mon profil', icon: 'i-heroicons-user', to: '/profile' },
-    { label: 'Tableau de bord', icon: 'i-heroicons-squares-2x2', to: '/dashboard' },
-    { label: 'Tarifs', icon: 'i-heroicons-credit-card', to: '/pricing' },
-    // Réservé aux administrateurs ; les pages et l'API le revérifient (server/utils/administration.ts).
-    ...((user.value as { isGlobalAdmin?: boolean } | null)?.isGlobalAdmin
-      ? [{ label: 'Administration', icon: 'i-heroicons-shield-check', to: '/admin' }]
-      : []),
-  ],
-  // Installer l'application, quand le navigateur le propose : le bandeau ne se présente qu'une
-  // fois puis se tait sept jours, et ce geste volontaire doit rester possible (comme dans app1).
-  ...(entreeDeMenuDisponible.value
-    ? [
-        [
-          {
-            label: "Installer l'application",
-            icon: 'i-heroicons-arrow-down-tray',
-            onSelect: () => installerLApplication(),
-          },
-        ],
-      ]
-    : []),
-  [{ label: 'Se déconnecter', icon: 'i-heroicons-arrow-right-on-rectangle', onSelect: logout }],
-])
+const { loggedIn } = useUserSession()
 </script>
