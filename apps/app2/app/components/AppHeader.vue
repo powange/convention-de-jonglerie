@@ -11,7 +11,6 @@
       </NuxtLink>
 
       <nav class="flex items-center gap-2">
-        <UColorModeSwitch />
         <template v-if="loggedIn">
           <UButton
             to="/dashboard"
@@ -29,6 +28,8 @@
             label="Tarifs"
             class="max-sm:hidden"
           />
+          <!-- Même place et même bouton que dans la barre de la gestion : juste avant le compte. -->
+          <UColorModeButton />
           <AppUserMenu />
         </template>
         <template v-else>
@@ -42,6 +43,7 @@
             label="Tarifs"
             class="max-sm:hidden"
           />
+          <UColorModeButton />
           <UButton
             to="/login"
             color="primary"
