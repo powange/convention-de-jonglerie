@@ -219,7 +219,7 @@ const cartes = computed(() => {
     {
       titre: "Informations de l'événement",
       description: a.droits.modifier
-        ? 'Nom, lieu, dates, fuseau.'
+        ? 'Nom, dates, adresse, affiche, page publique.'
         : 'Nom, lieu, dates (lecture seule).',
       icone: 'i-lucide-settings',
       couleur: 'bg-primary/10 text-primary',

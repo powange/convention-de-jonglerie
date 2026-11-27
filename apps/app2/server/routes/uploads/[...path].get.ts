@@ -37,6 +37,12 @@ const DOMAINES: DomaineFichiers[] = [
     motif: new RegExp(`^(?:temp/)?profiles/\\d+/[A-Za-z0-9_-]+\\.${IMAGES}$`, 'i'),
     lecture: 'public',
   },
+  // Affiches d'événement : publiques (page publique de l'événement). Dépôt dans temp/events/<id>/,
+  // rangées ensuite dans events/<id>/ (affiche-evenement.ts).
+  {
+    motif: new RegExp(`^(?:temp/events|events)/\\d+/[A-Za-z0-9_-]+\\.${IMAGES}$`, 'i'),
+    lecture: 'public',
+  },
   // Visuels de spectacle : publics (affichés sur le programme), comme dans app1. Dépôt dans
   // temp/shows/<événement>/, rangés ensuite dans shows/<spectacle>/.
   {

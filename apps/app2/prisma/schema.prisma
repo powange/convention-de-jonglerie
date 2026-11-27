@@ -115,7 +115,24 @@ model Event {
   publicId                         String               @unique @default(nanoid(10)) @db.VarChar(16)
   name                             String
   description                      String?              @db.Text
+  /// Nom du lieu (« Salle des fêtes de Lyon »). L'adresse postale est dans les colonnes address*.
   location                         String?
+  /// Adresse postale du lieu, affichée sur la page publique (avec un lien vers la carte).
+  addressLine1                     String?
+  addressLine2                     String?
+  postalCode                       String?  @db.VarChar(20)
+  city                             String?
+  country                          String?
+  /// Affiche de l'événement (`/uploads/events/<id>/<fichier>`), publique.
+  imageUrl                         String?
+  /// Liens publics de l'événement.
+  officialWebsiteUrl               String?  @db.VarChar(500)
+  ticketingUrl                     String?  @db.VarChar(500)
+  facebookUrl                      String?  @db.VarChar(500)
+  instagramUrl                     String?  @db.VarChar(500)
+  /// La page de l'événement (`/events/<publicId>`) est visible de tous, sans connexion. Choisi par
+  /// l'organisateur : fermée par défaut, pour qu'aucun événement en préparation ne s'expose seul.
+  pagePublique                     Boolean  @default(false)
   startDate                        DateTime?
   // Métadonnées génériques lues par le layer bénévoles (comme l'`Event` d'app1).
   endDate                          DateTime?
