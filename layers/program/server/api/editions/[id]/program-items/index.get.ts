@@ -1,6 +1,6 @@
+import { canManageProgram } from '#program/server/utils/permissions/program-permissions'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canManageProgram } from '#server/utils/permissions/program-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**

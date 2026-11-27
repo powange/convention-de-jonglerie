@@ -51,6 +51,8 @@ export default defineEventHandler(async (event) => {
       artistsEnabled: true,
       faqEnabled: true,
       faqPagePublic: true,
+      programEnabled: true,
+      programPagePublic: true,
       _count: { select: { faqEntries: { where: { isPublic: true } } } },
       volunteerSettings: { select: { pagePublic: true, open: true } },
       showCalls: {
@@ -115,6 +117,8 @@ export default defineEventHandler(async (event) => {
       : [],
     // La FAQ publique : module actif, page publique, et au moins une question publiée.
     faq: e.faqEnabled && e.faqPagePublic && e._count.faqEntries > 0,
+    // Le programme publié (module actif, page publique).
+    programme: e.programEnabled && e.programPagePublic,
     droits: droits?.voir ? { voir: true, estProprietaire: droits.estProprietaire } : null,
   }
 })

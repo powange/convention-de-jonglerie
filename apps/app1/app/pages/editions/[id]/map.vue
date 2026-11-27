@@ -223,7 +223,7 @@ import {
 import { externalMapEmbedUrl as buildExternalMapEmbedUrl } from '#map/shared/utils/external-map'
 // ⚠️ Import EXPLICITE : les utils de `shared/` ne sont pas auto-importés — `program.vue` importe
 // `estTermine` de la même façon. Sans cette ligne, le filtre lèverait au premier popup.
-import { estTermine } from '~~/shared/utils/program-timeline'
+import { estTermine } from '#program/shared/utils/program-timeline'
 
 const route = useRoute()
 const { t, locale } = useI18n()

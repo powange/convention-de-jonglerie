@@ -52,7 +52,7 @@
  * plusieurs workshops, si bien que le modifier ici renommerait l'endroit pour tous les autres.
  * C'est la même asymétrie que pour leur visibilité, et elle se règle sur leur propre page.
  */
-import type { EntreeProgramme } from '~~/shared/utils/program-timeline'
+import type { EntreeProgramme } from '#program/shared/utils/program-timeline'
 
 const props = defineProps<{
   entree: EntreeProgramme

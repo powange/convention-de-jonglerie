@@ -35,19 +35,21 @@ l'organisateur choisit de montrer au public.
 - **FAQ** (27/11) : le layer `faq` branché ; une carte « Questions fréquentes » mène à
   `/events/<id>/faq` quand la FAQ est active, publique et a au moins une question publiée.
 
+- **Programme** (27/11) : le programme d'app1 sorti dans `layers/program` ; une carte
+  « Programme » mène à `/events/<id>/program` quand il est publié.
+
 ## Ce qui manque encore côté gestion
 
 Par ordre d'intérêt pour la page publique.
 
-| Manque                                    | Ce que fait app1                                                     | Dans Flowvent                                                                                                  |
-| ----------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| **Programme**                             | onglet « Programme » : éléments de programme, spectacles, ateliers   | rien. Les spectacles existent (module artistes) mais ne sont pas publiés ; `program-items` vit dans app1 seule |
-| **Carte du site publique**                | onglet « Carte », zones et repères, export KML                       | la carte existe en gestion et la colonne `mapPublic` aussi, mais ni réglage ni page publique                   |
-| **Tarifs de la billetterie**              | billetterie intégrée                                                 | le layer billetterie a un endpoint public des tarifs (`tiers/public`) : il pourrait s'afficher sur la page     |
-| **Services et équipements**               | ~25 cases (accessibilité PMR, camping, restauration, toilettes, CB…) | rien                                                                                                           |
-| **Statut de l'événement**                 | publié, hors ligne, annulé                                           | la colonne existe, la page sait afficher « annulé », mais rien ne permet de le choisir (audit, constat G1)     |
-| **Organisateurs affichés**                | liste des organisateurs sur la page                                  | rien (choix à faire : montrer l'équipe ou non)                                                                 |
-| **Covoiturage, ateliers, objets trouvés** | onglets dédiés (layers `carpool`, `workshops`, `lost-found`)         | layers présents dans le dépôt, non branchés                                                                    |
+| Manque                                    | Ce que fait app1                                                     | Dans Flowvent                                                                                              |
+| ----------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| **Carte du site publique**                | onglet « Carte », zones et repères, export KML                       | la carte existe en gestion et la colonne `mapPublic` aussi, mais ni réglage ni page publique               |
+| **Tarifs de la billetterie**              | billetterie intégrée                                                 | le layer billetterie a un endpoint public des tarifs (`tiers/public`) : il pourrait s'afficher sur la page |
+| **Services et équipements**               | ~25 cases (accessibilité PMR, camping, restauration, toilettes, CB…) | rien                                                                                                       |
+| **Statut de l'événement**                 | publié, hors ligne, annulé                                           | la colonne existe, la page sait afficher « annulé », mais rien ne permet de le choisir (audit, constat G1) |
+| **Organisateurs affichés**                | liste des organisateurs sur la page                                  | rien (choix à faire : montrer l'équipe ou non)                                                             |
+| **Covoiturage, ateliers, objets trouvés** | onglets dédiés (layers `carpool`, `workshops`, `lost-found`)         | layers présents dans le dépôt, non branchés                                                                |
 
 Dès que deux de ces sections existent (programme, carte), la page gagnera des **onglets**, comme
 celle d'une édition d'app1.

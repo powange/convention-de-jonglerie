@@ -44,6 +44,8 @@ export default defineEventHandler(async (event) => {
       publicId: true,
       ...selectionModules,
       mapPublic: true,
+      programPagePublic: true,
+      faqPagePublic: true,
       externalMapProvider: true,
       externalMapRef: true,
       artistInfo: true,
@@ -110,6 +112,10 @@ export default defineEventHandler(async (event) => {
     // Carte du site (layer `map`) : sa visibilité et la carte externe d'où l'on importe. Pas de
     // coordonnées : la carte s'ouvre sur son centre par défaut, puis se cadre sur les zones.
     mapPublic: evenement.mapPublic,
+    // Programme et FAQ (layers `program`, `faq`) : leur page publique est-elle visible ? Lu par
+    // leurs pages de gestion pour l'état initial de l'interrupteur.
+    programPagePublic: evenement.programPagePublic,
+    faqPagePublic: evenement.faqPagePublic,
     externalMapProvider: evenement.externalMapProvider,
     externalMapRef: evenement.externalMapRef,
     // Artistes (layer `artists`) : le texte de l'espace artiste.

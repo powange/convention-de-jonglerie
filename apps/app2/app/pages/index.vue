@@ -149,6 +149,8 @@ const presentation: Record<CleModule, string> = {
   billetterie: "Vos tarifs et commandes HelloAsso, et le contrôle des billets à l'entrée.",
   tresorerie: 'Dépenses, recettes et justificatifs, avec les montants de tous les modules.',
   faq: 'Les réponses aux questions que tout le monde pose, sur une page publique à partager.',
+  programme:
+    'La frise de votre événement, spectacles et moments forts, publiée quand elle est prête.',
 }
 
 const liensAccroche: ButtonProps[] = [

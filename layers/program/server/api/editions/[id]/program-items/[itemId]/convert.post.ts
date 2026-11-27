@@ -1,10 +1,11 @@
 import { z } from 'zod'
 
+import { canManageProgram } from '#program/server/utils/permissions/program-permissions'
+import { dureeEnMinutes } from '#program/shared/utils/program-conversion'
+import { useProgramPorts } from '#server/program/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canManageProgram } from '#server/utils/permissions/program-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { dureeEnMinutes } from '~~/shared/utils/program-conversion'
 
 const schema = z.object({
   cible: z.enum(['spectacle', 'workshop']),
@@ -45,16 +46,16 @@ export default wrapApiHandler(
       throw createError({ status: 404, message: 'Élément de programmation introuvable' })
     }
 
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      select: { artistsEnabled: true, workshopsEnabled: true },
-    })
+    // Les réglages de l'événement viennent de l'app hôte (édition d'app1, événement de Flowvent).
+    const ports = useProgramPorts()
+    const edition = await ports.lireReglages(editionId)
 
     // Convertir vers un module éteint créerait une fiche que personne ne peut voir ni modifier.
     if (cible === 'spectacle' && !edition?.artistsEnabled) {
       throw createError({ status: 400, message: 'Le module artistes n’est pas activé' })
     }
-    if (cible === 'workshop' && !edition?.workshopsEnabled) {
+    // Sans `creerAtelier`, l'hôte n'a pas d'ateliers (Flowvent) : rien vers quoi convertir.
+    if (cible === 'workshop' && (!edition?.workshopsEnabled || !ports.creerAtelier)) {
       throw createError({ status: 400, message: 'Le module workshops n’est pas activé' })
     }
 
@@ -96,47 +97,17 @@ export default wrapApiHandler(
           select: { id: true },
         })
       } else {
-        // Le lieu d'un workshop est une entité à part, réutilisée d'un workshop à l'autre. On
-        // retrouve celui qui porte le même nom plutôt que d'en semer un nouveau à chaque conversion.
-        let locationId: number | null = null
-        const nomDuLieu = element.locationName?.trim()
-        if (nomDuLieu || element.zoneId || element.markerId) {
-          const existant = await tx.workshopLocation.findFirst({
-            where: {
-              editionId,
-              ...(nomDuLieu ? { name: nomDuLieu } : {}),
-              ...(element.zoneId ? { zoneId: element.zoneId } : {}),
-              ...(element.markerId ? { markerId: element.markerId } : {}),
-            },
-            select: { id: true },
-          })
-          locationId =
-            existant?.id ??
-            (
-              await tx.workshopLocation.create({
-                data: {
-                  editionId,
-                  // Un lieu de workshop a besoin d'un nom : à défaut, celui du créneau fait foi.
-                  name: nomDuLieu || element.title,
-                  zoneId: element.zoneId,
-                  markerId: element.markerId,
-                },
-                select: { id: true },
-              })
-            ).id
-        }
-
-        resultat = await tx.workshop.create({
-          data: {
-            editionId,
-            creatorId: user.id,
-            title: element.title,
-            description: element.description,
-            startDateTime: element.startDateTime,
-            endDateTime: fin,
-            locationId,
-          },
-          select: { id: true },
+        // Le lieu et l'atelier relèvent de l'app hôte : c'est son port qui les crée.
+        resultat = await ports.creerAtelier!(tx, {
+          editionId,
+          creatorId: user.id,
+          title: element.title,
+          description: element.description,
+          startDateTime: element.startDateTime,
+          endDateTime: fin,
+          locationName: element.locationName,
+          zoneId: element.zoneId,
+          markerId: element.markerId,
         })
       }
 

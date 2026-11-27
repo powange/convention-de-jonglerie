@@ -384,7 +384,8 @@
         "volunteers": "Repas bénévoles",
         "with_allergies": "Avec allergies"
       }
-    }
+    },
+    "program": "Programme"
   },
   "errors": {
     "error_occurred": "Une erreur est survenue",
@@ -480,6 +481,50 @@
       "export_pdf_all": "Tout, statuts compris",
       "export_pdf_empty": "Aucune entrée à exporter",
       "confirm_delete": "Supprimer l'entrée « {question} » ?"
+    },
+    "program": {
+      "edit_place": "Modifier le lieu",
+      "field": {
+        "place": "Lieu sur la carte",
+        "published": "Visible du public",
+        "end_optional": "Fin (facultative)",
+        "end_time": "Heure de fin",
+        "title": "Titre",
+        "description": "Description",
+        "start": "Début",
+        "start_time": "Heure de début"
+      },
+      "place_error": "Le lieu n'a pas pu être enregistré.",
+      "description": "Composez la frise horaire de l’événement : workshops, spectacles et autres moments.",
+      "add": "Ajouter un élément",
+      "page_public": "Page publique",
+      "page_public_help": "Rend la frise visible de tous. Tant qu'elle est éteinte, seuls les organisateurs y accèdent et l'onglet reste masqué au public.",
+      "sources_hint": "Les workshops et les spectacles apparaissent ici mais se modifient depuis leur propre page. Leur visibilité, elle, se règle sur cette frise.",
+      "empty": "Aucun élément au programme pour l'instant.",
+      "local_times": "Horaires à l'heure locale de la convention ({fuseau}), saisie comprise.",
+      "overlap": "Chevauchement",
+      "workshop_always_public": "Les workshops sont toujours visibles du public.",
+      "convert": "Convertir",
+      "convert_intro": "Transformer « {title} » en une fiche plus complète. L'élément de programme sera supprimé.",
+      "convert_target": "Convertir en",
+      "convert_public_warning": "Les workshops sont toujours visibles du public : ce brouillon le deviendra aussitôt.",
+      "column": {
+        "time": "Heure",
+        "title": "Titre",
+        "source": "Type",
+        "place": "Lieu",
+        "visibility": "Visibilité",
+        "day": "Jour"
+      },
+      "edit_title": "Modifier l'élément",
+      "source": {
+        "spectacle": "Spectacle",
+        "workshop": "Workshop",
+        "element": "Programme"
+      },
+      "converted": "Élément converti",
+      "error_end_before_start": "La fin doit être postérieure au début.",
+      "confirm_delete": "Supprimer « {title} » du programme ?"
     }
   },
   "organizers": {
@@ -855,5 +900,19 @@
     "empty_state": "Aucune question publiée pour le moment.",
     "search_placeholder": "Rechercher dans la FAQ…",
     "no_results": "Aucun résultat pour « {query} »"
+  },
+  "program": {
+    "show_past": "Afficher les moments passés",
+    "empty": "Le programme n'est pas encore publié.",
+    "no_result": "Aucun élément ne correspond à ce filtre.",
+    "no_result_hint": "Décochez une case, ou affichez les moments passés, pour élargir la sélection.",
+    "not_public_preview": "Cette page n'est pas encore publique : vous la voyez en tant qu'organisateur.",
+    "local_times": "Horaires à l'heure locale de la convention ({fuseau}).",
+    "no_end_time": "Heure de fin non précisée",
+    "source": {
+      "workshop": "Workshop",
+      "spectacle": "Spectacle",
+      "element": "Programme"
+    }
   }
 }

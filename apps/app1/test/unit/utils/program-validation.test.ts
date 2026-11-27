@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   programItemLocationSchema,
   programItemSchema,
-} from '../../../server/utils/program-validation'
+} from '#program/server/utils/program-validation'
 
 const base = {
   title: 'Repas du soir',

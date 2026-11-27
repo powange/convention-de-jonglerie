@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { dureeEnMinutes, manquesPourWorkshop } from '../../../shared/utils/program-conversion'
+import { dureeEnMinutes, manquesPourWorkshop } from '#program/shared/utils/program-conversion'
 
 describe('dureeEnMinutes', () => {
   it('calcule la durée entre deux instants', () => {

@@ -67,7 +67,8 @@ export interface WorkshopSource {
   title: string
   description?: string | null
   startDateTime: Date | string
-  endDateTime: Date | string
+  /** Un atelier peut se passer d'heure de fin (comme l'élément de programme dont il est issu). */
+  endDateTime?: Date | string | null
   location?: {
     name?: string | null
     zone?: LieuCarteSource | null
@@ -198,7 +199,8 @@ export function construireFriseProgramme(
       titre: a.title,
       description: a.description ?? null,
       debut: enIso(a.startDateTime),
-      fin: enIso(a.endDateTime),
+      // Sans heure de fin, l'atelier n'a pas de fin : `enIso(null)` levait et vidait la frise.
+      fin: a.endDateTime ? enIso(a.endDateTime) : null,
       lieuTexte: a.location?.name ?? null,
       zone: enLieuCarte(a.location?.zone),
       repere: enLieuCarte(a.location?.marker),

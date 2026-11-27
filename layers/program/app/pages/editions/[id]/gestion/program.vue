@@ -162,7 +162,7 @@
             <ProgramLieuCell
               :entree="row.original"
               :edition-id="editionId"
-              :site-map-enabled="edition?.siteMapEnabled"
+              :site-map-enabled="edition?.siteMapEnabled === true"
               @enregistre="rechargerFrise"
             />
           </template>
@@ -318,7 +318,7 @@
             v-model:zone-id="formulaire.zoneId"
             v-model:marker-id="formulaire.markerId"
             :edition-id="editionId"
-            :site-map-enabled="edition?.siteMapEnabled"
+            :site-map-enabled="edition?.siteMapEnabled === true"
             :label="$t('gestion.program.field.place')"
           />
 
@@ -369,7 +369,7 @@ import {
   detecterChevauchements,
   grouperParJournee,
   type EntreeProgramme,
-} from '~~/shared/utils/program-timeline'
+} from '#program/shared/utils/program-timeline'
 
 const { succes } = useNotificateur()
 
@@ -377,12 +377,12 @@ definePageMeta({
   middleware: ['auth-protected'],
 })
 
-const route = useRoute()
 const { t, locale } = useI18n()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 
-const editionId = computed(() => parseInt(route.params.id as string))
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionIdRef).
+const editionId = useEditionIdRef()
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 const initialLoading = ref(true)
 
@@ -423,7 +423,8 @@ watch(
 )
 
 const { execute: executerBasculeVisibilite, loading: enregistrementVisibilite } = useApiAction(
-  () => `/api/editions/${editionId.value}`,
+  // Le point du layer, et non la mise à jour générale de l'édition (propre à chaque app).
+  () => `/api/editions/${editionId.value}/program/visibility`,
   {
     method: 'PUT',
     body: () => ({ programPagePublic: pagePubliqueLocale.value }),
@@ -911,7 +912,9 @@ const supprimer = (entree: EntreeProgramme) => {
     titre: t('common.delete'),
     description: t('gestion.program.confirm_delete', { title: entree.titre }),
     libelleConfirmer: t('common.delete'),
-    agir: () => executerSuppression(entree.cle),
+    agir: async () => {
+      await executerSuppression(entree.cle)
+    },
   })
 }
 

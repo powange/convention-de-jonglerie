@@ -45,7 +45,7 @@
  * L'affichage vit dans son propre composant pour que la frise et son éditeur en place montrent
  * exactement la même chose — le second n'étant que le premier, rendu cliquable.
  */
-import type { EntreeProgramme } from '~~/shared/utils/program-timeline'
+import type { EntreeProgramme } from '#program/shared/utils/program-timeline'
 
 defineProps<{ entree: EntreeProgramme }>()
 

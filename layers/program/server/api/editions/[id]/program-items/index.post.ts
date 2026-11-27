@@ -1,8 +1,8 @@
+import { canManageProgram } from '#program/server/utils/permissions/program-permissions'
+import { assurerLieuDeLEdition } from '#program/server/utils/program-location'
+import { PROGRAM_ITEM_LIMITS, programItemSchema } from '#program/server/utils/program-validation'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canManageProgram } from '#server/utils/permissions/program-permissions'
-import { assurerLieuDeLEdition } from '#server/utils/program-location'
-import { PROGRAM_ITEM_LIMITS, programItemSchema } from '#server/utils/program-validation'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
