@@ -176,6 +176,7 @@ const bandeauLectureSeule = computed(() => {
 
 const moduleBenevoles = computed(() => acces.value?.modules.benevoles !== false)
 const carteDuSite = computed(() => !!acces.value?.modules.carte && !!acces.value?.droits.modifier)
+const faqOuverte = computed(() => !!acces.value?.modules.faq && !!acces.value?.droits.modifier)
 // Artistes et spectacles : module activé ET droit dédié (même règle qu'app1).
 const artistesOuverts = computed(
   () => !!acces.value?.modules.artistes && !!acces.value?.droits.artistes
@@ -290,6 +291,16 @@ const navigation = computed<NavigationMenuItem[][]>(() => {
               label: 'Carte du site',
               icon: 'i-heroicons-map',
               to: `/events/${refPublique.value}/gestion/map`,
+            },
+          ]
+        : []),
+      // FAQ : module activé ET droit « modifier l'événement » (canManageFAQ, côté serveur).
+      ...(faqOuverte.value
+        ? [
+            {
+              label: 'FAQ',
+              icon: 'i-heroicons-question-mark-circle',
+              to: `/events/${refPublique.value}/gestion/faq`,
             },
           ]
         : []),

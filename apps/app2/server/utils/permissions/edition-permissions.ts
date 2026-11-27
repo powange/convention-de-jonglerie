@@ -37,11 +37,14 @@ export interface EditionWithPermissions {
 
 export async function getEditionWithPermissions(
   eventId: number,
-  options: { userId: number; requiredRights?: string[] }
+  options: { userId?: number; requiredRights?: string[] }
 ): Promise<EditionWithPermissions | null> {
   const evenement = await prisma.event.findUnique({ where: { id: eventId } })
   if (!evenement) return null
-  const droits = await droitsSurEvenement(eventId, options.userId)
+  // Un visiteur (pages publiques, FAQ) n'a pas d'identifiant : 0 ne désigne aucun compte, donc
+  // aucun droit — sans passer `undefined` à Prisma, qui le refuserait.
+  const userId = options.userId ?? 0
+  const droits = await droitsSurEvenement(eventId, userId)
   return {
     ...evenement,
     creatorId: evenement.ownerId,
@@ -54,7 +57,7 @@ export async function getEditionWithPermissions(
       organizers: [],
     },
     droits,
-    pourUtilisateur: options.userId,
+    pourUtilisateur: userId,
   }
 }
 
@@ -87,6 +90,11 @@ export const canManageStock = droitSurEdition('stock')
 export const canManageArtists = droitSurEdition('artistes')
 export const canManageMeals = droitSurEdition('repas')
 export const canManageTicketing = droitSurEdition('billetterie')
+/**
+ * La FAQ est un contenu public de l'événement : elle relève du droit « modifier l'événement »,
+ * comme la carte du site, plutôt que d'un droit à part (décision du 27/11/2026).
+ */
+export const canManageFAQ = droitSurEdition('modifier')
 
 /**
  * L'événement, à condition que la personne puisse le modifier : 404 s'il n'existe pas ou qu'elle

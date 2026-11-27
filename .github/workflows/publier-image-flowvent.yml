@@ -28,6 +28,7 @@ on:
       - 'layers/meals/**'
       - 'layers/treasury/**'
       - 'layers/backup/**'
+      - 'layers/faq/**'
       - 'layers/auth/**'
       - '.github/workflows/publier-image-flowvent.yml'
   workflow_dispatch:

@@ -116,9 +116,9 @@ interface AccordionItem {
   slot: 'body'
 }
 
-const route = useRoute()
 const editionStore = useEditionStore()
-const editionId = parseInt(route.params.id as string)
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionId).
+const editionId = useEditionId()
 if (Number.isNaN(editionId)) {
   throw createError({ statusCode: 404, statusMessage: 'Édition introuvable', fatal: true })
 }

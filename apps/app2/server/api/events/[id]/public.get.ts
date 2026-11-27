@@ -49,6 +49,9 @@ export default defineEventHandler(async (event) => {
       pagePublique: true,
       volunteersEnabled: true,
       artistsEnabled: true,
+      faqEnabled: true,
+      faqPagePublic: true,
+      _count: { select: { faqEntries: { where: { isPublic: true } } } },
       volunteerSettings: { select: { pagePublic: true, open: true } },
       showCalls: {
         where: { visibility: { in: ['PUBLIC', 'CLOSED'] } },
@@ -110,6 +113,8 @@ export default defineEventHandler(async (event) => {
           dateLimite: a.deadline,
         }))
       : [],
+    // La FAQ publique : module actif, page publique, et au moins une question publiée.
+    faq: e.faqEnabled && e.faqPagePublic && e._count.faqEntries > 0,
     droits: droits?.voir ? { voir: true, estProprietaire: droits.estProprietaire } : null,
   }
 })

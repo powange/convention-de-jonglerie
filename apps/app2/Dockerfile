@@ -41,6 +41,7 @@ COPY layers/ticketing/ /app/layers/ticketing/
 COPY layers/meals/ /app/layers/meals/
 COPY layers/treasury/ /app/layers/treasury/
 COPY layers/backup/ /app/layers/backup/
+COPY layers/faq/ /app/layers/faq/
 # Commit construit, passé par la CI : il nomme le répertoire des fichiers de build
 # (`/_nuxt-<sha>/`, cf. nuxt.config.ts), ce qui rend le commit servi lisible dans la page.
 # Placé après les COPY : il change à chaque commit, et n'invalide ainsi que le build.

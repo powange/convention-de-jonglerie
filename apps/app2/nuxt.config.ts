@@ -43,6 +43,7 @@ export default defineNuxtConfig({
     '../../layers/meals',
     '../../layers/treasury',
     '../../layers/backup',
+    '../../layers/faq',
   ],
 
   hooks: {

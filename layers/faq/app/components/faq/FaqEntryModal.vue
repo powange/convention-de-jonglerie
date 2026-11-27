@@ -90,7 +90,7 @@ function applyApiErrors(e: any): boolean {
   if (!errors || typeof errors !== 'object') return false
   const next: Record<string, string> = {}
   for (const [path, message] of Object.entries(errors as Record<string, string>)) {
-    const fieldName = path.split('.')[0]
+    const fieldName = path.split('.')[0] ?? path
     if (!next[fieldName]) next[fieldName] = message
   }
   fieldErrors.value = next

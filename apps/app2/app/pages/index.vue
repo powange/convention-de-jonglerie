@@ -148,6 +148,7 @@ const presentation: Record<CleModule, string> = {
   repas: 'Les repas des bénévoles, des artistes et des organisateurs, et leur validation.',
   billetterie: "Vos tarifs et commandes HelloAsso, et le contrôle des billets à l'entrée.",
   tresorerie: 'Dépenses, recettes et justificatifs, avec les montants de tous les modules.',
+  faq: 'Les réponses aux questions que tout le monde pose, sur une page publique à partager.',
 }
 
 const liensAccroche: ButtonProps[] = [

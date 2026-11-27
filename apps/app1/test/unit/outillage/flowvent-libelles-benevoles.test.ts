@@ -29,6 +29,7 @@ const SOURCES = [
   'layers/meals/app',
   'layers/treasury/app',
   'layers/backup/app',
+  'layers/faq/app',
   'layers/ui/app',
 ]
 

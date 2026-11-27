@@ -27,6 +27,14 @@ l'organisateur choisit de montrer au public.
   `events/<id>/` à l'enregistrement, ancienne effacée. Le domaine `events/` est public dans la route
   `/uploads`.
 
+## Ajouté depuis
+
+- **Contact public** (27/11) : e-mail de contact affiché sur la page.
+- **Coordonnées GPS** (27/11) : calculées depuis l'adresse (Nominatim), corrigeables, et une carte
+  du lieu sur la page publique.
+- **FAQ** (27/11) : le layer `faq` branché ; une carte « Questions fréquentes » mène à
+  `/events/<id>/faq` quand la FAQ est active, publique et a au moins une question publiée.
+
 ## Ce qui manque encore côté gestion
 
 Par ordre d'intérêt pour la page publique.
@@ -38,9 +46,6 @@ Par ordre d'intérêt pour la page publique.
 | **Tarifs de la billetterie**              | billetterie intégrée                                                 | le layer billetterie a un endpoint public des tarifs (`tiers/public`) : il pourrait s'afficher sur la page     |
 | **Services et équipements**               | ~25 cases (accessibilité PMR, camping, restauration, toilettes, CB…) | rien                                                                                                           |
 | **Statut de l'événement**                 | publié, hors ligne, annulé                                           | la colonne existe, la page sait afficher « annulé », mais rien ne permet de le choisir (audit, constat G1)     |
-| **Contact public**                        | e-mail de la convention                                              | rien : pas d'adresse de contact publique                                                                       |
-| **Coordonnées GPS**                       | latitude et longitude, carte intégrée                                | un lien OpenStreetMap par l'adresse ; pas de carte intégrée                                                    |
-| **FAQ**                                   | onglet FAQ (layer `faq`)                                             | le layer existe dans le dépôt, il n'est pas branché dans Flowvent                                              |
 | **Organisateurs affichés**                | liste des organisateurs sur la page                                  | rien (choix à faire : montrer l'équipe ou non)                                                                 |
 | **Covoiturage, ateliers, objets trouvés** | onglets dédiés (layers `carpool`, `workshops`, `lost-found`)         | layers présents dans le dépôt, non branchés                                                                    |
 

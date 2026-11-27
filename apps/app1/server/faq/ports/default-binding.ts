@@ -1,6 +1,6 @@
 // Câblage jonglerie des ports du module FAQ. Lit le modèle concret (Edition) pour les flags de
 // visibilité. Reste côté app ; le layer faq ne consomme que les interfaces (types.ts).
-import type { FaqPorts } from './types'
+import type { FaqPorts } from '#faq/server/ports/types'
 
 export function createDefaultFaqPorts(): FaqPorts {
   return {
@@ -15,6 +15,12 @@ export function createDefaultFaqPorts(): FaqPorts {
           enabled: edition?.faqEnabled === true,
           pagePublic: edition?.faqPagePublic === true,
         }
+      },
+      async setFaqPagePublic(editionId, pagePublic) {
+        await prisma.edition.update({
+          where: { id: editionId },
+          data: { faqPagePublic: pagePublic },
+        })
       },
     },
   }

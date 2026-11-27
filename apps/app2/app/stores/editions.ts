@@ -121,6 +121,10 @@ export const useEditionStore = defineStore('editions', {
     canManageTreasury(edition: EditionFlowvent | undefined | null, _userId?: number): boolean {
       return !!edition?.droits?.tresorerie
     },
+    /** La FAQ relève de « modifier l'événement » (cf. canManageFAQ côté serveur). */
+    canManageFAQ(edition: EditionFlowvent | undefined | null, _userId?: number): boolean {
+      return !!edition?.droits?.modifier
+    },
 
     /** Validation des repas : responsable de l'équipe qui valide, ou bénévole en créneau actif. */
     async canAccessMealValidation(editionId: number): Promise<boolean> {
