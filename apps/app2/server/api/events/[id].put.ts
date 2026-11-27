@@ -3,12 +3,14 @@ import { z } from 'zod'
 import { afficheAEnregistrer } from '../../utils/affiche-evenement'
 import { droitsSurEvenement } from '../../utils/droits-evenement'
 import { idDepuisLaRoute } from '../../utils/evenement-public'
+import { geocoderAdresse } from '../../utils/geocodage'
 
 import { fuseauUtilisable, versInstant } from '#core/shared/utils/fuseau-edition'
 
 /**
  * Modifie un événement : nom, description, lieu, dates de début et de fin, fuseau — et ce que
- * montre sa page publique : adresse, affiche, liens, et le choix de la rendre publique.
+ * montre sa page publique : adresse (et ses coordonnées GPS), contact, affiche, liens, et le
+ * choix de la rendre publique.
  *
  * Les champs de la page publique sont FACULTATIFS : absents, ils ne changent pas (un client ouvert
  * avant leur ajout continue d'enregistrer sans les effacer).
@@ -55,6 +57,19 @@ const schema = z
     facebookUrl: lien,
     instagramUrl: lien,
     pagePublique: z.boolean().optional(),
+    contactEmail: z
+      .string()
+      .trim()
+      .max(191)
+      .refine(
+        (v) => v === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+        'Adresse e-mail de contact invalide'
+      )
+      .nullable()
+      .optional(),
+    // Coordonnées GPS saisies à la main ; absentes, elles se recalculent depuis l'adresse.
+    latitude: z.number().min(-90).max(90).nullable().optional(),
+    longitude: z.number().min(-180).max(180).nullable().optional(),
   })
   .refine((d) => !d.debut || !d.fin || d.fin >= d.debut, {
     message: 'La fin doit suivre le début',
@@ -78,10 +93,45 @@ export default defineEventHandler(async (event) => {
     })
   }
   const d = resultat.data
-  const actuel = await prisma.event.findUniqueOrThrow({ where: { id }, select: { imageUrl: true } })
+  const actuel = await prisma.event.findUniqueOrThrow({
+    where: { id },
+    select: {
+      imageUrl: true,
+      addressLine1: true,
+      postalCode: true,
+      city: true,
+      country: true,
+      latitude: true,
+      longitude: true,
+    },
+  })
   const imageUrl = await afficheAEnregistrer(d.imageUrl, actuel.imageUrl, id)
   /** `undefined` (absent) ne change rien ; une chaîne vide efface. */
   const facultatif = (v: string | null | undefined) => (v === undefined ? undefined : v || null)
+
+  // Coordonnées GPS : celles saisies à la main si elles changent ; sinon, si l'adresse change,
+  // recalculées depuis elle (null si elle est introuvable : les anciennes ne vaudraient plus).
+  const adresse = {
+    ligne1: d.addressLine1 === undefined ? actuel.addressLine1 : d.addressLine1 || null,
+    codePostal: d.postalCode === undefined ? actuel.postalCode : d.postalCode || null,
+    ville: d.city === undefined ? actuel.city : d.city || null,
+    pays: d.country === undefined ? actuel.country : d.country || null,
+  }
+  const adresseChangee =
+    adresse.ligne1 !== actuel.addressLine1 ||
+    adresse.codePostal !== actuel.postalCode ||
+    adresse.ville !== actuel.city ||
+    adresse.pays !== actuel.country
+  const saisieManuelle =
+    (d.latitude !== undefined && d.latitude !== actuel.latitude) ||
+    (d.longitude !== undefined && d.longitude !== actuel.longitude)
+  let coordonnees: { latitude: number | null; longitude: number | null } | undefined
+  if (saisieManuelle) {
+    coordonnees = { latitude: d.latitude ?? null, longitude: d.longitude ?? null }
+  } else if (adresseChangee) {
+    const trouvees = await geocoderAdresse(adresse)
+    coordonnees = trouvees ?? { latitude: null, longitude: null }
+  }
 
   const evenement = await prisma.event.update({
     where: { id },
@@ -103,6 +153,8 @@ export default defineEventHandler(async (event) => {
       facebookUrl: facultatif(d.facebookUrl),
       instagramUrl: facultatif(d.instagramUrl),
       pagePublique: d.pagePublique,
+      contactEmail: facultatif(d.contactEmail),
+      ...coordonnees,
     },
   })
   return createSuccessResponse({ event: evenement }, 'Événement mis à jour')

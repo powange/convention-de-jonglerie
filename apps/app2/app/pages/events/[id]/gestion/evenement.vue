@@ -120,6 +120,37 @@
             />
           </UFormField>
 
+          <div class="grid gap-4 sm:grid-cols-2">
+            <UFormField
+              label="Latitude"
+              name="latitude"
+              description="Calculées depuis l'adresse à l'enregistrement ; corrigez-les si le repère tombe à côté."
+            >
+              <UInput
+                v-model="etat.latitude"
+                type="number"
+                step="any"
+                min="-90"
+                max="90"
+                class="w-full"
+                placeholder="45.7640"
+                :disabled="!droits?.modifier"
+              />
+            </UFormField>
+            <UFormField label="Longitude" name="longitude">
+              <UInput
+                v-model="etat.longitude"
+                type="number"
+                step="any"
+                min="-180"
+                max="180"
+                class="w-full"
+                placeholder="4.8357"
+                :disabled="!droits?.modifier"
+              />
+            </UFormField>
+          </div>
+
           <USeparator label="Page publique" />
 
           <!-- La page de l'événement, partageable sans compte : fermée par défaut. -->
@@ -143,6 +174,22 @@
               :disabled="!droits?.modifier"
             />
           </div>
+
+          <UFormField
+            label="E-mail de contact"
+            name="contactEmail"
+            description="Affiché sur la page publique, pour joindre l'organisation."
+            :error="erreurContact"
+          >
+            <UInput
+              v-model="etat.contactEmail"
+              type="email"
+              class="w-full"
+              icon="i-heroicons-envelope"
+              placeholder="contact@mon-festival.fr"
+              :disabled="!droits?.modifier"
+            />
+          </UFormField>
 
           <UFormField
             label="Affiche"
@@ -234,7 +281,9 @@
               icon="i-heroicons-check"
               label="Enregistrer"
               :loading="enregistrement"
-              :disabled="!modifie || !!erreurFin || Object.keys(erreursLiens).length > 0"
+              :disabled="
+                !modifie || !!erreurFin || !!erreurContact || Object.keys(erreursLiens).length > 0
+              "
             />
           </div>
           <UAlert
@@ -371,6 +420,9 @@ interface Evenement {
   facebookUrl: string | null
   instagramUrl: string | null
   pagePublique: boolean
+  latitude: number | null
+  longitude: number | null
+  contactEmail: string | null
 }
 interface Droits {
   voir: boolean
@@ -414,7 +466,18 @@ function etatDepuis(e: Evenement | undefined) {
     facebookUrl: e?.facebookUrl ?? '',
     instagramUrl: e?.instagramUrl ?? '',
     pagePublique: !!e?.pagePublique,
+    // Chaînes, comme les champs : vide = pas de coordonnée.
+    latitude: e?.latitude === null || e?.latitude === undefined ? '' : String(e.latitude),
+    longitude: e?.longitude === null || e?.longitude === undefined ? '' : String(e.longitude),
+    contactEmail: e?.contactEmail ?? '',
   }
+}
+
+/** « 45.76 » → 45.76 ; vide → null. */
+function versNombre(valeur: string | number): number | null {
+  if (valeur === '' || valeur === null || valeur === undefined) return null
+  const n = Number(valeur)
+  return Number.isFinite(n) ? n : null
 }
 
 /** Les liens publics de l'événement (les champs du formulaire, pour leur validation). */
@@ -440,6 +503,11 @@ const erreursLiens = computed(() =>
       (l) => [l.cle, 'Le lien doit commencer par http:// ou https://']
     )
   )
+)
+const erreurContact = computed(() =>
+  etat.contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(etat.contactEmail.trim())
+    ? 'Adresse e-mail invalide'
+    : undefined
 )
 const erreurFin = computed(() =>
   etat.debut && etat.fin && etat.fin < etat.debut ? 'La fin doit suivre le début' : undefined
@@ -467,6 +535,9 @@ const { execute: enregistrer, loading: enregistrement } = useApiAction(
       facebookUrl: etat.facebookUrl.trim(),
       instagramUrl: etat.instagramUrl.trim(),
       pagePublique: etat.pagePublique,
+      contactEmail: etat.contactEmail.trim(),
+      latitude: versNombre(etat.latitude),
+      longitude: versNombre(etat.longitude),
     }),
     successMessage: { title: 'Événement mis à jour' },
     errorMessages: { default: "L'événement n'a pas pu être enregistré" },
