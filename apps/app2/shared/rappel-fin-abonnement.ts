@@ -57,7 +57,12 @@ function jour(d: Date | string): string {
 }
 
 /** Le sujet, le corps HTML et le corps texte du rappel. */
-export function contenuRappel(c: ContenuRappel): { subject: string; html: string; text: string } {
+export function contenuRappel(c: ContenuRappel): {
+  subject: string
+  html: string
+  text: string
+  phrases: string[]
+} {
   const fin = jour(c.fin)
   const gratuit = c.code?.advantage === 'free'
   const finAvantage = c.advantageEndsAt ? new Date(c.advantageEndsAt) : null
@@ -102,5 +107,6 @@ ${phrases.map((p) => `  <p>${echapper(p)}</p>`).join('\n')}
     '',
     `Renouveler ma formule : ${c.lienTarifs}`,
   ].join('\n')
-  return { subject, html, text }
+  // `phrases` : pour l'habillage complet du courriel (shared/gabarit-courriel.ts, côté appelant).
+  return { subject, html, text, phrases }
 }

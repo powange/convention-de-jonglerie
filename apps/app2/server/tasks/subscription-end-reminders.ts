@@ -1,4 +1,5 @@
 import { formule } from '../../shared/formules'
+import { gabaritCourriel } from '../../shared/gabarit-courriel'
 import { contenuRappel, doitRappeler, JOURS_AVANT_RAPPEL } from '../../shared/rappel-fin-abonnement'
 import { getSiteUrl, sendEmail } from '../utils/emailService'
 import prisma from '../utils/prisma'
@@ -30,14 +31,24 @@ export default defineTask({
     let envoyes = 0
     for (const abonnement of candidats) {
       if (!doitRappeler(abonnement, maintenant)) continue
-      const { subject, html, text } = contenuRappel({
-        // Le prénom est facultatif en base ; le pseudo, unique, ne manque jamais.
-        nom: abonnement.user.prenom?.trim() || abonnement.user.pseudo,
+      // Le prénom est facultatif en base ; le pseudo, unique, ne manque jamais.
+      const nom = abonnement.user.prenom?.trim() || abonnement.user.pseudo
+      const { subject, text, phrases } = contenuRappel({
+        nom,
         formule: `${formule(abonnement.formule)?.libelle ?? 'Flowvent'} ${abonnement.plan === 'annual' ? 'annuel' : 'mensuel'}`,
         fin: abonnement.currentPeriodEnd,
         code: abonnement.promoCode,
         advantageEndsAt: abonnement.advantageEndsAt,
         lienTarifs,
+      })
+      const html = gabaritCourriel({
+        siteUrl: getSiteUrl(),
+        titre: 'Votre abonnement Flowvent arrive à son terme',
+        apercu: subject,
+        salutation: `Bonjour ${nom}`,
+        paragraphes: phrases,
+        bouton: { libelle: 'Renouveler ma formule', url: lienTarifs },
+        raison: 'Vous recevez ce courriel car vous êtes abonné à Flowvent.',
       })
       const parti = await sendEmail({ to: abonnement.user.email, subject, html, text })
       // Un envoi échoué n'est pas retenu : le passage du lendemain réessaiera.

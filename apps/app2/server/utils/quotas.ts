@@ -24,6 +24,7 @@ import {
   peutAjouter,
   plafondTolere,
 } from '../../shared/formules'
+import { gabaritCourriel } from '../../shared/gabarit-courriel'
 
 import { getSiteUrl, sendEmail } from './emailService'
 import prisma from './prisma'
@@ -165,7 +166,23 @@ export async function signalerSeuil(
     lienTarifs: `${site}/pricing`,
     lienEvenement: `${site}/events/${evenement.publicId}/gestion`,
   })
-  return sendEmail({ to: evenement.owner.email, ...contenu })
+  return sendEmail({
+    to: evenement.owner.email,
+    subject: contenu.subject,
+    text: contenu.text,
+    html: gabaritCourriel({
+      siteUrl: site,
+      titre:
+        palier === 'plein'
+          ? `Limite de ${LIBELLES_ALERTE[compteur]} atteinte`
+          : `Vous approchez de la limite de ${LIBELLES_ALERTE[compteur]}`,
+      apercu: contenu.subject,
+      salutation: `Bonjour ${evenement.owner.prenom || evenement.owner.pseudo}`,
+      paragraphes: contenu.phrases,
+      bouton: { libelle: 'Voir les formules', url: `${site}/pricing` },
+      raison: `Vous recevez ce courriel car vous êtes propriétaire de « ${evenement.name} ».`,
+    }),
+  })
 }
 
 /** Garde de CRÉATION (ou de désarchivage) d'un événement par `ownerId`. */

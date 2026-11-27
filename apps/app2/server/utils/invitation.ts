@@ -1,5 +1,7 @@
 import { randomBytes } from 'node:crypto'
 
+import { gabaritCourriel } from '../../shared/gabarit-courriel'
+
 import type { H3Event } from 'h3'
 
 import { createFutureDate } from '#server/utils/date-utils'
@@ -75,12 +77,24 @@ export async function createPendingUserAndInvite(params: CreatePendingUserAndInv
   await sendEmail({
     to: email,
     subject: `Invitation ${role} — ${params.eventName}`,
-    html: `<p>Bonjour ${prenom},</p><p>Un organisateur de ${params.eventName} vous a ajouté comme ${role} sur Flowvent.</p><p><a href="${lien}">Activer mon compte</a> (lien valable 7 jours).</p>`,
+    html: gabaritCourriel({
+      siteUrl: getSiteUrl(),
+      titre: `Vous êtes invité sur « ${params.eventName} »`,
+      apercu: `Un organisateur vous a ajouté comme ${role} sur Flowvent.`,
+      salutation: `Bonjour ${prenom}`,
+      paragraphes: [
+        `Un organisateur de « ${params.eventName} » vous a ajouté comme ${role} sur Flowvent.`,
+        'Un compte a été préparé à votre nom : il ne reste qu’à choisir votre mot de passe pour l’activer.',
+      ],
+      bouton: { libelle: 'Activer mon compte', url: lien },
+      note: 'Ce lien est valable 7 jours.',
+      raison: 'Vous recevez ce courriel car un organisateur a saisi votre adresse sur Flowvent.',
+    }),
     text: `Bonjour ${prenom}, un organisateur de ${params.eventName} vous a ajouté comme ${role} sur Flowvent. Activez votre compte : ${lien} (lien valable 7 jours).`,
   })
 
-  // Le lien est rendu à l'appelant : Flowvent n'envoie pas de courriel, c'est l'organisateur
-  // qui le transmet (les appelants du layer bénévoles l'ignorent).
+  // Le lien est aussi rendu à l'appelant, en secours : l'organisateur peut le transmettre si le
+  // courriel s'est perdu (les appelants du layer bénévoles l'ignorent).
   return { user, lien }
 }
 
