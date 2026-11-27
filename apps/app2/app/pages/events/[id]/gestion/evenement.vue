@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-auto max-w-3xl space-y-6">
+  <div class="mx-auto max-w-6xl space-y-6">
     <ManagementPageHeader
       titre="Informations de l'événement"
       description="Le nom, les dates, le lieu, et ce que montre la page publique de l'événement."
@@ -16,384 +16,370 @@
     <USkeleton v-else-if="!evenement" class="h-96 w-full" />
 
     <template v-else>
-      <UCard>
-        <UForm :state="etat" class="space-y-5" @submit="enregistrer">
-          <UFormField label="Nom de l'événement" name="name" required>
-            <UInput v-model="etat.name" class="w-full" :disabled="!droits?.modifier" />
-          </UFormField>
+      <UForm :state="etat" class="space-y-6" @submit="enregistrer">
+        <!-- Sur grand écran, deux colonnes : ce qui décrit l'événement à gauche, ce qui le montre
+             (affiche, page publique, liens) à droite. Une seule colonne sur mobile. -->
+        <div class="grid items-start gap-6 lg:grid-cols-3">
+          <div class="space-y-6 lg:col-span-2">
+            <UCard>
+              <template #header>
+                <h2 class="flex items-center gap-2 font-semibold">
+                  <UIcon name="i-heroicons-calendar-days" class="text-primary" /> L'événement
+                </h2>
+              </template>
+              <div class="space-y-5">
+                <UFormField label="Nom de l'événement" name="name" required>
+                  <UInput v-model="etat.name" class="w-full" :disabled="!droits?.modifier" />
+                </UFormField>
 
-          <UFormField
-            label="Fuseau horaire"
-            name="timezone"
-            description="Celui du lieu de l'événement : les dates ci-dessous y sont saisies et affichées, quel que soit le pays de la personne qui les lit."
-            required
-          >
-            <TimezoneSelectMenu
-              v-model="etat.timezone"
-              placeholder="Choisir un fuseau horaire"
-              :disabled="!droits?.modifier"
-            />
-          </UFormField>
+                <UFormField
+                  label="Fuseau horaire"
+                  name="timezone"
+                  description="Celui du lieu de l'événement : les dates ci-dessous y sont saisies et affichées, quel que soit le pays de la personne qui les lit."
+                  required
+                >
+                  <TimezoneSelectMenu
+                    v-model="etat.timezone"
+                    placeholder="Choisir un fuseau horaire"
+                    :disabled="!droits?.modifier"
+                  />
+                </UFormField>
 
-          <div class="grid gap-4 sm:grid-cols-2">
-            <UFormField label="Début" name="debut">
-              <UInput
-                v-model="etat.debut"
-                type="datetime-local"
-                class="w-full"
-                :disabled="!droits?.modifier"
-              />
-            </UFormField>
-            <UFormField label="Fin" name="fin" :error="erreurFin">
-              <UInput
-                v-model="etat.fin"
-                type="datetime-local"
-                class="w-full"
-                :min="etat.debut || undefined"
-                :disabled="!droits?.modifier"
-              />
-            </UFormField>
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <UFormField label="Début" name="debut">
+                    <UInput
+                      v-model="etat.debut"
+                      type="datetime-local"
+                      class="w-full"
+                      :disabled="!droits?.modifier"
+                    />
+                  </UFormField>
+                  <UFormField label="Fin" name="fin" :error="erreurFin">
+                    <UInput
+                      v-model="etat.fin"
+                      type="datetime-local"
+                      class="w-full"
+                      :min="etat.debut || undefined"
+                      :disabled="!droits?.modifier"
+                    />
+                  </UFormField>
+                </div>
+              </div>
+            </UCard>
+
+            <UCard>
+              <template #header>
+                <h2 class="flex items-center gap-2 font-semibold">
+                  <UIcon name="i-heroicons-map-pin" class="text-primary" /> Le lieu
+                </h2>
+              </template>
+              <div class="space-y-5">
+                <EvenementRechercheAdresse v-if="droits?.modifier" @choisie="remplirAdresse" />
+
+                <UFormField label="Nom du lieu" name="location">
+                  <UInput
+                    v-model="etat.location"
+                    class="w-full"
+                    placeholder="Salle des fêtes, gymnase, parc…"
+                    :disabled="!droits?.modifier"
+                  />
+                </UFormField>
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <UFormField label="Adresse" name="addressLine1">
+                    <UInput
+                      v-model="etat.addressLine1"
+                      class="w-full"
+                      placeholder="12 rue des Lilas"
+                      autocomplete="address-line1"
+                      :disabled="!droits?.modifier"
+                    />
+                  </UFormField>
+                  <UFormField label="Complément d'adresse" name="addressLine2">
+                    <UInput
+                      v-model="etat.addressLine2"
+                      class="w-full"
+                      autocomplete="address-line2"
+                      :disabled="!droits?.modifier"
+                    />
+                  </UFormField>
+                </div>
+                <div class="grid gap-4 sm:grid-cols-[10rem_1fr_1fr]">
+                  <UFormField label="Code postal" name="postalCode">
+                    <UInput
+                      v-model="etat.postalCode"
+                      class="w-full"
+                      autocomplete="postal-code"
+                      :disabled="!droits?.modifier"
+                    />
+                  </UFormField>
+                  <UFormField label="Ville" name="city">
+                    <UInput
+                      v-model="etat.city"
+                      class="w-full"
+                      autocomplete="address-level2"
+                      :disabled="!droits?.modifier"
+                    />
+                  </UFormField>
+                  <UFormField label="Pays" name="country">
+                    <UInput
+                      v-model="etat.country"
+                      class="w-full"
+                      placeholder="France"
+                      autocomplete="country-name"
+                      :disabled="!droits?.modifier"
+                    />
+                  </UFormField>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <UFormField label="Latitude" name="latitude">
+                    <UInput
+                      v-model="etat.latitude"
+                      type="number"
+                      step="any"
+                      min="-90"
+                      max="90"
+                      class="w-full"
+                      placeholder="45.7640"
+                      :disabled="!droits?.modifier"
+                    />
+                  </UFormField>
+                  <UFormField label="Longitude" name="longitude">
+                    <UInput
+                      v-model="etat.longitude"
+                      type="number"
+                      step="any"
+                      min="-180"
+                      max="180"
+                      class="w-full"
+                      placeholder="4.8357"
+                      :disabled="!droits?.modifier"
+                    />
+                  </UFormField>
+                </div>
+                <!-- Sous les DEUX champs : portée par la latitude seule, l'aide décalait la longitude. -->
+                <p class="-mt-2 text-sm text-muted">
+                  Coordonnées remplies par la recherche, ou calculées depuis l'adresse à
+                  l'enregistrement ; corrigez-les si le repère tombe à côté.
+                </p>
+              </div>
+            </UCard>
+
+            <UCard>
+              <template #header>
+                <h2 class="flex items-center gap-2 font-semibold">
+                  <UIcon name="i-heroicons-document-text" class="text-primary" /> Description
+                </h2>
+              </template>
+              <UFormField name="description">
+                <UTextarea
+                  v-model="etat.description"
+                  :rows="8"
+                  autoresize
+                  class="w-full"
+                  placeholder="Ce que le public trouvera sur la page de l'événement."
+                  :disabled="!droits?.modifier"
+                />
+              </UFormField>
+            </UCard>
           </div>
 
-          <UFormField label="Description" name="description">
-            <UTextarea
-              v-model="etat.description"
-              :rows="5"
-              autoresize
-              class="w-full"
-              :disabled="!droits?.modifier"
-            />
-          </UFormField>
-
-          <USeparator label="Lieu" />
-
-          <UFormField label="Nom du lieu" name="location">
-            <UInput
-              v-model="etat.location"
-              class="w-full"
-              placeholder="Salle des fêtes, gymnase, parc…"
-              :disabled="!droits?.modifier"
-            />
-          </UFormField>
-          <UFormField label="Adresse" name="addressLine1">
-            <UInput
-              v-model="etat.addressLine1"
-              class="w-full"
-              placeholder="12 rue des Lilas"
-              autocomplete="address-line1"
-              :disabled="!droits?.modifier"
-            />
-          </UFormField>
-          <UFormField label="Complément d'adresse" name="addressLine2">
-            <UInput
-              v-model="etat.addressLine2"
-              class="w-full"
-              autocomplete="address-line2"
-              :disabled="!droits?.modifier"
-            />
-          </UFormField>
-          <div class="grid gap-4 sm:grid-cols-[10rem_1fr]">
-            <UFormField label="Code postal" name="postalCode">
-              <UInput
-                v-model="etat.postalCode"
-                class="w-full"
-                autocomplete="postal-code"
-                :disabled="!droits?.modifier"
-              />
-            </UFormField>
-            <UFormField label="Ville" name="city">
-              <UInput
-                v-model="etat.city"
-                class="w-full"
-                autocomplete="address-level2"
-                :disabled="!droits?.modifier"
-              />
-            </UFormField>
-          </div>
-          <UFormField label="Pays" name="country">
-            <UInput
-              v-model="etat.country"
-              class="w-full"
-              placeholder="France"
-              autocomplete="country-name"
-              :disabled="!droits?.modifier"
-            />
-          </UFormField>
-
-          <div class="grid gap-4 sm:grid-cols-2">
-            <UFormField
-              label="Latitude"
-              name="latitude"
-              description="Calculées depuis l'adresse à l'enregistrement ; corrigez-les si le repère tombe à côté."
-            >
-              <UInput
-                v-model="etat.latitude"
-                type="number"
-                step="any"
-                min="-90"
-                max="90"
-                class="w-full"
-                placeholder="45.7640"
-                :disabled="!droits?.modifier"
-              />
-            </UFormField>
-            <UFormField label="Longitude" name="longitude">
-              <UInput
-                v-model="etat.longitude"
-                type="number"
-                step="any"
-                min="-180"
-                max="180"
-                class="w-full"
-                placeholder="4.8357"
-                :disabled="!droits?.modifier"
-              />
-            </UFormField>
-          </div>
-
-          <USeparator label="Page publique" />
-
-          <!-- La page de l'événement, partageable sans compte : fermée par défaut. -->
-          <div class="flex flex-wrap items-start justify-between gap-4">
-            <div class="min-w-0 flex-1">
-              <p class="font-medium">Rendre la page de l'événement publique</p>
-              <p class="text-sm text-muted">
-                Toute personne qui a le lien voit l'affiche, les dates, le lieu, la description, les
-                liens, et ce à quoi elle peut participer (bénévolat, appels à spectacles).
-              </p>
-              <ULink
-                :to="`/events/${refEvenement}`"
-                class="mt-1 inline-flex items-center gap-1 text-sm text-primary hover:underline"
+          <div class="space-y-6">
+            <UCard>
+              <template #header>
+                <h2 class="flex items-center gap-2 font-semibold">
+                  <UIcon name="i-heroicons-photo" class="text-primary" /> Affiche
+                </h2>
+              </template>
+              <UFormField
+                name="imageUrl"
+                description="Affichée en tête de la page publique. JPEG, PNG ou WebP, 5 Mo au plus."
               >
-                <UIcon name="i-heroicons-eye" /> Voir la page
-              </ULink>
-            </div>
-            <USwitch
-              v-model="etat.pagePublique"
-              :label="etat.pagePublique ? 'Publique' : 'Fermée'"
-              :disabled="!droits?.modifier"
-            />
+                <UiImageUpload
+                  v-if="droits?.modifier"
+                  v-model="etat.imageUrl"
+                  :endpoint="{ type: 'edition', id }"
+                  :options="{
+                    validation: {
+                      maxSize: 5 * 1024 * 1024,
+                      allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+                      allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
+                    },
+                    resetAfterUpload: false,
+                  }"
+                  alt="Affiche de l'événement"
+                  placeholder="Choisissez l'affiche de l'événement"
+                  :allow-delete="!!etat.imageUrl"
+                  @uploaded="
+                    (r: { imageUrl?: string }) => r.imageUrl && (etat.imageUrl = r.imageUrl)
+                  "
+                  @deleted="etat.imageUrl = ''"
+                />
+                <img
+                  v-else-if="etat.imageUrl"
+                  :src="etat.imageUrl"
+                  alt="Affiche de l'événement"
+                  class="max-h-64 rounded-lg"
+                />
+              </UFormField>
+            </UCard>
+
+            <UCard>
+              <template #header>
+                <h2 class="flex items-center gap-2 font-semibold">
+                  <UIcon name="i-heroicons-globe-europe-africa" class="text-primary" /> Page
+                  publique
+                </h2>
+              </template>
+              <div class="space-y-5">
+                <!-- La page de l'événement, partageable sans compte : fermée par défaut. -->
+                <div class="flex items-start justify-between gap-4">
+                  <div class="min-w-0 flex-1">
+                    <p class="font-medium">Rendre la page publique</p>
+                    <p class="text-sm text-muted">
+                      Toute personne qui a le lien voit l'affiche, les dates, le lieu, la
+                      description, les liens, et ce à quoi elle peut participer (bénévolat, appels à
+                      spectacles).
+                    </p>
+                    <ULink
+                      :to="`/events/${refEvenement}`"
+                      class="mt-1 inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                    >
+                      <UIcon name="i-heroicons-eye" /> Voir la page
+                    </ULink>
+                  </div>
+                  <USwitch
+                    v-model="etat.pagePublique"
+                    :label="etat.pagePublique ? 'Publique' : 'Fermée'"
+                    :disabled="!droits?.modifier"
+                  />
+                </div>
+
+                <UFormField
+                  label="E-mail de contact"
+                  name="contactEmail"
+                  description="Affiché sur la page publique, pour joindre l'organisation."
+                  :error="erreurContact"
+                >
+                  <UInput
+                    v-model="etat.contactEmail"
+                    type="email"
+                    class="w-full"
+                    icon="i-heroicons-envelope"
+                    placeholder="contact@mon-festival.fr"
+                    :disabled="!droits?.modifier"
+                  />
+                </UFormField>
+              </div>
+            </UCard>
+
+            <UCard>
+              <template #header>
+                <h2 class="flex items-center gap-2 font-semibold">
+                  <UIcon name="i-heroicons-link" class="text-primary" /> Liens externes
+                </h2>
+              </template>
+              <div class="space-y-4">
+                <!-- Écrits un par un : une boucle dont la variable sert DANS le slot de UFormField
+                     n'était pas vue du typage de la CI (TS2304), ni sur le composant ni sur un template. -->
+                <UFormField
+                  label="Site officiel"
+                  name="officialWebsiteUrl"
+                  :error="erreursLiens.officialWebsiteUrl"
+                >
+                  <UInput
+                    v-model="etat.officialWebsiteUrl"
+                    type="url"
+                    class="w-full"
+                    icon="i-heroicons-globe-alt"
+                    placeholder="https://…"
+                    :disabled="!droits?.modifier"
+                  />
+                </UFormField>
+                <UFormField
+                  label="Billetterie en ligne"
+                  name="ticketingUrl"
+                  :error="erreursLiens.ticketingUrl"
+                >
+                  <UInput
+                    v-model="etat.ticketingUrl"
+                    type="url"
+                    class="w-full"
+                    icon="i-heroicons-ticket"
+                    placeholder="https://…"
+                    :disabled="!droits?.modifier"
+                  />
+                </UFormField>
+                <UFormField label="Facebook" name="facebookUrl" :error="erreursLiens.facebookUrl">
+                  <UInput
+                    v-model="etat.facebookUrl"
+                    type="url"
+                    class="w-full"
+                    icon="i-simple-icons-facebook"
+                    placeholder="https://…"
+                    :disabled="!droits?.modifier"
+                  />
+                </UFormField>
+                <UFormField
+                  label="Instagram"
+                  name="instagramUrl"
+                  :error="erreursLiens.instagramUrl"
+                >
+                  <UInput
+                    v-model="etat.instagramUrl"
+                    type="url"
+                    class="w-full"
+                    icon="i-simple-icons-instagram"
+                    placeholder="https://…"
+                    :disabled="!droits?.modifier"
+                  />
+                </UFormField>
+              </div>
+            </UCard>
           </div>
-
-          <UFormField
-            label="E-mail de contact"
-            name="contactEmail"
-            description="Affiché sur la page publique, pour joindre l'organisation."
-            :error="erreurContact"
-          >
-            <UInput
-              v-model="etat.contactEmail"
-              type="email"
-              class="w-full"
-              icon="i-heroicons-envelope"
-              placeholder="contact@mon-festival.fr"
-              :disabled="!droits?.modifier"
-            />
-          </UFormField>
-
-          <UFormField
-            label="Affiche"
-            name="imageUrl"
-            description="Affichée en tête de la page publique. JPEG, PNG ou WebP, 5 Mo au plus."
-          >
-            <UiImageUpload
-              v-if="droits?.modifier"
-              v-model="etat.imageUrl"
-              :endpoint="{ type: 'edition', id }"
-              :options="{
-                validation: {
-                  maxSize: 5 * 1024 * 1024,
-                  allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
-                  allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
-                },
-                resetAfterUpload: false,
-              }"
-              alt="Affiche de l'événement"
-              placeholder="Choisissez l'affiche de l'événement"
-              :allow-delete="!!etat.imageUrl"
-              @uploaded="(r: { imageUrl?: string }) => r.imageUrl && (etat.imageUrl = r.imageUrl)"
-              @deleted="etat.imageUrl = ''"
-            />
-            <img
-              v-else-if="etat.imageUrl"
-              :src="etat.imageUrl"
-              alt="Affiche de l'événement"
-              class="max-h-64 rounded-lg"
-            />
-          </UFormField>
-
-          <div class="grid gap-4 sm:grid-cols-2">
-            <!-- Écrits un par un : une boucle dont la variable sert DANS le slot de UFormField
-                 n'était pas vue du typage de la CI (TS2304), ni sur le composant ni sur un template. -->
-            <UFormField
-              label="Site officiel"
-              name="officialWebsiteUrl"
-              :error="erreursLiens.officialWebsiteUrl"
-            >
-              <UInput
-                v-model="etat.officialWebsiteUrl"
-                type="url"
-                class="w-full"
-                icon="i-heroicons-globe-alt"
-                placeholder="https://…"
-                :disabled="!droits?.modifier"
-              />
-            </UFormField>
-            <UFormField
-              label="Billetterie en ligne"
-              name="ticketingUrl"
-              :error="erreursLiens.ticketingUrl"
-            >
-              <UInput
-                v-model="etat.ticketingUrl"
-                type="url"
-                class="w-full"
-                icon="i-heroicons-ticket"
-                placeholder="https://…"
-                :disabled="!droits?.modifier"
-              />
-            </UFormField>
-            <UFormField label="Facebook" name="facebookUrl" :error="erreursLiens.facebookUrl">
-              <UInput
-                v-model="etat.facebookUrl"
-                type="url"
-                class="w-full"
-                icon="i-simple-icons-facebook"
-                placeholder="https://…"
-                :disabled="!droits?.modifier"
-              />
-            </UFormField>
-            <UFormField label="Instagram" name="instagramUrl" :error="erreursLiens.instagramUrl">
-              <UInput
-                v-model="etat.instagramUrl"
-                type="url"
-                class="w-full"
-                icon="i-simple-icons-instagram"
-                placeholder="https://…"
-                :disabled="!droits?.modifier"
-              />
-            </UFormField>
-          </div>
-
-          <div v-if="droits?.modifier" class="flex justify-end">
-            <UButton
-              type="submit"
-              icon="i-heroicons-check"
-              label="Enregistrer"
-              :loading="enregistrement"
-              :disabled="
-                !modifie || !!erreurFin || !!erreurContact || Object.keys(erreursLiens).length > 0
-              "
-            />
-          </div>
-          <UAlert
-            v-else
-            color="neutral"
-            variant="soft"
-            icon="i-heroicons-lock-closed"
-            :title="
-              evenement?.archivedAt
-                ? 'Lecture seule : cet événement est archivé.'
-                : 'Lecture seule : vous ne pouvez pas modifier cet événement pour le moment.'
-            "
-          />
-        </UForm>
-      </UCard>
-
-      <!-- Archiver : lecture seule complète, et une place libérée dans la formule du propriétaire.
-           Permis même quand la gestion est en lecture seule : c'est le moyen d'en sortir. -->
-      <UCard v-if="droits?.supprimer">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p class="font-semibold">
-              {{ evenement?.archivedAt ? 'Événement archivé' : "Archiver l'événement" }}
-            </p>
-            <p class="text-sm text-muted">
-              {{
-                evenement?.archivedAt
-                  ? `Archivé le ${new Date(evenement.archivedAt).toLocaleDateString('fr-FR')} : tout reste consultable, rien n'est modifiable. Le désarchiver reprend une place de votre formule.`
-                  : "Pour un événement passé : tout reste consultable, plus rien n'est modifiable, et il libère une place parmi les événements en cours de votre formule."
-              }}
-            </p>
-          </div>
-          <UButton
-            color="neutral"
-            variant="outline"
-            :icon="
-              evenement?.archivedAt ? 'i-heroicons-arrow-uturn-left' : 'i-heroicons-archive-box'
-            "
-            :label="evenement?.archivedAt ? 'Désarchiver' : 'Archiver'"
-            :loading="archivage"
-            class="shrink-0"
-            @click="basculerArchive"
-          />
         </div>
-      </UCard>
 
-      <!-- Le propriétaire seul supprime (décision de l'utilisateur). -->
-      <UCard v-if="droits?.supprimer" :ui="{ root: 'ring-error/40' }">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p class="font-semibold text-error">Supprimer l'événement</p>
-            <p class="text-sm text-muted">
-              Définitif : toutes ses données partent avec lui (candidatures, équipes, créneaux,
-              planning, organisateurs).
-            </p>
-          </div>
-          <UButton
-            color="error"
-            variant="soft"
-            icon="i-heroicons-trash"
-            label="Supprimer…"
-            @click="fenetreSuppression = true"
-          />
-        </div>
-      </UCard>
-    </template>
-
-    <UModal
-      v-model:open="fenetreSuppression"
-      title="Supprimer l'événement ?"
-      :description="`« ${evenement?.name} » et toutes ses données seront effacés. Cette action est irréversible.`"
-    >
-      <template #body>
-        <UFormField
-          :label="`Pour confirmer, retapez le nom : ${evenement?.name}`"
-          name="confirmation"
+        <!-- Collé au bas de l'écran, et seulement quand il y a quelque chose à enregistrer : le
+             formulaire est long, l'enregistrement reste à portée. -->
+        <div
+          v-if="droits?.modifier && modifie"
+          class="sticky bottom-0 z-10 -mx-1 flex items-center justify-end gap-3 rounded-lg border border-default bg-default/90 px-4 py-3 backdrop-blur"
         >
-          <UInput v-model="confirmation" class="w-full" autocomplete="off" />
-        </UFormField>
-      </template>
-      <template #footer>
-        <div class="flex w-full justify-end gap-2">
+          <span class="text-sm text-muted">Modifications non enregistrées</span>
           <UButton
-            color="neutral"
-            variant="ghost"
-            label="Annuler"
-            @click="fenetreSuppression = false"
-          />
-          <UButton
-            color="error"
-            icon="i-heroicons-trash"
-            label="Supprimer définitivement"
-            :loading="suppression"
-            :disabled="confirmation.trim() !== evenement?.name.trim()"
-            @click="supprimer"
+            type="submit"
+            icon="i-heroicons-check"
+            label="Enregistrer"
+            :loading="enregistrement"
+            :disabled="!!erreurFin || !!erreurContact || Object.keys(erreursLiens).length > 0"
           />
         </div>
-      </template>
-    </UModal>
+        <UAlert
+          v-else-if="!droits?.modifier"
+          color="neutral"
+          variant="soft"
+          icon="i-heroicons-lock-closed"
+          :title="
+            evenement?.archivedAt
+              ? 'Lecture seule : cet événement est archivé.'
+              : 'Lecture seule : vous ne pouvez pas modifier cet événement pour le moment.'
+          "
+        />
+      </UForm>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 /**
- * Gestion de l'événement lui-même : ses informations, et sa suppression.
+ * Gestion de l'événement lui-même : ses informations. L'archivage et la suppression sont en bas de
+ * l'accueil de la gestion (`EvenementZoneSensible`).
  *
  * Les dates sont montrées et saisies en HORLOGE MURALE du fuseau de l'événement
  * (`versChampLocal`) ; le serveur les ancre dans ce fuseau (PUT /api/events/:id). Changer le fuseau
  * réinterprète donc les heures affichées : 10 h reste 10 h, mais dans le nouveau fuseau.
  */
+import type { AdresseTrouvee } from '~/components/evenement/RechercheAdresse.vue'
 import { useEditionStore } from '~/stores/editions'
 
 import { versChampLocal } from '#core/shared/utils/fuseau-edition'
@@ -513,6 +499,22 @@ const erreurFin = computed(() =>
   etat.debut && etat.fin && etat.fin < etat.debut ? 'La fin doit suivre le début' : undefined
 )
 
+/**
+ * Une adresse choisie dans la recherche remplit tous les champs du lieu, coordonnées comprises (le
+ * serveur garde des coordonnées saisies plutôt que de regéocoder). Le nom du lieu n'est repris que
+ * s'il est vide : il a souvent été saisi à la main, plus parlant que celui d'OpenStreetMap. Le
+ * complément d'adresse (bâtiment, étage) n'est pas touché : la recherche ne le connaît pas.
+ */
+function remplirAdresse(a: AdresseTrouvee) {
+  etat.addressLine1 = a.addressLine1
+  etat.postalCode = a.postalCode
+  etat.city = a.city
+  etat.country = a.country
+  etat.latitude = String(a.latitude)
+  etat.longitude = String(a.longitude)
+  if (!etat.location.trim() && a.nomDuLieu) etat.location = a.nomDuLieu
+}
+
 const { execute: enregistrer, loading: enregistrement } = useApiAction(
   `/api/events/${refEvenement}`,
   {
@@ -548,37 +550,4 @@ const { execute: enregistrer, loading: enregistrement } = useApiAction(
     },
   }
 )
-
-const { execute: basculerArchive, loading: archivage } = useApiAction(
-  `/api/events/${refEvenement}/archive`,
-  {
-    method: 'POST',
-    body: () => ({ archive: !evenement.value?.archivedAt }),
-    // Lu au moment du message, AVANT le rafraîchissement : l'état d'avant dit ce qui vient d'être fait.
-    successMessage: {
-      get title() {
-        return evenement.value?.archivedAt ? 'Événement désarchivé' : 'Événement archivé'
-      },
-    },
-    errorMessages: { default: "L'archivage n'a pas abouti" },
-    // Le bandeau de lecture seule de la gestion lit l'accès : on le relit avec l'événement.
-    onSuccess: async () => {
-      await Promise.all([refresh(), refreshNuxtData(`acces-gestion-${refEvenement}`)])
-    },
-  }
-)
-
-const fenetreSuppression = ref(false)
-const confirmation = ref('')
-watch(fenetreSuppression, (ouverte) => {
-  if (ouverte) confirmation.value = ''
-})
-
-const { execute: supprimer, loading: suppression } = useApiAction(`/api/events/${refEvenement}`, {
-  method: 'DELETE',
-  body: () => ({ confirmation: confirmation.value }),
-  successMessage: { title: 'Événement supprimé' },
-  errorMessages: { default: "L'événement n'a pas pu être supprimé" },
-  onSuccess: () => navigateTo('/dashboard'),
-})
 </script>
