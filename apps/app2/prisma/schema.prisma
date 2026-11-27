@@ -123,6 +123,12 @@ model Event {
   postalCode                       String?  @db.VarChar(20)
   city                             String?
   country                          String?
+  /// Coordonnées GPS du lieu (carte de la page publique) : calculées depuis l'adresse à
+  /// l'enregistrement, corrigeables à la main.
+  latitude                         Float?
+  longitude                        Float?
+  /// Adresse e-mail de contact affichée sur la page publique.
+  contactEmail                     String?
   /// Affiche de l'événement (`/uploads/events/<id>/<fichier>`), publique.
   imageUrl                         String?
   /// Liens publics de l'événement.

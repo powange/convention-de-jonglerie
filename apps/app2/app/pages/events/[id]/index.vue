@@ -71,6 +71,13 @@
             </li>
           </ul>
 
+          <p v-if="e.contactEmail" class="flex items-start gap-2 text-sm">
+            <UIcon name="i-heroicons-envelope" class="mt-0.5 size-5 shrink-0 text-muted" />
+            <ULink :to="`mailto:${e.contactEmail}`" class="text-primary hover:underline">
+              {{ e.contactEmail }}
+            </ULink>
+          </p>
+
           <div v-if="liens.length" class="flex flex-wrap gap-2">
             <UButton
               v-for="l in liens"
@@ -86,6 +93,15 @@
           </div>
         </div>
       </div>
+
+      <!-- Le lieu sur une carte, quand ses coordonnées GPS sont connues. -->
+      <!-- Sans ClientOnly : le composant ne touche à Leaflet que dans onMounted (navigateur). -->
+      <EvenementCarteDuLieu
+        v-if="e.coordonnees"
+        :latitude="e.coordonnees.latitude"
+        :longitude="e.coordonnees.longitude"
+        :titre="e.location || e.name"
+      />
 
       <section v-if="e.description" class="space-y-2">
         <h2 class="text-lg font-semibold">À propos</h2>
@@ -147,6 +163,8 @@ interface PagePublique {
       ville: string | null
       pays: string | null
     }
+    coordonnees: { latitude: number; longitude: number } | null
+    contactEmail: string | null
     startDate: string | null
     endDate: string | null
     timezone: string | null
@@ -186,8 +204,12 @@ const adresse = computed(() => {
   return [a.ligne1, a.ligne2, ville, a.pays].filter(Boolean).join(', ')
 })
 
-/** Recherche du lieu sur OpenStreetMap : l'adresse, sinon le nom du lieu. */
+/** Le lieu sur OpenStreetMap : ses coordonnées si on les a, sinon une recherche par l'adresse. */
 const lienCarte = computed(() => {
+  const c = e.value.coordonnees
+  if (c) {
+    return `https://www.openstreetmap.org/?mlat=${c.latitude}&mlon=${c.longitude}#map=17/${c.latitude}/${c.longitude}`
+  }
   const requete = adresse.value || e.value.location
   return requete
     ? `https://www.openstreetmap.org/search?query=${encodeURIComponent(requete)}`

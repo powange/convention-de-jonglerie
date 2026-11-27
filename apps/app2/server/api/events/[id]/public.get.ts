@@ -9,8 +9,8 @@ import { resoudreEvenement } from '../../../utils/evenement-public'
  * en ligne) ; sinon seulement qui est impliqué — l'organisateur y voit alors un aperçu, marqué
  * comme non public. Sinon 404 : l'existence de l'événement ne se devine pas.
  *
- * Rien que des informations publiques : pas d'adresse e-mail, pas de données de compte, pas de
- * chiffres de gestion.
+ * Rien que des informations publiques : ni l'adresse e-mail d'un compte (seule celle de contact,
+ * publiée par l'organisateur), ni données de compte, ni chiffres de gestion.
  */
 export default defineEventHandler(async (event) => {
   const user = optionalAuth(event)
@@ -33,6 +33,9 @@ export default defineEventHandler(async (event) => {
       postalCode: true,
       city: true,
       country: true,
+      latitude: true,
+      longitude: true,
+      contactEmail: true,
       startDate: true,
       endDate: true,
       timezone: true,
@@ -71,6 +74,12 @@ export default defineEventHandler(async (event) => {
         ville: e.city,
         pays: e.country,
       },
+      coordonnees:
+        e.latitude !== null && e.longitude !== null
+          ? { latitude: e.latitude, longitude: e.longitude }
+          : null,
+      // L'adresse de contact que l'organisateur a choisi de publier (pas celle d'un compte).
+      contactEmail: e.contactEmail,
       startDate: e.startDate,
       endDate: e.endDate,
       timezone: e.timezone,
