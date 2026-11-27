@@ -17,7 +17,7 @@ export interface EvenementResolu {
   publicId: string
   /** Gère, ou a candidaté : peut l'atteindre par son numéro. */
   impliquee: boolean
-  /** Page bénévoles publique ou candidatures ouvertes. */
+  /** Page de l'événement publique, page bénévoles publique, candidatures ouvertes, ou appel en ligne. */
   estPublic: boolean
 }
 
@@ -37,6 +37,7 @@ export async function resoudreEvenement(
       publicId: true,
       volunteersEnabled: true,
       artistsEnabled: true,
+      pagePublique: true,
       volunteerSettings: { select: { pagePublic: true, open: true } },
     },
   })
@@ -67,7 +68,11 @@ export async function resoudreEvenement(
       where: { editionId: evenement.id, visibility: { not: 'OFFLINE' } },
       select: { id: true },
     }))
-  const estPublic = (evenement.volunteersEnabled && !!(s?.pagePublic || s?.open)) || appelEnLigne
+  // La page de l'événement rendue publique par l'organisateur l'ouvre à tous, elle aussi.
+  const estPublic =
+    evenement.pagePublique ||
+    (evenement.volunteersEnabled && !!(s?.pagePublic || s?.open)) ||
+    appelEnLigne
 
   if (!impliquee && (numero || !estPublic)) return null
   return { id: evenement.id, publicId: evenement.publicId, impliquee, estPublic }

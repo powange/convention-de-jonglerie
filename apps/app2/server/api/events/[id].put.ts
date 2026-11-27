@@ -1,12 +1,17 @@
 import { z } from 'zod'
 
+import { afficheAEnregistrer } from '../../utils/affiche-evenement'
 import { droitsSurEvenement } from '../../utils/droits-evenement'
 import { idDepuisLaRoute } from '../../utils/evenement-public'
 
 import { fuseauUtilisable, versInstant } from '#core/shared/utils/fuseau-edition'
 
 /**
- * Modifie un événement : nom, description, lieu, dates de début et de fin, fuseau.
+ * Modifie un événement : nom, description, lieu, dates de début et de fin, fuseau — et ce que
+ * montre sa page publique : adresse, affiche, liens, et le choix de la rendre publique.
+ *
+ * Les champs de la page publique sont FACULTATIFS : absents, ils ne changent pas (un client ouvert
+ * avant leur ajout continue d'enregistrer sans les effacer).
  *
  * Les dates arrivent en HORLOGE MURALE (`AAAA-MM-JJTHH:MM`, ce que montre un champ date-heure) et
  * sont ancrées ICI dans le fuseau de l'événement — jamais dans celui du navigateur : un
@@ -17,6 +22,20 @@ const horloge = z
   .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, 'Date et heure invalides')
   .nullable()
 
+/** Texte court facultatif : vide → null. */
+const texte = (max: number) => z.string().trim().max(max).nullable().optional()
+/** Lien http(s) facultatif : vide → null. */
+const lien = z
+  .string()
+  .trim()
+  .max(500)
+  .refine(
+    (v) => v === '' || /^https?:\/\/\S+$/i.test(v),
+    'Le lien doit commencer par http:// ou https://'
+  )
+  .nullable()
+  .optional()
+
 const schema = z
   .object({
     name: z.string().trim().min(1, "Le nom de l'événement est requis").max(200),
@@ -25,6 +44,17 @@ const schema = z
     timezone: z.string().refine((f) => !!fuseauUtilisable(f), 'Fuseau horaire inconnu'),
     debut: horloge,
     fin: horloge,
+    addressLine1: texte(191),
+    addressLine2: texte(191),
+    postalCode: texte(20),
+    city: texte(191),
+    country: texte(191),
+    imageUrl: z.string().max(500).nullable().optional(),
+    officialWebsiteUrl: lien,
+    ticketingUrl: lien,
+    facebookUrl: lien,
+    instagramUrl: lien,
+    pagePublique: z.boolean().optional(),
   })
   .refine((d) => !d.debut || !d.fin || d.fin >= d.debut, {
     message: 'La fin doit suivre le début',
@@ -48,6 +78,10 @@ export default defineEventHandler(async (event) => {
     })
   }
   const d = resultat.data
+  const actuel = await prisma.event.findUniqueOrThrow({ where: { id }, select: { imageUrl: true } })
+  const imageUrl = await afficheAEnregistrer(d.imageUrl, actuel.imageUrl, id)
+  /** `undefined` (absent) ne change rien ; une chaîne vide efface. */
+  const facultatif = (v: string | null | undefined) => (v === undefined ? undefined : v || null)
 
   const evenement = await prisma.event.update({
     where: { id },
@@ -58,6 +92,17 @@ export default defineEventHandler(async (event) => {
       timezone: d.timezone,
       startDate: d.debut ? new Date(versInstant(d.debut, d.timezone)) : null,
       endDate: d.fin ? new Date(versInstant(d.fin, d.timezone)) : null,
+      addressLine1: facultatif(d.addressLine1),
+      addressLine2: facultatif(d.addressLine2),
+      postalCode: facultatif(d.postalCode),
+      city: facultatif(d.city),
+      country: facultatif(d.country),
+      imageUrl,
+      officialWebsiteUrl: facultatif(d.officialWebsiteUrl),
+      ticketingUrl: facultatif(d.ticketingUrl),
+      facebookUrl: facultatif(d.facebookUrl),
+      instagramUrl: facultatif(d.instagramUrl),
+      pagePublique: d.pagePublique,
     },
   })
   return createSuccessResponse({ event: evenement }, 'Événement mis à jour')

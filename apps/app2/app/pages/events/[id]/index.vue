@@ -1,130 +1,277 @@
 <template>
-  <UContainer class="max-w-3xl py-10">
-    <UButton
-      to="/dashboard"
-      variant="link"
-      color="neutral"
-      icon="i-heroicons-arrow-left"
-      label="Retour"
-      class="-ml-2 mb-4"
-    />
+  <UContainer class="max-w-5xl space-y-8 py-10">
+    <template v-if="page">
+      <!-- Aperçu pour l'équipe : la page n'est pas (encore) visible de tous. -->
+      <UAlert
+        v-if="!page.estPublique && page.droits"
+        color="neutral"
+        variant="subtle"
+        icon="i-heroicons-eye-slash"
+        title="Cette page n'est visible que de l'équipe d'organisation"
+        :description="
+          page.droits.estProprietaire
+            ? 'Rendez-la publique depuis les informations de l’événement pour la partager.'
+            : 'Le propriétaire ou un organisateur autorisé peut la rendre publique.'
+        "
+        :actions="[
+          {
+            label: 'Informations de l’événement',
+            to: `/events/${e.publicId}/gestion/evenement`,
+            color: 'neutral',
+            variant: 'outline',
+          },
+        ]"
+      />
+      <UAlert
+        v-if="e.annule"
+        color="error"
+        variant="subtle"
+        icon="i-heroicons-x-circle"
+        title="Cet événement est annulé"
+      />
 
-    <div v-if="event">
-      <h1 class="text-2xl font-bold">{{ event.name }}</h1>
-      <div class="mt-2 flex flex-wrap gap-3 text-sm text-muted">
-        <span v-if="event.location" class="flex items-center gap-1">
-          <UIcon name="i-heroicons-map-pin" /> {{ event.location }}
-        </span>
-        <span v-if="event.startDate" class="flex items-center gap-1">
-          <UIcon name="i-heroicons-calendar" />
-          {{ periodeEvenement({ ...event, timezone: event.timezone ?? undefined }) }}
-        </span>
+      <!-- En-tête : l'affiche, puis le nom, les dates, le lieu et les liens. -->
+      <div class="flex flex-col gap-6 sm:flex-row sm:items-start">
+        <img
+          v-if="e.imageUrl"
+          :src="e.imageUrl"
+          :alt="`Affiche de ${e.name}`"
+          class="w-full max-w-xs self-center rounded-lg object-cover shadow-sm sm:w-56 sm:self-start"
+        />
+        <div class="min-w-0 flex-1 space-y-4">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <h1 class="text-3xl font-bold text-balance">{{ e.name }}</h1>
+            <UButton
+              v-if="page.droits"
+              :to="`/events/${e.publicId}/gestion`"
+              icon="i-heroicons-squares-2x2"
+              label="Gérer l'événement"
+            />
+          </div>
+
+          <ul class="space-y-2 text-sm">
+            <li v-if="dates" class="flex items-start gap-2">
+              <UIcon name="i-heroicons-calendar" class="mt-0.5 size-5 shrink-0 text-muted" />
+              <span>{{ dates }}</span>
+            </li>
+            <li v-if="e.location || adresse" class="flex items-start gap-2">
+              <UIcon name="i-heroicons-map-pin" class="mt-0.5 size-5 shrink-0 text-muted" />
+              <span>
+                <span v-if="e.location" class="block font-medium">{{ e.location }}</span>
+                <span v-if="adresse" class="block text-muted">{{ adresse }}</span>
+                <ULink
+                  v-if="lienCarte"
+                  :to="lienCarte"
+                  target="_blank"
+                  class="text-primary hover:underline"
+                >
+                  Voir sur la carte
+                </ULink>
+              </span>
+            </li>
+          </ul>
+
+          <div v-if="liens.length" class="flex flex-wrap gap-2">
+            <UButton
+              v-for="l in liens"
+              :key="l.to"
+              :to="l.to"
+              target="_blank"
+              :icon="l.icone"
+              :label="l.libelle"
+              color="neutral"
+              variant="outline"
+              size="sm"
+            />
+          </div>
+        </div>
       </div>
 
-      <p v-if="event.description" class="mt-4 whitespace-pre-line text-muted">
-        {{ event.description }}
-      </p>
+      <section v-if="e.description" class="space-y-2">
+        <h2 class="text-lg font-semibold">À propos</h2>
+        <p class="whitespace-pre-line text-muted">{{ e.description }}</p>
+      </section>
 
-      <USeparator v-if="acces?.droits.voir" class="my-8" label="Fonctionnalités d'organisation" />
-
-      <!-- La gestion s'ouvre à qui la voit ; archivé, ou propriétaire en surnombre d'événements,
-           l'événement reste consultable en lecture seule (droits-evenement.ts). -->
-      <div v-if="acces?.droits.voir" class="space-y-4">
-        <UAlert
-          v-if="acces.lectureSeule"
-          color="warning"
-          variant="subtle"
-          icon="i-heroicons-lock-closed"
-          :title="
-            acces.lectureSeule === 'archive'
-              ? 'Cet événement est archivé : sa gestion est en lecture seule'
-              : 'Trop d’événements en cours pour la formule du propriétaire : la gestion est en lecture seule'
-          "
-          description="Rien n'est supprimé."
-          :actions="
-            acces.droits.estProprietaire && acces.lectureSeule === 'surnombre'
-              ? [{ label: 'Voir les formules', to: '/pricing', color: 'warning', variant: 'solid' }]
-              : []
-          "
-        />
+      <!-- Participer : ce que l'organisateur a ouvert au public. -->
+      <section v-if="participations.length" class="space-y-3">
+        <h2 class="text-lg font-semibold">Participer</h2>
         <div class="grid gap-4 sm:grid-cols-2">
           <UCard
-            v-for="carte in cartes"
-            :key="carte.to"
+            v-for="p in participations"
+            :key="p.to"
             class="cursor-pointer transition hover:ring-2 hover:ring-primary"
-            @click="navigateTo(carte.to)"
+            @click="ouvrir(p)"
           >
             <div class="flex items-center gap-3">
               <div
-                class="flex size-11 items-center justify-center rounded-lg"
-                :class="carte.couleur"
+                class="flex size-11 shrink-0 items-center justify-center rounded-lg"
+                :class="p.couleur"
               >
-                <UIcon :name="carte.icone" class="text-2xl" />
+                <UIcon :name="p.icone" class="text-2xl" />
               </div>
-              <div>
-                <p class="font-semibold">{{ carte.titre }}</p>
-                <p class="text-sm text-muted">{{ carte.description }}</p>
+              <div class="min-w-0">
+                <p class="font-semibold">{{ p.titre }}</p>
+                <p class="text-sm text-muted">{{ p.description }}</p>
               </div>
             </div>
           </UCard>
         </div>
-      </div>
-    </div>
+      </section>
+    </template>
   </UContainer>
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
-
+/**
+ * La page PUBLIQUE d'un événement Flowvent, lisible sans connexion quand l'organisateur l'a rendue
+ * publique (ou qu'un autre accès public est ouvert : page bénévoles, appel à spectacles) — règle
+ * de `resoudreEvenement`, servie par GET /api/events/:id/public. L'équipe d'organisation y voit en
+ * plus l'accès à la gestion, et un aperçu quand la page n'est pas encore publique.
+ *
+ * Le pendant de la page d'une édition d'app1 (`/editions/:id`) : informations, affiche, adresse,
+ * liens, et ce à quoi on peut participer.
+ */
 const route = useRoute()
 
-const { data, error } = await useFetch(`/api/events/${route.params.id}`)
-if (error.value) {
+interface PagePublique {
+  evenement: {
+    id: number
+    publicId: string
+    name: string
+    description: string | null
+    location: string | null
+    adresse: {
+      ligne1: string | null
+      ligne2: string | null
+      codePostal: string | null
+      ville: string | null
+      pays: string | null
+    }
+    startDate: string | null
+    endDate: string | null
+    timezone: string | null
+    imageUrl: string | null
+    liens: {
+      siteOfficiel: string | null
+      billetterie: string | null
+      facebook: string | null
+      instagram: string | null
+    }
+    annule: boolean
+    archive: boolean
+  }
+  estPublique: boolean
+  pagePublique: boolean
+  benevoles: { candidaturesOuvertes: boolean } | null
+  appels: { id: number; nom: string; ouvert: boolean; dateLimite: string | null }[]
+  droits: { voir: boolean; estProprietaire: boolean } | null
+}
+
+const { data: page, error } = await useFetch<PagePublique>(
+  () => `/api/events/${route.params.id}/public`
+)
+if (error.value || !page.value) {
   throw createError({ statusCode: 404, statusMessage: 'Événement introuvable', fatal: true })
 }
-const event = computed(() => data.value?.event)
+const e = computed(() => page.value!.evenement)
 
-// Droits de la personne, et l'abonnement du propriétaire qui ouvre (ou non) la gestion.
-const { data: acces } = await useFetch<{
-  droits: {
-    voir: boolean
-    modifier: boolean
-    organisateurs: boolean
-    benevoles: boolean
-    estProprietaire: boolean
-  }
-  lectureSeule: 'archive' | 'surnombre' | null
-  modules?: { benevoles: boolean }
-}>(`/api/events/${route.params.id}/acces-gestion`)
+const dates = computed(() =>
+  periodeEvenement({ ...e.value, timezone: e.value.timezone ?? undefined })
+)
 
-// La gestion se résume ici à deux portes : son accueil (qui ouvre chaque module selon les droits),
-// et la page que l'on partage aux bénévoles si leur module est actif.
-const cartes = computed(() => {
-  const e = event.value
-  const a = acces.value
-  if (!e || !a) return []
-  const base = `/events/${e.publicId}`
+/** « 12 rue des Lilas, 69001 Lyon, France » — les parties renseignées seulement. */
+const adresse = computed(() => {
+  const a = e.value.adresse
+  const ville = [a.codePostal, a.ville].filter(Boolean).join(' ')
+  return [a.ligne1, a.ligne2, ville, a.pays].filter(Boolean).join(', ')
+})
+
+/** Recherche du lieu sur OpenStreetMap : l'adresse, sinon le nom du lieu. */
+const lienCarte = computed(() => {
+  const requete = adresse.value || e.value.location
+  return requete
+    ? `https://www.openstreetmap.org/search?query=${encodeURIComponent(requete)}`
+    : null
+})
+
+const liens = computed(() => {
+  const l = e.value.liens
   return [
-    {
-      titre: "Gestion de l'événement",
-      description: 'Bénévoles, organisateurs, informations, modules.',
-      icone: 'i-heroicons-squares-2x2',
-      couleur: 'bg-primary/10 text-primary',
-      to: `${base}/gestion`,
+    l.siteOfficiel && {
+      to: l.siteOfficiel,
+      libelle: 'Site officiel',
+      icone: 'i-heroicons-globe-alt',
     },
-    ...(a.modules?.benevoles !== false
+    l.billetterie && { to: l.billetterie, libelle: 'Billetterie', icone: 'i-heroicons-ticket' },
+    l.facebook && { to: l.facebook, libelle: 'Facebook', icone: 'i-simple-icons-facebook' },
+    l.instagram && { to: l.instagram, libelle: 'Instagram', icone: 'i-simple-icons-instagram' },
+  ].filter(Boolean) as { to: string; libelle: string; icone: string }[]
+})
+
+interface Participation {
+  titre: string
+  description: string
+  icone: string
+  couleur: string
+  to: string
+  externe?: boolean
+}
+
+const participations = computed<Participation[]>(() => {
+  const p = page.value!
+  const base = `/events/${e.value.publicId}`
+  const formatDate = (d: string) =>
+    new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  return [
+    ...(p.benevoles
       ? [
           {
-            titre: 'Page des bénévoles',
-            description: 'Ce que voient les candidats, et le lien à partager.',
-            icone: 'i-heroicons-eye',
-            couleur: 'bg-secondary/10 text-secondary',
+            titre: 'Devenir bénévole',
+            description: p.benevoles.candidaturesOuvertes
+              ? 'Les candidatures sont ouvertes.'
+              : 'Les candidatures sont fermées pour le moment.',
+            icone: 'i-heroicons-hand-raised',
+            couleur: 'bg-primary/10 text-primary',
             to: `${base}/volunteers`,
+          },
+        ]
+      : []),
+    ...p.appels.map((a) => ({
+      titre: a.nom,
+      description: a.ouvert
+        ? a.dateLimite
+          ? `Appel à spectacles ouvert jusqu'au ${formatDate(a.dateLimite)}.`
+          : 'Appel à spectacles ouvert.'
+        : 'Appel à spectacles clos.',
+      icone: 'i-heroicons-star',
+      couleur: 'bg-secondary/10 text-secondary',
+      to: `${base}/shows-call/${a.id}`,
+    })),
+    ...(e.value.liens.billetterie
+      ? [
+          {
+            titre: 'Prendre un billet',
+            description: 'Sur la billetterie de l’événement.',
+            icone: 'i-heroicons-ticket',
+            couleur: 'bg-success/10 text-success',
+            to: e.value.liens.billetterie,
+            externe: true,
           },
         ]
       : []),
   ]
 })
 
-useSeoMeta({ title: () => (event.value ? `${event.value.name} — Flowvent` : 'Événement') })
+function ouvrir(p: Participation) {
+  if (p.externe) window.open(p.to, '_blank', 'noopener')
+  else navigateTo(p.to)
+}
+
+useSeoMeta({
+  title: () => `${e.value.name} — Flowvent`,
+  description: () => e.value.description?.slice(0, 160) || `${e.value.name}, ${dates.value}`,
+  ogImage: () => e.value.imageUrl ?? undefined,
+  // Un aperçu d'équipe ne doit pas être indexé.
+  robots: () => (page.value?.estPublique ? 'index, follow' : 'noindex, nofollow'),
+})
 </script>

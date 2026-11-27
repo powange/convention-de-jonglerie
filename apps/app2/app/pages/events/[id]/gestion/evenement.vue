@@ -2,7 +2,7 @@
   <div class="mx-auto max-w-3xl space-y-6">
     <ManagementPageHeader
       titre="Informations de l'événement"
-      description="Le nom, le lieu et les dates que voient les bénévoles."
+      description="Le nom, les dates, le lieu, et ce que montre la page publique de l'événement."
       module="general-info"
     />
 
@@ -20,15 +20,6 @@
         <UForm :state="etat" class="space-y-5" @submit="enregistrer">
           <UFormField label="Nom de l'événement" name="name" required>
             <UInput v-model="etat.name" class="w-full" :disabled="!droits?.modifier" />
-          </UFormField>
-
-          <UFormField label="Lieu" name="location">
-            <UInput
-              v-model="etat.location"
-              class="w-full"
-              placeholder="Ville, salle, adresse…"
-              :disabled="!droits?.modifier"
-            />
           </UFormField>
 
           <UFormField
@@ -74,13 +65,142 @@
             />
           </UFormField>
 
+          <USeparator label="Lieu" />
+
+          <UFormField label="Nom du lieu" name="location">
+            <UInput
+              v-model="etat.location"
+              class="w-full"
+              placeholder="Salle des fêtes, gymnase, parc…"
+              :disabled="!droits?.modifier"
+            />
+          </UFormField>
+          <UFormField label="Adresse" name="addressLine1">
+            <UInput
+              v-model="etat.addressLine1"
+              class="w-full"
+              placeholder="12 rue des Lilas"
+              autocomplete="address-line1"
+              :disabled="!droits?.modifier"
+            />
+          </UFormField>
+          <UFormField label="Complément d'adresse" name="addressLine2">
+            <UInput
+              v-model="etat.addressLine2"
+              class="w-full"
+              autocomplete="address-line2"
+              :disabled="!droits?.modifier"
+            />
+          </UFormField>
+          <div class="grid gap-4 sm:grid-cols-[10rem_1fr]">
+            <UFormField label="Code postal" name="postalCode">
+              <UInput
+                v-model="etat.postalCode"
+                class="w-full"
+                autocomplete="postal-code"
+                :disabled="!droits?.modifier"
+              />
+            </UFormField>
+            <UFormField label="Ville" name="city">
+              <UInput
+                v-model="etat.city"
+                class="w-full"
+                autocomplete="address-level2"
+                :disabled="!droits?.modifier"
+              />
+            </UFormField>
+          </div>
+          <UFormField label="Pays" name="country">
+            <UInput
+              v-model="etat.country"
+              class="w-full"
+              placeholder="France"
+              autocomplete="country-name"
+              :disabled="!droits?.modifier"
+            />
+          </UFormField>
+
+          <USeparator label="Page publique" />
+
+          <!-- La page de l'événement, partageable sans compte : fermée par défaut. -->
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div class="min-w-0 flex-1">
+              <p class="font-medium">Rendre la page de l'événement publique</p>
+              <p class="text-sm text-muted">
+                Toute personne qui a le lien voit l'affiche, les dates, le lieu, la description, les
+                liens, et ce à quoi elle peut participer (bénévolat, appels à spectacles).
+              </p>
+              <ULink
+                :to="`/events/${refEvenement}`"
+                class="mt-1 inline-flex items-center gap-1 text-sm text-primary hover:underline"
+              >
+                <UIcon name="i-heroicons-eye" /> Voir la page
+              </ULink>
+            </div>
+            <USwitch
+              v-model="etat.pagePublique"
+              :label="etat.pagePublique ? 'Publique' : 'Fermée'"
+              :disabled="!droits?.modifier"
+            />
+          </div>
+
+          <UFormField
+            label="Affiche"
+            name="imageUrl"
+            description="Affichée en tête de la page publique. JPEG, PNG ou WebP, 5 Mo au plus."
+          >
+            <UiImageUpload
+              v-if="droits?.modifier"
+              v-model="etat.imageUrl"
+              :endpoint="{ type: 'edition', id }"
+              :options="{
+                validation: {
+                  maxSize: 5 * 1024 * 1024,
+                  allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+                  allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
+                },
+                resetAfterUpload: false,
+              }"
+              alt="Affiche de l'événement"
+              placeholder="Choisissez l'affiche de l'événement"
+              :allow-delete="!!etat.imageUrl"
+              @uploaded="(r: { imageUrl?: string }) => r.imageUrl && (etat.imageUrl = r.imageUrl)"
+              @deleted="etat.imageUrl = ''"
+            />
+            <img
+              v-else-if="etat.imageUrl"
+              :src="etat.imageUrl"
+              alt="Affiche de l'événement"
+              class="max-h-64 rounded-lg"
+            />
+          </UFormField>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <UFormField
+              v-for="l in CHAMPS_LIENS"
+              :key="l.cle"
+              :label="l.libelle"
+              :name="l.cle"
+              :error="erreursLiens[l.cle]"
+            >
+              <UInput
+                v-model="etat[l.cle]"
+                type="url"
+                class="w-full"
+                :icon="l.icone"
+                placeholder="https://…"
+                :disabled="!droits?.modifier"
+              />
+            </UFormField>
+          </div>
+
           <div v-if="droits?.modifier" class="flex justify-end">
             <UButton
               type="submit"
               icon="i-heroicons-check"
               label="Enregistrer"
               :loading="enregistrement"
-              :disabled="!modifie || !!erreurFin"
+              :disabled="!modifie || !!erreurFin || Object.keys(erreursLiens).length > 0"
             />
           </div>
           <UAlert
@@ -206,6 +326,17 @@ interface Evenement {
   endDate: string | null
   timezone: string | null
   archivedAt: string | null
+  addressLine1: string | null
+  addressLine2: string | null
+  postalCode: string | null
+  city: string | null
+  country: string | null
+  imageUrl: string | null
+  officialWebsiteUrl: string | null
+  ticketingUrl: string | null
+  facebookUrl: string | null
+  instagramUrl: string | null
+  pagePublique: boolean
 }
 interface Droits {
   voir: boolean
@@ -238,8 +369,27 @@ function etatDepuis(e: Evenement | undefined) {
     timezone: fuseau,
     debut: e?.startDate ? versChampLocal(e.startDate, fuseau) : '',
     fin: e?.endDate ? versChampLocal(e.endDate, fuseau) : '',
+    addressLine1: e?.addressLine1 ?? '',
+    addressLine2: e?.addressLine2 ?? '',
+    postalCode: e?.postalCode ?? '',
+    city: e?.city ?? '',
+    country: e?.country ?? '',
+    imageUrl: e?.imageUrl ?? '',
+    officialWebsiteUrl: e?.officialWebsiteUrl ?? '',
+    ticketingUrl: e?.ticketingUrl ?? '',
+    facebookUrl: e?.facebookUrl ?? '',
+    instagramUrl: e?.instagramUrl ?? '',
+    pagePublique: !!e?.pagePublique,
   }
 }
+
+/** Les liens publics de l'événement. */
+const CHAMPS_LIENS = [
+  { cle: 'officialWebsiteUrl', libelle: 'Site officiel', icone: 'i-heroicons-globe-alt' },
+  { cle: 'ticketingUrl', libelle: 'Billetterie en ligne', icone: 'i-heroicons-ticket' },
+  { cle: 'facebookUrl', libelle: 'Facebook', icone: 'i-simple-icons-facebook' },
+  { cle: 'instagramUrl', libelle: 'Instagram', icone: 'i-simple-icons-instagram' },
+] as const
 
 const etat = reactive(etatDepuis(evenement.value))
 const reference = ref(JSON.stringify(etatDepuis(evenement.value)))
@@ -249,6 +399,14 @@ watch(evenement, (e) => {
 })
 
 const modifie = computed(() => JSON.stringify(etat) !== reference.value)
+/** Un lien saisi doit commencer par http(s) — même règle que le serveur. */
+const erreursLiens = computed(() =>
+  Object.fromEntries(
+    CHAMPS_LIENS.filter((l) => etat[l.cle] && !/^https?:\/\/\S+$/i.test(etat[l.cle].trim())).map(
+      (l) => [l.cle, 'Le lien doit commencer par http:// ou https://']
+    )
+  )
+)
 const erreurFin = computed(() =>
   etat.debut && etat.fin && etat.fin < etat.debut ? 'La fin doit suivre le début' : undefined
 )
@@ -264,6 +422,17 @@ const { execute: enregistrer, loading: enregistrement } = useApiAction(
       timezone: etat.timezone,
       debut: etat.debut || null,
       fin: etat.fin || null,
+      addressLine1: etat.addressLine1,
+      addressLine2: etat.addressLine2,
+      postalCode: etat.postalCode,
+      city: etat.city,
+      country: etat.country,
+      imageUrl: etat.imageUrl || null,
+      officialWebsiteUrl: etat.officialWebsiteUrl.trim(),
+      ticketingUrl: etat.ticketingUrl.trim(),
+      facebookUrl: etat.facebookUrl.trim(),
+      instagramUrl: etat.instagramUrl.trim(),
+      pagePublique: etat.pagePublique,
     }),
     successMessage: { title: 'Événement mis à jour' },
     errorMessages: { default: "L'événement n'a pas pu être enregistré" },
