@@ -1,4 +1,7 @@
 export default defineAppConfig({
+  // Après une connexion sans page demandée : le tableau de bord. L'accueil, lui, reste ouvert aux
+  // personnes connectées (le logo y ramène) — décision du 27/11/2026.
+  auth: { destinationApresConnexion: '/dashboard' },
   // Bénévoles : Flowvent n'offre que la gestion interne (son objet est l'outil lui-même), et n'a pas
   // de messagerie. La billetterie (lot 6) et les organisateurs déclarés y existent désormais : le
   // statut du billet des bénévoles et les organisateurs dans les équipes sont ouverts (décision du

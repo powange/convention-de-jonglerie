@@ -13,7 +13,8 @@
  */
 export function sanitizeReturnTo(
   returnTo: string | null | undefined,
-  fallback: string = '/'
+  // Flowvent : après une connexion (Google, Facebook) sans page demandée, le tableau de bord.
+  fallback: string = '/dashboard'
 ): string {
   if (!returnTo || typeof returnTo !== 'string') return fallback
 
