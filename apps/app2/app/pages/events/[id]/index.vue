@@ -184,6 +184,7 @@ interface PagePublique {
   appels: { id: number; nom: string; ouvert: boolean; dateLimite: string | null }[]
   faq: boolean
   programme: boolean
+  carte: boolean
   droits: { voir: boolean; estProprietaire: boolean } | null
 }
 
@@ -279,6 +280,17 @@ const participations = computed<Participation[]>(() => {
             icone: 'i-heroicons-calendar-days',
             couleur: 'bg-warning/10 text-warning',
             to: `${base}/program`,
+          },
+        ]
+      : []),
+    ...(p.carte
+      ? [
+          {
+            titre: 'Carte du site',
+            description: 'Les zones et les repères du lieu, pour s’y retrouver.',
+            icone: 'i-heroicons-map',
+            couleur: 'bg-primary/10 text-primary',
+            to: `${base}/map`,
           },
         ]
       : []),

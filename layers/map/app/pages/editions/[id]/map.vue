@@ -229,8 +229,12 @@ const route = useRoute()
 const { t, locale } = useI18n()
 const editionStore = useEditionStore()
 
-const editionId = computed(() => parseInt(route.params.id as string))
+// Numéro dans app1, identifiant public résolu dans Flowvent (cf. core useEditionIdRef).
+const editionId = useEditionIdRef()
 const edition = computed(() => editionStore.getEditionById(editionId.value))
+/** Le centre de la carte, quand l'édition a des coordonnées (nombres, dans les deux apps). */
+const latitude = computed(() => (edition.value?.latitude as number | null | undefined) ?? null)
+const longitude = computed(() => (edition.value?.longitude as number | null | undefined) ?? null)
 
 // Query params pour focus automatique sur une zone ou un marqueur
 const focusZoneId = computed(() => {
@@ -264,7 +268,11 @@ const loading = computed(() => editionStore.loading)
 // Carte externe éventuelle de l'organisateur. Seule la référence est stockée : l'URL intégrable
 // se reconstruit ici, ce qui évite d'avoir figé un cadrage ou un numéro de compte en base.
 const externalMapEmbedUrl = computed(() => {
-  const { externalMapProvider: provider, externalMapRef: mapRef } = edition.value ?? {}
+  // Typé à la main : le store de chaque app décrit l'édition à sa façon (app1, Flowvent).
+  const { externalMapProvider: provider, externalMapRef: mapRef } = (edition.value ?? {}) as {
+    externalMapProvider?: string | null
+    externalMapRef?: string | null
+  }
   if (!provider || !mapRef) return null
   return buildExternalMapEmbedUrl({ provider: provider as ExternalMapProvider, ref: mapRef })
 })
@@ -361,8 +369,8 @@ const {
   setView,
 } = useLeafletEditable(mapContainerRef, {
   center: computed(() => {
-    if (edition.value?.latitude && edition.value?.longitude) {
-      return [edition.value.latitude, edition.value.longitude]
+    if (latitude.value && longitude.value) {
+      return [latitude.value, longitude.value]
     }
     return [46.603354, 1.888334]
   }).value,
@@ -380,8 +388,8 @@ const {
  */
 useCadrageSurLEdition({
   map,
-  latitude: computed(() => edition.value?.latitude),
-  longitude: computed(() => edition.value?.longitude),
+  latitude,
+  longitude,
   nombreDElements: computed(() => zones.value.length + markers.value.length),
   cadrageDejaFait: initialViewSet,
   setView,

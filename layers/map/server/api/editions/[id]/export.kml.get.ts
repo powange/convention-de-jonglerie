@@ -1,4 +1,5 @@
 import { assurerCarteLisible } from '#map/server/utils/carte-lisible'
+import { useMapPorts } from '#server/map/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
@@ -35,22 +36,9 @@ export default wrapApiHandler(
   async (event) => {
     const editionId = validateEditionId(event)
 
-    // Récupérer l'édition avec ses infos
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      select: {
-        id: true,
-        name: true,
-        siteMapEnabled: true,
-        mapPublic: true,
-        convention: {
-          select: {
-            name: true,
-          },
-        },
-      },
-    })
-
+    // Les drapeaux et le nom viennent de l'app hôte (édition d'app1, événement de Flowvent).
+    const ports = useMapPorts()
+    const edition = await ports.lireDrapeaux(editionId)
     if (!edition) {
       throw createError({
         status: 404,
@@ -87,7 +75,7 @@ export default wrapApiHandler(
       }),
     ])
 
-    const editionName = edition.name || edition.convention.name
+    const editionName = (await ports.lireNom(editionId)) ?? ''
 
     // Générer le KML
     let kml = `<?xml version="1.0" encoding="UTF-8"?>

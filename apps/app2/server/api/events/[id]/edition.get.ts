@@ -44,6 +44,9 @@ export default defineEventHandler(async (event) => {
       publicId: true,
       ...selectionModules,
       mapPublic: true,
+      latitude: true,
+      longitude: true,
+      city: true,
       programPagePublic: true,
       faqPagePublic: true,
       externalMapProvider: true,
@@ -109,9 +112,13 @@ export default defineEventHandler(async (event) => {
     // lisent les layers partagés.
     ...Object.fromEntries(MODULES_EVENEMENT.map((m) => [m.colonne, evenement[m.colonne]])),
     // Seulement les droits proposés (événement + modules portés) : aucun sur un module à venir.
-    // Carte du site (layer `map`) : sa visibilité et la carte externe d'où l'on importe. Pas de
-    // coordonnées : la carte s'ouvre sur son centre par défaut, puis se cadre sur les zones.
+    // Carte du site (layer `map`) : sa visibilité, la carte externe d'où l'on importe, et les
+    // coordonnées du lieu (calculées depuis l'adresse) sur lesquelles elle s'ouvre avant de se
+    // cadrer sur les zones. La ville sert à la description de la page publique de la carte.
     mapPublic: evenement.mapPublic,
+    latitude: evenement.latitude,
+    longitude: evenement.longitude,
+    city: evenement.city,
     // Programme et FAQ (layers `program`, `faq`) : leur page publique est-elle visible ? Lu par
     // leurs pages de gestion pour l'état initial de l'interrupteur.
     programPagePublic: evenement.programPagePublic,

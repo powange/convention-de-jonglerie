@@ -53,6 +53,8 @@ export default defineEventHandler(async (event) => {
       faqPagePublic: true,
       programEnabled: true,
       programPagePublic: true,
+      siteMapEnabled: true,
+      mapPublic: true,
       _count: { select: { faqEntries: { where: { isPublic: true } } } },
       volunteerSettings: { select: { pagePublic: true, open: true } },
       showCalls: {
@@ -119,6 +121,8 @@ export default defineEventHandler(async (event) => {
     faq: e.faqEnabled && e.faqPagePublic && e._count.faqEntries > 0,
     // Le programme publié (module actif, page publique).
     programme: e.programEnabled && e.programPagePublic,
+    // La carte du site publiée (module actif, carte publique).
+    carte: e.siteMapEnabled && e.mapPublic,
     droits: droits?.voir ? { voir: true, estProprietaire: droits.estProprietaire } : null,
   }
 })

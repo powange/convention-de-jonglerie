@@ -43,7 +43,8 @@ const HORS_ENVELOPPE_A_DESSEIN: Record<string, string> = {
   '__sitemap__/carpool.get.ts': 'format imposé par @nuxtjs/sitemap, qui lit un tableau nu',
   '__sitemap__/editions.get.ts': 'format imposé par @nuxtjs/sitemap, qui lit un tableau nu',
   '__sitemap__/volunteers.get.ts': 'format imposé par @nuxtjs/sitemap, qui lit un tableau nu',
-  'editions/[id]/export.kml.get.ts': 'rend du XML : une enveloppe JSON n’aurait aucun sens',
+  'layers/map/editions/[id]/export.kml.get.ts':
+    'rend du XML : une enveloppe JSON n’aurait aucun sens',
   'project-costs/webhook.post.ts': 'appelé par Stripe, qui n’a aucune idée de notre enveloppe',
   'public/editions.get.ts': 'API publique par jeton : des clients hors du dépôt la lisent',
   'public/error-logs.get.ts': 'API publique par jeton, lue par la surveillance externe',

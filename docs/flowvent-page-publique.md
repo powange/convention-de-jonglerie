@@ -38,13 +38,16 @@ l'organisateur choisit de montrer au public.
 - **Programme** (27/11) : le programme d'app1 sorti dans `layers/program` ; une carte
   « Programme » mène à `/events/<id>/program` quand il est publié.
 
+- **Carte du site publique** (27/11) : la page publique de la carte d'app1 et son export KML
+  rejoignent `layers/map` ; une carte « Carte du site » mène à `/events/<id>/map` quand la carte
+  est publique.
+
 ## Ce qui manque encore côté gestion
 
 Par ordre d'intérêt pour la page publique.
 
 | Manque                                    | Ce que fait app1                                                     | Dans Flowvent                                                                                              |
 | ----------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| **Carte du site publique**                | onglet « Carte », zones et repères, export KML                       | la carte existe en gestion et la colonne `mapPublic` aussi, mais ni réglage ni page publique               |
 | **Tarifs de la billetterie**              | billetterie intégrée                                                 | le layer billetterie a un endpoint public des tarifs (`tiers/public`) : il pourrait s'afficher sur la page |
 | **Services et équipements**               | ~25 cases (accessibilité PMR, camping, restauration, toilettes, CB…) | rien                                                                                                       |
 | **Statut de l'événement**                 | publié, hors ligne, annulé                                           | la colonne existe, la page sait afficher « annulé », mais rien ne permet de le choisir (audit, constat G1) |
