@@ -52,6 +52,12 @@ const items: NavigationMenuItem[] = [
     onSelect: () => emit('navigate'),
   },
   {
+    label: 'Notifications',
+    icon: 'i-heroicons-bell',
+    to: '/profile/notifications',
+    onSelect: () => emit('navigate'),
+  },
+  {
     label: 'Sécurité',
     icon: 'i-heroicons-shield-check',
     to: '/profile/securite',

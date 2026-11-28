@@ -44,7 +44,10 @@ onMounted(async () => {
   }
 })
 
+const { desabonnerAvantDeconnexion } = usePushNotifications()
+
 async function changerDeCompte() {
+  await desabonnerAvantDeconnexion()
   await $fetch('/api/auth/logout', { method: 'POST' }).catch(() => null)
   await clear()
   await navigateTo(`/login?returnTo=${encodeURIComponent(`/events/${refEvenement}/app`)}`)

@@ -78,6 +78,28 @@
             </div>
           </li>
         </ul>
+
+        <!-- Recevoir ces notifications sur le téléphone : proposé tant que cet appareil ne les
+             reçoit pas (et qu'il le peut). La permission se demande sur ce geste. -->
+        <div
+          v-if="etatPush === 'inactif'"
+          class="flex items-center justify-between gap-3 border-t border-default px-4 py-3"
+        >
+          <p class="text-sm text-muted">Les recevoir aussi sur cet appareil ?</p>
+          <UButton
+            size="sm"
+            icon="i-heroicons-bell-alert"
+            label="Activer"
+            :loading="activation"
+            @click="activerPush"
+          />
+        </div>
+        <p
+          v-else-if="etatPush === 'refuse'"
+          class="border-t border-default px-4 py-3 text-xs text-muted"
+        >
+          Notifications bloquées dans ce navigateur : autorisez-les dans les réglages du site.
+        </p>
       </div>
     </template>
   </UPopover>
@@ -134,23 +156,51 @@ const libelle = computed(() =>
     : `Notifications, ${nonLues.value} non lue${nonLues.value > 1 ? 's' : ''}`
 )
 
+const toast = useToast()
+const { etat: etatPush, rafraichir: rafraichirPush, activer } = usePushNotifications()
 watch(ouvert, (o) => {
-  if (o) refresh()
+  if (!o) return
+  refresh()
+  if (etatPush.value === 'inconnu') rafraichirPush()
 })
+
+const activation = ref(false)
+async function activerPush() {
+  activation.value = true
+  try {
+    if (await activer()) {
+      toast.add({
+        title: 'Notifications activées sur cet appareil',
+        icon: 'i-heroicons-bell',
+        color: 'success',
+      })
+    }
+  } catch {
+    toast.add({ title: "Les notifications n'ont pas pu être activées", color: 'error' })
+  } finally {
+    activation.value = false
+  }
+}
 
 let minuterie: ReturnType<typeof setInterval> | undefined
 function auRetour() {
   if (document.visibilityState === 'visible') refresh()
+}
+/** Un push vient d'arriver (prévenu par le service worker) : la pastille suit à l'instant. */
+function aLaReception(message: MessageEvent) {
+  if ((message.data as { type?: string } | null)?.type === 'flowvent:push') refresh()
 }
 onMounted(() => {
   minuterie = setInterval(() => {
     if (document.visibilityState === 'visible') refresh()
   }, 60_000)
   document.addEventListener('visibilitychange', auRetour)
+  navigator.serviceWorker?.addEventListener('message', aLaReception)
 })
 onBeforeUnmount(() => {
   clearInterval(minuterie)
   document.removeEventListener('visibilitychange', auRetour)
+  navigator.serviceWorker?.removeEventListener('message', aLaReception)
 })
 
 /** « à l'instant », « il y a 5 min », « il y a 3 h », « il y a 2 j », puis la date. */

@@ -7,9 +7,12 @@
  *   candidature et d'échange de créneau (contrat d'hôte, cf. docs/flowvent-benevoles.md).
  *
  * Différences assumées avec app1 : Flowvent est en français seul, donc des textes plutôt que des
- * clés de traduction ; pas de préférences de notification, pas de push ; et les liens visent les
- * pages de Flowvent (`/events/<id>/…`), pas celles d'app1 (`/editions/<id>/…`).
+ * clés de traduction ; pas de préférences de notification ; le push passe par le Web Push standard
+ * (server/utils/push.ts), et non par Firebase ; et les liens visent les pages de Flowvent
+ * (`/events/<id>/…`), pas celles d'app1 (`/editions/<id>/…`).
  */
+import { contenuPushDeNotification, envoyerPush } from './push'
+
 import type { NotificationType } from '#server/types/prisma'
 
 export interface CreateNotificationData {
@@ -51,7 +54,7 @@ export const NotificationService = {
         'Au moins un système doit être utilisé (titleKey/messageKey OU titleText/messageText)'
       )
     }
-    return prisma.notification.create({
+    const notification = await prisma.notification.create({
       data: {
         userId: data.userId,
         type: data.type,
@@ -68,6 +71,12 @@ export const NotificationService = {
         actionText: data.actionText,
       },
     })
+    // Le push en tâche de fond : l'opération qui a créé la notification n'attend pas le réseau, et
+    // n'échoue jamais pour lui.
+    void contenuPushDeNotification(notification)
+      .then((contenu) => envoyerPush(notification.userId, contenu))
+      .catch((erreur) => console.warn('[push] notification non poussée :', erreur))
+    return notification
   },
 }
 
