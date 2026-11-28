@@ -264,5 +264,7 @@ Cette commande s'arrête si une étape échoue.
 - **UCollapsible** : Repli/dépli d'un bloc — le déclencheur va dans le slot par défaut, le contenu dans `#content` (`default-open`, `unmount-on-hide`)
 - **UColorModeButton** : Bouton (icône seule) qui bascule entre mode clair et sombre
 - **UAccordion** : Liste de questions/réponses repliables (`items` avec `label` et `content`), utilisée pour la FAQ de la page tarifs de Flowvent
+- **UPopover** : Fenêtre flottante ouverte par un déclencheur (slot par défaut, `v-model:open`, `:content="{ align, side, sideOffset }"`), contenu dans `#content` — la cloche des notifications de Flowvent. ⚠️ Le déclencheur doit être le bouton lui-même : enveloppé dans un `UChip`, il n'ouvrait rien
+- **UChip** : Pastille (compteur, état) posée sur un élément (`text`, `show`, `color`, `size`, `inset`), ou seule avec `standalone`
 
 A Chaque fois que tu ajoutes un nouveau component Nuxt UI, ajoute-le à cette liste.

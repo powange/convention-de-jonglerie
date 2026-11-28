@@ -63,6 +63,7 @@
               :ui="{ label: 'max-sm:hidden' }"
             />
             <!-- Comme sur le reste du site : le thème, et le compte connecté avec son menu. -->
+            <AppNotifications />
             <UColorModeButton />
             <AppUserMenu />
           </template>

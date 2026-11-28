@@ -31,7 +31,8 @@
             label="Tarifs"
             class="max-sm:hidden"
           />
-          <!-- Même place et même bouton que dans la barre de la gestion : juste avant le compte. -->
+          <!-- Même place et mêmes boutons que dans la barre de la gestion : juste avant le compte. -->
+          <AppNotifications />
           <UColorModeButton />
           <AppUserMenu />
         </template>
