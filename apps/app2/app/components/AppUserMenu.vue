@@ -47,8 +47,12 @@ const avatar = computed(() => ({
   alt: user.value?.pseudo || user.value?.email || '',
 }))
 
+const { desabonnerAvantDeconnexion } = usePushNotifications()
+
 async function logout() {
   try {
+    // Avant de fermer la session : cet appareil ne doit plus recevoir les notifications du compte.
+    await desabonnerAvantDeconnexion()
     await $fetch('/api/auth/logout', { method: 'POST' })
   } finally {
     await clear()

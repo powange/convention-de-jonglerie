@@ -72,6 +72,7 @@ model User {
   volunteerAutoAssignPlans           VolunteerAutoAssignPlan[]           @relation("VolunteerAutoAssignPlan_createdBy")
   volunteerComments                  VolunteerComment[]
   notifications                      Notification[]
+  abonnementsPush                    PushSubscription[]
   organizers                         Organizer[]
   // Stock (layer `stock`) : responsables de retrait et de retour d'un article, réservations.
   stockPickupResponsibilities        StockItem[]                         @relation("StockPickupResponsible")
@@ -351,6 +352,26 @@ model Notification {
   @@index([createdAt])
   @@index([category])
   @@index([entityType, entityId])
+}
+
+/// Un appareil abonné aux notifications push (Web Push standard) : ce que le navigateur rend à
+/// `pushManager.subscribe`. Un abonnement par appareil ET par compte ; un abonnement refusé par le
+/// service de push (404 / 410 : désinstallé, permission retirée) est supprimé à l'envoi suivant.
+model PushSubscription {
+  id            Int       @id @default(autoincrement())
+  userId        Int
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// L'adresse du service de push du navigateur (Google, Mozilla, Apple…), unique par appareil.
+  endpoint      String    @unique @db.VarChar(700)
+  /// Clés de chiffrement du contenu, propres à l'abonnement.
+  p256dh        String    @db.VarChar(255)
+  auth          String    @db.VarChar(255)
+  /// Le navigateur, pour reconnaître l'appareil dans la liste (informatif).
+  userAgent     String?   @db.VarChar(500)
+  createdAt     DateTime  @default(now())
+  lastSuccessAt DateTime?
+
+  @@index([userId])
 }
 
 /// Un organisateur de Flowvent (base des co-organisateurs). Le layer bénévoles ne lit que
