@@ -27,7 +27,8 @@ const { loggedIn, user, clear } = useUserSession()
 const { entreeDeMenuDisponible, installer: installerLApplication } = useInvitePwa()
 const applicationEvenement = useApplicationEvenement()
 const route = useRoute()
-// Sur la page d'un événement, le navigateur propose d'installer l'application de CET événement.
+// Sur la page d'un événement, le navigateur propose d'installer l'application de CET événement ;
+// ailleurs, rien ne s'installe.
 const surUnEvenement = computed(() => !!evenementDuChemin(route.path))
 const toast = useToast()
 
@@ -79,13 +80,12 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
   ],
   // Installer l'application, quand le navigateur le propose : le bandeau ne se présente qu'une
   // fois puis se tait sept jours, et ce geste volontaire doit rester possible (comme dans app1).
-  ...(entreeDeMenuDisponible.value
+  // Sur la page d'un événement seulement : Flowvent lui-même ne s'installe plus.
+  ...(entreeDeMenuDisponible.value && surUnEvenement.value
     ? [
         [
           {
-            label: surUnEvenement.value
-              ? "Installer l'application de l'événement"
-              : "Installer l'application",
+            label: "Installer l'application de l'événement",
             icon: 'i-heroicons-arrow-down-tray',
             onSelect: () => installerLApplication(),
           },

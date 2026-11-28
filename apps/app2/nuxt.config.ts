@@ -96,7 +96,7 @@ export default defineNuxtConfig({
   // Icônes : même déclaration qu'app1. Les PNG et l'ICO sortent de `npm run favicons` (générateur
   // commun, scripts/favicons/) ; `favicon.svg`, tiré d'AppLogo, suit le mode sombre du navigateur.
   // `?v=` : Cloudflare garde les fichiers publics 4 h, l'incrémenter après une régénération. Le
-  // manifeste n'est PAS déclaré ici : `app.vue` choisit celui de Flowvent ou celui de l'événement.
+  // manifeste n'est PAS déclaré ici : `app.vue` déclare celui de l'événement, sur ses pages seulement.
   app: {
     buildAssetsDir,
 
